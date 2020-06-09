@@ -2,7 +2,18 @@
 
     <ot-extension-indicators-message></ot-extension-indicators-message>
 
-    <div class="row" ng-show="loadingPortfolio">
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" ng-class="{'active': activeTab == 'portfolio'}"><a ng-click="selectTab('portfolio')"
+                                                                                   aria-controls="portfolio" role="tab">Portfolio</a>
+        </li>
+        <li role="presentation" ng-class="{'active': activeTab == 'projects'}"><a ng-click="selectTab('projects')"
+                                                                                  aria-controls="projects" role="tab">Projects</a>
+        </li>
+    </ul>
+
+    <!-- Portfolio -->
+
+    <div class="row" ng-show="loadingPortfolio && activeTab == 'portfolio'">
         <div class="col-md-12">
             <div class="alert alert-info">
                 <span class="ot-loading-indicator"></span>
@@ -28,7 +39,8 @@
         </div>
     </div>
 
-    <div class="row" ng-if="portfolio && portfolio.projects.length > 0 && portfolio.categoryStats.length == 0">
+    <div class="row" ng-if="portfolio && portfolio.projects.length > 0 && portfolio.categoryStats.length == 0"
+         ng-show="activeTab == 'portfolio'">
         <div class="col-md-12">
             <div class="alert alert-info">
                 This portfolio does not contain any category.
@@ -41,7 +53,8 @@
         </div>
     </div>
 
-    <table ng-if="portfolio && portfolio.projects.length > 0 && portfolio.categoryStats.length > 0" class="table table-striped">
+    <table ng-if="portfolio && portfolio.projects.length > 0 && portfolio.categoryStats.length > 0"
+           ng-show="activeTab == 'portfolio'" class="table table-striped">
         <thead>
         <tr>
             <td>
@@ -61,7 +74,9 @@
                 <ot-extension-indicators-status status="categoryStats" size="md"></ot-extension-indicators-status>
             </td>
             <td ng-repeat-end>
-                <p><b><a href="#/extension/indicators/portfolios/{{portfolio.id}}/category/{{categoryStats.category.id}}">{{categoryStats.category.name}}</a></b></p>
+                <p><b><a
+                        href="#/extension/indicators/portfolios/{{portfolio.id}}/category/{{categoryStats.category.id}}">{{categoryStats.category.name}}</a></b>
+                </p>
                 <ot-extension-indicators-stats-summary
                         stats="categoryStats.stats"
                         previous-stats="categoryStats.previousStats"
@@ -72,16 +87,83 @@
         <tbody>
         <tr ng-repeat="project in portfolio.projects">
             <td>
-                <a href="#/extension/indicators/project-indicators/{{project.id}}" title="Manage the project indicators for the {{project.name}} project">{{project.name}}</a>
+                <a href="#/extension/indicators/project-indicators/{{project.id}}"
+                   title="Manage the project indicators for the {{project.name}} project">{{project.name}}</a>
             </td>
             <td ng-repeat-start="projectCategory in project.projectIndicators.categories" style="width: 36px;">
-                <ot-extension-indicators-status status="projectCategory.stats" size="md"></ot-extension-indicators-status>
+                <ot-extension-indicators-status status="projectCategory.stats"
+                                                size="md"></ot-extension-indicators-status>
             </td>
             <td ng-repeat-end>
                 <ot-extension-indicators-stats-summary
                         stats="projectCategory.categoryStats.stats"
                         previous-stats="projectCategory.categoryStats.previousStats"
                         item="project and category"></ot-extension-indicators-stats-summary>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Project portfolios -->
+
+    <div class="row" ng-show="loadingPortfolioProjects && activeTab == 'projects'">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the portfolio projects overview...
+            </div>
+        </div>
+    </div>
+
+    <br ng-show="activeTab == 'projects'"/>
+
+    <!-- Ideally, we'd like a directive to not duplicate the code in view.home.tpl.html, but here,
+         we need a static view, without the possibility to select / unselect favourites -->
+    <table class="ot-home-projects" ng-if="projects.length > 0" ng-show="activeTab == 'projects'">
+        <tbody>
+        <tr ng-repeat="project in projects">
+            <td ng-class="{'ot-entity-disabled': project.disabled}">
+                <a href="#/project/{{project.id}}">{{project.name}}</a>
+                <ot-entity-embedded-decorations decorations="project.decorations"></ot-entity-embedded-decorations>
+            </td>
+            <td>
+                <div class="ot-home-branch" ng-if="project.branches.length == 0">
+                    <span class="ot-description">
+                        <span class="fa fa-ban" title="No branch on this project"></span>
+                        No branch
+                    </span>
+                </div>
+                <div class="ot-home-branch"
+                     ng-repeat="branch in project.branches">
+                     <span class="ot-home-branch-name ot-decoration-list"
+                           ng-class="{'ot-entity-disabled': branch.disabled}">
+                         <a href="#/branch/{{branch.id}}">{{branch.name}}</a>
+                         <ot-entity-embedded-decorations
+                                 decorations="branch.decorations"></ot-entity-embedded-decorations>
+                     </span>
+                    <span ng-if="branch.latestPromotions.length > 0" class="ot-home-branch-promotion">
+                         <a href="#/promotionLevel/{{branch.latestPromotions[0].promotionRuns[0].promotionLevel.id}}">
+                             <ot-entity-image
+                                     entity="branch.latestPromotions[0].promotionRuns[0].promotionLevel"></ot-entity-image>
+                             {{branch.latestPromotions[0].promotionRuns[0].promotionLevel.name}}
+                        </a>
+                        <span class="fa fa-arrow-right"></span>
+                        <a href="#/build/{{branch.latestPromotions[0].id}}">{{branch.latestPromotions[0].name}}</a>
+                     </span>
+                    <span ng-if="branch.latestPromotions.length == 0 && branch.latestBuild.length > 0"
+                          class="ot-home-branch-promotion">
+                        <span class="ot-description">Latest</span>
+                        <span class="fa fa-arrow-right"></span>
+                        <a href="#/build/{{branch.latestBuild[0].id}}">{{branch.latestBuild[0].name}}</a>
+                     </span>
+                    <span ng-if="branch.latestPromotions.length == 0 && branch.latestBuild.length == 0"
+                          class="ot-home-branch-promotion">
+                                <span class="fa fa-ban"></span>
+                                <span class="ot-description">
+                                    No build yet
+                                </span>
+                            </span>
+                </div>
             </td>
         </tr>
         </tbody>

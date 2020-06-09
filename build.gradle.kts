@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.allopen.gradle.AllOpenExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.redline_rpm.header.Os
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
+import java.time.Duration
 
 buildscript {
     repositories {
@@ -234,6 +235,8 @@ configure(exportedProjects) p@ {
     }
 
     configure<NexusPublishExtension> {
+        clientTimeout.set(Duration.ofMinutes(10))
+        connectTimeout.set(Duration.ofMinutes(10))
         repositories {
             sonatype {
                 username.set(ossrhUsername)

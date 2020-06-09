@@ -1015,6 +1015,7 @@ angular.module('ontrack.extension.indicators', [
     .controller('PortfolioViewCtrl', function ($stateParams, $scope, $http, $location, ot, otGraphqlService, otAlertService) {
         const portfolioId = $stateParams.portfolioId;
         $scope.loadingPortfolio = true;
+        $scope.loadingPortfolioProjects = true;
 
         const view = ot.view();
         view.title = "Portfolio";
@@ -1093,12 +1094,72 @@ angular.module('ontrack.extension.indicators', [
             duration: undefined
         };
 
+        // Same than in view.home.js for the project favourites
+        const queryProjects = `
+            query LoadPortfolioProjects($id: String!) {
+                indicatorPortfolios(id: $id) {
+                    projects {
+                        id
+                        name
+                        disabled
+                        decorations {
+                          ...decorationContent
+                        }
+                        links {
+                          _unfavourite
+                        }
+                        branches(useModel: true) {
+                          id
+                          name
+                          type
+                          disabled
+                          decorations {
+                            ...decorationContent
+                          }
+                          latestPromotions: builds(lastPromotions: true, count: 1) {
+                            id
+                            name
+                            promotionRuns {
+                              promotionLevel {
+                                id
+                                name
+                                image
+                                _image
+                              }
+                            }
+                          }
+                          latestBuild: builds(count: 1) {
+                            id
+                            name
+                          }
+                        }
+                    }
+                }
+            }
+            
+            fragment decorationContent on Decoration {
+              decorationType
+              error
+              data
+              feature {
+                id
+              }
+            }
+        `;
+
         $scope.pageModel = {
             duration: undefined
         };
 
+        $scope.activeTab = 'portfolio';
+
+        $scope.selectTab = (id) => {
+            $scope.activeTab = id;
+        };
+
         const loadPortfolio = () => {
             $scope.loadingPortfolio = true;
+            $scope.loadingPortfolioProjects = true;
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.portfolio = data.indicatorPortfolios[0];
                 view.title = `Portfolio: ${$scope.portfolio.name}`;
@@ -1152,8 +1213,16 @@ angular.module('ontrack.extension.indicators', [
                     }
                 });
 
+                // OK for now
+                $scope.loadingPortfolio = false;
+
+                // Project overview
+                return otGraphqlService.pageGraphQLCall(queryProjects, {id: portfolioId});
+            }).then((data) => {
+                $scope.projects = data.indicatorPortfolios[0].projects;
             }).finally(() => {
                 $scope.loadingPortfolio = false;
+                $scope.loadingPortfolioProjects = false;
             });
         };
 
