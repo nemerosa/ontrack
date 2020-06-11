@@ -294,6 +294,10 @@ angular.module('ontrack.extension.indicators', [
 
         let viewInitialized = false;
 
+        $scope.filtering = {
+            showAllCategories: false
+        };
+
         const loadIndicators = () => {
             $scope.loadingIndicators = true;
             otGraphqlService.pageGraphQLCall(query, queryVars).then((data) => {
@@ -302,8 +306,19 @@ angular.module('ontrack.extension.indicators', [
                 $scope.portfolios = $scope.project.indicatorPortfolios;
                 $scope.projectIndicators = $scope.project.projectIndicators;
 
+                // By default, select all portfolios
+                $scope.portfolios.forEach(portfolio => {
+                    portfolio.selected = true;
+                });
+
+                // If no portfolio, show all categories by default
+                if ($scope.portfolios.length === 0) {
+                    $scope.filtering.showAllCategories = true;
+                }
+
                 // Getting the list of portfolios per categories
                 $scope.projectIndicators.categories.forEach((categoryIndicators) => {
+                    categoryIndicators.unfolded = true;
                     const categoryId = categoryIndicators.category.id;
                     // Gets the list of portfolios matching this category
                     categoryIndicators.portfolios = $scope.portfolios.filter((portfolio) =>
@@ -330,12 +345,23 @@ angular.module('ontrack.extension.indicators', [
 
         loadIndicators();
 
+        $scope.isCategoryIndicatorsSelected = (categoryIndicators) =>
+            $scope.filtering.showAllCategories || categoryIndicators.portfolios.some((portfolio) => portfolio.selected);
+
         $scope.editIndicator = (indicator) => {
             otExtensionIndicatorsService.editIndicator(indicator).then(loadIndicators);
         };
 
         $scope.deleteIndicator = (indicator) => {
             otExtensionIndicatorsService.deleteIndicator(indicator).then(loadIndicators);
+        };
+
+        $scope.unfold = (categoryIndicators) => {
+            categoryIndicators.unfolded = true;
+        };
+
+        $scope.fold = (categoryIndicators) => {
+            categoryIndicators.unfolded = false;
         };
 
     })
