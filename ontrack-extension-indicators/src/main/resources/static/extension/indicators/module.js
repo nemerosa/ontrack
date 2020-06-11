@@ -227,6 +227,14 @@ angular.module('ontrack.extension.indicators', [
               projects(id: $project) {
                 id
                 name
+                indicatorPortfolios {
+                    id
+                    name
+                    label {
+                      color
+                      foregroundColor
+                    }
+                }
                 projectIndicators {
                   categories {
                     category {
@@ -287,6 +295,7 @@ angular.module('ontrack.extension.indicators', [
             otGraphqlService.pageGraphQLCall(query, queryVars).then((data) => {
 
                 $scope.project = data.projects[0];
+                $scope.portfolios = $scope.project.indicatorPortfolios;
                 $scope.projectIndicators = $scope.project.projectIndicators;
 
                 if (!viewInitialized) {
