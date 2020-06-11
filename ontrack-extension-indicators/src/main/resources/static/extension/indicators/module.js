@@ -230,6 +230,9 @@ angular.module('ontrack.extension.indicators', [
                 indicatorPortfolios {
                     id
                     name
+                    categories {
+                        id
+                    }
                     label {
                       color
                       foregroundColor
@@ -238,6 +241,7 @@ angular.module('ontrack.extension.indicators', [
                 projectIndicators {
                   categories {
                     category {
+                      id
                       name
                     }
                     indicators {
@@ -297,6 +301,15 @@ angular.module('ontrack.extension.indicators', [
                 $scope.project = data.projects[0];
                 $scope.portfolios = $scope.project.indicatorPortfolios;
                 $scope.projectIndicators = $scope.project.projectIndicators;
+
+                // Getting the list of portfolios per categories
+                $scope.projectIndicators.categories.forEach((categoryIndicators) => {
+                    const categoryId = categoryIndicators.category.id;
+                    // Gets the list of portfolios matching this category
+                    categoryIndicators.portfolios = $scope.portfolios.filter((portfolio) =>
+                        portfolio.categories.find(category => category.id === categoryId)
+                    );
+                });
 
                 if (!viewInitialized) {
                     // Title

@@ -31,7 +31,19 @@
         </thead>
         <tbody ng-repeat="categoryIndicators in projectIndicators.categories">
         <tr class="info">
-            <th colspan="6">{{categoryIndicators.category.name}}</th>
+            <th colspan="6">
+                {{categoryIndicators.category.name}}
+                <span ng-repeat="portfolio in categoryIndicators.portfolios" class="ot-project-label-box">
+                    <a href="#/extension/indicators/portfolios/{{portfolio.id}}">
+                        <span class="ot-project-label-box-square"
+                              ng-style="{
+                                'background-color': portfolio.label.color + ' !important;',
+                                'color': portfolio.label.foregroundColor + ' !important;'
+                              }"></span>
+                        <span class="ot-project-label-box-text">{{portfolio.name}}</span>
+                    </a>
+                </span>
+            </th>
         </tr>
         <tr class="text-muted">
             <td>Type</td>
