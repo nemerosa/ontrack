@@ -208,6 +208,15 @@ pipeline {
                 }
                 always {
                     sh '''
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose  \\
+                            --project-name local \\
+                            --file docker-compose.yml \\
+                            --file docker-compose-jacoco.yml \\
+                            logs ontrack > docker-compose-acceptance-ontrack.log
+                    '''
+                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance.log", allowEmptyArchive: true)
+                    sh '''
                         rm -rf build/acceptance
                         mkdir -p build
                         cp -r ontrack-acceptance/src/main/compose/build build/acceptance
