@@ -126,6 +126,19 @@ class IndicatorPortfolioServiceImpl(
         return portfolio
     }
 
+    override fun findPortfolioByProject(project: Project): List<IndicatorPortfolio> {
+        // Gets the labels for this project
+        val labels = projectLabelManagementService.getLabelsForProject(project).map { it.id }.toSet()
+        // Gets all portfolios and filter on label
+        return if (labels.isEmpty()) {
+            emptyList()
+        } else {
+            findAll().filter { portfolio ->
+                portfolio.label != null && portfolio.label in labels
+            }
+        }
+    }
+
     companion object {
         private val STORE = IndicatorPortfolio::class.java.name
         private val STORE_PORTFOLIO_OF_PORTFOLIOS = IndicatorPortfolioOfPortfolios::class.java.name
