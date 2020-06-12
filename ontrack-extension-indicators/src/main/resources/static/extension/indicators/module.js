@@ -604,14 +604,17 @@ angular.module('ontrack.extension.indicators', [
             }).then(loadPortfolios);
         };
 
-        $scope.selectTrend = () => {
-            if ($scope.pageModel.trendDuration) {
-                queryVariables.trendDuration = Number($scope.pageModel.trendDuration);
-            } else {
-                queryVariables.trendDuration = undefined;
+        $scope.$watch('pageModel.trendDuration', (newValue, oldValue) => {
+            if (newValue !== oldValue) {
+                if ($scope.pageModel.trendDuration) {
+                    queryVariables.trendDuration = Number($scope.pageModel.trendDuration);
+                } else {
+                    queryVariables.trendDuration = undefined;
+                }
+                loadPortfolios();
             }
-            loadPortfolios();
-        };
+        });
+
     })
     .config(function ($stateProvider) {
         $stateProvider.state('portfolio-global-indicators', {
@@ -1276,6 +1279,17 @@ angular.module('ontrack.extension.indicators', [
 
         loadPortfolio();
 
+        $scope.$watch('pageModel.duration', (newValue, oldValue) => {
+            if (newValue !== oldValue) {
+                if ($scope.pageModel.duration) {
+                    queryVariables.duration = Number($scope.pageModel.duration);
+                } else {
+                    queryVariables.duration = undefined;
+                }
+                loadPortfolio();
+            }
+        });
+
         $scope.selectTrend = () => {
             if ($scope.pageModel.duration) {
                 queryVariables.duration = Number($scope.pageModel.duration);
@@ -1375,8 +1389,7 @@ angular.module('ontrack.extension.indicators', [
             templateUrl: 'extension/indicators/directive.indicators-trend-selection.tpl.html',
             scope: {
                 selectId: '@',
-                model: '=',
-                onTrendChange: '&'
+                model: '='
             }
         };
     })
