@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import net.nemerosa.ontrack.graphql.support.simpleMutation
-import net.nemerosa.ontrack.graphql.support.unitMutation
+import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescriptionState
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class ProjectMutations(
         private val structureService: StructureService
-) : MutationProvider {
+) : TypedMutationProvider() {
 
     override val mutations: List<Mutation> = listOf(
             /**
