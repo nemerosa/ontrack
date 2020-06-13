@@ -14,7 +14,7 @@ angular.module('ot.service.action', [
             // Gets the form URI
             const uri = action.links.form.uri;
             // Form configuration
-            var formConfig = {
+            const formConfig = {
                 uri: uri,
                 title: action.links.form.description,
                 submit: function (data) {

@@ -13,7 +13,7 @@
         <div class="col-md-12 ot-view-title">
             <span id="ot-view-title">{{project.name}}</span>
             <ot-entity-embedded-decorations decorations="project.decorations"></ot-entity-embedded-decorations>
-            <div ng-if="project.description" class="ot-description" ng-bind-html="project.annotatedDescription"></div>
+            <div ng-if="project.annotatedDescription" class="ot-description" ng-bind-html="project.annotatedDescription"></div>
             <div ng-if="project.labels.length > 0" class="ot-project-label-container">
                 <ot-project-label label="label" ng-repeat="label in project.labels" action="projectLabelFilter(label)"></ot-project-label>
                 <span ng-if="project.links._labels" class="fa fa-pencil" title="Edition of labels" ng-click="editProjectLabels()"></span>
