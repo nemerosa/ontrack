@@ -18,25 +18,25 @@ class GQLTypeUIActionLink : GQLType {
                          having an uri, a HTTP method (like `PUT`
                          or `POST`) and a type.
                          The  type identifies the type of action,
-                         like "download", "create", "update", "delete", etc.""".trimMargin())
+                         like "download", "form", "upload", etc.""".trimMargin())
                     .field {
-                        it.name(UIActionLink<*>::type.name)
-                                .description("Link type")
-                                .type(GraphQLString)
-                                .dataFetcher { env ->
-                                    env.getSource<UIActionLinkContext<*>>().link.type
-                                }
-                    }
-                    .field {
-                        it.name(UIActionLink<*>::description.name)
+                        it.name("description")
                                 .description("Link description")
-                                .type(GraphQLString)
+                                .type(nullableType(GraphQLString, false))
                                 .dataFetcher { env ->
                                     env.getSource<UIActionLinkContext<*>>().link.description
                                 }
                     }
                     .field {
-                        it.name(UIActionLinkContext<*>::enabled.name)
+                        it.name("method")
+                                .description("HTTP method to use")
+                                .type(nullableType(GraphQLString, false))
+                                .dataFetcher { env ->
+                                    env.getSource<UIActionLinkContext<*>>().link.method.name
+                                }
+                    }
+                    .field {
+                        it.name("enabled")
                                 .description("Is this end point enabled, according to authorizations and state.")
                                 .type(nullableType(Scalars.GraphQLBoolean, false))
                                 .dataFetcher { env ->
@@ -44,9 +44,9 @@ class GQLTypeUIActionLink : GQLType {
                                 }
                     }
                     .field {
-                        it.name(UIActionLink<*>::uri.name)
+                        it.name("uri")
                                 .description("End point URI")
-                                .type(Scalars.GraphQLString)
+                                .type(GraphQLString)
                                 .dataFetcher { env ->
                                     env.getSource<UIActionLinkContext<*>>().uri?.toString()
                                 }

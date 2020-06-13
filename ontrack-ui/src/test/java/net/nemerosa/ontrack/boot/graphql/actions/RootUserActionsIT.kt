@@ -13,6 +13,7 @@ class RootUserActionsIT: AbstractQLKTITSupport() {
                 user {
                     actions {
                         createProject {
+                            description
                             links {
                                 form {
                                     method

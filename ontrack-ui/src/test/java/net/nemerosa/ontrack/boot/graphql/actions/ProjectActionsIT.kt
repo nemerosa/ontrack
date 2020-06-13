@@ -15,8 +15,10 @@ class ProjectActionsIT : AbstractQLKTITSupport() {
                      projects(id: $id) {
                         actions {
                             updateProject {
+                                description
                                 links {
                                     form {
+                                        description
                                         method
                                         uri
                                     }
@@ -24,12 +26,15 @@ class ProjectActionsIT : AbstractQLKTITSupport() {
                                 mutation
                             }
                             deleteProject {
+                                description
                                 mutation
                             }
                             disableProject {
+                                description
                                 mutation
                             }
                             enableProject {
+                                description
                                 mutation
                             }
                         }
@@ -39,21 +44,26 @@ class ProjectActionsIT : AbstractQLKTITSupport() {
                 assertEquals(
                         mapOf(
                                 "updateProject" to mapOf(
+                                        "description" to "Updating the project",
                                         "links" to mapOf(
                                                 "form" to mapOf(
+                                                        "description" to "Update form",
                                                         "method" to "GET",
-                                                        "uri" to "uri"
+                                                        "uri" to "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#saveProjectForm:$id"
                                                 )
                                         ),
                                         "mutation" to "updateProject"
                                 ),
                                 "deleteProject" to mapOf(
+                                        "description" to "Deleting the project",
                                         "mutation" to "deleteProject"
                                 ),
                                 "disableProject" to mapOf(
+                                        "description" to "Disabling the project",
                                         "mutation" to "disableProject"
                                 ),
                                 "enableProject" to mapOf(
+                                        "description" to "Enabling the project",
                                         "mutation" to "enableProject"
                                 )
                         ).asJson(),

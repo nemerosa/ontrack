@@ -1,14 +1,16 @@
 package net.nemerosa.ontrack.graphql.schema.actions
 
+import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLObjectType
+import net.nemerosa.ontrack.graphql.support.nullableType
 import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
 
 @Component
 class UIActionsGraphQLServiceImpl(
-        private val uiAction: GQLTypeUIAction,
-        actionsProviders: List<UIActionsProvider<*>>
+        actionsProviders: List<UIActionsProvider<*>>,
+        private val uiActionLink: GQLTypeUIActionLink
 ) : UIActionsGraphQLService {
 
     /**
@@ -18,7 +20,9 @@ class UIActionsGraphQLServiceImpl(
 
     override fun <T : Any> actionsField(type: KClass<T>): GraphQLFieldDefinition? {
         // Collects the actions providers for this type
-        val actionsProviders = actionsIndex[type] ?: return null
+        @Suppress("UNCHECKED_CAST")
+        val actionsProviders: List<UIActionsProvider<T>> =
+                (actionsIndex[type] ?: return null) as List<UIActionsProvider<T>>
         // Creates a type to hold all actions
         val name = type.java.simpleName
         val typeName = "${name}Actions"
@@ -29,7 +33,7 @@ class UIActionsGraphQLServiceImpl(
         // One field per action (and associated fetcher)
         actionsProviders.forEach { actionsProvider ->
             actionsProvider.actions.forEach { action ->
-                gqlType.actionField(action)
+                gqlType.actionField(type, action)
             }
         }
         // Authorizations field
@@ -41,16 +45,76 @@ class UIActionsGraphQLServiceImpl(
                 .build()
     }
 
-    private fun <T : Any> GraphQLObjectType.Builder.actionField(action: UIAction<T>) {
+    private fun <T : Any> GraphQLObjectType.Builder.actionField(type: KClass<T>, action: UIAction<T>) {
         field { f ->
             f.name(action.name)
                     .description(action.description)
-                    .type(uiAction.typeRef)
-                    .dataFetcher { env ->
-                        val t: T? = env.getSource()
-                        UIActionContext(action, t)
-                    }
+                    .type(createUIActionType(type, action))
+                    .dataFetcher { it.getSource<T?>() }
         }
     }
+
+    private fun <T : Any> createUIActionType(type: KClass<T>, action: UIAction<T>): GraphQLObjectType =
+            GraphQLObjectType.newObject()
+                    .name("${type.java.simpleName}Action${action.name.capitalize()}")
+                    .description(action.description)
+                    // Description field
+                    .field {
+                        it.name("description")
+                                .description("Description of the action")
+                                .type(nullableType(GraphQLString, false))
+                                .dataFetcher { action.description }
+                    }
+                    // Links field
+                    .apply {
+                        if (action.links.isNotEmpty()) {
+                            field {
+                                it.name("links")
+                                        .description("Links attached to this action")
+                                        .type(createUIActionLinksType(type, action))
+                                        .dataFetcher { it.getSource<T?>() }
+                            }
+                        }
+                    }
+                    // Mutation field
+                    .apply {
+                        if (action.mutation != null) {
+                            field {
+                                it.name("mutation")
+                                        .description("Mutation associated with this action")
+                                        .type(GraphQLString)
+                                        .dataFetcher { env ->
+                                            val t: T? = env.getSource()
+                                            if (t != null && action.mutation.enabled(t)) {
+                                                // Name of the mutation
+                                                action.mutation.name
+                                            } else {
+                                                null
+                                            }
+                                        }
+                            }
+                        }
+                    }
+                    // OK
+                    .build()
+
+    private fun <T : Any> createUIActionLinksType(type: KClass<T>, action: UIAction<T>): GraphQLObjectType =
+            GraphQLObjectType.newObject()
+                    .name("${type.java.simpleName}Action${action.name.capitalize()}Links")
+                    .description("Links attached to the ${action.name} action on the ${type.simpleName} type.")
+                    .apply {
+                        action.links.forEach { link ->
+                            field {
+                                it.name(link.type)
+                                        .description(link.description)
+                                        .type(uiActionLink.typeRef)
+                                        .dataFetcher { env ->
+                                            val t: T? = env.getSource()
+                                            UIActionLinkContext(link, t)
+                                        }
+                            }
+                        }
+                    }
+                    .build()
 
 }
