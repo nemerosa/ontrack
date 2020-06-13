@@ -74,6 +74,33 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
     }
 
     @Test
+    fun `Creating a project with an invalid name`() {
+        asAdmin {
+            val data = run("""
+                mutation CreateProject(${'$'}name: String!) {
+                    createProject(input: {name: ${'$'}name}) {
+                        project {
+                            id
+                            name
+                        }
+                        errors {
+                            message
+                            exception
+                            location
+                        }
+                    }
+                }
+            """, mapOf("name" to "white space"))
+            // Checks the errors
+            val error = data["createProject"]["errors"][0]
+            assertEquals("The name can only have letters, digits, dots (.), dashes (-) or underscores (_).", error["message"].asText())
+            assertEquals("net.nemerosa.ontrack.graphql.support.MutationInputValidationException", error["exception"].asText())
+            assertEquals("name", error["location"].asText())
+            assertTrue(data["createProject"]["project"].isNullOrNullNode(), "Project not returned")
+        }
+    }
+
+    @Test
     fun `Updating a project's name`() {
         asAdmin {
             project {

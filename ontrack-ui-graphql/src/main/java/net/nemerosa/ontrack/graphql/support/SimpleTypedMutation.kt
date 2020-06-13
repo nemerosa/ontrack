@@ -5,6 +5,8 @@ import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLInputObjectField
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter.asInputFields
+import javax.validation.ConstraintViolation
+import javax.validation.Validation
 import kotlin.reflect.KClass
 
 fun <I : Any, T : Any> simpleMutation(
@@ -54,7 +56,7 @@ private class SimpleTypedMutation<I : Any, T : Any>(
         outputDescription: String,
         outputType: KClass<T>,
         private val fetcher: (I) -> T
-) : Mutation {
+) : ValidatingInputMutation<I>() {
 
     override val inputFields: List<GraphQLInputObjectField> = asInputFields(input)
 
@@ -64,7 +66,7 @@ private class SimpleTypedMutation<I : Any, T : Any>(
 
     override fun fetch(env: DataFetchingEnvironment): Any {
         val input = mutationInput(input, env)
-        // TODO Validate
+        validateInput(input)
         return mapOf(outputName to fetcher(input))
     }
 }
@@ -75,16 +77,31 @@ private class UnitTypedMutation<I : Any>(
         private val input: KClass<I>,
         override val outputFields: List<GraphQLFieldDefinition>,
         private val fetcher: (I) -> Unit
-) : Mutation {
+) : ValidatingInputMutation<I>() {
 
     override val inputFields: List<GraphQLInputObjectField> = asInputFields(input)
 
     override fun fetch(env: DataFetchingEnvironment): Any {
         val input = mutationInput(input, env)
-        // TODO Validate the input
-        // Runs
+        validateInput(input)
         fetcher(input)
         // Nothing to return
         return Unit
     }
+}
+
+/**
+ * [Mutation] which can validate an input
+ */
+private abstract class ValidatingInputMutation<I : Any> : Mutation {
+
+    private val validator = Validation.buildDefaultValidatorFactory().validator
+
+    protected fun validateInput(input: I) {
+        val violations: Set<ConstraintViolation<I>> = validator.validate(input)
+        if (violations.isNotEmpty()) {
+            throw MutationInputValidationException(violations)
+        }
+    }
+
 }

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.schema.*
 import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.common.UserException
+import net.nemerosa.ontrack.graphql.support.MutationInputValidationException
 import org.springframework.stereotype.Service
 
 @Service
@@ -80,7 +81,11 @@ class GraphqlSchemaServiceImpl(
         return try {
             mutation.fetch(env)
         } catch (ex: Exception) {
-            if (ex is UserException) {
+            if (ex is MutationInputValidationException) {
+                mapOf("errors" to ex.violations.map { cv ->
+                    MutationInputValidationException.asUserError(cv)
+                })
+            } else if (ex is UserException) {
                 val exception = ex::class.java.name
                 val error = UserError(
                         message = ex.message ?: exception,

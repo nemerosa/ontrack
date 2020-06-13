@@ -46,7 +46,7 @@ data class Branch(
                         ID.NONE,
                         nameDescription.name,
                         nameDescription.description,
-                        nameDescription.isDisabled,
+                        nameDescription.isDisabled ?: false,
                         project,
                         Signature.anonymous()
                 )
@@ -75,6 +75,6 @@ data class Branch(
 
     fun update(form: NameDescriptionState): Branch =
             of(project, form)
-                    .withId(id).withDisabled(form.isDisabled)
+                    .withId(id).withDisabled(form.isDisabled ?: false)
 
 }

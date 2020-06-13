@@ -12,5 +12,5 @@ data class NameDescriptionState(
         val name: String,
         val description: String?,
         @get:JsonProperty("disabled")
-        val isDisabled: Boolean
+        val isDisabled: Boolean?
 )
