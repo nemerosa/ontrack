@@ -1,96 +1,74 @@
-package net.nemerosa.ontrack.service;
+package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusChangeForbiddenException;
-import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusNotFoundException;
-import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusUnknownDependencyException;
-import net.nemerosa.ontrack.model.structure.ValidationRunStatusID;
-import net.nemerosa.ontrack.model.structure.ValidationRunStatusService;
-import net.nemerosa.ontrack.model.support.StartupService;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static net.nemerosa.ontrack.model.structure.ValidationRunStatusID.*;
+import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusChangeForbiddenException
+import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusNotFoundException
+import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusUnknownDependencyException
+import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
+import net.nemerosa.ontrack.model.structure.ValidationRunStatusService
+import net.nemerosa.ontrack.model.support.StartupService
+import org.apache.commons.lang3.StringUtils
+import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
-public class ValidationRunStatusServiceImpl implements ValidationRunStatusService, StartupService {
+class ValidationRunStatusServiceImpl : ValidationRunStatusService, StartupService {
 
-    private final Logger logger = LoggerFactory.getLogger(ValidationRunStatusService.class);
+    private val logger = LoggerFactory.getLogger(ValidationRunStatusService::class.java)
 
-    private final Map<String, ValidationRunStatusID> statuses = new LinkedHashMap<>();
+    private val statuses: MutableMap<String, ValidationRunStatusID> = LinkedHashMap()
 
-    @Override
-    public Collection<ValidationRunStatusID> getValidationRunStatusList() {
-        return statuses.values();
-    }
+    override fun getValidationRunStatusList(): Collection<ValidationRunStatusID> = statuses.values
 
-    @Override
-    public ValidationRunStatusID getValidationRunStatus(String id) {
-        return Optional.ofNullable(statuses.get(id)).orElseThrow(() -> new ValidationRunStatusNotFoundException(id));
-    }
+    override fun getValidationRunStatus(id: String): ValidationRunStatusID =
+            Optional.ofNullable(statuses[id]).orElseThrow { ValidationRunStatusNotFoundException(id) }
 
-    @Override
-    public List<ValidationRunStatusID> getNextValidationRunStatusList(String id) {
-        return getValidationRunStatus(id).getFollowingStatuses().stream()
-                .map(this::getValidationRunStatus)
-                .collect(Collectors.toList());
-    }
+    override fun getNextValidationRunStatusList(id: String): List<ValidationRunStatusID> =
+            getValidationRunStatus(id)
+                    .followingStatuses
+                    .map { getValidationRunStatus(it) }
 
-    @Override
-    public void checkTransition(ValidationRunStatusID from, ValidationRunStatusID to) {
-        if (!from.getFollowingStatuses().contains(to.getId())) {
-            throw new ValidationRunStatusChangeForbiddenException(from.getId(), to.getId());
+    override fun checkTransition(from: ValidationRunStatusID, to: ValidationRunStatusID) {
+        if (!from.followingStatuses.contains(to.id)) {
+            throw ValidationRunStatusChangeForbiddenException(from.id, to.id)
         }
     }
 
-    @Override
-    public String getName() {
-        return "Loading of validation run statuses";
-    }
+    override fun getName(): String = "Loading of validation run statuses"
 
-    @Override
-    public int startupOrder() {
-        return SYSTEM_REGISTRATION;
-    }
+    override fun startupOrder(): Int = StartupService.SYSTEM_REGISTRATION
 
     /**
      * Registers the tree of validation run status ids.
      */
-    @Override
-    public void start() {
-        register(STATUS_PASSED);
-        register(STATUS_FIXED);
-        register(STATUS_DEFECTIVE);
-        register(STATUS_EXPLAINED, FIXED);
-        register(STATUS_INVESTIGATING, DEFECTIVE, EXPLAINED, FIXED);
-        register(STATUS_INTERRUPTED, INVESTIGATING, FIXED);
-        register(STATUS_FAILED, INTERRUPTED, INVESTIGATING, EXPLAINED, DEFECTIVE);
-        register(STATUS_WARNING, INTERRUPTED, INVESTIGATING, EXPLAINED, DEFECTIVE);
-        // TODO Participation from extensions
+    override fun start() {
+        register(ValidationRunStatusID.STATUS_PASSED)
+        register(ValidationRunStatusID.STATUS_FIXED)
+        register(ValidationRunStatusID.STATUS_DEFECTIVE)
+        register(ValidationRunStatusID.STATUS_EXPLAINED, ValidationRunStatusID.FIXED)
+        register(ValidationRunStatusID.STATUS_INVESTIGATING, ValidationRunStatusID.DEFECTIVE, ValidationRunStatusID.EXPLAINED, ValidationRunStatusID.FIXED)
+        register(ValidationRunStatusID.STATUS_INTERRUPTED, ValidationRunStatusID.INVESTIGATING, ValidationRunStatusID.FIXED)
+        register(ValidationRunStatusID.STATUS_FAILED, ValidationRunStatusID.INTERRUPTED, ValidationRunStatusID.INVESTIGATING, ValidationRunStatusID.EXPLAINED, ValidationRunStatusID.DEFECTIVE)
+        register(ValidationRunStatusID.STATUS_WARNING, ValidationRunStatusID.INTERRUPTED, ValidationRunStatusID.INVESTIGATING, ValidationRunStatusID.EXPLAINED, ValidationRunStatusID.DEFECTIVE)
         // Checks the tree
-        for (ValidationRunStatusID statusID : statuses.values()) {
-            for (String nextStatus : statusID.getFollowingStatuses()) {
+        for (statusID in statuses.values) {
+            for (nextStatus in statusID.followingStatuses) {
                 if (!statuses.containsKey(nextStatus)) {
-                    throw new ValidationRunStatusUnknownDependencyException(statusID.getId(), nextStatus);
+                    throw ValidationRunStatusUnknownDependencyException(statusID.id, nextStatus)
                 }
             }
         }
         // Logging
-        for (ValidationRunStatusID statusID : statuses.values()) {
+        for (statusID in statuses.values) {
             logger.info(
                     "[status] {} -> {}",
-                    statusID.getId(),
-                    StringUtils.join(statusID.getFollowingStatuses(), ",")
-            );
+                    statusID.id,
+                    StringUtils.join(statusID.followingStatuses, ",")
+            )
         }
     }
 
-    private void register(ValidationRunStatusID statusID, String... next) {
-        statuses.put(statusID.getId(), statusID.addDependencies(next));
+    private fun register(statusID: ValidationRunStatusID, vararg next: String) {
+        statuses[statusID.id] = statusID.addDependencies(*next)
     }
-
 }

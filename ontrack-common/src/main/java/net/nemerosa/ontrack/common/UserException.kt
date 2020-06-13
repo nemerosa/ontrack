@@ -1,3 +1,7 @@
 package net.nemerosa.ontrack.common
 
-abstract class UserException(message: String) : BaseException(message)
+/**
+ * User exceptions are business exceptions, which can be tracked and will not
+ * rollback a transaction.
+ */
+abstract class UserException(message: String) : Exception(message)
