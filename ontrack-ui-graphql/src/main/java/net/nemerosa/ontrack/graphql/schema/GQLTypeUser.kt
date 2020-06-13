@@ -1,17 +1,16 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.schema.GraphQLObjectType
-import net.nemerosa.ontrack.graphql.schema.authorizations.*
+import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
+import net.nemerosa.ontrack.graphql.schema.actions.actions
 import net.nemerosa.ontrack.graphql.support.objectField
-import net.nemerosa.ontrack.model.security.ProjectCreation
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
-import kotlin.reflect.KClass
 
 @Component
 class GQLTypeUser(
         private val securityService: SecurityService,
-        private val authorizationsService: AuthorizationsService
+        private val uiActionsGraphQLService: UIActionsGraphQLService
 ) : GQLType {
 
     companion object {
@@ -30,8 +29,8 @@ class GQLTypeUser(
                                 securityService.currentAccount?.account
                             }
                     )
-                    // Authorizations
-                    .authorizations(authorizationsService, RootUser::class)
+                    // Actions
+                    .actions(uiActionsGraphQLService, RootUser::class)
                     // OK
                     .build()
 
@@ -44,22 +43,4 @@ class RootUser private constructor() {
     companion object {
         val INSTANCE = RootUser()
     }
-}
-
-/**
- * Root authorizations
- */
-@Component
-class RootUserAuthorizations(
-        private val securityService: SecurityService
-) : Authorizations<RootUser> {
-
-    override val targetType: KClass<RootUser> = RootUser::class
-
-    override val authorizations: List<Authorization<RootUser>> = listOf(
-            Authorization("createProject", "Creating a project") {
-                securityService.isGlobalFunctionGranted<ProjectCreation>()
-            }
-    )
-
 }
