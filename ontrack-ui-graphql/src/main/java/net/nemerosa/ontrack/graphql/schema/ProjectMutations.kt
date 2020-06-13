@@ -2,11 +2,10 @@ package net.nemerosa.ontrack.graphql.schema
 
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.NameDescriptionState
-import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
+import javax.validation.constraints.NotNull
+import javax.validation.constraints.Pattern
 
 @Component
 class ProjectMutations(
@@ -36,7 +35,7 @@ class ProjectMutations(
                         description = input.description ?: project.description,
                         isDisabled = input.disabled ?: project.isDisabled
                 )
-                // TODO Validation of the state
+                validateInput(state)
                 val updatedProject = project.update(state)
                 structureService.saveProject(updatedProject)
                 updatedProject

@@ -20,6 +20,16 @@ abstract class TypedMutationProvider protected constructor(
     constructor() : this(Validation.buildDefaultValidatorFactory().validator)
 
     /**
+     * Validates an input object
+     */
+    protected fun validateInput(input: Any) {
+        val violations: Set<ConstraintViolation<*>> = validator.validate(input)
+        if (violations.isNotEmpty()) {
+            throw MutationInputValidationException(violations)
+        }
+    }
+
+    /**
      * Builds a mutation which does not return anything but allows the declaration of arbitrary fields.
      *
      * Suitable for deletions.
@@ -30,7 +40,7 @@ abstract class TypedMutationProvider protected constructor(
             input: KClass<I>,
             outputFields: List<GraphQLFieldDefinition> = emptyList(),
             fetcher: (I) -> Unit
-    ): Mutation = UnitTypedMutation(validator, name, description, input, outputFields, fetcher)
+    ): Mutation = UnitTypedMutation(name, description, input, outputFields, fetcher)
 
     /**
      * Re-ified version of [unitMutation].
@@ -68,65 +78,47 @@ abstract class TypedMutationProvider protected constructor(
             outputDescription: String,
             outputType: KClass<T>,
             fetcher: (I) -> T
-    ): Mutation = SimpleTypedMutation(validator, name, description, input, outputName, outputDescription, outputType, fetcher)
+    ): Mutation = SimpleTypedMutation(name, description, input, outputName, outputDescription, outputType, fetcher)
 
-}
+    inner class SimpleTypedMutation<I : Any, T : Any>(
+            override val name: String,
+            override val description: String,
+            private val input: KClass<I>,
+            private val outputName: String,
+            outputDescription: String,
+            outputType: KClass<T>,
+            private val fetcher: (I) -> T
+    ) : Mutation {
 
-class SimpleTypedMutation<I : Any, T : Any>(
-        validator: Validator,
-        override val name: String,
-        override val description: String,
-        private val input: KClass<I>,
-        private val outputName: String,
-        outputDescription: String,
-        outputType: KClass<T>,
-        private val fetcher: (I) -> T
-) : ValidatingInputMutation<I>(validator) {
+        override val inputFields: List<GraphQLInputObjectField> = asInputFields(input)
 
-    override val inputFields: List<GraphQLInputObjectField> = asInputFields(input)
+        override val outputFields: List<GraphQLFieldDefinition> = listOf(
+                objectField(outputType, outputName, outputDescription)
+        )
 
-    override val outputFields: List<GraphQLFieldDefinition> = listOf(
-            objectField(outputType, outputName, outputDescription)
-    )
-
-    override fun fetch(env: DataFetchingEnvironment): Any {
-        val input = mutationInput(input, env)
-        validateInput(input)
-        return mapOf(outputName to fetcher(input))
+        override fun fetch(env: DataFetchingEnvironment): Any {
+            val input = mutationInput(input, env)
+            validateInput(input)
+            return mapOf(outputName to fetcher(input))
+        }
     }
-}
 
-class UnitTypedMutation<I : Any>(
-        validator: Validator,
-        override val name: String,
-        override val description: String,
-        private val input: KClass<I>,
-        override val outputFields: List<GraphQLFieldDefinition>,
-        private val fetcher: (I) -> Unit
-) : ValidatingInputMutation<I>(validator) {
+    inner class UnitTypedMutation<I : Any>(
+            override val name: String,
+            override val description: String,
+            private val input: KClass<I>,
+            override val outputFields: List<GraphQLFieldDefinition>,
+            private val fetcher: (I) -> Unit
+    ) : Mutation {
 
-    override val inputFields: List<GraphQLInputObjectField> = asInputFields(input)
+        override val inputFields: List<GraphQLInputObjectField> = asInputFields(input)
 
-    override fun fetch(env: DataFetchingEnvironment): Any {
-        val input = mutationInput(input, env)
-        validateInput(input)
-        fetcher(input)
-        // Nothing to return
-        return Unit
-    }
-}
-
-/**
- * [Mutation] which can validate an input
- */
-abstract class ValidatingInputMutation<I : Any>(
-        private val validator: Validator
-) : Mutation {
-
-    protected fun validateInput(input: I) {
-        val violations: Set<ConstraintViolation<I>> = validator.validate(input)
-        if (violations.isNotEmpty()) {
-            throw MutationInputValidationException(violations)
+        override fun fetch(env: DataFetchingEnvironment): Any {
+            val input = mutationInput(input, env)
+            validateInput(input)
+            fetcher(input)
+            // Nothing to return
+            return Unit
         }
     }
 
