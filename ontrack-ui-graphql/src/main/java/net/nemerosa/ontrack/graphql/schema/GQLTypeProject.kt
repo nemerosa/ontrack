@@ -10,8 +10,8 @@ import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.common.and
-import net.nemerosa.ontrack.graphql.schema.authorizations.AuthorizationsService
-import net.nemerosa.ontrack.graphql.schema.authorizations.authorizations
+import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
+import net.nemerosa.ontrack.graphql.schema.actions.actions
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
@@ -24,7 +24,7 @@ import java.util.regex.Pattern
 
 @Component
 class GQLTypeProject(
-        private val authorizationsService: AuthorizationsService,
+        private val uiActionsGraphQLService: UIActionsGraphQLService,
         private val structureService: StructureService,
         private val projectLabelManagementService: ProjectLabelManagementService,
         creation: GQLTypeCreation,
@@ -56,8 +56,8 @@ class GQLTypeProject(
                 .withInterface(projectEntityInterface.typeRef)
                 .fields(projectEntityInterfaceFields())
                 .field(GraphqlUtils.disabledField())
-                // Authorizations
-                .authorizations(authorizationsService, Project::class)
+                // Actions
+                .actions(uiActionsGraphQLService, Project::class)
                 // Branches
                 .field(
                         newFieldDefinition()
