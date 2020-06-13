@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema.actions
 
+import org.springframework.http.HttpMethod
 import java.net.URI
 
 /**
@@ -12,6 +13,6 @@ import java.net.URI
 class UIActionLink<T>(
         val type: String,
         val description: String,
-        val method: String,
+        val method: HttpMethod,
         val uri: (T) -> URI?
 )
