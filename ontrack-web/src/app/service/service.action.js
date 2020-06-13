@@ -37,12 +37,12 @@ angular.module('ot.service.action', [
                 // Management of errors
                 const errors = returnedData.errors;
                 if (errors && errors.length > 0) {
-                    if (errors.length === 1) {
-                        const error = errors[0];
-                        d.reject(error.message);
-                    } else {
-                        d.reject(errors.map(error => error.message).join(" | "));
-                    }
+                    let message = errors.map(error => error.message).join(" | ");
+                    d.reject({
+                        status: 'exception', // TODO Gets the exception ID when only 1 error
+                        type: 'error',
+                        content: message
+                    });
                 } else {
                     // Success
                     d.resolve(returnedData);
