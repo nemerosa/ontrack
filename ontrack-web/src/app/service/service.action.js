@@ -25,6 +25,13 @@ angular.module('ot.service.action', [
             return otFormService.display(formConfig);
         };
 
+        // Calling a mutation only
+        self.runMutationAction = (action, mutationConfig) => callMutationWithForm(
+            action.mutation,
+            null, // No data from any form
+            mutationConfig
+        );
+
         // Calling a mutation based on the content of a form
         const callMutationWithForm = (mutation, data, mutationConfig) => {
             const d = $q.defer();

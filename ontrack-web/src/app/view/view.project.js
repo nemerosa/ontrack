@@ -60,11 +60,13 @@ angular.module('ot.view.project', [
                         }
                         mutation
                     }
+                    deleteProject {
+                        mutation
+                    }
                 }
                 links {
                   _self
                   _createBranch
-                  _delete
                   _permissions
                   _clone
                   _enable
@@ -257,23 +259,11 @@ angular.module('ot.view.project', [
                         }
                     },
                     {
-                        condition: function () {
-                            return $scope.project.links._delete;
-                        },
+                        condition: () => $scope.project.actions.deleteProject.mutation,
                         id: 'deleteProject',
                         name: "Delete project",
                         cls: 'ot-command-project-delete',
-                        action: function () {
-                            otAlertService.confirm({
-                                title: "Deleting a project",
-                                message: "Do you really want to delete the project " + $scope.project.name +
-                                    " and all its associated data?"
-                            }).then(function () {
-                                return ot.call($http.delete($scope.project.links._delete));
-                            }).then(function () {
-                                $state.go('home');
-                            });
-                        }
+                        action: deleteProject
                     },
                     ot.viewApiCommand($scope.project.links._self),
                     ot.viewActionsCommand($scope.project.links._actions),
@@ -289,6 +279,31 @@ angular.module('ot.view.project', [
 
         // Reload callback available in the scope
         $scope.reloadProject = loadProject;
+
+        // Deleting the project
+        const deleteProject = () => {
+            otAlertService.confirm({
+                title: "Deleting a project",
+                message: `Do you really want to delete the project ${$scope.project.name} and all its associated data?`
+            }).then(() => otActionService.runMutationAction(
+                $scope.project.actions.deleteProject,
+                {
+                    query: `
+                        mutation DeleteProject($id: Int!) {
+                            deleteProject(input: {id: $id}) {
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }     
+                    `,
+                    variables: () => ({
+                        id: $scope.project.id
+                    })
+                }
+            )).then(() => $state.go('home'));
+        };
 
         // Updating the project
         const updateProject = () => {
