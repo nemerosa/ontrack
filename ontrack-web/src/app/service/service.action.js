@@ -6,7 +6,7 @@ angular.module('ot.service.action', [
     'ot.service.form',
     'ot.service.graphql'
 ])
-    .service('otActionService', function ($q, ot, otFormService, otGraphqlService, otNotificationService) {
+    .service('otActionService', function ($q, ot, otFormService, otGraphqlService) {
         const self = {};
 
         // Using a form & a mutation
@@ -39,11 +39,9 @@ angular.module('ot.service.action', [
                 if (errors && errors.length > 0) {
                     if (errors.length === 1) {
                         const error = errors[0];
-                        otNotificationService.error(error.message);
-                        d.reject();
+                        d.reject(error.message);
                     } else {
-                        otNotificationService.error(errors.map(error => error.message).join(" | "));
-                        d.reject();
+                        d.reject(errors.map(error => error.message).join(" | "));
                     }
                 } else {
                     // Success
