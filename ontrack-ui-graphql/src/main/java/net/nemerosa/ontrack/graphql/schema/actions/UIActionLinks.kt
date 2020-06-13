@@ -5,12 +5,7 @@ package net.nemerosa.ontrack.graphql.schema.actions
  */
 object UIActionLinks {
 
-    const val CREATE = "create"
-    const val UPDATE = "update"
-    const val DELETE = "delete"
-
-    const val DISABLE = "disable"
-    const val ENABLE = "enable"
+    const val FORM = "form"
 
     const val DOWNLOAD = "download"
     const val UPLOAD = "upload"

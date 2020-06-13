@@ -27,7 +27,7 @@ class ProjectUIActions(
                     "Updating the project",
                     listOf(
                             UIActionLink(
-                                    UIActionLinks.UPDATE,
+                                    UIActionLinks.FORM,
                                     "Update form",
                                     HttpMethod.GET
                             ) { uriBuilder.build(on(ProjectController::class.java).saveProjectForm(it.id)) }

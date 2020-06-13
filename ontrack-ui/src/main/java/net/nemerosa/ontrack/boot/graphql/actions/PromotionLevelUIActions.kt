@@ -28,7 +28,7 @@ class PromotionLevelUIActions(
                                     HttpMethod.GET
                             ) { uriBuilder.build(on(PromotionLevelController::class.java).getPromotionLevelImage_(null, it.id)) },
                             UIActionLink(
-                                    UIActionLinks.UPDATE,
+                                    UIActionLinks.UPLOAD,
                                     "Upload image",
                                     HttpMethod.POST
                             ) { uriBuilder.build(on(PromotionLevelController::class.java).setPromotionLevelImage(it.id, null)) }

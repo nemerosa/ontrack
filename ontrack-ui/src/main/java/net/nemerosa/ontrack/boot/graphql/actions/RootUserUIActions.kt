@@ -25,7 +25,7 @@ class RootUserUIActions(
                     "Creating a project",
                     listOf(
                             UIActionLink(
-                                    UIActionLinks.CREATE,
+                                    UIActionLinks.FORM,
                                     "Form to create a project",
                                     HttpMethod.GET
                             ) {
