@@ -19,7 +19,7 @@ class ProjectMutations(
              * Creating a project
              */
             simpleMutation(
-                    "createProject", "Creates a new project", NameDescriptionState::class,
+                    CREATE_PROJECT, "Creates a new project", NameDescriptionState::class,
                     "project", "Created project", Project::class
             ) { input ->
                 structureService.newProject(Project.of(input))
@@ -28,7 +28,7 @@ class ProjectMutations(
              * Updating a project
              */
             simpleMutation(
-                    "updateProject", "Updates an existing project", UpdateProjectInput::class,
+                    UPDATE_PROJECT, "Updates an existing project", UpdateProjectInput::class,
                     "project", "Updated project", Project::class
             ) { input ->
                 val project = structureService.getProject(ID(input.id))
@@ -45,14 +45,14 @@ class ProjectMutations(
             /**
              * Deleting a project
              */
-            unitMutation<DeleteProjectInput>("deleteProject", "Deletes an existing project") { input ->
+            unitMutation<DeleteProjectInput>(DELETE_PROJECT, "Deletes an existing project") { input ->
                 structureService.deleteProject(ID(input.id))
             },
             /**
              * Disables a project
              */
             simpleMutation(
-                    "disableProject", "Disables an existing project", DisableProjectInput::class,
+                    DISABLE_PROJECT, "Disables an existing project", DisableProjectInput::class,
                     "project", "Updated project", Project::class
             ) { input ->
                 val project = structureService.getProject(ID(input.id))
@@ -62,18 +62,23 @@ class ProjectMutations(
              * Enables a project
              */
             simpleMutation(
-                    "enableProject", "Enables an existing project", EnableProjectInput::class,
+                    ENABLE_PROJECT, "Enables an existing project", EnableProjectInput::class,
                     "project", "Updated project", Project::class
             ) { input ->
                 val project = structureService.getProject(ID(input.id))
                 structureService.enableProject(project)
             }
-
-            // TODO New project form
-            // TODO Update project form
             // TODO Mark a project as favourite
             // TODO Unmark a project as favourite
     )
+
+    companion object {
+        const val ENABLE_PROJECT = "enableProject"
+        const val DISABLE_PROJECT = "disableProject"
+        const val DELETE_PROJECT = "deleteProject"
+        const val UPDATE_PROJECT = "updateProject"
+        const val CREATE_PROJECT = "createProject"
+    }
 
 }
 
