@@ -31,6 +31,7 @@ const ontrack = angular.module('ontrack', [
         'ot.service.info',
         'ot.service.task',
         'ot.service.form',
+        'ot.service.action',
         'ot.service.configuration',
         'ot.service.graphql',
         'ot.service.label',
