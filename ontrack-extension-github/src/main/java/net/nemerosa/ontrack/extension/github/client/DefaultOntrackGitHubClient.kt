@@ -109,7 +109,7 @@ class DefaultOntrackGitHubClient(
         )
     }
 
-    private fun createGitHubClient(): GitHubClient {
+    override fun createGitHubClient(): GitHubClient {
         // GitHub client (non authentified)
         val client: GitHubClient = object : GitHubClient() {
             override fun configureRequest(request: HttpURLConnection): HttpURLConnection {
