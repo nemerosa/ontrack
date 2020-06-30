@@ -22,15 +22,15 @@ class GraphQLBeanConverterTest {
 
     @Test
     fun `Simple type`() {
-        val type = GraphQLBeanConverter.asObjectType(Person::class.java, cache)
+        val type = GraphQLBeanConverter.asObjectType(Person::class, cache)
         assertEquals("Person", type.name)
         val fields = fieldToTypeNames(type.fieldDefinitions)
         assertEquals(
                 mapOf(
-                        "name" to "String",
-                        "address" to "String",
-                        "age" to "Int",
-                        "developer" to "Boolean"
+                        "address" to "String!",
+                        "age" to "Int!",
+                        "name" to "String!",
+                        "developer" to "Boolean!"
                 ),
                 fields
         )
@@ -38,7 +38,7 @@ class GraphQLBeanConverterTest {
 
     @Test
     fun `Description from annotation`() {
-        val type = GraphQLBeanConverter.asObjectType(Person::class.java, cache)
+        val type = GraphQLBeanConverter.asObjectType(Person::class, cache)
         assertEquals("Person", type.name)
         assertNotNull(type.fieldDefinitions.find { it.name == "name" }) {
             assertEquals("Full name", it.description)
@@ -50,14 +50,14 @@ class GraphQLBeanConverterTest {
 
     @Test
     fun `Composite type`() {
-        val type = GraphQLBeanConverter.asObjectType(Account::class.java, cache)
+        val type = GraphQLBeanConverter.asObjectType(Account::class, cache)
         assertEquals("Account", type.name)
         val fields = fieldToTypeNames(type.fieldDefinitions)
         assertEquals(
                 mapOf(
-                        "username" to "String",
-                        "password" to "String",
-                        "identity" to "Person"
+                        "username" to "String!",
+                        "password" to "String!",
+                        "identity" to "Person!"
                 ),
                 fields
         )
@@ -65,13 +65,13 @@ class GraphQLBeanConverterTest {
 
     @Test
     fun `Composite type with three levels`() {
-        val type = GraphQLBeanConverter.asObjectType(OnBehalf::class.java, cache)
+        val type = GraphQLBeanConverter.asObjectType(OnBehalf::class, cache)
         assertEquals("OnBehalf", type.name)
         val fields = fieldToTypeNames(type.fieldDefinitions)
         assertEquals(
                 mapOf(
-                        "delegate" to "Account",
-                        "account" to "Account"
+                        "delegate" to "Account!",
+                        "account" to "Account!"
                 ),
                 fields
         )
