@@ -34,6 +34,7 @@ class GQLTypeProject(
         private val projectEntityInterface: GQLProjectEntityInterface,
         private val label: GQLTypeLabel,
         private val branchFavouriteService: BranchFavouriteService,
+        private val projectFavouriteService: ProjectFavouriteService,
         private val branchModelMatcherService: BranchModelMatcherService,
         private val paginatedListFactory: GQLPaginatedListFactory,
         private val validationRunSearchService: ValidationRunSearchService,
@@ -58,6 +59,16 @@ class GQLTypeProject(
                 .field(GraphqlUtils.disabledField())
                 // Actions
                 .actions(uiActionsGraphQLService, Project::class)
+                // Is this project a favourite?
+                .field {
+                    it.name("favourite")
+                            .description("Is this project a favourite of the current user?")
+                            .type(GraphQLBoolean)
+                            .dataFetcher { env ->
+                                val project: Project = env.getSource()
+                                projectFavouriteService.isProjectFavourite(project)
+                            }
+                }
                 // Branches
                 .field(
                         newFieldDefinition()

@@ -9,7 +9,8 @@ import javax.validation.constraints.Pattern
 
 @Component
 class ProjectMutations(
-        private val structureService: StructureService
+        private val structureService: StructureService,
+        private val projectFavouriteService: ProjectFavouriteService
 ) : TypedMutationProvider() {
 
     override val mutations: List<Mutation> = listOf(
@@ -65,9 +66,29 @@ class ProjectMutations(
             ) { input ->
                 val project = structureService.getProject(ID(input.id))
                 structureService.enableProject(project)
+            },
+            /*
+             * Mark a project as favourite
+             */
+            simpleMutation(
+                    FAVOURITE_PROJECT, "Marks a project as favourite", FavouriteProjectInput::class,
+                    "project", "Updated project", Project::class
+            ) { input ->
+                val project = structureService.getProject(ID(input.id))
+                projectFavouriteService.setProjectFavourite(project, true)
+                structureService.getProject(ID(input.id))
+            },
+            /*
+             * Unmark a project as favourite
+             */
+            simpleMutation(
+                    UNFAVOURITE_PROJECT, "Unmarks a project as favourite", UnfavouriteProjectInput::class,
+                    "project", "Updated project", Project::class
+            ) { input ->
+                val project = structureService.getProject(ID(input.id))
+                projectFavouriteService.setProjectFavourite(project, false)
+                structureService.getProject(ID(input.id))
             }
-            // TODO Mark a project as favourite
-            // TODO Unmark a project as favourite
     )
 
     companion object {
@@ -76,6 +97,8 @@ class ProjectMutations(
         const val DELETE_PROJECT = "deleteProject"
         const val UPDATE_PROJECT = "updateProject"
         const val CREATE_PROJECT = "createProject"
+        const val FAVOURITE_PROJECT = "favouriteProject"
+        const val UNFAVOURITE_PROJECT = "unfavouriteProject"
     }
 
 }
@@ -102,6 +125,16 @@ data class DisableProjectInput(
 )
 
 data class EnableProjectInput(
+        @APIDescription("Project ID")
+        val id: Int
+)
+
+data class FavouriteProjectInput(
+        @APIDescription("Project ID")
+        val id: Int
+)
+
+data class UnfavouriteProjectInput(
         @APIDescription("Project ID")
         val id: Int
 )
