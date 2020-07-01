@@ -18,10 +18,10 @@ class ProjectMutations(
              * Creating a project
              */
             simpleMutation(
-                    CREATE_PROJECT, "Creates a new project", NameDescriptionState::class,
+                    CREATE_PROJECT, "Creates a new project", CreateProjectInput::class,
                     "project", "Created project", Project::class
             ) { input ->
-                structureService.newProject(Project.of(input))
+                structureService.newProject(Project.of(input.toNameDescriptionState()))
             },
             /**
              * Updating a project
@@ -103,9 +103,27 @@ class ProjectMutations(
 
 }
 
+data class CreateProjectInput(
+        @get:NotNull(message = "The name is required.")
+        @get:Pattern(regexp = NameDescription.NAME, message = "The name ${NameDescription.NAME_MESSAGE_SUFFIX}")
+        @APIDescription("Project name")
+        val name: String,
+        @APIDescription("Project description")
+        val description: String?,
+        @APIDescription("Project state, null for not disabled")
+        val disabled: Boolean?
+) {
+    fun toNameDescriptionState() = NameDescriptionState(
+            name = name,
+            description = description,
+            isDisabled = disabled ?: false
+    )
+}
+
 data class UpdateProjectInput(
         @APIDescription("Project ID")
         val id: Int,
+        @get:Pattern(regexp = NameDescription.NAME, message = "The name ${NameDescription.NAME_MESSAGE_SUFFIX}")
         @APIDescription("Project name (leave null to not change)")
         val name: String?,
         @APIDescription("Project description (leave null to not change)")

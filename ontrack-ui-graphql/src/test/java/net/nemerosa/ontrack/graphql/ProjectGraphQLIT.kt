@@ -119,6 +119,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 """, mapOf("name" to newName))
+                // Checks for errors
+                checkGraphQLUserErrors(data, "updateProject")
                 // Checks the project has been created
                 structureService.getProject(id).apply {
                     assertEquals(newName, name)
@@ -152,6 +154,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 """, mapOf("description" to newDescription))
+                // Checks for errors
+                checkGraphQLUserErrors(data, "updateProject")
                 // Checks the project has been created
                 structureService.getProject(id).apply {
                     assertEquals(newDescription, description)
@@ -184,6 +188,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 """)
+                // Checks for errors
+                checkGraphQLUserErrors(data, "updateProject")
                 // Checks the project has been created
                 structureService.getProject(id).apply {
                     assertTrue(isDisabled)

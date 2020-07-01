@@ -31,7 +31,7 @@ class RootUserActionsIT: AbstractQLKTITSupport() {
             val links = create["links"]
             val form = links["form"]
             assertEquals("GET", form["method"].asText())
-            assertEquals("", form["uri"].asText())
+            assertEquals("urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#newProjectForm:", form["uri"].asText())
         }
     }
 

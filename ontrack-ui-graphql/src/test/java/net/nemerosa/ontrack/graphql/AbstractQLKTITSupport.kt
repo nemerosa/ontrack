@@ -3,9 +3,11 @@ package net.nemerosa.ontrack.graphql
 import com.fasterxml.jackson.databind.JsonNode
 import graphql.GraphQL
 import net.nemerosa.ontrack.graphql.schema.GraphqlSchemaService
+import net.nemerosa.ontrack.graphql.schema.UserError
 import net.nemerosa.ontrack.graphql.support.exception
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.parse
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.fail
 
@@ -44,6 +46,14 @@ abstract class AbstractQLKTITSupport : AbstractDSLTestSupport() {
             } else {
                 fail("No data was returned and no error was thrown.")
             }
+        }
+    }
+
+    protected fun checkGraphQLUserErrors(data: JsonNode, field: String) {
+        val node = data.path(field).path("errors")
+        if (node != null && node.isArray && node.size() > 0) {
+            val error = node.first().parse<UserError>()
+            throw IllegalStateException(error.toString())
         }
     }
 
