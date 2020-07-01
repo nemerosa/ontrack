@@ -116,6 +116,7 @@ angular.module('ot.view.home', [
               projects {
                 id
                 name
+                favourite
                 labels {
                   id
                   category
@@ -128,9 +129,15 @@ angular.module('ot.view.home', [
                     name
                   }
                 }
-                links {
-                  _favourite
-                  _unfavourite
+                actions {
+                  favouriteProject {
+                    description
+                    mutation
+                  }
+                  unfavouriteProject {
+                    description
+                    mutation
+                  }
                 }
                 decorations {
                   ...decorationContent
@@ -143,8 +150,11 @@ angular.module('ot.view.home', [
                 decorations {
                   ...decorationContent
                 }
-                links {
-                  _unfavourite
+                actions {
+                  unfavouriteProject {
+                    description
+                    mutation
+                  }
                 }
                 branches(useModel: true) {
                   id
@@ -269,15 +279,49 @@ angular.module('ot.view.home', [
 
         // Sets a project as favourite
         $scope.projectFavourite = function (project) {
-            if (project.links._favourite) {
-                ot.pageCall($http.put(project.links._favourite)).then(loadProjects);
+            if (project.actions.favouriteProject.mutation) {
+                otActionService.runMutationAction(
+                    project.actions.favouriteProject,
+                    {
+                        query: `
+                            mutation FavouriteProject($id: Int!) {
+                                favouriteProject(input: {id: $id}) {
+                                    errors {
+                                        message
+                                        exception
+                                    }
+                                }
+                            }     
+                        `,
+                        variables: () => ({
+                            id: project.id
+                        })
+                    }
+                ).then(loadProjects);
             }
         };
 
         // Unsets a project as favourite
         $scope.projectUnfavourite = function (project) {
-            if (project.links._unfavourite) {
-                ot.pageCall($http.put(project.links._unfavourite)).then(loadProjects);
+            if (project.actions.unfavouriteProject.mutation) {
+                otActionService.runMutationAction(
+                    project.actions.unfavouriteProject,
+                    {
+                        query: `
+                            mutation UnfavouriteProject($id: Int!) {
+                                unfavouriteProject(input: {id: $id}) {
+                                    errors {
+                                        message
+                                        exception
+                                    }
+                                }
+                            }     
+                        `,
+                        variables: () => ({
+                            id: project.id
+                        })
+                    }
+                ).then(loadProjects);
             }
         };
 
