@@ -65,7 +65,7 @@ class DefaultOntrackGitHubClient(
         val repositoryService = RepositoryService(client)
         // Gets the repository names
         return try {
-            repositoryService.getRepositories(organization).map { it.name }
+            repositoryService.getOrgRepositories(organization).map { it.name }
         } catch (e: IOException) {
             throw OntrackGitHubClientException(e)
         }
