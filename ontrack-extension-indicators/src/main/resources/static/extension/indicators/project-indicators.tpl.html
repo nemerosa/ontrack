@@ -11,12 +11,60 @@
         </div>
     </div>
 
+    <div class="row" ng-show="!loadingIndicators && portfolios.length == 0">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                This project is not associated with any portfolio. All indicator types
+                will be displayed.
+            </div>
+        </div>
+    </div>
+
     <table class="table table-bordered table-hover">
-        <tbody ng-repeat="categoryIndicators in projectIndicators.categories">
-        <tr class="info">
-            <th colspan="6">{{categoryIndicators.category.name}}</th>
+        <thead ng-if="portfolios.length > 0">
+        <tr>
+            <td colspan="6" class="">
+                Filter:
+                <span ng-repeat="portfolio in portfolios">
+                    <label title="Select categories which match the '{{portfolio.name}}' portfolio."
+                        ng-class="{
+                            'text-muted': filtering.showAllCategories || !portfolio.selected
+                        }">
+                        <input id="{{portfolio.id}}-selection" type="checkbox" ng-model="portfolio.selected"/>
+                        <span>{{portfolio.name}}</span>
+                        <a href="#/extension/indicators/portfolios/{{portfolio.id}}">
+                            <span class="fa fa-info-circle" title="Go to the '{{portfolio.name}}' portfolio page."></span>
+                        </a>
+                    </label>
+                </span>
+                <label>
+                    <input id="all-types-selection" type="checkbox" ng-model="filtering.showAllCategories"/>
+                    <span>Show all categories</span>
+                    <span class="fa fa-info-circle" title="Shows all categories, independently of the portfolios."></span>
+                </label>
+            </td>
         </tr>
-        <tr class="text-muted">
+        </thead>
+        <tbody ng-repeat="categoryIndicators in projectIndicators.categories"
+               ng-show="isCategoryIndicatorsSelected(categoryIndicators)">
+        <tr class="info">
+            <th colspan="6">
+                <span class="fa fa-caret-right ot-action" title="Show associated types" ng-hide="categoryIndicators.unfolded" ng-click="unfold(categoryIndicators)"></span>
+                <span class="fa fa-caret-down ot-action" title="Hide associated types" ng-show="categoryIndicators.unfolded" ng-click="fold(categoryIndicators)"></span>
+                {{categoryIndicators.category.name}}
+                <span ng-repeat="portfolio in categoryIndicators.portfolios" class="ot-project-label-box">
+                    <a href="#/extension/indicators/portfolios/{{portfolio.id}}">
+                        <span class="ot-project-label-box-square"
+                              ng-style="{
+                                'background-color': portfolio.label.color + ' !important;',
+                                'color': portfolio.label.foregroundColor + ' !important;'
+                              }"></span>
+                        <span class="ot-project-label-box-text">{{portfolio.name}}</span>
+                    </a>
+                </span>
+            </th>
+        </tr>
+        <tr class="text-muted" ng-show="categoryIndicators.unfolded">
             <td>Type</td>
             <td>Value</td>
             <td>Status</td>
@@ -24,7 +72,7 @@
             <td>Comment</td>
             <td>Signature</td>
         </tr>
-        <tr ng-repeat="indicator in categoryIndicators.indicators">
+        <tr ng-repeat="indicator in categoryIndicators.indicators" ng-show="categoryIndicators.unfolded">
             <td>
                 <ot-extension-indicators-type-name type="indicator.type"></ot-extension-indicators-type-name>
             </td>

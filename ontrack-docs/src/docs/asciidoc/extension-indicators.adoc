@@ -167,6 +167,11 @@ The history of an indicator can be accessed by clicking on the _History_ icon:
 
 image::images/extension-indicators-project-indicator-history.png[Indicator history]
 
+The list of <<extension-indicators-portfolios,portfolios>> the project belongs to is displayed at the top
+of the indicator list:
+
+image::images/extension-indicators-project-portfolios.png[Project portfolios,300]
+
 [[extension-indicators-portfolios]]
 ==== Indicator portfolios
 
