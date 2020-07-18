@@ -43,7 +43,7 @@ public class DefaultOntrackGitLabClient implements OntrackGitLabClient {
             return api.getProjects().stream()
                     .map(GitlabProject::getNameWithNamespace)
                     .collect(Collectors.toList());
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new OntrackGitLabClientException(e);
         }
     }
@@ -61,7 +61,7 @@ public class DefaultOntrackGitLabClient implements OntrackGitLabClient {
             }
             // OK
             return GitLabIssueWrapper.of(issue, milestoneUrl, issueUrl);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new OntrackGitLabClientException(e);
         }
     }
