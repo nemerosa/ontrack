@@ -1,67 +1,75 @@
-package net.nemerosa.ontrack.extension.stash.property;
+package net.nemerosa.ontrack.extension.stash.property
 
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
-import net.nemerosa.ontrack.extension.git.model.GitConfigurator;
-import net.nemerosa.ontrack.extension.git.model.GitPullRequest;
-import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
-import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.PropertyService;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import net.nemerosa.ontrack.extension.git.model.GitConfiguration
+import net.nemerosa.ontrack.extension.git.model.GitConfigurator
+import net.nemerosa.ontrack.extension.git.model.GitPullRequest
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
+import net.nemerosa.ontrack.extension.support.client.ClientConnection
+import net.nemerosa.ontrack.extension.support.client.ClientFactory
+import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.PropertyService
+import org.springframework.stereotype.Component
 
 @Component
-public class StashConfigurator implements GitConfigurator {
+class StashConfigurator(
+        private val propertyService: PropertyService,
+        private val issueServiceRegistry: IssueServiceRegistry,
+        private val clientFactory: ClientFactory
+) : GitConfigurator {
 
-    private final PropertyService propertyService;
-    private final IssueServiceRegistry issueServiceRegistry;
-
-    @Autowired
-    public StashConfigurator(PropertyService propertyService, IssueServiceRegistry issueServiceRegistry) {
-        this.propertyService = propertyService;
-        this.issueServiceRegistry = issueServiceRegistry;
+    override fun isProjectConfigured(project: Project): Boolean {
+        return propertyService.hasProperty(project, StashProjectConfigurationPropertyType::class.java)
     }
 
-    @Override
-    public boolean isProjectConfigured(@NotNull Project project) {
-        return propertyService.hasProperty(project, StashProjectConfigurationPropertyType.class);
+    override fun getConfiguration(project: Project): GitConfiguration? {
+        return propertyService.getProperty(project, StashProjectConfigurationPropertyType::class.java)
+                .value
+                ?.run { getGitConfiguration(this) }
     }
 
-    @Nullable
-    @Override
-    public GitConfiguration getConfiguration(@NotNull Project project) {
-        return propertyService.getProperty(project, StashProjectConfigurationPropertyType.class)
-                .option()
-                .map(this::getGitConfiguration)
-                .orElse(null);
+    override fun toPullRequestID(key: String): Int? {
+        if (key.isNotBlank()) {
+            val m = "PR-(\\d+)".toRegex().matchEntire(key)
+            if (m != null) {
+                return m.groupValues[1].toInt(10)
+            }
+        }
+        return null
     }
 
-    @Nullable
-    @Override
-    public Integer toPullRequestID(@NotNull String key) {
-        // TODO #690
-        throw new UnsupportedOperationException("Pull requests not supported yet for Bitbucket");
-    }
+    override fun getPullRequest(configuration: GitConfiguration, id: Int): GitPullRequest? =
+            if (configuration is StashGitConfiguration) {
+                val client = clientFactory.getJsonClient(
+                        ClientConnection(
+                                configuration.property.configuration.url,
+                                configuration.property.configuration.user,
+                                configuration.property.configuration.password
+                        )
+                )
+                val json = client.get("rest/api/1.0/projects/${configuration.property.project}/repos/${configuration.property.repository}/pull-requests/$id")
+                GitPullRequest(
+                        id = id,
+                        key = "PR-$id",
+                        source = json["fromRef"]["id"].asText(),
+                        target = json["toRef"]["id"].asText(),
+                        title = json["title"].asText()
+                )
+            } else {
+                null
+            }
 
-    @Nullable
-    @Override
-    public GitPullRequest getPullRequest(@NotNull GitConfiguration configuration, int id) {
-        // TODO #690
-        throw new UnsupportedOperationException("Pull requests not supported yet for Bitbucket");
-    }
-
-    private GitConfiguration getGitConfiguration(StashProjectConfigurationProperty property) {
-        return new StashGitConfiguration(
+    private fun getGitConfiguration(property: StashProjectConfigurationProperty): GitConfiguration {
+        return StashGitConfiguration(
                 property,
                 getConfiguredIssueService(property)
-        );
+        )
     }
 
-    private ConfiguredIssueService getConfiguredIssueService(StashProjectConfigurationProperty property) {
+    private fun getConfiguredIssueService(property: StashProjectConfigurationProperty): ConfiguredIssueService {
         return issueServiceRegistry.getConfiguredIssueService(
-                property.getIssueServiceConfigurationIdentifier()
-        );
+                property.issueServiceConfigurationIdentifier
+        )
     }
+
 }
