@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.gitlab.property;
 
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator;
+import net.nemerosa.ontrack.extension.git.model.GitPullRequest;
 import net.nemerosa.ontrack.extension.gitlab.GitLabIssueServiceExtension;
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
@@ -40,6 +41,20 @@ public class GitLabConfigurator implements GitConfigurator {
                 .option()
                 .map(this::getGitConfiguration)
                 .orElse(null);
+    }
+
+    @Nullable
+    @Override
+    public Integer toPullRequestID(@NotNull String key) {
+        // TODO #690
+        throw new UnsupportedOperationException("Pull requests not supported yet for GitLab");
+    }
+
+    @Nullable
+    @Override
+    public GitPullRequest getPullRequest(@NotNull GitConfiguration configuration, int id) {
+        // TODO #690
+        throw new UnsupportedOperationException("Pull requests not supported yet for GitLab");
     }
 
     private GitConfiguration getGitConfiguration(GitLabProjectConfigurationProperty property) {

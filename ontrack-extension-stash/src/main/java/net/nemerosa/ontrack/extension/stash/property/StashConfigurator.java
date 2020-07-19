@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.stash.property;
 
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator;
+import net.nemerosa.ontrack.extension.git.model.GitPullRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.model.structure.Project;
@@ -35,6 +36,20 @@ public class StashConfigurator implements GitConfigurator {
                 .option()
                 .map(this::getGitConfiguration)
                 .orElse(null);
+    }
+
+    @Nullable
+    @Override
+    public Integer toPullRequestID(@NotNull String key) {
+        // TODO #690
+        throw new UnsupportedOperationException("Pull requests not supported yet for Bitbucket");
+    }
+
+    @Nullable
+    @Override
+    public GitPullRequest getPullRequest(@NotNull GitConfiguration configuration, int id) {
+        // TODO #690
+        throw new UnsupportedOperationException("Pull requests not supported yet for Bitbucket");
     }
 
     private GitConfiguration getGitConfiguration(StashProjectConfigurationProperty property) {

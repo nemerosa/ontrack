@@ -1,70 +1,77 @@
-package net.nemerosa.ontrack.extension.github.property;
+package net.nemerosa.ontrack.extension.github.property
 
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
-import net.nemerosa.ontrack.extension.git.model.GitConfigurator;
-import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension;
-import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration;
-import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
-import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.PropertyService;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import net.nemerosa.ontrack.extension.git.model.GitConfiguration
+import net.nemerosa.ontrack.extension.git.model.GitConfigurator
+import net.nemerosa.ontrack.extension.git.model.GitPullRequest
+import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension
+import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
+import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation.Companion.isSelf
+import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.PropertyService
+import org.springframework.stereotype.Component
 
 @Component
-public class GitHubConfigurator implements GitConfigurator {
+class GitHubConfigurator(
+        private val propertyService: PropertyService,
+        private val issueServiceRegistry: IssueServiceRegistry,
+        private val issueServiceExtension: GitHubIssueServiceExtension,
+        private val ontrackGitHubClientFactory: OntrackGitHubClientFactory
+) : GitConfigurator {
 
-    private final PropertyService propertyService;
-    private final IssueServiceRegistry issueServiceRegistry;
-    private final GitHubIssueServiceExtension issueServiceExtension;
-
-    @Autowired
-    public GitHubConfigurator(
-            PropertyService propertyService,
-            IssueServiceRegistry issueServiceRegistry,
-            GitHubIssueServiceExtension issueServiceExtension) {
-        this.propertyService = propertyService;
-        this.issueServiceRegistry = issueServiceRegistry;
-        this.issueServiceExtension = issueServiceExtension;
+    override fun isProjectConfigured(project: Project): Boolean {
+        return propertyService.hasProperty(project, GitHubProjectConfigurationPropertyType::class.java)
     }
 
-    @Override
-    public boolean isProjectConfigured(@NotNull Project project) {
-        return propertyService.hasProperty(project, GitHubProjectConfigurationPropertyType.class);
+    override fun getConfiguration(project: Project): GitConfiguration? {
+        return propertyService.getProperty(project, GitHubProjectConfigurationPropertyType::class.java)
+                .value
+                ?.run { getGitConfiguration(this) }
     }
 
-    @Nullable
-    @Override
-    public GitConfiguration getConfiguration(@NotNull Project project) {
-        return propertyService.getProperty(project, GitHubProjectConfigurationPropertyType.class)
-                .option()
-                .map(this::getGitConfiguration)
-                .orElse(null);
+    override fun toPullRequestID(key: String): Int? {
+        if (key.isNotBlank()) {
+            val m = "#(\\d+)".toRegex().matchEntire(key)
+            if (m != null) {
+                return m.groupValues[1].toInt(10)
+            }
+        }
+        return null
     }
 
-    private GitConfiguration getGitConfiguration(GitHubProjectConfigurationProperty property) {
-        return new GitHubGitConfiguration(
+    override fun getPullRequest(configuration: GitConfiguration, id: Int): GitPullRequest? =
+            if (configuration is GitHubGitConfiguration) {
+                val client = ontrackGitHubClientFactory.create(configuration.property.configuration)
+                client.getPullRequest(
+                        configuration.property.repository,
+                        id
+                )
+            } else {
+                null
+            }
+
+    private fun getGitConfiguration(property: GitHubProjectConfigurationProperty): GitConfiguration {
+        return GitHubGitConfiguration(
                 property,
                 getConfiguredIssueService(property)
-        );
+        )
     }
 
-    private ConfiguredIssueService getConfiguredIssueService(GitHubProjectConfigurationProperty property) {
-        String identifier = property.getIssueServiceConfigurationIdentifier();
-        if (StringUtils.isBlank(identifier) || IssueServiceConfigurationRepresentation.Companion.isSelf(identifier)) {
-            return new ConfiguredIssueService(
+    private fun getConfiguredIssueService(property: GitHubProjectConfigurationProperty): ConfiguredIssueService {
+        val identifier = property.issueServiceConfigurationIdentifier
+        return if (identifier.isNullOrBlank() || isSelf(identifier)) {
+            ConfiguredIssueService(
                     issueServiceExtension,
-                    new GitHubIssueServiceConfiguration(
-                            property.getConfiguration(),
-                            property.getRepository()
+                    GitHubIssueServiceConfiguration(
+                            property.configuration,
+                            property.repository
                     )
-            );
+            )
         } else {
-            return issueServiceRegistry.getConfiguredIssueService(identifier);
+            issueServiceRegistry.getConfiguredIssueService(identifier)
         }
     }
+
 }

@@ -20,7 +20,7 @@ interface GitConfigurator {
     /**
      * Converts a PR key to an ID when possible
      */
-    fun toPullRequestID(key: String): Int? = TODO("To be implemented by all Git providers")
+    fun toPullRequestID(key: String): Int?
 
     /**
      * Loads a pull request
@@ -29,6 +29,6 @@ interface GitConfigurator {
      * @param id            ID of the pull request
      * @return Pull request or null if not existing
      */
-    fun getPullRequest(configuration: GitConfiguration, id: Int): GitPullRequest? = TODO("To be implemented by all Git providers")
+    fun getPullRequest(configuration: GitConfiguration, id: Int): GitPullRequest?
 
 }

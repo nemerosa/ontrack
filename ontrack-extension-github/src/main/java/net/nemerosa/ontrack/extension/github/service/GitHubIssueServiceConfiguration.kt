@@ -1,29 +1,16 @@
-package net.nemerosa.ontrack.extension.github.service;
+package net.nemerosa.ontrack.extension.github.service
 
-import lombok.Data;
-import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension;
-import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
+import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension
+import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 
-import static java.lang.String.format;
+data class GitHubIssueServiceConfiguration(
+        val configuration: GitHubEngineConfiguration,
+        val repository: String
+) : IssueServiceConfiguration {
 
-@Data
-public class GitHubIssueServiceConfiguration implements IssueServiceConfiguration {
+    override fun getServiceId(): String = GitHubIssueServiceExtension.GITHUB_SERVICE_ID
 
-    private final GitHubEngineConfiguration configuration;
-    private final String repository;
+    override fun getName(): String = "${configuration.name}:$repository"
 
-    @Override
-    public String getServiceId() {
-        return GitHubIssueServiceExtension.GITHUB_SERVICE_ID;
-    }
-
-    @Override
-    public String getName() {
-        return format(
-                "%s:%s",
-                configuration.getName(),
-                repository
-        );
-    }
 }

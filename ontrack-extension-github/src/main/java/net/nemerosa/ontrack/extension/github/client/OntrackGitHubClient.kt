@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.github.client
 
+import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.model.GitHubIssue
 import net.nemerosa.ontrack.extension.github.model.GitHubUser
 import org.eclipse.egit.github.core.client.GitHubClient
+
 
 /**
  * Client used to connect to a GitHub engine from Ontrack.
@@ -40,4 +42,14 @@ interface OntrackGitHubClient {
      * can add features.
      */
     fun createGitHubClient(): GitHubClient
+
+
+    /**
+     * Gets a pull request using its ID
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param id         ID of the pull request
+     * @return Details of the pull request or `null` if it does not exist
+     */
+    fun getPullRequest(repository: String, id: Int): GitPullRequest?
 }
