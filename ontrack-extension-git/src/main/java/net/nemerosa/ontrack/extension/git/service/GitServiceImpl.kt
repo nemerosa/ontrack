@@ -630,6 +630,16 @@ class GitServiceImpl(
         return SCMBuildView(getBuildView(buildId), GitBuildInfo())
     }
 
+    private fun getGitConfiguratorAndConfiguration(project: Project): Pair<GitConfigurator, GitConfiguration>? =
+            gitConfigurators.mapNotNull {
+                val configuration = it.getConfiguration(project)
+                if (configuration != null) {
+                    it to configuration
+                } else {
+                    null
+                }
+            }.firstOrNull()
+
     override fun isProjectConfiguredForGit(project: Project): Boolean =
             gitConfigurators.any { configurator ->
                 configurator.isProjectConfigured(project)
@@ -657,23 +667,33 @@ class GitServiceImpl(
             val buildTagInterval: Int
             val branchConfig = propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java)
             if (!branchConfig.isEmpty) {
-                gitBranch = branchConfig.value.branch
-                buildCommitLink = branchConfig.value.buildCommitLink?.let {
+                val branchConfigurationProperty = branchConfig.value
+                gitBranch = branchConfigurationProperty.branch
+                buildCommitLink = branchConfigurationProperty.buildCommitLink?.let {
                     toConfiguredBuildGitCommitLink<Any>(it)
                 }
-                override = branchConfig.value.isOverride
-                buildTagInterval = branchConfig.value.buildTagInterval
+                override = branchConfigurationProperty.isOverride
+                buildTagInterval = branchConfigurationProperty.buildTagInterval
+                // Pull request information
+                val gitPullRequest: GitPullRequest? = getGitConfiguratorAndConfiguration(branch.project)
+                        ?.let { (configurator, gitConfiguration) ->
+                            // Tries to get the Git branch as a PR key
+                            configurator.toPullRequestID(branchConfigurationProperty.branch)?.let { prId ->
+                                configurator.getPullRequest(gitConfiguration, prId)
+                            }
+                        }
+                // OK
+                return GitBranchConfiguration(
+                        configuration,
+                        gitBranch,
+                        gitPullRequest,
+                        buildCommitLink,
+                        override,
+                        buildTagInterval
+                )
             } else {
                 return null
             }
-            // OK
-            return GitBranchConfiguration(
-                    configuration,
-                    gitBranch,
-                    buildCommitLink,
-                    override,
-                    buildTagInterval
-            )
         } else {
             return null
         }
@@ -761,6 +781,7 @@ class GitServiceImpl(
         // Link
         @Suppress("UNCHECKED_CAST")
         val link = branchConfiguration.buildCommitLink?.link as IndexableBuildGitCommitLink<T>?
+
         @Suppress("UNCHECKED_CAST")
         val linkData = branchConfiguration.buildCommitLink?.data as T?
         // Check for configuration
