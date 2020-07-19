@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.gitlab.client;
 
+import net.nemerosa.ontrack.extension.git.model.GitPullRequest;
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueWrapper;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -22,5 +25,15 @@ public interface OntrackGitLabClient {
      * @return Details about the issue
      */
     GitLabIssueWrapper getIssue(String repository, int id);
+
+    /**
+     * Gets a pull request using its ID
+     *
+     * @param repository Repository name, like <code>nemerosa/ontrack</code>
+     * @param id         ID of the pull request
+     * @return Details of the pull request
+     */
+    @Nullable
+    GitPullRequest getPullRequest(@NotNull String repository, int id);
 
 }
