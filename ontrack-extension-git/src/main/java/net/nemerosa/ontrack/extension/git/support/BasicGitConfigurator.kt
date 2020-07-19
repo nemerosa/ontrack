@@ -1,54 +1,55 @@
-package net.nemerosa.ontrack.extension.git.support;
+package net.nemerosa.ontrack.extension.git.support
 
-import net.nemerosa.ontrack.extension.git.model.BasicGitActualConfiguration;
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
-import net.nemerosa.ontrack.extension.git.model.GitConfigurator;
-import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty;
-import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType;
-import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
-import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.PropertyService;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import net.nemerosa.ontrack.extension.git.model.BasicGitActualConfiguration
+import net.nemerosa.ontrack.extension.git.model.GitConfiguration
+import net.nemerosa.ontrack.extension.git.model.GitConfigurator
+import net.nemerosa.ontrack.extension.git.model.GitPullRequest
+import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty
+import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
+import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.PropertyService
+import org.springframework.stereotype.Component
 
 @Component
-public class BasicGitConfigurator implements GitConfigurator {
+class BasicGitConfigurator(
+        private val propertyService: PropertyService,
+        private val issueServiceRegistry: IssueServiceRegistry
+) : GitConfigurator {
 
-    private final PropertyService propertyService;
-    private final IssueServiceRegistry issueServiceRegistry;
-
-    @Autowired
-    public BasicGitConfigurator(PropertyService propertyService, IssueServiceRegistry issueServiceRegistry) {
-        this.propertyService = propertyService;
-        this.issueServiceRegistry = issueServiceRegistry;
+    override fun isProjectConfigured(project: Project): Boolean {
+        return propertyService.hasProperty(project, GitProjectConfigurationPropertyType::class.java)
     }
 
-    @Override
-    public boolean isProjectConfigured(@NotNull Project project) {
-        return propertyService.hasProperty(project, GitProjectConfigurationPropertyType.class);
+    override fun getConfiguration(project: Project): GitConfiguration? {
+        return propertyService.getProperty(project, GitProjectConfigurationPropertyType::class.java)
+                .value
+                ?.run {
+                    getGitConfiguration(this)
+                }
     }
 
-    @Nullable
-    @Override
-    public GitConfiguration getConfiguration(@NotNull Project project) {
-        return propertyService.getProperty(project, GitProjectConfigurationPropertyType.class)
-                .option()
-                .map(this::getGitConfiguration)
-                .orElse(null);
-    }
+    /**
+     * Pull requests are not supported by basic Git.
+     */
+    override fun toPullRequestID(key: String): Int? = null
 
-    private GitConfiguration getGitConfiguration(GitProjectConfigurationProperty property) {
-        return new BasicGitActualConfiguration(
-                property.getConfiguration(),
+    /**
+     * Pull requests are not supported by basic Git.
+     */
+    override fun getPullRequest(configuration: GitConfiguration, id: Int): GitPullRequest? = null
+
+    private fun getGitConfiguration(property: GitProjectConfigurationProperty): GitConfiguration {
+        return BasicGitActualConfiguration(
+                property.configuration,
                 getConfiguredIssueService(property)
-        );
+        )
     }
 
-    private ConfiguredIssueService getConfiguredIssueService(GitProjectConfigurationProperty property) {
-        String identifier = property.getConfiguration().getIssueServiceConfigurationIdentifier();
-        return issueServiceRegistry.getConfiguredIssueService(identifier);
+    private fun getConfiguredIssueService(property: GitProjectConfigurationProperty): ConfiguredIssueService {
+        val identifier = property.configuration.issueServiceConfigurationIdentifier
+        return issueServiceRegistry.getConfiguredIssueService(identifier)
     }
+
 }
