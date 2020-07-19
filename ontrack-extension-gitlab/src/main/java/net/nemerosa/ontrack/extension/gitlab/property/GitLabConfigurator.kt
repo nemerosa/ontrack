@@ -31,16 +31,6 @@ class GitLabConfigurator(
                 ?.run { getGitConfiguration(this) }
     }
 
-    override fun toPullRequestID(key: String): Int? {
-        if (key.isNotBlank()) {
-            val m = "#(\\d+)".toRegex().matchEntire(key)
-            if (m != null) {
-                return m.groupValues[1].toInt(10)
-            }
-        }
-        return null
-    }
-
     override fun getPullRequest(configuration: GitConfiguration, id: Int): GitPullRequest? =
             if (configuration is GitLabGitConfiguration) {
                 val client = ontrackGitLabClientFactory.create(configuration.property.configuration)

@@ -20,7 +20,15 @@ interface GitConfigurator {
     /**
      * Converts a PR key to an ID when possible
      */
-    fun toPullRequestID(key: String): Int?
+    fun toPullRequestID(key: String): Int? {
+        if (key.isNotBlank()) {
+            val m = "PR-(\\d+)".toRegex().matchEntire(key)
+            if (m != null) {
+                return m.groupValues[1].toInt(10)
+            }
+        }
+        return null
+    }
 
     /**
      * Loads a pull request

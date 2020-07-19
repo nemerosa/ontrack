@@ -31,16 +31,6 @@ class GitHubConfigurator(
                 ?.run { getGitConfiguration(this) }
     }
 
-    override fun toPullRequestID(key: String): Int? {
-        if (key.isNotBlank()) {
-            val m = "#(\\d+)".toRegex().matchEntire(key)
-            if (m != null) {
-                return m.groupValues[1].toInt(10)
-            }
-        }
-        return null
-    }
-
     override fun getPullRequest(configuration: GitConfiguration, id: Int): GitPullRequest? =
             if (configuration is GitHubGitConfiguration) {
                 val client = ontrackGitHubClientFactory.create(configuration.property.configuration)
