@@ -637,7 +637,7 @@ class GitServiceImpl(
 
     override fun getProjectConfiguration(project: Project): GitConfiguration? {
         return gitConfigurators.asSequence()
-                .mapNotNull { c -> c.getConfiguration(project).getOrNull() }
+                .mapNotNull { c -> c.getConfiguration(project) }
                 .firstOrNull()
     }
 

@@ -11,10 +11,9 @@ import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 public class GitHubConfigurator implements GitConfigurator {
@@ -38,11 +37,13 @@ public class GitHubConfigurator implements GitConfigurator {
         return propertyService.hasProperty(project, GitHubProjectConfigurationPropertyType.class);
     }
 
+    @Nullable
     @Override
-    public Optional<GitConfiguration> getConfiguration(Project project) {
+    public GitConfiguration getConfiguration(@NotNull Project project) {
         return propertyService.getProperty(project, GitHubProjectConfigurationPropertyType.class)
                 .option()
-                .map(this::getGitConfiguration);
+                .map(this::getGitConfiguration)
+                .orElse(null);
     }
 
     private GitConfiguration getGitConfiguration(GitHubProjectConfigurationProperty property) {

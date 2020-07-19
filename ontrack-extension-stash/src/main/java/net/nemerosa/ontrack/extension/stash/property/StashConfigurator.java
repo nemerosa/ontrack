@@ -7,10 +7,9 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 public class StashConfigurator implements GitConfigurator {
@@ -29,11 +28,13 @@ public class StashConfigurator implements GitConfigurator {
         return propertyService.hasProperty(project, StashProjectConfigurationPropertyType.class);
     }
 
+    @Nullable
     @Override
-    public Optional<GitConfiguration> getConfiguration(Project project) {
+    public GitConfiguration getConfiguration(@NotNull Project project) {
         return propertyService.getProperty(project, StashProjectConfigurationPropertyType.class)
                 .option()
-                .map(this::getGitConfiguration);
+                .map(this::getGitConfiguration)
+                .orElse(null);
     }
 
     private GitConfiguration getGitConfiguration(StashProjectConfigurationProperty property) {

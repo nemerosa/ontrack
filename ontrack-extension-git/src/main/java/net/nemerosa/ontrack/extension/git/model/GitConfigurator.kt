@@ -1,15 +1,20 @@
 package net.nemerosa.ontrack.extension.git.model
 
 import net.nemerosa.ontrack.model.structure.Project
-import java.util.*
 
 /**
  * Extracting the Git configuration from a project.
  */
 interface GitConfigurator {
 
+    /**
+     * Checks if the project is configured for Git.
+     */
     fun isProjectConfigured(project: Project): Boolean
 
-    fun getConfiguration(project: Project): Optional<GitConfiguration>
-    
+    /**
+     * Gets the configuration for a project, when it exists.
+     */
+    fun getConfiguration(project: Project): GitConfiguration?
+
 }
