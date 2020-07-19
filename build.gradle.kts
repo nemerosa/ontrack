@@ -690,10 +690,10 @@ val gitterAnnouncement by tasks.registering(GitterAnnouncement::class) {
     roomId = gitterRoom
     text = {
         """
-        ## Ontrack $version is out
-        
-        ${githubReleaseChangeLog.get().changeLog}       
-        """.trimIndent()
+        |## Ontrack $version is out
+        | 
+        |${githubReleaseChangeLog.get().changeLog}       
+        """.trimMargin()
     }
 }
 
