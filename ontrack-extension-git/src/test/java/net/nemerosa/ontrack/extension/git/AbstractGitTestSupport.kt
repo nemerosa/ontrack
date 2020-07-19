@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.git
 
+import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurationProperty
+import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.BranchInfo
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
@@ -82,6 +84,26 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
                 this,
                 GitProjectConfigurationPropertyType::class.java,
                 GitProjectConfigurationProperty(gitConfiguration)
+        )
+        // Makes sure to register the project
+        if (sync) {
+            asAdmin().execute {
+                jobOrchestrator.orchestrate(JobRunListener.out())
+            }
+        }
+    }
+
+    /**
+     * Configures a project for Git, with compatibility with pull requests (mocking)
+     */
+    protected fun Project.prGitProject(repo: GitRepo, sync: Boolean = true) {
+        // Create a Git configuration
+        val gitConfiguration = createGitConfiguration(repo, sync)
+        // Configures the project
+        setProperty(
+                this,
+                GitMockingConfigurationPropertyType::class.java,
+                GitMockingConfigurationProperty(gitConfiguration, null)
         )
         // Makes sure to register the project
         if (sync) {
