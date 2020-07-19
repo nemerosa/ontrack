@@ -10,7 +10,7 @@ constructor(
         val configuration: GitConfiguration,
 
         /**
-         * Default branch
+         * Git branch name (can be a PR key)
          */
         val branch: String,
 

@@ -11,9 +11,7 @@ class GitMockingConfiguration: GitConfiguration {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getRemote(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getRemote(): String = "uri:test:git"
 
     override fun getName(): String = "Mocking"
 

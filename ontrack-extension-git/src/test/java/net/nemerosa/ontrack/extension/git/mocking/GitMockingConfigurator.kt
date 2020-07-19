@@ -20,20 +20,37 @@ class GitMockingConfigurator(
                     .value
                     ?.let { GitMockingConfiguration() }
 
-    override fun toPullRequestID(key: String): Int? {
-        if (key.isNotBlank()) {
-            val m = "#(\\d+)".toRegex().matchEntire(key)
-            if (m != null) {
-                return m.groupValues[1].toInt(10)
-            }
-        }
-        return null
-    }
-
     override fun getPullRequest(configuration: GitConfiguration, id: Int): GitPullRequest? =
             if (configuration is GitMockingConfiguration) {
-                TODO("Creates a mock pull request")
+                pullRequests[id]
             } else {
                 null
             }
+
+    private val pullRequests = mutableMapOf<Int,GitPullRequest>()
+
+    fun clearPullRequests() {
+        pullRequests.clear()
+    }
+
+    /**
+     * Registers a PR for testing purpose.
+     *
+     * Caution: this method and [clearPullRequests] are not meant to run in parallel
+     */
+    fun registerPullRequest(
+            id: Int,
+            source: String = "feature/TK-$id-feature",
+            target: String = "release/1.0",
+            title: String = "PR n°$id"
+    ) {
+        val pr = GitPullRequest(
+                id = id,
+                key = "#$id",
+                source = "refs/heads/$source",
+                target = "refs/heads/$target",
+                title = title
+        )
+        pullRequests[id] = pr
+    }
 }
