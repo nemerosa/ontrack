@@ -618,6 +618,7 @@ pipeline {
             }
             environment {
                 GITHUB_TOKEN = credentials("JENKINS_GITHUB_TOKEN")
+                GITTER_TOKEN = credentials("GITTER_TOKEN")
             }
             when {
                 beforeAgent true
@@ -634,7 +635,8 @@ pipeline {
                         -PgitHubToken=${GITHUB_TOKEN} \\
                         -PgitHubCommit=${GIT_COMMIT} \\
                         -PgitHubChangeLogReleaseBranch=${ONTRACK_BRANCH_NAME} \\
-                        githubRelease
+                        -PgitterToken=${GITTER_TOKEN} \\
+                        release
                 '''
 
             }
