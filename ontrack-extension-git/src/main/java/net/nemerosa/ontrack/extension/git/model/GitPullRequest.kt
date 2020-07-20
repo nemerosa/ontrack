@@ -8,11 +8,19 @@ package net.nemerosa.ontrack.extension.git.model
  * @property source Source branch of the pull request (Git complete ref, like `refs/heads/master`)
  * @property target Target branch of the pull request (Git complete ref, like `refs/heads/master`)
  * @property title Title of the pull request
+ * @property url URL to get more details about the pull request
  */
 class GitPullRequest(
         val id: Int,
         val key: String,
         val source: String,
         val target: String,
-        val title: String
-)
+        val title: String,
+        val url: String
+) {
+
+    companion object {
+        fun simpleBranchName(ref: String) = ref.removePrefix("refs/heads/")
+    }
+
+}

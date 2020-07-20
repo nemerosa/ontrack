@@ -49,7 +49,8 @@ class GitMockingConfigurator(
                 key = "#$id",
                 source = "refs/heads/$source",
                 target = "refs/heads/$target",
-                title = title
+                title = title,
+                url = "uri:testing:web:git:pr:$id"
         )
         pullRequests[id] = pr
     }

@@ -43,7 +43,8 @@ class StashConfigurator(
                         key = "PR-$id",
                         source = json["fromRef"]["id"].asText(),
                         target = json["toRef"]["id"].asText(),
-                        title = json["title"].asText()
+                        title = json["title"].asText(),
+                        url = "${configuration.property.configuration.url}/projects/${configuration.property.project}/repos/${configuration.property.repository}/pull-requests/$id"
                 )
             } else {
                 null

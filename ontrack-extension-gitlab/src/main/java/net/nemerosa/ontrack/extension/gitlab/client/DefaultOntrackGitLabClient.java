@@ -83,7 +83,8 @@ public class DefaultOntrackGitLabClient implements OntrackGitLabClient {
                         "#" + id,
                         pr.getSourceBranch(),
                         pr.getTargetBranch(),
-                        pr.getTitle()
+                        pr.getTitle(),
+                        pr.getWebUrl()
                 );
             } catch (FileNotFoundException ignored) {
                 return null;

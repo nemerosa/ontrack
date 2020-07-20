@@ -630,7 +630,7 @@ class GitServiceImpl(
         return SCMBuildView(getBuildView(buildId), GitBuildInfo())
     }
 
-    private fun getGitConfiguratorAndConfiguration(project: Project): Pair<GitConfigurator, GitConfiguration>? =
+    override fun getGitConfiguratorAndConfiguration(project: Project): Pair<GitConfigurator, GitConfiguration>? =
             gitConfigurators.mapNotNull {
                 val configuration = it.getConfiguration(project)
                 if (configuration != null) {

@@ -152,11 +152,12 @@ class DefaultOntrackGitHubClient(
         }
         // Conversion
         return GitPullRequest(
-                id,
-                "#$id",
-                pr.base.ref,
-                pr.head.ref,
-                pr.title
+                id = id,
+                key = "#$id",
+                source = pr.base.ref,
+                target = pr.head.ref,
+                title = pr.title,
+                url = pr.htmlUrl
         )
     }
 
