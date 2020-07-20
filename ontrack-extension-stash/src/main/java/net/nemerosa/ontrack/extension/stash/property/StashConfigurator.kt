@@ -57,10 +57,9 @@ class StashConfigurator(
         )
     }
 
-    private fun getConfiguredIssueService(property: StashProjectConfigurationProperty): ConfiguredIssueService {
-        return issueServiceRegistry.getConfiguredIssueService(
-                property.issueServiceConfigurationIdentifier
-        )
-    }
+    private fun getConfiguredIssueService(property: StashProjectConfigurationProperty): ConfiguredIssueService? =
+            property.issueServiceConfigurationIdentifier
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let { issueServiceRegistry.getConfiguredIssueService(it) }
 
 }
