@@ -47,9 +47,9 @@ class BasicGitConfigurator(
         )
     }
 
-    private fun getConfiguredIssueService(property: GitProjectConfigurationProperty): ConfiguredIssueService {
-        val identifier = property.configuration.issueServiceConfigurationIdentifier
-        return issueServiceRegistry.getConfiguredIssueService(identifier)
+    private fun getConfiguredIssueService(property: GitProjectConfigurationProperty): ConfiguredIssueService? {
+        val identifier = property.configuration.issueServiceConfigurationIdentifier?.takeIf { it.isNotBlank() }
+        return identifier?.let { issueServiceRegistry.getConfiguredIssueService(it) }
     }
 
 }
