@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class SonarQubeMeasuresInformationExtension(
@@ -15,16 +14,16 @@ class SonarQubeMeasuresInformationExtension(
         private val sonarQubeMeasuresCollectionService: SonarQubeMeasuresCollectionService
 ) : AbstractExtension(extensionFeature), EntityInformationExtension {
 
-    override fun getInformation(entity: ProjectEntity): Optional<EntityInformation> {
+    override fun getInformation(entity: ProjectEntity): EntityInformation? {
         return if (entity is Build) {
             val measures = sonarQubeMeasuresCollectionService.getMeasures(entity)
             if (measures != null) {
-                Optional.of(EntityInformation(this, measures))
+                EntityInformation(this, measures)
             } else {
-                Optional.empty()
+                null
             }
         } else {
-            Optional.empty()
+            null
         }
     }
 }

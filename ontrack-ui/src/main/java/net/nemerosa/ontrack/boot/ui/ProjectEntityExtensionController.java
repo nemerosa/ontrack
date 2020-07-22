@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -61,8 +62,7 @@ public class ProjectEntityExtensionController extends AbstractProjectEntityContr
         // List of informations to return
         List<EntityInformation> informations = extensionManager.getExtensions(EntityInformationExtension.class).stream()
                 .map(x -> x.getInformation(entity))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         // OK

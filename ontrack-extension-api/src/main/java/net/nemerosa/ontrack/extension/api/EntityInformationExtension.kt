@@ -1,20 +1,16 @@
-package net.nemerosa.ontrack.extension.api;
+package net.nemerosa.ontrack.extension.api
 
-import net.nemerosa.ontrack.extension.api.model.EntityInformation;
-import net.nemerosa.ontrack.model.extension.Extension;
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
-
-import java.util.Optional;
+import net.nemerosa.ontrack.extension.api.model.EntityInformation
+import net.nemerosa.ontrack.model.extension.Extension
+import net.nemerosa.ontrack.model.structure.ProjectEntity
 
 /**
  * Defines an extension that can provide additional content to an
- * {@linkplain net.nemerosa.ontrack.model.structure.ProjectEntity entity}.
+ * [entity][net.nemerosa.ontrack.model.structure.ProjectEntity].
  */
-public interface EntityInformationExtension extends Extension {
-
+interface EntityInformationExtension : Extension {
     /**
-     * Gets information for an entity.
+     * Gets information for an entity. Returns `null` when none is available.
      */
-    Optional<EntityInformation> getInformation(ProjectEntity entity);
-
+    fun getInformation(entity: ProjectEntity): EntityInformation?
 }
