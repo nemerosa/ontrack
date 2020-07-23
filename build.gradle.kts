@@ -280,6 +280,7 @@ configure(coreProjects) p@{
             dependency("org.kohsuke:groovy-sandbox:1.19")
             dependency("com.graphql-java:graphql-java:11.0")
             dependency("org.jetbrains.kotlin:kotlin-test:${kotlinVersion}")
+            dependency("com.opencsv:opencsv:5.2")
             // Overrides from Spring Boot
             dependency("org.postgresql:postgresql:9.4.1208")
         }

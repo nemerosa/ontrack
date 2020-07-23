@@ -12,6 +12,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation(project(":ontrack-repository-support"))
     implementation("io.micrometer:micrometer-core")
+    implementation("com.opencsv:opencsv")
 
     testImplementation("org.codehaus.groovy:groovy")
     testImplementation(project(":ontrack-it-utils"))
