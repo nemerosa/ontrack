@@ -60,6 +60,22 @@
                         <label for="catalog-filter-project">Project</label>
                         <input id="catalog-filter-project" class="form-control" type="text" ng-model="queryVariables.project" />
                     </div>
+                    <!-- After last activity filter -->
+                    <div class="form-group">
+                        <label for="catalog-filter-after-last-activity">After</label>
+                        <input ng-model="queryVariables.afterLastActivity" id="catalog-filter-after-last-activity" type="text" class="form-control"
+                               datepicker-popup="EEE dd MMM yyyy"
+                               is-open="catalog-filter-before-last-activity-opened"
+                        />
+                    </div>
+                    <!-- Before last activity filter -->
+                    <div class="form-group">
+                        <label for="catalog-filter-before-last-activity">Before</label>
+                        <input ng-model="queryVariables.beforeLastActivity" id="catalog-filter-before-last-activity" type="text" class="form-control"
+                               datepicker-popup="EEE dd MMM yyyy"
+                               is-open="catalog-filter-before-last-activity-opened"
+                        />
+                    </div>
                     <!-- Search button -->
                     <div class="form-group">
                         <button type="button"

@@ -63,10 +63,18 @@ class SCMCatalogFilterServiceImpl(
             { entry: SCMCatalogEntry -> it.matches(entry.repository) }
         } ?: { true }
         val entryLinkFilter: (SCMCatalogEntry) -> Boolean = getEntryLinkFilter(filter.link)
+        val entryBeforeLastActivityFilter: (SCMCatalogEntry) -> Boolean = filter.beforeLastActivity?.let {
+            { entry: SCMCatalogEntry -> entry.lastActivity != null && entry.lastActivity.toLocalDate() <= it }
+        } ?: { true }
+        val entryAfterLastActivityFilter: (SCMCatalogEntry) -> Boolean = filter.afterLastActivity?.let {
+            { entry: SCMCatalogEntry -> entry.lastActivity != null && entry.lastActivity.toLocalDate() >= it }
+        } ?: { true }
         val entryFilter: (SCMCatalogEntry) -> Boolean = entryScmFilter and
                 entryConfigFilter and
                 entryRepositoryFilter and
-                entryLinkFilter
+                entryLinkFilter and
+                entryBeforeLastActivityFilter and
+                entryAfterLastActivityFilter
 
         val entries: () -> Sequence<SCMCatalogEntryOrProject> = {
             scmCatalog.catalogEntries.filter(entryFilter).map { entry ->

@@ -513,6 +513,8 @@ angular.module('ontrack.extension.scm', [
             repository: "",
             project: "",
             link: "ENTRY",
+            beforeLastActivity: null,
+            afterLastActivity: null,
             sortOn: null,
             sortAscending: true
         };
@@ -526,8 +528,8 @@ angular.module('ontrack.extension.scm', [
         };
 
         const query = `
-            query CatalogInfo($offset: Int!, $size: Int!, $scm: String, $config: String, $repository: String, $link: String, $project: String, $sortOn: String, $sortAscending: Boolean) {
-                scmCatalog(offset: $offset, size: $size, scm: $scm, config: $config, repository: $repository, link: $link, project: $project, sortOn: $sortOn, sortAscending: $sortAscending) {
+            query CatalogInfo($offset: Int!, $size: Int!, $scm: String, $config: String, $repository: String, $link: String, $project: String, $sortOn: String, $sortAscending: Boolean, $beforeLastActivity: String, $afterLastActivity: String) {
+                scmCatalog(offset: $offset, size: $size, scm: $scm, config: $config, repository: $repository, link: $link, project: $project, sortOn: $sortOn, sortAscending: $sortAscending, beforeLastActivity: $beforeLastActivity, afterLastActivity: $afterLastActivity) {
                     pageInfo {
                       totalSize
                       currentOffset
