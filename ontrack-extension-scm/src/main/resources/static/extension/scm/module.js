@@ -547,6 +547,7 @@ angular.module('ontrack.extension.scm', [
                         config
                         repository
                         repositoryPage
+                        lastActivity
                         timestamp
                       }
                       project {

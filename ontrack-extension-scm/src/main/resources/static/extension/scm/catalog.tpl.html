@@ -12,7 +12,7 @@
     <table class="table table-hover table-condensed" ng-show="data">
         <thead>
         <tr>
-            <td colspan="4">
+            <td colspan="6">
                 <form class="form-inline">
                     <button class="btn btn-default" type="button" ng-click="navigate(data.scmCatalog.pageInfo.previousPage)" ng-disabled="!data.scmCatalog.pageInfo.previousPage">
                         <span class="fa fa-step-backward"></span>
@@ -83,7 +83,7 @@
         </thead>
         <tbody ng-if="data.scmCatalog.pageInfo.currentSize == 0">
         <tr class="alert alert-warning">
-            <td colspan="4">
+            <td colspan="6">
                 No SCM catalog entry was collected or the filter is too restrictive.
             </td>
         </tr>
@@ -94,6 +94,7 @@
             <th>Config</th>
             <th>Repository</th>
             <th>Project</th>
+            <th>Last activity</th>
             <th>Collection time</th>
         </tr>
         </thead>
@@ -106,6 +107,11 @@
                 <span ng-if="!item.entry"><span class="fa fa-ban text-danger"></span>&nbsp;<a ng-if="item.project" href="{{item.project.links._page}}">{{item.project.name}}</a>&nbsp;<span class="ot-description">This project is not linked to any repository.</span></span>
                 <span ng-if="item.entry && !item.project"><span class="fa fa-info text-info"></span>&nbsp;<span class="ot-description">This project is not managed in Ontrack.</span></span>
                 <span ng-if="item.entry && item.project"><span class="fa fa-archive text-success"></span>&nbsp;<a ng-if="item.project" href="{{item.project.links._page}}">{{item.project.name}}</a></span>
+            </td>
+            <td title="Last activity">
+                <span ng-if="item.entry.lastActivity">
+                {{item.entry.lastActivity | date:'mediumDate'}}
+                </span>
             </td>
             <td title="Collection timestamp">
                 {{item.entry.timestamp | date:'mediumDate'}}

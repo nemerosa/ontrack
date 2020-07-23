@@ -42,6 +42,11 @@ class GQLTypeSCMCatalogEntry(
                                 .type(GraphQLString)
                     }
                     .field {
+                        it.name("lastActivity")
+                                .description("Last activity timestamp")
+                                .type(GQLScalarLocalDateTime.INSTANCE)
+                    }
+                    .field {
                         it.name("timestamp")
                                 .description("Collection timestamp")
                                 .type(GQLScalarLocalDateTime.INSTANCE)
