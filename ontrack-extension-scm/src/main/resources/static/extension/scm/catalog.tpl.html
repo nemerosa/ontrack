@@ -92,9 +92,19 @@
         <tr>
             <th>SCM</th>
             <th>Config</th>
-            <th>Repository</th>
+            <th ng-click="changeCatalogSorting('REPOSITORY')" class="ot-action">
+                Repository
+                <span class="fa fa-sort-asc" ng-if="catalogSortOn == 'REPOSITORY' && catalogSortAscending"></span>
+                <span class="fa fa-sort-desc" ng-if="catalogSortOn == 'REPOSITORY' && !catalogSortAscending"></span>
+                <span class="fa fa-sort text-muted" ng-if="catalogSortOn != 'REPOSITORY'"></span>
+            </th>
             <th>Project</th>
-            <th>Last activity</th>
+            <th ng-click="changeCatalogSorting('LAST_ACTIVITY')" class="ot-action">
+                Last activity
+                <span class="fa fa-sort-asc" ng-if="catalogSortOn == 'LAST_ACTIVITY' && catalogSortAscending"></span>
+                <span class="fa fa-sort-desc" ng-if="catalogSortOn == 'LAST_ACTIVITY' && !catalogSortAscending"></span>
+                <span class="fa fa-sort text-muted" ng-if="catalogSortOn != 'LAST_ACTIVITY'"></span>
+            </th>
             <th>Collection time</th>
         </tr>
         </thead>

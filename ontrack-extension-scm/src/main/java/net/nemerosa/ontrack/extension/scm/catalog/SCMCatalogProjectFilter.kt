@@ -10,5 +10,7 @@ data class SCMCatalogProjectFilter(
         val config: String? = null,
         val repository: String? = null,
         val project: String? = null,
-        val link: SCMCatalogProjectFilterLink = SCMCatalogProjectFilterLink.ALL
+        val link: SCMCatalogProjectFilterLink = SCMCatalogProjectFilterLink.ALL,
+        val sortOn: SCMCatalogProjectFilterSort? = null,
+        val sortAscending: Boolean = true
 )

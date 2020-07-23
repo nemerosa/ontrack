@@ -512,7 +512,9 @@ angular.module('ontrack.extension.scm', [
             config: "",
             repository: "",
             project: "",
-            link: "ENTRY"
+            link: "ENTRY",
+            sortOn: null,
+            sortAscending: true
         };
 
         $scope.filterLinks = {
@@ -524,8 +526,8 @@ angular.module('ontrack.extension.scm', [
         };
 
         const query = `
-            query CatalogInfo($offset: Int!, $size: Int!, $scm: String, $config: String, $repository: String, $link: String, $project: String) {
-                scmCatalog(offset: $offset, size: $size, scm: $scm, config: $config, repository: $repository, link: $link, project: $project) {
+            query CatalogInfo($offset: Int!, $size: Int!, $scm: String, $config: String, $repository: String, $link: String, $project: String, $sortOn: String, $sortAscending: Boolean) {
+                scmCatalog(offset: $offset, size: $size, scm: $scm, config: $config, repository: $repository, link: $link, project: $project, sortOn: $sortOn, sortAscending: $sortAscending) {
                     pageInfo {
                       totalSize
                       currentOffset
@@ -562,6 +564,18 @@ angular.module('ontrack.extension.scm', [
             }
         `;
 
+        $scope.catalogSortOn = 'REPOSITORY';
+        $scope.catalogSortAscending = true;
+
+        $scope.changeCatalogSorting = (property) => {
+            if ($scope.catalogSortOn === property) {
+                $scope.catalogSortAscending = !$scope.catalogSortAscending;
+            } else {
+                $scope.catalogSortOn = property;
+            }
+            loadCatalog();
+        };
+
         const loadCatalog = () => {
             $scope.loadingCatalog = true;
 
@@ -572,6 +586,9 @@ angular.module('ontrack.extension.scm', [
             if ($scope.queryVariables.project && $scope.queryVariables.project.indexOf("*") < 0) {
                 $scope.queryVariables.project = `.*${$scope.queryVariables.project}.*`;
             }
+
+            $scope.queryVariables.sortOn = $scope.catalogSortOn;
+            $scope.queryVariables.sortAscending = $scope.catalogSortAscending;
 
             otGraphqlService.pageGraphQLCall(query, $scope.queryVariables).then(data => {
                 $scope.data = data;

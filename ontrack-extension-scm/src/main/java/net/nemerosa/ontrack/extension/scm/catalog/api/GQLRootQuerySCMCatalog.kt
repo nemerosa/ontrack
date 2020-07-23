@@ -1,13 +1,11 @@
 package net.nemerosa.ontrack.extension.scm.catalog.api
 
+import graphql.Scalars.GraphQLBoolean
 import graphql.Scalars.GraphQLString
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition
-import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogEntryOrProject
-import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogFilterService
-import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogProjectFilter
-import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogProjectFilterLink
+import net.nemerosa.ontrack.extension.scm.catalog.*
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
@@ -47,6 +45,14 @@ class GQLRootQuerySCMCatalog(
                             GraphQLArgument.newArgument().name(ARG_PROJECT)
                                     .description("Filters on the name of the orphan projects")
                                     .type(GraphQLString)
+                                    .build(),
+                            GraphQLArgument.newArgument().name(ARG_SORT_ON)
+                                    .description("Property to sort on. Supported: ${SCMCatalogProjectFilterSort.values().joinToString(", ")}")
+                                    .type(GraphQLString)
+                                    .build(),
+                            GraphQLArgument.newArgument().name(ARG_SORT_ASCENDING)
+                                    .description("Sorting direction.")
+                                    .type(GraphQLBoolean)
                                     .build()
                     )
             )
@@ -59,6 +65,8 @@ class GQLRootQuerySCMCatalog(
                 ?.run { SCMCatalogProjectFilterLink.valueOf(this) }
                 ?: SCMCatalogProjectFilterLink.ALL
         val project: String? = env.getArgument<String>(ARG_PROJECT)
+        val sortOn: SCMCatalogProjectFilterSort? = env.getArgument<String?>(ARG_SORT_ON)?.run { SCMCatalogProjectFilterSort.valueOf(this) }
+        val sortAscending: Boolean = env.getArgument(ARG_SORT_ASCENDING) ?: true
         val filter = SCMCatalogProjectFilter(
                 offset = offset,
                 size = size,
@@ -66,7 +74,9 @@ class GQLRootQuerySCMCatalog(
                 config = config,
                 repository = repository,
                 link = link,
-                project = project
+                project = project,
+                sortOn = sortOn,
+                sortAscending = sortAscending
         )
         return scmCatalogFilterService.findCatalogProjectEntries(filter)
     }
@@ -77,6 +87,8 @@ class GQLRootQuerySCMCatalog(
         private const val ARG_REPOSITORY = "repository"
         private const val ARG_LINK = "link"
         private const val ARG_PROJECT = "project"
+        private const val ARG_SORT_ON = "sortOn"
+        private const val ARG_SORT_ASCENDING = "sortAscending"
     }
 
 }

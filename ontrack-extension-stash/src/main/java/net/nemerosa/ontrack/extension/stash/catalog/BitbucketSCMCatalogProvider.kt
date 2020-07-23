@@ -9,6 +9,8 @@ import net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPr
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
@@ -17,6 +19,8 @@ class BitbucketSCMCatalogProvider(
         private val bitbucketClientFactory: BitbucketClientFactory,
         private val propertyService: PropertyService
 ) : SCMCatalogProvider {
+
+    private val logger: Logger = LoggerFactory.getLogger(BitbucketSCMCatalogProvider::class.java)
 
     override val id: String = "bitbucket"
 
@@ -27,14 +31,21 @@ class BitbucketSCMCatalogProvider(
                     val client = bitbucketClientFactory.getBitbucketClient(config)
                     client.projects.flatMap { project ->
                         client.getRepositories(project)
-                    }.map { repo ->
-                        val lastModified = client.getRepositoryLastModified(repo)
-                        SCMCatalogSource(
-                                config = config.name,
-                                repository = "${repo.project}/${repo.repository}",
-                                repositoryPage = StashProjectConfigurationProperty(config, repo.project, repo.repository, 0, null).repositoryUrl,
-                                lastActivity = lastModified
-                        )
+                    }.mapNotNull { repo ->
+                        val lastModified = try {
+                            client.getRepositoryLastModified(repo)
+                        } catch (ex: Exception) {
+                            logger.debug("Cannot get last modified date on Bitbucket repository at $repo")
+                            null
+                        }
+                        lastModified?.let {
+                            SCMCatalogSource(
+                                    config = config.name,
+                                    repository = "${repo.project}/${repo.repository}",
+                                    repositoryPage = StashProjectConfigurationProperty(config, repo.project, repo.repository, 0, null).repositoryUrl,
+                                    lastActivity = it
+                            )
+                        }
                     }
                 }
 

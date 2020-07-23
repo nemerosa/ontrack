@@ -109,7 +109,18 @@ class SCMCatalogFilterServiceImpl(
         }
 
         // Sorting
-        return allEntries.sorted().drop(filter.offset).take(filter.size).toList()
+        val sortOn = filter.sortOn ?: SCMCatalogProjectFilterSort.REPOSITORY
+        val comparator: Comparator<SCMCatalogEntryOrProject> =
+                compareBy(sortOn.sortingSelector).run {
+                    if (filter.sortAscending) {
+                        this
+                    } else {
+                        reversed()
+                    }
+                }
+
+        // Sorting & truncating
+        return allEntries.sortedWith(comparator).drop(filter.offset).take(filter.size).toList()
     }
 
     private fun getEntryLinkFilter(link: SCMCatalogProjectFilterLink): (SCMCatalogEntry) -> Boolean = { entry ->
