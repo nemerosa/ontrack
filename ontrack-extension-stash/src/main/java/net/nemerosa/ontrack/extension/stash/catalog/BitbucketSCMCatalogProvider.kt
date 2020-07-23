@@ -28,10 +28,12 @@ class BitbucketSCMCatalogProvider(
                     client.projects.flatMap { project ->
                         client.getRepositories(project)
                     }.map { repo ->
+                        val lastModified = client.getRepositoryLastModified(repo)
                         SCMCatalogSource(
                                 config = config.name,
                                 repository = "${repo.project}/${repo.repository}",
-                                repositoryPage = StashProjectConfigurationProperty(config, repo.project, repo.repository, 0, null).repositoryUrl
+                                repositoryPage = StashProjectConfigurationProperty(config, repo.project, repo.repository, 0, null).repositoryUrl,
+                                lastActivity = lastModified
                         )
                     }
                 }

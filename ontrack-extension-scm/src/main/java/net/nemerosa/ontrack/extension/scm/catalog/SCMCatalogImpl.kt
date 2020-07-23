@@ -44,6 +44,7 @@ class SCMCatalogImpl(
                         config = source.config,
                         repository = source.repository,
                         repositoryPage = source.repositoryPage,
+                        lastActivity = source.lastActivity,
                         timestamp = Time.now()
                 )
                 // Stores the entry
