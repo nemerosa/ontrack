@@ -2,7 +2,7 @@
     <div class="panel-heading">
         <span class="fa fa-code-fork"></span> Pull request
     </div>
-    <div class="panel-body">
+    <div class="panel-body" ng-if="value.data.isValid">
         <p>
             <a href="{{value.data.url}}">{{value.data.key}}</a>
             <span>{{value.data.title}}</span>
@@ -10,6 +10,12 @@
         <p>
             From <code>{{value.data.source}}</code>
             to <code>{{value.data.target}}</code>
+        </p>
+    </div>
+    <div class="panel-body" ng-if="!value.data.isValid">
+        <p>
+            <span style="text-decoration: line-through;">{{value.data.key}}</span>
+            <span class="ot-decoration">Invalid pull request (not found or does not exist any longer)</span>
         </p>
     </div>
 </div>

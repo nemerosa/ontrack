@@ -56,10 +56,37 @@ class GitPullRequestInformationExtensionIT : AbstractGitTestSupport() {
                     assertNotNull(info) {
                         assertIs<GitPullRequest>(it.data) { pr ->
                             assertEquals(1, pr.id)
+                            assertEquals(true, pr.isValid)
                             assertEquals("#1", pr.key)
                             assertEquals("refs/heads/feature/TK-1-feature", pr.source)
                             assertEquals("refs/heads/release/1.0", pr.target)
                             assertEquals("Useful feature", pr.title)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `PR entity information for a PR branch with unexisting PR`() {
+        createRepo {
+            commits(1)
+        } and { repo, _ ->
+            project {
+                prGitProject(repo)
+                branch {
+                    gitBranch("PR-1")
+                    // Gets the PR entity information
+                    val info = entityInformationExtension.getInformation(this)
+                    assertNotNull(info) {
+                        assertIs<GitPullRequest>(it.data) { pr ->
+                            assertEquals(1, pr.id)
+                            assertEquals(false, pr.isValid)
+                            assertEquals("#1", pr.key)
+                            assertEquals("", pr.source)
+                            assertEquals("", pr.target)
+                            assertEquals("", pr.title)
                         }
                     }
                 }
