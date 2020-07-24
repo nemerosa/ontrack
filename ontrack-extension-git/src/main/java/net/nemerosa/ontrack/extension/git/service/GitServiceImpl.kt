@@ -654,6 +654,11 @@ class GitServiceImpl(
                 ?: throw GitBranchNotConfiguredException(branch.id)
     }
 
+    override fun getBranchAsPullRequest(branch: Branch): GitPullRequest? =
+            propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java).value?.let { property ->
+                getBranchAsPullRequest(branch, property)
+            }
+
     override fun getBranchConfiguration(branch: Branch): GitBranchConfiguration? {
         // Get the configuration for the project
         val configuration = getProjectConfiguration(branch.project)

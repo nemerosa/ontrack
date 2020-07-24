@@ -41,6 +41,17 @@ interface GitService : SCMService {
     fun getProjectConfiguration(project: Project): GitConfiguration?
 
     /**
+     * Gets (if any) the pull request associated to a branch.
+     *
+     * Note that [GitService.getBranchAsPullRequest] must be used instead if you happen
+     * to already have some information about the branch.
+     *
+     * @param branch Branch
+     * @return Pull request or null is none
+     */
+    fun getBranchAsPullRequest(branch: Branch): GitPullRequest?
+
+    /**
      * Gets the configuration for a branch
      *
      * @param branch Branch to check
