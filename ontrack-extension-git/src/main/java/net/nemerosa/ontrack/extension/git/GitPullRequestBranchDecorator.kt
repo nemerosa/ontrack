@@ -40,6 +40,7 @@ class GitPullRequestBranchDecorator(
 }
 
 class GitPullRequestDecoration(
+        val isValid: Boolean,
         val key: String,
         val source: String,
         val target: String,
@@ -48,6 +49,7 @@ class GitPullRequestDecoration(
 ) {
 
     constructor(config: GitBranchConfiguration, pr: GitPullRequest) : this(
+            isValid = pr.isValid,
             key = pr.key,
             source = GitPullRequest.simpleBranchName(pr.source),
             target = GitPullRequest.simpleBranchName(pr.target),

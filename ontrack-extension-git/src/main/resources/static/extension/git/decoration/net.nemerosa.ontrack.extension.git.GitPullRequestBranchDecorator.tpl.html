@@ -1,3 +1,8 @@
-<a href="{{decoration.data.url}}"
+<a ng-if="decoration.data.isValid"
+   href="{{decoration.data.url}}"
    title="Pull request {{decoration.data.key}} - from {{decoration.data.source}} to {{decoration.data.target}} - {{decoration.data.title}}"
    target="_blank"><span class="fa fa-code-fork"></span></a>
+<span
+        ng-if="!decoration.data.isValid"
+        title="Pull request {{decoration.data.key}} - invalid - not found or has been deleted"><span
+        class="fa fa-code-fork"></span></span>
