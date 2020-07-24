@@ -17,15 +17,28 @@ class GitPullRequest private constructor(
         val source: String,
         val target: String,
         val title: String,
+        val status: String,
         val url: String
 ) {
-    constructor(id: Int, key: String, source: String, target: String, title: String, url: String) : this(
+    fun simplifyBranchNames() = GitPullRequest(
+            id = id,
+            isValid = isValid,
+            key = key,
+            source = simpleBranchName(source),
+            target = simpleBranchName(target),
+            title = title,
+            status = status,
+            url = url
+    )
+
+    constructor(id: Int, key: String, source: String, target: String, title: String, status: String, url: String) : this(
             id = id,
             isValid = true,
             key = key,
             source = source,
             target = target,
             title = title,
+            status = status,
             url = url
     )
 
@@ -40,6 +53,7 @@ class GitPullRequest private constructor(
                 source = "",
                 target = "",
                 title = "",
+                status = "",
                 url = ""
         )
 

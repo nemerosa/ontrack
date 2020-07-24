@@ -42,7 +42,8 @@ class GitMockingConfigurator(
             id: Int,
             source: String = "feature/TK-$id-feature",
             target: String = "release/1.0",
-            title: String = "PR n°$id"
+            title: String = "PR n°$id",
+            status: String = "open"
     ) {
         val pr = GitPullRequest(
                 id = id,
@@ -50,6 +51,7 @@ class GitMockingConfigurator(
                 source = "refs/heads/$source",
                 target = "refs/heads/$target",
                 title = title,
+                status = status,
                 url = "uri:testing:web:git:pr:$id"
         )
         pullRequests[id] = pr

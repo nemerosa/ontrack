@@ -71,6 +71,36 @@ class GitPullRequestIT : AbstractGitTestSupport() {
     }
 
     @Test
+    fun `PR status changing`() {
+        createRepo {
+            commits(1)
+        } and { repo, _ ->
+            gitMockingConfigurator.registerPullRequest(1, status = "open")
+            project {
+                prGitProject(repo)
+                branch {
+                    gitBranch("PR-1")
+                    // Checks the status
+                    assertEquals(
+                            "open",
+                            gitService.getBranchConfiguration(this)
+                                    ?.pullRequest
+                                    ?.status
+                    )
+                    // Changing the status
+                    gitMockingConfigurator.registerPullRequest(1, status = "closed")
+                    assertEquals(
+                            "closed",
+                            gitService.getBranchConfiguration(this)
+                                    ?.pullRequest
+                                    ?.status
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `PR information as the PR is deleted`() {
         createRepo {
             commits(1)

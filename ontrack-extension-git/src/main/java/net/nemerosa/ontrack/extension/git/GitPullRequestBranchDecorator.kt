@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.extension.api.DecorationExtension
-import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.support.AbstractExtension
@@ -26,7 +25,7 @@ class GitPullRequestBranchDecorator(
                                 listOf(
                                         Decoration.of(
                                                 this,
-                                                GitPullRequestDecoration(config, pr)
+                                                GitPullRequestDecoration(pr)
                                         )
                                 )
                             }
@@ -45,15 +44,17 @@ class GitPullRequestDecoration(
         val source: String,
         val target: String,
         val title: String,
+        val status: String,
         val url: String
 ) {
 
-    constructor(config: GitBranchConfiguration, pr: GitPullRequest) : this(
+    constructor(pr: GitPullRequest) : this(
             isValid = pr.isValid,
             key = pr.key,
             source = GitPullRequest.simpleBranchName(pr.source),
             target = GitPullRequest.simpleBranchName(pr.target),
             title = pr.title,
+            status = pr.status,
             url = pr.url
     )
 

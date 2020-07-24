@@ -157,6 +157,7 @@ class DefaultOntrackGitHubClient(
                 source = pr.base.ref,
                 target = pr.head.ref,
                 title = pr.title,
+                status = pr.state,
                 url = pr.htmlUrl
         )
     }
