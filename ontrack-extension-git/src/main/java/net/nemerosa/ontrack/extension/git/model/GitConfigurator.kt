@@ -31,6 +31,11 @@ interface GitConfigurator {
     }
 
     /**
+     * Given a PR ID, returns a display key.
+     */
+    fun toPullRequestKey(prId: Int): String = "#$prId"
+
+    /**
      * Loads a pull request
      *
      * @param configuration Configuration to use

@@ -58,10 +58,52 @@ class GitPullRequestIT : AbstractGitTestSupport() {
                         assertEquals("PR-1", it.branch)
                         assertNotNull(it.pullRequest) { pr ->
                             assertEquals(1, pr.id)
+                            assertEquals(true, pr.isValid)
                             assertEquals("#1", pr.key)
                             assertEquals("refs/heads/feature/TK-1-feature", pr.source)
                             assertEquals("refs/heads/release/1.0", pr.target)
                             assertEquals("Useful feature", pr.title)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `PR information as the PR is deleted`() {
+        createRepo {
+            commits(1)
+        } and { repo, _ ->
+            // Registers a PR
+            gitMockingConfigurator.registerPullRequest(1)
+            project {
+                prGitProject(repo)
+                branch {
+                    // Creates a branch for this PR
+                    gitBranch("PR-1")
+                    // Checks that the PR is associated to the branch
+                    assertNotNull(gitService.getBranchConfiguration(this)) { config ->
+                        assertNotNull(config.pullRequest) { pr ->
+                            assertEquals(1, pr.id)
+                            assertEquals(true, pr.isValid)
+                            assertEquals("#1", pr.key)
+                            assertEquals("refs/heads/feature/TK-1-feature", pr.source)
+                            assertEquals("refs/heads/release/1.0", pr.target)
+                            assertEquals("PR n°1", pr.title)
+                        }
+                    }
+                    // Removes the PR (deletion)
+                    gitMockingConfigurator.unregisterPullRequest(1)
+                    // Checks that the PR is associated to the branch
+                    assertNotNull(gitService.getBranchConfiguration(this)) { config ->
+                        assertNotNull(config.pullRequest, "Branch still identified as a pull request") { pr ->
+                            assertEquals(1, pr.id)
+                            assertEquals(false, pr.isValid)
+                            assertEquals("#1", pr.key)
+                            assertEquals("", pr.source)
+                            assertEquals("", pr.target)
+                            assertEquals("", pr.title)
                         }
                     }
                 }

@@ -27,7 +27,7 @@ class GitMockingConfigurator(
                 null
             }
 
-    private val pullRequests = mutableMapOf<Int,GitPullRequest>()
+    private val pullRequests = mutableMapOf<Int, GitPullRequest>()
 
     fun clearPullRequests() {
         pullRequests.clear()
@@ -53,5 +53,14 @@ class GitMockingConfigurator(
                 url = "uri:testing:web:git:pr:$id"
         )
         pullRequests[id] = pr
+    }
+
+    /**
+     * Unregisters a PR for testing purpose.
+     *
+     * Caution: this method and [clearPullRequests] are not meant to run in parallel
+     */
+    fun unregisterPullRequest(id: Int) {
+        pullRequests.remove(id)
     }
 }

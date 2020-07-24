@@ -12,6 +12,7 @@ fun GitService.getBranchAsPullRequest(
             ?.let { (configurator, configuration) ->
                 configurator.toPullRequestID(gitBranchConfigurationProperty.branch)?.let { prId ->
                     configurator.getPullRequest(configuration, prId)
+                            ?: GitPullRequest.invalidPR(prId, configurator.toPullRequestKey(prId))
                 }
             }
 }

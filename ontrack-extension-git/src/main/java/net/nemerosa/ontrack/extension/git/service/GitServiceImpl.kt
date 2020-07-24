@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.common.FutureUtils
 import net.nemerosa.ontrack.common.asOptional
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequestDifferenceProjectException
 import net.nemerosa.ontrack.extension.git.branching.BranchingModelService
@@ -41,7 +40,6 @@ import java.lang.String.format
 import java.util.*
 import java.util.concurrent.Future
 import java.util.function.BiConsumer
-import java.util.function.Predicate
 import java.util.stream.Stream
 
 @Service
@@ -675,13 +673,7 @@ class GitServiceImpl(
                 override = branchConfigurationProperty.isOverride
                 buildTagInterval = branchConfigurationProperty.buildTagInterval
                 // Pull request information
-                val gitPullRequest: GitPullRequest? = getGitConfiguratorAndConfiguration(branch.project)
-                        ?.let { (configurator, gitConfiguration) ->
-                            // Tries to get the Git branch as a PR key
-                            configurator.toPullRequestID(branchConfigurationProperty.branch)?.let { prId ->
-                                configurator.getPullRequest(gitConfiguration, prId)
-                            }
-                        }
+                val gitPullRequest = getBranchAsPullRequest(branch, branchConfigurationProperty)
                 // OK
                 return GitBranchConfiguration(
                         configuration,

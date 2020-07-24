@@ -28,6 +28,8 @@ class StashConfigurator(
                 ?.run { getGitConfiguration(this) }
     }
 
+    override fun toPullRequestKey(prId: Int): String = "PR-$prId"
+
     override fun getPullRequest(configuration: GitConfiguration, id: Int): GitPullRequest? =
             if (configuration is StashGitConfiguration) {
                 val client = clientFactory.getJsonClient(
