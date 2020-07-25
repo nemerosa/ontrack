@@ -15,6 +15,8 @@ class GitPullRequestGQLType : GQLType {
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType =
             GraphQLObjectType.newObject()
+                    .name(typeName)
+                    .description("Git pull request associated to a branch")
                     .intField(GitPullRequest::id, "PR id")
                     .booleanField(GitPullRequest::isValid, "PR validity - does it exist?")
                     .stringField(GitPullRequest::key, "Display name for the PR")
