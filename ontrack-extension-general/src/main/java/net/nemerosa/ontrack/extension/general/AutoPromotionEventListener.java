@@ -62,7 +62,8 @@ public class AutoPromotionEventListener implements EventListener {
                 property = new AutoPromotionProperty(
                         keptValidationStamps,
                         property.getInclude(),
-                        property.getExclude()
+                        property.getExclude(),
+                        property.getPromotionLevels()
                 );
                 propertyService.editProperty(
                         promotionLevel,

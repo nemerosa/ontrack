@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.BranchCloneRequest
 import net.nemerosa.ontrack.model.structure.CopyService
@@ -15,6 +16,9 @@ class AutoPromotionPropertyIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var copyService: CopyService
+
+    @Autowired
+    private lateinit var autoPromotionPropertyType: AutoPromotionPropertyType
 
     /**
      * This test checks that a promotion level is not attributed twice on validation upon auto promotion.
@@ -33,7 +37,7 @@ class AutoPromotionPropertyIT : AbstractDSLTestSupport() {
                 setProperty(
                         promotionLevel,
                         AutoPromotionPropertyType::class.java,
-                        AutoPromotionProperty(emptyList(), "CI.*", "")
+                        AutoPromotionProperty(emptyList(), "CI.*", "", emptyList())
                 )
                 // Creates a build
                 build("1") {
@@ -81,7 +85,7 @@ class AutoPromotionPropertyIT : AbstractDSLTestSupport() {
                 setProperty(
                         promotionLevel,
                         AutoPromotionPropertyType::class.java,
-                        AutoPromotionProperty(listOf(vs1, vs2), "", "")
+                        AutoPromotionProperty(listOf(vs1, vs2), "", "", emptyList())
                 )
                 // Deletes a validation stamp
                 asUser().with(this, ProjectEdit::class.java).with(this, ProjectEdit::class.java).call {
@@ -116,7 +120,7 @@ class AutoPromotionPropertyIT : AbstractDSLTestSupport() {
                 setProperty(
                         promotionLevel,
                         AutoPromotionPropertyType::class.java,
-                        AutoPromotionProperty(listOf(vs1), "", "")
+                        AutoPromotionProperty(listOf(vs1), "", "", emptyList())
                 )
                 // Cloning the branch
                 val clonedBranchName = TestUtils.uid("B")
@@ -151,6 +155,29 @@ class AutoPromotionPropertyIT : AbstractDSLTestSupport() {
                         )
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Backward compatibility test from 3.42 when `promotionLevels` was not set.
+     */
+    @Test
+    fun `Backward compatibility parsing from 3-42`() {
+        project {
+            branch {
+                val vs1 = validationStamp()
+                val vs2 = validationStamp()
+                val node = mapOf(
+                        "validationStamps" to listOf(vs1.id(), vs2.id()),
+                        "include" to "INCLUDE.*",
+                        "exclude" to "EXCLUDE.*"
+                ).asJson()
+                val property = autoPromotionPropertyType.fromStorage(node)
+                assertEquals(listOf(vs1, vs2), property.validationStamps)
+                assertEquals("INCLUDE.*", property.include)
+                assertEquals("EXCLUDE.*", property.exclude)
+                assertEquals(emptyList(), property.promotionLevels)
             }
         }
     }

@@ -51,7 +51,7 @@ class AutoPromotionPropertyTypeTest {
         when(structureService.getValidationStampListForBranch(branch.getId())).thenReturn([validationStamp1, validationStamp2])
         def form = type.getEditionForm(
                 promotionLevel,
-                new AutoPromotionProperty([validationStamp1], '', ''))
+                new AutoPromotionProperty([validationStamp1], '', '', []))
         def field = form.getField('validationStamps') as MultiSelection
         assert field.items.collect { it.name } == ['VS1', 'VS2']
         assert field.items.collect { it.selected } == [true, false]
@@ -95,7 +95,8 @@ class AutoPromotionPropertyTypeTest {
         def autoPromotionProperty = new AutoPromotionProperty(
                 [validationStamp1, validationStamp2],
                 'include',
-                'exclude'
+                'exclude',
+                [],
         )
         def node = type.forStorage(autoPromotionProperty)
         assert node.path('validationStamps')[0].asInt() == 1
@@ -105,13 +106,14 @@ class AutoPromotionPropertyTypeTest {
     }
 
     @Test
-    void 'For/from storage'() {
+    void 'For and from storage'() {
         when(structureService.getValidationStamp(ID.of(1))).thenReturn(validationStamp1)
         when(structureService.getValidationStamp(ID.of(2))).thenReturn(validationStamp2)
         def autoPromotionProperty = new AutoPromotionProperty(
                 [validationStamp1, validationStamp2],
                 'include',
-                'exclude'
+                'exclude',
+                []
         )
         def node = type.forStorage(autoPromotionProperty)
         def restored = type.fromStorage(node)

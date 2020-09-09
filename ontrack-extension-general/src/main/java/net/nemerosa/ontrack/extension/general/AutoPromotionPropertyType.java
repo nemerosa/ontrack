@@ -100,15 +100,19 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
             return new AutoPromotionProperty(
                     readValidationStamps(node),
                     "",
-                    ""
+                    "",
+                    Collections.emptyList()
             );
         } else {
             JsonNode validationStamps = node.get("validationStamps");
             List<ValidationStamp> validationStampList = readValidationStamps(validationStamps);
+            JsonNode promotionLevels = node.get("promotionLevels");
+            List<PromotionLevel> promotionLevelList = readPromotionLevels(promotionLevels);
             return new AutoPromotionProperty(
                     validationStampList,
                     JsonUtils.get(node, "include", false, ""),
-                    JsonUtils.get(node, "exclude", false, "")
+                    JsonUtils.get(node, "exclude", false, ""),
+                    promotionLevelList
             );
         }
     }
@@ -128,6 +132,23 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
         return validationStampList;
     }
 
+    private List<PromotionLevel> readPromotionLevels(JsonNode promotionLevelIds) {
+        if (promotionLevelIds != null) {
+            if (promotionLevelIds.isArray()) {
+                List<Integer> ids = new ArrayList<>();
+                promotionLevelIds.forEach(id -> ids.add(id.asInt()));
+                // Reading the validation stamps and then the names
+                return ids.stream()
+                        .map(id -> structureService.getPromotionLevel(ID.of(id)))
+                        .collect(Collectors.toList());
+            } else {
+                throw new AutoPromotionPropertyCannotParseException("Cannot get the list of promotion levels");
+            }
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
     @Override
     public AutoPromotionProperty copy(ProjectEntity sourceEntity, AutoPromotionProperty value, ProjectEntity targetEntity, Function<String, String> replacementFn) {
         PromotionLevel targetPromotionLevel = (PromotionLevel) targetEntity;
@@ -142,7 +163,16 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
                         .map(Optional::get)
                         .collect(Collectors.toList()),
                 value.getInclude(),
-                value.getExclude()
+                value.getExclude(),
+                value.getPromotionLevels().stream()
+                        .map(pl -> structureService.findPromotionLevelByName(
+                                targetPromotionLevel.getBranch().getProject().getName(),
+                                targetPromotionLevel.getBranch().getName(),
+                                pl.getName()
+                        ))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList())
         );
     }
 
