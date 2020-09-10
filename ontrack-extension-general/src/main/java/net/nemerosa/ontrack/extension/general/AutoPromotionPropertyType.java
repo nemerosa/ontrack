@@ -86,6 +86,21 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
                                 .value(value != null ? value.getExclude() : "")
                                 .help("Regular expression to exclude validation stamps by name")
                 )
+                .with(
+                        MultiSelection.of("promotionLevels")
+                                .label("Promotion levels")
+                                .items(
+                                        structureService.getPromotionLevelListForBranch(promotionLevel.getBranch().getId())
+                                                .stream()
+                                                .map(pl -> new PromotionLevelSelection(
+                                                                pl,
+                                                                value != null && value.contains(pl)
+                                                        )
+                                                )
+                                                .collect(Collectors.toList())
+                                )
+                                .help("When all the selected promotion levels have been granted to a build, the promotion will automatically be granted.")
+                )
                 ;
     }
 
@@ -188,6 +203,9 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
                                 .collect(Collectors.toList()))
                         .with("include", value.getInclude())
                         .with("exclude", value.getExclude())
+                        .with("promotionLevels", value.getPromotionLevels().stream()
+                                .map(Entity::id)
+                                .collect(Collectors.toList()))
                         .get()
         );
     }

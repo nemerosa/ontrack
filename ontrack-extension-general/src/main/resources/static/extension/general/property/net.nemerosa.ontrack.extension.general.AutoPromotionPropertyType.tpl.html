@@ -9,3 +9,8 @@
 <p ng-if="property.value.exclude">
     Excludes: <b>{{property.value.exclude}}</b>
 </p>
+<span ng-repeat="promotionLevel in property.value.promotionLevels">
+    <ot-entity-image entity="promotionLevel">
+        {{promotionLevel.name}}
+    </ot-entity-image>
+</span>
