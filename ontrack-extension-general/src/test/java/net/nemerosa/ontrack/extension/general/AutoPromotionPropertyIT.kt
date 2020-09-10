@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.BranchCloneRequest
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.CopyService
 import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.test.TestUtils
@@ -11,6 +12,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class AutoPromotionPropertyIT : AbstractDSLTestSupport() {
 
@@ -179,6 +181,162 @@ class AutoPromotionPropertyIT : AbstractDSLTestSupport() {
                 assertEquals("EXCLUDE.*", property.exclude)
                 assertEquals(emptyList(), property.promotionLevels)
             }
+        }
+    }
+
+    @Test
+    fun `Auto promotion based on another promotion`() {
+        project {
+            branch {
+                val silver = promotionLevel()
+                val gold = promotionLevel()
+                // Auto promotion
+                setProperty(
+                        gold,
+                        AutoPromotionPropertyType::class.java,
+                        AutoPromotionProperty(emptyList(), "", "", listOf(silver))
+                )
+                // Testing on a build
+                build {
+                    // Promotes to silver
+                    promote(silver)
+                    // ... checks it has been promoted to gold
+                    checkBuildIsPromoted(this, gold)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Auto promotion based on another promotion and validation stamps`() {
+        project {
+            branch {
+                val silver = promotionLevel()
+                val gold = promotionLevel()
+                val quality = validationStamp()
+                val security = validationStamp()
+                // Auto promotion
+                setProperty(
+                        gold,
+                        AutoPromotionPropertyType::class.java,
+                        AutoPromotionProperty(listOf(quality, security), "", "", listOf(silver))
+                )
+                // Testing on a build
+                build {
+                    // Performs validations
+                    validate(quality)
+                    validate(security)
+                    // ... checks it's not promoted to gold yet
+                    checkBuildIsNotPromoted(this, gold)
+                    // Promotes to silver
+                    promote(silver)
+                    // ... checks it has been promoted to gold
+                    checkBuildIsPromoted(this, gold)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Auto promotion based on another promotion and validation stamps with promotion first`() {
+        project {
+            branch {
+                val silver = promotionLevel()
+                val gold = promotionLevel()
+                val quality = validationStamp()
+                val security = validationStamp()
+                // Auto promotion
+                setProperty(
+                        gold,
+                        AutoPromotionPropertyType::class.java,
+                        AutoPromotionProperty(listOf(quality, security), "", "", listOf(silver))
+                )
+                // Testing on a build
+                build {
+                    // Promotes to silver
+                    promote(silver)
+                    // ... checks it's not promoted to gold yet
+                    checkBuildIsNotPromoted(this, gold)
+                    // Performs validations
+                    validate(quality)
+                    validate(security)
+                    // ... checks it has been promoted to gold
+                    checkBuildIsPromoted(this, gold)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Auto promotion based on same promotion has no effect`() {
+        project {
+            branch {
+                val gold = promotionLevel()
+                // Auto promotion
+                setProperty(
+                        gold,
+                        AutoPromotionPropertyType::class.java,
+                        AutoPromotionProperty(emptyList(), "", "", listOf(gold))
+                )
+                // Testing on a build
+                build {
+                    // Promotes to gold
+                    promote(gold)
+                    // ... checks it has been promoted to gold only once
+                    asUserWithView {
+                        val runs = structureService.getPromotionRunsForBuildAndPromotionLevel(this, gold)
+                        assertEquals(1, runs.size)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Auto promotion adjusted on promotion deletion`() {
+        project {
+            branch {
+                // Creation of two promotion levels
+                val iron = promotionLevel()
+                val silver = promotionLevel()
+                val gold = promotionLevel()
+                // Sets the auto promotion
+                setProperty(
+                        gold,
+                        AutoPromotionPropertyType::class.java,
+                        AutoPromotionProperty(emptyList(), "", "", listOf(iron, silver))
+                )
+                // Deletes the promotion level depended upon
+                asUser().with(this, ProjectEdit::class.java).with(this, ProjectEdit::class.java).call {
+                    structureService.deletePromotionLevel(silver.id)
+                }
+                // Gets the auto promotion configuration
+                val property: AutoPromotionProperty? = getProperty(gold, AutoPromotionPropertyType::class.java)
+                // Checks it does not contain the silver promotion any longer
+                assertNotNull(property) {
+                    assertEquals(
+                            listOf(iron.id),
+                            it.promotionLevels.map { pl -> pl.id }
+                    )
+                }
+            }
+        }
+    }
+
+    private fun checkBuildIsPromoted(build: Build, promotionLevel: PromotionLevel) {
+        build.asUserWithView {
+            val runs = structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel)
+            assertEquals(
+                    listOf(promotionLevel.id),
+                    runs.map { it.promotionLevel.id }
+            )
+        }
+    }
+
+    private fun checkBuildIsNotPromoted(build: Build, promotionLevel: PromotionLevel) {
+        build.asUserWithView {
+            val runs = structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel)
+            assertTrue(runs.isEmpty())
         }
     }
 }
