@@ -92,6 +92,7 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
                                 .items(
                                         structureService.getPromotionLevelListForBranch(promotionLevel.getBranch().getId())
                                                 .stream()
+                                                .filter(pl -> pl.id() != promotionLevel.id())
                                                 .map(pl -> new PromotionLevelSelection(
                                                                 pl,
                                                                 value != null && value.contains(pl)
