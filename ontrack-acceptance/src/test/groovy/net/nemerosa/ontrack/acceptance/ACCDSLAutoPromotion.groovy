@@ -150,4 +150,39 @@ class ACCDSLAutoPromotion extends AbstractACCDSL {
 
     }
 
+    @Test
+    void 'Auto promotion based on promotion'() {
+
+        // Creating a project and a branch
+        def projectName = uid('P')
+        ontrack.project(projectName) {
+            branch('B', '')
+        }
+        def branch = ontrack.branch(projectName, 'B')
+
+        // Creating a a promotion level
+        branch {
+            promotionLevel("SILVER")
+        }
+
+        // Creating an auto promoted promotion level
+        branch {
+            promotionLevel("GOLD") {
+                config {
+                    autoPromotion([], "", "", ["SILVER"])
+                }
+            }
+        }
+
+        // Creating a build
+        def build = branch.build('1')
+
+        // Promotion 3 --> promoted
+        build.promote('SILVER')
+        def promotionRuns = build.promotionRuns
+        assert promotionRuns.size() == 2
+        assert promotionRuns*.promotionLevel.name ==['GOLD', 'SILVER']
+
+    }
+
 }
