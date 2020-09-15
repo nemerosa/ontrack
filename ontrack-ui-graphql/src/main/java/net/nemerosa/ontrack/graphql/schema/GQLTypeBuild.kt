@@ -5,6 +5,7 @@ import graphql.schema.*
 import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType.newObject
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.fetcher
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
@@ -74,7 +75,7 @@ class GQLTypeBuild(
                                 .argument(
                                         newArgument()
                                                 .name(ARG_VALIDATION_STAMP)
-                                                .description("Name of the validation stamp")
+                                                .description("Name of the validation stamp, can be a regular expression.")
                                                 .type(GraphQLString)
                                                 .build()
                                 )
@@ -360,23 +361,34 @@ class GQLTypeBuild(
                 val count = GraphqlUtils.getIntArgument(environment, ARG_COUNT).orElse(50)
                 val validation = GraphqlUtils.getStringArgument(environment, ARG_VALIDATION_STAMP).orElse(null)
                 if (validation != null) {
-                    // Gets the validation stamp
+                    // Gets one validation stamp by name
                     val validationStamp = structureService.findValidationStampByName(
                             build.project.name,
                             build.branch.name,
                             validation
-                    ).orElseThrow {
-                        ValidationStampNotFoundException(
-                                build.project.name,
-                                build.branch.name,
-                                validation
-                        )
+                    ).getOrNull()
+                    // If there is one, we return the list of runs for this very stamp
+                    if (validationStamp != null) {
+                        // Gets validations runs for this validation level
+                        return@DataFetcher structureService.getValidationRunsForBuildAndValidationStamp(
+                                build.id,
+                                validationStamp.id
+                        ).take(count)
                     }
-                    // Gets validations runs for this validation level
-                    return@DataFetcher structureService.getValidationRunsForBuildAndValidationStamp(
-                            build.id,
-                            validationStamp.id
-                    ).take(count)
+                    // If not, we collect the list of matching validation stamp, assuming
+                    // the argument is a regular expression
+                    else {
+                        val vsNameRegex = validation.toRegex()
+                        return@DataFetcher structureService.getValidationStampListForBranch(build.branch.id)
+                                .filter { vs -> vsNameRegex.matches(vs.name) }
+                                .flatMap { vs ->
+                                    structureService.getValidationRunsForBuildAndValidationStamp(
+                                            build.id,
+                                            vs.id,
+                                            0, count
+                                    )
+                                }
+                    }
                 } else {
                     // Gets all the validation runs (limited by count)
                     return@DataFetcher structureService.getValidationRunsForBuild(build.id)
