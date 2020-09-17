@@ -16,7 +16,7 @@ class ValidationRunStatus extends AbstractResource {
     }
 
     @DSLMethod("Returns the status ID in JSON form")
-    String getStatusID() {
+    Object getStatusID() {
         return node['statusID']
     }
 
