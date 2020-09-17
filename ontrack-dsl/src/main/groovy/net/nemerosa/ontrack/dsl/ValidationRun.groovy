@@ -32,9 +32,16 @@ class ValidationRun extends AbstractProjectResource {
         node.validationStamp
     }
 
-    @DSLMethod("Gets the list of statuses (JSON)")
-    def getValidationRunStatuses() {
-        node.validationRunStatuses
+    @DSLMethod("Gets the list of statuses")
+    List<ValidationRunStatus> getValidationRunStatuses() {
+        node.validationRunStatuses.collect { node ->
+            new ValidationRunStatus(ontrack, node)
+        }
+    }
+
+    @DSLMethod("Gets the last of statuses")
+    ValidationRunStatus getLastValidationRunStatus() {
+        validationRunStatuses[0]
     }
 
     @DSLMethod("Gets the associated run info with this validation run or `null` if none")
