@@ -24,7 +24,7 @@ class ValidationRun extends AbstractProjectResource {
 
     @DSLMethod("Gets the status for this validation run.")
     String getStatus() {
-        validationRunStatuses[0].statusID.id
+        validationRunStatuses[0].status
     }
 
     @DSLMethod("Gets the associated validation stamp (JSON)")
