@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * When a new validation run is created with a Passed status, we check all auto promoted promotion levels
+ * When a new validation run is created with a Passed status, or when a promotion is granted, we check all auto promoted promotion levels
  * to know if each of their validation stamps is now passed.
  */
 @Component
@@ -37,6 +37,10 @@ public class AutoPromotionEventListener implements EventListener {
             onNewValidationRun(event);
         } else if (event.getEventType() == EventFactory.DELETE_VALIDATION_STAMP) {
             onDeleteValidationStamp(event);
+        } else if (event.getEventType() == EventFactory.NEW_PROMOTION_RUN) {
+            onNewPromotionRun(event);
+        } else if (event.getEventType() == EventFactory.DELETE_PROMOTION_LEVEL) {
+            onDeletePromotionLevel(event);
         }
     }
 
@@ -48,10 +52,21 @@ public class AutoPromotionEventListener implements EventListener {
         // Gets all promotion levels for this branch
         List<PromotionLevel> promotionLevels = structureService.getPromotionLevelListForBranch(branch.getId());
         // Checks all promotion levels
-        promotionLevels.forEach(promotionLevel -> cleanPromotionLevel(promotionLevel, validationStampId));
+        promotionLevels.forEach(promotionLevel -> cleanPromotionLevelFromValidationStamp(promotionLevel, validationStampId));
     }
 
-    private void cleanPromotionLevel(PromotionLevel promotionLevel, int validationStampId) {
+    private void onDeletePromotionLevel(Event event) {
+        // Gets the promotion level ID
+        int promotionLevelId = event.getIntValue("promotion_level_id");
+        // Branch
+        Branch branch = event.getEntity(ProjectEntityType.BRANCH);
+        // Gets all promotion levels for this branch
+        List<PromotionLevel> promotionLevels = structureService.getPromotionLevelListForBranch(branch.getId());
+        // Checks all promotion levels
+        promotionLevels.forEach(promotionLevel -> cleanPromotionLevelFromPromotionLevel(promotionLevel, promotionLevelId));
+    }
+
+    private void cleanPromotionLevelFromValidationStamp(PromotionLevel promotionLevel, int validationStampId) {
         Optional<AutoPromotionProperty> oProperty = propertyService.getProperty(promotionLevel, AutoPromotionPropertyType.class).option();
         if (oProperty.isPresent()) {
             AutoPromotionProperty property = oProperty.get();
@@ -62,7 +77,31 @@ public class AutoPromotionEventListener implements EventListener {
                 property = new AutoPromotionProperty(
                         keptValidationStamps,
                         property.getInclude(),
-                        property.getExclude()
+                        property.getExclude(),
+                        property.getPromotionLevels()
+                );
+                propertyService.editProperty(
+                        promotionLevel,
+                        AutoPromotionPropertyType.class,
+                        property
+                );
+            }
+        }
+    }
+
+    private void cleanPromotionLevelFromPromotionLevel(PromotionLevel promotionLevel, int promotionLevelId) {
+        Optional<AutoPromotionProperty> oProperty = propertyService.getProperty(promotionLevel, AutoPromotionPropertyType.class).option();
+        if (oProperty.isPresent()) {
+            AutoPromotionProperty property = oProperty.get();
+            List<PromotionLevel> keptPromotionLevels = property.getPromotionLevels().stream().filter(
+                    pl -> (promotionLevelId != pl.id())
+            ).collect(Collectors.toList());
+            if (keptPromotionLevels.size() < property.getPromotionLevels().size()) {
+                property = new AutoPromotionProperty(
+                        property.getValidationStamps(),
+                        property.getInclude(),
+                        property.getExclude(),
+                        keptPromotionLevels
                 );
                 propertyService.editProperty(
                         promotionLevel,
@@ -79,20 +118,28 @@ public class AutoPromotionEventListener implements EventListener {
         if (Objects.equals(
                 validationRun.getLastStatus().getStatusID(),
                 ValidationRunStatusID.STATUS_PASSED)) {
-            // Branch
-            Branch branch = event.getEntity(ProjectEntityType.BRANCH);
-            // Build
-            Build build = event.getEntity(ProjectEntityType.BUILD);
-            // Gets all promotion levels for this branch
-            List<PromotionLevel> promotionLevels = structureService.getPromotionLevelListForBranch(branch.getId());
-            // Gets all validation stamps for this branch
-            List<ValidationStamp> validationStamps = structureService.getValidationStampListForBranch(branch.getId());
-            // Gets the promotion levels which have an auto promotion property
-            promotionLevels.forEach(promotionLevel -> checkPromotionLevel(build, promotionLevel, validationStamps));
+            processEvent(event);
         }
     }
 
-    private void checkPromotionLevel(Build build, PromotionLevel promotionLevel, List<ValidationStamp> validationStamps) {
+    private void onNewPromotionRun(Event event) {
+        processEvent(event);
+    }
+
+    private void processEvent(Event event) {
+        // Branch
+        Branch branch = event.getEntity(ProjectEntityType.BRANCH);
+        // Build
+        Build build = event.getEntity(ProjectEntityType.BUILD);
+        // Gets all promotion levels for this branch
+        List<PromotionLevel> promotionLevels = structureService.getPromotionLevelListForBranch(branch.getId());
+        // Gets all validation stamps for this branch
+        List<ValidationStamp> validationStamps = structureService.getValidationStampListForBranch(branch.getId());
+        // Gets the promotion levels which have an auto promotion property
+        promotionLevels.forEach(promotionLevel -> checkPromotionLevel(build, promotionLevel, promotionLevels, validationStamps));
+    }
+
+    private void checkPromotionLevel(Build build, PromotionLevel promotionLevel, List<PromotionLevel> promotionLevels, List<ValidationStamp> validationStamps) {
         Optional<AutoPromotionProperty> oProperty = propertyService.getProperty(promotionLevel, AutoPromotionPropertyType.class).option();
         if (oProperty.isPresent()) {
             AutoPromotionProperty property = oProperty.get();
@@ -100,12 +147,19 @@ public class AutoPromotionEventListener implements EventListener {
             List<PromotionRun> runs = structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel);
             if (runs.isEmpty()) {
                 // Checks the status of each validation stamp
-                boolean allPassed = validationStamps.stream()
+                boolean allVSPassed = validationStamps.stream()
                         // Keeps only the ones selectable for the autopromotion property
                         .filter(property::contains)
                         // They must all pass
-                        .allMatch(validationStamp -> isPassed(build, validationStamp));
-                if (allPassed) {
+                        .allMatch(validationStamp -> isValidationStampPassed(build, validationStamp));
+                // Checks that all needed promotions are granted
+                boolean allPLPassed = promotionLevels.stream()
+                        // Keeps only the ones selectable for the autopromotion property
+                        .filter(property::contains)
+                        // They must all be granted
+                        .allMatch(pl -> isPromotionLevelGranted(build, pl));
+                // Promotion is needed
+                if (allVSPassed && allPLPassed) {
                     // Promotes
                     // Makes sure to raise the auth level because the one
                     // having made a validation might not be granted to
@@ -125,7 +179,7 @@ public class AutoPromotionEventListener implements EventListener {
         }
     }
 
-    private boolean isPassed(Build build, ValidationStamp validationStamp) {
+    private boolean isValidationStampPassed(Build build, ValidationStamp validationStamp) {
         List<ValidationRun> runs = structureService.getValidationRunsForBuildAndValidationStamp(
                 build.getId(),
                 validationStamp.getId(),
@@ -141,6 +195,11 @@ public class AutoPromotionEventListener implements EventListener {
                     ValidationRunStatusID.STATUS_PASSED
             );
         }
+    }
+
+    private boolean isPromotionLevelGranted(Build build, PromotionLevel promotionLevel) {
+        List<PromotionRun> runs = structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel);
+        return !runs.isEmpty();
     }
 
 }

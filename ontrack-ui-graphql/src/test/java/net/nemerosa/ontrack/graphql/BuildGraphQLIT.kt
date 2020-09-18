@@ -483,4 +483,33 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `Validation runs filtered by validation stamp using a regular expression`() {
+        project {
+            branch {
+                val stamps = (1..3).map {
+                    validationStamp(name = "VS$it")
+                }
+                build {
+                    stamps.forEach { vs ->
+                        validate(vs)
+                    }
+                    // Validation runs for this build, filtered on first validation stamp
+                    val data = asUserWithView {
+                        run("""{
+                            builds(id: $id) {
+                                validationRuns(validationStamp: "VS(1|2)") {
+                                    id
+                                }
+                            }
+                        }""")
+                    }
+                    // Checks the validation runs
+                    val runs = data["builds"][0]["validationRuns"]
+                    assertEquals(2, runs.size())
+                }
+            }
+        }
+    }
+
 }
