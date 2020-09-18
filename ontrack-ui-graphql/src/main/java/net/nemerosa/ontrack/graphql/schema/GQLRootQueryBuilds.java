@@ -4,13 +4,16 @@ import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLFieldDefinition;
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException;
+import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static graphql.Scalars.GraphQLInt;
@@ -25,6 +28,7 @@ public class GQLRootQueryBuilds implements GQLRootQuery {
 
     public static final String PROJECT_ARGUMENT = "project";
     public static final String BRANCH_ARGUMENT = "branch";
+    public static final String NAME_ARGUMENT = "name";
     public static final String BUILD_BRANCH_FILTER_ARGUMENT = "buildBranchFilter";
     public static final String BUILD_PROJECT_FILTER_ARGUMENT = "buildProjectFilter";
 
@@ -74,6 +78,13 @@ public class GQLRootQueryBuilds implements GQLRootQuery {
                 )
                 .argument(
                         newArgument()
+                                .name(NAME_ARGUMENT)
+                                .description("Name of a build - requires 'project' & 'branch' to be filled as well")
+                                .type(GraphQLString)
+                                .build()
+                )
+                .argument(
+                        newArgument()
                                 .name(BUILD_BRANCH_FILTER_ARGUMENT)
                                 .description("Filter to apply for the builds on the branch - requires 'branch' to be filled.")
                                 .type(inputBuildStandardFilter.getTypeRef())
@@ -90,11 +101,12 @@ public class GQLRootQueryBuilds implements GQLRootQuery {
                 .build();
     }
 
-    private DataFetcher buildFetcher() {
+    private DataFetcher<List<Build>> buildFetcher() {
         return environment -> {
             Integer id = environment.getArgument("id");
             Optional<String> oProject = GraphqlUtils.getStringArgument(environment, PROJECT_ARGUMENT);
             Optional<String> oBranch = GraphqlUtils.getStringArgument(environment, BRANCH_ARGUMENT);
+            Optional<String> oName = GraphqlUtils.getStringArgument(environment, NAME_ARGUMENT);
             Object branchFilter = environment.getArgument(BUILD_BRANCH_FILTER_ARGUMENT);
             Object projectFilter = environment.getArgument(BUILD_PROJECT_FILTER_ARGUMENT);
             // Per ID
@@ -108,13 +120,21 @@ public class GQLRootQueryBuilds implements GQLRootQuery {
             else if (oProject.isPresent()) {
                 // ... and branch
                 if (oBranch.isPresent()) {
-                    // Gets the branch
-                    Branch branch = structureService.findBranchByName(oProject.get(), oBranch.get())
-                            .orElseThrow(() -> new BranchNotFoundException(oProject.get(), oBranch.get()));
+                    // Name only
+                    if (oName.isPresent()) {
+                        return structureService.findBuildByName(oProject.get(), oBranch.get(), oName.get())
+                                .map(Collections::singletonList)
+                                .orElse(Collections.emptyList());
+                    }
                     // Configurable branch filter
-                    BuildFilterProviderData<?> filter = inputBuildStandardFilter.convert(branchFilter);
-                    // Runs the filter
-                    return filter.filterBranchBuilds(branch);
+                    else {
+                        // Gets the branch
+                        Branch branch = structureService.findBranchByName(oProject.get(), oBranch.get())
+                                .orElseThrow(() -> new BranchNotFoundException(oProject.get(), oBranch.get()));
+                        // Runs the filter
+                        BuildFilterProviderData<?> filter = inputBuildStandardFilter.convert(branchFilter);
+                        return filter.filterBranchBuilds(branch);
+                    }
                 }
                 // Project only
                 else {
