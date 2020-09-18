@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.NameDescription.nd
+import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ValidationStamp
 import org.junit.Before

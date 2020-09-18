@@ -303,8 +303,10 @@ class GQLTypeBuild(
                         // Gets validations runs for this validation level
                         return@DataFetcher structureService.getValidationRunsForBuildAndValidationStamp(
                                 build.id,
-                                validationStamp.id
-                        ).take(count)
+                                validationStamp.id,
+                                0,
+                                count
+                        )
                     }
                     // If not, we collect the list of matching validation stamp, assuming
                     // the argument is a regular expression
