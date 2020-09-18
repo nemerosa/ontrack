@@ -62,10 +62,18 @@ class SCMCatalogFilterServiceImpl(
             { entry: SCMCatalogEntry -> it.matches(entry.repository) }
         } ?: { true }
         val entryLinkFilter: (SCMCatalogEntry) -> Boolean = getEntryLinkFilter(filter.link)
+        val entryBeforeLastActivityFilter: (SCMCatalogEntry) -> Boolean = filter.beforeLastActivity?.let {
+            { entry: SCMCatalogEntry -> entry.lastActivity != null && entry.lastActivity.toLocalDate() <= it }
+        } ?: { true }
+        val entryAfterLastActivityFilter: (SCMCatalogEntry) -> Boolean = filter.afterLastActivity?.let {
+            { entry: SCMCatalogEntry -> entry.lastActivity != null && entry.lastActivity.toLocalDate() >= it }
+        } ?: { true }
         val entryFilter: (SCMCatalogEntry) -> Boolean = entryScmFilter and
                 entryConfigFilter and
                 entryRepositoryFilter and
-                entryLinkFilter
+                entryLinkFilter and
+                entryBeforeLastActivityFilter and
+                entryAfterLastActivityFilter
 
         val entries: () -> Sequence<SCMCatalogEntryOrProject> = {
             scmCatalog.catalogEntries.filter(entryFilter).map { entry ->
@@ -108,7 +116,18 @@ class SCMCatalogFilterServiceImpl(
         }
 
         // Sorting
-        return allEntries.sorted().drop(filter.offset).take(filter.size).toList()
+        val sortOn = filter.sortOn ?: SCMCatalogProjectFilterSort.REPOSITORY
+        val comparator: Comparator<SCMCatalogEntryOrProject> =
+                compareBy(sortOn.sortingSelector).run {
+                    if (filter.sortAscending) {
+                        this
+                    } else {
+                        reversed()
+                    }
+                }
+
+        // Sorting & truncating
+        return allEntries.sortedWith(comparator).drop(filter.offset).take(filter.size).toList()
     }
 
     private fun getEntryLinkFilter(link: SCMCatalogProjectFilterLink): (SCMCatalogEntry) -> Boolean = { entry ->

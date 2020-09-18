@@ -1320,6 +1320,10 @@ class StructureServiceImpl(
     override fun isValidationRunStatusCommentEditable(validationRunStatus: ID): Boolean {
         // Loads the parent
         val run = getParentValidationRun(validationRunStatus, checkForAccess = false)
+        return isValidationRunStatusCommentEditable(run, validationRunStatus)
+    }
+
+    private fun isValidationRunStatusCommentEditable(run: ValidationRun?, validationRunStatus: ID): Boolean {
         return when {
             // Checks if available at all
             run == null -> false
@@ -1346,6 +1350,10 @@ class StructureServiceImpl(
     override fun saveValidationRunStatusComment(run: ValidationRun, runStatusId: ID, comment: String): ValidationRun {
         // Checks
         isEntityDefined(run, "Validation run must be defined")
+        // Checks the edition rights
+        if (!isValidationRunStatusCommentEditable(run, runStatusId)) {
+            throw AccessDeniedException("Status comment edition denied.")
+        }
         // Loading the status
         val runStatus = structureRepository.getValidationRunStatus(runStatusId) { validationRunStatusService.getValidationRunStatus(it) }
                 ?: throw IllegalStateException("Could not find validation run status with id = $runStatusId")
@@ -1354,7 +1362,6 @@ class StructureServiceImpl(
         if (!parentOK) {
             throw IllegalStateException("Cannot edit a validation run status without a proper reference to its parent run.")
         }
-        // FIXME Security checks
         // Saving the new comment
         structureRepository.saveValidationRunStatusComment(runStatus, comment)
         // Event

@@ -9,9 +9,11 @@ apply<OntrackExtensionPlugin>()
 
 dependencies {
     api(project(":ontrack-extension-issues"))
+    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.apache.commons:commons-lang3")
     implementation(project(":ontrack-repository-support"))
     implementation("io.micrometer:micrometer-core")
+    implementation("com.opencsv:opencsv")
 
     testImplementation("org.codehaus.groovy:groovy")
     testImplementation(project(":ontrack-it-utils"))

@@ -645,6 +645,7 @@ pipeline {
             }
             environment {
                 GITHUB_TOKEN = credentials("JENKINS_GITHUB_TOKEN")
+                GITTER_TOKEN = credentials("GITTER_TOKEN")
             }
             when {
                 beforeAgent true
@@ -661,7 +662,8 @@ pipeline {
                         -PgitHubToken=${GITHUB_TOKEN} \\
                         -PgitHubCommit=${GIT_COMMIT} \\
                         -PgitHubChangeLogReleaseBranch=${ONTRACK_BRANCH_NAME} \\
-                        githubRelease
+                        -PgitterToken=${GITTER_TOKEN} \\
+                        release
                 '''
 
             }
@@ -767,6 +769,7 @@ pipeline {
                     sh '''
                         git config --local user.email "jenkins@nemerosa.net"
                         git config --local user.name "Jenkins"
+                        git remote set-url origin git@github.com:nemerosa/ontrack.git
                         git checkout master
                         git pull origin master
                         git merge $BRANCH_NAME

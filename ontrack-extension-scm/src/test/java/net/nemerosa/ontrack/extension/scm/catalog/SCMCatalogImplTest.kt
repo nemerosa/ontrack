@@ -158,14 +158,15 @@ class SCMCatalogImplTest {
             "config",
             name,
             "https://scm/$name",
+            Time.now(),
             Time.now()
     )
 
     private fun source(name: String) = SCMCatalogSource(
             "config",
             name,
-            "https://scm/$name"
+            "https://scm/$name",
+            Time.now()
     )
-
 
 }

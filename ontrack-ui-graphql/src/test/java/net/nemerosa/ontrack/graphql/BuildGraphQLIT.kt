@@ -483,4 +483,64 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `Validation runs filtered by validation stamp using a regular expression`() {
+        project {
+            branch {
+                val stamps = (1..3).map {
+                    validationStamp(name = "VS$it")
+                }
+                build {
+                    stamps.forEach { vs ->
+                        validate(vs)
+                    }
+                    // Validation runs for this build, filtered on first validation stamp
+                    val data = asUserWithView {
+                        run("""{
+                            builds(id: $id) {
+                                validationRuns(validationStamp: "VS(1|2)") {
+                                    id
+                                }
+                            }
+                        }""")
+                    }
+                    // Checks the validation runs
+                    val runs = data["builds"][0]["validationRuns"]
+                    assertEquals(2, runs.size())
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Build by name`() {
+        project {
+            branch {
+                val builds = (1..10).map { build("$it") }
+                // Gets all builds by name, one by one
+                builds.forEach { build ->
+                    val data = asUserWithView {
+                        run("""{
+                            builds(project: "${build.branch.project.name}", branch: "${build.branch.name}", name: "${build.name}") {
+                                id
+                            }
+                        }""")
+                    }
+                    val id = data["builds"][0]["id"].asInt()
+                    assertEquals(build.id(), id)
+                }
+                // Looks for a non existing build
+                val data = asUserWithView {
+                    run("""{
+                        builds(project: "${project.name}", branch: "${name}", name: "11") {
+                            id
+                        }
+                    }""")
+                }
+                val list = data["builds"]
+                assertEquals(0, list.size())
+            }
+        }
+    }
+
 }

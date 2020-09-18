@@ -12,7 +12,7 @@
     <table class="table table-hover table-condensed" ng-show="data">
         <thead>
         <tr>
-            <td colspan="4">
+            <td colspan="6">
                 <form class="form-inline">
                     <button class="btn btn-default" type="button" ng-click="navigate(data.scmCatalog.pageInfo.previousPage)" ng-disabled="!data.scmCatalog.pageInfo.previousPage">
                         <span class="fa fa-step-backward"></span>
@@ -60,6 +60,22 @@
                         <label for="catalog-filter-project">Project</label>
                         <input id="catalog-filter-project" class="form-control" type="text" ng-model="queryVariables.project" />
                     </div>
+                    <!-- After last activity filter -->
+                    <div class="form-group">
+                        <label for="catalog-filter-after-last-activity">After</label>
+                        <input ng-model="queryVariables.afterLastActivity" id="catalog-filter-after-last-activity" type="text" class="form-control"
+                               datepicker-popup="EEE dd MMM yyyy"
+                               is-open="catalog-filter-before-last-activity-opened"
+                        />
+                    </div>
+                    <!-- Before last activity filter -->
+                    <div class="form-group">
+                        <label for="catalog-filter-before-last-activity">Before</label>
+                        <input ng-model="queryVariables.beforeLastActivity" id="catalog-filter-before-last-activity" type="text" class="form-control"
+                               datepicker-popup="EEE dd MMM yyyy"
+                               is-open="catalog-filter-before-last-activity-opened"
+                        />
+                    </div>
                     <!-- Search button -->
                     <div class="form-group">
                         <button type="button"
@@ -77,13 +93,23 @@
                             <span class="fa fa-ban"></span>
                         </button>
                     </div>
+                    <!-- Download button -->
+                    <div class="form-group">
+                        <a
+                                href="/extension/scm/catalog/export/csv"
+                                target="_blank"
+                                title="Downloads the whole SCM catalog as CSV"
+                                class="btn btn-default">
+                            <span class="fa fa-download"></span>
+                        </a>
+                    </div>
                 </form>
             </td>
         </tr>
         </thead>
         <tbody ng-if="data.scmCatalog.pageInfo.currentSize == 0">
         <tr class="alert alert-warning">
-            <td colspan="4">
+            <td colspan="6">
                 No SCM catalog entry was collected or the filter is too restrictive.
             </td>
         </tr>
@@ -92,8 +118,19 @@
         <tr>
             <th>SCM</th>
             <th>Config</th>
-            <th>Repository</th>
+            <th ng-click="changeCatalogSorting('REPOSITORY')" class="ot-action">
+                Repository
+                <span class="fa fa-sort-asc" ng-if="catalogSortOn == 'REPOSITORY' && catalogSortAscending"></span>
+                <span class="fa fa-sort-desc" ng-if="catalogSortOn == 'REPOSITORY' && !catalogSortAscending"></span>
+                <span class="fa fa-sort text-muted" ng-if="catalogSortOn != 'REPOSITORY'"></span>
+            </th>
             <th>Project</th>
+            <th ng-click="changeCatalogSorting('LAST_ACTIVITY')" class="ot-action">
+                Last activity
+                <span class="fa fa-sort-asc" ng-if="catalogSortOn == 'LAST_ACTIVITY' && catalogSortAscending"></span>
+                <span class="fa fa-sort-desc" ng-if="catalogSortOn == 'LAST_ACTIVITY' && !catalogSortAscending"></span>
+                <span class="fa fa-sort text-muted" ng-if="catalogSortOn != 'LAST_ACTIVITY'"></span>
+            </th>
             <th>Collection time</th>
         </tr>
         </thead>
@@ -106,6 +143,11 @@
                 <span ng-if="!item.entry"><span class="fa fa-ban text-danger"></span>&nbsp;<a ng-if="item.project" href="{{item.project.links._page}}">{{item.project.name}}</a>&nbsp;<span class="ot-description">This project is not linked to any repository.</span></span>
                 <span ng-if="item.entry && !item.project"><span class="fa fa-info text-info"></span>&nbsp;<span class="ot-description">This project is not managed in Ontrack.</span></span>
                 <span ng-if="item.entry && item.project"><span class="fa fa-archive text-success"></span>&nbsp;<a ng-if="item.project" href="{{item.project.links._page}}">{{item.project.name}}</a></span>
+            </td>
+            <td title="Last activity">
+                <span ng-if="item.entry.lastActivity">
+                {{item.entry.lastActivity | date:'mediumDate'}}
+                </span>
             </td>
             <td title="Collection timestamp">
                 {{item.entry.timestamp | date:'mediumDate'}}

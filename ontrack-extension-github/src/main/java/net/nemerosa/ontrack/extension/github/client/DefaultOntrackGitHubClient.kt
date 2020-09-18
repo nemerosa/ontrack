@@ -71,6 +71,21 @@ class DefaultOntrackGitHubClient(
         }
     }
 
+    override fun getRepositoryLastModified(repo: String): LocalDateTime? {
+        // Logging
+        logger.debug("[github] Getting repository last modification {}", repo)
+        // Getting a client
+        val client = createGitHubClient()
+        // Service
+        val repositoryService = RepositoryService(client)
+        // Gets the repository
+        val owner = repo.substringBefore("/")
+        val name = repo.substringAfter("/")
+        val repository = repositoryService.getRepository(owner, name)
+        // Last modification date
+        return repository.pushedAt?.let { Time.from(it, null) }
+    }
+
     override fun getIssue(repository: String, id: Int): GitHubIssue? {
         // Logging
         logger.debug("[github] Getting issue {}/{}", repository, id)

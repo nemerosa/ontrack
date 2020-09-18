@@ -6,6 +6,7 @@ import com.netflix.gradle.plugins.packaging.SystemPackagingTask
 import com.netflix.gradle.plugins.rpm.Rpm
 import de.marcphilipp.gradle.nexus.NexusPublishExtension
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
+import net.nemerosa.ontrack.gradle.GitterAnnouncement
 import net.nemerosa.ontrack.gradle.OntrackChangeLog
 import net.nemerosa.ontrack.gradle.OntrackLastReleases
 import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
@@ -292,6 +293,7 @@ configure(coreProjects) p@{
             dependency("args4j:args4j:2.33")
             dependency("org.jgrapht:jgrapht-core:1.3.0")
             dependency("com.graphql-java:graphql-java:11.0")
+            dependency("com.opencsv:opencsv:5.2")
             dependency("org.jetbrains.kotlin:kotlin-test:${Versions.kotlinVersion}")
             // Overrides from Spring Boot
             dependency("org.postgresql:postgresql:9.4.1208")
@@ -689,9 +691,40 @@ githubRelease {
     }
 }
 
-tasks.named("githubRelease") {
+val githubRelease by tasks.named("githubRelease") {
     dependsOn(prepareGitHubRelease)
     dependsOn(githubReleaseChangeLog)
+}
+
+/**
+ * Release & announcement
+ */
+
+val gitterToken: String by project
+val gitterRoom: String by project
+
+val gitterAnnouncement by tasks.registering(GitterAnnouncement::class) {
+    dependsOn(githubReleaseChangeLog)
+    mustRunAfter(githubRelease)
+    token = gitterToken
+    roomId = gitterRoom
+    text = {
+        """
+        |## Ontrack $version is out
+        | 
+        |${githubReleaseChangeLog.get().changeLog}       
+        """.trimMargin()
+    }
+}
+
+val announcements by tasks.registering {
+    mustRunAfter(githubRelease)
+    dependsOn(gitterAnnouncement)
+}
+
+val release by tasks.registering {
+    dependsOn(githubRelease)
+    dependsOn(announcements)
 }
 
 /**

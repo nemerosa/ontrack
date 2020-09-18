@@ -4,12 +4,14 @@ import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.model.GitHubIssue
 import net.nemerosa.ontrack.extension.github.model.GitHubUser
 import org.eclipse.egit.github.core.client.GitHubClient
+import java.time.LocalDateTime
 
 
 /**
  * Client used to connect to a GitHub engine from Ontrack.
  */
 interface OntrackGitHubClient {
+
     /**
      * Gets an issue from a repository.
      *
@@ -43,7 +45,6 @@ interface OntrackGitHubClient {
      */
     fun createGitHubClient(): GitHubClient
 
-
     /**
      * Gets a pull request using its ID
      *
@@ -52,4 +53,9 @@ interface OntrackGitHubClient {
      * @return Details of the pull request or `null` if it does not exist
      */
     fun getPullRequest(repository: String, id: Int): GitPullRequest?
+
+    /**
+     * Gets the last modified date for a given [repository][repo].
+     */
+    fun getRepositoryLastModified(repo: String): LocalDateTime?
 }
