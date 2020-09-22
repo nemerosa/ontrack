@@ -24,7 +24,7 @@ class GitPullRequestInformationExtension(
                 val property: GitBranchConfigurationProperty? = propertyService.getProperty(entity, GitBranchConfigurationPropertyType::class.java).value
                 val pr = gitService.getBranchAsPullRequest(entity, property)
                 pr?.let {
-                    EntityInformation(this, pr.simplifyBranchNames())
+                    EntityInformation(this, pr)
                 }
             } else {
                 null

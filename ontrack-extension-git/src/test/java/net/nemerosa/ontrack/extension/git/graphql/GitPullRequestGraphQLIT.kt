@@ -36,9 +36,7 @@ class GitPullRequestGraphQLIT: AbstractGitTestSupport() {
                                     key
                                     isValid
                                     source
-                                    simpleSource
                                     target
-                                    simpleTarget
                                     title
                                     status
                                     url
@@ -70,9 +68,7 @@ class GitPullRequestGraphQLIT: AbstractGitTestSupport() {
                                     key
                                     isValid
                                     source
-                                    simpleSource
                                     target
-                                    simpleTarget
                                     title
                                     status
                                     url
@@ -83,10 +79,8 @@ class GitPullRequestGraphQLIT: AbstractGitTestSupport() {
                     assertEquals(1, pr.path("id").asInt())
                     assertEquals("#1", pr.path("key").asText())
                     assertEquals(true, pr.path("isValid").asBoolean())
-                    assertEquals("refs/heads/feature/TK-1-feature", pr.path("source").asText())
-                    assertEquals("feature/TK-1-feature", pr.path("simpleSource").asText())
-                    assertEquals("refs/heads/release/1.0", pr.path("target").asText())
-                    assertEquals("release/1.0", pr.path("simpleTarget").asText())
+                    assertEquals("feature/TK-1-feature", pr.path("source").asText())
+                    assertEquals("release/1.0", pr.path("target").asText())
                     assertEquals("PR n°1", pr.path("title").asText())
                     assertEquals("open", pr.path("status").asText())
                     assertEquals("uri:testing:web:git:pr:1", pr.path("url").asText())

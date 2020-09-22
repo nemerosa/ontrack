@@ -48,8 +48,8 @@ class GitMockingConfigurator(
         val pr = GitPullRequest(
                 id = id,
                 key = "#$id",
-                source = "refs/heads/$source",
-                target = "refs/heads/$target",
+                source = source,
+                target = target,
                 title = title,
                 status = status,
                 url = "uri:testing:web:git:pr:$id"

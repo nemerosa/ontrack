@@ -58,8 +58,8 @@ class GitPullRequestInformationExtensionIT : AbstractGitTestSupport() {
                             assertEquals(1, pr.id)
                             assertEquals(true, pr.isValid)
                             assertEquals("#1", pr.key)
-                            assertEquals("refs/heads/feature/TK-1-feature", pr.source)
-                            assertEquals("refs/heads/release/1.0", pr.target)
+                            assertEquals("feature/TK-1-feature", pr.source)
+                            assertEquals("release/1.0", pr.target)
                             assertEquals("Useful feature", pr.title)
                         }
                     }
