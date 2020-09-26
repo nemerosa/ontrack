@@ -169,8 +169,8 @@ class DefaultOntrackGitHubClient(
         return GitPullRequest(
                 id = id,
                 key = "#$id",
-                source = pr.base.ref,
-                target = pr.head.ref,
+                source = pr.head.ref,
+                target = pr.base.ref,
                 title = pr.title,
                 status = pr.state,
                 url = pr.htmlUrl

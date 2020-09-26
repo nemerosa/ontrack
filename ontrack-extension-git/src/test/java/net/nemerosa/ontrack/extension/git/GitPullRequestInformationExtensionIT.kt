@@ -54,13 +54,13 @@ class GitPullRequestInformationExtensionIT : AbstractGitTestSupport() {
                     // Gets the PR entity information
                     val info = entityInformationExtension.getInformation(this)
                     assertNotNull(info) {
-                        assertIs<GitPullRequest>(it.data) { pr ->
-                            assertEquals(1, pr.id)
-                            assertEquals(true, pr.isValid)
-                            assertEquals("#1", pr.key)
-                            assertEquals("feature/TK-1-feature", pr.source)
-                            assertEquals("release/1.0", pr.target)
-                            assertEquals("Useful feature", pr.title)
+                        assertIs<GitPullRequestInformationExtension.GitPullRequestInformationExtensionData>(it.data) { pr ->
+                            assertEquals(1, pr.pr.id)
+                            assertEquals(true, pr.pr.isValid)
+                            assertEquals("#1", pr.pr.key)
+                            assertEquals("feature/TK-1-feature", pr.pr.source)
+                            assertEquals("release/1.0", pr.pr.target)
+                            assertEquals("Useful feature", pr.pr.title)
                         }
                     }
                 }
@@ -80,13 +80,13 @@ class GitPullRequestInformationExtensionIT : AbstractGitTestSupport() {
                     // Gets the PR entity information
                     val info = entityInformationExtension.getInformation(this)
                     assertNotNull(info) {
-                        assertIs<GitPullRequest>(it.data) { pr ->
-                            assertEquals(1, pr.id)
-                            assertEquals(false, pr.isValid)
-                            assertEquals("#1", pr.key)
-                            assertEquals("", pr.source)
-                            assertEquals("", pr.target)
-                            assertEquals("", pr.title)
+                        assertIs<GitPullRequestInformationExtension.GitPullRequestInformationExtensionData>(it.data) { pr ->
+                            assertEquals(1, pr.pr.id)
+                            assertEquals(false, pr.pr.isValid)
+                            assertEquals("#1", pr.pr.key)
+                            assertEquals("", pr.pr.source)
+                            assertEquals("", pr.pr.target)
+                            assertEquals("", pr.pr.title)
                         }
                     }
                 }
