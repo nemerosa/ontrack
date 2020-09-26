@@ -111,6 +111,56 @@ class GitChangeLogIT : AbstractGitTestSupport() {
     }
 
     @Test
+    fun `Change log for PR based on commits`() {
+        createRepo {
+            // 5 commits on master branch
+            commits(5)
+            // Creates a feature branch
+            git("checkout", "-b", "feature/my-feature")
+            // Creates some commits on this feature branch
+            (6..8).map {
+                it to commit(it)
+            }.toMap()
+        } and { repo, commits ->
+            // Creates a project ...
+            project project@{
+                gitProject(repo)
+                // ... and a PR branch configured for Git commit as a property
+                branch("PR-1") branch@{
+                    gitBranch {
+                        commitAsProperty()
+                    }
+                    // Creates builds for some commits on the feature branch
+                    val builds = (6..8).map {
+                        it to build(it.toString()) {
+                            gitCommitProperty(commits.getValue(it))
+                        }
+                    }.toMap()
+                    // Getting the change log between build 6 and 8
+                    asUserWithView(this@branch).execute {
+                        val buildFrom = builds[6] ?: error("No build 6")
+                        val buildTo = builds[8] ?: error("No build 8")
+                        val buildDiffRequest = BuildDiffRequest(
+                                buildFrom.id,
+                                buildTo.id
+                        )
+                        val changeLog = gitService.changeLog(buildDiffRequest)
+                        // Getting the commits
+                        val changeLogCommits = gitService.getChangeLogCommits(changeLog)
+                        // Checks the commits
+                        val messages = changeLogCommits.log.commits.map { it.commit.shortMessage }
+                        assertEquals(
+                                listOf("Commit 8", "Commit 7"),
+                                messages
+                        )
+
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Change log based on tags`() {
 
         createRepo {
