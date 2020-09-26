@@ -24,6 +24,9 @@ class GitPullRequestBranchGraphQLFieldContributor(
                                 .dataFetcher { env ->
                                     val branch: Branch = env.getSource()
                                     gitService.getBranchAsPullRequest(branch)
+                                            ?.let { pr ->
+                                                GitPullRequestGQLType.Data(branch, pr)
+                                            }
                                 }
                                 .build()
                 )
