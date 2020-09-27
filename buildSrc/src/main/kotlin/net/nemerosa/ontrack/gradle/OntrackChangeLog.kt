@@ -43,11 +43,11 @@ open class OntrackChangeLog : AbstractOntrackTask() {
         this.changeLog = changeLog.exportIssues(mapOf(
                 "format" to "text",
                 "groups" to mapOf(
-                        "Features" to listOf("feature"),
-                        "Enhancements" to listOf("enhancement"),
-                        "Bugs" to listOf("bug")
+                        "Features" to listOf("type: feature"),
+                        "Enhancements" to listOf("type: enhancement"),
+                        "Bugs" to listOf("type: bug")
                 ),
-                "exclude" to listOf("design", "delivery")
+                "exclude" to emptyList<String>()
         ))
     }
 

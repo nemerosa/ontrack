@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.extension.stash.client
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.stash.model.BitbucketProject
 import net.nemerosa.ontrack.extension.stash.model.BitbucketRepository
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
 import org.springframework.boot.web.client.RestTemplateBuilder
+import java.time.LocalDateTime
 
 class BitbucketClientImpl(
         configuration: StashConfiguration
@@ -24,6 +26,11 @@ class BitbucketClientImpl(
                     }
                     ?: emptyList()
 
+    override fun getRepositoryLastModified(repo: BitbucketRepository): LocalDateTime? =
+            template.getForObject("/rest/api/1.0/projects/${repo.project}/repos/${repo.repository}/last-modified?at=HEAD", RepositoryLastModifiedResponse::class.java)
+                    ?.latestCommit?.authorTimestamp
+                    ?.let { timestamp -> Time.from(timestamp) }
+
     private val template = RestTemplateBuilder()
             .rootUri(configuration.url)
             .basicAuthentication(
@@ -43,6 +50,14 @@ class BitbucketClientImpl(
     private class RepositoriesResponseItem(
             @Suppress("unused") val id: Int,
             val slug: String
+    )
+
+    private class RepositoryLastModifiedResponse(
+            val latestCommit: CommitResponse?
+    )
+
+    private class CommitResponse(
+            val authorTimestamp: Long?
     )
 
 }

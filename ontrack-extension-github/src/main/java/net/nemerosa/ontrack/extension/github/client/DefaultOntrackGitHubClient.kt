@@ -65,10 +65,25 @@ class DefaultOntrackGitHubClient(
         val repositoryService = RepositoryService(client)
         // Gets the repository names
         return try {
-            repositoryService.getRepositories(organization).map { it.name }
+            repositoryService.getOrgRepositories(organization).map { it.name }
         } catch (e: IOException) {
             throw OntrackGitHubClientException(e)
         }
+    }
+
+    override fun getRepositoryLastModified(repo: String): LocalDateTime? {
+        // Logging
+        logger.debug("[github] Getting repository last modification {}", repo)
+        // Getting a client
+        val client = createGitHubClient()
+        // Service
+        val repositoryService = RepositoryService(client)
+        // Gets the repository
+        val owner = repo.substringBefore("/")
+        val name = repo.substringAfter("/")
+        val repository = repositoryService.getRepository(owner, name)
+        // Last modification date
+        return repository.pushedAt?.let { Time.from(it, null) }
     }
 
     override fun getIssue(repository: String, id: Int): GitHubIssue? {
@@ -109,7 +124,7 @@ class DefaultOntrackGitHubClient(
         )
     }
 
-    private fun createGitHubClient(): GitHubClient {
+    override fun createGitHubClient(): GitHubClient {
         // GitHub client (non authentified)
         val client: GitHubClient = object : GitHubClient() {
             override fun configureRequest(request: HttpURLConnection): HttpURLConnection {

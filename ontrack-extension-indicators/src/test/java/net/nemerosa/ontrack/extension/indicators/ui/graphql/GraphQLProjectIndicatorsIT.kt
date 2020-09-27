@@ -11,6 +11,40 @@ import kotlin.test.assertTrue
 class GraphQLProjectIndicatorsIT : AbstractIndicatorsTestSupport() {
 
     @Test
+    fun `Portfolios associated with a project`() {
+        // Labels to use for connecting projects to portfolios
+        val label1 = label()
+        val label2 = label()
+        val label3 = label() // Not linked to any portfolio
+        val label4 = label() // Not linked to any project, but assigned to a portfolio
+        // Project using those labels
+        val project = project {
+            labels = listOf(label1, label2, label3)
+        }
+        // Portfolios for the first two labels
+        val portfolio1 = portfolio(label = label1)
+        val portfolio2 = portfolio(label = label2)
+        portfolio(label = label4)
+        // Querying the portfolio for the project
+        asUserWithView(project) {
+            val data = run("""
+                {
+                    projects(id: ${project.id}) {
+                        indicatorPortfolios {
+                            id
+                        }
+                    }
+                }
+            """)
+            val portfolioIds = data["projects"][0]["indicatorPortfolios"].map { it["id"].asText() }
+            assertEquals(
+                    setOf(portfolio1.id, portfolio2.id),
+                    portfolioIds.toSet()
+            )
+        }
+    }
+
+    @Test
     fun `Project category stats for one category`() {
         clearIndicators()
 

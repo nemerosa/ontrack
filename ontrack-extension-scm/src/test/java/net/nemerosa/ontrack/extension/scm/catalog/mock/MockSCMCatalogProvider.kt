@@ -43,7 +43,8 @@ class MockSCMCatalogProvider : SCMCatalogProvider {
         storedEntries += SCMCatalogSource(
                 config = entry.config,
                 repository = entry.repository,
-                repositoryPage = entry.repositoryPage
+                repositoryPage = entry.repositoryPage,
+                lastActivity = entry.lastActivity
         )
     }
 

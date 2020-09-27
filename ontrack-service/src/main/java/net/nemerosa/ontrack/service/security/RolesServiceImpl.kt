@@ -247,7 +247,8 @@ class RolesServiceImpl(
                         BuildCreate::class.java,
                         BuildConfig::class.java,
                         PromotionRunCreate::class.java,
-                        ValidationRunCreate::class.java
+                        ValidationRunCreate::class.java,
+                        ValidationRunStatusCommentEdit::class.java
                 )
         )
 

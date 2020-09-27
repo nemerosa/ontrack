@@ -39,7 +39,8 @@ class GitHubSCMCatalogProvider(
             SCMCatalogSource(
                     config.name,
                     repo,
-                    "${config.url}/$repo"
+                    "${config.url}/$repo",
+                    client.getRepositoryLastModified(repo)
             )
         }
     }
