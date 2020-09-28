@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.FutureUtils
 import net.nemerosa.ontrack.common.asOptional
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequestDifferenceProjectException
+import net.nemerosa.ontrack.extension.git.GitConfigProperties
 import net.nemerosa.ontrack.extension.git.branching.BranchingModelService
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
@@ -58,6 +59,7 @@ class GitServiceImpl(
         private val gitRepositoryHelper: GitRepositoryHelper,
         private val branchingModelService: BranchingModelService,
         private val entityDataService: EntityDataService,
+        private val gitConfigProperties: GitConfigProperties,
         transactionManager: PlatformTransactionManager
 ) : AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue>(structureService, propertyService), GitService, JobOrchestratorSupplier {
 
@@ -657,6 +659,22 @@ class GitServiceImpl(
     override fun getBranchAsPullRequest(branch: Branch): GitPullRequest? =
             propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java).value?.let { property ->
                 getBranchAsPullRequest(branch, property)
+            }
+
+    override fun getBranchAsPullRequest(branch: Branch, gitBranchConfigurationProperty: GitBranchConfigurationProperty?): GitPullRequest? =
+            if (gitConfigProperties.pullRequests) {
+                gitBranchConfigurationProperty?.let {
+                    getGitConfiguratorAndConfiguration(branch.project)
+                            ?.let { (configurator, configuration) ->
+                                configurator.toPullRequestID(gitBranchConfigurationProperty.branch)?.let { prId ->
+                                    configurator.getPullRequest(configuration, prId)
+                                            ?: GitPullRequest.invalidPR(prId, configurator.toPullRequestKey(prId))
+                                }
+                            }
+                }
+            } else {
+                // Pull requests are not supported
+                null
             }
 
     override fun getBranchConfiguration(branch: Branch): GitBranchConfiguration? {

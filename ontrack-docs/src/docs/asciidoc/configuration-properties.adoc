@@ -111,4 +111,11 @@ ontrack.config.search.index.logging = false
 # Note: if set to `true` this generates an awful lot if information
 # at DEBUG level.
 ontrack.config.search.index.tracing = false
+
+#################################
+# Git configuration properties
+#################################
+
+# Enabling pull requests
+ontrack.config.extension.git.pull-requests = true
 ----

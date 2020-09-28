@@ -52,6 +52,15 @@ interface GitService : SCMService {
     fun getBranchAsPullRequest(branch: Branch): GitPullRequest?
 
     /**
+     * Given a branch and its Git configuration, gets its PR information.
+     *
+     * @param branch Branch
+     * @param gitBranchConfigurationProperty Gt branch configuration
+     * @return Pull request or null is none
+     */
+    fun getBranchAsPullRequest(branch: Branch, gitBranchConfigurationProperty: GitBranchConfigurationProperty?): GitPullRequest?
+
+    /**
      * Gets the configuration for a branch
      *
      * @param branch Branch to check
