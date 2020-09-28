@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.git
 import net.nemerosa.ontrack.extension.api.EntityInformationExtension
 import net.nemerosa.ontrack.extension.api.model.EntityInformation
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
-import net.nemerosa.ontrack.extension.git.model.getBranchAsPullRequest
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.service.GitService

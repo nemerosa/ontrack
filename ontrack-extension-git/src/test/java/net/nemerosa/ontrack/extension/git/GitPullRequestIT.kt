@@ -14,6 +14,9 @@ import kotlin.test.assertNull
 class GitPullRequestIT : AbstractGitTestSupport() {
 
     @Autowired
+    private lateinit var gitConfigProperties: GitConfigProperties
+
+    @Autowired
     private lateinit var gitMockingConfigurator: GitMockingConfigurator
 
     @Before
@@ -64,6 +67,33 @@ class GitPullRequestIT : AbstractGitTestSupport() {
                             assertEquals("release/1.0", pr.target)
                             assertEquals("Useful feature", pr.title)
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `No PR information when not enabled`() {
+        createRepo {
+            commits(1)
+        } and { repo, _ ->
+            gitMockingConfigurator.registerPullRequest(1, title = "Useful feature")
+            project {
+                prGitProject(repo)
+                branch {
+                    gitBranch("PR-1")
+                    // Disabling pull requests
+                    gitConfigProperties.pullRequests = false
+                    try {
+                        // Gets the Git configuration for this branch
+                        val branchConfiguration = gitService.getBranchConfiguration(this)
+                        assertNotNull(branchConfiguration) {
+                            assertEquals("PR-1", it.branch)
+                            assertNull(it.pullRequest, "PR is not reported since it's deactivated")
+                        }
+                    } finally {
+                        gitConfigProperties.pullRequests = true
                     }
                 }
             }
