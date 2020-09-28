@@ -4,13 +4,13 @@ import net.nemerosa.ontrack.extension.git.GitExtensionFeature
 import net.nemerosa.ontrack.extension.gitlab.client.OntrackGitLabClient
 import net.nemerosa.ontrack.extension.gitlab.client.OntrackGitLabClientFactory
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabConfiguration
+import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssue
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueWrapper
 import net.nemerosa.ontrack.extension.gitlab.service.GitLabConfigurationService
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
-import org.gitlab.api.models.GitlabIssue
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -50,8 +50,7 @@ class GitLabIssueServiceExtensionTest {
                 "nemerosa/ontrack"
         )
         issueWrapper = GitLabIssueWrapper(
-                GitlabIssue(),
-                "url/xxx",
+                GitLabIssue(),
                 "url/xxx"
         )
     }
