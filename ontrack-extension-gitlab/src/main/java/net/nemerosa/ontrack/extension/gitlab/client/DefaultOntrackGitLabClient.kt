@@ -1,97 +1,71 @@
-package net.nemerosa.ontrack.extension.gitlab.client;
+package net.nemerosa.ontrack.extension.gitlab.client
 
-import net.nemerosa.ontrack.extension.git.model.GitPullRequest;
-import net.nemerosa.ontrack.extension.gitlab.model.GitLabConfiguration;
-import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueWrapper;
-import org.gitlab.api.GitlabAPI;
-import org.gitlab.api.TokenType;
-import org.gitlab.api.models.GitlabIssue;
-import org.gitlab.api.models.GitlabMergeRequest;
-import org.gitlab.api.models.GitlabMilestone;
-import org.gitlab.api.models.GitlabProject;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.nemerosa.ontrack.extension.git.model.GitPullRequest
+import net.nemerosa.ontrack.extension.gitlab.model.GitLabConfiguration
+import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueWrapper
+import org.gitlab4j.api.GitLabApi
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.io.FileNotFoundException
+import java.io.IOException
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
+class DefaultOntrackGitLabClient(
+        private val configuration: GitLabConfiguration
+) : OntrackGitLabClient {
 
-public class DefaultOntrackGitLabClient implements OntrackGitLabClient {
+    private val logger: Logger = LoggerFactory.getLogger(OntrackGitLabClient::class.java)
 
-    private final Logger logger = LoggerFactory.getLogger(OntrackGitLabClient.class);
+    private val api: GitLabApi by lazy {
+        val personalAccessToken = configuration.password
+        val api = GitLabApi(configuration.url, personalAccessToken)
+        api.setRequestTimeout(1000, 5000)
+        api.setIgnoreCertificateErrors(configuration.isIgnoreSslCertificate)
+        api
+    }
 
-    private final GitlabAPI api;
-    private final GitLabConfiguration configuration;
-
-    public DefaultOntrackGitLabClient(GitLabConfiguration configuration) {
-        this.configuration = configuration;
-        String personalAccessToken = configuration.getPassword();
-        GitlabAPI api = GitlabAPI.connect(
-                configuration.getUrl(),
-                personalAccessToken,
-                TokenType.PRIVATE_TOKEN
-        );
-        if (configuration.isIgnoreSslCertificate()) {
-            this.api = api.ignoreCertificateErrors(true);
-        } else {
-            this.api = api;
+    override fun getRepositories(): List<String> {
+        logger.debug("[gitlab] Getting repository list")
+        return try {
+            api.projectApi.ownedProjects
+                    .map { "${it.namespace}/${it.name}" }
+        } catch (e: Exception) {
+            throw OntrackGitLabClientException(e)
         }
     }
 
-    @Override
-    public List<String> getRepositories() {
-        logger.debug("[gitlab] Getting repository list");
-        try {
-            return api.getProjects().stream()
-                    .map(GitlabProject::getNameWithNamespace)
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            throw new OntrackGitLabClientException(e);
-        }
-    }
-
-    @Override
-    public GitLabIssueWrapper getIssue(String repository, int id) {
-        try {
-            // Issue
-            String issueUrl = configuration.getUrl() + "/" + repository + GitlabIssue.URL + "/" + id;
-            GitlabIssue issue = api.getIssue(repository, id);
+    override fun getIssue(repository: String, id: Int): GitLabIssueWrapper {
+        return try {
+            val issue = api.issuesApi.getIssue(repository, id)
             // Milestone URL
-            String milestoneUrl = null;
-            if (issue.getMilestone() != null) {
-                milestoneUrl = configuration.getUrl() + "/" + repository + GitlabMilestone.URL + "/" + issue.getMilestone().getId();
+            var milestoneUrl: String? = null
+            if (issue.milestone != null) {
+                milestoneUrl = "${configuration.url}/projects/${repository}/milestones/${issue.milestone?.id}"
             }
             // OK
-            return GitLabIssueWrapper.of(issue, milestoneUrl, issueUrl);
-        } catch (Exception e) {
-            throw new OntrackGitLabClientException(e);
+            GitLabIssueWrapper(issue, milestoneUrl)
+        } catch (e: Exception) {
+            throw OntrackGitLabClientException(e)
         }
     }
 
-
-    @Nullable
-    @Override
-    public GitPullRequest getPullRequest(@NotNull String repository, int id) {
-        try {
+    override fun getPullRequest(repository: String, id: Int): GitPullRequest? {
+        return try {
             try {
-                GitlabMergeRequest pr = api.getMergeRequestByIid(repository, id);
-                return new GitPullRequest(
+                val pr = api.mergeRequestApi.getMergeRequest(repository, id)
+                GitPullRequest(
                         id,
-                        "#" + id,
-                        pr.getSourceBranch(),
-                        pr.getTargetBranch(),
-                        pr.getTitle(),
-                        pr.getState(),
-                        pr.getWebUrl()
-                );
-            } catch (FileNotFoundException ignored) {
-                return null;
+                        "#$id",
+                        pr.sourceBranch,
+                        pr.targetBranch,
+                        pr.title,
+                        pr.state,
+                        pr.webUrl
+                )
+            } catch (ignored: FileNotFoundException) {
+                null
             }
-        } catch (IOException e) {
-            throw new OntrackGitLabClientException(e);
+        } catch (e: IOException) {
+            throw OntrackGitLabClientException(e)
         }
     }
 

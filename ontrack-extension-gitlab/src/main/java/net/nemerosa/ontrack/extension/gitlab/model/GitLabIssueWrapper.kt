@@ -1,57 +1,23 @@
-package net.nemerosa.ontrack.extension.gitlab.model;
+package net.nemerosa.ontrack.extension.gitlab.model
 
-import lombok.Data;
-import net.nemerosa.ontrack.common.Time;
-import net.nemerosa.ontrack.extension.issues.model.Issue;
-import net.nemerosa.ontrack.extension.issues.model.IssueStatus;
-import org.gitlab.api.models.GitlabIssue;
+import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.extension.issues.model.Issue
+import net.nemerosa.ontrack.extension.issues.model.IssueStatus
+import java.time.LocalDateTime
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
+typealias GitLabIssue = org.gitlab4j.api.models.Issue
 
-@Data
-public class GitLabIssueWrapper implements Issue {
+class GitLabIssueWrapper(
+        val gitlabIssue: GitLabIssue,
+        val milestoneUrl: String?
+) : Issue {
 
-    private final GitlabIssue gitlabIssue;
-    private final String milestoneUrl;
-    private final String issueUrl;
+    override val url: String = gitlabIssue.webUrl
+    override val key: String = gitlabIssue.id.toString()
+    override val displayKey: String = "#${gitlabIssue.id}"
+    override val summary: String = gitlabIssue.title
+    override val status: IssueStatus = GitLabIssueStatusWrapper(gitlabIssue.state.name)
+    override val updateTime: LocalDateTime = Time.from(gitlabIssue.updatedAt.time)
+    val labels: List<String> = gitlabIssue.labels
 
-    @Override
-    public String getKey() {
-        return String.valueOf(gitlabIssue.getId());
-    }
-
-    @Override
-    public String getDisplayKey() {
-        return "#" + gitlabIssue.getId();
-    }
-
-    @Override
-    public String getSummary() {
-        return gitlabIssue.getTitle();
-    }
-
-    @Override
-    public String getUrl() {
-        return issueUrl;
-    }
-
-    @Override
-    public IssueStatus getStatus() {
-        return new GitLabIssueStatusWrapper(gitlabIssue.getState());
-    }
-
-    @Override
-    public LocalDateTime getUpdateTime() {
-        return Time.from(gitlabIssue.getUpdatedAt(), null);
-    }
-
-    public static GitLabIssueWrapper of(GitlabIssue issue, String milestoneUrl, String issueUrl) {
-        return new GitLabIssueWrapper(issue, milestoneUrl, issueUrl);
-    }
-
-    public List<String> getLabels() {
-        return Arrays.asList(gitlabIssue.getLabels());
-    }
 }
