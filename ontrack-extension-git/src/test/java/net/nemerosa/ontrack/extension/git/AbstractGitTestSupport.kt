@@ -31,6 +31,9 @@ import kotlin.test.assertNull
 abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
+    protected lateinit var gitConfigProperties: GitConfigProperties
+
+    @Autowired
     private lateinit var commitBuildNameGitCommitLink: CommitBuildNameGitCommitLink
 
     @Autowired
@@ -53,6 +56,19 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var jobOrchestrator: JobOrchestrator
+
+    /**
+     * Working with the PR cache disabled
+     */
+    protected fun <T> withPRCacheDisabled(code: () -> T): T {
+        val old = gitConfigProperties.pullRequests.cache.enabled
+        return try {
+            gitConfigProperties.pullRequests.cache.enabled = false
+            code()
+        } finally {
+            gitConfigProperties.pullRequests.cache.enabled = old
+        }
+    }
 
     /**
      * Creates and saves a Git configuration

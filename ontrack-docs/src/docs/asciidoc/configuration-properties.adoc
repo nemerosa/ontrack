@@ -117,5 +117,14 @@ ontrack.config.search.index.tracing = false
 #################################
 
 # Enabling pull requests
-ontrack.config.extension.git.pull-requests = true
+ontrack.config.extension.git.pull-requests.enabled = true
+
+# Caching enabled for pull requests
+ontrack.config.extension.git.pull-requests.cache.enabled = true
+
+# Caching duration for pull requests
+ontrack.config.extension.git.pull-requests.cache.duration = 30m
+
+# Caching size for pull requests
+ontrack.config.extension.git.pull-requests.cache.size = 200
 ----

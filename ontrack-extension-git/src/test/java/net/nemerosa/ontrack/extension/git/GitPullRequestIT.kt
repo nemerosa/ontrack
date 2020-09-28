@@ -14,9 +14,6 @@ import kotlin.test.assertNull
 class GitPullRequestIT : AbstractGitTestSupport() {
 
     @Autowired
-    private lateinit var gitConfigProperties: GitConfigProperties
-
-    @Autowired
     private lateinit var gitMockingConfigurator: GitMockingConfigurator
 
     @Before
@@ -84,7 +81,7 @@ class GitPullRequestIT : AbstractGitTestSupport() {
                 branch {
                     gitBranch("PR-1")
                     // Disabling pull requests
-                    gitConfigProperties.pullRequests = false
+                    gitConfigProperties.pullRequests.enabled = false
                     try {
                         // Gets the Git configuration for this branch
                         val branchConfiguration = gitService.getBranchConfiguration(this)
@@ -93,7 +90,7 @@ class GitPullRequestIT : AbstractGitTestSupport() {
                             assertNull(it.pullRequest, "PR is not reported since it's deactivated")
                         }
                     } finally {
-                        gitConfigProperties.pullRequests = true
+                        gitConfigProperties.pullRequests.enabled = true
                     }
                 }
             }
@@ -118,13 +115,16 @@ class GitPullRequestIT : AbstractGitTestSupport() {
                                     ?.status
                     )
                     // Changing the status
-                    gitMockingConfigurator.registerPullRequest(1, status = "closed")
-                    assertEquals(
-                            "closed",
-                            gitService.getBranchConfiguration(this)
-                                    ?.pullRequest
-                                    ?.status
-                    )
+                    withPRCacheDisabled {
+                        gitMockingConfigurator.registerPullRequest(1, status = "closed")
+                        // Getting the new status
+                        assertEquals(
+                                "closed",
+                                gitService.getBranchConfiguration(this)
+                                        ?.pullRequest
+                                        ?.status
+                        )
+                    }
                 }
             }
         }
@@ -153,17 +153,19 @@ class GitPullRequestIT : AbstractGitTestSupport() {
                             assertEquals("PR n°1", pr.title)
                         }
                     }
-                    // Removes the PR (deletion)
-                    gitMockingConfigurator.unregisterPullRequest(1)
-                    // Checks that the PR is associated to the branch
-                    assertNotNull(gitService.getBranchConfiguration(this)) { config ->
-                        assertNotNull(config.pullRequest, "Branch still identified as a pull request") { pr ->
-                            assertEquals(1, pr.id)
-                            assertEquals(false, pr.isValid)
-                            assertEquals("#1", pr.key)
-                            assertEquals("", pr.source)
-                            assertEquals("", pr.target)
-                            assertEquals("", pr.title)
+                    withPRCacheDisabled {
+                        // Removes the PR (deletion)
+                        gitMockingConfigurator.unregisterPullRequest(1)
+                        // Checks that the PR is associated to the branch
+                        assertNotNull(gitService.getBranchConfiguration(this)) { config ->
+                            assertNotNull(config.pullRequest, "Branch still identified as a pull request") { pr ->
+                                assertEquals(1, pr.id)
+                                assertEquals(false, pr.isValid)
+                                assertEquals("#1", pr.key)
+                                assertEquals("", pr.source)
+                                assertEquals("", pr.target)
+                                assertEquals("", pr.title)
+                            }
                         }
                     }
                 }
