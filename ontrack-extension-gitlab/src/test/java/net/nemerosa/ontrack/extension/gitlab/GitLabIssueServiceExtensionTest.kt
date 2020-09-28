@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.extension.gitlab.service.GitLabConfigurationService
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
+import org.gitlab4j.api.Constants
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -50,7 +51,14 @@ class GitLabIssueServiceExtensionTest {
                 "nemerosa/ontrack"
         )
         issueWrapper = GitLabIssueWrapper(
-                GitLabIssue(),
+                GitLabIssue().apply {
+                    id = 1
+                    webUrl = "url/1"
+                    title = "Issue 1"
+                    state = Constants.IssueState.OPENED
+                    updatedAt = Date()
+                    labels = emptyList()
+                },
                 "url/xxx"
         )
     }
