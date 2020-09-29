@@ -1,22 +1,27 @@
-package net.nemerosa.ontrack.extension.stale;
+package net.nemerosa.ontrack.extension.stale
 
-import lombok.Data;
-import lombok.experimental.Wither;
+data class StaleProperty(
+        val disablingDuration: Int,
+        val deletingDuration: Int,
+        val promotionsToKeep: List<String>?
+) {
 
-import java.util.Collections;
-import java.util.List;
-
-@Data
-public class StaleProperty {
-
-    @Wither
-    private final int disablingDuration;
-    @Wither
-    private final int deletingDuration;
-    @Wither
-    private final List<String> promotionsToKeep;
-
-    public static StaleProperty create() {
-        return new StaleProperty(0, 0, Collections.emptyList());
+    fun withDisablingDuration(disablingDuration: Int): StaleProperty {
+        return if (this.disablingDuration == disablingDuration) this else StaleProperty(disablingDuration, deletingDuration, promotionsToKeep)
     }
+
+    fun withDeletingDuration(deletingDuration: Int): StaleProperty {
+        return if (this.deletingDuration == deletingDuration) this else StaleProperty(disablingDuration, deletingDuration, promotionsToKeep)
+    }
+
+    fun withPromotionsToKeep(promotionsToKeep: List<String>?): StaleProperty {
+        return if (this.promotionsToKeep === promotionsToKeep) this else StaleProperty(disablingDuration, deletingDuration, promotionsToKeep)
+    }
+
+    companion object {
+        fun create(): StaleProperty {
+            return StaleProperty(0, 0, emptyList())
+        }
+    }
+
 }

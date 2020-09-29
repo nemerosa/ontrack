@@ -1,24 +1,21 @@
-package net.nemerosa.ontrack.extension.stale;
+package net.nemerosa.ontrack.extension.stale
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import net.nemerosa.ontrack.json.JsonUtils;
-import net.nemerosa.ontrack.test.TestUtils;
-import org.junit.Test;
+import net.nemerosa.ontrack.extension.stale.StaleProperty
+import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.test.TestUtils
+import org.junit.Test
 
-public class StalePropertyTest {
-
+class StalePropertyTest {
     @Test
-    public void backward_compatibility_of_json() throws JsonProcessingException {
-        ObjectNode json = JsonUtils.object()
+    fun backward_compatibility_of_json() {
+        val json = JsonUtils.`object`()
                 .with("disablingDuration", 30)
                 .with("deletingDuration", 0)
-                .end();
+                .end()
         TestUtils.assertJsonRead(
-                new StaleProperty(30, 0, null),
+                StaleProperty(30, 0, null),
                 json,
-                StaleProperty.class
-        );
+                StaleProperty::class.java
+        )
     }
-
 }

@@ -1,175 +1,149 @@
-package net.nemerosa.ontrack.extension.stale;
+package net.nemerosa.ontrack.extension.stale
 
-import net.nemerosa.ontrack.common.Time;
-import net.nemerosa.ontrack.job.*;
-import net.nemerosa.ontrack.model.structure.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Stream;
+import net.nemerosa.ontrack.common.Time.now
+import net.nemerosa.ontrack.job.*
+import net.nemerosa.ontrack.job.JobCategory.Companion.of
+import net.nemerosa.ontrack.model.structure.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Component
+import java.time.LocalDateTime
+import java.util.*
+import java.util.function.Consumer
+import java.util.stream.Stream
 
 @Component
-public class StaleJobServiceImpl implements StaleJobService {
+class StaleJobServiceImpl(
+        private val structureService: StructureService,
+        private val propertyService: PropertyService
+) : StaleJobService {
 
-    private final Logger logger = LoggerFactory.getLogger(StaleJobServiceImpl.class);
+    private val logger: Logger = LoggerFactory.getLogger(StaleJobServiceImpl::class.java)
 
-    public static final JobType STALE_BRANCH_JOB =
-            JobCategory.of("cleanup").withName("Cleanup")
-                    .getType("stale-branches").withName("Stale branches cleanup");
-
-    private final StructureService structureService;
-    private final PropertyService propertyService;
-
-    @Autowired
-    public StaleJobServiceImpl(StructureService structureService, PropertyService propertyService) {
-        this.structureService = structureService;
-        this.propertyService = propertyService;
-    }
-
-    @Override
-    public Stream<JobRegistration> collectJobRegistrations() {
+    override fun collectJobRegistrations(): Stream<JobRegistration> {
         // Gets all projects...
-        return structureService.getProjectList().stream()
+        return structureService.projectList
                 // ... which have a StaleProperty
-                .filter(project -> propertyService.hasProperty(project, StalePropertyType.class))
+                .filter { project -> propertyService.hasProperty(project, StalePropertyType::class.java) }
                 // ... and associates a job with them
-                .map(this::createStaleJob);
+                .map { project -> createStaleJob(project) }
+                // ... as a stream
+                .stream()
     }
 
-    protected JobRegistration createStaleJob(Project project) {
-        return JobRegistration.of(
-                new Job() {
-
-                    @Override
-                    public JobKey getKey() {
-                        return getStaleJobKey(project);
-                    }
-
-                    @Override
-                    public JobRun getTask() {
-                        return runListener -> detectAndManageStaleBranches(runListener, project);
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return "Detection and management of stale branches for " + project.getName();
-                    }
-
-                    @Override
-                    public boolean isDisabled() {
-                        return project.isDisabled();
-                    }
-
-                    @Override
-                    public boolean isValid() {
-                        return propertyService.hasProperty(project, StalePropertyType.class);
-                    }
+    protected fun createStaleJob(project: Project): JobRegistration = JobRegistration(
+            object : Job {
+                override fun getKey(): JobKey {
+                    return getStaleJobKey(project)
                 }
-        ).withSchedule(Schedule.EVERY_DAY);
+
+                override fun getTask(): JobRun {
+                    return JobRun { runListener: JobRunListener -> detectAndManageStaleBranches(runListener, project) }
+                }
+
+                override fun getDescription(): String {
+                    return "Detection and management of stale branches for " + project.name
+                }
+
+                override fun isDisabled(): Boolean {
+                    return project.isDisabled
+                }
+
+                override fun isValid(): Boolean {
+                    return propertyService.hasProperty(project, StalePropertyType::class.java)
+                }
+            },
+            Schedule.EVERY_DAY
+    )
+
+    protected fun getStaleJobKey(project: Project): JobKey {
+        return STALE_BRANCH_JOB.getKey(project.id.toString())
     }
 
-    protected JobKey getStaleJobKey(Project project) {
-        return STALE_BRANCH_JOB.getKey(
-                String.valueOf(project.getId())
-        );
-    }
-
-    protected void trace(Project project, String pattern, Object... arguments) {
+    protected fun trace(project: Project, pattern: String?, vararg arguments: Any?) {
         logger.debug(String.format(
                 "[%s] %s",
-                project.getName(),
-                String.format(pattern, arguments)
-        ));
+                project.name, String.format(pattern!!, *arguments)))
     }
 
-    @Override
-    public void detectAndManageStaleBranches(JobRunListener runListener, Project project) {
+    override fun detectAndManageStaleBranches(runListener: JobRunListener, project: Project) {
         // Gets the stale property for the project
-        propertyService.getProperty(project, StalePropertyType.class).option().ifPresent(property -> {
+        propertyService.getProperty(project, StalePropertyType::class.java).option().ifPresent { property: StaleProperty ->
             // Disabling and deletion times
-            int disablingDuration = property.getDisablingDuration();
-            int deletionDuration = property.getDeletingDuration();
-            List<String> promotionsToKeep = property.getPromotionsToKeep();
+            val disablingDuration = property.disablingDuration
+            val deletionDuration = property.deletingDuration
+            val promotionsToKeep = property.promotionsToKeep
             if (disablingDuration <= 0) {
-                trace(project, "No disabling time being set - exiting.");
+                trace(project, "No disabling time being set - exiting.")
             } else {
                 // Current time
-                LocalDateTime now = Time.now();
+                val now = now()
                 // Disabling time
-                LocalDateTime disablingTime = now.minusDays(disablingDuration);
+                val disablingTime = now.minusDays(disablingDuration.toLong())
                 // Deletion time
-                Optional<LocalDateTime> deletionTime =
-                        Optional.ofNullable(
-                                deletionDuration > 0 ?
-                                        disablingTime.minusDays(deletionDuration) :
-                                        null
-                        );
+                val deletionTime: LocalDateTime? = if (deletionDuration > 0) disablingTime.minusDays(deletionDuration.toLong()) else null
                 // Logging
-                trace(project, "Disabling time: %s", disablingTime);
-                trace(project, "Deletion time: %s", deletionTime);
+                trace(project, "Disabling time: %s", disablingTime)
+                trace(project, "Deletion time: %s", deletionTime)
                 // Going on with the scan of the project
-                runListener.message("Scanning %s project for stale branches", project.getName());
-                trace(project, "Scanning project for stale branches");
-                structureService.getBranchesForProject(project.getId()).forEach(
-                        branch -> detectAndManageStaleBranch(branch, disablingTime, deletionTime.orElse(null), promotionsToKeep)
-                );
+                runListener.message("Scanning %s project for stale branches", project.name)
+                trace(project, "Scanning project for stale branches")
+                structureService.getBranchesForProject(project.id).forEach(
+                        Consumer { branch: Branch -> detectAndManageStaleBranch(branch, disablingTime, deletionTime, promotionsToKeep) }
+                )
             }
-        });
+        }
     }
 
-    @Override
-    public void detectAndManageStaleBranch(Branch branch, LocalDateTime disablingTime, LocalDateTime deletionTime, List<String> promotionsToKeep) {
-        trace(branch.getProject(), "[%s] Scanning branch for staleness", branch.getName());
+    override fun detectAndManageStaleBranch(branch: Branch, disablingTime: LocalDateTime?, deletionTime: LocalDateTime?, promotionsToKeep: List<String>?) {
+        trace(branch.project, "[%s] Scanning branch for staleness", branch.name)
         // Indexation of promotion levels to protect
-        Set<String> promotionsToProtect;
-        if (promotionsToKeep != null) {
-            promotionsToProtect = new HashSet<>(promotionsToKeep);
+        val promotionsToProtect: Set<String> = if (promotionsToKeep != null) {
+            HashSet(promotionsToKeep)
         } else {
-            promotionsToProtect = Collections.emptySet();
+            emptySet()
         }
         // Gets the last promotions for this branch
-        List<PromotionView> lastPromotions = structureService.getBranchStatusView(branch).getPromotions();
-        boolean isProtected = lastPromotions.stream()
-                .anyMatch(promotionView -> promotionView.getPromotionRun() != null
-                        && promotionsToProtect.contains(promotionView.getPromotionLevel().getName()));
+        val lastPromotions = structureService.getBranchStatusView(branch).promotions
+        val isProtected = lastPromotions.stream()
+                .anyMatch { promotionView: PromotionView ->
+                    (promotionView.promotionRun != null
+                            && promotionsToProtect.contains(promotionView.promotionLevel.name))
+                }
         if (isProtected) {
-            trace(branch.getProject(), "[%s] Branch is promoted and is not eligible for staleness", branch.getName());
-            return;
+            trace(branch.project, "[%s] Branch is promoted and is not eligible for staleness", branch.name)
+            return
         }
         // Last date
-        LocalDateTime lastTime;
+        val lastTime: LocalDateTime
         // Last build on this branch
-        Optional<Build> oBuild = structureService.getLastBuild(branch.getId());
-        if (!oBuild.isPresent()) {
-            trace(branch.getProject(), "[%s] No available build - taking branch's creation time", branch.getName());
+        val oBuild = structureService.getLastBuild(branch.id)
+        lastTime = if (!oBuild.isPresent) {
+            trace(branch.project, "[%s] No available build - taking branch's creation time", branch.name)
             // Takes the branch creation time from the branch itself
-            if (branch.getSignature() != null && branch.getSignature().getTime() != null) {
-                lastTime = branch.getSignature().getTime();
-            } else {
-                trace(branch.getProject(), "[%s] No available branch creation date - keeping the branch", branch.getName());
-                lastTime = Time.now();
-            }
+            branch.signature.time
         } else {
-            Build build = oBuild.get();
-            lastTime = build.getSignature().getTime();
+            val (_, _, _, signature) = oBuild.get()
+            signature.time
         }
         // Logging
-        trace(branch.getProject(), "[%s] Branch last build activity: %s", branch.getName(), lastTime);
+        trace(branch.project, "[%s] Branch last build activity: %s", branch.name, lastTime)
         // Deletion?
-        if (deletionTime != null && deletionTime.compareTo(lastTime) > 0) {
-            trace(branch.getProject(), "[%s] Branch due for deletion", branch.getName());
-            structureService.deleteBranch(branch.getId());
-        } else if (disablingTime.compareTo(lastTime) > 0 && !branch.isDisabled()) {
-            trace(branch.getProject(), "[%s] Branch due for staleness - disabling", branch.getName());
+        if (deletionTime != null && deletionTime > lastTime) {
+            trace(branch.project, "[%s] Branch due for deletion", branch.name)
+            structureService.deleteBranch(branch.id)
+        } else if (disablingTime != null && disablingTime > lastTime && !branch.isDisabled) {
+            trace(branch.project, "[%s] Branch due for staleness - disabling", branch.name)
             structureService.saveBranch(
                     branch.withDisabled(true)
-            );
+            )
         } else {
-            trace(branch.getProject(), "[%s] Not touching the branch", branch.getName());
+            trace(branch.project, "[%s] Not touching the branch", branch.name)
         }
+    }
+
+    companion object {
+        val STALE_BRANCH_JOB: JobType = of("cleanup").withName("Cleanup")
+                .getType("stale-branches").withName("Stale branches cleanup")
     }
 }
