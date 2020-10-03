@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.stale
 
 data class StaleProperty(
         val disablingDuration: Int,
-        val deletingDuration: Int,
+        val deletingDuration: Int?,
         val promotionsToKeep: List<String>?
 ) {
 

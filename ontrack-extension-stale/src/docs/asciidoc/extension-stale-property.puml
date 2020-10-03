@@ -1,0 +1,22 @@
+@startuml
+
+start
+
+if (Project has stale property?) then (yes)
+    if (Last build older than D days?) then (yes)
+        if (Last build older than D/X days) then (yes)
+            :Delete branch;
+            end
+        else (no)
+            :Disable branch;
+            end
+        endif
+    else (no)
+    endif
+else (no)
+endif
+
+:Keep branch;
+end
+
+@enduml
