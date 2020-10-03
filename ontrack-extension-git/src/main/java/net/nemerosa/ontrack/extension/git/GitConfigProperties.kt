@@ -31,6 +31,29 @@ class GitConfigProperties {
          * Pull requests caching configuration
          */
         var cache = GitPullRequestCacheConfigProperties()
+
+        /**
+         * Pull requests cleanup policy
+         */
+        var cleanup = GitPullRequestCleanupConfigProperties()
+    }
+
+    /**
+     * Pull requests cleanup policy
+     */
+    class GitPullRequestCleanupConfigProperties() {
+        /**
+         * Cleanup enabled
+         */
+        var enabled: Boolean = true
+        /**
+         * Days before disabling
+         */
+        var disabling: Int = 1
+        /**
+         * Days after disabling, before deleting
+         */
+        var deleting: Int = 7
     }
 
     /**

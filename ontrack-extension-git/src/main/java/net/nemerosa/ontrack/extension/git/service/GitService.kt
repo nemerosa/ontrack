@@ -52,6 +52,16 @@ interface GitService : SCMService {
     fun getBranchAsPullRequest(branch: Branch): GitPullRequest?
 
     /**
+     * Is this branch a potential pull request?
+     *
+     * This method won't check if the branch associated pull request actually exists.
+     *
+     * @param branch Branch
+     * @return Pull request status
+     */
+    fun isBranchAPullRequest(branch: Branch): Boolean
+
+    /**
      * Given a branch and its Git configuration, gets its PR information.
      *
      * @param branch Branch

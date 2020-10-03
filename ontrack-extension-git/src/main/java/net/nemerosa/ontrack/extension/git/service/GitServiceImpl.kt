@@ -670,6 +670,17 @@ class GitServiceImpl(
                 getBranchAsPullRequest(branch, property)
             }
 
+    override fun isBranchAPullRequest(branch: Branch): Boolean =
+            gitConfigProperties.pullRequests.enabled &&
+                    propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java).value
+                            ?.let { property ->
+                                getGitConfiguratorAndConfiguration(branch.project)
+                                        ?.let { (configurator, _) ->
+                                            configurator.toPullRequestID(property.branch) != null
+                                        }
+                            }
+                    ?: false
+
     override fun getBranchAsPullRequest(branch: Branch, gitBranchConfigurationProperty: GitBranchConfigurationProperty?): GitPullRequest? =
             if (gitConfigProperties.pullRequests.enabled) {
                 // Actual code to get the PR
