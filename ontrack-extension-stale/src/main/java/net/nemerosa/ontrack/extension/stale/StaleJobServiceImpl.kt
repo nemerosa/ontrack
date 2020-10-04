@@ -79,13 +79,13 @@ class StaleJobServiceImpl(
     fun detectAndManageStaleBranch(branch: Branch, lastBuild: Build?) {
         logger.debug("[{}] Scanning branch for staleness", branch.entityDisplayName)
         // Gets all results
-        val status: StaleBranchStatus = checks.fold<StaleBranchCheck, StaleBranchStatus?>(null) { acc: StaleBranchStatus?, check: StaleBranchCheck ->
+        val status: StaleBranchStatus? = checks.fold<StaleBranchCheck, StaleBranchStatus?>(null) { acc: StaleBranchStatus?, check: StaleBranchCheck ->
             when (acc) {
                 null -> check.getBranchStaleness(branch, lastBuild)
                 StaleBranchStatus.KEEP -> StaleBranchStatus.KEEP
                 else -> min(acc, check.getBranchStaleness(branch, lastBuild))
             }
-        } ?: StaleBranchStatus.KEEP
+        }
         // Logging
         logger.debug("[{}] Branch staleness status: {}", branch.entityDisplayName, status)
         // Actions
@@ -94,7 +94,8 @@ class StaleJobServiceImpl(
             StaleBranchStatus.DISABLE -> if (!branch.isDisabled) {
                 structureService.disableBranch(branch)
             }
-            StaleBranchStatus.KEEP -> {
+            // NUll or KEEP
+            else -> {
             }
         }
     }

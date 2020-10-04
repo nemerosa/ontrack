@@ -25,8 +25,16 @@ enum class StaleBranchStatus {
         /**
          * Out of two statuses, takes the less disruptive one.
          */
-        fun min(a: StaleBranchStatus, b: StaleBranchStatus): StaleBranchStatus =
-                if (a < b) a else b
+        fun min(a: StaleBranchStatus?, b: StaleBranchStatus?): StaleBranchStatus? =
+                if (a == null) {
+                    b
+                } else if (b == null) {
+                    a
+                } else if (a < b) {
+                    a
+                } else {
+                    b
+                }
 
     }
 

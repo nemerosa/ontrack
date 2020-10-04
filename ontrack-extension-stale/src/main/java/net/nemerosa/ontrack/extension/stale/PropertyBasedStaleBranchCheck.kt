@@ -27,18 +27,18 @@ class PropertyBasedStaleBranchCheck(
 
     override fun isBranchEligible(branch: Branch): Boolean = true
 
-    override fun getBranchStaleness(branch: Branch, lastBuild: Build?): StaleBranchStatus {
+    override fun getBranchStaleness(branch: Branch, lastBuild: Build?): StaleBranchStatus? {
         // Gets the project property
         val property: StaleProperty = propertyService.getProperty(branch.project, StalePropertyType::class.java).value
         // If no property, returns
-                ?: return StaleBranchStatus.KEEP
+                ?: return null
         // Disabling and deletion times
         val disablingDuration = property.disablingDuration
         val deletionDuration = property.deletingDuration
         val promotionsToKeep = property.promotionsToKeep
         if (disablingDuration <= 0) {
             logger.debug("[{}] No disabling time being set - exiting.", branch.entityDisplayName)
-            return StaleBranchStatus.KEEP
+            return null
         } else {
             // Current time
             val now = Time.now()
@@ -73,7 +73,7 @@ class PropertyBasedStaleBranchCheck(
             } else if (disablingTime > lastTime && !branch.isDisabled) {
                 StaleBranchStatus.DISABLE
             } else {
-                StaleBranchStatus.KEEP
+                null
             }
         }
     }

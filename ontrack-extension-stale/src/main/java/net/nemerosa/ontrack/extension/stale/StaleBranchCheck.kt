@@ -25,8 +25,8 @@ interface StaleBranchCheck : Extension {
      *
      * @param branch Branch to check
      * @param lastBuild Last build on this branch, if any
-     * @return The staleness status
+     * @return The staleness status, or `null` if this check does not emit any advice
      */
-    fun getBranchStaleness(branch: Branch, lastBuild: Build?): StaleBranchStatus
+    fun getBranchStaleness(branch: Branch, lastBuild: Build?): StaleBranchStatus?
 
 }
