@@ -71,6 +71,48 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
     }
 
     /**
+     * Working with PR feature disabled
+     */
+    protected fun <T> withPRDisabled(code: () -> T): T {
+        val old = gitConfigProperties.pullRequests.enabled
+        return try {
+            gitConfigProperties.pullRequests.enabled = false
+            code()
+        } finally {
+            gitConfigProperties.pullRequests.enabled = old
+        }
+    }
+
+    /**
+     * Working with PR cleanup feature disabled
+     */
+    protected fun <T> withPRCleanupDisabled(code: () -> T): T {
+        val old = gitConfigProperties.pullRequests.cleanup.enabled
+        return try {
+            gitConfigProperties.pullRequests.cleanup.enabled = false
+            code()
+        } finally {
+            gitConfigProperties.pullRequests.cleanup.enabled = old
+        }
+    }
+
+    /**
+     * Working with custom PR cleanup properties
+     */
+    protected fun <T> withPRCleanupProperties(disabling: Int? = null, deleting: Int? = null, code: () -> T): T {
+        val oldDisabling = gitConfigProperties.pullRequests.cleanup.disabling
+        val oldDeleting = gitConfigProperties.pullRequests.cleanup.deleting
+        return try {
+            disabling?.apply { gitConfigProperties.pullRequests.cleanup.disabling = this }
+            deleting?.apply { gitConfigProperties.pullRequests.cleanup.deleting = this }
+            code()
+        } finally {
+            gitConfigProperties.pullRequests.cleanup.disabling = oldDisabling
+            gitConfigProperties.pullRequests.cleanup.deleting = oldDeleting
+        }
+    }
+
+    /**
      * Creates and saves a Git configuration
      */
     protected fun createGitConfiguration(repo: GitRepo, sync: Boolean = true): BasicGitConfiguration {
