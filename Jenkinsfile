@@ -103,7 +103,7 @@ pipeline {
                         -Psigning.keyId=${GPG_KEY_USR} \\
                         -Psigning.password=${GPG_KEY_PSW} \\
                         -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
-                        -Dorg.gradle.jvmargs=-Xmx4096m \\
+                        -Dorg.gradle.jvmargs=-Xmx8192m \\
                         --stacktrace \\
                         --parallel \\
                         --console plain
