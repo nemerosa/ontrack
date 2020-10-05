@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.extension.gitlab.service.GitLabConfigurationService
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
+import net.nemerosa.ontrack.extension.stale.StaleExtensionFeature
 import org.gitlab4j.api.Constants
 import org.junit.Assert.*
 import org.junit.Before
@@ -34,7 +35,7 @@ class GitLabIssueServiceExtensionTest {
         gitHubClientFactory = mock(OntrackGitLabClientFactory::class.java)
         val issueExportServiceFactory = mock(IssueExportServiceFactory::class.java)
         extension = GitLabIssueServiceExtension(
-                GitLabExtensionFeature(GitExtensionFeature(SCMExtensionFeature())),
+                GitLabExtensionFeature(GitExtensionFeature(SCMExtensionFeature(), StaleExtensionFeature())),
                 issueExportServiceFactory,
                 configurationService,
                 gitHubClientFactory
