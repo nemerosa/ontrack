@@ -36,12 +36,10 @@ class PullRequestStaleBranchCheck(
                     gitService.isBranchConfiguredForGit(branch) && gitService.isBranchAPullRequest(branch)
 
     override fun getBranchStaleness(branch: Branch, lastBuild: Build?): StaleBranchStatus? {
-        if (gitConfigProperties.pullRequests.enabled && gitConfigProperties.pullRequests.cleanup.enabled) {
-            val pr = gitService.getBranchAsPullRequest(branch)
-            if (pr != null) {
-                if (pr.isValid) {
-                    return null
-                } else {
+        return if (gitConfigProperties.pullRequests.enabled && gitConfigProperties.pullRequests.cleanup.enabled) {
+            if (gitService.isBranchAPullRequest(branch)) {
+                val pr = gitService.getBranchAsPullRequest(branch)
+                if (pr == null || !pr.isValid) {
                     val lastTime = lastBuild?.signature?.time ?: branch.signature.time
                     // Current time
                     val now = Time.now()
@@ -50,17 +48,13 @@ class PullRequestStaleBranchCheck(
                     // Deletion time
                     val deletionTime: LocalDateTime = disablingTime.minusDays(gitConfigProperties.pullRequests.cleanup.deleting.toLong())
                     // Check
-                    return when {
+                    when {
                         lastTime < deletionTime -> StaleBranchStatus.DELETE
                         lastTime < disablingTime -> StaleBranchStatus.DISABLE
                         else -> null
                     }
-                }
-            } else {
-                return null
-            }
-        } else {
-            return null
-        }
+                } else null
+            } else null
+        } else null
     }
 }

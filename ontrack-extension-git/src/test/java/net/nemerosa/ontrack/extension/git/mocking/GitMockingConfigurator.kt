@@ -43,17 +43,22 @@ class GitMockingConfigurator(
             source: String = "feature/TK-$id-feature",
             target: String = "release/1.0",
             title: String = "PR n°$id",
-            status: String = "open"
+            status: String = "open",
+            invalid: Boolean = false
     ) {
-        val pr = GitPullRequest(
-                id = id,
-                key = "#$id",
-                source = source,
-                target = target,
-                title = title,
-                status = status,
-                url = "uri:testing:web:git:pr:$id"
-        )
+        val pr = if (invalid)  {
+            GitPullRequest.invalidPR(id, "#$id")
+        } else {
+            GitPullRequest(
+                    id = id,
+                    key = "#$id",
+                    source = source,
+                    target = target,
+                    title = title,
+                    status = status,
+                    url = "uri:testing:web:git:pr:$id"
+            )
+        }
         pullRequests[id] = pr
     }
 
