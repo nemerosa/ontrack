@@ -20,47 +20,6 @@ import kotlin.test.assertTrue
 
 /**
  * Integration tests between the PR check and the normal branch check.
- *
- * Combinations:
- *
- * | PR status | Stale property | Last build | Expected result |
- * |---|---|---|---|
- * | Valid PR | No property | Recent | Kept |
- * | Valid PR | No property | Medium | Kept |
- * | Valid PR | No property | Old | Kept |
- * | Valid PR | Property w/o promotion | Recent | Kept |
- * | Valid PR | Property w/o promotion | Medium | Disabled |
- * | Valid PR | Property w/o promotion | Old | Deleted |
- * | Valid PR | Property w/ promotion and not promoted | Recent | Kept |
- * | Valid PR | Property w/ promotion and not promoted | Medium | Disabled |
- * | Valid PR | Property w/ promotion and not promoted | Old | Deleted |
- * | Valid PR | Property w/ promotion and promoted | Recent | Kept |
- * | Valid PR | Property w/ promotion and promoted | Medium | Kept |
- * | Valid PR | Property w/ promotion and promoted | Old | Kept |
- * | Missing PR | No property | Recent | Kept |
- * | Missing PR | No property | Medium | Disabled |
- * | Missing PR | No property | Old | Deleted |
- * | Missing PR | Property w/o promotion | Recent | Kept |
- * | Missing PR | Property w/o promotion | Medium | Disabled |
- * | Missing PR | Property w/o promotion | Old | Deleted |
- * | Missing PR | Property w/ promotion and not promoted | Recent | Kept |
- * | Missing PR | Property w/ promotion and not promoted | Medium | Disabled |
- * | Missing PR | Property w/ promotion and not promoted | Old | Deleted |
- * | Missing PR | Property w/ promotion and promoted | Recent | Kept |
- * | Missing PR | Property w/ promotion and promoted | Medium | Kept |
- * | Missing PR | Property w/ promotion and promoted | Old | Kept |
- * | Invalid PR | No property | Recent | Kept |
- * | Invalid PR | No property | Medium | Disabled |
- * | Invalid PR | No property | Old | Deleted |
- * | Invalid PR | Property w/o promotion | Recent | Kept |
- * | Invalid PR | Property w/o promotion | Medium | Disabled |
- * | Invalid PR | Property w/o promotion | Old | Deleted |
- * | Invalid PR | Property w/ promotion and not promoted | Recent | Kept |
- * | Invalid PR | Property w/ promotion and not promoted | Medium | Disabled |
- * | Invalid PR | Property w/ promotion and not promoted | Old | Deleted |
- * | Invalid PR | Property w/ promotion and promoted | Recent | Kept |
- * | Invalid PR | Property w/ promotion and promoted | Medium | Kept |
- * | Invalid PR | Property w/ promotion and promoted | Old | Kept |
  */
 class PullRequestStaleBranchCompleteCheckIT : AbstractGitTestSupport() {
 
@@ -80,15 +39,66 @@ class PullRequestStaleBranchCompleteCheckIT : AbstractGitTestSupport() {
         notAPR() withProperty none() withBuild recent() returns kept()
         notAPR() withProperty none() withBuild medium() returns kept()
         notAPR() withProperty none() withBuild old() returns kept()
+        //
         notAPR() withProperty propertyWithoutPromotion() withBuild recent() returns kept()
         notAPR() withProperty propertyWithoutPromotion() withBuild medium() returns disabled()
         notAPR() withProperty propertyWithoutPromotion() withBuild old() returns deleted()
+        //
         notAPR() withProperty propertyWithPromotionAndNotPromoted() withBuild recent() returns kept()
         notAPR() withProperty propertyWithPromotionAndNotPromoted() withBuild medium() returns disabled()
         notAPR() withProperty propertyWithPromotionAndNotPromoted() withBuild old() returns deleted()
+        //
         notAPR() withProperty propertyWithPromotionAndPromoted() withBuild recent() returns kept()
         notAPR() withProperty propertyWithPromotionAndPromoted() withBuild medium() returns kept()
         notAPR() withProperty propertyWithPromotionAndPromoted() withBuild old() returns kept()
+        //
+        validPR() withProperty none() withBuild recent() returns kept()
+        validPR() withProperty none() withBuild medium() returns kept()
+        validPR() withProperty none() withBuild old() returns kept()
+        //
+        validPR() withProperty propertyWithoutPromotion() withBuild recent() returns kept()
+        validPR() withProperty propertyWithoutPromotion() withBuild medium() returns disabled()
+        validPR() withProperty propertyWithoutPromotion() withBuild old() returns deleted()
+        //
+        validPR() withProperty propertyWithPromotionAndNotPromoted() withBuild recent() returns kept()
+        validPR() withProperty propertyWithPromotionAndNotPromoted() withBuild medium() returns disabled()
+        validPR() withProperty propertyWithPromotionAndNotPromoted() withBuild old() returns deleted()
+        //
+        validPR() withProperty propertyWithPromotionAndPromoted() withBuild recent() returns kept()
+        validPR() withProperty propertyWithPromotionAndPromoted() withBuild medium() returns kept()
+        validPR() withProperty propertyWithPromotionAndPromoted() withBuild old() returns kept()
+        //
+        missingPR() withProperty none() withBuild recent() returns kept()
+        missingPR() withProperty none() withBuild medium() returns disabled()
+        missingPR() withProperty none() withBuild old() returns deleted()
+        //
+        missingPR() withProperty propertyWithoutPromotion() withBuild recent() returns kept()
+        missingPR() withProperty propertyWithoutPromotion() withBuild medium() returns disabled()
+        missingPR() withProperty propertyWithoutPromotion() withBuild old() returns deleted()
+        //
+        missingPR() withProperty propertyWithPromotionAndNotPromoted() withBuild recent() returns kept()
+        missingPR() withProperty propertyWithPromotionAndNotPromoted() withBuild medium() returns disabled()
+        missingPR() withProperty propertyWithPromotionAndNotPromoted() withBuild old() returns deleted()
+        //
+        missingPR() withProperty propertyWithPromotionAndPromoted() withBuild recent() returns kept()
+        missingPR() withProperty propertyWithPromotionAndPromoted() withBuild medium() returns kept()
+        missingPR() withProperty propertyWithPromotionAndPromoted() withBuild old() returns kept()
+        //
+        invalidPR() withProperty none() withBuild recent() returns kept()
+        invalidPR() withProperty none() withBuild medium() returns disabled()
+        invalidPR() withProperty none() withBuild old() returns deleted()
+        //
+        invalidPR() withProperty propertyWithoutPromotion() withBuild recent() returns kept()
+        invalidPR() withProperty propertyWithoutPromotion() withBuild medium() returns disabled()
+        invalidPR() withProperty propertyWithoutPromotion() withBuild old() returns deleted()
+        //
+        invalidPR() withProperty propertyWithPromotionAndNotPromoted() withBuild recent() returns kept()
+        invalidPR() withProperty propertyWithPromotionAndNotPromoted() withBuild medium() returns disabled()
+        invalidPR() withProperty propertyWithPromotionAndNotPromoted() withBuild old() returns deleted()
+        //
+        invalidPR() withProperty propertyWithPromotionAndPromoted() withBuild recent() returns kept()
+        invalidPR() withProperty propertyWithPromotionAndPromoted() withBuild medium() returns kept()
+        invalidPR() withProperty propertyWithPromotionAndPromoted() withBuild old() returns kept()
     }
 
     private inner class ExpectedResult(
@@ -122,6 +132,8 @@ class PullRequestStaleBranchCompleteCheckIT : AbstractGitTestSupport() {
             private val buildConfiguration: BuildConfiguration
     ) {
         infix fun returns(expectedResult: ExpectedResult) {
+            val description = "${branchConfiguration.description} with ${buildConfiguration.description} expects to be ${expectedResult.description}"
+            logger.info("TEST $description")
             createRepo {
                 commits(1)
             } and { repo, _ ->
@@ -143,7 +155,6 @@ class PullRequestStaleBranchCompleteCheckIT : AbstractGitTestSupport() {
                             staleJobService.detectAndManageStaleBranches(JobRunListener.out(), project)
                             // Expectations
                             val actualBranch = structureService.findBranchByID(branch.id)
-                            val description = "${branchConfiguration.description} with ${buildConfiguration.description} expects to be ${expectedResult.description}"
                             expectedResult.check(description, actualBranch)
                         }
                     }
@@ -285,6 +296,29 @@ class PullRequestStaleBranchCompleteCheckIT : AbstractGitTestSupport() {
     private fun notAPR() = BranchPRConfiguration("Branch which is not a PR") {
         gitMockingConfigurator.clearPullRequests()
         it.gitBranch("master") {
+            commitAsProperty()
+        }
+    }
+
+    private fun validPR() = BranchPRConfiguration("Branch which is a valid PR") {
+        gitMockingConfigurator.clearPullRequests()
+        gitMockingConfigurator.registerPullRequest(1)
+        it.gitBranch("PR-1") {
+            commitAsProperty()
+        }
+    }
+
+    private fun missingPR() = BranchPRConfiguration("Branch which is a missing PR") {
+        gitMockingConfigurator.clearPullRequests()
+        it.gitBranch("PR-1") {
+            commitAsProperty()
+        }
+    }
+
+    private fun invalidPR() = BranchPRConfiguration("Branch which is an invalid PR") {
+        gitMockingConfigurator.clearPullRequests()
+        gitMockingConfigurator.registerPullRequest(1, invalid = true)
+        it.gitBranch("PR-1") {
             commitAsProperty()
         }
     }
