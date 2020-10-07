@@ -327,14 +327,16 @@ configure(coreProjects) p@{
     // Unit tests run with the `test` task
     tasks.named<Test>("test") {
         include("**/*Test.class")
+        minHeapSize = "1024m"
+        maxHeapSize = "2048m"
     }
 
     // Integration tests
     val integrationTest by tasks.registering(Test::class) {
         mustRunAfter("test")
         include("**/*IT.class")
-        minHeapSize = "512m"
-        maxHeapSize = "1024m"
+        minHeapSize = "1024m"
+        maxHeapSize = "2048m"
         dependsOn(":preIntegrationTest")
         finalizedBy(":postIntegrationTest")
         /**
