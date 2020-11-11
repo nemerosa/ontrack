@@ -134,15 +134,25 @@ class IndicatorServiceImpl(
     }
 
     private fun <C, T> toIndicator(stored: StoredIndicator?, type: IndicatorType<T, C>): Indicator<T> {
-        return if (stored != null && !stored.value.isNull) {
-            val value = type.fromStoredJson(stored.value)
-            Indicator(
-                    type = type,
-                    value = value,
-                    compliance = value?.let { type.getStatus(it) },
-                    comment = stored.comment,
-                    signature = stored.signature
-            )
+        return if (stored != null) {
+            if (stored.value != null && !stored.value.isNull) {
+                val value = type.fromStoredJson(stored.value)
+                Indicator(
+                        type = type,
+                        value = value,
+                        compliance = value?.let { type.getStatus(it) },
+                        comment = stored.comment,
+                        signature = stored.signature
+                )
+            } else {
+                Indicator(
+                        type = type,
+                        value = null,
+                        compliance = null,
+                        comment = stored.comment,
+                        signature = stored.signature
+                )
+            }
         } else {
             Indicator(
                     type = type,
