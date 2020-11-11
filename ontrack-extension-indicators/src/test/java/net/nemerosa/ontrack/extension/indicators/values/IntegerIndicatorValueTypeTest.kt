@@ -86,8 +86,8 @@ class IntegerIndicatorValueTypeTest {
         assertClientJson(""""text"""".parseAsJson(), null)
         assertClientJson(mapOf("test" to true).asJson(), null)
 
-        assertClientJson(mapOf("value" to null).asJson(), 0)
-        assertClientJson(mapOf("value" to "text").asJson(), 0)
+        assertClientJson(mapOf("value" to null).asJson(), null)
+        assertClientJson(mapOf("value" to "text").asJson(), null)
         assertClientJson(mapOf("value" to 25).asJson(), 25)
         assertClientJson(mapOf("value" to 75).asJson(), 75)
 

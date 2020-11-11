@@ -162,7 +162,14 @@ public final class JsonUtils {
 
     public static int getInt(JsonNode data, String field, boolean required, int defaultValue) {
         if (data.has(field)) {
-            return data.path(field).asInt();
+            JsonNode node = data.path(field);
+            if (node.isInt()) {
+                return node.asInt();
+            } else if (required) {
+                throw new JsonMissingFieldException(field);
+            } else {
+                return defaultValue;
+            }
         } else if (required) {
             throw new JsonMissingFieldException(field);
         } else {
