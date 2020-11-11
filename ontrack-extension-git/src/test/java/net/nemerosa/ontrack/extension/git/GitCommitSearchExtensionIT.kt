@@ -70,9 +70,29 @@ class GitCommitSearchExtensionIT : AbstractGitSearchTestSupport() {
                 searchIndexService.index(gitCommitSearchExtension)
                 // Looks for every commit
                 commits.forEach { (_, commit) ->
-                    val results = searchService.search(SearchRequest(commit))
+                    val results = searchService.paginatedSearch(SearchRequest(commit)).items
                     val title = "$name $commit"
                     val result = results.find { it.title == title }
+                    assertNotNull(result)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Looking for a commit on a project using its short ID`() {
+        createRepo {
+            commits(10, shortId = true)
+        } and { repo, commits ->
+            project {
+                gitProject(repo)
+                // Re-indexes the commits
+                searchIndexService.index(gitCommitSearchExtension)
+                // Looks for every commit
+                commits.forEach { (_, commit) ->
+                    val results = searchService.paginatedSearch(SearchRequest(commit)).items
+                    val title = "$name $commit"
+                    val result = results.find { it.title.startsWith(title) }
                     assertNotNull(result)
                 }
             }
