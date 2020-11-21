@@ -127,4 +127,13 @@ ontrack.config.extension.git.pull-requests.cache.duration = 30m
 
 # Caching size for pull requests
 ontrack.config.extension.git.pull-requests.cache.size = 200
+
+# Auto cleanup of pull requests
+ontrack.config.extension.git.pull-requests.cleanup.enabled = true
+
+# Days before disabling
+ontrack.config.extension.git.pull-requests.cleanup.disabling = 1
+
+# Days before deleting
+ontrack.config.extension.git.pull-requests.cleanup.deleting = 7
 ----
