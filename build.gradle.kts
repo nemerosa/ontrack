@@ -327,16 +327,16 @@ configure(coreProjects) p@{
     // Unit tests run with the `test` task
     tasks.named<Test>("test") {
         include("**/*Test.class")
-        minHeapSize = "1024m"
-        maxHeapSize = "2048m"
+        minHeapSize = "512m"
+        maxHeapSize = "4096m"
     }
 
     // Integration tests
     val integrationTest by tasks.registering(Test::class) {
         mustRunAfter("test")
         include("**/*IT.class")
-        minHeapSize = "1024m"
-        maxHeapSize = "2048m"
+        minHeapSize = "512m"
+        maxHeapSize = "4096m"
         dependsOn(":preIntegrationTest")
         finalizedBy(":postIntegrationTest")
         /**
@@ -713,8 +713,8 @@ val gitterAnnouncement by tasks.registering(GitterAnnouncement::class) {
     text = {
         """
         |## Ontrack $version is out
-        | 
-        |${githubReleaseChangeLog.get().changeLog}       
+        |
+        |${githubReleaseChangeLog.get().changeLog}
         """.trimMargin()
     }
 }
