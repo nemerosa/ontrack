@@ -244,13 +244,15 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
      * Creates [n] commits, from 1 to [n], with message being "Commit `i`" by default.
      *
      * @param n Number of commits to create
+     * @param pauses `true` if we must pause ~ 1 second between each commit (default to `false`)
+     * @param shortId `true` if we must return the short commit hash, not the long ones (default to `false`)
      * @return A map where the key in the index, and the value is the commit hash.
      */
-    protected fun GitRepo.commits(n: Int, pauses: Boolean = false) =
+    protected fun GitRepo.commits(n: Int, pauses: Boolean = false, shortId: Boolean = false) =
             (1..n).associate {
                 val message = "Commit $it"
                 commit(it, message)
-                val hash = commitLookup(message, false)
+                val hash = commitLookup(message, shortId)
                 if (pauses) sleep(1010)
                 it to hash
             }

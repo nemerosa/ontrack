@@ -26,6 +26,7 @@ class IntegerIndicatorValueType(
             Form.create()
                     .with(
                             IntField.of("value")
+                                    .optional()
                                     .label("Value")
                                     .min(0)
                                     .value(value)
