@@ -30,6 +30,10 @@ public class GitLabGitConfiguration implements GitConfiguration {
         return property.getConfiguration().getName();
     }
 
+    public GitLabProjectConfigurationProperty getProperty() {
+        return property;
+    }
+
     @Override
     public String getRemote() {
         return format(

@@ -111,4 +111,29 @@ ontrack.config.search.index.logging = false
 # Note: if set to `true` this generates an awful lot if information
 # at DEBUG level.
 ontrack.config.search.index.tracing = false
+
+#################################
+# Git configuration properties
+#################################
+
+# Enabling pull requests
+ontrack.config.extension.git.pull-requests.enabled = true
+
+# Caching enabled for pull requests
+ontrack.config.extension.git.pull-requests.cache.enabled = true
+
+# Caching duration for pull requests
+ontrack.config.extension.git.pull-requests.cache.duration = 30m
+
+# Caching size for pull requests
+ontrack.config.extension.git.pull-requests.cache.size = 200
+
+# Auto cleanup of pull requests
+ontrack.config.extension.git.pull-requests.cleanup.enabled = true
+
+# Days before disabling
+ontrack.config.extension.git.pull-requests.cleanup.disabling = 1
+
+# Days before deleting
+ontrack.config.extension.git.pull-requests.cleanup.deleting = 7
 ----

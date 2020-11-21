@@ -31,6 +31,7 @@ class PercentageIndicatorValueType(
             Form.create()
                     .with(
                             Int.of("value")
+                                    .optional()
                                     .label("Value (%)")
                                     .min(0)
                                     .max(100)

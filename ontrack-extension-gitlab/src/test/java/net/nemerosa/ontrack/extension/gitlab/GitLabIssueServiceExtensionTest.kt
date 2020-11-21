@@ -4,13 +4,15 @@ import net.nemerosa.ontrack.extension.git.GitExtensionFeature
 import net.nemerosa.ontrack.extension.gitlab.client.OntrackGitLabClient
 import net.nemerosa.ontrack.extension.gitlab.client.OntrackGitLabClientFactory
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabConfiguration
+import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssue
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueWrapper
 import net.nemerosa.ontrack.extension.gitlab.service.GitLabConfigurationService
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
-import org.gitlab.api.models.GitlabIssue
+import net.nemerosa.ontrack.extension.stale.StaleExtensionFeature
+import org.gitlab4j.api.Constants
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -33,7 +35,7 @@ class GitLabIssueServiceExtensionTest {
         gitHubClientFactory = mock(OntrackGitLabClientFactory::class.java)
         val issueExportServiceFactory = mock(IssueExportServiceFactory::class.java)
         extension = GitLabIssueServiceExtension(
-                GitLabExtensionFeature(GitExtensionFeature(SCMExtensionFeature())),
+                GitLabExtensionFeature(GitExtensionFeature(SCMExtensionFeature(), StaleExtensionFeature())),
                 issueExportServiceFactory,
                 configurationService,
                 gitHubClientFactory
@@ -50,8 +52,14 @@ class GitLabIssueServiceExtensionTest {
                 "nemerosa/ontrack"
         )
         issueWrapper = GitLabIssueWrapper(
-                GitlabIssue(),
-                "url/xxx",
+                GitLabIssue().apply {
+                    id = 1
+                    webUrl = "url/1"
+                    title = "Issue 1"
+                    state = Constants.IssueState.OPENED
+                    updatedAt = Date()
+                    labels = emptyList()
+                },
                 "url/xxx"
         )
     }

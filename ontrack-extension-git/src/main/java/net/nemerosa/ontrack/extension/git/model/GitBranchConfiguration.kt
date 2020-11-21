@@ -10,9 +10,14 @@ constructor(
         val configuration: GitConfiguration,
 
         /**
-         * Default branch
+         * Git branch name (can be a PR key)
          */
         val branch: String,
+
+        /**
+         * Pull request information
+         */
+        val pullRequest: GitPullRequest?,
 
         /**
          * Configured link

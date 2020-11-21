@@ -21,6 +21,11 @@ val GIT_JOB_CATEGORY = JobCategory.of("git").withName("Git")
 interface GitService : SCMService {
 
     /**
+     * Gets the Git configurator for a project
+     */
+    fun getGitConfiguratorAndConfiguration(project: Project): Pair<GitConfigurator, GitConfiguration>?
+
+    /**
      * Tests if a project is correctly configured for Git.
      */
     fun isProjectConfiguredForGit(project: Project): Boolean
@@ -34,6 +39,36 @@ interface GitService : SCMService {
      * Gets the configuration for a project.
      */
     fun getProjectConfiguration(project: Project): GitConfiguration?
+
+    /**
+     * Gets (if any) the pull request associated to a branch.
+     *
+     * Note that [GitService.getBranchAsPullRequest] must be used instead if you happen
+     * to already have some information about the branch.
+     *
+     * @param branch Branch
+     * @return Pull request or null is none
+     */
+    fun getBranchAsPullRequest(branch: Branch): GitPullRequest?
+
+    /**
+     * Is this branch a potential pull request?
+     *
+     * This method won't check if the branch associated pull request actually exists.
+     *
+     * @param branch Branch
+     * @return Pull request status
+     */
+    fun isBranchAPullRequest(branch: Branch): Boolean
+
+    /**
+     * Given a branch and its Git configuration, gets its PR information.
+     *
+     * @param branch Branch
+     * @param gitBranchConfigurationProperty Gt branch configuration
+     * @return Pull request or null is none
+     */
+    fun getBranchAsPullRequest(branch: Branch, gitBranchConfigurationProperty: GitBranchConfigurationProperty?): GitPullRequest?
 
     /**
      * Gets the configuration for a branch

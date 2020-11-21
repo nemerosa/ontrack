@@ -28,6 +28,10 @@ public class StashGitConfiguration implements GitConfiguration {
         return property.getConfiguration().getName();
     }
 
+    public StashProjectConfigurationProperty getProperty() {
+        return property;
+    }
+
     /**
      * Checks if this configuration denotes any BitBucket Cloud instance
      */

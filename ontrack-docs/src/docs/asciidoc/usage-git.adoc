@@ -1,6 +1,8 @@
 [[usage-git]]
 === Working with Git
 
+include::git-pull-requests.adoc[]
+
 include::usage-github.adoc[]
 
 include::usage-gitlab.adoc[]

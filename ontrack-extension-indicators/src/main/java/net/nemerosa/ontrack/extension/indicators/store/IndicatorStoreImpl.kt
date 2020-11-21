@@ -54,22 +54,18 @@ class IndicatorStoreImpl(
 
     private fun toStoredIndicator(record: EntityDataStoreRecord): StoredIndicator? {
         val rep = record.data.parse<StoredIndicatorRepresentation>()
-        return if (rep.value != null) {
-            StoredIndicator(
-                    value = rep.value,
-                    comment = rep.comment,
-                    signature = record.signature
-            )
-        } else {
-            null
-        }
+        return StoredIndicator(
+                value = rep.value,
+                comment = rep.comment,
+                signature = record.signature
+        )
     }
 
     override fun loadPreviousIndicator(project: Project, typeId: String): StoredIndicator? {
         // We need the current value
         val current = loadIndicator(project, typeId) ?: return null
         // Gets its JSON value
-        val json = current.value.asJsonString()
+        val json = current.value?.asJsonString() ?: return null
         // Getting the first indicator whose value if different than the current one
         return entityDataStore.getByFilter(
                 EntityDataStoreFilter(project)

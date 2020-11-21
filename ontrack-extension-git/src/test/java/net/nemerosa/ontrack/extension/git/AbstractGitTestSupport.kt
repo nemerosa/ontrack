@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.git
 
+import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurationProperty
+import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.BranchInfo
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
@@ -29,6 +31,9 @@ import kotlin.test.assertNull
 abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
+    protected lateinit var gitConfigProperties: GitConfigProperties
+
+    @Autowired
     private lateinit var commitBuildNameGitCommitLink: CommitBuildNameGitCommitLink
 
     @Autowired
@@ -51,6 +56,61 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var jobOrchestrator: JobOrchestrator
+
+    /**
+     * Working with the PR cache disabled
+     */
+    protected fun <T> withPRCacheDisabled(code: () -> T): T {
+        val old = gitConfigProperties.pullRequests.cache.enabled
+        return try {
+            gitConfigProperties.pullRequests.cache.enabled = false
+            code()
+        } finally {
+            gitConfigProperties.pullRequests.cache.enabled = old
+        }
+    }
+
+    /**
+     * Working with PR feature disabled
+     */
+    protected fun <T> withPRDisabled(code: () -> T): T {
+        val old = gitConfigProperties.pullRequests.enabled
+        return try {
+            gitConfigProperties.pullRequests.enabled = false
+            code()
+        } finally {
+            gitConfigProperties.pullRequests.enabled = old
+        }
+    }
+
+    /**
+     * Working with PR cleanup feature disabled
+     */
+    protected fun <T> withPRCleanupDisabled(code: () -> T): T {
+        val old = gitConfigProperties.pullRequests.cleanup.enabled
+        return try {
+            gitConfigProperties.pullRequests.cleanup.enabled = false
+            code()
+        } finally {
+            gitConfigProperties.pullRequests.cleanup.enabled = old
+        }
+    }
+
+    /**
+     * Working with custom PR cleanup properties
+     */
+    protected fun <T> withPRCleanupProperties(disabling: Int? = null, deleting: Int? = null, code: () -> T): T {
+        val oldDisabling = gitConfigProperties.pullRequests.cleanup.disabling
+        val oldDeleting = gitConfigProperties.pullRequests.cleanup.deleting
+        return try {
+            disabling?.apply { gitConfigProperties.pullRequests.cleanup.disabling = this }
+            deleting?.apply { gitConfigProperties.pullRequests.cleanup.deleting = this }
+            code()
+        } finally {
+            gitConfigProperties.pullRequests.cleanup.disabling = oldDisabling
+            gitConfigProperties.pullRequests.cleanup.deleting = oldDeleting
+        }
+    }
 
     /**
      * Creates and saves a Git configuration
@@ -82,6 +142,26 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
                 this,
                 GitProjectConfigurationPropertyType::class.java,
                 GitProjectConfigurationProperty(gitConfiguration)
+        )
+        // Makes sure to register the project
+        if (sync) {
+            asAdmin().execute {
+                jobOrchestrator.orchestrate(JobRunListener.out())
+            }
+        }
+    }
+
+    /**
+     * Configures a project for Git, with compatibility with pull requests (mocking)
+     */
+    protected fun Project.prGitProject(repo: GitRepo, sync: Boolean = true) {
+        // Create a Git configuration
+        val gitConfiguration = createGitConfiguration(repo, sync)
+        // Configures the project
+        setProperty(
+                this,
+                GitMockingConfigurationPropertyType::class.java,
+                GitMockingConfigurationProperty(gitConfiguration, null)
         )
         // Makes sure to register the project
         if (sync) {
@@ -164,13 +244,15 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
      * Creates [n] commits, from 1 to [n], with message being "Commit `i`" by default.
      *
      * @param n Number of commits to create
+     * @param pauses `true` if we must pause ~ 1 second between each commit (default to `false`)
+     * @param shortId `true` if we must return the short commit hash, not the long ones (default to `false`)
      * @return A map where the key in the index, and the value is the commit hash.
      */
-    protected fun GitRepo.commits(n: Int, pauses: Boolean = false) =
+    protected fun GitRepo.commits(n: Int, pauses: Boolean = false, shortId: Boolean = false) =
             (1..n).associate {
                 val message = "Commit $it"
                 commit(it, message)
-                val hash = commitLookup(message, false)
+                val hash = commitLookup(message, shortId)
                 if (pauses) sleep(1010)
                 it to hash
             }

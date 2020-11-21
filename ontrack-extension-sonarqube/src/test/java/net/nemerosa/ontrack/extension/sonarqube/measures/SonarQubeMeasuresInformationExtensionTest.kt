@@ -8,11 +8,11 @@ import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.createBranch
 import net.nemerosa.ontrack.model.structure.createBuild
 import net.nemerosa.ontrack.test.assertIs
-import net.nemerosa.ontrack.test.assertNotPresent
-import net.nemerosa.ontrack.test.assertPresent
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class SonarQubeMeasuresInformationExtensionTest {
 
@@ -40,7 +40,7 @@ class SonarQubeMeasuresInformationExtensionTest {
                 )
         )
         val info = informationExtension.getInformation(build)
-        assertPresent(info) {
+        assertNotNull(info) {
             assertIs<SonarQubeMeasures>(it.data) { q ->
                 assertEquals(
                         mapOf(
@@ -57,13 +57,13 @@ class SonarQubeMeasuresInformationExtensionTest {
     fun `Not getting any measure when no measure is attached to the build`() {
         val build: Build = createBuild()
         val info = informationExtension.getInformation(build)
-        assertNotPresent(info)
+        assertNull(info)
     }
 
     @Test
     fun `Not getting any measure for something different than a build`() {
         val info = informationExtension.getInformation(createBranch())
-        assertNotPresent(info)
+        assertNull(info)
     }
 
 }

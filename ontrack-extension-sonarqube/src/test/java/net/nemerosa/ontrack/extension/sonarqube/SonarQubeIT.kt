@@ -83,7 +83,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                 )
             }
             // Checks the entity information
-            val information = informationExtension.getInformation(build).getOrNull()
+            val information = informationExtension.getInformation(build)
             assertNotNull(information) {
                 assertIs<SonarQubeMeasures>(it.data) { q ->
                     assertEquals(

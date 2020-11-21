@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.model.structure.ServiceConfiguration
 class GitBranchConfigurationProperty(
 
         /**
-         * Git branch
+         * Git branch or pull request ID
          */
         val branch: String,
 

@@ -156,6 +156,24 @@ class IndicatorIT : AbstractIndicatorsTestSupport() {
     }
 
     @Test
+    fun `Comment without value`() {
+        val category = category()
+        val type = category.booleanType()
+        project {
+            asAdmin {
+                indicatorService.updateProjectIndicator<Boolean>(this, type.id, mapOf(
+                        "value" to null,
+                        "comment" to "Some comment"
+                ).asJson())
+                checkIndicator(type) { i ->
+                    assertEquals(null, i.value)
+                    assertEquals("Some comment", i.comment)
+                }
+            }
+        }
+    }
+
+    @Test
     fun `No comment in input`() {
         val category = category()
         val type = category.booleanType()

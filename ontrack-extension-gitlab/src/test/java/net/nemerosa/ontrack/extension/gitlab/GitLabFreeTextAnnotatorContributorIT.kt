@@ -33,7 +33,8 @@ class GitLabFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
     fun `Git configuration without any issue service`() {
         project {
             gitLabConfig(issueServiceConfigurationIdentifier = null)
-            expects("Text with #123" to """Text with #123""")
+            // GitLab issue system will be taken by default
+            expects("Text with #123" to """Text with <a href="https://gitlab.com/nemerosa/test/issues/123">#123</a>""")
         }
     }
 
