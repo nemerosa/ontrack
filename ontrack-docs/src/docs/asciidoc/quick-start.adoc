@@ -28,4 +28,4 @@ Where to go from there?
 You can also check the following sections:
 
 * <<installation>>
-* <<configuration>>
+* <<setup>>

@@ -17,8 +17,16 @@ Damien Coraboeuf
 
 include::quick-start.adoc[]
 
-//include::installation.adoc[]
-//
+include::installation.adoc[]
+
+include::setup.adoc[]
+
+include::feeding.adoc[]
+
+include::usage.adoc[]
+
+include::api.adoc[]
+
 //include::usage.adoc[]
 //
 //include::administration.adoc[]

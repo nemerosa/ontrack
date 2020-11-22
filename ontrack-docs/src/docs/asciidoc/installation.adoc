@@ -3,342 +3,342 @@
 
 There are several ways to install Ontrack.
 
-[[installation-prerequisites]]
-=== Prerequisites
-
-Ontrack has been tested on different Linux variants (Ubuntu, Debian, CentOS)
-and should also work on Windows.
-
-Ontrack relies on at least a JDK 11.0.6. More recent versions of the JDK 11
-are OK. However, no test has been done yet using JDK 12 and more recent versions.
-
-Ontrack runs fine with 512 Mb of memory. However, think of upgrading to 2 Gb of
-memory if you intend to host a lot of projects. See the different installation
-modes (Docker, RPM, etc.) to know how to setup the memory settings.
-
-Ontrack stores its data in a Postgres database and can optionally
-use ElasticSearch for search indexes.
-
-[[installation-quick-start]]
-=== Quick start
-
-The fastest way to start Ontrack is to use Docker Compose:
-
-[source,bash]
-----
-curl -fsSLO https://raw.githubusercontent.com/nemerosa/ontrack/master/compose/docker-compose.yml
-docker-compose up -d
-----
-
-This sets up:
-
-* a Postgres database
-* an ElasticSearch (single node)
-* Ontrack running on port 8080
-
-Go to http://localhost:8080 and start using Ontrack. The initial
-administrator credentials are `admin` / `admin`.
-
-See <<usage>> to start using Ontrack.
-
-[[installation-postgres]]
-=== Postgres database
-
-Unless you choose to deploy with <<installation-docker-compose,Docker Compose>>,
-you will need to have a Postgres database accessible by Ontrack.
-
-Version 9.5 of Postgres has been tested successfully with Ontrack, but
-any later 9.x version should be OK as well.
-
-No test with Postgres 10.x has been performed yet.
-
-Ontrack will by default try to connect to
-`jdbc:postgresql://postgresql/ontrack`, using `ontrack / ontrack`
-as credentials.
-
-Those parameters can be configured using normal Spring Boot JDBC <<configuration,configuration>>,
-for example using arguments at startup:
-
-[source]
-----
---spring.datasource.url=jdbc:postgresql://localhost:5432/ontrack
---spring.datasource.username=myuser
---spring.datasource.password=password
-----
-
-See the https://docs.spring.io/spring-boot/docs/1.5.8.RELEASE/reference/htmlsingle/#boot-features-external-config[Spring Boot documentation]
-to see other and better ways to pass
-those <<configuration,configuration>> parameters.
-
-[[installation-docker]]
-=== Installing using Docker
-
-Ontrack is distributed as a Docker image on the https://hub.docker.com[Docker Hub], as `nemerosa/ontrack:{ontrack-version}`.
-
-[[installation-docker-overview]]
-==== Overview
-
-The Ontrack image exposes the port `8080`.
-
-Two volumes are defined:
-
-* `/var/ontrack/data` - contains some working files but also the log files.
-* `/var/ontrack/conf` - contains the <<configuration-properties,configuration files>> for Ontrack (see later).
-
-Several modes of database setup can be done:
-
-* <<installation-docker-db-volume,database persisted in volume>>
-* <<installation-docker-db-server,using a H2 server database>>
-
-[[installation-docker-basic]]
-==== Basic deployment
-
-You can start Ontrack as a container and a shared database and configuration on the host using:
-
-[source,bash]
-----
-docker run --detach \
-   --publish=8080:8080 \
-   --volume=/var/ontrack/data:/var/ontrack/data \
-   --volume=/var/ontrack/conf:/var/ontrack/conf \
-   nemerosa/ontrack
-----
-
-The <<configuration,configuration files>> for Ontrack can be put on the host in
-`/var/ontrack/conf` and the database and working files will be available
-in `/var/ontrack/data`. The application will be available on port `8080` of
-the host.
-
-Java options, like memory settings, can be passed to the Docker container using
-the `JAVA_OPTIONS` environment variable:
-
-[source,bash]
-----
-docker run \
-   ...
-   --env "JAVA_OPTIONS=-Xmx2048m" \
-   ...
-----
-
-Additional arguments to the Ontrack process, like
-<<configuration,configuration arguments>>
-passed on the command line, can use the `ONTRACK_ARGS` environment variable.
-
-[source,bash]
-----
-docker run \
-   ...
-   --env "ONTRACK_ARGS=..."
-   ...
-----
-
-[[installation-docker-compose]]
-==== Docker Compose deployment
-
-Create the following file:
-
-[source,yaml]
-.docker-compose.yml
-----
-version: "2.1"
-
-services:
-  # Ontrack container
-  ontrack:
-    image: nemerosa/ontrack:3
-    environment:
-        PROFILE: prod
-    links:
-      - "postgresql:postgresql"
-    ports:
-      - "8080:8080"
-
-  # Postgresql database
-  postgresql:
-    image: postgres:9.5.2
-    environment:
-      POSTGRES_DB      : ontrack
-      POSTGRES_USER    : ontrack
-      POSTGRES_PASSWORD: ontrack
-    ports:
-      - "5432"
-----
-
-In the same directory, run:
-
-[source,bash]
-----
-docker-compose up -d
-----
-
-After some time, Ontrack becomes available at http://localhost:8080
-
-[[installation-rpm]]
-=== RPM installation
-
-You can install Ontrack using a RPM file you can download from the
-https://github.com/nemerosa/ontrack/releases[releases] page.
-
-The RPM is continuously tested on CentOS 6.7 and CentOS 7.1.
-
-To install Ontrack:
-
-[source,bash]
-----
-rpm -i ontrack.rpm
-----
-
-The following directories are created:
-
-|===
-| Directory | Description
-
-| `/opt/ontrack` | Binaries and scripts
-| `/usr/lib/ontrack` | Working and <<configuration-properties,configuration>> directory
-| `/var/log/ontrack` | Logging directory
-|===
-
-You can optionally create an `application.yml` configuration file in
-`/usr/lib/ontrack`. For example, to customise the port Ontrack is running on:
-
-[source,yaml]
-----
-server:
-  port: 9080
-----
-
-Ontrack is installed as a service using `/etc/init.d/ontrack`.
-
-[source,bash]
-----
-# Starting Ontrack
-service ontrack start
-# Status of Ontrack
-service ontrack status
-# Stopping Ontrack
-service ontrack stop
-----
-
-To upgrade Ontrack:
-
-[source,bash]
-----
-# Stopping Ontrack
-sudo service ontrack stop
-# Updating
-sudo rpm --upgrade ontrack.rpm
-# Starting Ontrack
-sudo service ontrack start
-----
-
-The optional `/etc/default/ontrack` file can be used to define
-environment variables like
-`JAVA_OPTIONS` or `ONTRACK_DB_URL` (to use the H2 server mode).
-For example:
-
-[source]
-./etc/default/ontrack
-----
-JAVA_OPTIONS=-Xmx2048m
-ONTRACK_DB_URL=jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL
-----
-
-The `ONTRACK_ARGS` environment variable can be use to pass
-additional application parameters.
-
-[[installation-debian]]
-=== Debian installation
-
-You can install Ontrack using a Debian file (`.deb`) you can download from the
-https://github.com/nemerosa/ontrack/releases[releases] page.
-
-To install Ontrack:
-
-[source,bash]
-----
-dpkg -i ontrack.deb
-----
-
-The following directories are created:
-
-|===
-| Directory | Description
-
-| `/opt/ontrack` | Binaries and scripts
-| `/usr/lib/ontrack` | Working and <<configuration-properties,configuration>> directory
-| `/var/log/ontrack` | Logging directory
-|===
-
-Ontrack is installed as a service using `/etc/init.d/ontrack`.
-
-[source,bash]
-----
-# Starting Ontrack
-service ontrack start
-# Status of Ontrack
-service ontrack status
-# Stopping Ontrack
-service ontrack stop
-----
-
-The optional `/etc/default/ontrack` file can be used to define
-environment variables like
-`JAVA_OPTIONS` or `ONTRACK_DB_URL` (to use the H2 server mode).
-For example:
-
-[source]
-./etc/default/ontrack
-----
-JAVA_OPTIONS=-Xmx2048m
-ONTRACK_DB_URL=jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL
-----
-
-The `ONTRACK_ARGS` environment variable can be use to pass
-additional application parameters.
-
-[[installation-sa]]
-=== Standalone installation
-
-Ontrack can be downloaded as a JAR and started as a Spring Boot application.
-
-Download the JAR from the
-https://github.com/nemerosa/ontrack/releases[Ontrack release page]
-
-Start it using `java -jar ontrack.jar`.
-
-<<configuration,Options>> can be passed on the command line.
-
-NOTE: See the <<installation-docker,Docker installation>> section for information
-on how to connect to the database.
-
-[[configuration]]
-=== Configuration
-
-As a regular http://projects.spring.io/spring-boot/[Spring Boot application],
-Ontrack can be configured using system properties and/or property files and/or
-YAML files. See the
-http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-properties-and-configuration[Spring Boot documentation]
-for more details.
-
-NOTE: The way to provide a YAML `application.yml` configuration file or
-command line arguments will vary
-according to the installation (Docker, RPM, etc.). See the corresponding
-section above for more details.
-
-For example, to setup the port Ontrack is running on, you can use the
-`server.port` property. Using a YAML file:
-
-[source,yaml]
-.application.yml
-----
-server.port=9999
-----
-
-or the command line option:
-
-[source,bash]
-----
---server.port=9999
-----
-
-See <<configuration-properties>> for the list of all available properties.
+//[[installation-prerequisites]]
+//=== Prerequisites
+//
+//Ontrack has been tested on different Linux variants (Ubuntu, Debian, CentOS)
+//and should also work on Windows.
+//
+//Ontrack relies on at least a JDK 11.0.6. More recent versions of the JDK 11
+//are OK. However, no test has been done yet using JDK 12 and more recent versions.
+//
+//Ontrack runs fine with 512 Mb of memory. However, think of upgrading to 2 Gb of
+//memory if you intend to host a lot of projects. See the different installation
+//modes (Docker, RPM, etc.) to know how to setup the memory settings.
+//
+//Ontrack stores its data in a Postgres database and can optionally
+//use ElasticSearch for search indexes.
+//
+//[[installation-quick-start]]
+//=== Quick start
+//
+//The fastest way to start Ontrack is to use Docker Compose:
+//
+//[source,bash]
+//----
+//curl -fsSLO https://raw.githubusercontent.com/nemerosa/ontrack/master/compose/docker-compose.yml
+//docker-compose up -d
+//----
+//
+//This sets up:
+//
+//* a Postgres database
+//* an ElasticSearch (single node)
+//* Ontrack running on port 8080
+//
+//Go to http://localhost:8080 and start using Ontrack. The initial
+//administrator credentials are `admin` / `admin`.
+//
+//See <<usage>> to start using Ontrack.
+//
+//[[installation-postgres]]
+//=== Postgres database
+//
+//Unless you choose to deploy with <<installation-docker-compose,Docker Compose>>,
+//you will need to have a Postgres database accessible by Ontrack.
+//
+//Version 9.5 of Postgres has been tested successfully with Ontrack, but
+//any later 9.x version should be OK as well.
+//
+//No test with Postgres 10.x has been performed yet.
+//
+//Ontrack will by default try to connect to
+//`jdbc:postgresql://postgresql/ontrack`, using `ontrack / ontrack`
+//as credentials.
+//
+//Those parameters can be configured using normal Spring Boot JDBC <<configuration,configuration>>,
+//for example using arguments at startup:
+//
+//[source]
+//----
+//--spring.datasource.url=jdbc:postgresql://localhost:5432/ontrack
+//--spring.datasource.username=myuser
+//--spring.datasource.password=password
+//----
+//
+//See the https://docs.spring.io/spring-boot/docs/1.5.8.RELEASE/reference/htmlsingle/#boot-features-external-config[Spring Boot documentation]
+//to see other and better ways to pass
+//those <<configuration,configuration>> parameters.
+//
+//[[installation-docker]]
+//=== Installing using Docker
+//
+//Ontrack is distributed as a Docker image on the https://hub.docker.com[Docker Hub], as `nemerosa/ontrack:{ontrack-version}`.
+//
+//[[installation-docker-overview]]
+//==== Overview
+//
+//The Ontrack image exposes the port `8080`.
+//
+//Two volumes are defined:
+//
+//* `/var/ontrack/data` - contains some working files but also the log files.
+//* `/var/ontrack/conf` - contains the <<configuration-properties,configuration files>> for Ontrack (see later).
+//
+//Several modes of database setup can be done:
+//
+//* <<installation-docker-db-volume,database persisted in volume>>
+//* <<installation-docker-db-server,using a H2 server database>>
+//
+//[[installation-docker-basic]]
+//==== Basic deployment
+//
+//You can start Ontrack as a container and a shared database and configuration on the host using:
+//
+//[source,bash]
+//----
+//docker run --detach \
+//   --publish=8080:8080 \
+//   --volume=/var/ontrack/data:/var/ontrack/data \
+//   --volume=/var/ontrack/conf:/var/ontrack/conf \
+//   nemerosa/ontrack
+//----
+//
+//The <<configuration,configuration files>> for Ontrack can be put on the host in
+//`/var/ontrack/conf` and the database and working files will be available
+//in `/var/ontrack/data`. The application will be available on port `8080` of
+//the host.
+//
+//Java options, like memory settings, can be passed to the Docker container using
+//the `JAVA_OPTIONS` environment variable:
+//
+//[source,bash]
+//----
+//docker run \
+//   ...
+//   --env "JAVA_OPTIONS=-Xmx2048m" \
+//   ...
+//----
+//
+//Additional arguments to the Ontrack process, like
+//<<configuration,configuration arguments>>
+//passed on the command line, can use the `ONTRACK_ARGS` environment variable.
+//
+//[source,bash]
+//----
+//docker run \
+//   ...
+//   --env "ONTRACK_ARGS=..."
+//   ...
+//----
+//
+//[[installation-docker-compose]]
+//==== Docker Compose deployment
+//
+//Create the following file:
+//
+//[source,yaml]
+//.docker-compose.yml
+//----
+//version: "2.1"
+//
+//services:
+//  # Ontrack container
+//  ontrack:
+//    image: nemerosa/ontrack:3
+//    environment:
+//        PROFILE: prod
+//    links:
+//      - "postgresql:postgresql"
+//    ports:
+//      - "8080:8080"
+//
+//  # Postgresql database
+//  postgresql:
+//    image: postgres:9.5.2
+//    environment:
+//      POSTGRES_DB      : ontrack
+//      POSTGRES_USER    : ontrack
+//      POSTGRES_PASSWORD: ontrack
+//    ports:
+//      - "5432"
+//----
+//
+//In the same directory, run:
+//
+//[source,bash]
+//----
+//docker-compose up -d
+//----
+//
+//After some time, Ontrack becomes available at http://localhost:8080
+//
+//[[installation-rpm]]
+//=== RPM installation
+//
+//You can install Ontrack using a RPM file you can download from the
+//https://github.com/nemerosa/ontrack/releases[releases] page.
+//
+//The RPM is continuously tested on CentOS 6.7 and CentOS 7.1.
+//
+//To install Ontrack:
+//
+//[source,bash]
+//----
+//rpm -i ontrack.rpm
+//----
+//
+//The following directories are created:
+//
+//|===
+//| Directory | Description
+//
+//| `/opt/ontrack` | Binaries and scripts
+//| `/usr/lib/ontrack` | Working and <<configuration-properties,configuration>> directory
+//| `/var/log/ontrack` | Logging directory
+//|===
+//
+//You can optionally create an `application.yml` configuration file in
+//`/usr/lib/ontrack`. For example, to customise the port Ontrack is running on:
+//
+//[source,yaml]
+//----
+//server:
+//  port: 9080
+//----
+//
+//Ontrack is installed as a service using `/etc/init.d/ontrack`.
+//
+//[source,bash]
+//----
+//# Starting Ontrack
+//service ontrack start
+//# Status of Ontrack
+//service ontrack status
+//# Stopping Ontrack
+//service ontrack stop
+//----
+//
+//To upgrade Ontrack:
+//
+//[source,bash]
+//----
+//# Stopping Ontrack
+//sudo service ontrack stop
+//# Updating
+//sudo rpm --upgrade ontrack.rpm
+//# Starting Ontrack
+//sudo service ontrack start
+//----
+//
+//The optional `/etc/default/ontrack` file can be used to define
+//environment variables like
+//`JAVA_OPTIONS` or `ONTRACK_DB_URL` (to use the H2 server mode).
+//For example:
+//
+//[source]
+//./etc/default/ontrack
+//----
+//JAVA_OPTIONS=-Xmx2048m
+//ONTRACK_DB_URL=jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL
+//----
+//
+//The `ONTRACK_ARGS` environment variable can be use to pass
+//additional application parameters.
+//
+//[[installation-debian]]
+//=== Debian installation
+//
+//You can install Ontrack using a Debian file (`.deb`) you can download from the
+//https://github.com/nemerosa/ontrack/releases[releases] page.
+//
+//To install Ontrack:
+//
+//[source,bash]
+//----
+//dpkg -i ontrack.deb
+//----
+//
+//The following directories are created:
+//
+//|===
+//| Directory | Description
+//
+//| `/opt/ontrack` | Binaries and scripts
+//| `/usr/lib/ontrack` | Working and <<configuration-properties,configuration>> directory
+//| `/var/log/ontrack` | Logging directory
+//|===
+//
+//Ontrack is installed as a service using `/etc/init.d/ontrack`.
+//
+//[source,bash]
+//----
+//# Starting Ontrack
+//service ontrack start
+//# Status of Ontrack
+//service ontrack status
+//# Stopping Ontrack
+//service ontrack stop
+//----
+//
+//The optional `/etc/default/ontrack` file can be used to define
+//environment variables like
+//`JAVA_OPTIONS` or `ONTRACK_DB_URL` (to use the H2 server mode).
+//For example:
+//
+//[source]
+//./etc/default/ontrack
+//----
+//JAVA_OPTIONS=-Xmx2048m
+//ONTRACK_DB_URL=jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL
+//----
+//
+//The `ONTRACK_ARGS` environment variable can be use to pass
+//additional application parameters.
+//
+//[[installation-sa]]
+//=== Standalone installation
+//
+//Ontrack can be downloaded as a JAR and started as a Spring Boot application.
+//
+//Download the JAR from the
+//https://github.com/nemerosa/ontrack/releases[Ontrack release page]
+//
+//Start it using `java -jar ontrack.jar`.
+//
+//<<configuration,Options>> can be passed on the command line.
+//
+//NOTE: See the <<installation-docker,Docker installation>> section for information
+//on how to connect to the database.
+//
+//[[configuration]]
+//=== Configuration
+//
+//As a regular http://projects.spring.io/spring-boot/[Spring Boot application],
+//Ontrack can be configured using system properties and/or property files and/or
+//YAML files. See the
+//http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-properties-and-configuration[Spring Boot documentation]
+//for more details.
+//
+//NOTE: The way to provide a YAML `application.yml` configuration file or
+//command line arguments will vary
+//according to the installation (Docker, RPM, etc.). See the corresponding
+//section above for more details.
+//
+//For example, to setup the port Ontrack is running on, you can use the
+//`server.port` property. Using a YAML file:
+//
+//[source,yaml]
+//.application.yml
+//----
+//server.port=9999
+//----
+//
+//or the command line option:
+//
+//[source,bash]
+//----
+//--server.port=9999
+//----
+//
+//See <<configuration-properties>> for the list of all available properties.
