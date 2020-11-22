@@ -1,0 +1,31 @@
+[[quick-start]]
+== Quick start
+
+The fastest way to start Ontrack is to use Docker Compose:
+
+[source,bash,subs="attributes"]
+----
+curl -fsSLO https://github.com/nemerosa/ontrack/blob/{ontrack-version}/compose/docker-compose.yml
+docker-compose up -d
+----
+
+This sets up:
+
+* a Postgres database
+* an ElasticSearch (single node)
+* Ontrack running on port 8080
+
+Go to http://localhost:8080 and start using Ontrack.
+
+The initial administrator credentials are `admin` / `admin`.
+
+Where to go from there?
+
+* learn how to <<feeding,feed information>> into Ontrack
+* learn how to <<usage,use the Ontrack UI>>
+* ... or to use its <<api>>
+
+You can also check the following sections:
+
+* <<installation>>
+* <<configuration>>

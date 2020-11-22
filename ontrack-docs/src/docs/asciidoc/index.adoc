@@ -1,5 +1,5 @@
 [[index]]
-= Ontrack Reference Guide {ontrack-version}
+= Ontrack Documentation {ontrack-version}
 Damien Coraboeuf
 // ========================================================
 :doctype: book
@@ -9,23 +9,26 @@ Damien Coraboeuf
 :numbered:
 :sectanchors:
 // ========================================================
-:ontrack-version: current
-:spring-boot-version: 2.0.2.RELEASE
-:spring-version: 4.3.22.RELEASE
+// Those versions are replaced at build time
+:ontrack-version: master
+:spring-boot-version: BOOT
+:spring-version: SPRING
 // ========================================================
 
-include::installation.adoc[]
+include::quick-start.adoc[]
 
-include::usage.adoc[]
-
-include::administration.adoc[]
-
-include::integration.adoc[]
-
-include::dsl.adoc[]
-
-include::contributing.adoc[]
-
-include::appendixes.adoc[]
+//include::installation.adoc[]
+//
+//include::usage.adoc[]
+//
+//include::administration.adoc[]
+//
+//include::integration.adoc[]
+//
+//include::dsl.adoc[]
+//
+//include::contributing.adoc[]
+//
+//include::appendixes.adoc[]
 
 // ========================================================
