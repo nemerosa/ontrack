@@ -3,6 +3,14 @@
 
 There are several ways to install Ontrack.
 
+include::installation-docker-compose.adoc[]
+
+include::installation-docker.adoc[]
+
+include::installation-package.adoc[]
+
+include::installation-dependencies.adoc[]
+
 //[[installation-prerequisites]]
 //=== Prerequisites
 //
