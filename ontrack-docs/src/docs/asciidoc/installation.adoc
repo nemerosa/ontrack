@@ -43,34 +43,3 @@ include::installation-dependencies.adoc[]
 //those <<configuration,configuration>> parameters.
 //
 //
-//[[configuration]]
-//=== Configuration
-//
-//As a regular http://projects.spring.io/spring-boot/[Spring Boot application],
-//Ontrack can be configured using system properties and/or property files and/or
-//YAML files. See the
-//http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-properties-and-configuration[Spring Boot documentation]
-//for more details.
-//
-//NOTE: The way to provide a YAML `application.yml` configuration file or
-//command line arguments will vary
-//according to the installation (Docker, RPM, etc.). See the corresponding
-//section above for more details.
-//
-//For example, to setup the port Ontrack is running on, you can use the
-//`server.port` property. Using a YAML file:
-//
-//[source,yaml]
-//.application.yml
-//----
-//server.port=9999
-//----
-//
-//or the command line option:
-//
-//[source,bash]
-//----
-//--server.port=9999
-//----
-//
-//See <<configuration-properties>> for the list of all available properties.
