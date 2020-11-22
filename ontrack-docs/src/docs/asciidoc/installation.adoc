@@ -43,37 +43,6 @@ include::installation-dependencies.adoc[]
 //those <<configuration,configuration>> parameters.
 //
 //
-//[[installation-rpm]]
-//=== RPM installation
-//
-//You can install Ontrack using a RPM file you can download from the
-//https://github.com/nemerosa/ontrack/releases[releases] page.
-//
-//The RPM is continuously tested on CentOS 6.7 and CentOS 7.1.
-//
-//To install Ontrack:
-//
-//[source,bash]
-//----
-//rpm -i ontrack.rpm
-//----
-//
-//
-//[[installation-sa]]
-//=== Standalone installation
-//
-//Ontrack can be downloaded as a JAR and started as a Spring Boot application.
-//
-//Download the JAR from the
-//https://github.com/nemerosa/ontrack/releases[Ontrack release page]
-//
-//Start it using `java -jar ontrack.jar`.
-//
-//<<configuration,Options>> can be passed on the command line.
-//
-//NOTE: See the <<installation-docker,Docker installation>> section for information
-//on how to connect to the database.
-//
 //[[configuration]]
 //=== Configuration
 //
