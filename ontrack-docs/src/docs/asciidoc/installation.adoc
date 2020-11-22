@@ -12,34 +12,3 @@ include::installation-package.adoc[]
 include::installation-jar.adoc[]
 
 include::installation-dependencies.adoc[]
-//
-//[[installation-postgres]]
-//=== Postgres database
-//
-//Unless you choose to deploy with <<installation-docker-compose,Docker Compose>>,
-//you will need to have a Postgres database accessible by Ontrack.
-//
-//Version 9.5 of Postgres has been tested successfully with Ontrack, but
-//any later 9.x version should be OK as well.
-//
-//No test with Postgres 10.x has been performed yet.
-//
-//Ontrack will by default try to connect to
-//`jdbc:postgresql://postgresql/ontrack`, using `ontrack / ontrack`
-//as credentials.
-//
-//Those parameters can be configured using normal Spring Boot JDBC <<configuration,configuration>>,
-//for example using arguments at startup:
-//
-//[source]
-//----
-//--spring.datasource.url=jdbc:postgresql://localhost:5432/ontrack
-//--spring.datasource.username=myuser
-//--spring.datasource.password=password
-//----
-//
-//See the https://docs.spring.io/spring-boot/docs/1.5.8.RELEASE/reference/htmlsingle/#boot-features-external-config[Spring Boot documentation]
-//to see other and better ways to pass
-//those <<configuration,configuration>> parameters.
-//
-//
