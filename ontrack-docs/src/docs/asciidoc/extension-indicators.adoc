@@ -4,6 +4,8 @@
 Project indicators are set at <<model,project>> level to hold values about different
 _types_ of information.
 
+image::images/extension-indicators-portfolio-overview.png[Portfolio overview]
+
 Those types of information are grouped into _categories_ and can have a specific _value
 type_, like a boolean (yes/no), a percentage, a numeric value, etc. Types can be entered
 manually, imported or computed.
@@ -69,35 +71,329 @@ Categories and types can also be <<extension-indicators-import,imported>> or
 <<extension-indicators-computing,computed>>. In such a case, both the category and the type
 are associated with a _source_ and they cannot be edited.
 
+[[extension-indicators-value-types]]
+===== Value types
+
+The following value types are available in Ontrack:
+
+|===
+| Type | Description | Configuration | Example
+
+| Yes/No
+| Value which can be either _Yes_ (`true`) or _No_ (`false`)
+| `required` - flag to indicate if the indicator _must_ be _Yes_ in order
+  for the project to be fully compliant. If `required` is `false`, the rating will
+  be `A` is the value is set to _Yes_  and `D` if the value is _No_. For a
+  _No_ value on a _required_ indicator, the rating would be `F`.
+| "Project should be build with Gradle" - because of the "should", the indicator
+  _required_ value is set to `false`.
+
+| Percentage
+| Integer value between `0` and `100` inclusive
+| `threshold` - pivot value (see example)
+
+  `higherIsBetter` - a higher percentage in the value of the indicator indicates
+  a better quality (see example)
+| "Test coverage" is expressed as a percentage and `higherIsBetter` will be
+  set to `true`. If `threshold` is set to 80:
+
+  * any value >= 80% has a rating of `A`
+  * for values below 80%, the rating is computed proportionally, with 0% having
+    a rating of `F`
+
+  "Duplicated code" can also be expressed as a percentage, but this time
+  with `higherIsBetter` being set to `false`. If `threshold` is set to 10:
+
+  * any value <= 10% has a rating of `A`
+  * for values above 10%, the rating is computed proportionally, with 100% having
+    a rating of `F`
+
+| Number
+| Integer value >= 0
+| `min` - pivot value (see example)
+
+  `max` - secondary pivot value (see example)
+
+  `higherIsBetter` - a higher value of the indicator indicates
+  a better quality (see example)
+| "Number of blocking issues" is expressed as a number with `higherIsBetter`
+  being set to `false`. If `min` is 0 and `max` is 10:
+
+* any value set to 0 has a rating of `A`
+* any value >= 10 has a rating of `F`
+* for any value in between, the rating is computed proportionally
+
+A "Number of tests" could be expressed as a number with `higherIsBetter`
+being set to `true`. If `min` is 100 and `max` is 1000:
+
+* any value <= 100 has a rating of `F`
+* any value >= 1000 has a rating of `A`
+* for any value in between, the rating is computed proportionally
+|===
+
+[NOTE]
+====
+Additional value types can be created by registering an <<extending,extension>>
+implementing the `IndicatorValueType` interface. See existing value types
+for examples.
+====
+
 [[extension-indicators-projects]]
 ==== Indicator edition
 
 An authorized user can edit the indicator for a project by going to the _Tools_ menu
-and select _Project indicators_.
+and select _Project indicators_:
+
+image::images/extension-indicators-project-tool.png[Project tool,200]
 
 All available types are displayed, grouped by categories, and each indicator value is shown
-together with its value, its rating. Note that selecting a time range allows to compute
-and display the trend for each indicator.
+together with its value, its rating:
+
+image::images/extension-indicators-project-indicators.png[Project indicators]
+
+If the indicator has a previous value, its previous rating is displayed.
 
 If the indicator is open to edition, the user can click on the pencil icon to edit the
 value according to the value type. Upon validation, a _new_ indicator value is stored ; the
 old value is kept for history and trend computation.
 
+Comments can be associated with an indicator values. Links & issue references will
+be rendered as links.
+
 An authorized user can also _delete_ the indicator ; this actually register a new _null_
 value for the indicator. The historical values are kept.
+
+The history of an indicator can be accessed by clicking on the _History_ icon:
+
+image::images/extension-indicators-project-indicator-history.png[Indicator history]
+
+The list of <<extension-indicators-portfolios,portfolios>> the project belongs to is displayed at the top
+of the indicator list:
+
+image::images/extension-indicators-project-portfolios.png[Project portfolios,300]
 
 [[extension-indicators-portfolios]]
 ==== Indicator portfolios
 
-TODO
+Portfolios are available in the _Indicator portfolios_ user menu and the
+associated page displays the list of already created portfolios.
+
+Each portfolio is associated with a list of selected _global categories_
+and each of those categories is associated with the average rating for all
+the projects and all the types of this category.
+
+image::images/extension-indicators-portfolio-overview.png[Portfolio overview]
+
+NOTE: Only indicators having an actual value are used to compute the
+average rating. The indicators which are not set are not used for
+the computation and the ratio "number of indicators being set" to the
+"number of total indicators" is also displayed. This gives an idea
+about the trust we can have in this average rating.
+
+NOTE: The minimum ratings are also mentioned if they diverge from
+the average.
+
+The trend period allows to display the average value from the past, and
+to compare it with the current value.
+
+[WARNING]
+====
+The trend computation is currently not correct -
+see the https://github.com/nemerosa/ontrack/issues/793[#793] issue.
+====
+
+[[extension-indicators-portfolios-global-indicators]]
+===== Global indicators
+
+<<extension-indicators-acl,Authorized users>> can edit the list
+of categories which are displayed on the portfolio overview by clicking
+on the _Global indicators_ command:
+
+image::images/extension-indicators-global-indicators-command.png[Global indicators command,300]
+
+On the associated page, the user can select / unselect the categories which
+must be displayed for _all portfolios_:
+
+image::images/extension-indicators-global-indicators-page.png[Global indicators,300]
+
+Closing this page goes back to the portfolio overview.
+
+[[extension-indicators-portfolios-management]]
+===== Management of portfolios
+
+<<extension-indicators-acl,Authorized users>> can create, edit and delete portfolios.
+
+Creating a portfolio is done using the _Create portfolio_ command:
+
+image::images/extension-indicators-portfolio-create-command.png[Create portfolio command,300]
+
+The portfolio creation dialog requires:
+
+* an ID - must be unique amont all the portfolios and will be used as an
+  identifier. It must therefore comply with the following regular expression:
+  `[a-z0-9:-]+` (lowercase letters, digits, `:` colon or `-` dashes). The ID
+  cannot be modified later on.
+* a display name
+
+image::images/extension-indicators-portfolio-create-dialog.png[Create portfolio dialog,400]
+
+Once created, the portfolio appears on the portfolio overview and can edited or
+deleted using the appropriate icons:
+
+image::images/extension-indicators-portfolio-commands.png[Portfolio commands]
+
+* the portfolio name is actually a link going to
+  the detailed <<extension-indicators-portfolios-view,portfolio view>>
+* the arrow icon goes to the home page and displays only the projects
+  associated to this portfolio
+* the edition icon goes to the <<extension-indicators-portfolios-edition,portfolio edition page>>
+* the deletion icon displays a warning and allows the user to delete the
+  portfolio.
+
+NOTE: The deletion of a portfolio _does not_ delete any indicator in any project.
+
+[[extension-indicators-portfolios-view]]
+===== Portfolio page
+
+By clicking on the portfolio name in the portfolio overview, you get to
+a page displaying:
+
+* the list of projects associated with this portfolio
+* the list of categories associated with this portfolio
+* the average indicator rating for project and for each category
+
+image::images/extension-indicators-portfolio-view.png[Portfolio view]
+
+NOTE: As for the portfolio overview, the average rating is computed only using the
+indicators which are actually set, and the ratio filled vs. total is displayed.
+
+The trend period selector allows you to check the past average values and the
+associated trends.
+
+Clicking on a project name goes to the <<extension-indicators-projects,project indicators page>>.
+
+Clicking on a category name goes to a page displaying a detailed view
+of indicators for all the types in this category and for all the projects
+of this portfolio:
+
+image::images/extension-indicators-portfolio-category.png[Portfolio category]
+
+In this view, clicking on the icon right to the type name will bring up
+a page displaying the indicator values for this type for all the projects
+of this portfolio:
+
+image::images/extension-indicators-portfolio-type.png[Portfolio type]
+
+According to your rights, you can edit and delete indicator values from this page.
+
+[[extension-indicators-portfolios-edition]]
+===== Portfolio edition
+
+The portfolio edition page allows you to:
+
+* edit the portfolio display name (not the ID)
+* set a label to select the associated projects
+* select the categories associated with this portfolio
+
+image::images/extension-indicators-portfolio-edition.png[Portfolio edition]
+
+The label allows a portfolio to be associated to all projects which
+have this label. See <<projects-labels>> for more information on how
+to manage labels.
+
+[NOTE]
+====
+<<extension-indicators-acl,"Global indicator portfolio managers">> and
+<<extension-indicators-acl,"Global indicator managers">> can associate
+existing labels to projects but cannot create new labels.
+====
 
 [[extension-indicators-import]]
 ==== Importing categories and types
 
-TODO
+While indicator categories and types can be <<extension-indicators-types,entered manually>>,
+it is also possible to import lists of categories and their associated types.
+
+****
+In a company, a number of "principles" have been created for projects
+to comply with. They have been written as Asciidoc and are published as a browsable
+web site. The associated principles, grouped in pages, have been imported
+as types (and categories) in Ontrack, by parsing the Asciidoc.
+****
+
+To import categories & types in Ontrack, you need a user allowed
+to <<extension-indicators-acl,manage types>> and you can use the
+`POST /extension/indicators/imports` end point, passing a JSON as payload.
+
+For example, with Curl:
+
+[source,bash]
+----
+curl --user <user> \
+  -H "Content-Type: application/json" \
+  -X POST \
+  http://ontrack/extension/indicators/imports \
+  --data @payload.json
+----
+
+where:
+
+[source,json]
+.payload.json
+----
+{
+  "source": "principles",
+  "categories": [
+    {
+      "id": "service-principles",
+      "name": "Service Principles",
+      "types": [
+        {
+          "id": "java-spring-boot",
+          "name": "SHOULD Use Java & spring boot stack",
+          "required": false,
+          "link": "https://example.com/architecture-principles/latest/service_principles.html#java-spring-boot"
+        }
+      ]
+    }
+  ]
+}
+----
+
+The `source` is an ID identifying the nature of this list.
+
+Each category must have an `id` (unique in Ontrack) and a display `name`.
+
+Each type must have:
+
+* an `id` (unique in Ontrack)
+* a display `name`
+* a `required` flag - as of now, only "Yes/No" <<extension-indicators-value-types,value types>>
+  are supported
+* an optional `link` to some external documentation
+
+Upon import:
+
+* new existing & types are created
+* existing categories & types are updated and associated indicators are left untouched
+* removed categories & types are deleted, and associated indicators are deleted
+
+NOTE: Imported categories & types cannot be edited.
 
 [[extension-indicators-computing]]
 ==== Computing indicators
 
-TODO
+It is possible to define some types whose value is not entered manually but
+is computed by Ontrack itself.
 
+You do so by registering an <<extending,extension>> which implements
+the `IndicatorComputer` interface, or the `AbstractBranchIndicatorComputer`
+class when the value must be computed from the "main branch" of a project.
+
+See the documentation of those two types for more information.
+
+The `SonarQubeIndicatorComputer` extension is an example of such an
+implementation.
+
+NOTE: Computed categories & types cannot be edited, and their values cannot
+      be edited manually.

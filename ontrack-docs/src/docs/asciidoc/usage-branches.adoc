@@ -22,6 +22,8 @@ project. Only the deletion of a branch will prompt you about your decision.
 
 include::usage-branches-favorites.adoc[]
 
+include::usage-pull-requests.adoc[]
+
 [[branches-stale]]
 ==== Managing stale branches
 

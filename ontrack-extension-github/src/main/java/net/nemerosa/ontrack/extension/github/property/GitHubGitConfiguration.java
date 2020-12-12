@@ -29,6 +29,10 @@ public class GitHubGitConfiguration implements GitConfiguration {
         return property.getConfiguration().getName();
     }
 
+    public GitHubProjectConfigurationProperty getProperty() {
+        return property;
+    }
+
     @Override
     public String getRemote() {
         return format(

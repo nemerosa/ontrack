@@ -83,6 +83,7 @@ class ResourceHttpMessageConverterIT : AbstractWebTestSupport() {
                         .with("_allValidationStampFilters", "urn:test:net.nemerosa.ontrack.boot.ui.ValidationStampFilterController#getAllBranchValidationStampFilters:1")
                         .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
                         .with("_properties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getProperties:BRANCH,1")
+                        .with("_extra", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getInformation:BRANCH,1")
                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:BRANCH,1")
                         .with("_status", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchStatusView:1")
                         .with("_view", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#buildView:1")

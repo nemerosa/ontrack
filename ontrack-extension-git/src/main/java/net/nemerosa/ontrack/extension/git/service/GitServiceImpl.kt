@@ -2,9 +2,11 @@ package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.common.FutureUtils
 import net.nemerosa.ontrack.common.asOptional
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequestDifferenceProjectException
+import net.nemerosa.ontrack.extension.git.CACHE_GIT_PULL_REQUEST
+import net.nemerosa.ontrack.extension.git.GitConfigProperties
+import net.nemerosa.ontrack.extension.git.GitPullRequestCacheNotAvailableException
 import net.nemerosa.ontrack.extension.git.branching.BranchingModelService
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
@@ -33,6 +35,8 @@ import net.nemerosa.ontrack.model.support.*
 import net.nemerosa.ontrack.tx.TransactionService
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
+import org.springframework.cache.Cache
+import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.Transactional
@@ -41,7 +45,6 @@ import java.lang.String.format
 import java.util.*
 import java.util.concurrent.Future
 import java.util.function.BiConsumer
-import java.util.function.Predicate
 import java.util.stream.Stream
 
 @Service
@@ -60,12 +63,18 @@ class GitServiceImpl(
         private val gitRepositoryHelper: GitRepositoryHelper,
         private val branchingModelService: BranchingModelService,
         private val entityDataService: EntityDataService,
+        private val gitConfigProperties: GitConfigProperties,
+        private val cacheManager: CacheManager,
         transactionManager: PlatformTransactionManager
 ) : AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue>(structureService, propertyService), GitService, JobOrchestratorSupplier {
 
     private val logger = LoggerFactory.getLogger(GitService::class.java)
 
     private val transactionTemplate = TransactionTemplate(transactionManager)
+
+    private val pullRequestCache: Cache by lazy {
+        cacheManager.getCache(CACHE_GIT_PULL_REQUEST) ?: throw GitPullRequestCacheNotAvailableException()
+    }
 
     override fun forEachConfiguredProject(consumer: BiConsumer<Project, GitConfiguration>) {
         structureService.projectList
@@ -630,6 +639,16 @@ class GitServiceImpl(
         return SCMBuildView(getBuildView(buildId), GitBuildInfo())
     }
 
+    override fun getGitConfiguratorAndConfiguration(project: Project): Pair<GitConfigurator, GitConfiguration>? =
+            gitConfigurators.mapNotNull {
+                val configuration = it.getConfiguration(project)
+                if (configuration != null) {
+                    it to configuration
+                } else {
+                    null
+                }
+            }.firstOrNull()
+
     override fun isProjectConfiguredForGit(project: Project): Boolean =
             gitConfigurators.any { configurator ->
                 configurator.isProjectConfigured(project)
@@ -637,7 +656,7 @@ class GitServiceImpl(
 
     override fun getProjectConfiguration(project: Project): GitConfiguration? {
         return gitConfigurators.asSequence()
-                .mapNotNull { c -> c.getConfiguration(project).getOrNull() }
+                .mapNotNull { c -> c.getConfiguration(project) }
                 .firstOrNull()
     }
 
@@ -645,6 +664,46 @@ class GitServiceImpl(
         return getBranchConfiguration(branch)
                 ?: throw GitBranchNotConfiguredException(branch.id)
     }
+
+    override fun getBranchAsPullRequest(branch: Branch): GitPullRequest? =
+            propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java).value?.let { property ->
+                getBranchAsPullRequest(branch, property)
+            }
+
+    override fun isBranchAPullRequest(branch: Branch): Boolean =
+            gitConfigProperties.pullRequests.enabled &&
+                    propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java).value
+                            ?.let { property ->
+                                getGitConfiguratorAndConfiguration(branch.project)
+                                        ?.let { (configurator, _) ->
+                                            configurator.toPullRequestID(property.branch) != null
+                                        }
+                            }
+                    ?: false
+
+    override fun getBranchAsPullRequest(branch: Branch, gitBranchConfigurationProperty: GitBranchConfigurationProperty?): GitPullRequest? =
+            if (gitConfigProperties.pullRequests.enabled) {
+                // Actual code to get the PR
+                fun internalPR() = gitBranchConfigurationProperty?.let {
+                    getGitConfiguratorAndConfiguration(branch.project)
+                            ?.let { (configurator, configuration) ->
+                                configurator.toPullRequestID(gitBranchConfigurationProperty.branch)?.let { prId ->
+                                    configurator.getPullRequest(configuration, prId)
+                                            ?: GitPullRequest.invalidPR(prId, configurator.toPullRequestKey(prId))
+                                }
+                            }
+                }
+                // Caching or not caching?
+                if (gitConfigProperties.pullRequests.cache.enabled) {
+                    pullRequestCache.get(branch.id()) { internalPR() }
+                } else {
+                    // No caching, direct call
+                    internalPR()
+                }
+            } else {
+                // Pull requests are not supported
+                null
+            }
 
     override fun getBranchConfiguration(branch: Branch): GitBranchConfiguration? {
         // Get the configuration for the project
@@ -657,23 +716,27 @@ class GitServiceImpl(
             val buildTagInterval: Int
             val branchConfig = propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java)
             if (!branchConfig.isEmpty) {
-                gitBranch = branchConfig.value.branch
-                buildCommitLink = branchConfig.value.buildCommitLink?.let {
+                val branchConfigurationProperty = branchConfig.value
+                gitBranch = branchConfigurationProperty.branch
+                buildCommitLink = branchConfigurationProperty.buildCommitLink?.let {
                     toConfiguredBuildGitCommitLink<Any>(it)
                 }
-                override = branchConfig.value.isOverride
-                buildTagInterval = branchConfig.value.buildTagInterval
+                override = branchConfigurationProperty.isOverride
+                buildTagInterval = branchConfigurationProperty.buildTagInterval
+                // Pull request information
+                val gitPullRequest = getBranchAsPullRequest(branch, branchConfigurationProperty)
+                // OK
+                return GitBranchConfiguration(
+                        configuration,
+                        gitBranch,
+                        gitPullRequest,
+                        buildCommitLink,
+                        override,
+                        buildTagInterval
+                )
             } else {
                 return null
             }
-            // OK
-            return GitBranchConfiguration(
-                    configuration,
-                    gitBranch,
-                    buildCommitLink,
-                    override,
-                    buildTagInterval
-            )
         } else {
             return null
         }
@@ -761,6 +824,7 @@ class GitServiceImpl(
         // Link
         @Suppress("UNCHECKED_CAST")
         val link = branchConfiguration.buildCommitLink?.link as IndexableBuildGitCommitLink<T>?
+
         @Suppress("UNCHECKED_CAST")
         val linkData = branchConfiguration.buildCommitLink?.data as T?
         // Check for configuration

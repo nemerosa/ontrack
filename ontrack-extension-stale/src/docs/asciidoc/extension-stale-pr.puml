@@ -1,0 +1,25 @@
+@startuml
+
+start
+
+if (Branch is PR?) then (yes)
+    if (PR does exist?) then (yes)
+    else (no)
+        if (Last build older than D days?) then (yes)
+            if (Last build older than D/X days) then (yes)
+                :Delete branch;
+                end
+            else (no)
+                :Disable branch;
+                end
+            endif
+        else (no)
+        endif
+    endif
+else (no)
+endif
+
+:Keep branch;
+end
+
+@enduml

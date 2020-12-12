@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.resource.*
 import net.nemerosa.ontrack.ui.resource.LinkDefinitions.page
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
@@ -48,6 +47,10 @@ class BranchResourceDecorator(
                 "_branches" linkTo { branch -> on(BranchController::class.java).getBranchListForProject(branch.projectId) },
                 // Actual properties for this build
                 "_properties" linkTo { branch -> on(PropertyController::class.java).getProperties(ProjectEntityType.BRANCH, branch.id) },
+                // Extra information
+                "_extra" linkTo { branch ->
+                    on(ProjectEntityExtensionController::class.java).getInformation(ProjectEntityType.BRANCH, branch.id)
+                },
                 // Actions
                 "_actions" linkTo { branch -> on(ProjectEntityExtensionController::class.java).getActions(ProjectEntityType.BRANCH, branch.id) },
                 // Update link (with authorisation)

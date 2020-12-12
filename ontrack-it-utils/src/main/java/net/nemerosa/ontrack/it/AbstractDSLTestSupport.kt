@@ -17,6 +17,7 @@ import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDateTime
 import kotlin.reflect.KClass
 import kotlin.test.assertEquals
 
@@ -174,6 +175,34 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     fun <T> Branch.build(name: String, init: Build.() -> T): T {
         val build = doCreateBuild(this, NameDescription.nd(name, ""))
         return build.init()
+    }
+
+    /**
+     * Updating the signature of a [Branch].
+     */
+    fun Branch.updateBranchSignature(
+            user: String? = null,
+            time: LocalDateTime? = null
+    ) {
+        structureService.saveBranch(
+                withSignature(
+                        Signature(time ?: signature.time, user?.let { User(user) } ?: signature.user)
+                )
+        )
+    }
+
+    /**
+     * Updating the signature of a [Build].
+     */
+    fun Build.updateBuildSignature(
+            user: String? = null,
+            time: LocalDateTime? = null
+    ) {
+        structureService.saveBuild(
+                withSignature(
+                        Signature(time ?: signature.time, user?.let { User(user) } ?: signature.user)
+                )
+        )
     }
 
     protected fun <T, P : PropertyType<T>> ProjectEntity.property(type: KClass<P>, value: T?) {

@@ -37,6 +37,7 @@ class BooleanIndicatorValueType(
             .with(
                     Selection.of("value")
                             .label("Value")
+                            .optional()
                             .items(
                                     listOf(
                                             Description("", "n/a", "Not applicable"),

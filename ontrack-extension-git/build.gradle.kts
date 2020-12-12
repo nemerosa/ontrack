@@ -9,6 +9,7 @@ apply<OntrackExtensionPlugin>()
 
 dependencies {
     api(project(":ontrack-extension-scm"))
+    api(project(":ontrack-extension-stale"))
     api(project(":ontrack-git"))
     api(project(":ontrack-tx"))
     api(project(":ontrack-json"))

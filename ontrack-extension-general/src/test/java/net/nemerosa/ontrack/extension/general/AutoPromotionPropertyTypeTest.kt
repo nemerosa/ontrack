@@ -50,7 +50,7 @@ class AutoPromotionPropertyTypeTest {
         whenever(structureService.getValidationStampListForBranch(branch.id)).thenReturn(listOf(validationStamp1, validationStamp2))
         val form = type.getEditionForm(
                 promotionLevel,
-                AutoPromotionProperty(listOf(validationStamp1), "", ""))
+                AutoPromotionProperty(listOf(validationStamp1), "", "", emptyList()))
         val field = form.getField("validationStamps") as MultiSelection
         assertEquals(listOf("VS1", "VS2"), field.items.map { it.name })
         assertEquals(listOf(true, false), field.items.map { it.isSelected })
@@ -94,7 +94,8 @@ class AutoPromotionPropertyTypeTest {
         val autoPromotionProperty = AutoPromotionProperty(
                 listOf(validationStamp1, validationStamp2),
                 "include",
-                "exclude"
+                "exclude",
+                emptyList()
         )
         val node = type.forStorage(autoPromotionProperty)
         assertEquals(1, node.path("validationStamps")[0].asInt())
@@ -110,7 +111,8 @@ class AutoPromotionPropertyTypeTest {
         val autoPromotionProperty = AutoPromotionProperty(
                 listOf(validationStamp1, validationStamp2),
                 "include",
-                "exclude"
+                "exclude",
+                emptyList()
         )
         val node = type.forStorage(autoPromotionProperty)
         val restored = type.fromStorage(node)

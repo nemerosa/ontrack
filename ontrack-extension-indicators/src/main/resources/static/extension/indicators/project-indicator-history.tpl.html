@@ -14,7 +14,7 @@
     <div class="row" ng-if="history.pageInfo.totalSize == 0">
         <div class="col-md-12">
             <div class="alert alert-warning">
-                No history available... Wrong link perhaps?
+                No history available.
             </div>
         </div>
     </div>
@@ -48,9 +48,7 @@
                 <span ng-bind-html="item.annotatedComment"></span>
             </td>
             <td>
-                <span ng-if="item.value">
-                    <ot-creation creation="item.signature"></ot-creation>
-                </span>
+                <ot-creation creation="item.signature"></ot-creation>
             </td>
         </tr>
         </tbody>

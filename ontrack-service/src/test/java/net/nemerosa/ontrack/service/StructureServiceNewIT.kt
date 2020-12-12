@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.PromotionLevelCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
@@ -10,6 +11,7 @@ import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.structure.ValidationStamp
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
+import java.time.Duration
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -18,6 +20,20 @@ import kotlin.test.assertTrue
  * This class supersedes [StructureServiceIT], which cannot be replaced as yet.
  */
 class StructureServiceNewIT : AbstractDSLTestSupport() {
+
+    @Test
+    fun `An admin can change the signature of a branch`() {
+        project {
+            val branch = branch {
+                updateBranchSignature(time = Time.now().minusDays(10))
+            }
+            // Loads the branch again
+            asUserWithView {
+                val reloaded = structureService.getBranch(branch.id)
+                assertEquals(10, Duration.between(reloaded.signature.time, Time.now()).toDays())
+            }
+        }
+    }
 
     @Test
     fun `Validation run status comment not editable by default`() {

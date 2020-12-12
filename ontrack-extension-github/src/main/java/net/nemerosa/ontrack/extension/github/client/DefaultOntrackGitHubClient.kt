@@ -1,22 +1,22 @@
 package net.nemerosa.ontrack.extension.github.client
 
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.model.*
 import org.apache.commons.lang3.StringUtils
-import org.eclipse.egit.github.core.Issue
-import org.eclipse.egit.github.core.Label
-import org.eclipse.egit.github.core.Milestone
-import org.eclipse.egit.github.core.User
+import org.eclipse.egit.github.core.*
 import org.eclipse.egit.github.core.client.GitHubClient
 import org.eclipse.egit.github.core.client.RequestException
 import org.eclipse.egit.github.core.service.IssueService
 import org.eclipse.egit.github.core.service.OrganizationService
+import org.eclipse.egit.github.core.service.PullRequestService
 import org.eclipse.egit.github.core.service.RepositoryService
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.time.LocalDateTime
 import java.util.*
+
 
 class DefaultOntrackGitHubClient(
         private val configuration: GitHubEngineConfiguration
@@ -65,10 +65,25 @@ class DefaultOntrackGitHubClient(
         val repositoryService = RepositoryService(client)
         // Gets the repository names
         return try {
-            repositoryService.getRepositories(organization).map { it.name }
+            repositoryService.getOrgRepositories(organization).map { it.name }
         } catch (e: IOException) {
             throw OntrackGitHubClientException(e)
         }
+    }
+
+    override fun getRepositoryLastModified(repo: String): LocalDateTime? {
+        // Logging
+        logger.debug("[github] Getting repository last modification {}", repo)
+        // Getting a client
+        val client = createGitHubClient()
+        // Service
+        val repositoryService = RepositoryService(client)
+        // Gets the repository
+        val owner = repo.substringBefore("/")
+        val name = repo.substringAfter("/")
+        val repository = repositoryService.getRepository(owner, name)
+        // Last modification date
+        return repository.pushedAt?.let { Time.from(it, null) }
     }
 
     override fun getIssue(repository: String, id: Int): GitHubIssue? {
@@ -109,7 +124,7 @@ class DefaultOntrackGitHubClient(
         )
     }
 
-    private fun createGitHubClient(): GitHubClient {
+    override fun createGitHubClient(): GitHubClient {
         // GitHub client (non authentified)
         val client: GitHubClient = object : GitHubClient() {
             override fun configureRequest(request: HttpURLConnection): HttpURLConnection {
@@ -130,6 +145,36 @@ class DefaultOntrackGitHubClient(
             }
         }
         return client
+    }
+
+    override fun getPullRequest(repository: String, id: Int): GitPullRequest? {
+        // Getting a client
+        val client = createGitHubClient()
+        // PR service using this client
+        val service = PullRequestService(client)
+        // Getting the PR
+        val pr: PullRequest
+        pr = try {
+            service.getPullRequest(RepositoryId.createFromId(repository), id)
+        } catch (ex: RequestException) {
+            return if (ex.status == 404) {
+                null
+            } else {
+                throw OntrackGitHubClientException(ex)
+            }
+        } catch (e: IOException) {
+            throw OntrackGitHubClientException(e)
+        }
+        // Conversion
+        return GitPullRequest(
+                id = id,
+                key = "#$id",
+                source = pr.head.ref,
+                target = pr.base.ref,
+                title = pr.title,
+                status = pr.state,
+                url = pr.htmlUrl
+        )
     }
 
     private fun toDateTime(date: Date?): LocalDateTime? = Time.from(date, null)

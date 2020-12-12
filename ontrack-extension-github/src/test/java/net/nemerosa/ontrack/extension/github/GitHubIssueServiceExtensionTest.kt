@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfigura
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
+import net.nemerosa.ontrack.extension.stale.StaleExtensionFeature
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -30,7 +31,7 @@ class GitHubIssueServiceExtensionTest {
         val gitHubClientFactory = mock(OntrackGitHubClientFactory::class.java)
         val issueExportServiceFactory = mock(IssueExportServiceFactory::class.java)
         extension = GitHubIssueServiceExtension(
-                GitHubExtensionFeature(GitExtensionFeature(SCMExtensionFeature())),
+                GitHubExtensionFeature(GitExtensionFeature(SCMExtensionFeature(), StaleExtensionFeature())),
                 configurationService,
                 gitHubClientFactory,
                 issueExportServiceFactory

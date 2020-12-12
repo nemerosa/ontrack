@@ -50,22 +50,32 @@ class IndicatorRoleContributor : RoleContributor {
                     )
             )
 
-    override fun getGlobalFunctionContributionsForGlobalRoles(): Map<String, List<Class<out GlobalFunction>>> =
-            mapOf(
-                    Roles.GLOBAL_ADMINISTRATOR to listOf(
-                            IndicatorPortfolioIndicatorManagement::class.java,
-                            IndicatorPortfolioManagement::class.java,
-                            IndicatorTypeManagement::class.java
-                    ),
-                    GLOBAL_INDICATOR_MANAGER to listOf(
-                            IndicatorPortfolioIndicatorManagement::class.java,
-                            IndicatorPortfolioManagement::class.java,
-                            IndicatorTypeManagement::class.java
-                    ),
-                    GLOBAL_INDICATOR_PORTFOLIO_MANAGER to listOf(
-                            IndicatorPortfolioManagement::class.java
-                    )
-            )
+    override fun getGlobalFunctionContributionsForGlobalRoles(): Map<String, List<Class<out GlobalFunction>>> {
+        val map = mutableMapOf<String, MutableList<Class<out GlobalFunction>>>()
+
+        Roles.GLOBAL_ROLES.associateWithTo(map) { mutableListOf(IndicatorPortfolioAccess::class.java) }
+
+        map[Roles.GLOBAL_ADMINISTRATOR]?.addAll(listOf(
+                IndicatorPortfolioIndicatorManagement::class.java,
+                IndicatorPortfolioManagement::class.java,
+                IndicatorPortfolioAccess::class.java,
+                IndicatorTypeManagement::class.java
+        ))
+
+        map[GLOBAL_INDICATOR_MANAGER] = mutableListOf(
+                IndicatorPortfolioIndicatorManagement::class.java,
+                IndicatorPortfolioManagement::class.java,
+                IndicatorPortfolioAccess::class.java,
+                IndicatorTypeManagement::class.java
+        )
+
+        map[GLOBAL_INDICATOR_PORTFOLIO_MANAGER] = mutableListOf(
+                IndicatorPortfolioManagement::class.java,
+                IndicatorPortfolioAccess::class.java
+        )
+
+        return map
+    }
 
     override fun getProjectFunctionContributionsForGlobalRoles(): Map<String, List<Class<out ProjectFunction>>> =
             mapOf(

@@ -1,12 +1,17 @@
 package net.nemerosa.ontrack.extension.github.client
 
+import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.model.GitHubIssue
 import net.nemerosa.ontrack.extension.github.model.GitHubUser
+import org.eclipse.egit.github.core.client.GitHubClient
+import java.time.LocalDateTime
+
 
 /**
  * Client used to connect to a GitHub engine from Ontrack.
  */
 interface OntrackGitHubClient {
+
     /**
      * Gets an issue from a repository.
      *
@@ -33,4 +38,24 @@ interface OntrackGitHubClient {
      * @return List of repository names in this [organization]
      */
     fun findRepositoriesByOrganization(organization: String): List<String>
+
+    /**
+     * Gets the underlying / native GitHub client so that extensions
+     * can add features.
+     */
+    fun createGitHubClient(): GitHubClient
+
+    /**
+     * Gets a pull request using its ID
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param id         ID of the pull request
+     * @return Details of the pull request or `null` if it does not exist
+     */
+    fun getPullRequest(repository: String, id: Int): GitPullRequest?
+
+    /**
+     * Gets the last modified date for a given [repository][repo].
+     */
+    fun getRepositoryLastModified(repo: String): LocalDateTime?
 }

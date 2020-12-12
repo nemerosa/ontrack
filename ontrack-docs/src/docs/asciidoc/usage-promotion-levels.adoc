@@ -8,16 +8,16 @@ By default, a build is <<model,promoted>> explicitly, by associated a promotion
 with it.
 
 By configuring an auto promotion, we allow a build to be automatically promoted
-whenever a given list of validations have passed on this build.
+whenever a given list of validations or promotions have passed on this build.
 
 For example, if a build had passed integration tests on platforms A, B and C,
-we can imagine to promote automatically this build to a promotion level,
+we can imagine promoting automatically this build to a promotion level,
 without having to do it explicitly.
 
 In order to configure the auto promotion, go to the promotion level and set
 the "Auto promotion" property. You then associate the list of validation stamps
-that must be `PASSED` on a build in order to get this build automatically
-promoted.
+that must be `PASSED` or promotion levels which must be granted on a build in
+order to get this build automatically promoted.
 
 The list of validation stamps can be defined by:
 
@@ -28,6 +28,8 @@ The list of validation stamps can be defined by:
 IMPORTANT: A validation stamp defined in the list is _always_ taken into account in the
 auto promotion, whatever the values for the `include` and `exclude` regular
 promotions.
+
+The list of promotion levels can be set independently of the list of validation stamps.
 
 [[promotion-levels-checks]]
 ==== Promotion checks

@@ -227,9 +227,21 @@ angular.module('ontrack.extension.indicators', [
               projects(id: $project) {
                 id
                 name
+                indicatorPortfolios {
+                    id
+                    name
+                    categories {
+                        id
+                    }
+                    label {
+                      color
+                      foregroundColor
+                    }
+                }
                 projectIndicators {
                   categories {
                     category {
+                      id
                       name
                     }
                     indicators {
@@ -282,12 +294,37 @@ angular.module('ontrack.extension.indicators', [
 
         let viewInitialized = false;
 
+        $scope.filtering = {
+            showAllCategories: false
+        };
+
         const loadIndicators = () => {
             $scope.loadingIndicators = true;
             otGraphqlService.pageGraphQLCall(query, queryVars).then((data) => {
 
                 $scope.project = data.projects[0];
+                $scope.portfolios = $scope.project.indicatorPortfolios;
                 $scope.projectIndicators = $scope.project.projectIndicators;
+
+                // By default, select all portfolios
+                $scope.portfolios.forEach(portfolio => {
+                    portfolio.selected = true;
+                });
+
+                // If no portfolio, show all categories by default
+                if ($scope.portfolios.length === 0) {
+                    $scope.filtering.showAllCategories = true;
+                }
+
+                // Getting the list of portfolios per categories
+                $scope.projectIndicators.categories.forEach((categoryIndicators) => {
+                    categoryIndicators.unfolded = true;
+                    const categoryId = categoryIndicators.category.id;
+                    // Gets the list of portfolios matching this category
+                    categoryIndicators.portfolios = $scope.portfolios.filter((portfolio) =>
+                        portfolio.categories.find(category => category.id === categoryId)
+                    );
+                });
 
                 if (!viewInitialized) {
                     // Title
@@ -308,12 +345,23 @@ angular.module('ontrack.extension.indicators', [
 
         loadIndicators();
 
+        $scope.isCategoryIndicatorsSelected = (categoryIndicators) =>
+            $scope.filtering.showAllCategories || categoryIndicators.portfolios.some((portfolio) => portfolio.selected);
+
         $scope.editIndicator = (indicator) => {
             otExtensionIndicatorsService.editIndicator(indicator).then(loadIndicators);
         };
 
         $scope.deleteIndicator = (indicator) => {
             otExtensionIndicatorsService.deleteIndicator(indicator).then(loadIndicators);
+        };
+
+        $scope.unfold = (categoryIndicators) => {
+            categoryIndicators.unfolded = true;
+        };
+
+        $scope.fold = (categoryIndicators) => {
+            categoryIndicators.unfolded = false;
         };
 
     })
@@ -556,14 +604,17 @@ angular.module('ontrack.extension.indicators', [
             }).then(loadPortfolios);
         };
 
-        $scope.selectTrend = () => {
-            if ($scope.pageModel.trendDuration) {
-                queryVariables.trendDuration = Number($scope.pageModel.trendDuration);
-            } else {
-                queryVariables.trendDuration = undefined;
+        $scope.$watch('pageModel.trendDuration', (newValue, oldValue) => {
+            if (newValue !== oldValue) {
+                if ($scope.pageModel.trendDuration) {
+                    queryVariables.trendDuration = Number($scope.pageModel.trendDuration);
+                } else {
+                    queryVariables.trendDuration = undefined;
+                }
+                loadPortfolios();
             }
-            loadPortfolios();
-        };
+        });
+
     })
     .config(function ($stateProvider) {
         $stateProvider.state('portfolio-global-indicators', {
@@ -1015,6 +1066,7 @@ angular.module('ontrack.extension.indicators', [
     .controller('PortfolioViewCtrl', function ($stateParams, $scope, $http, $location, ot, otGraphqlService, otAlertService) {
         const portfolioId = $stateParams.portfolioId;
         $scope.loadingPortfolio = true;
+        $scope.loadingPortfolioProjects = true;
 
         const view = ot.view();
         view.title = "Portfolio";
@@ -1093,12 +1145,72 @@ angular.module('ontrack.extension.indicators', [
             duration: undefined
         };
 
+        // Same than in view.home.js for the project favourites
+        const queryProjects = `
+            query LoadPortfolioProjects($id: String!) {
+                indicatorPortfolios(id: $id) {
+                    projects {
+                        id
+                        name
+                        disabled
+                        decorations {
+                          ...decorationContent
+                        }
+                        links {
+                          _unfavourite
+                        }
+                        branches(useModel: true) {
+                          id
+                          name
+                          type
+                          disabled
+                          decorations {
+                            ...decorationContent
+                          }
+                          latestPromotions: builds(lastPromotions: true, count: 1) {
+                            id
+                            name
+                            promotionRuns {
+                              promotionLevel {
+                                id
+                                name
+                                image
+                                _image
+                              }
+                            }
+                          }
+                          latestBuild: builds(count: 1) {
+                            id
+                            name
+                          }
+                        }
+                    }
+                }
+            }
+            
+            fragment decorationContent on Decoration {
+              decorationType
+              error
+              data
+              feature {
+                id
+              }
+            }
+        `;
+
         $scope.pageModel = {
             duration: undefined
         };
 
+        $scope.activeTab = 'portfolio';
+
+        $scope.selectTab = (id) => {
+            $scope.activeTab = id;
+        };
+
         const loadPortfolio = () => {
             $scope.loadingPortfolio = true;
+            $scope.loadingPortfolioProjects = true;
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.portfolio = data.indicatorPortfolios[0];
                 view.title = `Portfolio: ${$scope.portfolio.name}`;
@@ -1152,12 +1264,31 @@ angular.module('ontrack.extension.indicators', [
                     }
                 });
 
+                // OK for now
+                $scope.loadingPortfolio = false;
+
+                // Project overview
+                return otGraphqlService.pageGraphQLCall(queryProjects, {id: portfolioId});
+            }).then((data) => {
+                $scope.projects = data.indicatorPortfolios[0].projects;
             }).finally(() => {
                 $scope.loadingPortfolio = false;
+                $scope.loadingPortfolioProjects = false;
             });
         };
 
         loadPortfolio();
+
+        $scope.$watch('pageModel.duration', (newValue, oldValue) => {
+            if (newValue !== oldValue) {
+                if ($scope.pageModel.duration) {
+                    queryVariables.duration = Number($scope.pageModel.duration);
+                } else {
+                    queryVariables.duration = undefined;
+                }
+                loadPortfolio();
+            }
+        });
 
         $scope.selectTrend = () => {
             if ($scope.pageModel.duration) {
@@ -1258,8 +1389,7 @@ angular.module('ontrack.extension.indicators', [
             templateUrl: 'extension/indicators/directive.indicators-trend-selection.tpl.html',
             scope: {
                 selectId: '@',
-                model: '=',
-                onTrendChange: '&'
+                model: '='
             }
         };
     })

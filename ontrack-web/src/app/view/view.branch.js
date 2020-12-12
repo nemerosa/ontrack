@@ -89,6 +89,7 @@ angular.module('ot.view.branch', [
                 links {
                   _reorderValidationStamps
                   _reorderPromotionLevels
+                  _extra
                 }
                 promotionLevels {
                   id
