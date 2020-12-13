@@ -81,19 +81,23 @@ class GraphqlSchemaServiceImpl(
         return try {
             mutation.fetch(env)
         } catch (ex: Exception) {
-            if (ex is MutationInputValidationException) {
-                mapOf("errors" to ex.violations.map { cv ->
-                    MutationInputValidationException.asUserError(cv)
-                })
-            } else if (ex is UserException) {
-                val exception = ex::class.java.name
-                val error = UserError(
+            when (ex) {
+                is MutationInputValidationException -> {
+                    mapOf("errors" to ex.violations.map { cv ->
+                        MutationInputValidationException.asUserError(cv)
+                    })
+                }
+                is UserException -> {
+                    val exception = ex::class.java.name
+                    val error = UserError(
                         message = ex.message ?: exception,
                         exception = exception
-                )
-                mapOf("errors" to listOf(error))
-            } else {
-                throw ex
+                    )
+                    mapOf("errors" to listOf(error))
+                }
+                else -> {
+                    throw ex
+                }
             }
         }
     }
