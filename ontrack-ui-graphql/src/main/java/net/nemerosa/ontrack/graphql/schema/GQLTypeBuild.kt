@@ -9,6 +9,8 @@ import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.common.getOrNull
 import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
+import net.nemerosa.ontrack.graphql.schema.actions.actions
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.fetcher
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
@@ -21,16 +23,17 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeBuild(
-        private val structureService: StructureService,
-        private val projectEntityInterface: GQLProjectEntityInterface,
-        private val validation: GQLTypeValidation,
-        private val validationRun: GQLTypeValidationRun,
-        private val runInfo: GQLTypeRunInfo,
-        private val runInfoService: RunInfoService,
-        private val paginatedListFactory: GQLPaginatedListFactory,
-        creation: GQLTypeCreation,
-        projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
-        freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
+    private val uiActionsGraphQLService: UIActionsGraphQLService,
+    private val structureService: StructureService,
+    private val projectEntityInterface: GQLProjectEntityInterface,
+    private val validation: GQLTypeValidation,
+    private val validationRun: GQLTypeValidationRun,
+    private val runInfo: GQLTypeRunInfo,
+    private val runInfoService: RunInfoService,
+    private val paginatedListFactory: GQLPaginatedListFactory,
+    creation: GQLTypeCreation,
+    projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
+    freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
 ) : AbstractGQLProjectEntity<Build>(Build::class.java, ProjectEntityType.BUILD, projectEntityFieldContributors, creation, freeTextAnnotatorContributors) {
 
     override fun getTypeName() = BUILD
@@ -40,6 +43,8 @@ class GQLTypeBuild(
                 .name(BUILD)
                 .withInterface(projectEntityInterface.typeRef)
                 .fields(projectEntityInterfaceFields())
+                // Actions
+                .actions(uiActionsGraphQLService, Build::class)
                 // Ref to branch
                 .field(
                         newFieldDefinition()

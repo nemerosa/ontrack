@@ -16,7 +16,7 @@ class ValidationRunQLIT : AbstractQLKTITSupport() {
                 build {
                     val data = run("""
                         mutation CreateValidationRun {
-                            createValidationRun(input: {
+                            createValidationRunForBuildByName(input: {
                                 project: "${project.name}",
                                 branch: "${branch.name}",
                                 build: "$name",
@@ -37,7 +37,7 @@ class ValidationRunQLIT : AbstractQLKTITSupport() {
                         }
                     """)
                     // Checks the errors
-                    val error = data["createValidationRun"]["errors"][0]
+                    val error = data["createValidationRunForBuildByName"]["errors"][0]
                     assertEquals("Validation Run Status is required because no data is provided.", error["message"].asText())
                     assertEquals("net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredBecauseNoDataException", error["exception"].asText())
                     assertTrue(data["createValidationRun"]["validationRun"].isNullOrNullNode(), "Validation run not returned")
@@ -54,10 +54,8 @@ class ValidationRunQLIT : AbstractQLKTITSupport() {
                 build {
                     val data = run("""
                         mutation CreateValidationRun {
-                            createValidationRun(input: {
-                                project: "${project.name}",
-                                branch: "${branch.name}",
-                                build: "$name",
+                            createValidationRunForBuildById(input: {
+                                buildId: $id,
                                 validationStamp: "${vs.name}",
                                 validationRunStatus: "PASSED"
                             }) {
@@ -73,7 +71,7 @@ class ValidationRunQLIT : AbstractQLKTITSupport() {
                     """)
                     assertEquals(
                         "PASSED",
-                        data.path("createValidationRun").path("validationRun").path("validationRunStatuses").path(0).path("statusID").path("id").asText()
+                        data.path("createValidationRunForBuildById").path("validationRun").path("validationRunStatuses").path(0).path("statusID").path("id").asText()
                     )
                 }
             }

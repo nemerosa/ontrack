@@ -19,9 +19,9 @@ class ValidationRunMutations(
 
     override val mutations: List<Mutation> = listOf(
         simpleMutation(
-            name = CREATE_VALIDATION_RUN,
-            description = "Creating a validation run for a build",
-            input = CreateValidationRunInput::class,
+            name = CREATE_VALIDATION_RUN_FOR_BUILD_BY_NAME,
+            description = "Creating a validation run for a build identified by its name",
+            input = CreateValidationRunForBuildByNameInput::class,
             outputName = "validationRun",
             outputDescription = "Created validation run",
             outputType = ValidationRun::class
@@ -29,6 +29,26 @@ class ValidationRunMutations(
             val build = (structureService.findBuildByName(input.project, input.branch, input.build)
                 .getOrNull()
                 ?: throw BuildNotFoundException(input.project, input.branch, input.build))
+            structureService.newValidationRun(
+                build = build,
+                validationRunRequest = ValidationRunRequest(
+                    validationStampName = input.validationStamp,
+                    validationRunStatusId = input.validationRunStatus?.let(validationRunStatusService::getValidationRunStatus),
+                    dataTypeId = input.dataTypeId,
+                    data = parseValidationRunData(build, input.validationStamp, input.dataTypeId, input.data),
+                    description = input.description
+                )
+            )
+        },
+        simpleMutation(
+            name = CREATE_VALIDATION_RUN_FOR_BUILD_BY_ID,
+            description = "Creating a validation run for a build identified by its ID",
+            input = CreateValidationRunForBuildByIdInput::class,
+            outputName = "validationRun",
+            outputDescription = "Created validation run",
+            outputType = ValidationRun::class
+        ) { input ->
+            val build = structureService.getBuild(ID.of(input.buildId))
             structureService.newValidationRun(
                 build = build,
                 validationRunRequest = ValidationRunRequest(
@@ -73,17 +93,33 @@ class ValidationRunMutations(
     }
 
     companion object {
-        const val CREATE_VALIDATION_RUN = "createValidationRun"
+        const val CREATE_VALIDATION_RUN_FOR_BUILD_BY_ID = "createValidationRunForBuildById"
+        const val CREATE_VALIDATION_RUN_FOR_BUILD_BY_NAME = "createValidationRunForBuildByName"
     }
 }
 
-class CreateValidationRunInput(
+class CreateValidationRunForBuildByNameInput(
     @APIDescription("Project name")
     val project: String,
     @APIDescription("Branch name")
     val branch: String,
     @APIDescription("Build name")
     val build: String,
+    @APIDescription("Validation stamp name")
+    val validationStamp: String,
+    @APIDescription("Validation run status")
+    val validationRunStatus: String?,
+    @APIDescription("Validation description")
+    val description: String?,
+    @APIDescription("Type of the data to associated with the validation")
+    val dataTypeId: String?,
+    @APIDescription("Data to associated with the validation")
+    val data: JsonNode?
+)
+
+class CreateValidationRunForBuildByIdInput(
+    @APIDescription("Build ID")
+    val buildId: Int,
     @APIDescription("Validation stamp name")
     val validationStamp: String,
     @APIDescription("Validation run status")
