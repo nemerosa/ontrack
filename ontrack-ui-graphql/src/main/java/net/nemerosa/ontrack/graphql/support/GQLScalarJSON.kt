@@ -42,7 +42,13 @@ class GQLScalarJSON private constructor() : GraphQLScalarType(
                 is StringValue -> TextNode.valueOf(input.value)
                 is IntValue -> IntNode.valueOf(input.value.toInt())
                 is BooleanValue -> BooleanNode.valueOf(input.isValue)
-                // TODO ArrayValue
+                is ArrayValue -> {
+                    val array = ArrayNode(mapper.nodeFactory)
+                    input.values.forEach { value ->
+                        array.add(parseLiteral(value))
+                    }
+                    array
+                }
                 is ObjectValue -> {
                     val `object` = ObjectNode(mapper.nodeFactory)
                     input.objectFields.forEach { of ->

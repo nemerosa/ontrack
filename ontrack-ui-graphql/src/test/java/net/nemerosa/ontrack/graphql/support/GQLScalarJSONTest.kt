@@ -1,10 +1,9 @@
 package net.nemerosa.ontrack.graphql.support
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
-import graphql.language.IntValue
-import graphql.language.ObjectField
-import graphql.language.ObjectValue
+import graphql.language.*
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -22,6 +21,23 @@ class GQLScalarJSONTest {
         val value = GQLScalarJSON.INSTANCE.coercing.parseLiteral(input)
         assertIs<ObjectNode>(value) {
             assertEquals(30, it.path("value").asInt())
+        }
+    }
+
+    @Test
+    fun `Parse literal array`() {
+        val input = ArrayValue(
+            listOf(
+                StringValue("one"),
+                StringValue("two")
+            )
+        )
+        val value = GQLScalarJSON.INSTANCE.coercing.parseLiteral(input)
+        assertIs<ArrayNode>(value) {
+            assertEquals(
+                listOf("one", "two"),
+                it.map { it.asText() }
+            )
         }
     }
 
