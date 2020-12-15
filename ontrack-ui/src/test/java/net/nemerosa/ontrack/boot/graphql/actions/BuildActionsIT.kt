@@ -39,16 +39,16 @@ class BuildActionsIT : AbstractQLKTITSupport() {
                         val actions = data["builds"][0]["actions"]
                         assertEquals(
                             mapOf(
-                                "createValidationRun" to mapOf(
-                                    "description" to "Creating a validation run",
+                                "createValidationRunForBuildById" to mapOf(
+                                    "description" to "Creating a validation run for this build",
                                     "links" to mapOf(
                                         "form" to mapOf(
-                                            "description" to "Creating a validation run",
+                                            "description" to "Creating a validation run for this build",
                                             "method" to "GET",
                                             "uri" to "urn:test:net.nemerosa.ontrack.boot.ui.ValidationRunController#newValidationRunForm:$id"
                                         )
                                     ),
-                                    "mutation" to "createValidationRun"
+                                    "mutation" to "createValidationRunForBuildById"
                                 )
                             ).asJson(),
                             actions
