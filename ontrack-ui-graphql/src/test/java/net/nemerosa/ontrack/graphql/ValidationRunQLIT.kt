@@ -43,10 +43,11 @@ class ValidationRunQLIT : AbstractQLKTITSupport() {
                         }
                     """)
                     // Checks the errors
-                    val error = data["createValidationRunForBuildByName"]["errors"][0]
-                    assertEquals("Validation Run Status is required because no data is provided.", error["message"].asText())
-                    assertEquals("net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredBecauseNoDataException", error["exception"].asText())
-                    assertTrue(data["createValidationRun"]["validationRun"].isNullOrNullNode(), "Validation run not returned")
+                    assertUserError(data, "createValidationRunForBuildByName",
+                        message = "Validation Run Status is required because no data is provided.",
+                        exception = "net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredBecauseNoDataException"
+                    )
+                    assertTrue(data["createValidationRunForBuildByName"]["validationRun"].isNullOrNullNode(), "Validation run not returned")
                 }
             }
         }
@@ -78,6 +79,45 @@ class ValidationRunQLIT : AbstractQLKTITSupport() {
                     assertEquals(
                         "PASSED",
                         data.path("createValidationRunForBuildById").path("validationRun").path("validationRunStatuses").path(0).path("statusID").path("id").asText()
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a PASSED validation run using build names`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                build {
+                    val data = run("""
+                        mutation CreateValidationRun {
+                            createValidationRunForBuildByName(input: {
+                                project: "${project.name}",
+                                branch: "${branch.name}",
+                                build: "$name",
+                                validationStamp: "${vs.name}",
+                                validationRunStatus: "PASSED"
+                            }) {
+                                validationRun {
+                                    validationRunStatuses {
+                                        statusID {
+                                            id
+                                        }
+                                    }
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    assertNoUserError(data, "createValidationRunForBuildByName")
+                    assertEquals(
+                        "PASSED",
+                        data.path("createValidationRunForBuildByName").path("validationRun").path("validationRunStatuses").path(0).path("statusID").path("id").asText()
                     )
                 }
             }

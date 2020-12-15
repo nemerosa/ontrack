@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.json.parse
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.test.assertEquals
 import kotlin.test.fail
 
 abstract class AbstractQLKTITSupport : AbstractDSLTestSupport() {
@@ -61,6 +62,30 @@ abstract class AbstractQLKTITSupport : AbstractDSLTestSupport() {
                     .takeIf { !it.isNullOrNullNode() }
                     ?.let { println("Error location: ${it.asText()}") }
                 fail(error.path("message").asText())
+            }
+        }
+    }
+
+    protected fun assertUserError(
+        data: JsonNode,
+        userNodeName: String,
+        message: String? = null,
+        exception: String? = null
+    ) {
+        val errors = data.path(userNodeName).path("errors")
+        if (errors.isNullOrNullNode()) {
+            fail("Excepted the `errors` user node.")
+        } else if (!errors.isArray) {
+            fail("Excepted the `errors` user node to be an array.")
+        } else if (errors.isEmpty) {
+            fail("Excepted the `errors` user node to be a non-empty array.")
+        } else {
+            val error = errors.first()
+            if (message != null) {
+                assertEquals(message, error.path("message").asText())
+            }
+            if (exception != null) {
+                assertEquals(exception, error.path("exception").asText())
             }
         }
     }
