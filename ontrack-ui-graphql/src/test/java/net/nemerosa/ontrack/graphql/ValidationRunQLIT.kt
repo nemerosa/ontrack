@@ -1,12 +1,18 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
+import net.nemerosa.ontrack.model.structure.config
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class ValidationRunQLIT : AbstractQLKTITSupport() {
+
+    @Autowired
+    private lateinit var testNumberValidationDataType: TestNumberValidationDataType
 
     @Test
     fun `Creating a validation run with missing status`() {
@@ -71,6 +77,60 @@ class ValidationRunQLIT : AbstractQLKTITSupport() {
                     """)
                     assertEquals(
                         "PASSED",
+                        data.path("createValidationRunForBuildById").path("validationRun").path("validationRunStatuses").path(0).path("statusID").path("id").asText()
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a validation run with data`() {
+        project {
+            branch {
+                val vs = validationStamp(
+                    validationDataTypeConfig = testNumberValidationDataType.config(50)
+                )
+                build {
+                    val data = run("""
+                        mutation CreateValidationRun {
+                            createValidationRunForBuildById(input: {
+                                buildId: $id,
+                                validationStamp: "${vs.name}",
+                                dataTypeId: "${TestNumberValidationDataType::class.java.name}",
+                                data: { value: 30 }
+                            }) {
+                                validationRun {
+                                    data {
+                                        descriptor {
+                                            id
+                                        }
+                                        data
+                                    }
+                                    validationRunStatuses {
+                                        statusID {
+                                            id
+                                        }
+                                    }
+                                }
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """)
+                    assertNoUserError(data, "createValidationRunForBuildById")
+                    assertEquals(0, data.path("createValidationRunForBuildById").path("errors").size())
+                    assertEquals(
+                        TestNumberValidationDataType::class.java.name,
+                        data.path("createValidationRunForBuildById").path("validationRun").path("data").path("descriptor").path("id").asText()
+                    )
+                    assertEquals(
+                        30,
+                        data.path("createValidationRunForBuildById").path("validationRun").path("data").path("data").asInt()
+                    )
+                    assertEquals(
+                        "FAILED",
                         data.path("createValidationRunForBuildById").path("validationRun").path("validationRunStatuses").path(0).path("statusID").path("id").asText()
                     )
                 }

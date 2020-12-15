@@ -130,5 +130,4 @@ class CreateValidationRunForBuildByIdInput(
     val dataTypeId: String?,
     @APIDescription("Data to associated with the validation")
     val data: JsonNode?
-
 )
