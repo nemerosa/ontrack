@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class IndicatorCategoryServiceImpl(
-        private val securityService: SecurityService,
-        private val storageService: StorageService
+    private val securityService: SecurityService,
+    private val storageService: StorageService
 ) : IndicatorCategoryService {
 
     private val listeners = mutableListOf<IndicatorCategoryListener>()
@@ -34,14 +34,15 @@ class IndicatorCategoryServiceImpl(
     override fun updateCategory(input: IndicatorForm, source: IndicatorSource?): IndicatorCategory {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         val stored = StoredIndicatorCategory(
-                id = input.id,
-                name = input.name,
-                source = source
+            id = input.id,
+            name = input.name,
+            source = source,
+            deprecated = input.deprecated
         )
         storageService.store(
-                STORE,
-                input.id,
-                stored
+            STORE,
+            input.id,
+            stored
         )
         return getCategory(input.id)
     }
@@ -58,10 +59,23 @@ class IndicatorCategoryServiceImpl(
         }
     }
 
+    override fun deprecateCategory(id: String, deprecated: String?) {
+        securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
+        val existing = storageService.retrieve(STORE, id, StoredIndicatorCategory::class.java).getOrNull()
+        if (existing != null) {
+            val deprecatedEntry = existing.withDeprecated(deprecated)
+            storageService.store(
+                STORE,
+                id,
+                deprecatedEntry
+            )
+        }
+    }
+
     override fun findCategoryById(id: String): IndicatorCategory? =
-            storageService.retrieve(STORE, id, StoredIndicatorCategory::class.java)
-                    .getOrNull()
-                    ?.let { fromStorage(it) }
+        storageService.retrieve(STORE, id, StoredIndicatorCategory::class.java)
+            .getOrNull()
+            ?.let { fromStorage(it) }
 
     override fun getCategory(id: String): IndicatorCategory {
         return findCategoryById(id) ?: throw IndicatorCategoryNotFoundException(id)
@@ -70,23 +84,32 @@ class IndicatorCategoryServiceImpl(
     override fun findAll(): List<IndicatorCategory> {
         return storageService.getKeys(STORE).mapNotNull { key ->
             storageService.retrieve(STORE, key, StoredIndicatorCategory::class.java).getOrNull()
-        }.mapNotNull {
+        }.map {
             fromStorage(it)
         }.sortedBy { it.name }
     }
 
-    private fun fromStorage(stored: StoredIndicatorCategory): IndicatorCategory? =
-            IndicatorCategory(
-                    id = stored.id,
-                    name = stored.name,
-                    source = stored.source
-            )
+    private fun fromStorage(stored: StoredIndicatorCategory): IndicatorCategory =
+        IndicatorCategory(
+            id = stored.id,
+            name = stored.name,
+            source = stored.source,
+            deprecated = stored.deprecated
+        )
 
     private class StoredIndicatorCategory(
-            val id: String,
-            val name: String,
-            val source: IndicatorSource?
-    )
+        val id: String,
+        val name: String,
+        val source: IndicatorSource?,
+        val deprecated: String?
+    ) {
+        fun withDeprecated(deprecated: String?) = StoredIndicatorCategory(
+            id,
+            name,
+            source,
+            deprecated
+        )
+    }
 
     companion object {
         private val STORE: String = IndicatorCategory::class.java.name

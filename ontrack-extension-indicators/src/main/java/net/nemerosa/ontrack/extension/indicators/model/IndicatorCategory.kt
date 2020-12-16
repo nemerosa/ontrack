@@ -6,11 +6,13 @@ package net.nemerosa.ontrack.extension.indicators.model
  * @param id Unique ID of the category
  * @param name Display name for the category
  * @param source Optional source for this category. `null` means that the category was provisioned manually.
+ * @param deprecated Optional deprecation reason
  */
 class IndicatorCategory(
         val id: String,
         val name: String,
-        val source: IndicatorSource?
+        val source: IndicatorSource?,
+        val deprecated: String? = null
 ) {
 
     override fun equals(other: Any?): Boolean {

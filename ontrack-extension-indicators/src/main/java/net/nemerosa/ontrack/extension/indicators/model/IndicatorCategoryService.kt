@@ -21,12 +21,21 @@ interface IndicatorCategoryService {
 
     fun deleteCategory(id: String): Ack
 
+    /**
+     * Marks a category as being deprecated
+     *
+     * @param id ID of category to deprecate
+     * @param deprecated Deprecation reason or null to remove it
+     */
+    fun deprecateCategory(id: String, deprecated: String?)
+
 }
 
 class IndicatorForm(
         @get:Pattern(regexp = IndicatorConstants.INDICATOR_ID_PATTERN)
         val id: String,
-        val name: String
+        val name: String,
+        val deprecated: String? = null
 )
 
 class IndicatorCategoryNotFoundException(id: String) : NotFoundException("Indicator category not found: $id")

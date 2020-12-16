@@ -13,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class IndicatorTypeServiceImpl(
-        private val indicatorCategoryService: IndicatorCategoryService,
-        private val indicatorValueTypeService: IndicatorValueTypeService,
-        private val storageService: StorageService,
-        private val securityService: SecurityService
+    private val indicatorCategoryService: IndicatorCategoryService,
+    private val indicatorValueTypeService: IndicatorValueTypeService,
+    private val storageService: StorageService,
+    private val securityService: SecurityService
 ) : IndicatorTypeService, IndicatorCategoryListener {
 
     init {
@@ -41,29 +41,29 @@ class IndicatorTypeServiceImpl(
         }.mapNotNull {
             fromStorage<Any, Any>(it)
         }.sortedWith(
-                compareBy(
-                        { it.category.name },
-                        { it.name }
-                )
+            compareBy(
+                { it.category.name },
+                { it.name }
+            )
         )
     }
 
     override fun findTypeById(typeId: String): IndicatorType<*, *>? =
-            storageService.retrieve(STORE, typeId, StoredIndicatorType::class.java)
-                    .getOrNull()
-                    ?.let { fromStorage<Any, Any>(it) }
+        storageService.retrieve(STORE, typeId, StoredIndicatorType::class.java)
+            .getOrNull()
+            ?.let { fromStorage<Any, Any>(it) }
 
     override fun getTypeById(typeId: String): IndicatorType<*, *> =
-            findTypeById(typeId) ?: throw IndicatorTypeNotFoundException(typeId)
+        findTypeById(typeId) ?: throw IndicatorTypeNotFoundException(typeId)
 
     override fun findByCategory(category: IndicatorCategory): List<IndicatorType<*, *>> {
         return findAll().filter {
             it.category.id == category.id
         }.sortedWith(
-                compareBy(
-                        { it.category.name },
-                        { it.name }
-                )
+            compareBy(
+                { it.category.name },
+                { it.name }
+            )
         )
     }
 
@@ -73,14 +73,15 @@ class IndicatorTypeServiceImpl(
         return if (category != null && valueType != null) {
             val valueConfig = valueType.fromConfigStoredJson(stored.valueConfig)
             IndicatorType(
-                    id = stored.id,
-                    category = category,
-                    name = stored.name,
-                    link = stored.link,
-                    valueType = valueType,
-                    valueConfig = valueConfig,
-                    source = stored.source,
-                    computed = stored.computed
+                id = stored.id,
+                category = category,
+                name = stored.name,
+                link = stored.link,
+                valueType = valueType,
+                valueConfig = valueConfig,
+                source = stored.source,
+                computed = stored.computed,
+                deprecated = stored.deprecated
             )
         } else {
             null
@@ -98,14 +99,14 @@ class IndicatorTypeServiceImpl(
     }
 
     override fun <T, C> createType(
-            id: String,
-            category: IndicatorCategory,
-            name: String,
-            link: String?,
-            valueType: IndicatorValueType<T, C>,
-            valueConfig: C,
-            source: IndicatorSource?,
-            computed: Boolean
+        id: String,
+        category: IndicatorCategory,
+        name: String,
+        link: String?,
+        valueType: IndicatorValueType<T, C>,
+        valueConfig: C,
+        source: IndicatorSource?,
+        computed: Boolean
     ): IndicatorType<T, C> {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         val type = findTypeById(id)
@@ -113,14 +114,14 @@ class IndicatorTypeServiceImpl(
             throw IndicatorTypeIdAlreadyExistsException(id)
         } else {
             return updateType(
-                    id,
-                    category,
-                    name,
-                    link,
-                    valueType,
-                    valueConfig,
-                    source,
-                    computed
+                id,
+                category,
+                name,
+                link,
+                valueType,
+                valueConfig,
+                source,
+                computed
             )
         }
     }
@@ -137,71 +138,100 @@ class IndicatorTypeServiceImpl(
         }
     }
 
+    override fun deprecateType(id: String, deprecated: String?) {
+        securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
+        val existing = storageService.retrieve(STORE, id, StoredIndicatorType::class.java).getOrNull()
+        if (existing != null) {
+            val deprecatedEntry = existing.withDeprecated(deprecated)
+            storageService.store(
+                STORE,
+                id,
+                deprecatedEntry
+            )
+        }
+    }
+
     override fun updateType(input: CreateTypeForm): IndicatorType<*, *> {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         val category = indicatorCategoryService.getCategory(input.category)
         val valueType = indicatorValueTypeService.getValueType<Any, Any>(input.valueType.id)
         val valueConfig = valueType.toConfigStoredJson(
-                valueType.fromConfigForm(input.valueType.data ?: NullNode.instance)
+            valueType.fromConfigForm(input.valueType.data ?: NullNode.instance)
         )
         val stored = StoredIndicatorType(
-                id = input.id,
-                category = category.id,
-                name = input.name,
-                link = input.link,
-                valueType = valueType.id,
-                valueConfig = valueConfig,
-                source = null,
-                computed = false
+            id = input.id,
+            category = category.id,
+            name = input.name,
+            link = input.link,
+            valueType = valueType.id,
+            valueConfig = valueConfig,
+            source = null,
+            computed = false,
+            deprecated = input.deprecated
         )
         storageService.store(
-                STORE,
-                input.id,
-                stored
+            STORE,
+            input.id,
+            stored
         )
         return getTypeById(input.id)
     }
 
     override fun <T, C> updateType(
-            id: String,
-            category: IndicatorCategory,
-            name: String,
-            link: String?,
-            valueType: IndicatorValueType<T, C>,
-            valueConfig: C,
-            source: IndicatorSource?,
-            computed: Boolean
+        id: String,
+        category: IndicatorCategory,
+        name: String,
+        link: String?,
+        valueType: IndicatorValueType<T, C>,
+        valueConfig: C,
+        source: IndicatorSource?,
+        computed: Boolean,
+        deprecated: String?
     ): IndicatorType<T, C> {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         val stored = StoredIndicatorType(
-                id = id,
-                category = category.id,
-                name = name,
-                link = link,
-                valueType = valueType.id,
-                valueConfig = valueType.toConfigStoredJson(valueConfig),
-                source = source,
-                computed = computed
+            id = id,
+            category = category.id,
+            name = name,
+            link = link,
+            valueType = valueType.id,
+            valueConfig = valueType.toConfigStoredJson(valueConfig),
+            source = source,
+            computed = computed,
+            deprecated = deprecated
         )
         storageService.store(
-                STORE,
-                id,
-                stored
+            STORE,
+            id,
+            stored
         )
         @Suppress("UNCHECKED_CAST")
         return getTypeById(id) as IndicatorType<T, C>
     }
 
     private class StoredIndicatorType(
-            val id: String,
-            val category: String,
-            val name: String,
-            val link: String?,
-            val valueType: String,
-            val valueConfig: JsonNode,
-            val source: IndicatorSource?,
-            val computed: Boolean
-    )
+        val id: String,
+        val category: String,
+        val name: String,
+        val link: String?,
+        val valueType: String,
+        val valueConfig: JsonNode,
+        val source: IndicatorSource?,
+        val computed: Boolean,
+        val deprecated: String?
+    ) {
+        fun withDeprecated(deprecated: String?) = StoredIndicatorType(
+            id,
+            category,
+            name,
+            link,
+            valueType,
+            valueConfig,
+            source,
+            computed,
+            deprecated
+        )
+    }
 
     companion object {
         private val STORE: String get() = IndicatorType::class.java.name

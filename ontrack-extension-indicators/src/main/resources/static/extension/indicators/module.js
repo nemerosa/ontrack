@@ -1074,6 +1074,11 @@ angular.module('ontrack.extension.indicators', [
 
         const query = `
             query LoadPortfolio($id: String!, $duration: Int) {
+              indicatorPortfolioOfPortfolios {
+                categories {
+                  id
+                }
+              }
               indicatorPortfolios(id: $id) {
                 id
                 name

@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.model.form.Form
  * @property valueConfig Configuration for the type of value (boundaries, thresholds, etc.)
  * @property source Where does this type come from? If `null` it means this type was entered manually
  * @property computed Flag which indicates if the associated project indicators are computed or not
+ * @property deprecated Set if this type is deprecated, explaining the reason why
  */
 data class IndicatorType<T, C>(
         val id: String,
@@ -23,7 +24,8 @@ data class IndicatorType<T, C>(
         val valueType: IndicatorValueType<T, C>,
         val valueConfig: C,
         val source: IndicatorSource?,
-        val computed: Boolean
+        val computed: Boolean,
+        val deprecated: String?
 ) {
     fun toClientJson(value: T) = valueType.toClientJson(valueConfig, value)
     fun fromClientJson(value: JsonNode): T? = valueType.fromClientJson(valueConfig, value)
