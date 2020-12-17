@@ -167,7 +167,7 @@ class IndicatorTypeServiceImpl(
             valueConfig = valueConfig,
             source = null,
             computed = false,
-            deprecated = input.deprecated
+            deprecated = input.deprecated?.takeIf { it.isNotBlank() }
         )
         storageService.store(
             STORE,
@@ -198,7 +198,7 @@ class IndicatorTypeServiceImpl(
             valueConfig = valueType.toConfigStoredJson(valueConfig),
             source = source,
             computed = computed,
-            deprecated = deprecated
+            deprecated = deprecated?.takeIf { it.isNotBlank() }
         )
         storageService.store(
             STORE,

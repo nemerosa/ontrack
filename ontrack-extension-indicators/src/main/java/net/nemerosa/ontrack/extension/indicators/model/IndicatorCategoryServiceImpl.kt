@@ -37,7 +37,7 @@ class IndicatorCategoryServiceImpl(
             id = input.id,
             name = input.name,
             source = source,
-            deprecated = input.deprecated
+            deprecated = input.deprecated?.takeIf { it.isNotBlank() }
         )
         storageService.store(
             STORE,
