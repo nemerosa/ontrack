@@ -70,6 +70,50 @@ class ProjectIndicatorTypeResourceDecoratorIT : AbstractResourceDecoratorTestSup
         }
     }
 
+    @Test
+    fun `Deletion not granted when type has a source and no deprecation reason`() {
+        val type = ProjectIndicatorType("test", "Testing", null, category, source, false, null)
+        asAdmin {
+            type.decorate(decorator) {
+                assertLinkNotPresent(Link.UPDATE)
+                assertLinkNotPresent(Link.DELETE)
+            }
+        }
+    }
+
+    @Test
+    fun `Deletion not granted when type has a source and a blank deprecation reason`() {
+        val type = ProjectIndicatorType("test", "Testing", null, category, source, false, "")
+        asAdmin {
+            type.decorate(decorator) {
+                assertLinkNotPresent(Link.UPDATE)
+                assertLinkNotPresent(Link.DELETE)
+            }
+        }
+    }
+
+    @Test
+    fun `Deletion granted when type has a source and a deprecation reason`() {
+        val type = ProjectIndicatorType("test", "Testing", null, category, source, false, "Ok to go")
+        asAdmin {
+            type.decorate(decorator) {
+                assertLinkNotPresent(Link.UPDATE)
+                assertLinkPresent(Link.DELETE)
+            }
+        }
+    }
+
+    @Test
+    fun `Deletion granted when type has no source`() {
+        val type = ProjectIndicatorType("test", "Testing", null, category, null, false, null)
+        asAdmin {
+            type.decorate(decorator) {
+                assertLinkPresent(Link.UPDATE)
+                assertLinkPresent(Link.DELETE)
+            }
+        }
+    }
+
     private val category = IndicatorCategory(
             id = "test",
             name = "Test",
