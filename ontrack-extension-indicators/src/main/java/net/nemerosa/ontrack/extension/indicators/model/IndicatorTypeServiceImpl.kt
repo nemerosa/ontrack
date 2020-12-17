@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
 import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
@@ -106,7 +107,8 @@ class IndicatorTypeServiceImpl(
         valueType: IndicatorValueType<T, C>,
         valueConfig: C,
         source: IndicatorSource?,
-        computed: Boolean
+        computed: Boolean,
+        deprecated: String?
     ): IndicatorType<T, C> {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         val type = findTypeById(id)
@@ -114,25 +116,31 @@ class IndicatorTypeServiceImpl(
             throw IndicatorTypeIdAlreadyExistsException(id)
         } else {
             return updateType(
-                id,
-                category,
-                name,
-                link,
-                valueType,
-                valueConfig,
-                source,
-                computed
+                id = id,
+                category = category,
+                name = name,
+                link = link,
+                valueType = valueType,
+                valueConfig = valueConfig,
+                source = source,
+                computed = computed,
+                deprecated = deprecated
             )
         }
     }
 
-    override fun deleteType(id: String): Ack {
+    override fun deleteType(id: String, force:Boolean): Ack {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
+        if (force) securityService.checkGlobalFunction(GlobalSettings::class.java)
         val type = findTypeById(id)
         return if (type != null) {
-            listeners.forEach { it.onTypeDeleted(type) }
-            storageService.delete(STORE, id)
-            Ack.OK
+            if (force || type.source == null || !type.deprecated.isNullOrBlank()) {
+                listeners.forEach { it.onTypeDeleted(type) }
+                storageService.delete(STORE, id)
+                Ack.OK
+            } else {
+                Ack.NOK
+            }
         } else {
             Ack.NOK
         }

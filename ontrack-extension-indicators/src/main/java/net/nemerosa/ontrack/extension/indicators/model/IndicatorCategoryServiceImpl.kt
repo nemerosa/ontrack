@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.indicators.model
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
 import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
@@ -47,13 +48,18 @@ class IndicatorCategoryServiceImpl(
         return getCategory(input.id)
     }
 
-    override fun deleteCategory(id: String): Ack {
+    override fun deleteCategory(id: String, force: Boolean): Ack {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
+        if (force) securityService.checkGlobalFunction(GlobalSettings::class.java)
         val category = findCategoryById(id)
         return if (category != null) {
-            listeners.forEach { it.onCategoryDeleted(category) }
-            storageService.delete(STORE, id)
-            Ack.OK
+            if (force || category.source == null || !category.deprecated.isNullOrBlank()) {
+                listeners.forEach { it.onCategoryDeleted(category) }
+                storageService.delete(STORE, id)
+                Ack.OK
+            } else {
+                Ack.NOK
+            }
         } else {
             Ack.NOK
         }

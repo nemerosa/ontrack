@@ -61,21 +61,33 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
         }
     }
 
-    protected fun category(id: String = uid("C"), name: String = id, source: IndicatorSource? = null) = asAdmin {
+    protected fun category(
+        id: String = uid("C"),
+        name: String = id,
+        source: IndicatorSource? = null,
+        deprecated: String? = null
+    ) = asAdmin {
         indicatorCategoryService.createCategory(
                 IndicatorForm(
                         id,
-                        name
+                        name,
+                        deprecated = deprecated
                 ),
                 source = source
         )
     }
 
+    protected fun source() = IndicatorSource(
+        IndicatorSourceProviderDescription("test-provider", "Provider for test"),
+        "test"
+    )
+
     protected fun IndicatorCategory.booleanType(
             id: String = uid("T"),
             name: String = "$id description",
             required: Boolean = true,
-            source: IndicatorSource? = null
+            source: IndicatorSource? = null,
+            deprecated: String? = null
     ): IndicatorType<Boolean, BooleanIndicatorValueTypeConfig> = asAdmin {
         indicatorTypeService.createType(
                 id = id,
@@ -84,7 +96,8 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
                 link = null,
                 valueType = booleanIndicatorValueType,
                 valueConfig = BooleanIndicatorValueTypeConfig(required),
-                source = source
+                source = source,
+                deprecated = deprecated
         )
     }
 

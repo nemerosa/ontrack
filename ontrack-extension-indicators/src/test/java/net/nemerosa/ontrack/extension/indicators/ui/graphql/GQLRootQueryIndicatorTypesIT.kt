@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorSource
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorSourceProviderDescription
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -12,10 +10,7 @@ class GQLRootQueryIndicatorTypesIT : AbstractIndicatorsTestSupport() {
     @Test
     fun `List of types`() {
         clearIndicators()
-        val source = IndicatorSource(
-                IndicatorSourceProviderDescription("test-provider", "Provider for test"),
-                "test"
-        )
+        val source = source()
         val category1 = category(id = "cat-1", source = source)
         val type11 = category1.booleanType(id = "type-11", source = source)
         val type12 = category1.booleanType(id = "type-12", source = source)

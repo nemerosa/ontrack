@@ -29,7 +29,8 @@ interface IndicatorTypeService {
             valueType: IndicatorValueType<T, C>,
             valueConfig: C,
             source: IndicatorSource? = null,
-            computed: Boolean = false
+            computed: Boolean = false,
+            deprecated: String? = null
     ): IndicatorType<T, C>
 
     fun updateType(input: CreateTypeForm): IndicatorType<*, *>
@@ -46,7 +47,7 @@ interface IndicatorTypeService {
             deprecated: String? = null
     ): IndicatorType<T, C>
 
-    fun deleteType(id: String): Ack
+    fun deleteType(id: String, force: Boolean = false): Ack
 
     /**
      * Marks a type as being deprecated

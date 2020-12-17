@@ -46,7 +46,7 @@ class IndicatorImportsServiceImpl(
                 }
                 .forEach {
                     if (indicatorConfigProperties.importing.deleting) {
-                        indicatorCategoryService.deleteCategory(it.id)
+                        indicatorCategoryService.deleteCategory(it.id, force = true)
                     } else {
                         indicatorCategoryService.deprecateCategory(it.id, "Deprecated because not part of the ${source.name} import source.")
                     }
@@ -62,7 +62,7 @@ class IndicatorImportsServiceImpl(
                 }
                 .forEach {
                     if (indicatorConfigProperties.importing.deleting) {
-                        indicatorTypeService.deleteType(it.id)
+                        indicatorTypeService.deleteType(it.id, force = true)
                     } else {
                         indicatorTypeService.deprecateType(it.id, "Deprecated because not part of the ${source.name} import source.")
                     }

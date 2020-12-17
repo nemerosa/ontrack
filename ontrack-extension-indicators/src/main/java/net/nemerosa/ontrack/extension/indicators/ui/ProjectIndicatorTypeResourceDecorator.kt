@@ -19,7 +19,7 @@ class ProjectIndicatorTypeResourceDecorator : AbstractLinkResourceDecorator<Proj
             Link.DELETE linkTo { t: ProjectIndicatorType ->
                 on(IndicatorTypeController::class.java).deleteType(t.id)
             } linkIf { t: ProjectIndicatorType, rc: ResourceContext ->
-                t.source == null && rc.isGlobalFunctionGranted(IndicatorTypeManagement::class.java)
+                (t.source == null || !t.deprecated.isNullOrBlank()) && rc.isGlobalFunctionGranted(IndicatorTypeManagement::class.java)
             }
 
     )

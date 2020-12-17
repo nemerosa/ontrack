@@ -19,7 +19,7 @@ interface IndicatorCategoryService {
 
     fun updateCategory(input: IndicatorForm, source: IndicatorSource? = null): IndicatorCategory
 
-    fun deleteCategory(id: String): Ack
+    fun deleteCategory(id: String, force: Boolean = false): Ack
 
     /**
      * Marks a category as being deprecated
