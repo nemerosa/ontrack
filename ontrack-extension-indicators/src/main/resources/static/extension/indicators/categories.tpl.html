@@ -34,6 +34,7 @@
         <tr ng-repeat="category in categories">
             <td>
                 <code>{{category.id}}</code>
+                <ot-extension-indicators-deprecation-icon deprecated="category.deprecated"></ot-extension-indicators-deprecation-icon>
             </td>
             <td>
                 {{category.name}}

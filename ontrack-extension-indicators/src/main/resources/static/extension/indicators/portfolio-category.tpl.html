@@ -11,6 +11,15 @@
         </div>
     </div>
 
+    <div class="row" ng-if="category.deprecated">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                <span class="fa fa-warning text-warning"></span>
+                Deprecated: {{category.deprecated}}
+            </div>
+        </div>
+    </div>
+
     <table class="table table-bordered">
         <thead>
         <tr>
@@ -28,6 +37,7 @@
                        href="#/extension/indicators/portfolios/{{portfolio.id}}/type/{{type.id}}"
                        title="See value for all projects in this portfolio for this type"></a>
                 </ot-extension-indicators-type-name>
+                <ot-extension-indicators-deprecation-icon deprecated="type.deprecated"></ot-extension-indicators-deprecation-icon>
             </td>
             <td ng-repeat="project in projects">
                 <ot-extension-indicators-status

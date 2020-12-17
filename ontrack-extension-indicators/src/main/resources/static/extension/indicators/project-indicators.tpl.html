@@ -52,6 +52,7 @@
                 <span class="fa fa-caret-right ot-action" title="Show associated types" ng-hide="categoryIndicators.unfolded" ng-click="unfold(categoryIndicators)"></span>
                 <span class="fa fa-caret-down ot-action" title="Hide associated types" ng-show="categoryIndicators.unfolded" ng-click="fold(categoryIndicators)"></span>
                 {{categoryIndicators.category.name}}
+                <ot-extension-indicators-deprecation-icon deprecated="categoryIndicators.category.deprecated"></ot-extension-indicators-deprecation-icon>
                 <span ng-repeat="portfolio in categoryIndicators.portfolios" class="ot-project-label-box">
                     <a href="#/extension/indicators/portfolios/{{portfolio.id}}">
                         <span class="ot-project-label-box-square"
@@ -75,6 +76,7 @@
         <tr ng-repeat="indicator in categoryIndicators.indicators" ng-show="categoryIndicators.unfolded">
             <td>
                 <ot-extension-indicators-type-name type="indicator.type"></ot-extension-indicators-type-name>
+                <ot-extension-indicators-deprecation-icon deprecated="indicator.type.deprecated"></ot-extension-indicators-deprecation-icon>
             </td>
             <td>
                 <span ng-if="indicator.value">

@@ -22,6 +22,7 @@ angular.module('ontrack.extension.indicators', [
                 categories {
                   id
                   name
+                  deprecated
                   source {
                     provider {
                         id
@@ -113,6 +114,7 @@ angular.module('ontrack.extension.indicators', [
                 types {
                   id
                   name
+                  deprecated
                   link
                   source {
                     provider {
@@ -125,6 +127,7 @@ angular.module('ontrack.extension.indicators', [
                   category {
                     id
                     name
+                    deprecated
                   }
                   valueType {
                     id
@@ -243,6 +246,7 @@ angular.module('ontrack.extension.indicators', [
                     category {
                       id
                       name
+                      deprecated
                     }
                     indicators {
                       links {
@@ -252,6 +256,7 @@ angular.module('ontrack.extension.indicators', [
                       type {
                         id
                         name
+                        deprecated
                         link
                         valueType {
                           id
@@ -391,6 +396,7 @@ angular.module('ontrack.extension.indicators', [
                     type {
                       id
                       name
+                      deprecated
                       link
                       valueType {
                         id
@@ -401,6 +407,7 @@ angular.module('ontrack.extension.indicators', [
                       category {
                         id
                         name
+                        deprecated
                       }
                     }
                     history(offset: $offset, size: $size) {
@@ -517,6 +524,7 @@ angular.module('ontrack.extension.indicators', [
                     category {
                       id
                       name
+                      deprecated
                     }
                     stats {
                       total
@@ -650,9 +658,11 @@ angular.module('ontrack.extension.indicators', [
                 categories {
                   id
                   name
+                  deprecated
                   types {
                     id
                     name
+                    deprecated
                     link
                   }
                 }
@@ -739,9 +749,11 @@ angular.module('ontrack.extension.indicators', [
                 categories {
                   id
                   name
+                  deprecated
                   types {
                     id
                     name
+                    deprecated
                     link
                   }
                 }
@@ -863,9 +875,11 @@ angular.module('ontrack.extension.indicators', [
                 categories(id: $category) {
                   id
                   name
+                  deprecated
                   types {
                     id
                     name
+                    deprecated
                     link
                     valueType {
                       id
@@ -962,10 +976,12 @@ angular.module('ontrack.extension.indicators', [
                 types(id: $type) {
                   id
                   name
+                  deprecated
                   link
                   category {
                     id
                     name
+                    deprecated
                   }
                   valueType {
                     id
@@ -1090,6 +1106,7 @@ angular.module('ontrack.extension.indicators', [
                   category {
                     id
                     name
+                    deprecated
                   }
                   stats {
                     total
@@ -1120,6 +1137,7 @@ angular.module('ontrack.extension.indicators', [
                         category {
                           id
                           name
+                          deprecated
                         }
                         stats {
                           total
@@ -1416,6 +1434,15 @@ angular.module('ontrack.extension.indicators', [
             restrict: 'E',
             templateUrl: 'extension/indicators/directive.indicators-message.tpl.html',
             scope: {
+            }
+        };
+    })
+    .directive('otExtensionIndicatorsDeprecationIcon', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/indicators/directive.indicators-deprecation-icon.tpl.html',
+            scope: {
+                deprecated: '='
             }
         };
     })

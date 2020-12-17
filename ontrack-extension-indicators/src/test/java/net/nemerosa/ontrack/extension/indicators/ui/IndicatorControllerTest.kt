@@ -45,7 +45,8 @@ class IndicatorControllerTest {
                         link = null,
                         category = IndicatorCategory("category", "Category", null),
                         source = null,
-                        computed = false
+                        computed = false,
+                        deprecated = null
                 ),
                 value = mapOf("value" to "true").asJson(),
                 compliance = IndicatorCompliance(100),
