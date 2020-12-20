@@ -1,7 +1,11 @@
 package net.nemerosa.ontrack.graphql.schema
 
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException
+import net.nemerosa.ontrack.model.security.ProjectView
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import javax.validation.constraints.NotNull
@@ -10,6 +14,7 @@ import javax.validation.constraints.Pattern
 @Component
 class ProjectMutations(
         private val structureService: StructureService,
+        private val securityService: SecurityService,
         private val projectFavouriteService: ProjectFavouriteService
 ) : TypedMutationProvider() {
 
@@ -22,6 +27,15 @@ class ProjectMutations(
                     "project", "Created project", Project::class
             ) { input ->
                 structureService.newProject(Project.of(input.toNameDescriptionState()))
+            },
+            /**
+             * Creating a project or getting it if it already exists
+             */
+            simpleMutation(
+                    CREATE_PROJECT_OR_GET, "Creates a new project or gets it if it already exists", CreateProjectOrGetInput::class,
+                    "project", "Created or existing project", Project::class
+            ) { input ->
+                createProjectOrGet(input)
             },
             /**
              * Updating a project
@@ -91,12 +105,32 @@ class ProjectMutations(
             }
     )
 
+    private fun createProjectOrGet(input: CreateProjectOrGetInput): Project {
+        // Gets the existing project using admin rights
+        // since a project might exist with the same name
+        // but not be accessible
+        val existing = securityService.asAdmin {
+            structureService.findProjectByName(input.name).getOrNull()
+        }
+        // If the project exists & is accessible, just returns it
+        return if (existing != null) {
+            if (securityService.isProjectFunctionGranted(existing, ProjectView::class.java)) {
+                existing
+            } else {
+                throw ProjectNameAlreadyDefinedException(input.name)
+            }
+        } else {
+            structureService.newProject(Project.of(input.toNameDescriptionState()))
+        }
+    }
+
     companion object {
         const val ENABLE_PROJECT = "enableProject"
         const val DISABLE_PROJECT = "disableProject"
         const val DELETE_PROJECT = "deleteProject"
         const val UPDATE_PROJECT = "updateProject"
         const val CREATE_PROJECT = "createProject"
+        const val CREATE_PROJECT_OR_GET = "createProjectOrGet"
         const val FAVOURITE_PROJECT = "favouriteProject"
         const val UNFAVOURITE_PROJECT = "unfavouriteProject"
     }
@@ -104,6 +138,23 @@ class ProjectMutations(
 }
 
 data class CreateProjectInput(
+        @get:NotNull(message = "The name is required.")
+        @get:Pattern(regexp = NameDescription.NAME, message = "The name ${NameDescription.NAME_MESSAGE_SUFFIX}")
+        @APIDescription("Project name")
+        val name: String,
+        @APIDescription("Project description")
+        val description: String?,
+        @APIDescription("Project state, null for not disabled")
+        val disabled: Boolean?
+) {
+    fun toNameDescriptionState() = NameDescriptionState(
+            name = name,
+            description = description,
+            isDisabled = disabled ?: false
+    )
+}
+
+data class CreateProjectOrGetInput(
         @get:NotNull(message = "The name is required.")
         @get:Pattern(regexp = NameDescription.NAME, message = "The name ${NameDescription.NAME_MESSAGE_SUFFIX}")
         @APIDescription("Project name")

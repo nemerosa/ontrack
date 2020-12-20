@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.json.isNullOrNullNode
+import net.nemerosa.ontrack.model.security.ProjectCreation
+import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.structure.BranchFavouriteService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
@@ -97,6 +99,127 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
             assertEquals("net.nemerosa.ontrack.graphql.support.MutationInputValidationException", error["exception"].asText())
             assertEquals("name", error["location"].asText())
             assertTrue(data["createProject"]["project"].isNullOrNullNode(), "Project not returned")
+        }
+    }
+
+    @Test
+    fun `Creating a project which already exist in get mode`() {
+        asAdmin {
+            val project = project()
+            val data = run("""
+                mutation CreateProject(${'$'}name: String!) {
+                    createProjectOrGet(input: {name: ${'$'}name}) {
+                        project {
+                            id
+                            name
+                        }
+                        errors {
+                            message
+                            exception
+                            location
+                        }
+                    }
+                }
+            """, mapOf("name" to project.name))
+            // Checks the errors
+            assertNoUserError(data, "createProjectOrGet")
+            val node = data["createProjectOrGet"]["project"]
+            assertEquals(project.id(), node["id"].asInt())
+            assertEquals(project.name, node["name"].asText())
+        }
+    }
+
+    @Test
+    fun `Creating a project which already exist in get mode with specific project access rights`() {
+        project {
+            withNoGrantViewToAll {
+                asUserWithView {
+                    val data = run(
+                        """
+                                mutation CreateProject(${'$'}name: String!) {
+                                    createProjectOrGet(input: {name: ${'$'}name}) {
+                                        project {
+                                            id
+                                            name
+                                        }
+                                        errors {
+                                            message
+                                            exception
+                                            location
+                                        }
+                                    }
+                                }
+                            """, mapOf("name" to name)
+                    )
+                    // Checks the errors
+                    assertNoUserError(data, "createProjectOrGet")
+                    val node = data["createProjectOrGet"]["project"]
+                    assertEquals(id(), node["id"].asInt())
+                    assertEquals(name, node["name"].asText())
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a project which already exists for another user`() {
+        val project = project()
+        withNoGrantViewToAll {
+            asUserWith<ProjectCreation> {
+                val data = run(
+                    """
+                        mutation CreateProject(${'$'}name: String!) {
+                            createProjectOrGet(input: {name: ${'$'}name}) {
+                                project {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                    location
+                                }
+                            }
+                        }
+                    """, mapOf("name" to project.name)
+                )
+                // Checks the errors
+                val error = data["createProjectOrGet"]["errors"][0]
+                assertEquals("Project name already exists: ${project.name}", error["message"].asText())
+                assertEquals(
+                    "net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException",
+                    error["exception"].asText()
+                )
+                assertTrue(data["createProjectOrGet"]["project"].isNullOrNullNode(), "Project not returned")
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a project in get mode`() {
+        asUserWith<ProjectCreation> {
+            val name = uid("P")
+            val data = run(
+                """
+                    mutation CreateProject(${'$'}name: String!) {
+                        createProjectOrGet(input: {name: ${'$'}name}) {
+                            project {
+                                id
+                                name
+                            }
+                            errors {
+                                message
+                                exception
+                                location
+                            }
+                        }
+                    }
+                """, mapOf("name" to name)
+            )
+            // Checks the errors
+            assertNoUserError(data, "createProjectOrGet")
+            val node = data["createProjectOrGet"]["project"]
+            assertEquals(name, node["name"].asText())
         }
     }
 
