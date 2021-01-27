@@ -33,7 +33,7 @@ public class StashGitConfiguration implements GitConfiguration {
     }
 
     /**
-     * Checks if this configuration denotes any BitBucket Cloud instance
+     * Checks if this configuration denotes any Bitbucket Cloud instance
      */
     protected boolean isCloud() {
         return property.getConfiguration().isCloud();

@@ -148,7 +148,7 @@
           },
           "title2": "Get information from your ecosystem",
           "subtitle2": "One of Bootstrap 4's big points",
-          "caption2": "Ontrack can communicate with many tools:&nbsp;GitHub,&nbsp;BitBucket,&nbsp;JIRA, Jenkins, Artifactory, SonarQube and many others. Data can be exported seamlessly to time series databases like InfluxDB, allowing a fast integration with Grafana.<br>",
+          "caption2": "Ontrack can communicate with many tools:&nbsp;GitHub,&nbsp;Bitbucket,&nbsp;JIRA, Jenkins, Artifactory, SonarQube and many others. Data can be exported seamlessly to time series databases like InfluxDB, allowing a fast integration with Grafana.<br>",
           "button2": "<a data-app-btn=\"true\" href=\"https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html\" class=\"btn btn-primary\" data-toolbar=\"-mbrBtnMove\">MORE</a>",
           "media3": {
             "iconFont": {

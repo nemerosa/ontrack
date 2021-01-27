@@ -1,5 +1,5 @@
-Associates the project with the <<usage-bitbucket,BitBucket configuration>> with the given `name` and specifies
-the project in BitBucket and the repository.
+Associates the project with the <<usage-bitbucket,Bitbucket configuration>> with the given `name` and specifies
+the project in Bitbucket and the repository.
 
 Example:
 

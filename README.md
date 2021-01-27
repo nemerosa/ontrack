@@ -36,7 +36,7 @@ Issue change logs are of course available:
 
 Ontrack can communicate with many tools:
 [GitHub](https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html#usage-github),
-[BitBucket](https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html#usage-bitbucket),
+[Bitbucket](https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html#usage-bitbucket),
 JIRA, Jenkins, Artifactory.
 
 And if this is not enough, you can add your own

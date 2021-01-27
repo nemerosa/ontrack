@@ -1,5 +1,5 @@
-When working with <<dsl-usage-bitbucket,BitBucket>>, the access
-to the BitBucket application must be configured.
+When working with <<dsl-usage-bitbucket,Bitbucket>>, the access
+to the Bitbucket application must be configured.
 
 `def stash(Map<String, ?> parameters, String name)`
 

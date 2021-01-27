@@ -26,6 +26,6 @@ public class StashUserMenuExtension extends AbstractExtension implements UserMen
 
     @Override
     public Action getAction() {
-        return Action.of("stash-configurations", "BitBucket configurations", "configurations");
+        return Action.of("stash-configurations", "Bitbucket configurations", "configurations");
     }
 }
