@@ -36,6 +36,7 @@ class GQLLinksContributorImpl(
                     newFieldDefinition()
                             .name("links")
                             .description("Links")
+                            .deprecate("Use the `actions` field instead.")
                             .type(
                                     newObject()
                                             .name(type.simpleName + "Links")

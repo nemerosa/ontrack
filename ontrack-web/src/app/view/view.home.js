@@ -2,6 +2,7 @@ angular.module('ot.view.home', [
     'ui.router',
     'ot.service.structure',
     'ot.service.core',
+    'ot.service.action',
     'ot.service.user',
     'ot.service.graphql',
     'ot.service.label'
@@ -13,7 +14,7 @@ angular.module('ot.view.home', [
             controller: 'HomeCtrl'
         });
     })
-    .controller('HomeCtrl', function ($rootScope, $location, $log, $scope, $http, ot, otGraphqlService, otStructureService, otNotificationService, otUserService, otLabelService) {
+    .controller('HomeCtrl', function ($rootScope, $location, $log, $scope, $http, ot, otGraphqlService, otStructureService, otNotificationService, otUserService, otLabelService, otActionService) {
         const search = $location.search();
         const code = search.code;
         const url = search.url;
@@ -38,8 +39,19 @@ angular.module('ot.view.home', [
         function loadProjects() {
             $scope.loadingProjects = true;
             otGraphqlService.pageGraphQLCall(`{
-              userRootActions {
-                projectCreate
+              user {
+                actions {
+                  createProject {
+                    links {
+                      form {
+                        description
+                        method
+                        uri
+                      }
+                    }
+                    mutation
+                  }
+                }
               }
               labels {
                 id
@@ -104,6 +116,7 @@ angular.module('ot.view.home', [
               projects {
                 id
                 name
+                favourite
                 labels {
                   id
                   category
@@ -116,9 +129,15 @@ angular.module('ot.view.home', [
                     name
                   }
                 }
-                links {
-                  _favourite
-                  _unfavourite
+                actions {
+                  favouriteProject {
+                    description
+                    mutation
+                  }
+                  unfavouriteProject {
+                    description
+                    mutation
+                  }
                 }
                 decorations {
                   ...decorationContent
@@ -131,8 +150,11 @@ angular.module('ot.view.home', [
                 decorations {
                   ...decorationContent
                 }
-                links {
-                  _unfavourite
+                actions {
+                  unfavouriteProject {
+                    description
+                    mutation
+                  }
                 }
                 branches(useModel: true) {
                   id
@@ -192,7 +214,7 @@ angular.module('ot.view.home', [
                         name: 'Create project',
                         cls: 'ot-command-project-new',
                         condition: function () {
-                            return data.userRootActions.projectCreate;
+                            return data.user.actions.createProject.mutation;
                         },
                         action: $scope.createProject
                     }, {
@@ -233,20 +255,73 @@ angular.module('ot.view.home', [
 
         // Creating a project
         $scope.createProject = function () {
-            otStructureService.createProject($scope.projectsData.userRootActions.projectCreate).then(loadProjects);
+            otActionService.runActionForm(
+                $scope.projectsData.user.actions.createProject,
+                {
+                    query: `
+                        mutation CreateProject($name: String!, $description: String, $disabled: Boolean!) {
+                            createProject(input: {name: $name, description: $description, disabled: $disabled}) {
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }     
+                    `,
+                    variables: data => ({
+                        name: data.name,
+                        description: data.description,
+                        disabled: data.disabled == null ? false : data.disabled
+                    })
+                }
+            ).then(loadProjects);
         };
 
         // Sets a project as favourite
         $scope.projectFavourite = function (project) {
-            if (project.links._favourite) {
-                ot.pageCall($http.put(project.links._favourite)).then(loadProjects);
+            if (project.actions.favouriteProject.mutation) {
+                otActionService.runMutationAction(
+                    project.actions.favouriteProject,
+                    {
+                        query: `
+                            mutation FavouriteProject($id: Int!) {
+                                favouriteProject(input: {id: $id}) {
+                                    errors {
+                                        message
+                                        exception
+                                    }
+                                }
+                            }     
+                        `,
+                        variables: () => ({
+                            id: project.id
+                        })
+                    }
+                ).then(loadProjects);
             }
         };
 
         // Unsets a project as favourite
         $scope.projectUnfavourite = function (project) {
-            if (project.links._unfavourite) {
-                ot.pageCall($http.put(project.links._unfavourite)).then(loadProjects);
+            if (project.actions.unfavouriteProject.mutation) {
+                otActionService.runMutationAction(
+                    project.actions.unfavouriteProject,
+                    {
+                        query: `
+                            mutation UnfavouriteProject($id: Int!) {
+                                unfavouriteProject(input: {id: $id}) {
+                                    errors {
+                                        message
+                                        exception
+                                    }
+                                }
+                            }     
+                        `,
+                        variables: () => ({
+                            id: project.id
+                        })
+                    }
+                ).then(loadProjects);
             }
         };
 

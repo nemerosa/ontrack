@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 @Component
 class GQLTypeAuthenticationSource : GQLType {
 
-    override fun createType(cache: GQLTypeCache): GraphQLObjectType = GraphQLBeanConverter.asObjectType(AuthenticationSource::class.java, cache)
+    override fun createType(cache: GQLTypeCache): GraphQLObjectType = GraphQLBeanConverter.asObjectType(AuthenticationSource::class, cache)
 
     override fun getTypeName(): String = AuthenticationSource::class.java.simpleName
 

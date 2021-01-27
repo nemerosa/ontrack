@@ -1,5 +1,6 @@
 angular.module('ot.view.project', [
     'ui.router',
+    'ot.service.action',
     'ot.service.core',
     'ot.service.structure',
     'ot.service.copy',
@@ -14,7 +15,7 @@ angular.module('ot.view.project', [
             controller: 'ProjectCtrl'
         });
     })
-    .controller('ProjectCtrl', function ($modal, $scope, $stateParams, $state, $http, ot, otGraphqlService, otStructureService, otAlertService, otCopyService, otLabelService) {
+    .controller('ProjectCtrl', function ($modal, $scope, $stateParams, $state, $http, ot, otGraphqlService, otStructureService, otAlertService, otCopyService, otLabelService, otActionService) {
         const view = ot.view();
         // Project's id
         const projectId = $stateParams.projectId;
@@ -48,11 +49,24 @@ angular.module('ot.view.project', [
                     name
                   }
                 }
+                actions {
+                    updateProject {
+                        links {
+                            form {
+                                description
+                                method
+                                uri
+                            }
+                        }
+                        mutation
+                    }
+                    deleteProject {
+                        mutation
+                    }
+                }
                 links {
                   _self
                   _createBranch
-                  _update
-                  _delete
                   _permissions
                   _clone
                   _enable
@@ -153,18 +167,11 @@ angular.module('ot.view.project', [
                         }
                     },
                     {
-                        condition: function () {
-                            return $scope.project.links._update;
-                        },
+                        condition: () => $scope.project.actions.updateProject.mutation,
                         id: 'updateProject',
                         name: "Update project",
                         cls: 'ot-command-project-update',
-                        action: function () {
-                            otStructureService.update(
-                                $scope.project.links._update,
-                                "Update project"
-                            ).then(loadProject);
-                        }
+                        action: updateProject
                     },
                     {
                         id: 'searchBuild',
@@ -252,23 +259,11 @@ angular.module('ot.view.project', [
                         }
                     },
                     {
-                        condition: function () {
-                            return $scope.project.links._delete;
-                        },
+                        condition: () => $scope.project.actions.deleteProject.mutation,
                         id: 'deleteProject',
                         name: "Delete project",
                         cls: 'ot-command-project-delete',
-                        action: function () {
-                            otAlertService.confirm({
-                                title: "Deleting a project",
-                                message: "Do you really want to delete the project " + $scope.project.name +
-                                    " and all its associated data?"
-                            }).then(function () {
-                                return ot.call($http.delete($scope.project.links._delete));
-                            }).then(function () {
-                                $state.go('home');
-                            });
-                        }
+                        action: deleteProject
                     },
                     ot.viewApiCommand($scope.project.links._self),
                     ot.viewActionsCommand($scope.project.links._actions),
@@ -284,6 +279,67 @@ angular.module('ot.view.project', [
 
         // Reload callback available in the scope
         $scope.reloadProject = loadProject;
+
+        // Deleting the project
+        const deleteProject = () => {
+            otAlertService.confirm({
+                title: "Deleting a project",
+                message: `Do you really want to delete the project ${$scope.project.name} and all its associated data?`
+            }).then(() => otActionService.runMutationAction(
+                $scope.project.actions.deleteProject,
+                {
+                    query: `
+                        mutation DeleteProject($id: Int!) {
+                            deleteProject(input: {id: $id}) {
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }     
+                    `,
+                    variables: () => ({
+                        id: $scope.project.id
+                    })
+                }
+            )).then(() => $state.go('home'));
+        };
+
+        // Updating the project
+        const updateProject = () => {
+            otActionService.runActionForm(
+                $scope.project.actions.updateProject,
+                {
+                    query: `
+                        mutation UpdateProject($id: Int!, $name: String!, $description: String, $disabled: Boolean!) {
+                            updateProject(input: {id: $id, name: $name, description: $description, disabled: $disabled}) {
+                                project {
+                                    name
+                                    description
+                                    annotatedDescription
+                                    disabled
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }     
+                    `,
+                    variables: data => ({
+                        id: $scope.project.id,
+                        name: data.name,
+                        description: data.description,
+                        disabled: data.disabled == null ? false : data.disabled
+                    })
+                }
+            ).then((data) => {
+                $scope.project.name = data.project.name;
+                $scope.project.description = data.project.description;
+                $scope.project.annotatedDescription = data.project.annotatedDescription;
+                $scope.project.disabled = data.project.disabled;
+            });
+        };
 
         // Time to use for sorting branches
         $scope.getBranchTime = function (branch) {

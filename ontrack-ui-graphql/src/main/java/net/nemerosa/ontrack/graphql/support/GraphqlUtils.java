@@ -15,6 +15,10 @@ import java.util.stream.Collectors;
 import static graphql.Scalars.*;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 
+/**
+ * @deprecated Use Kotlin-friendly fields
+ */
+@Deprecated
 public final class GraphqlUtils {
 
     public static final String ID = "id";
@@ -85,7 +89,10 @@ public final class GraphqlUtils {
 
     /**
      * Returns a non-null list of non-null types
+     *
+     * @deprecated Use the Kotlin form
      */
+    @Deprecated
     public static GraphQLOutputType stdList(GraphQLType type) {
         return new GraphQLNonNull(
                 new GraphQLList(

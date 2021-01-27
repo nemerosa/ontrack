@@ -27,7 +27,7 @@ data class Project(
 
         @JvmStatic
         fun of(nameDescription: NameDescriptionState) =
-                Project(ID.NONE, nameDescription.name, nameDescription.description, nameDescription.isDisabled, Signature.anonymous())
+                Project(ID.NONE, nameDescription.name, nameDescription.description, nameDescription.isDisabled ?: false, Signature.anonymous())
 
         @JvmStatic
         fun of(nameDescription: NameDescription) =
@@ -49,7 +49,7 @@ data class Project(
 
 
     fun update(form: NameDescriptionState): Project =
-            of(form).withId(id).withDisabled(form.isDisabled)
+            of(form).withId(id).withDisabled(form.isDisabled ?: false)
 
     fun asForm(): Form =
             form().name(name).description(description).fill("disabled", isDisabled)

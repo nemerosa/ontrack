@@ -1,11 +1,45 @@
 package net.nemerosa.ontrack.graphql.support
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ArrayNode
+import com.fasterxml.jackson.databind.node.ObjectNode
+import graphql.language.*
+import net.nemerosa.ontrack.test.assertIs
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class GQLScalarJSONTest {
+
+    @Test
+    fun `Parse literal object`() {
+        val input = ObjectValue(
+            listOf(
+                ObjectField("value", IntValue(30.toBigInteger()))
+            )
+        )
+        val value = GQLScalarJSON.INSTANCE.coercing.parseLiteral(input)
+        assertIs<ObjectNode>(value) {
+            assertEquals(30, it.path("value").asInt())
+        }
+    }
+
+    @Test
+    fun `Parse literal array`() {
+        val input = ArrayValue(
+            listOf(
+                StringValue("one"),
+                StringValue("two")
+            )
+        )
+        val value = GQLScalarJSON.INSTANCE.coercing.parseLiteral(input)
+        assertIs<ArrayNode>(value) {
+            assertEquals(
+                listOf("one", "two"),
+                it.map { it.asText() }
+            )
+        }
+    }
 
     @Test
     fun `JSON text`() {
@@ -43,10 +77,11 @@ class GQLScalarJSONTest {
     @Test
     fun `Deep obfuscation of password in arrays`() {
         // Data with password
-        val data = SampleArray("value",
-                listOf(
-                        SampleConfig("user", "secret")
-                )
+        val data = SampleArray(
+            "value",
+            listOf(
+                SampleConfig("user", "secret")
+            )
         )
         // As JSON scaler
         val json = GQLScalarJSON.INSTANCE.coercing.serialize(data) as JsonNode
@@ -57,18 +92,18 @@ class GQLScalarJSONTest {
     }
 
     data class SampleConfig(
-            val user: String,
-            val password: String
+        val user: String,
+        val password: String
     )
 
     data class SampleData(
-            val value: String,
-            val config: SampleConfig
+        val value: String,
+        val config: SampleConfig
     )
 
     data class SampleArray(
-            val value: String,
-            val configs: List<SampleConfig>
+        val value: String,
+        val configs: List<SampleConfig>
     )
 
 }

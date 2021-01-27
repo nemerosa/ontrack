@@ -10,6 +10,8 @@ import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.common.and
+import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
+import net.nemerosa.ontrack.graphql.schema.actions.actions
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
@@ -20,10 +22,9 @@ import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import org.springframework.stereotype.Component
 import java.util.regex.Pattern
 
-const val GRAPHQL_PROJECT_BRANCHES_USE_MODEL_ARG = "useModel"
-
 @Component
 class GQLTypeProject(
+        private val uiActionsGraphQLService: UIActionsGraphQLService,
         private val structureService: StructureService,
         private val projectLabelManagementService: ProjectLabelManagementService,
         creation: GQLTypeCreation,
@@ -33,6 +34,7 @@ class GQLTypeProject(
         private val projectEntityInterface: GQLProjectEntityInterface,
         private val label: GQLTypeLabel,
         private val branchFavouriteService: BranchFavouriteService,
+        private val projectFavouriteService: ProjectFavouriteService,
         private val branchModelMatcherService: BranchModelMatcherService,
         private val paginatedListFactory: GQLPaginatedListFactory,
         private val validationRunSearchService: ValidationRunSearchService,
@@ -55,6 +57,18 @@ class GQLTypeProject(
                 .withInterface(projectEntityInterface.typeRef)
                 .fields(projectEntityInterfaceFields())
                 .field(GraphqlUtils.disabledField())
+                // Actions
+                .actions(uiActionsGraphQLService, Project::class)
+                // Is this project a favourite?
+                .field {
+                    it.name("favourite")
+                            .description("Is this project a favourite of the current user?")
+                            .type(GraphQLBoolean)
+                            .dataFetcher { env ->
+                                val project: Project = env.getSource()
+                                projectFavouriteService.isProjectFavourite(project)
+                            }
+                }
                 // Branches
                 .field(
                         newFieldDefinition()
@@ -181,6 +195,7 @@ class GQLTypeProject(
 
     companion object {
         const val PROJECT = "Project"
+        const val GRAPHQL_PROJECT_BRANCHES_USE_MODEL_ARG = "useModel"
     }
 
 }

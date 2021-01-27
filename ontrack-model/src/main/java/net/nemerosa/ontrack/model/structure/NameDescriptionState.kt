@@ -11,6 +11,6 @@ data class NameDescriptionState(
         @get:Pattern(regexp = NAME, message = "The name $NAME_MESSAGE_SUFFIX")
         val name: String,
         val description: String?,
-        @JsonProperty("disabled")
+        @get:JsonProperty("disabled")
         val isDisabled: Boolean
 )

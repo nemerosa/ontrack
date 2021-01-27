@@ -104,7 +104,7 @@
                         <span
                                 class="fa fa-star ot-command"
                                 title="Unsets as favourite"
-                                ng-if="projectFavourite.links._unfavourite"
+                                ng-if="projectFavourite.actions.unfavouriteProject.mutation"
                                 ng-click="projectUnfavourite(projectFavourite)"
                         ></span>
                         <a href="#/project/{{projectFavourite.id}}">
@@ -158,7 +158,7 @@
         <div class="col-md-12">
             <div class="alert alert-info">
                 No project in the list.
-                <span ng-if="projectsData.userRootActions.projectCreate">
+                <span ng-if="projectsData.user.actions.createProject.mutation">
                     Create a new project by using this
                     <a href ng-click="createProject()">link</a>.
                 </span>
@@ -238,14 +238,14 @@
                         <span
                                 class="fa fa-star-o ot-command"
                                 title="Sets as favourite"
-                                ng-if="project.links._favourite"
+                                ng-if="!project.favourite && project.actions.favouriteProject.mutation"
                                 ng-click="projectFavourite(project)"
                         ></span>
                         <span
                                 class="fa fa-star ot-action"
                                 style="color: yellow;"
                                 title="Unsets as favourite"
-                                ng-if="project.links._unfavourite"
+                                ng-if="project.favourite && project.actions.unfavouriteProject.mutation"
                                 ng-click="projectUnfavourite(project)"
                         ></span>
                         <a href="#/project/{{project.id}}">

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql
 
 import com.fasterxml.jackson.databind.JsonNode
 import graphql.ExecutionResult
+import net.nemerosa.ontrack.common.UserException
 import net.nemerosa.ontrack.graphql.service.GraphQLService
 import net.nemerosa.ontrack.json.ObjectMapperFactory
 import org.springframework.transaction.annotation.Transactional
@@ -9,7 +10,9 @@ import org.springframework.web.bind.annotation.*
 import java.io.IOException
 import java.util.concurrent.Callable
 
-@Transactional
+@Transactional(
+        noRollbackFor = [UserException::class]
+)
 @RestController
 @RequestMapping("/graphql")
 class GraphqlController(

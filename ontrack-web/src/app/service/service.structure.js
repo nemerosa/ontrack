@@ -24,14 +24,6 @@ angular.module('ot.service.structure', [
         self.update = otFormService.update;
 
         /**
-         * Creating a project
-         * @param uri URI to the creation URL
-         */
-        self.createProject = function (uri) {
-            return self.create(uri, 'New project');
-        };
-
-        /**
          * Getting a project
          */
         self.getProject = function (id) {

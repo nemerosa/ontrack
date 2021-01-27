@@ -34,7 +34,9 @@ import java.util.function.BiFunction
 import java.util.function.Predicate
 
 @Service
-@Transactional
+@Transactional(
+        noRollbackFor = [UserException::class]
+)
 class StructureServiceImpl(
         private val securityService: SecurityService,
         private val eventPostService: EventPostService,

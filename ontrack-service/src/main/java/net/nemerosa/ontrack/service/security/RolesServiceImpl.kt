@@ -280,6 +280,15 @@ class RolesServiceImpl(
                 )
         )
 
+        // Participant in all projects
+        registerGlobalRole(Roles.GLOBAL_PARTICIPANT, "Participant",
+                "This role grants a read-only access to all projects and the right to comment on validation runs.",
+                RolesService.readOnlyGlobalFunctions,
+                RolesService.readOnlyProjectFunctions
+                        + ValidationRunStatusChange::class.java
+                        + ValidationRunStatusCommentEditOwn::class.java
+        )
+
         // Read only on all projects
         registerGlobalRole(Roles.GLOBAL_READ_ONLY, "Read Only",
                 "This role grants a read-only access to all projects",
