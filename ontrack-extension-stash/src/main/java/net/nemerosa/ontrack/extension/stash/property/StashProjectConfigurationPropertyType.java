@@ -42,12 +42,12 @@ public class StashProjectConfigurationPropertyType extends AbstractGitProjectCon
 
     @Override
     public String getName() {
-        return "BitBucket configuration";
+        return "Bitbucket configuration";
     }
 
     @Override
     public String getDescription() {
-        return "Associates the project with a BitBucket repository";
+        return "Associates the project with a Bitbucket repository";
     }
 
     @Override
@@ -72,20 +72,20 @@ public class StashProjectConfigurationPropertyType extends AbstractGitProjectCon
                 .with(
                         Selection.of("configuration")
                                 .label("Configuration")
-                                .help("BitBucket configuration to use to access the repository")
+                                .help("Bitbucket configuration to use to access the repository")
                                 .items(configurationService.getConfigurationDescriptors())
                                 .value(value != null ? value.getConfiguration().getName() : null)
                 )
                 .with(
                         Text.of("project")
                                 .label("Project")
-                                .help("ID of the BitBucket project")
+                                .help("ID of the Bitbucket project")
                                 .value(value != null ? value.getProject() : null)
                 )
                 .with(
                         Text.of("repository")
                                 .label("Repository")
-                                .help("Repository in the BitBucket project")
+                                .help("Repository in the Bitbucket project")
                                 .value(value != null ? value.getRepository() : null)
                 )
                 .with(
