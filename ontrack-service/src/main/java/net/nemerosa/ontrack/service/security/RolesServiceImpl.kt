@@ -284,7 +284,7 @@ class RolesServiceImpl(
         )
 
         // Participant in all projects
-        registerGlobalRole(Roles.GLOBAL_PARTICIPANT, "Participant",
+        register(Roles.GLOBAL_PARTICIPANT, "Participant",
                 "This role grants a read-only access to all projects and the right to comment on validation runs.",
                 RolesService.readOnlyGlobalFunctions,
                 RolesService.readOnlyProjectFunctions
