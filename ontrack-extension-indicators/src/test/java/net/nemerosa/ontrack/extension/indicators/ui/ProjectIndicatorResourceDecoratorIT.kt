@@ -98,38 +98,39 @@ class ProjectIndicatorResourceDecoratorIT : AbstractResourceDecoratorTestSupport
 
     private fun indicator(source: IndicatorSource? = null, computed: Boolean = false) = project<ProjectIndicator> {
         ProjectIndicator(
-                project = this,
-                indicator = Indicator(
-                        type = type(source, computed),
-                        value = true,
-                        compliance = null,
-                        comment = null,
-                        signature = Signature.anonymous()
-                )
+            project = this,
+            indicator = Indicator(
+                type = type(source, computed),
+                value = true,
+                compliance = null,
+                comment = null,
+                signature = Signature.anonymous()
+            )
         )
     }
 
     private fun type(source: IndicatorSource? = null, computed: Boolean = false) =
-            IndicatorType(
-                    id = "test",
-                    category = category,
-                    name = "Testing",
-                    link = null,
-                    valueType = valueType,
-                    valueConfig = BooleanIndicatorValueTypeConfig(required = false),
-                    source = source,
-                    computed = computed
-            )
+        IndicatorType(
+            id = "test",
+            category = category,
+            name = "Testing",
+            link = null,
+            valueType = valueType,
+            valueConfig = BooleanIndicatorValueTypeConfig(required = false),
+            source = source,
+            computed = computed,
+            deprecated = null
+        )
 
     private val category = IndicatorCategory(
-            id = "test",
-            name = "Test",
-            source = null
+        id = "test",
+        name = "Test",
+        source = null
     )
 
     private val source = IndicatorSource(
-            IndicatorSourceProviderDescription("test", "Test"),
-            "testing"
+        IndicatorSourceProviderDescription("test", "Test"),
+        "testing"
     )
 
 }

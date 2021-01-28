@@ -20,6 +20,15 @@
         </div>
     </div>
 
+    <div class="row" ng-if="type.deprecated">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                <span class="fa fa-warning text-warning"></span>
+                Deprecated: {{type.deprecated}}
+            </div>
+        </div>
+    </div>
+
     <table class="table table-bordered">
         <thead>
         <tr>

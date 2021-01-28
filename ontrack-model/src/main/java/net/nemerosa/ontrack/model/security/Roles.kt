@@ -50,6 +50,7 @@ interface Roles {
         const val GLOBAL_CREATOR = "CREATOR"
         const val GLOBAL_AUTOMATION = "AUTOMATION"
         const val GLOBAL_CONTROLLER = "CONTROLLER"
+        const val GLOBAL_PARTICIPANT = "PARTICIPANT"
         const val GLOBAL_READ_ONLY = "READ_ONLY"
         /**
          * The global validation manager can manage the validation stamps across all projects.
@@ -63,6 +64,7 @@ interface Roles {
                 GLOBAL_AUTOMATION,
                 GLOBAL_CONTROLLER,
                 GLOBAL_READ_ONLY,
+                GLOBAL_PARTICIPANT,
                 GLOBAL_VALIDATION_MANAGER
         )
     }

@@ -376,7 +376,14 @@ Upon import:
 
 * new existing & types are created
 * existing categories & types are updated and associated indicators are left untouched
-* removed categories & types are deleted, and associated indicators are deleted
+* removed categories & types are marked as deprecated, and associated indicators are kept
+
+[NOTE]
+====
+Instead of marking obsolete categories & types as deprecated, those can be deleted
+using the `ontrack.config.extension.indicators.importing.deleting = true`
+<<configuration-properties,configuration property>> but this is not recommended.
+====
 
 NOTE: Imported categories & types cannot be edited.
 

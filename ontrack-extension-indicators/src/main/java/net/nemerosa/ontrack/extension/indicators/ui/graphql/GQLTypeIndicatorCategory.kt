@@ -26,6 +26,7 @@ class GQLTypeIndicatorCategory(
             // Core fields
             .stringField("id", "Indicator category ID")
             .stringField("name", "Indicator category name")
+            .stringField("deprecated", "Indicator category deprecation reason if any")
             // Source
             .field {
                 it.name(IndicatorCategory::source.name)

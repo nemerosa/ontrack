@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.indicators.ui
 
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
 import net.nemerosa.ontrack.extension.indicators.model.*
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorConstants.INDICATOR_ID_PATTERN
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Text
@@ -80,14 +81,23 @@ class IndicatorCategoryController(
                 .with(
                         Text.of(IndicatorCategory::id.name)
                                 .label("ID")
-                                .regex(IndicatorConstants.INDICATOR_ID_PATTERN)
+                            .help("ID for the category. Must be unique among ALL categories and comply with the $INDICATOR_ID_PATTERN regular expression.")
+                                .regex(INDICATOR_ID_PATTERN)
                                 .readOnly(category != null)
                                 .value(category?.id)
                 )
                 .with(
                         Text.of(IndicatorCategory::name.name)
                                 .label("Name")
+                                .help("Display name for the category.")
                                 .value(category?.name)
+                )
+                .with(
+                        Text.of(IndicatorCategory::deprecated.name)
+                                .label("Deprecated")
+                                .help("If filled in, indicates that the category is deprecated and should not be used any longer.")
+                                .optional()
+                                .value(category?.deprecated)
                 )
     }
 }

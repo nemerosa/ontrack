@@ -27,6 +27,7 @@ class GQLTypeProjectIndicatorType(
             .description("Type of indicator")
             .stringField(ProjectIndicatorType::id.name, "Unique ID for the type")
             .stringField(ProjectIndicatorType::name.name, "Name for the indicator type")
+            .stringField(ProjectIndicatorType::deprecated.name, "Indicator type deprecation reason if any")
             .stringField(ProjectIndicatorType::link.name, "Link to the definition of the indicator")
             // Computed flag
             .booleanField(ProjectIndicatorType::computed)

@@ -77,7 +77,10 @@
                             </span>
                         </div>
                         <div class="col-md-9" style="border-right: solid 1px gray;">
-                            <p><strong>{{categoryStats.category.name}}</strong></p>
+                            <p>
+                                <strong>{{categoryStats.category.name}}</strong>
+                                <ot-extension-indicators-deprecation-icon deprecated="categoryStats.category.deprecated"></ot-extension-indicators-deprecation-icon>
+                            </p>
                             <ot-extension-indicators-stats-summary stats="categoryStats.stats" previous-stats="categoryStats.previousStats" item="portfolio and category"></ot-extension-indicators-stats-summary>
                         </div>
                     </div>
