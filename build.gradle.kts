@@ -129,7 +129,7 @@ val exportedProjects = javaProjects.filter {
 }
 
 val coreProjects = javaProjects.filter {
-    it.path != ":ontrack-dsl"
+    it.path != ":ontrack-dsl-v4"
 }
 
 configure(javaProjects) p@{

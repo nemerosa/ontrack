@@ -15,7 +15,7 @@ dependencies {
     implementation("org.apache.httpcomponents:httpclient")
     implementation("org.apache.httpcomponents:httpmime")
     implementation("org.springframework.boot:spring-boot-starter")
-    implementation(project(":ontrack-dsl"))
+    implementation(project(":ontrack-dsl-v4"))
 }
 
 tasks.getByName<Jar>("jar") {
@@ -28,3 +28,4 @@ tasks.getByName<BootJar>("bootJar") {
     launchScript()
     archiveClassifier.set("executable")
 }
+    

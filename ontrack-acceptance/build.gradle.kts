@@ -15,7 +15,7 @@ dependencies {
     implementation("org.codehaus.groovy:groovy")
 
     testImplementation(project(":ontrack-client"))
-    testImplementation(project(":ontrack-dsl"))
+    testImplementation(project(":ontrack-dsl-v4"))
     testImplementation(project(":ontrack-dsl-shell"))
     testImplementation(project(":ontrack-test-utils"))
     testImplementation("org.apache.commons:commons-lang3")

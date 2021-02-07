@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":ontrack-dsl"))
+    implementation(project(":ontrack-dsl-v4"))
     implementation(project(":ontrack-json"))
     implementation("commons-io:commons-io")
     implementation("org.apache.commons:commons-lang3")
@@ -29,15 +29,15 @@ if (project.hasProperty("documentation")) {
 
     val generateDoc by tasks.registering(JavaExec::class) {
         dependsOn("classes")
-        dependsOn(":ontrack-dsl:classes")
+        dependsOn(":ontrack-dsl-v4:classes")
         main = "net.nemerosa.ontrack.docs.DSLDocGenerator"
         classpath = sourceSets["main"].runtimeClasspath
         args = listOf(
-                project(":ontrack-dsl").file("src/main/groovy").absolutePath,
+                project(":ontrack-dsl-v4").file("src/main/groovy").absolutePath,
                 "build/dsl"
         )
 
-        inputs.dir(project(":ontrack-dsl").file("src/main/groovy"))
+        inputs.dir(project(":ontrack-dsl-v4").file("src/main/groovy"))
         outputs.dir("build/dsl")
     }
 

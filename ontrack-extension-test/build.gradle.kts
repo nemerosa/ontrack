@@ -47,7 +47,7 @@ dependencies {
     "compile"("org.apache.commons:commons-math3:3.6.1")
 
     "testCompile"("net.nemerosa.ontrack:ontrack-acceptance:${ontrackVersion}")
-    "testCompile"("net.nemerosa.ontrack:ontrack-dsl:${ontrackVersion}")
+    "testCompile"("net.nemerosa.ontrack:ontrack-dsl-v4:${ontrackVersion}")
 }
 
 val prepareDockerImage by tasks.registering(Copy::class) {
