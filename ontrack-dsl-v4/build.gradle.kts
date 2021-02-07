@@ -5,6 +5,9 @@ plugins {
 
 description = "DSL for Ontrack."
 
+java.sourceCompatibility = JavaVersion.VERSION_1_8
+java.targetCompatibility = JavaVersion.VERSION_1_8
+
 /**
  * Dependencies of the DSL module must be carefully controlled
  * outside of the core modules
