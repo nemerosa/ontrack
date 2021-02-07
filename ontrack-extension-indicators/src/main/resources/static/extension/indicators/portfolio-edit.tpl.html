@@ -76,6 +76,7 @@
             </td>
             <td>
                 {{category.name}}
+                <ot-extension-indicators-deprecation-icon deprecated="category.deprecated"></ot-extension-indicators-deprecation-icon>
                 <span class="fa fa-caret-right ot-action" title="Show associated types" ng-hide="category.unfolded" ng-click="unfold(category)"></span>
                 <span class="fa fa-caret-down ot-action" title="Hide associated types" ng-show="category.unfolded" ng-click="fold(category)"></span>
             </td>
@@ -87,6 +88,7 @@
                        href="#/extension/indicators/portfolios/{{portfolio.id}}/type/{{type.id}}"
                        title="See value for all projects in this portfolio"></a>
                 </ot-extension-indicators-type-name>
+                <ot-extension-indicators-deprecation-icon deprecated="type.deprecated"></ot-extension-indicators-deprecation-icon>
             </td>
         </tr>
         </tbody>

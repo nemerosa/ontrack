@@ -12,7 +12,9 @@ class ProjectIndicatorType(
         val category: IndicatorCategory,
         val source: IndicatorSource?,
         @APIDescription("Flag which indicates if the associated project indicators are computed or not")
-        val computed: Boolean
+        val computed: Boolean,
+        @APIDescription("Deprecation reason for this type, if any/")
+        val deprecated: String?
 ) {
     constructor(type: IndicatorType<out Any?, out Any?>) : this(
             id = type.id,
@@ -20,6 +22,7 @@ class ProjectIndicatorType(
             link = type.link,
             category = type.category,
             source = type.source,
-            computed = type.computed
+            computed = type.computed,
+            deprecated = type.deprecated
     )
 }

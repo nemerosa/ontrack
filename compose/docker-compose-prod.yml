@@ -29,6 +29,7 @@ services:
       PROFILE: prod
       JAVA_OPTIONS: "-Xms1024m -Xmx1024m"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
+      ONTRACK_CONFIG_KEY_STORE: "jdbc"
       SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
     depends_on:
       influxdb:

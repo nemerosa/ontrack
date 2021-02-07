@@ -75,6 +75,7 @@
             <td ng-repeat-end>
                 <p><b><a
                         href="#/extension/indicators/portfolios/{{portfolio.id}}/category/{{categoryStats.category.id}}">{{categoryStats.category.name}}</a></b>
+                    <ot-extension-indicators-deprecation-icon deprecated="categoryStats.category.deprecated"></ot-extension-indicators-deprecation-icon>
                 </p>
                 <ot-extension-indicators-stats-summary
                         stats="categoryStats.stats"

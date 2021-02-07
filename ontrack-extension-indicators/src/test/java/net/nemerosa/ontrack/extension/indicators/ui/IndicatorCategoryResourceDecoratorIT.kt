@@ -70,9 +70,53 @@ class IndicatorCategoryResourceDecoratorIT : AbstractResourceDecoratorTestSuppor
         }
     }
 
+    @Test
+    fun `Deletion not granted when category has a source and no deprecation reason`() {
+        val category = IndicatorCategory("test", "Test", source)
+        asAdmin {
+            category.decorate(decorator) {
+                assertLinkNotPresent(Link.UPDATE)
+                assertLinkNotPresent(Link.DELETE)
+            }
+        }
+    }
+
+    @Test
+    fun `Deletion not granted when category has a source and a blank deprecation reason`() {
+        val category = IndicatorCategory("test", "Test", source, deprecated = "")
+        asAdmin {
+            category.decorate(decorator) {
+                assertLinkNotPresent(Link.UPDATE)
+                assertLinkNotPresent(Link.DELETE)
+            }
+        }
+    }
+
+    @Test
+    fun `Deletion granted when category has a source and a deprecation reason`() {
+        val category = IndicatorCategory("test", "Test", source, deprecated = "Good to go")
+        asAdmin {
+            category.decorate(decorator) {
+                assertLinkNotPresent(Link.UPDATE)
+                assertLinkPresent(Link.DELETE)
+            }
+        }
+    }
+
+    @Test
+    fun `Deletion granted when category has no source`() {
+        val category = IndicatorCategory("test", "Test", null)
+        asAdmin {
+            category.decorate(decorator) {
+                assertLinkPresent(Link.UPDATE)
+                assertLinkPresent(Link.DELETE)
+            }
+        }
+    }
+
     private val source = IndicatorSource(
-            IndicatorSourceProviderDescription("test", "Test"),
-            "testing"
+        IndicatorSourceProviderDescription("test", "Test"),
+        "testing"
     )
 
 }

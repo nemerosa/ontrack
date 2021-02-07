@@ -314,6 +314,7 @@ configure(coreProjects) p@{
         "testImplementation"("junit:junit")
         "testImplementation"("org.mockito:mockito-core")
         "testImplementation"("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+        "testImplementation"("io.mockk:mockk:1.10.3")
         "testImplementation"("org.jetbrains.kotlin:kotlin-test")
     }
 

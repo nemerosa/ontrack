@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.imports
 
+import net.nemerosa.ontrack.extension.indicators.IndicatorConfigProperties
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
 import net.nemerosa.ontrack.extension.indicators.model.*
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueType
@@ -15,7 +16,8 @@ class IndicatorImportsServiceImpl(
         private val indicatorCategoryService: IndicatorCategoryService,
         private val indicatorTypeService: IndicatorTypeService,
         private val booleanIndicatorValueType: BooleanIndicatorValueType,
-        private val importsIndicatorSourceProvider: ImportsIndicatorSourceProvider
+        private val importsIndicatorSourceProvider: ImportsIndicatorSourceProvider,
+        private val indicatorConfigProperties: IndicatorConfigProperties
 ) : IndicatorImportsService {
 
     override fun imports(data: IndicatorImports) {
@@ -43,7 +45,11 @@ class IndicatorImportsServiceImpl(
                             it !in data
                 }
                 .forEach {
-                    indicatorCategoryService.deleteCategory(it.id)
+                    if (indicatorConfigProperties.importing.deleting) {
+                        indicatorCategoryService.deleteCategory(it.id, force = true)
+                    } else {
+                        indicatorCategoryService.deprecateCategory(it.id, "Deprecated because not part of the ${source.name} import source.")
+                    }
                 }
     }
 
@@ -55,7 +61,11 @@ class IndicatorImportsServiceImpl(
                             it !in data
                 }
                 .forEach {
-                    indicatorTypeService.deleteType(it.id)
+                    if (indicatorConfigProperties.importing.deleting) {
+                        indicatorTypeService.deleteType(it.id, force = true)
+                    } else {
+                        indicatorTypeService.deprecateType(it.id, "Deprecated because not part of the ${source.name} import source.")
+                    }
                 }
     }
 

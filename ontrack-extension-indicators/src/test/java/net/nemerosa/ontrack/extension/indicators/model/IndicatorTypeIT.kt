@@ -17,16 +17,16 @@ class IndicatorTypeIT : AbstractIndicatorsTestSupport() {
         asUserWith<IndicatorTypeManagement> {
             assertFailsWith<IndicatorTypeIdAlreadyExistsException> {
                 indicatorTypeService.createType(
-                        CreateTypeForm(
-                                id = type.id,
-                                category = category.id,
-                                name = "Another type with same ID",
-                                link = null,
-                                valueType = ServiceConfiguration(
-                                        id = booleanIndicatorValueType.id,
-                                        data = booleanIndicatorValueType.toConfigForm(BooleanIndicatorValueTypeConfig(true))
-                                )
+                    CreateTypeForm(
+                        id = type.id,
+                        category = category.id,
+                        name = "Another type with same ID",
+                        link = null,
+                        valueType = ServiceConfiguration(
+                            id = booleanIndicatorValueType.id,
+                            data = booleanIndicatorValueType.toConfigForm(BooleanIndicatorValueTypeConfig(true))
                         )
+                    )
                 )
             }
         }
@@ -39,14 +39,14 @@ class IndicatorTypeIT : AbstractIndicatorsTestSupport() {
         asUserWith<IndicatorTypeManagement> {
             assertFailsWith<IndicatorTypeIdAlreadyExistsException> {
                 indicatorTypeService.createType(
-                        id = type.id,
-                        category = category,
-                        name = "Another type with same ID",
-                        link = null,
-                        valueType = booleanIndicatorValueType,
-                        valueConfig = BooleanIndicatorValueTypeConfig(true),
-                        source = null,
-                        computed = false
+                    id = type.id,
+                    category = category,
+                    name = "Another type with same ID",
+                    link = null,
+                    valueType = booleanIndicatorValueType,
+                    valueConfig = BooleanIndicatorValueTypeConfig(true),
+                    source = null,
+                    computed = false
                 )
             }
         }
@@ -58,16 +58,16 @@ class IndicatorTypeIT : AbstractIndicatorsTestSupport() {
         val typeId = uid("T")
         asUserWith<IndicatorTypeManagement> {
             indicatorTypeService.createType(
-                    CreateTypeForm(
-                            id = typeId,
-                            category = category.id,
-                            name = "Another type",
-                            link = null,
-                            valueType = ServiceConfiguration(
-                                    id = booleanIndicatorValueType.id,
-                                    data = booleanIndicatorValueType.toConfigForm(BooleanIndicatorValueTypeConfig(true))
-                            )
+                CreateTypeForm(
+                    id = typeId,
+                    category = category.id,
+                    name = "Another type",
+                    link = null,
+                    valueType = ServiceConfiguration(
+                        id = booleanIndicatorValueType.id,
+                        data = booleanIndicatorValueType.toConfigForm(BooleanIndicatorValueTypeConfig(true))
                     )
+                )
             )
             // Gets the type back
             indicatorTypeService.getTypeById(typeId).apply {
@@ -85,16 +85,16 @@ class IndicatorTypeIT : AbstractIndicatorsTestSupport() {
         val type = category.booleanType()
         asUserWith<IndicatorTypeManagement> {
             indicatorTypeService.updateType(
-                    CreateTypeForm(
-                            id = type.id,
-                            category = category.id,
-                            name = "Another type",
-                            link = null,
-                            valueType = ServiceConfiguration(
-                                    id = booleanIndicatorValueType.id,
-                                    data = booleanIndicatorValueType.toConfigForm(BooleanIndicatorValueTypeConfig(false))
-                            )
+                CreateTypeForm(
+                    id = type.id,
+                    category = category.id,
+                    name = "Another type",
+                    link = null,
+                    valueType = ServiceConfiguration(
+                        id = booleanIndicatorValueType.id,
+                        data = booleanIndicatorValueType.toConfigForm(BooleanIndicatorValueTypeConfig(false))
                     )
+                )
             )
             // Gets the type back
             indicatorTypeService.getTypeById(type.id).apply {
@@ -133,6 +133,50 @@ class IndicatorTypeIT : AbstractIndicatorsTestSupport() {
         asAdmin {
             val result = indicatorTypeService.deleteType("xxx")
             assertFalse(result.isSuccess)
+        }
+    }
+
+    @Test
+    fun `Type cannot be deleted if there is a source and no deprecation reason`() {
+        asAdmin {
+            val type = category().booleanType(
+                source = source()
+            )
+            assertFalse(indicatorTypeService.deleteType(type.id).isSuccess, "Type was not deleted")
+            assertNotNull(indicatorTypeService.findTypeById(type.id), "Type was not deleted")
+        }
+    }
+
+    @Test
+    fun `Category cannot be deleted if there is a source and a blank deprecation reason`() {
+        asAdmin {
+            val type = category().booleanType(
+                source = source(),
+                deprecated = ""
+            )
+            assertFalse(indicatorTypeService.deleteType(type.id).isSuccess, "Type was not deleted")
+            assertNotNull(indicatorTypeService.findTypeById(type.id), "Type was not deleted")
+        }
+    }
+
+    @Test
+    fun `Category can be deleted if there is a source but a deprecation reason`() {
+        asAdmin {
+            val type = category().booleanType(
+                source = source(),
+                deprecated = "Obsolete"
+            )
+            assertTrue(indicatorTypeService.deleteType(type.id).isSuccess, "Type was deleted")
+            assertNull(indicatorTypeService.findTypeById(type.id), "Type has been deleted")
+        }
+    }
+
+    @Test
+    fun `Category can be deleted if there is no source`() {
+        asAdmin {
+            val type = category().booleanType()
+            assertTrue(indicatorTypeService.deleteType(type.id).isSuccess, "Type was deleted")
+            assertNull(indicatorTypeService.findTypeById(type.id), "Type has been deleted")
         }
     }
 

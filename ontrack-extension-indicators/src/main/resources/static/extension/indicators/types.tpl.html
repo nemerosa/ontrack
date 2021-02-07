@@ -25,6 +25,7 @@
         <tr class="info">
             <th colspan="7">
                 <a href="#/extension/indicators/categories" title="Goes to the list of categories">{{category.name}}</a>
+                <ot-extension-indicators-deprecation-icon deprecated="category.deprecated"></ot-extension-indicators-deprecation-icon>
             </th>
         </tr>
         <tr>
@@ -39,6 +40,7 @@
         <tr ng-repeat="type in category.types">
             <td>
                 <code>{{type.id}}</code>
+                <ot-extension-indicators-deprecation-icon deprecated="type.deprecated"></ot-extension-indicators-deprecation-icon>
             </td>
             <td>
                 <ot-extension-indicators-type-name type="type"></ot-extension-indicators-type-name>

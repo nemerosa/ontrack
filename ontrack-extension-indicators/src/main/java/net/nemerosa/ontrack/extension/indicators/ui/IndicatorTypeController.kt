@@ -78,6 +78,7 @@ class IndicatorTypeController(
                 .with(
                         Text.of("id")
                                 .label("ID")
+                                .help("ID for the type. Must be unique among ALL types and comply with the $INDICATOR_ID_PATTERN regular expression.")
                                 .regex(INDICATOR_ID_PATTERN)
                                 .readOnly(type != null)
                                 .value(type?.id)
@@ -85,6 +86,7 @@ class IndicatorTypeController(
                 .with(
                         Selection.of(CreateTypeForm::category.name)
                                 .label("Indicator category")
+                                .help("The category the type is associated with.")
                                 .items(indicatorCategoryService.findAll())
                                 .itemId(IndicatorCategory::id.name)
                                 .itemName(IndicatorCategory::name.name)
@@ -93,17 +95,26 @@ class IndicatorTypeController(
                 .with(
                         Text.of(CreateTypeForm::name.name)
                                 .label("Name")
+                                .help("Display name for the type.")
                                 .value(type?.name)
                 )
                 .with(
                         Url.of(CreateTypeForm::link.name)
-                                .label("Link to longer description")
+                                .label("Link to a longer description")
                                 .optional()
                                 .value(type?.link)
                 )
                 .with(
+                        Text.of(CreateTypeForm::deprecated.name)
+                                .label("Deprecation")
+                                .help("If filled in, indicates that the type is deprecated and should not be used any longer.")
+                                .optional()
+                                .value(type?.deprecated)
+                )
+                .with(
                         ServiceConfigurator.of(CreateTypeForm::valueType.name)
                                 .label("Value type")
+                                .help("Type of value associated with this type.")
                                 .readOnly(type != null)
                                 .sources(
                                         indicatorValueTypeService.findAll()
