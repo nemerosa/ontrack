@@ -722,9 +722,9 @@ pipeline {
             when {
                 beforeAgent true
                 allOf {
-                    branch "release/3.*"
+                    branch "release/4.*"
                     expression {
-                        ontrackGetLastBranch(project: ONTRACK_PROJECT_NAME, pattern: 'release-3\\..*') == ONTRACK_BRANCH_NAME
+                        ontrackGetLastBranch(project: ONTRACK_PROJECT_NAME, pattern: 'release-4\\..*') == ONTRACK_BRANCH_NAME
                     }
                 }
             }
@@ -928,111 +928,6 @@ pipeline {
                             branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
                             validationStamp: 'SITE',
-                    )
-                }
-            }
-        }
-
-        // Production
-
-        stage('Production') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
-            when {
-                beforeAgent true
-                branch "master"
-            }
-            environment {
-                ONTRACK_POSTGRES = credentials('ONTRACK_POSTGRES')
-            }
-            steps {
-                echo "Deploying ${ONTRACK_VERSION} from branch ${ONTRACK_TARGET_BRANCH_NAME} in production"
-                // Running the deployment
-                timeout(time: 15, unit: 'MINUTES') {
-                    script {
-                        sshagent(credentials: ['ONTRACK_SSH_KEY']) {
-                            sh '''
-                                SSH_OPTIONS=StrictHostKeyChecking=no
-                                
-                                SSH_HOST=${ONTRACK_IP}
-                                
-                                scp -o ${SSH_OPTIONS} compose/docker-compose-prod.yml root@${SSH_HOST}:/root
-                                ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONTRACK_POSTGRES_USER=${ONTRACK_POSTGRES_USR}" "ONTRACK_POSTGRES_PASSWORD=${ONTRACK_POSTGRES_PSW}" docker-compose --project-name prod --file /root/docker-compose-prod.yml up -d
-                                
-                                '''
-                        }
-                    }
-                }
-            }
-        }
-
-        // Production tests
-
-        stage('Production tests') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
-            when {
-                beforeAgent true
-                branch "master"
-            }
-            environment {
-                ONTRACK_ACCEPTANCE_ADMIN = credentials("ONTRACK_ACCEPTANCE_ADMIN")
-            }
-            steps {
-                timeout(time: 30, unit: 'MINUTES') {
-                    sh '''
-                        echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-                        
-                        echo "(*) Launching the tests..."
-                        docker-compose \\
-                            --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
-                            --project-name production \\
-                            up --exit-code-from ontrack_acceptance
-                        '''
-                }
-            }
-            post {
-                always {
-                    sh '''
-                        echo "(*) Copying the test results..."
-                        mkdir -p build
-                        cp -r ontrack-acceptance/src/main/compose/build build/production
-                        
-                        echo "(*) Removing the test environment..."
-                        docker-compose \\
-                            --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
-                            --project-name production \\
-                            down
-                        
-                        '''
-                    archiveArtifacts 'build/production/**'
-                    script {
-                        def results = junit 'build/production/*.xml'
-                        ontrackValidate(
-                                project: ONTRACK_PROJECT_NAME,
-                                branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
-                                build: env.ONTRACK_VERSION as String,
-                                validationStamp: 'ONTRACK.SMOKE',
-                                testResults: results,
-                        )
-                    }
-                }
-                success {
-                    ontrackPromote(
-                            project: ONTRACK_PROJECT_NAME,
-                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
-                            build: env.ONTRACK_VERSION as String,
-                            promotionLevel: 'ONTRACK',
                     )
                 }
             }
