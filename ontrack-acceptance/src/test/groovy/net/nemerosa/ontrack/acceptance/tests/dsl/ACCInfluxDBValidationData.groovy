@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.acceptance.tests.dsl
 
 import net.nemerosa.ontrack.acceptance.AcceptanceTestClient
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import net.nemerosa.ontrack.dsl.TestSummary
+import net.nemerosa.ontrack.dsl.v4.TestSummary
 import org.influxdb.InfluxDBFactory
 import org.influxdb.annotation.Column
 import org.influxdb.annotation.Measurement

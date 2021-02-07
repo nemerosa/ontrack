@@ -2,8 +2,8 @@ package net.nemerosa.ontrack.acceptance.tests.dsl
 
 import net.nemerosa.ontrack.acceptance.AbstractACCDSL
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import net.nemerosa.ontrack.dsl.SearchResult
-import net.nemerosa.ontrack.dsl.http.OTNotFoundException
+import net.nemerosa.ontrack.dsl.v4.SearchResult
+import net.nemerosa.ontrack.dsl.v4.http.OTNotFoundException
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid

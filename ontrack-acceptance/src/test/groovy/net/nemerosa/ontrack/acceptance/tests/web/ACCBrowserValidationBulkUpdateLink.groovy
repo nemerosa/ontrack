@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.acceptance.tests.web
 import net.nemerosa.ontrack.acceptance.AcceptanceTestClient
 import net.nemerosa.ontrack.acceptance.browser.pages.ValidationStampPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import net.nemerosa.ontrack.dsl.ValidationStamp
+import net.nemerosa.ontrack.dsl.v4.ValidationStamp
 import org.junit.Before
 import org.junit.Test
 

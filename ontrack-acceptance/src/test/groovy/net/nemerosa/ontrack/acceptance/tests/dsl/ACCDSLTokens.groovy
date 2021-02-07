@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.acceptance.tests.dsl
 
 import net.nemerosa.ontrack.acceptance.AbstractACCDSL
-import net.nemerosa.ontrack.dsl.Ontrack
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid

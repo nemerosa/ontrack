@@ -4,12 +4,12 @@ import net.nemerosa.ontrack.acceptance.AbstractACCDSL
 import net.nemerosa.ontrack.acceptance.AcceptanceTestContext
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import net.nemerosa.ontrack.dsl.Branch
-import net.nemerosa.ontrack.dsl.MetaInfo
-import net.nemerosa.ontrack.dsl.ObjectAlreadyExistsException
-import net.nemerosa.ontrack.dsl.Ontrack
-import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
-import net.nemerosa.ontrack.dsl.http.OTNotFoundException
+import net.nemerosa.ontrack.dsl.v4.Branch
+import net.nemerosa.ontrack.dsl.v4.MetaInfo
+import net.nemerosa.ontrack.dsl.v4.ObjectAlreadyExistsException
+import net.nemerosa.ontrack.dsl.v4.Ontrack
+import net.nemerosa.ontrack.dsl.v4.http.OTForbiddenClientException
+import net.nemerosa.ontrack.dsl.v4.http.OTNotFoundException
 import org.junit.Assert
 import org.junit.Test
 

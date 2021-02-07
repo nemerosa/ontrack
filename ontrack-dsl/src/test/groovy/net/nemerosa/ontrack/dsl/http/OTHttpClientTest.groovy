@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.dsl.http
 
+import net.nemerosa.ontrack.dsl.v4.http.OTHttpClient
 import org.apache.http.HttpHost
 import org.apache.http.conn.HttpHostConnectException
 import org.codehaus.groovy.runtime.InvokerInvocationException

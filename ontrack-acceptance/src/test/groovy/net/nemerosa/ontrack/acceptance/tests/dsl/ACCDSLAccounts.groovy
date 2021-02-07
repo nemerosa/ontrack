@@ -2,8 +2,8 @@ package net.nemerosa.ontrack.acceptance.tests.dsl
 
 import net.nemerosa.ontrack.acceptance.AbstractACCDSL
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
-import net.nemerosa.ontrack.dsl.http.OTMessageClientException
+import net.nemerosa.ontrack.dsl.v4.http.OTForbiddenClientException
+import net.nemerosa.ontrack.dsl.v4.http.OTMessageClientException
 import org.junit.Ignore
 import org.junit.Test
 

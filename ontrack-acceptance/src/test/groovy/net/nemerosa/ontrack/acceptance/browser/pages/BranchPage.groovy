@@ -2,8 +2,8 @@ package net.nemerosa.ontrack.acceptance.browser.pages
 
 import net.nemerosa.ontrack.acceptance.browser.Browser
 import net.nemerosa.ontrack.acceptance.browser.dialogs.ValidationRunDialog
-import net.nemerosa.ontrack.dsl.Build
-import net.nemerosa.ontrack.dsl.ValidationStamp
+import net.nemerosa.ontrack.dsl.v4.Build
+import net.nemerosa.ontrack.dsl.v4.ValidationStamp
 import org.openqa.selenium.WebElement
 
 class BranchPage extends AbstractHeaderPage {

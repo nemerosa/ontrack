@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.acceptance.config.AcceptanceConfigRule;
 import net.nemerosa.ontrack.client.*;
-import net.nemerosa.ontrack.dsl.http.OTMessageClientException;
+import net.nemerosa.ontrack.dsl.v4.http.OTMessageClientException;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.junit.Before;
 import org.junit.Rule;

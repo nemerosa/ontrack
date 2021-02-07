@@ -3,8 +3,8 @@ package net.nemerosa.ontrack.acceptance.tests.dsl
 import net.nemerosa.ontrack.acceptance.AcceptanceTestClient
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.client.OTHttpClientBuilder
-import net.nemerosa.ontrack.dsl.Ontrack
-import net.nemerosa.ontrack.dsl.OntrackConnection
+import net.nemerosa.ontrack.dsl.v4.Ontrack
+import net.nemerosa.ontrack.dsl.v4.OntrackConnection
 import org.apache.http.client.methods.HttpGet
 import org.junit.Before
 import org.junit.Test

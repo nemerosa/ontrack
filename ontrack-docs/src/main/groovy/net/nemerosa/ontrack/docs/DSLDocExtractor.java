@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.docs;
 
-import net.nemerosa.ontrack.dsl.doc.DSL;
-import net.nemerosa.ontrack.dsl.doc.DSLMethod;
-import net.nemerosa.ontrack.dsl.doc.DSLProperties;
+import net.nemerosa.ontrack.dsl.v4.doc.DSL;
+import net.nemerosa.ontrack.dsl.v4.doc.DSLMethod;
+import net.nemerosa.ontrack.dsl.v4.doc.DSLProperties;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.groovydoc.GroovyMethodDoc;

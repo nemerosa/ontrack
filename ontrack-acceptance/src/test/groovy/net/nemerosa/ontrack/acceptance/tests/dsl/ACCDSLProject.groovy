@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.acceptance.tests.dsl
 
 import net.nemerosa.ontrack.acceptance.AbstractACCDSL
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import net.nemerosa.ontrack.dsl.properties.MainBuildLinks
+import net.nemerosa.ontrack.dsl.v4.properties.MainBuildLinks
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid

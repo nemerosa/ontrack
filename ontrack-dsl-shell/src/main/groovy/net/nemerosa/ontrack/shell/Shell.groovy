@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.shell
 
 import groovy.json.JsonOutput
-import net.nemerosa.ontrack.dsl.DSLException
-import net.nemerosa.ontrack.dsl.Ontrack
-import net.nemerosa.ontrack.dsl.OntrackConnection
-import net.nemerosa.ontrack.dsl.OntrackLogger
+import net.nemerosa.ontrack.dsl.v4.DSLException
+import net.nemerosa.ontrack.dsl.v4.Ontrack
+import net.nemerosa.ontrack.dsl.v4.OntrackConnection
+import net.nemerosa.ontrack.dsl.v4.OntrackLogger
 import org.kohsuke.args4j.CmdLineException
 import org.kohsuke.args4j.CmdLineParser
 

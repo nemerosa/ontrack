@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.docs;
 
-import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.dsl.v4.Ontrack;
 
 import java.io.File;
 import java.io.IOException;

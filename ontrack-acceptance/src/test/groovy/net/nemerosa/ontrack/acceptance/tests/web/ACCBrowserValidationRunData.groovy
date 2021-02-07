@@ -5,8 +5,8 @@ import net.nemerosa.ontrack.acceptance.browser.dialogs.ValidationRunDialog
 import net.nemerosa.ontrack.acceptance.browser.pages.BranchPage
 import net.nemerosa.ontrack.acceptance.browser.pages.BuildPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import net.nemerosa.ontrack.dsl.Build
-import net.nemerosa.ontrack.dsl.ValidationStamp
+import net.nemerosa.ontrack.dsl.v4.Build
+import net.nemerosa.ontrack.dsl.v4.ValidationStamp
 import org.junit.Before
 import org.junit.Test
 import org.openqa.selenium.By

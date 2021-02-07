@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.docs
 
-import net.nemerosa.ontrack.dsl.doc.DSLMethod
+import net.nemerosa.ontrack.dsl.v4.doc.DSLMethod
 import org.codehaus.groovy.groovydoc.GroovyClassDoc
 import org.codehaus.groovy.groovydoc.GroovyMethodDoc
 import org.codehaus.groovy.groovydoc.GroovyRootDoc

@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import net.nemerosa.ontrack.dsl.ValidationRun
+import net.nemerosa.ontrack.dsl.v4.ValidationRun
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
