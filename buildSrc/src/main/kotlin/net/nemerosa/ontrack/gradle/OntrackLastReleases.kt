@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.gradle
 
-import net.nemerosa.ontrack.dsl.Build
+import net.nemerosa.ontrack.dsl.v4.Build
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction

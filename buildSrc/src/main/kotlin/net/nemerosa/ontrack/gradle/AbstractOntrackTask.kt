@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.gradle
 
-import net.nemerosa.ontrack.dsl.Ontrack
-import net.nemerosa.ontrack.dsl.OntrackConnection
+import net.nemerosa.ontrack.dsl.v4.Ontrack
+import net.nemerosa.ontrack.dsl.v4.OntrackConnection
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 
