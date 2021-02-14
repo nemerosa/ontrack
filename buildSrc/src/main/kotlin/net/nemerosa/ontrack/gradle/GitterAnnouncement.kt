@@ -54,8 +54,8 @@ open class GitterAnnouncement : DefaultTask() {
         val httpPost = HttpPost("$url/v1/rooms/$roomId/chatMessages")
         httpPost.addHeader("Authorization", "Bearer $token")
         httpPost.entity = StringEntity(
-                jsonPayload,
-                ContentType.create("application/json", "UTF-8")
+            jsonPayload,
+            ContentType.create("application/json", "UTF-8")
         )
         val httpResponse = httpClient.execute(httpPost)
         if (httpResponse.statusLine?.statusCode != HttpStatus.SC_OK) {
