@@ -619,6 +619,7 @@ pipeline {
             environment {
                 GITHUB_TOKEN = credentials("JENKINS_GITHUB_TOKEN")
                 GITTER_TOKEN = credentials("GITTER_TOKEN")
+                ONTRACK = credentials("ONTRACK_SERVICE_ACCOUNT")
             }
             when {
                 beforeAgent true
@@ -632,6 +633,8 @@ pipeline {
                         --info \\
                         --console plain \\
                         --stacktrace \\
+                        -PontrackUser=${ONTRACK_USR} \\
+                        -PontrackPassword=${ONTRACK_PSW} \\
                         -PgitHubToken=${GITHUB_TOKEN} \\
                         -PgitHubCommit=${GIT_COMMIT} \\
                         -PgitHubChangeLogReleaseBranch=${ONTRACK_BRANCH_NAME} \\
