@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.json.isNullOrNullNode
+import net.nemerosa.ontrack.model.security.ProjectCreation
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.BranchFavouriteService
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -185,6 +186,122 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
                 assertEquals("The name can only have letters, digits, dots (.), dashes (-) or underscores (_).", error["message"].asText())
                 assertEquals("net.nemerosa.ontrack.graphql.support.MutationInputValidationException", error["exception"].asText())
                 assertTrue(data["createBranch"]["branch"].isNullOrNullNode(), "Branch not returned")
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a branch in get mode from a project ID`() {
+        asAdmin {
+            project {
+                val data = run(
+                    """
+                        mutation  {
+                            createBranchOrGet(input: {projectId: $id, name: "main"}) {
+                                branch {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """
+                )
+                // Checks the errors
+                assertNoUserError(data, "createBranchOrGet")
+                val node = data["createBranchOrGet"]["branch"]
+                assertEquals("main", node["name"].asText())
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a branch in get mode from a project name`() {
+        asAdmin {
+            project {
+                val data = run(
+                    """
+                        mutation  {
+                            createBranchOrGet(input: {projectName: "$name", name: "main"}) {
+                                branch {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """
+                )
+                // Checks the errors
+                assertNoUserError(data, "createBranchOrGet")
+                val node = data["createBranchOrGet"]["branch"]
+                assertEquals("main", node["name"].asText())
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a branch in get mode for an existing branch from a project ID`() {
+        asAdmin {
+            project {
+                val branch = branch(name = "main")
+                val data = run(
+                    """
+                        mutation  {
+                            createBranchOrGet(input: {projectId: $id, name: "main"}) {
+                                branch {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """
+                )
+                // Checks the errors
+                assertNoUserError(data, "createBranchOrGet")
+                val node = data["createBranchOrGet"]["branch"]
+                assertEquals("main", node["name"].asText())
+                assertEquals(branch.id(), node["id"].asInt())
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a branch in get mode for an existing branch from a project name`() {
+        asAdmin {
+            project {
+                val branch = branch(name = "main")
+                val data = run(
+                    """
+                        mutation  {
+                            createBranchOrGet(input: {projectName: "$name", name: "main"}) {
+                                branch {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """
+                )
+                // Checks the errors
+                assertNoUserError(data, "createBranchOrGet")
+                val node = data["createBranchOrGet"]["branch"]
+                assertEquals("main", node["name"].asText())
+                assertEquals(branch.id(), node["id"].asInt())
             }
         }
     }
