@@ -186,15 +186,23 @@ object GraphQLBeanConverter {
         return builder
     }
 
-    private fun getScalarType(type: Class<*>): GraphQLScalarType? {
+    internal fun getScalarType(type: Class<*>): GraphQLScalarType? {
         return when {
+            // Raw Kotlin
             Int::class.java.isAssignableFrom(type) -> GraphQLInt
             Long::class.java.isAssignableFrom(type) -> GraphQLLong
             Double::class.java.isAssignableFrom(type) -> GraphQLFloat
             Float::class.java.isAssignableFrom(type) -> GraphQLFloat
-            java.lang.Boolean::class.java.isAssignableFrom(type) -> GraphQLBoolean
             Boolean::class.java.isAssignableFrom(type) -> GraphQLBoolean
             String::class.java.isAssignableFrom(type) -> GraphQLString
+            // Java equivalents
+            java.lang.Integer::class.java.isAssignableFrom(type) -> GraphQLInt
+            java.lang.Long::class.java.isAssignableFrom(type) -> GraphQLLong
+            java.lang.Double::class.java.isAssignableFrom(type) -> GraphQLFloat
+            java.lang.Float::class.java.isAssignableFrom(type) -> GraphQLFloat
+            java.lang.Boolean::class.java.isAssignableFrom(type) -> GraphQLBoolean
+            java.lang.String::class.java.isAssignableFrom(type) -> GraphQLString
+            // Custom scalar types
             JsonNode::class.java.isAssignableFrom(type) -> GQLScalarJSON.INSTANCE
             LocalDateTime::class.java.isAssignableFrom(type) -> GQLScalarLocalDateTime.INSTANCE
             else -> null

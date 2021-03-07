@@ -10,5 +10,6 @@ class Person(
         val address: String,
         val age: Int,
         @get:JsonProperty("developer")
-        val isDeveloper: Boolean
+        val isDeveloper: Boolean,
+        val experience: Int?
 )

@@ -21,18 +21,50 @@ class GraphQLBeanConverterTest {
     }
 
     @Test
+    fun `Scalar types`() {
+        assertNotNull(GraphQLBeanConverter.getScalarType(String::class.java)) {
+            assertEquals("String", it.name)
+        }
+        assertNotNull(GraphQLBeanConverter.getScalarType(Int::class.java)) {
+            assertEquals("Int", it.name)
+        }
+        assertNotNull(GraphQLBeanConverter.getScalarType(Integer::class.java)) {
+            assertEquals("Int", it.name)
+        }
+    }
+
+    @Test
     fun `Simple type`() {
         val type = GraphQLBeanConverter.asObjectType(Person::class, cache)
         assertEquals("Person", type.name)
         val fields = fieldToTypeNames(type.fieldDefinitions)
         assertEquals(
-                mapOf(
-                        "address" to "String!",
-                        "age" to "Int!",
-                        "name" to "String!",
-                        "developer" to "Boolean!"
-                ),
-                fields
+            mapOf(
+                "address" to "String!",
+                "age" to "Int!",
+                "name" to "String!",
+                "developer" to "Boolean!",
+                "experience" to "Int"
+            ),
+            fields
+        )
+    }
+
+    @Test
+    fun `Simple input type`() {
+        val fields = GraphQLBeanConverter.asInputFields(Person::class)
+        val indexedFields = fields.associate {
+            it.name to typeName(it.type)
+        }
+        assertEquals(
+            mapOf(
+                "address" to "String!",
+                "age" to "Int!",
+                "name" to "String!",
+                "developer" to "Boolean!",
+                "experience" to "Int"
+            ),
+            indexedFields
         )
     }
 
@@ -54,12 +86,12 @@ class GraphQLBeanConverterTest {
         assertEquals("Account", type.name)
         val fields = fieldToTypeNames(type.fieldDefinitions)
         assertEquals(
-                mapOf(
-                        "username" to "String!",
-                        "password" to "String!",
-                        "identity" to "Person!"
-                ),
-                fields
+            mapOf(
+                "username" to "String!",
+                "password" to "String!",
+                "identity" to "Person!"
+            ),
+            fields
         )
     }
 
@@ -69,11 +101,11 @@ class GraphQLBeanConverterTest {
         assertEquals("OnBehalf", type.name)
         val fields = fieldToTypeNames(type.fieldDefinitions)
         assertEquals(
-                mapOf(
-                        "delegate" to "Account!",
-                        "account" to "Account!"
-                ),
-                fields
+            mapOf(
+                "delegate" to "Account!",
+                "account" to "Account!"
+            ),
+            fields
         )
     }
 
@@ -124,9 +156,9 @@ class GraphQLBeanConverterTest {
         }
 
         fun fieldToTypeNames(fields: List<GraphQLFieldDefinition>): Map<String, String> =
-                fields.associate {
-                    it.name to typeName(it.type)
-                }
+            fields.associate {
+                it.name to typeName(it.type)
+            }
 
     }
 
