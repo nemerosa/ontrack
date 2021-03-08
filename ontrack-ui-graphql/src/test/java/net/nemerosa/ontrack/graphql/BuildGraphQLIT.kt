@@ -1,8 +1,11 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.model.structure.Build
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -10,6 +13,478 @@ import kotlin.test.assertTrue
  * Integration tests around the `builds` root query.
  */
 class BuildGraphQLIT : AbstractQLKTITSupport() {
+
+    @Test
+    fun `Creating a build from a branch ID`() {
+        asAdmin {
+            project project@{
+                branch branch@{
+                    val data = run("""
+                        mutation {
+                            createBuild(input: {branchId: ${this@branch.id}, name: "1"}) {
+                                build {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    // Checks the build has been created
+                    assertNotNull(
+                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                        "Build has been created")
+                    // Checks the data
+                    val build = data["createBuild"]["build"]
+                    assertTrue(build["id"].asInt() > 0, "ID is set")
+                    assertEquals("1", build["name"].asText(), "Name is OK")
+                    assertTrue(data["createBuild"]["errors"].isNullOrNullNode(), "No error")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a build from a branch ID with invalid name`() {
+        asAdmin {
+            project project@{
+                branch branch@{
+                    val data = run("""
+                        mutation {
+                            createBuild(input: {branchId: ${this@branch.id}, name: "1 0"}) {
+                                build {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    // Checks the errors
+                    val error = data["createBuild"]["errors"][0]
+                    assertEquals("The name can only have letters, digits, dots (.), dashes (-) or underscores (_).", error["message"].asText())
+                    assertEquals("net.nemerosa.ontrack.graphql.support.MutationInputValidationException", error["exception"].asText())
+                    assertTrue(data["createBuild"]["build"].isNullOrNullNode(), "Build not returned")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a build from a branch ID with existing name`() {
+        asAdmin {
+            project project@{
+                branch branch@{
+                    build(name = "1")
+                    val data = run("""
+                        mutation {
+                            createBuild(input: {branchId: ${this@branch.id}, name: "1"}) {
+                                build {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    // Checks the errors
+                    val error = data["createBuild"]["errors"][0]
+                    assertEquals("Build name already exists: 1", error["message"].asText())
+                    assertEquals("net.nemerosa.ontrack.model.exceptions.BuildNameAlreadyDefinedException", error["exception"].asText())
+                    assertTrue(data["createBuild"]["build"].isNullOrNullNode(), "Build not returned")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a build from a project ID and branch name`() {
+        asAdmin {
+            project project@{
+                branch branch@{
+                    val data = run("""
+                        mutation {
+                            createBuild(input: {projectId: ${this@project.id}, branchName: "${this@branch.name}", name: "1"}) {
+                                build {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    // Checks the build has been created
+                    assertNotNull(
+                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                        "Build has been created")
+                    // Checks the data
+                    val build = data["createBuild"]["build"]
+                    assertTrue(build["id"].asInt() > 0, "ID is set")
+                    assertEquals("1", build["name"].asText(), "Name is OK")
+                    assertTrue(data["createBuild"]["errors"].isNullOrNullNode(), "No error")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a build from a project name and branch name`() {
+        asAdmin {
+            project project@{
+                branch branch@{
+                    val data = run("""
+                        mutation {
+                            createBuild(input: {projectName: "${this@project.name}", branchName: "${this@branch.name}", name: "1"}) {
+                                build {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    // Checks the build has been created
+                    assertNotNull(
+                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                        "Build has been created")
+                    // Checks the data
+                    val build = data["createBuild"]["build"]
+                    assertTrue(build["id"].asInt() > 0, "ID is set")
+                    assertEquals("1", build["name"].asText(), "Name is OK")
+                    assertTrue(data["createBuild"]["errors"].isNullOrNullNode(), "No error")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a build from a project ID and missing branch name`() {
+        asAdmin {
+            project project@{
+                branch branch@{
+                    build(name = "1")
+                    val data = run("""
+                        mutation {
+                            createBuild(input: {projectId: ${this@project.id}, name: "1"}) {
+                                build {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    // Checks the errors
+                    val error = data["createBuild"]["errors"][0]
+                    assertEquals("branchName is required if branchId is not provided", error["message"].asText())
+                    assertEquals("net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException", error["exception"].asText())
+                    assertTrue(data["createBuild"]["build"].isNullOrNullNode(), "Build not returned")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a build from a branch name and missing project information`() {
+        asAdmin {
+            project project@{
+                branch branch@{
+                    build(name = "1")
+                    val data = run("""
+                        mutation {
+                            createBuild(input: {branchName: "${this@branch.name}", name: "1"}) {
+                                build {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    // Checks the errors
+                    val error = data["createBuild"]["errors"][0]
+                    assertEquals("When using branchName, projectName is required if projectId is not provided", error["message"].asText())
+                    assertEquals("net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException", error["exception"].asText())
+                    assertTrue(data["createBuild"]["build"].isNullOrNullNode(), "Build not returned")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a build from a branch ID and superfluous branch name`() {
+        asAdmin {
+            project project@{
+                branch branch@{
+                    build(name = "1")
+                    val data = run("""
+                        mutation {
+                            createBuild(input: {branchId: ${this@branch.id}, branchName: "${this@branch.name}", name: "1"}) {
+                                build {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    // Checks the errors
+                    val error = data["createBuild"]["errors"][0]
+                    assertEquals("Since branchId is provided, branchName is not required.", error["message"].asText())
+                    assertEquals("net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException", error["exception"].asText())
+                    assertTrue(data["createBuild"]["build"].isNullOrNullNode(), "Build not returned")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a build from a branch ID and superfluous project name`() {
+        asAdmin {
+            project project@{
+                branch branch@{
+                    build(name = "1")
+                    val data = run("""
+                        mutation {
+                            createBuild(input: {branchId: ${this@branch.id}, projectName: "${this@project.name}", name: "1"}) {
+                                build {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    // Checks the errors
+                    val error = data["createBuild"]["errors"][0]
+                    assertEquals("Since branchId is provided, projectName is not required.", error["message"].asText())
+                    assertEquals("net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException", error["exception"].asText())
+                    assertTrue(data["createBuild"]["build"].isNullOrNullNode(), "Build not returned")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a build from a branch ID and superfluous project ID`() {
+        asAdmin {
+            project project@{
+                branch branch@{
+                    build(name = "1")
+                    val data = run("""
+                        mutation {
+                            createBuild(input: {branchId: ${this@branch.id}, projectId: ${this@project.id}, name: "1"}) {
+                                build {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    // Checks the errors
+                    val error = data["createBuild"]["errors"][0]
+                    assertEquals("Since branchId is provided, projectId is not required.", error["message"].asText())
+                    assertEquals("net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException", error["exception"].asText())
+                    assertTrue(data["createBuild"]["build"].isNullOrNullNode(), "Build not returned")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a build from a project ID, branch name and superfluous project name`() {
+        asAdmin {
+            project project@{
+                branch branch@{
+                    build(name = "1")
+                    val data = run("""
+                        mutation {
+                            createBuild(input: {branchName: "${this@branch.name}", projectId: ${this@project.id}, projectName: "${this@project.name}", name: "1"}) {
+                                build {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    // Checks the errors
+                    val error = data["createBuild"]["errors"][0]
+                    assertEquals("Since projectId is provided, projectName is not required.", error["message"].asText())
+                    assertEquals("net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException", error["exception"].asText())
+                    assertTrue(data["createBuild"]["build"].isNullOrNullNode(), "Build not returned")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a build in get mode from a branch ID`() {
+        asAdmin {
+            project project@{
+                branch branch@{
+                    val data = run("""
+                        mutation {
+                            createBuildOrGet(input: {branchId: ${this@branch.id}, name: "1"}) {
+                                build {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    // Checks the build has been created
+                    assertNotNull(
+                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                        "Build has been created")
+                    // Checks the data
+                    val build = data["createBuildOrGet"]["build"]
+                    assertTrue(build["id"].asInt() > 0, "ID is set")
+                    assertEquals("1", build["name"].asText(), "Name is OK")
+                    assertTrue(data["createBuildOrGet"]["errors"].isNullOrNullNode(), "No error")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a build in get mode from a branch name and project name`() {
+        asAdmin {
+            project project@{
+                branch branch@{
+                    val data = run("""
+                        mutation {
+                            createBuildOrGet(input: {projectName: "${this@project.name}", branchName: "${this@branch.name}", name: "1"}) {
+                                build {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    // Checks the build has been created
+                    assertNotNull(
+                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                        "Build has been created")
+                    // Checks the data
+                    val build = data["createBuildOrGet"]["build"]
+                    assertTrue(build["id"].asInt() > 0, "ID is set")
+                    assertEquals("1", build["name"].asText(), "Name is OK")
+                    assertTrue(data["createBuildOrGet"]["errors"].isNullOrNullNode(), "No error")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a build in get mode for an existing build from a branch ID`() {
+        asAdmin {
+            project project@{
+                branch branch@{
+                    val existing = build(name = "1")
+                    val data = run("""
+                        mutation {
+                            createBuildOrGet(input: {branchId: ${this@branch.id}, name: "1"}) {
+                                build {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    // Checks the build has been created
+                    assertNotNull(
+                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                        "Build has been created")
+                    // Checks the data
+                    val build = data["createBuildOrGet"]["build"]
+                    assertEquals(existing.id(), build["id"].asInt(), "ID is the same")
+                    assertEquals("1", build["name"].asText(), "Name is OK")
+                    assertTrue(data["createBuildOrGet"]["errors"].isNullOrNullNode(), "No error")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a build in get mode for an existing build from a branch name and project name`() {
+        asAdmin {
+            project project@{
+                branch branch@{
+                    val existing = build(name = "1")
+                    val data = run("""
+                        mutation {
+                            createBuildOrGet(input: {projectName: "${this@project.name}", branchName: "${this@branch.name}", name: "1"}) {
+                                build {
+                                    id
+                                    name
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    // Checks the build has been created
+                    assertNotNull(
+                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                        "Build has been created")
+                    // Checks the data
+                    val build = data["createBuildOrGet"]["build"]
+                    assertEquals(existing.id(), build["id"].asInt(), "ID is the same")
+                    assertEquals("1", build["name"].asText(), "Name is OK")
+                    assertTrue(data["createBuildOrGet"]["errors"].isNullOrNullNode(), "No error")
+                }
+            }
+        }
+    }
 
     @Test
     fun `Filtered build links`() {
@@ -51,8 +526,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                         this["builds"][0]["using"]["pageItems"].map { it["name"].asText() }.toSet()
                     }.run {
                         assertEquals(
-                                setOf("1.0", "2.0", "3.0"),
-                                this
+                            setOf("1.0", "2.0", "3.0"),
+                            this
                         )
                     }
 
@@ -70,8 +545,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                         this["builds"][0]["using"]["pageItems"].map { it["name"].asText() }.toSet()
                     }.run {
                         assertEquals(
-                                setOf("1.0", "2.0"),
-                                this
+                            setOf("1.0", "2.0"),
+                            this
                         )
                     }
 
@@ -89,8 +564,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                         this["builds"][0]["using"]["pageItems"].map { it["name"].asText() }.toSet()
                     }.run {
                         assertEquals(
-                                setOf("2.0"),
-                                this
+                            setOf("2.0"),
+                            this
                         )
                     }
                 }
@@ -143,8 +618,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
             }.run {
                 assertEquals(
-                        setOf("1.0", "2.0", "3.0"),
-                        this
+                    setOf("1.0", "2.0", "3.0"),
+                    this
                 )
             }
             // No filter, first one only
@@ -161,8 +636,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
             }.run {
                 assertEquals(
-                        setOf("3.0"),
-                        this
+                    setOf("3.0"),
+                    this
                 )
             }
             // Project restriction, all of them
@@ -179,8 +654,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
             }.run {
                 assertEquals(
-                        setOf("1.0", "2.0"),
-                        this
+                    setOf("1.0", "2.0"),
+                    this
                 )
             }
             // Project restriction, first one
@@ -197,8 +672,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
             }.run {
                 assertEquals(
-                        setOf("2.0"),
-                        this
+                    setOf("2.0"),
+                    this
                 )
             }
             // Branch restriction
@@ -215,8 +690,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
             }.run {
                 assertEquals(
-                        setOf("2.0"),
-                        this
+                    setOf("2.0"),
+                    this
                 )
             }
         }
@@ -392,8 +867,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     // Dependencies Ids
                     val dependencies = data["builds"][0]["using"]["pageItems"].map { it["id"].asInt() }
                     assertEquals(
-                            setOf(dep1.id(), dep2.id()),
-                            dependencies.toSet()
+                        setOf(dep1.id(), dep2.id()),
+                        dependencies.toSet()
                     )
                 }
             }
