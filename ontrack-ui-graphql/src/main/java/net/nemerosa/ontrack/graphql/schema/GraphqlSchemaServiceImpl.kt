@@ -11,6 +11,7 @@ class GraphqlSchemaServiceImpl(
         private val types: List<GQLType>,
         private val inputTypes: List<GQLInputType<*>>,
         private val interfaces: List<GQLInterface>,
+        private val enums: List<GQLEnum>,
         private val rootQueries: List<GQLRootQuery>,
         private val mutationProviders: List<MutationProvider>
 ) : GraphqlSchemaService {
@@ -25,6 +26,7 @@ class GraphqlSchemaServiceImpl(
         val dictionary = mutableSetOf<GraphQLType>()
         dictionary.addAll(types.map { it.createType(cache) })
         dictionary.addAll(interfaces.map { it.createInterface() })
+        dictionary.addAll(enums.map { it.createEnum() })
         dictionary.addAll(inputTypes.map { it.createInputType() })
         val mutationType = createMutationType(dictionary)
         return GraphQLSchema.newSchema()
