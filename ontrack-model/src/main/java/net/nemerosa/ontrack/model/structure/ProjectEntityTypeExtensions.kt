@@ -6,6 +6,7 @@ package net.nemerosa.ontrack.model.structure
  */
 val ProjectEntityType.varName: String
     get() = name.toLowerCase().split("_").joinToString("") { it.capitalize() }.decapitalize()
+
 /**
  * Name suitable for generating a code type.
  */

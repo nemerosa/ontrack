@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode
 import graphql.Scalars.GraphQLInt
 import graphql.Scalars.GraphQLString
 import graphql.schema.*
-import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
-import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
-import net.nemerosa.ontrack.graphql.support.getMutationInputField
-import net.nemerosa.ontrack.graphql.support.getRequiredMutationInputField
+import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.exceptions.NotFoundException
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 
@@ -23,8 +21,8 @@ class PropertiesMutations(
 
     private val genericMutations: List<Mutation> = ProjectEntityType.values().flatMap { projectEntityType ->
         listOf(
-            createGenericMutationById(projectEntityType)
-            // TODO createGenericMutationByName(projectEntityType)
+            createGenericMutationById(projectEntityType),
+            createGenericMutationByName(projectEntityType)
         )
     }
 
@@ -32,7 +30,7 @@ class PropertiesMutations(
 
     private fun createGenericMutationById(type: ProjectEntityType) = object : Mutation {
 
-        override val name: String = "set${type.typeName}Property"
+        override val name: String = "set${type.typeName}PropertyById"
 
         override val description: String = "Sets a property on a ${type.displayName} identified by ID"
 
@@ -46,7 +44,7 @@ class PropertiesMutations(
             projectEntityTypeField(type)
         )
 
-        override fun fetch(env: DataFetchingEnvironment): Any {
+        override fun fetch(env: DataFetchingEnvironment): Map<String, ProjectEntity> {
             val id: Int = getRequiredMutationInputField(env, ARG_ID)
             val propertyName: String = getRequiredMutationInputField(env, ARG_PROPERTY_TYPE)
             val propertyValue: JsonNode? = getMutationInputField<Any>(env, ARG_PROPERTY_VALUE)?.asJson()
@@ -74,9 +72,53 @@ class PropertiesMutations(
         return entity
     }
 
-    private fun createGenericMutationByName(type: ProjectEntityType): Mutation {
-        TODO()
+    private fun createGenericMutationByName(type: ProjectEntityType) = object : Mutation {
+
+        override val name: String = "set${type.typeName}Property"
+
+        override val description: String = "Sets a property on a ${type.displayName} identified by name"
+
+        override val inputFields: List<GraphQLInputObjectField> = type.names.map {
+            name(it)
+        } + listOf(
+            propertyType(),
+            propertyValue()
+        )
+
+        override val outputFields: List<GraphQLFieldDefinition> = listOf(
+            projectEntityTypeField(type)
+        )
+
+        override fun fetch(env: DataFetchingEnvironment): Map<String, ProjectEntity> {
+            val names = type.names.associateWith { name ->
+                getRequiredMutationInputField<String>(env, name)
+            }
+            val propertyName: String = getRequiredMutationInputField(env, ARG_PROPERTY_TYPE)
+            val propertyValue: JsonNode? = getMutationInputField<Any>(env, ARG_PROPERTY_VALUE)?.asJson()
+            // Loads the entity
+            val entity: ProjectEntity = type.loadByNames(structureService, names)
+                ?: throw EntityNotFoundByNameException(type, names)
+            // Edition
+            val result = editProperty(entity, propertyName, propertyValue)
+            // Result
+            return mapOf(
+                type.varName to result
+            )
+        }
     }
+
+    class EntityNotFoundByNameException(
+        type: ProjectEntityType,
+        names: Map<String, String>
+    ) : NotFoundException(
+        """Cannot find ${type.displayName} using names: $names."""
+    )
+
+    private fun name(name: String): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
+        .name(name)
+        .description("${name.capitalize()} name")
+        .type(GraphQLNonNull(GraphQLString))
+        .build()
 
     private fun id(type: ProjectEntityType): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
         .name(ARG_ID)
