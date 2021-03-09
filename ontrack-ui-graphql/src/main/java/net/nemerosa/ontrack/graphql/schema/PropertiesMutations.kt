@@ -4,7 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode
 import graphql.Scalars.GraphQLInt
 import graphql.Scalars.GraphQLString
 import graphql.schema.*
-import net.nemerosa.ontrack.graphql.support.*
+import net.nemerosa.ontrack.common.BaseException
+import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
+import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
+import net.nemerosa.ontrack.graphql.support.getMutationInputField
+import net.nemerosa.ontrack.graphql.support.getRequiredMutationInputField
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.exceptions.NotFoundException
 import net.nemerosa.ontrack.model.structure.*
@@ -16,17 +20,30 @@ import org.springframework.stereotype.Component
 @Component
 class PropertiesMutations(
     private val structureService: StructureService,
-    private val propertyService: PropertyService
+    private val propertyService: PropertyService,
+    private val propertyMutationProviders: List<PropertyMutationProvider<*>>
 ) : TypedMutationProvider() {
 
-    private val genericMutations: List<Mutation> = ProjectEntityType.values().flatMap { projectEntityType ->
-        listOf(
-            createGenericMutationById(projectEntityType),
-            createGenericMutationByName(projectEntityType)
-        )
-    }
+    private val genericMutations: List<Mutation>
+        get() = ProjectEntityType.values().flatMap { projectEntityType ->
+            listOf(
+                createGenericMutationById(projectEntityType),
+                createGenericMutationByName(projectEntityType)
+            )
+        }
 
-    override val mutations: List<Mutation> = genericMutations
+    private val specificMutations: List<Mutation>
+        get() {
+            // Get the list of all property types
+            val propertyTypes = propertyService.propertyTypes
+            // For each property type
+            return propertyTypes.flatMap { propertyType ->
+                createSpecificPropertyMutations(propertyType)
+            }
+        }
+
+    override val mutations: List<Mutation>
+        get() = genericMutations + specificMutations
 
     private fun createGenericMutationById(type: ProjectEntityType) = object : Mutation {
 
@@ -57,6 +74,72 @@ class PropertiesMutations(
                 type.varName to result
             )
         }
+    }
+
+    private fun <T> createSpecificPropertyMutations(propertyType: PropertyType<T>): List<Mutation> {
+        // Providers for this property
+        val providers = propertyMutationProviders.filter { it.propertyType.java.name == propertyType::class.java.name }
+        if (providers.size > 1) {
+            throw MultiplePropertyMutationProviderException(propertyType)
+        } else if (providers.size == 1) {
+            @Suppress("UNCHECKED_CAST")
+            val provider = providers.first() as PropertyMutationProvider<T>
+            // For each supported entity
+            return propertyType.supportedEntityTypes.flatMap { type ->
+                listOf(
+                    createSpecificPropertyMutationById(propertyType, provider, type)
+                    // TODO createSpecificPropertyMutationByName(propertyType, provider, type)
+                    // TODO createSpecificPropertyDeletionById(propertyType, provider, type)
+                    // TODO createSpecificPropertyDeletionByName(propertyType, provider, type)
+                )
+            }
+        } else {
+            return emptyList()
+        }
+    }
+
+    private fun <T> createSpecificPropertyMutationById(
+        propertyType: PropertyType<T>,
+        provider: PropertyMutationProvider<T>,
+        type: ProjectEntityType
+    ): Mutation {
+        return object : Mutation {
+            override val name: String = "set${type.typeName}${provider.mutationNameFragment}PropertyById"
+            override val description: String =
+                "Set the ${propertyType.name.decapitalize()} property on a ${type.displayName}."
+
+            override val inputFields: List<GraphQLInputObjectField> = listOf(
+                id(type)
+            ) + provider.inputFields
+
+            override val outputFields: List<GraphQLFieldDefinition> = listOf(
+                projectEntityTypeField(type)
+            )
+
+            override fun fetch(env: DataFetchingEnvironment): Any {
+                val id: Int = getRequiredMutationInputField(env, ARG_ID)
+                val value: T = provider.readInput(EnvPropertyMutationInput(env))
+                // Loads the entity
+                val entity: ProjectEntity = type.getEntityFn(structureService).apply(ID.of(id))
+                // Sets the property
+                propertyService.editProperty(entity, propertyType::class.java, value)
+                // OK
+                return mapOf(
+                    type.varName to entity
+                )
+            }
+        }
+    }
+
+    private class EnvPropertyMutationInput(
+        private val env: DataFetchingEnvironment
+    ) : PropertyMutationInput {
+
+        override fun <T> getRequiredInput(name: String): T =
+            getRequiredMutationInputField(env, name)
+
+        override fun <T> getInput(name: String): T? =
+            getMutationInputField(env, name)
     }
 
     private fun editProperty(entity: ProjectEntity, propertyName: String, propertyValue: JsonNode?): ProjectEntity {
@@ -112,6 +195,10 @@ class PropertiesMutations(
         names: Map<String, String>
     ) : NotFoundException(
         """Cannot find ${type.displayName} using names: $names."""
+    )
+
+    class MultiplePropertyMutationProviderException(propertyType: PropertyType<*>) : BaseException(
+        """Found multiple implementations of mutation providers for ${propertyType::class.java.name}. This is not supported."""
     )
 
     private fun name(name: String): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
