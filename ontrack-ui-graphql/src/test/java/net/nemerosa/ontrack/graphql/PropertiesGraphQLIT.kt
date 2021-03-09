@@ -60,6 +60,28 @@ class PropertiesGraphQLIT : AbstractQLKTITSupport() {
                 assertEquals("My message", property.text)
             }
         }
+
+        // Deleting the property
+        run("""
+            mutation {
+                set${projectEntityType.typeName}Property(input: {id: $id, property: "$testPropertyName", value: null}) {
+                    ${projectEntityType.varName} {
+                        id
+                    }
+                    errors {
+                        message
+                    }
+                }
+            }
+        """).let { data ->
+            val nodeName = "set${projectEntityType.typeName}Property"
+            assertNoUserError(data, nodeName)
+            val returnedEntityId = data.path(nodeName).path(projectEntityType.varName).path("id").asInt()
+            assertEquals(this.id(), returnedEntityId)
+
+            val property = getProperty(this, MessagePropertyType::class.java)
+            assertNull(property)
+        }
     }
 
     @Test
