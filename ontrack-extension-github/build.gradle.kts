@@ -10,6 +10,7 @@ dependencies {
     api(project(":ontrack-extension-git"))
     api("org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5")
 
+    implementation(project(":ontrack-ui-graphql"))
     implementation("org.apache.commons:commons-lang3")
 
     testImplementation(project(":ontrack-test-utils"))
