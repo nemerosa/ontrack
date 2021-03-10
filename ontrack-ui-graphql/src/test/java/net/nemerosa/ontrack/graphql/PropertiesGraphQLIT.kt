@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.extension.general.MessageProperty
 import net.nemerosa.ontrack.extension.general.MessagePropertyType
 import net.nemerosa.ontrack.extension.general.MessageType
 import net.nemerosa.ontrack.model.structure.*
@@ -9,6 +10,58 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 class PropertiesGraphQLIT : AbstractQLKTITSupport() {
+
+    @Test
+    fun `Getting a property by type for an entity`() {
+        asAdmin {
+            project {
+                branch {
+                    build {
+                        setProperty(this,
+                            MessagePropertyType::class.java,
+                            MessageProperty(MessageType.INFO, "My message"))
+                        run("""{
+                            builds(id: $id) {
+                                properties(type: "$testPropertyName") {
+                                    value
+                                }
+                            }
+                        }""").let { data ->
+                            val property = data.path("builds").path(0).path("properties").path(0).path("value")
+                            assertEquals("INFO", property.path("type").asText())
+                            assertEquals("My message", property.path("text").asText())
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting a property for an entity`() {
+        asAdmin {
+            project {
+                branch {
+                    build {
+                        setProperty(this,
+                            MessagePropertyType::class.java,
+                            MessageProperty(MessageType.INFO, "My message"))
+                        run("""{
+                            builds(id: $id) {
+                                messageProperty {
+                                    value
+                                }
+                            }
+                        }""").let { data ->
+                            val property = data.path("builds").path(0).path("messageProperty").path("value")
+                            assertEquals("INFO", property.path("type").asText())
+                            assertEquals("My message", property.path("text").asText())
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @Test
     fun `Edition of property by ID`() {
@@ -101,7 +154,7 @@ class PropertiesGraphQLIT : AbstractQLKTITSupport() {
     }
 
     private fun ProjectEntity.testPropertyEditionByName() {
-        val input = nameValues.map { (field, value) -> """$field: "$value""""}.joinToString(", ")
+        val input = nameValues.map { (field, value) -> """$field: "$value"""" }.joinToString(", ")
         run("""
             mutation {
                 set${projectEntityType.typeName}Property(input: {$input, property: "$testPropertyName", value: {type: "INFO", text: "My message"}}) {

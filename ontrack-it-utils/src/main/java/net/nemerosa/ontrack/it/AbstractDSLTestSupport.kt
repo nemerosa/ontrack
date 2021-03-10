@@ -484,6 +484,27 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         return BuildSearchAssertion(this, filter)
     }
 
+    /**
+     * Running some at all levels of a model
+     */
+    protected fun multiLevelTest(code: ProjectEntity.() -> Unit) {
+        asAdmin {
+            project {
+                code()
+                branch {
+                    code()
+                    val build = build {
+                        code()
+                    }
+                    val vs = validationStamp().apply { code() }
+                    val pl = promotionLevel { code() }
+                    build.validate(vs).apply { code() }
+                    build.promote(pl).apply { code() }
+                }
+            }
+        }
+    }
+
     protected class BuildSearchAssertion(
             private val branch: Branch,
             private val filter: BuildFilterProviderData<*>
