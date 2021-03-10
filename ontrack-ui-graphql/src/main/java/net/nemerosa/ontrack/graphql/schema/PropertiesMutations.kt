@@ -89,9 +89,9 @@ class PropertiesMutations(
                 // For each supported entity
                 return propertyType.supportedEntityTypes.flatMap { type ->
                     listOf(
-                        createSpecificPropertyMutationById(propertyType, provider, type)
+                        createSpecificPropertyMutationById(propertyType, provider, type),
                         // TODO createSpecificPropertyMutationByName(propertyType, provider, type)
-                        // TODO createSpecificPropertyDeletionById(propertyType, provider, type)
+                        createSpecificPropertyDeletionById(propertyType, provider, type)
                         // TODO createSpecificPropertyDeletionByName(propertyType, provider, type)
                     )
                 }
@@ -127,6 +127,39 @@ class PropertiesMutations(
                 val entity: ProjectEntity = type.getEntityFn(structureService).apply(ID.of(id))
                 // Sets the property
                 propertyService.editProperty(entity, propertyType::class.java, value)
+                // OK
+                return mapOf(
+                    type.varName to entity
+                )
+            }
+        }
+    }
+
+    private fun <T> createSpecificPropertyDeletionById(
+        propertyType: PropertyType<T>,
+        provider: PropertyMutationProvider<T>,
+        type: ProjectEntityType
+    ): Mutation {
+        return object : Mutation {
+            override val name: String = "delete${type.typeName}${provider.mutationNameFragment}PropertyById"
+            override val description: String =
+                "Deletes the ${propertyType.name.decapitalize()} property on a ${type.displayName}."
+
+            // Only the ID is needed
+            override val inputFields: List<GraphQLInputObjectField> = listOf(
+                id(type)
+            )
+
+            override val outputFields: List<GraphQLFieldDefinition> = listOf(
+                projectEntityTypeField(type)
+            )
+
+            override fun fetch(env: DataFetchingEnvironment): Any {
+                val id: Int = getRequiredMutationInputField(env, ARG_ID)
+                // Loads the entity
+                val entity: ProjectEntity = type.getEntityFn(structureService).apply(ID.of(id))
+                // Deletes the property
+                propertyService.deleteProperty(entity, propertyType::class.java)
                 // OK
                 return mapOf(
                     type.varName to entity

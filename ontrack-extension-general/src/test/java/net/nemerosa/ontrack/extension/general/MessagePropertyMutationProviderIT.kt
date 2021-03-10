@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.structure.varName
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class MessagePropertyMutationProviderIT : AbstractQLKTITSupport() {
 
@@ -54,27 +55,27 @@ class MessagePropertyMutationProviderIT : AbstractQLKTITSupport() {
             }
         }
 
-        // TODO Deleting the property
-//        run("""
-//            mutation {
-//                set${projectEntityType.typeName}PropertyById(input: {id: $id, property: "${PropertiesGraphQLIT.testPropertyName}", value: null}) {
-//                    ${projectEntityType.varName} {
-//                        id
-//                    }
-//                    errors {
-//                        message
-//                    }
-//                }
-//            }
-//        """).let { data ->
-//            val nodeName = "set${projectEntityType.typeName}PropertyById"
-//            assertNoUserError(data, nodeName)
-//            val returnedEntityId = data.path(nodeName).path(projectEntityType.varName).path("id").asInt()
-//            assertEquals(this.id(), returnedEntityId)
-//
-//            val property = getProperty(this, MessagePropertyType::class.java)
-//            assertNull(property)
-//        }
+        // Deleting the property
+        run("""
+            mutation {
+                delete${projectEntityType.typeName}MessagePropertyById(input: {id: $id}) {
+                    ${projectEntityType.varName} {
+                        id
+                    }
+                    errors {
+                        message
+                    }
+                }
+            }
+        """).let { data ->
+            val nodeName = "delete${projectEntityType.typeName}MessagePropertyById"
+            assertNoUserError(data, nodeName)
+            val returnedEntityId = data.path(nodeName).path(projectEntityType.varName).path("id").asInt()
+            assertEquals(this.id(), returnedEntityId)
+
+            val property = getProperty(this, MessagePropertyType::class.java)
+            assertNull(property)
+        }
     }
 
 }
