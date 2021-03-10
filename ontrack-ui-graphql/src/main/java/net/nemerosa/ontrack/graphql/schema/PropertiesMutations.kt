@@ -90,9 +90,9 @@ class PropertiesMutations(
                 return propertyType.supportedEntityTypes.flatMap { type ->
                     listOf(
                         createSpecificPropertyMutationById(propertyType, provider, type),
-                        // TODO createSpecificPropertyMutationByName(propertyType, provider, type)
-                        createSpecificPropertyDeletionById(propertyType, provider, type)
-                        // TODO createSpecificPropertyDeletionByName(propertyType, provider, type)
+                        createSpecificPropertyMutationByName(propertyType, provider, type),
+                        createSpecificPropertyDeletionById(propertyType, provider, type),
+                        createSpecificPropertyDeletionByName(propertyType, provider, type)
                     )
                 }
             }
@@ -127,6 +127,77 @@ class PropertiesMutations(
                 val entity: ProjectEntity = type.getEntityFn(structureService).apply(ID.of(id))
                 // Sets the property
                 propertyService.editProperty(entity, propertyType::class.java, value)
+                // OK
+                return mapOf(
+                    type.varName to entity
+                )
+            }
+        }
+    }
+
+    private fun <T> createSpecificPropertyMutationByName(
+        propertyType: PropertyType<T>,
+        provider: PropertyMutationProvider<T>,
+        type: ProjectEntityType
+    ): Mutation {
+        return object : Mutation {
+            override val name: String = "set${type.typeName}${provider.mutationNameFragment}Property"
+            override val description: String =
+                "Set the ${propertyType.name.decapitalize()} property on a ${type.displayName} identified by name."
+
+            override val inputFields: List<GraphQLInputObjectField> = type.names.map {
+                name(it)
+            } + provider.inputFields
+
+            override val outputFields: List<GraphQLFieldDefinition> = listOf(
+                projectEntityTypeField(type)
+            )
+
+            override fun fetch(env: DataFetchingEnvironment): Any {
+                val names = type.names.associateWith { name ->
+                    getRequiredMutationInputField<String>(env, name)
+                }
+                val value: T = provider.readInput(EnvPropertyMutationInput(env))
+                // Loads the entity
+                val entity: ProjectEntity = type.loadByNames(structureService, names)
+                    ?: throw EntityNotFoundByNameException(type, names)
+                // Sets the property
+                propertyService.editProperty(entity, propertyType::class.java, value)
+                // OK
+                return mapOf(
+                    type.varName to entity
+                )
+            }
+        }
+    }
+
+    private fun <T> createSpecificPropertyDeletionByName(
+        propertyType: PropertyType<T>,
+        provider: PropertyMutationProvider<T>,
+        type: ProjectEntityType
+    ): Mutation {
+        return object : Mutation {
+            override val name: String = "delete${type.typeName}${provider.mutationNameFragment}Property"
+            override val description: String =
+                "Deletes the ${propertyType.name.decapitalize()} property on a ${type.displayName} identified by name."
+
+            override val inputFields: List<GraphQLInputObjectField> = type.names.map {
+                name(it)
+            }
+
+            override val outputFields: List<GraphQLFieldDefinition> = listOf(
+                projectEntityTypeField(type)
+            )
+
+            override fun fetch(env: DataFetchingEnvironment): Any {
+                val names = type.names.associateWith { name ->
+                    getRequiredMutationInputField<String>(env, name)
+                }
+                // Loads the entity
+                val entity: ProjectEntity = type.loadByNames(structureService, names)
+                    ?: throw EntityNotFoundByNameException(type, names)
+                // Deletes the property
+                propertyService.deleteProperty(entity, propertyType::class.java)
                 // OK
                 return mapOf(
                     type.varName to entity
