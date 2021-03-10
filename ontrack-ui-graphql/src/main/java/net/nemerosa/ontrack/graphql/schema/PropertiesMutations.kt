@@ -79,22 +79,26 @@ class PropertiesMutations(
     private fun <T> createSpecificPropertyMutations(propertyType: PropertyType<T>): List<Mutation> {
         // Providers for this property
         val providers = propertyMutationProviders.filter { it.propertyType.java.name == propertyType::class.java.name }
-        if (providers.size > 1) {
-            throw MultiplePropertyMutationProviderException(propertyType)
-        } else if (providers.size == 1) {
-            @Suppress("UNCHECKED_CAST")
-            val provider = providers.first() as PropertyMutationProvider<T>
-            // For each supported entity
-            return propertyType.supportedEntityTypes.flatMap { type ->
-                listOf(
-                    createSpecificPropertyMutationById(propertyType, provider, type)
-                    // TODO createSpecificPropertyMutationByName(propertyType, provider, type)
-                    // TODO createSpecificPropertyDeletionById(propertyType, provider, type)
-                    // TODO createSpecificPropertyDeletionByName(propertyType, provider, type)
-                )
+        when {
+            providers.size > 1 -> {
+                throw MultiplePropertyMutationProviderException(propertyType)
             }
-        } else {
-            return emptyList()
+            providers.size == 1 -> {
+                @Suppress("UNCHECKED_CAST")
+                val provider = providers.first() as PropertyMutationProvider<T>
+                // For each supported entity
+                return propertyType.supportedEntityTypes.flatMap { type ->
+                    listOf(
+                        createSpecificPropertyMutationById(propertyType, provider, type)
+                        // TODO createSpecificPropertyMutationByName(propertyType, provider, type)
+                        // TODO createSpecificPropertyDeletionById(propertyType, provider, type)
+                        // TODO createSpecificPropertyDeletionByName(propertyType, provider, type)
+                    )
+                }
+            }
+            else -> {
+                return emptyList()
+            }
         }
     }
 

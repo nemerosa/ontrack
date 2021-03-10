@@ -15,7 +15,7 @@ class GitHubProjectConfigurationPropertyMutationProvider(
 
     override val propertyType: KClass<out PropertyType<GitHubProjectConfigurationProperty>> =
         GitHubProjectConfigurationPropertyType::class
-    override val mutationNameFragment: String = "gitHubConfiguration"
+    override val mutationNameFragment: String = "GitHubConfiguration"
 
     override val inputFields: List<GraphQLInputObjectField> = listOf(
         requiredStringInputField("configuration", "Name of the GitHub configuration to use"),

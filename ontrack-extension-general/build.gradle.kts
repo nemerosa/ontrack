@@ -14,6 +14,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
+    testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
     testImplementation("org.codehaus.groovy:groovy")
     testImplementation(project(":ontrack-it-utils"))
 
