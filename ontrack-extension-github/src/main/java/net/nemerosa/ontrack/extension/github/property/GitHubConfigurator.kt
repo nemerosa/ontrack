@@ -49,7 +49,7 @@ class GitHubConfigurator(
         )
     }
 
-    private fun getConfiguredIssueService(property: GitHubProjectConfigurationProperty): ConfiguredIssueService {
+    private fun getConfiguredIssueService(property: GitHubProjectConfigurationProperty): ConfiguredIssueService? {
         val identifier = property.issueServiceConfigurationIdentifier
         return if (identifier.isNullOrBlank() || isSelf(identifier)) {
             ConfiguredIssueService(

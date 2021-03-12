@@ -33,7 +33,7 @@ class CombinedIssueServiceExtension(
         val combinedIssueServiceConfiguration = issueServiceConfiguration as CombinedIssueServiceConfiguration
         return combinedIssueServiceConfiguration
                 .issueServiceConfigurationIdentifiers
-                .map { issueServiceRegistry.getConfiguredIssueService(it) }
+                .mapNotNull { issueServiceRegistry.getConfiguredIssueService(it) }
     }
 
     override fun getId(): String {

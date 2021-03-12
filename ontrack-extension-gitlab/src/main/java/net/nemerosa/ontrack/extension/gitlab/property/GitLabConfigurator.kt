@@ -49,7 +49,7 @@ class GitLabConfigurator(
         )
     }
 
-    private fun getConfiguredIssueService(property: GitLabProjectConfigurationProperty): ConfiguredIssueService {
+    private fun getConfiguredIssueService(property: GitLabProjectConfigurationProperty): ConfiguredIssueService? {
         val identifier = property.issueServiceConfigurationIdentifier
         return if (identifier.isNullOrBlank() || isSelf(identifier)) {
             ConfiguredIssueService(
