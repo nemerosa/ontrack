@@ -122,7 +122,7 @@ public class GitHubProjectConfigurationPropertyType
         GitHubProjectConfigurationProperty property = fromStorage(node);
         // Checks the issue service configuration
         String issueServiceConfigurationIdentifier = property.getIssueServiceConfigurationIdentifier();
-        if (StringUtils.isNotBlank(issueServiceConfigurationIdentifier)) {
+        if (StringUtils.isNotBlank(issueServiceConfigurationIdentifier) && !IssueServiceConfigurationRepresentation.isSelf(issueServiceConfigurationIdentifier)) {
             ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(issueServiceConfigurationIdentifier);
             if (configuredIssueService == null) {
                 throw new IssueServiceConfigurationIdentifierNotFoundException(issueServiceConfigurationIdentifier);
