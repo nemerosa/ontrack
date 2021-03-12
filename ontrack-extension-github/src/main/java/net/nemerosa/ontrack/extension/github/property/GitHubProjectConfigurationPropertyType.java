@@ -7,7 +7,10 @@ import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature;
 import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension;
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
+import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationIdentifierNotFoundException;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
@@ -19,13 +22,11 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 @Component
@@ -118,7 +119,17 @@ public class GitHubProjectConfigurationPropertyType
 
     @Override
     public GitHubProjectConfigurationProperty fromClient(JsonNode node) {
-        return fromStorage(node);
+        GitHubProjectConfigurationProperty property = fromStorage(node);
+        // Checks the issue service configuration
+        String issueServiceConfigurationIdentifier = property.getIssueServiceConfigurationIdentifier();
+        if (StringUtils.isNotBlank(issueServiceConfigurationIdentifier)) {
+            ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(issueServiceConfigurationIdentifier);
+            if (configuredIssueService == null) {
+                throw new IssueServiceConfigurationIdentifierNotFoundException(issueServiceConfigurationIdentifier);
+            }
+        }
+        // OK
+        return property;
     }
 
     @Override

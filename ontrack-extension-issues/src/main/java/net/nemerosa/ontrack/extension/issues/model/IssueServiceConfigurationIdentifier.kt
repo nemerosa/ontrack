@@ -1,29 +1,30 @@
 package net.nemerosa.ontrack.extension.issues.model
 
-import org.apache.commons.lang3.StringUtils
-
 /**
  * Representation of the ID of an [net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration].
  */
-class IssueServiceConfigurationIdentifier(
-        val serviceId: String,
-        val name: String
+data class IssueServiceConfigurationIdentifier(
+    val serviceId: String,
+    val name: String
 ) {
 
-    fun format(): String = "$serviceId//$name"
+    fun format(): String = "$serviceId$DELIMITER$name"
 
     companion object {
+
+        private const val DELIMITER = "//"
+
         @JvmStatic
         fun parse(value: String?): IssueServiceConfigurationIdentifier? {
             return if (value.isNullOrBlank()) {
                 null
             } else {
-                val serviceId = StringUtils.substringBefore(value, "//").trim()
-                val name = StringUtils.substringAfter(value, "//").trim()
-                if (StringUtils.isNotBlank(serviceId) && StringUtils.isNotBlank(name)) {
+                val serviceId = value.substringBefore(DELIMITER, missingDelimiterValue = "").trim()
+                val name = value.substringAfter(DELIMITER, missingDelimiterValue = "").trim()
+                if (serviceId.isNotBlank() && name.isNotBlank()) {
                     IssueServiceConfigurationIdentifier(serviceId, name)
                 } else {
-                    throw IssueServiceConfigurationIdentifierFormatException(value)
+                    null
                 }
             }
         }
