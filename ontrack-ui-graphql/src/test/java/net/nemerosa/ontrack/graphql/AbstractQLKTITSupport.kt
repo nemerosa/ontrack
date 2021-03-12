@@ -51,8 +51,9 @@ abstract class AbstractQLKTITSupport : AbstractDSLTestSupport() {
         }
     }
 
-    protected fun assertNoUserError(data: JsonNode, userNodeName: String) {
-        val errors = data.path(userNodeName).path("errors")
+    protected fun assertNoUserError(data: JsonNode, userNodeName: String): JsonNode {
+        val userNode = data.path(userNodeName)
+        val errors = userNode.path("errors")
         if (!errors.isNullOrNullNode() && errors.isArray && errors.size() > 0) {
             errors.forEach { error: JsonNode ->
                 error.path("exception")
@@ -64,6 +65,7 @@ abstract class AbstractQLKTITSupport : AbstractDSLTestSupport() {
                 fail(error.path("message").asText())
             }
         }
+        return userNode
     }
 
     protected fun assertUserError(
