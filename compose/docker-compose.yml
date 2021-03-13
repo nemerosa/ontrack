@@ -6,7 +6,7 @@ services:
 
   # Ontrack container
   ontrack:
-    image: nemerosa/ontrack:${ONTRACK_VERSION:-3}
+    image: nemerosa/ontrack:${ONTRACK_VERSION:-4}
     restart: always
     environment:
       PROFILE: prod

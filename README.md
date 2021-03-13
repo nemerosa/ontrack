@@ -53,7 +53,7 @@ You can feed information into Ontrack using:
 The fastest way to start Ontrack is to use Docker Compose:
 
 ```bash
-curl -fsSLO https://raw.githubusercontent.com/nemerosa/ontrack/master/compose/docker-compose.yml
+curl -fsSLO https://github.com/nemerosa/ontrack/blob/master/compose/docker-compose.yml
 docker-compose up -d
 ```
 
