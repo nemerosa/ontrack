@@ -60,3 +60,14 @@ fun requiredRefInputField(
     .description(description)
     .type(GraphQLNonNull(typeRef))
     .build()
+
+
+fun optionalRefInputField(
+    name: String,
+    description: String,
+    typeRef: GraphQLTypeReference
+): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
+    .name(name)
+    .description(description)
+    .type(typeRef)
+    .build()
