@@ -27,15 +27,15 @@ object UIUtils {
     }
 
     @JvmStatic
-    fun setupDefaultImageCache(response: HttpServletResponse, document: Document) {
+    fun setupDefaultImageCache(response: HttpServletResponse?, document: Document) {
         setupImageCache(response, document, 1)
     }
 
     @JvmStatic
-    fun setupImageCache(response: HttpServletResponse, document: Document, maxDays: Int) {
+    fun setupImageCache(response: HttpServletResponse?, document: Document, maxDays: Int) {
         if (!document.isEmpty) {
             val cacheControl = CacheControl.maxAge(maxDays.toLong(), TimeUnit.DAYS).cachePublic().headerValue
-            response.setHeader("Cache-Control", cacheControl)
+            response?.setHeader("Cache-Control", cacheControl)
         }
     }
 }

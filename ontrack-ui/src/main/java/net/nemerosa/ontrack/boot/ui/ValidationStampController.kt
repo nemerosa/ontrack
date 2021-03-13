@@ -62,10 +62,12 @@ class ValidationStampController(
     @PutMapping("branches/{branchId}/validationStamps/reorder")
     fun reorderValidationStampListForBranch(
         @PathVariable branchId: ID,
-        @RequestBody reordering: Reordering
+        @RequestBody reordering: Reordering?
     ): Resources<ValidationStamp> {
         // Reordering
-        structureService.reorderValidationStamps(branchId, reordering)
+        reordering?.let {
+            structureService.reorderValidationStamps(branchId, reordering)
+        }
         // OK
         return getValidationStampListForBranch(branchId)
     }
@@ -150,7 +152,7 @@ class ValidationStampController(
     }
 
     @GetMapping("validationStamps/{validationStampId}/image")
-    fun getValidationStampImage_(response: HttpServletResponse, @PathVariable validationStampId: ID): Document {
+    fun getValidationStampImage_(response: HttpServletResponse?, @PathVariable validationStampId: ID): Document {
         val image = structureService.getValidationStampImage(validationStampId)
         setupDefaultImageCache(response, image)
         return image
