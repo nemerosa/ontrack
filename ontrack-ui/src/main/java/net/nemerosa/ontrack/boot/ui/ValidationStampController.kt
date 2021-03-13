@@ -1,190 +1,168 @@
-package net.nemerosa.ontrack.boot.ui;
+package net.nemerosa.ontrack.boot.ui
 
-import net.nemerosa.ontrack.common.Document;
-import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.ServiceConfigurator;
-import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.security.ValidationStampCreate;
-import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
-import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.Resources;
-import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.stream.Collectors;
-
-import static net.nemerosa.ontrack.ui.support.UIUtils.setupDefaultImageCache;
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import net.nemerosa.ontrack.common.Document
+import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.Form.Companion.nameAndDescription
+import net.nemerosa.ontrack.model.form.ServiceConfigurator
+import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.security.ValidationStampCreate
+import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.ValidationStamp.Companion.of
+import net.nemerosa.ontrack.ui.controller.AbstractResourceController
+import net.nemerosa.ontrack.ui.resource.Link
+import net.nemerosa.ontrack.ui.resource.Resources
+import net.nemerosa.ontrack.ui.support.UIUtils.setupDefaultImageCache
+import org.springframework.http.HttpStatus
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
+import java.util.stream.Collectors
+import javax.servlet.http.HttpServletResponse
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/rest/structure")
-public class ValidationStampController extends AbstractResourceController {
-
-    private final StructureService structureService;
-    private final SecurityService securityService;
-    private final DecorationService decorationService;
-    private final ValidationDataTypeService validationDataTypeService;
-
-    @Autowired
-    public ValidationStampController(StructureService structureService, SecurityService securityService, DecorationService decorationService, ValidationDataTypeService validationDataTypeService) {
-        this.structureService = structureService;
-        this.securityService = securityService;
-        this.decorationService = decorationService;
-        this.validationDataTypeService = validationDataTypeService;
-    }
+class ValidationStampController(
+    private val structureService: StructureService,
+    private val securityService: SecurityService,
+    private val decorationService: DecorationService,
+    private val validationDataTypeService: ValidationDataTypeService
+) : AbstractResourceController() {
 
     // Validation stamps
-
-    @RequestMapping(value = "branches/{branchId}/validationStamps", method = RequestMethod.GET)
-    public Resources<ValidationStamp> getValidationStampListForBranch(@PathVariable ID branchId) {
-        Branch branch = structureService.getBranch(branchId);
+    @GetMapping("branches/{branchId}/validationStamps")
+    fun getValidationStampListForBranch(@PathVariable branchId: ID): Resources<ValidationStamp> {
+        val (_, _, _, _, project) = structureService.getBranch(branchId)
         return Resources.of(
-                structureService.getValidationStampListForBranch(branchId),
-                uri(on(ValidationStampController.class).getValidationStampListForBranch(branchId))
-        )
-                // Create
-                .with(
-                        Link.CREATE,
-                        uri(on(ValidationStampController.class).newValidationStampForm(branchId)),
-                        securityService.isProjectFunctionGranted(branch.getProject().id(), ValidationStampCreate.class)
-                )
-                ;
+            structureService.getValidationStampListForBranch(branchId),
+            uri(MvcUriComponentsBuilder.on(ValidationStampController::class.java)
+                .getValidationStampListForBranch(branchId))
+        ) // Create
+            .with(
+                Link.CREATE,
+                uri(MvcUriComponentsBuilder.on(ValidationStampController::class.java).newValidationStampForm(branchId)),
+                securityService.isProjectFunctionGranted(project.id(), ValidationStampCreate::class.java)
+            )
     }
 
-    @RequestMapping(value = "branches/{branchId}/validationStamps/view", method = RequestMethod.GET)
+    @GetMapping("branches/{branchId}/validationStamps/view")
     @Transactional
-    public Resources<ValidationStampView> getValidationStampViewListForBranch(@PathVariable ID branchId) {
+    fun getValidationStampViewListForBranch(@PathVariable branchId: ID): Resources<ValidationStampView> {
         return getValidationStampListForBranch(branchId)
-                .transform(validationStamp ->
-                        ValidationStampView.of(
-                                validationStamp,
-                                decorationService.getDecorations(validationStamp)
-                        )
-                );
-    }
-
-    @RequestMapping(value = "branches/{branchId}/validationStamps/reorder", method = RequestMethod.PUT)
-    public Resources<ValidationStamp> reorderValidationStampListForBranch(@PathVariable ID branchId, @RequestBody Reordering reordering) {
-        // Reordering
-        structureService.reorderValidationStamps(branchId, reordering);
-        // OK
-        return getValidationStampListForBranch(branchId);
-    }
-
-    @RequestMapping(value = "branches/{branchId}/validationStamps/create", method = RequestMethod.GET)
-    public Form newValidationStampForm(@PathVariable ID branchId) {
-        structureService.getBranch(branchId);
-        return Form.nameAndDescription()
-                .with(
-                        ServiceConfigurator.of("dataType")
-                                .label("Data type")
-                                .help("Type of the data to associate with a validation run.")
-                                .optional()
-                                .sources(
-                                        validationDataTypeService.getAllTypes().stream()
-                                                .map(
-                                                        dataType -> new ServiceConfigurationSource(
-                                                                dataType.getClass().getName(),
-                                                                dataType.getDisplayName(),
-                                                                dataType.getConfigForm(null),
-                                                                Collections.emptyMap()
-                                                        )
-                                                )
-                                                .collect(Collectors.toList())
-                                )
-                );
-    }
-
-    @RequestMapping(value = "branches/{branchId}/validationStamps/create", method = RequestMethod.POST)
-    public ValidationStamp newValidationStamp(@PathVariable ID branchId, @RequestBody @Valid ValidationStampInput input) {
-        // Gets the holding branch
-        Branch branch = structureService.getBranch(branchId);
-        // Validation
-        ValidationDataTypeConfig<?> config = validateValidationDataTypeConfig(input);
-        // Creates a new validation stamp
-        ValidationStamp validationStamp = ValidationStamp.of(
-                branch,
-                input.asNameDescription()
-        ).withDataType(config);
-        // Saves it into the repository
-        return structureService.newValidationStamp(validationStamp);
-    }
-
-    @Nullable
-    private <C> ValidationDataTypeConfig<C> validateValidationDataTypeConfig(@RequestBody @Valid ValidationStampInput input) {
-        // Validating the data type configuration if needed
-        ServiceConfiguration inputConfig = input.getDataType();
-        if (inputConfig != null) {
-            ValidationDataType<C, ?> dataType = validationDataTypeService.getValidationDataType(inputConfig.getId());
-            if (dataType != null) {
-                // Parsing without exception
-                return new ValidationDataTypeConfig<>(
-                        dataType.getDescriptor(),
-                        dataType.fromConfigForm(inputConfig.getData())
-                );
+            .transform { validationStamp: ValidationStamp? ->
+                ValidationStampView.of(
+                    validationStamp,
+                    decorationService.getDecorations(validationStamp)
+                )
             }
-        }
-        return null;
     }
 
-    @RequestMapping(value = "validationStamps/{validationStampId}", method = RequestMethod.GET)
-    public ValidationStamp getValidationStamp(@PathVariable ID validationStampId) {
-        return structureService.getValidationStamp(validationStampId);
+    @PutMapping("branches/{branchId}/validationStamps/reorder")
+    fun reorderValidationStampListForBranch(
+        @PathVariable branchId: ID,
+        @RequestBody reordering: Reordering
+    ): Resources<ValidationStamp> {
+        // Reordering
+        structureService.reorderValidationStamps(branchId, reordering)
+        // OK
+        return getValidationStampListForBranch(branchId)
     }
 
-    @RequestMapping(value = "validationStamps/{validationStampId}/update", method = RequestMethod.GET)
-    public Form updateValidationStampForm(@PathVariable ID validationStampId) {
-        ValidationStamp validationStamp = structureService.getValidationStamp(validationStampId);
-        return newValidationStampForm(validationStamp.getBranch().getId())
-                .fill("name", validationStamp.getName())
-                .fill("description", validationStamp.getDescription())
-                .fill("dataType", validationDataTypeService.getServiceConfigurationForConfig(validationStamp.getDataType()))
-                ;
+    @GetMapping("branches/{branchId}/validationStamps/create")
+    fun newValidationStampForm(@PathVariable branchId: ID): Form {
+        structureService.getBranch(branchId)
+        return nameAndDescription()
+            .with(
+                ServiceConfigurator.of("dataType")
+                    .label("Data type")
+                    .help("Type of the data to associate with a validation run.")
+                    .optional()
+                    .sources(
+                        validationDataTypeService.getAllTypes().stream()
+                            .map { dataType: ValidationDataType<*, *> ->
+                                ServiceConfigurationSource(
+                                    dataType.javaClass.name,
+                                    dataType.displayName,
+                                    dataType.getConfigForm(null), emptyMap<String, Any>())
+                            }
+                            .collect(Collectors.toList())
+                    )
+            )
     }
 
-    @RequestMapping(value = "validationStamps/{validationStampId}/update", method = RequestMethod.PUT)
-    public ValidationStamp updateValidationStamp(@PathVariable ID validationStampId, @RequestBody @Valid ValidationStampInput input) {
-        // Gets from the repository
-        ValidationStamp validationStamp = structureService.getValidationStamp(validationStampId);
+    @PostMapping("branches/{branchId}/validationStamps/create")
+    fun newValidationStamp(
+        @PathVariable branchId: ID,
+        @RequestBody input: @Valid ValidationStampInput
+    ): ValidationStamp {
+        // Gets the holding branch
+        val branch = structureService.getBranch(branchId)
         // Validation
-        ValidationDataTypeConfig<?> dataTypeServiceConfig = validateValidationDataTypeConfig(input);
+        val config: ValidationDataTypeConfig<*>? =
+            validationDataTypeService.validateValidationDataTypeConfig<Any>(input.dataType?.id, input.dataType?.data)
+        // Creates a new validation stamp
+        val validationStamp = of(
+            branch,
+            input.asNameDescription()
+        ).withDataType(config)
+        // Saves it into the repository
+        return structureService.newValidationStamp(validationStamp)
+    }
+
+    @GetMapping("validationStamps/{validationStampId}")
+    fun getValidationStamp(@PathVariable validationStampId: ID): ValidationStamp {
+        return structureService.getValidationStamp(validationStampId)
+    }
+
+    @GetMapping("validationStamps/{validationStampId}/update")
+    fun updateValidationStampForm(@PathVariable validationStampId: ID): Form {
+        val (_, name, description, branch, _, _, _, dataType) = structureService.getValidationStamp(
+            validationStampId)
+        return newValidationStampForm(branch.id)
+            .fill("name", name)
+            .fill("description", description)
+            .fill("dataType", validationDataTypeService.getServiceConfigurationForConfig(dataType))
+    }
+
+    @PutMapping("validationStamps/{validationStampId}/update")
+    fun updateValidationStamp(
+        @PathVariable validationStampId: ID,
+        @RequestBody input: @Valid ValidationStampInput
+    ): ValidationStamp {
+        // Gets from the repository
+        var validationStamp = structureService.getValidationStamp(validationStampId)
+        // Validation
+        val dataTypeServiceConfig: ValidationDataTypeConfig<*>? =
+            validationDataTypeService.validateValidationDataTypeConfig<Any>(input.dataType?.id, input.dataType?.data)
         // Updates
-        validationStamp = validationStamp.update(input.asNameDescription()).withDataType(dataTypeServiceConfig);
+        validationStamp = validationStamp.update(input.asNameDescription()).withDataType(dataTypeServiceConfig)
         // Saves in repository
-        structureService.saveValidationStamp(validationStamp);
+        structureService.saveValidationStamp(validationStamp)
         // As resource
-        return validationStamp;
+        return validationStamp
     }
 
-    @RequestMapping(value = "validationStamps/{validationStampId}", method = RequestMethod.DELETE)
-    public Ack deleteValidationStamp(@PathVariable ID validationStampId) {
-        return structureService.deleteValidationStamp(validationStampId);
+    @DeleteMapping("validationStamps/{validationStampId}")
+    fun deleteValidationStamp(@PathVariable validationStampId: ID): Ack {
+        return structureService.deleteValidationStamp(validationStampId)
     }
 
-    @RequestMapping(value = "validationStamps/{validationStampId}/image", method = RequestMethod.GET)
-    public Document getValidationStampImage_(HttpServletResponse response, @PathVariable ID validationStampId) {
-        Document image = structureService.getValidationStampImage(validationStampId);
-        setupDefaultImageCache(response, image);
-        return image;
+    @GetMapping("validationStamps/{validationStampId}/image")
+    fun getValidationStampImage_(response: HttpServletResponse, @PathVariable validationStampId: ID): Document {
+        val image = structureService.getValidationStampImage(validationStampId)
+        setupDefaultImageCache(response, image)
+        return image
     }
 
-    @RequestMapping(value = "validationStamps/{validationStampId}/image", method = RequestMethod.POST)
+    @PostMapping("validationStamps/{validationStampId}/image")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void setValidationStampImage(@PathVariable ID validationStampId, @RequestParam MultipartFile file) throws IOException {
-        structureService.setValidationStampImage(validationStampId, new Document(
-                file.getContentType(),
-                file.getBytes()
-        ));
+    fun setValidationStampImage(@PathVariable validationStampId: ID, @RequestParam file: MultipartFile) {
+        structureService.setValidationStampImage(validationStampId, Document(
+            file.contentType!!,
+            file.bytes
+        ))
     }
 
     /**
@@ -195,7 +173,7 @@ public class ValidationStampController extends AbstractResourceController {
      * @return Result of the update
      */
     @PutMapping("validationStamps/{validationStampId}/bulk")
-    public Ack bulkUpdate(@PathVariable ID validationStampId) {
-        return structureService.bulkUpdateValidationStamps(validationStampId);
+    fun bulkUpdate(@PathVariable validationStampId: ID): Ack {
+        return structureService.bulkUpdateValidationStamps(validationStampId)
     }
 }
