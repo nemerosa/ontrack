@@ -79,7 +79,7 @@ data class SetupValidationStampInput(
     val project: String,
     val branch: String,
     val validation: String,
-    val description: String,
+    val description: String?,
     val dataType: String?,
     val dataTypeConfig: JsonNode?
 )

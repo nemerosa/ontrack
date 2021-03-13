@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.test.assertPresent
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -10,6 +11,74 @@ import kotlin.test.assertTrue
  */
 class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
 
+    @Test
+    fun `Creation of a plain validation stamp`() {
+        asAdmin {
+            project {
+                branch {
+                    run("""
+                        mutation {
+                            setupValidationStamp(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                validation: "test"
+                            }) {
+                                validationStamp {
+                                    id
+                                }
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """).let { data ->
+                        val node = assertNoUserError(data, "setupValidationStamp")
+                        assertTrue(node.path("validationStamp").path("id").asInt() != 0, "VS created")
+
+                        assertPresent(structureService.findValidationStampByName(project.name, name, "test")) {
+                            assertEquals("test", it.name)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Update of a plain validation stamp`() {
+        asAdmin {
+            project {
+                branch {
+                    val vs = validationStamp()
+                    run("""
+                        mutation {
+                            setupValidationStamp(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                validation: "${vs.name}",
+                                description: "New description"
+                            }) {
+                                validationStamp {
+                                    id
+                                }
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """).let { data ->
+                        val node = assertNoUserError(data, "setupValidationStamp")
+                        assertEquals(vs.id(), node.path("validationStamp").path("id").asInt(), "VS updated")
+
+                        assertPresent(structureService.findValidationStampByName(project.name, name, vs.name)) {
+                            assertEquals(vs.name, it.name)
+                            assertEquals("New description", it.description)
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @Test
     fun `No validation stamp`() {
