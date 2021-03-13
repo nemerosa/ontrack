@@ -10,7 +10,7 @@ import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 data class TestSummaryValidationConfig(
         val warningIfSkipped: Boolean
 ) {
-    fun computeStatus(data: TestSummaryValidationData): ValidationRunStatusID? =
+    fun computeStatus(data: TestSummaryValidationData): ValidationRunStatusID =
             when {
                 data.failed > 0 -> ValidationRunStatusID.STATUS_FAILED
                 data.skipped > 0 && warningIfSkipped -> ValidationRunStatusID.STATUS_WARNING

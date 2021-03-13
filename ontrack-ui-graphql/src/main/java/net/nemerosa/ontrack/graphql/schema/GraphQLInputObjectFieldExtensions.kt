@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import graphql.Scalars.GraphQLInt
-import graphql.Scalars.GraphQLString
+import graphql.Scalars.*
 import graphql.schema.GraphQLInputObjectField
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLTypeReference
@@ -41,6 +40,15 @@ fun requiredIntInputField(
     .name(name)
     .description(description)
     .type(GraphQLNonNull(GraphQLInt))
+    .build()
+
+fun optionalBooleanInputField(
+    name: String,
+    description: String
+): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
+    .name(name)
+    .description(description)
+    .type(GraphQLNonNull(GraphQLBoolean))
     .build()
 
 fun requiredRefInputField(
