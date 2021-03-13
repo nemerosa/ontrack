@@ -128,24 +128,6 @@ class ACCBrowserBasic extends AcceptanceTestClient {
     }
 
     @Test
-    void 'Project API page must be accessible'() {
-        browser { browser ->
-            withProject { id, name ->
-                // Goes to the home page and logs in browser ->
-                HomePage home = loginAsAdmin(browser)
-                // Goes to the project
-                ProjectPage projectPage = home.goToProject(name)
-                // Goes to the API page
-                APIPage apiPage = projectPage.goToAPI()
-                // Gets the link of the page
-                def link = apiPage.apiLink
-                // Checks the link
-                assert link == "/rest/structure/projects/${id}"
-            }
-        }
-    }
-
-    @Test
     void 'Build page'() {
         def projectName = uid("P")
         ontrack.project(projectName) {
