@@ -1,7 +1,13 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.extension.general.validation.CHML
+import net.nemerosa.ontrack.extension.general.validation.CHMLLevel
+import net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType
+import net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataTypeConfig
+import net.nemerosa.ontrack.model.structure.config
 import net.nemerosa.ontrack.test.assertPresent
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -10,6 +16,9 @@ import kotlin.test.assertTrue
  * Integration tests around the `validationStamp` root query.
  */
 class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
+
+    @Autowired
+    private lateinit var chmlValidationDataType: CHMLValidationDataType
 
     @Test
     fun `Creation of a plain validation stamp`() {
@@ -81,6 +90,111 @@ class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
     }
 
     @Test
+    fun `Creation of a CHML validation stamp`() {
+        asAdmin {
+            project {
+                branch {
+                    run("""
+                        mutation {
+                            setupValidationStamp(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                validation: "test",
+                                dataType: "net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType",
+                                dataTypeConfig: {
+                                    warningLevel: "HIGH",
+                                    warningValue: 1,
+                                    failedLevel: "CRITICAL",
+                                    failedValue: 1
+                                }
+                            }) {
+                                validationStamp {
+                                    id
+                                }
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """).let { data ->
+                        val node = assertNoUserError(data, "setupValidationStamp")
+                        assertTrue(node.path("validationStamp").path("id").asInt() != 0, "VS created")
+
+                        assertPresent(structureService.findValidationStampByName(project.name, name, "test")) {
+                            assertEquals("test", it.name)
+                            assertEquals("net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType",
+                                it.dataType?.descriptor?.id)
+                            assertEquals(
+                                CHMLValidationDataTypeConfig(
+                                    warningLevel = CHMLLevel(CHML.HIGH, 1),
+                                    failedLevel = CHMLLevel(CHML.CRITICAL, 1)
+                                ),
+                                it.dataType?.config
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Update of a CHML validation stamp`() {
+        asAdmin {
+            project {
+                branch {
+                    val vs = validationStamp(
+                        validationDataTypeConfig = chmlValidationDataType.config(
+                            CHMLValidationDataTypeConfig(
+                                warningLevel = CHMLLevel(CHML.CRITICAL, 1),
+                                failedLevel = CHMLLevel(CHML.CRITICAL, 10)
+                            )
+                        ))
+                    run("""
+                        mutation {
+                            setupValidationStamp(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                validation: "${vs.name}",
+                                dataType: "net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType",
+                                dataTypeConfig: {
+                                    warningLevel: "HIGH",
+                                    warningValue: 1,
+                                    failedLevel: "CRITICAL",
+                                    failedValue: 1
+                                }
+                            }) {
+                                validationStamp {
+                                    id
+                                }
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """).let { data ->
+                        val node = assertNoUserError(data, "setupValidationStamp")
+                        assertEquals(vs.id(), node.path("validationStamp").path("id").asInt(), "VS updated")
+
+                        assertPresent(structureService.findValidationStampByName(project.name, name, vs.name)) {
+                            assertEquals(vs.name, it.name)
+                            assertEquals("net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType",
+                                it.dataType?.descriptor?.id)
+                            assertEquals(
+                                CHMLValidationDataTypeConfig(
+                                    warningLevel = CHMLLevel(CHML.HIGH, 1),
+                                    failedLevel = CHMLLevel(CHML.CRITICAL, 1)
+                                ),
+                                it.dataType?.config
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `No validation stamp`() {
         // Creates a VS and deletes it
         val vsId = project<Int> {
@@ -131,9 +245,9 @@ class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
                 }
                 // Checks the number of validation runs
                 assertEquals(
-                        60,
-                        structureService.getValidationRunsCountForValidationStamp(vs.id),
-                        "Checking the number of validation runs having been created"
+                    60,
+                    structureService.getValidationRunsCountForValidationStamp(vs.id),
+                    "Checking the number of validation runs having been created"
                 )
                 // Paginated query with variables
                 val query = """
@@ -171,9 +285,9 @@ class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
                     """
                 // Initial parameters
                 val params = mutableMapOf(
-                        "offset" to 0,
-                        "size" to 20,
-                        "validationStampId" to vs.id()
+                    "offset" to 0,
+                    "size" to 20,
+                    "validationStampId" to vs.id()
                 )
 
                 /**
