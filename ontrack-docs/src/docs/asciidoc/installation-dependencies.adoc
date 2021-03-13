@@ -9,18 +9,29 @@ Ontrack relies on the following components to be available:
 [[installation-postgres]]
 ==== Postgres
 
-Versions 9.5.+ and version 10.+ of Ontrack have been tested.
+Versions 9.5.+ to version 11.+ of Ontrack have been tested.
 
 By default, Ontrack will use the following
 <<configuration-properties,configuration properties>> and their default
 values to connect to Postgres:
 
 |===
-| Property | Description | Default value
+| Property | Env variable | Description | Default value
 
-| spring.datasource.url | JDBC URL to the Postgres Ontrack DB | `jdbc:postgresql://localhost/ontrack`
-| spring.datasource.username | Username used to connect to the Postgres Ontrack DB | `ontrack`
-| spring.datasource.password | Password used to connect to the Postgres Ontrack DB | `ontrack`
+| spring.datasource.url
+| SPRING_DATASOURCE_URL
+| JDBC URL to the Postgres Ontrack DB
+| `jdbc:postgresql://localhost/ontrack`
+
+| spring.datasource.username
+| SPRING_DATASOURCE_USERNAME
+| Username used to connect to the Postgres Ontrack DB
+| `ontrack`
+
+| spring.datasource.password
+| SPRING_DATASOURCE_PASSWORD
+| Password used to connect to the Postgres Ontrack DB
+| `ontrack`
 |===
 
 Other properties are available in link:https://docs.spring.io/spring-boot/docs/{spring-boot-version}/reference/html/appendix-application-properties.html#data-properties[Spring Boot].
@@ -35,9 +46,12 @@ By default, Ontrack will use the following
 values to connect to Postgres:
 
 |===
-| Property | Description | Default value
+| Property | Env variable | Description | Default value
 
-| spring.elasticsearch.rest.uris | REST URI of Elasticsearch | `http://localhost:9200`
+| spring.elasticsearch.rest.uris
+| SPRING_ELASTICSEARCH_REST_URIS
+| REST URI of Elasticsearch
+| `http://localhost:9200`
 |===
 
 Other properties are available in link:https://docs.spring.io/spring-boot/docs/{spring-boot-version}/reference/html/appendix-application-properties.html#data-properties[Spring Boot].
