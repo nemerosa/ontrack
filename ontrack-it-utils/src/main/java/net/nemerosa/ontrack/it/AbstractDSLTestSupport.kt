@@ -423,12 +423,12 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Creation of a predefined validation stamp
      */
-    protected fun predefinedValidationStamp(name: String, description: String = "", image: Boolean = false) {
+    protected fun predefinedValidationStamp(name: String, description: String = "", image: Boolean = false, dataType: ValidationDataTypeConfig<*>? = null) {
         asAdmin().call {
             val pps = predefinedValidationStampService.newPredefinedValidationStamp(
                     PredefinedValidationStamp.of(
                             NameDescription.nd(name, description)
-                    )
+                    ).withDataType(dataType)
             )
             if (image) {
                 val document = Document("image/png", TestUtils.resourceBytes("/validationStampImage1.png"))

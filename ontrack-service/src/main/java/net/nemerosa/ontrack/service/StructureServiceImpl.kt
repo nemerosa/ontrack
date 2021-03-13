@@ -797,7 +797,7 @@ class StructureServiceImpl(
 
     override fun newValidationStamp(validationStamp: ValidationStamp): ValidationStamp {
         // Raw creation
-        val newValidationStamp = rawNewValidationStamp(validationStamp)
+        var newValidationStamp = rawNewValidationStamp(validationStamp)
         // Checking if there is an associated predefined validation stamp
         return securityService.asAdmin {
             val predefined: PredefinedValidationStamp? =
@@ -806,7 +806,8 @@ class StructureServiceImpl(
             if (predefined != null) {
                 // Description
                 if (validationStamp.description.isNullOrBlank()) {
-                    saveValidationStamp(newValidationStamp.withDescription(predefined.description))
+                    newValidationStamp = newValidationStamp.withDescription(predefined.description)
+                    saveValidationStamp(newValidationStamp)
                 }
                 // Image
                 if (predefined.isImage) {
@@ -814,6 +815,11 @@ class StructureServiceImpl(
                             newValidationStamp.id,
                             predefinedValidationStampService.getPredefinedValidationStampImage(predefined.id)
                     )
+                }
+                // Data type
+                if (validationStamp.dataType == null && predefined.dataType != null) {
+                    newValidationStamp = newValidationStamp.withDataType(predefined.dataType)
+                    saveValidationStamp(newValidationStamp)
                 }
                 // Reloading
                 getValidationStamp(newValidationStamp.id)

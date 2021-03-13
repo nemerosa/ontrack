@@ -232,6 +232,56 @@ class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
     }
 
     @Test
+    fun `Creation of a validation stamp based on a typed predefined one`() {
+        asAdmin {
+            val vsName = uid("pvs")
+            predefinedValidationStamp(vsName, "Predefined", dataType = chmlValidationDataType.config(
+                CHMLValidationDataTypeConfig(
+                    warningLevel = CHMLLevel(CHML.CRITICAL, 1),
+                    failedLevel = CHMLLevel(CHML.CRITICAL, 10)
+                )
+            ))
+            project {
+                branch {
+                    run("""
+                        mutation {
+                            setupValidationStamp(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                validation: "$vsName"
+                            }) {
+                                validationStamp {
+                                    id
+                                }
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """).let { data ->
+                        val node = assertNoUserError(data, "setupValidationStamp")
+                        assertTrue(node.path("validationStamp").path("id").asInt() != 0, "VS created")
+
+                        assertPresent(structureService.findValidationStampByName(project.name, name, vsName)) {
+                            assertEquals(vsName, it.name)
+                            assertEquals("Predefined", it.description)
+                            assertEquals("net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType",
+                                it.dataType?.descriptor?.id)
+                            assertEquals(
+                                CHMLValidationDataTypeConfig(
+                                    warningLevel = CHMLLevel(CHML.CRITICAL, 1),
+                                    failedLevel = CHMLLevel(CHML.CRITICAL, 10)
+                                ),
+                                it.dataType?.config
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `No validation stamp`() {
         // Creates a VS and deletes it
         val vsId = project<Int> {
