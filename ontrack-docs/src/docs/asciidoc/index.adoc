@@ -17,6 +17,8 @@ Damien Coraboeuf
 
 include::quick-start.adoc[]
 
+// TODO include::saas.adoc[]
+
 include::installation.adoc[]
 
 include::setup.adoc[]
@@ -26,17 +28,5 @@ include::feeding.adoc[]
 include::usage.adoc[]
 
 include::api.adoc[]
-
-//include::usage.adoc[]
-//
-//include::administration.adoc[]
-//
-//include::integration.adoc[]
-//
-//include::dsl.adoc[]
-//
-//include::contributing.adoc[]
-//
-//include::appendixes.adoc[]
 
 // ========================================================

@@ -36,5 +36,5 @@ java -jar ontrack.jar
 
 [source,bash]
 ----
-SPRING_DATASOURCE_URL=... java ...
+SPRING_DATASOURCE_URL=...
 ----

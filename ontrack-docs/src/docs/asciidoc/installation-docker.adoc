@@ -1,11 +1,9 @@
 [[installation-docker]]
 === Docker installation
 
-The Ontrack Docker image is available in the Docker Hub
-at https://hub.docker.com/r/nemerosa/ontrack.
+The Ontrack Docker image is available in the Docker Hub at https://hub.docker.com/r/nemerosa/ontrack.
 
-Each specific version is available and also a "latest" version per major and minor
-version. For example:
+Each specific version is available and also a "latest" version per major and minor version. For example:
 
 * 4
 * 4.0
@@ -32,12 +30,8 @@ docker container run \
     nemerosa/ontrack:4
 ----
 
-The memory settings and other JVM parameters for Ontrack can be passed
-using the `JAVA_OPTIONS` environment variable.
+The memory settings and other JVM parameters for Ontrack can be passed using the `JAVA_OPTIONS` environment variable.
 
-Other <<configuration-properties,Ontrack configuration properties>> must be passed
-through environment variables.
+Other <<configuration-properties,Ontrack configuration properties>> must be passed through environment variables.
 
-Optionally, a volume can be mapped to the Ontrack `/var/ontrack/data` Docker
-volume. This is particularly needed when using a secret storage based on the
-file system (see <<setup>>).
+Optionally, a volume can be mapped to the Ontrack `/var/ontrack/data` Docker volume. This is particularly needed when using a secret storage based on the file system (see <<setup>>).

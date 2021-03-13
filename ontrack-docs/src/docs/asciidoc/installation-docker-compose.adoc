@@ -1,8 +1,7 @@
 [[installation-docker-compose]]
 === Docker Compose installation
 
-The fastest way to start Ontrack is to use Docker Compose, but it might not be
-the best way to run it in production.
+The fastest way to start Ontrack is to use Docker Compose, but it might not be adapted for a production environment.
 
 The Docker Compose file can be downloaded from:
 
@@ -21,8 +20,7 @@ This starts three services:
 * a Postgres database
 * an Elasticsearch single node
 
-Neither Postgres or Elasticsearch are exposed by default, but you can of course
-edit the Docker Compose file at your convenience.
+Neither Postgres or Elasticsearch are exposed by default, but you can of course edit the Docker Compose file at your convenience.
 
 The version of Ontrack is set by default to `4` (latest 4.x version) but
 you can override it using the `ONTRACK_VERSION` environment variable.
