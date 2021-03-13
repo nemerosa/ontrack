@@ -27,6 +27,6 @@ interface PropertyMutationProvider<T> {
     /**
      * Given an
      */
-    fun readInput(input: PropertyMutationInput): T
+    fun readInput(input: MutationInput): T
 
 }

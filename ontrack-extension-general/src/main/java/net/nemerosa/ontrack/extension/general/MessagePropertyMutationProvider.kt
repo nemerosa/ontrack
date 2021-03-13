@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.general
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLInputObjectField
 import graphql.schema.GraphQLNonNull
-import net.nemerosa.ontrack.graphql.schema.PropertyMutationInput
+import net.nemerosa.ontrack.graphql.schema.MutationInput
 import net.nemerosa.ontrack.graphql.schema.PropertyMutationProvider
 import net.nemerosa.ontrack.model.structure.PropertyType
 import org.springframework.stereotype.Component
@@ -28,7 +28,7 @@ class MessagePropertyMutationProvider : PropertyMutationProvider<MessageProperty
             .build()
     )
 
-    override fun readInput(input: PropertyMutationInput) = MessageProperty(
+    override fun readInput(input: MutationInput) = MessageProperty(
         MessageType.valueOf(input.getRequiredInput("type")),
         input.getRequiredInput("text")
     )

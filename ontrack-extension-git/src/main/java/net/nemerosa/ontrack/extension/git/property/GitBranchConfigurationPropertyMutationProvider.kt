@@ -5,7 +5,7 @@ import graphql.schema.GraphQLInputObjectField
 import graphql.schema.GraphQLNonNull
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
-import net.nemerosa.ontrack.graphql.schema.PropertyMutationInput
+import net.nemerosa.ontrack.graphql.schema.MutationInput
 import net.nemerosa.ontrack.graphql.schema.PropertyMutationProvider
 import net.nemerosa.ontrack.model.structure.PropertyType
 import net.nemerosa.ontrack.model.support.NoConfig
@@ -29,7 +29,7 @@ class GitBranchConfigurationPropertyMutationProvider(
             .build()
     )
 
-    override fun readInput(input: PropertyMutationInput) = GitBranchConfigurationProperty(
+    override fun readInput(input: MutationInput) = GitBranchConfigurationProperty(
         branch = input.getRequiredInput(INPUT_BRANCH),
         buildCommitLink = ConfiguredBuildGitCommitLink(link, NoConfig.INSTANCE).toServiceConfiguration(),
         isOverride = false,

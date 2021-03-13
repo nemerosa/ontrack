@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.graphql.schema
 
 /**
- * Abstraction for the input for a [PropertyMutationProvider].
+ * Abstraction for the input for a GraphQL mutation.
  */
-interface PropertyMutationInput {
+interface MutationInput {
 
     /**
      * Gets an input by name

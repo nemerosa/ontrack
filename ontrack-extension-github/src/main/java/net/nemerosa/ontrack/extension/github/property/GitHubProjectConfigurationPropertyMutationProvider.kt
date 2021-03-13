@@ -25,7 +25,7 @@ class GitHubProjectConfigurationPropertyMutationProvider(
             "Issue identifier to use, for example jira//name where name is the name of the JIRA configuration in Ontrack.")
     )
 
-    override fun readInput(input: PropertyMutationInput) = GitHubProjectConfigurationProperty(
+    override fun readInput(input: MutationInput) = GitHubProjectConfigurationProperty(
         configuration = gitHubConfigurationService.getConfiguration(input.getRequiredInput("configuration")),
         repository = input.getRequiredInput("repository"),
         indexationInterval = input.getInput<Int>("indexationInterval") ?: 0,

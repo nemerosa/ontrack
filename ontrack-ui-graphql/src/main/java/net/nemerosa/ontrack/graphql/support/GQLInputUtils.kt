@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql.support
 
-import graphql.Scalars.GraphQLBoolean
-import graphql.Scalars.GraphQLString
+import graphql.Scalars.*
 import graphql.schema.GraphQLInputObjectField
 import graphql.schema.GraphQLInputType
 import graphql.schema.GraphQLNonNull
@@ -38,6 +37,23 @@ fun inputBoolean(
         .name(name)
         .description(description)
         .type(nullableInputType(GraphQLBoolean, nullable))
+        .build()
+
+/**
+ * Input field as a int
+ *
+ * @param name Name of the field
+ * @param description Description of the field
+ * @param nullable Is the field nullable? (true by default)
+ */
+fun inputInt(
+        name: String,
+        description: String?,
+        nullable: Boolean = true
+): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
+        .name(name)
+        .description(description)
+        .type(nullableInputType(GraphQLInt, nullable))
         .build()
 
 /**

@@ -4,6 +4,7 @@ import graphql.Scalars.GraphQLInt
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLInputObjectField
 import graphql.schema.GraphQLNonNull
+import graphql.schema.GraphQLTypeReference
 
 fun requiredStringInputField(
     name: String,
@@ -30,4 +31,24 @@ fun optionalIntInputField(
     .name(name)
     .description(description)
     .type(GraphQLInt)
+    .build()
+
+
+fun requiredIntInputField(
+    name: String,
+    description: String
+): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
+    .name(name)
+    .description(description)
+    .type(GraphQLNonNull(GraphQLInt))
+    .build()
+
+fun requiredRefInputField(
+    name: String,
+    description: String,
+    typeRef: GraphQLTypeReference
+): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
+    .name(name)
+    .description(description)
+    .type(GraphQLNonNull(typeRef))
     .build()

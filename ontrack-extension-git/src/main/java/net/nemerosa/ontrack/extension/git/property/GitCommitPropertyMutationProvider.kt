@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.git.property
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLInputObjectField
 import graphql.schema.GraphQLNonNull
-import net.nemerosa.ontrack.graphql.schema.PropertyMutationInput
+import net.nemerosa.ontrack.graphql.schema.MutationInput
 import net.nemerosa.ontrack.graphql.schema.PropertyMutationProvider
 import net.nemerosa.ontrack.model.structure.PropertyType
 import org.springframework.stereotype.Component
@@ -23,7 +23,7 @@ class GitCommitPropertyMutationProvider : PropertyMutationProvider<GitCommitProp
             .build()
     )
 
-    override fun readInput(input: PropertyMutationInput) = GitCommitProperty(
+    override fun readInput(input: MutationInput) = GitCommitProperty(
         commit = input.getRequiredInput(INPUT_COMMIT)
     )
 
