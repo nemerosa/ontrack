@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.general.validation.CHMLLevel
 import net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType
 import net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataTypeConfig
 import net.nemerosa.ontrack.model.structure.config
+import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertPresent
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -187,6 +188,42 @@ class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
                                 ),
                                 it.dataType?.config
                             )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creation of a validation stamp based on a plain predefined one`() {
+        asAdmin {
+            val vsName = uid("pvs")
+            predefinedValidationStamp(vsName, "Predefined")
+            project {
+                branch {
+                    run("""
+                        mutation {
+                            setupValidationStamp(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                validation: "$vsName"
+                            }) {
+                                validationStamp {
+                                    id
+                                }
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """).let { data ->
+                        val node = assertNoUserError(data, "setupValidationStamp")
+                        assertTrue(node.path("validationStamp").path("id").asInt() != 0, "VS created")
+
+                        assertPresent(structureService.findValidationStampByName(project.name, name, vsName)) {
+                            assertEquals(vsName, it.name)
+                            assertEquals("Predefined", it.description)
                         }
                     }
                 }
