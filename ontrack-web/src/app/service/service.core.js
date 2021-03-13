@@ -34,23 +34,6 @@ angular.module('ot.service.core', [
         };
 
         /**
-         * API command
-         */
-        self.viewApiCommand = function (link) {
-            return {
-                id: 'api',
-                name: "API",
-                cls: "ot-command-api",
-                action: function () {
-                    $log.debug("[api] Going to API page for ", link);
-                    var encodedLink = encodeURIComponent(link);
-                    $log.debug("[api] Encoding link ", encodedLink);
-                    $state.go('api', {'link': encodedLink});
-                }
-            };
-        };
-
-        /**
          * Defines a command that list some actions in a select.
          *
          * The list of actions is returned by a call to the URI in parameter.

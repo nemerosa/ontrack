@@ -207,7 +207,6 @@ angular.module('ot.view.validationStamp', [
                                 }).then(loadValidationStamp);
                             }
                         },
-                        ot.viewApiCommand($scope.validationStamp.links._self),
                         ot.viewCloseCommand('/branch/' + $scope.validationStamp.branch.id)
                     ];
                     // View OK now

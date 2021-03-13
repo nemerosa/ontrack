@@ -265,7 +265,6 @@ angular.module('ot.view.project', [
                         cls: 'ot-command-project-delete',
                         action: deleteProject
                     },
-                    ot.viewApiCommand($scope.project.links._self),
                     ot.viewActionsCommand($scope.project.links._actions),
                     ot.viewCloseCommand('/home')
                 ];

@@ -18,7 +18,6 @@ angular.module('ot.view.settings', [
         function loadSettings(activeId) {
             ot.call($http.get('rest/settings')).then(function (forms) {
                 view.commands = [
-                    ot.viewApiCommand(forms._self),
                     ot.viewCloseCommand('/home')
                 ];
                 // Preparation of all forms

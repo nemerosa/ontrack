@@ -171,7 +171,6 @@ angular.module('ot.view.promotionLevel', [
                                 }).then(loadPromotionLevel);
                             }
                         },
-                        ot.viewApiCommand($scope.promotionLevel.links._self),
                         ot.viewCloseCommand('/branch/' + $scope.promotionLevel.branch.id)
                     ];
                     viewInitialized = true;

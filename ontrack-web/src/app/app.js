@@ -37,8 +37,6 @@ const ontrack = angular.module('ontrack', [
         'ot.service.label',
         'ot.service.search',
         // Views
-        'ot.view.api',
-        'ot.view.api-doc',
         'ot.view.home',
         'ot.view.search',
         'ot.view.settings',

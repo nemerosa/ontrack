@@ -106,7 +106,6 @@ angular.module('ot.view.admin.jobs', [
                     $scope.jobs = jobs;
                     $scope.page= jobs.pagination;
                     view.commands = [
-                        ot.viewApiCommand(jobs._self),
                         ot.viewCloseCommand('/home')
                     ];
                 })

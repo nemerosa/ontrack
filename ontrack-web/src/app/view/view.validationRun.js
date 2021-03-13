@@ -100,7 +100,6 @@ angular.module('ot.view.validationRun', [
                     view.breadcrumbs = ot.buildBreadcrumbs(validationRun.build);
                     // Commands
                     view.commands = [
-                        ot.viewApiCommand(validationRun.links._self),
                         ot.viewCloseCommand('/build/' + validationRun.build.id)
                     ];
                     // OK

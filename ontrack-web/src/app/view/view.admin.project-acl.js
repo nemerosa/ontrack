@@ -28,7 +28,6 @@ angular.module('ot.view.admin.project-acl', [
                 return ot.pageCall($http.get('rest/accounts/permissions/projects/' + projectId));
             }).then(function (projectPermissions) {
                 view.commands = [
-                    ot.viewApiCommand(projectPermissions._self),
                     ot.viewCloseCommand('/project/' + projectId)
                 ];
                 $scope.projectPermissions = projectPermissions;

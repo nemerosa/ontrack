@@ -367,7 +367,6 @@ angular.module('ot.view.branch', [
                             });
                         }
                     },
-                    ot.viewApiCommand(branchResource._self),
                     ot.viewCloseCommand('/project/' + branchResource.project.id),
                     ot.viewActionsCommand(
                         $scope.branch._actions,

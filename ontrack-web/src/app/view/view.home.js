@@ -238,10 +238,6 @@ angular.module('ot.view.home', [
                             $scope.showDisabled = false;
                         }
                     }, {
-                        name: "API",
-                        cls: 'ot-command-api',
-                        link: '/api-doc'
-                    }, {
                         name: "GraphiQL",
                         cls: 'ot-command-api',
                         absoluteLink: "graphiql.html"

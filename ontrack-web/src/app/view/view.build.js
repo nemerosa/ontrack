@@ -288,7 +288,6 @@ angular.module('ot.view.build', [
                                 });
                             }
                         },
-                        ot.viewApiCommand(build.links._self),
                         ot.viewActionsCommand(build.links._actions),
                         ot.viewCloseCommand('/branch/' + build.branch.id)
                     ];
