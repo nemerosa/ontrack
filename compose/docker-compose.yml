@@ -6,11 +6,11 @@ services:
 
   # Ontrack container
   ontrack:
-    image: nemerosa/ontrack:${ONTRACK_VERSION:-3}
+    image: nemerosa/ontrack:${ONTRACK_VERSION:-4}
     restart: always
     environment:
       PROFILE: prod
-      JAVA_OPTIONS: "-Xms1024m -Xmx1024m"
+      JAVA_OPTIONS: "${JAVA_OPTIONS:--Xms1024m -Xmx1024m}"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
       SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
     depends_on:

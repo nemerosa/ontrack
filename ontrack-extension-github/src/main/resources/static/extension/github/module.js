@@ -28,7 +28,6 @@ angular.module('ontrack.extension.github', [
                         cls: 'ot-command-new',
                         action: $scope.createConfiguration
                     },
-                    ot.viewApiCommand(configurations._self),
                     ot.viewCloseCommand('/home')
                 ];
             });

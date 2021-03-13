@@ -1,29 +1,32 @@
-[[basics]]
-== Basics
+[[usage]]
+== Usage
 
-include::usage-projects.adoc[]
-
-include::usage-branches.adoc[]
-
-include::usage-validation-stamps.adoc[]
-
-include::usage-promotion-levels.adoc[]
-
-include::usage-builds.adoc[]
-
-include::usage-validation-runs.adoc[]
-
-include::usage-properties.adoc[]
-
-[[topics]]
-== Topics
-
-include::usage-scm.adoc[]
-
-include::usage-git.adoc[]
-
-include::changelogs.adoc[]
-
-include::searching.adoc[]
-
-include::extension-indicators.adoc[]
+//[[basics]]
+//== Basics
+//
+//include::usage-projects.adoc[]
+//
+//include::usage-branches.adoc[]
+//
+//include::usage-validation-stamps.adoc[]
+//
+//include::usage-promotion-levels.adoc[]
+//
+//include::usage-builds.adoc[]
+//
+//include::usage-validation-runs.adoc[]
+//
+//include::usage-properties.adoc[]
+//
+//[[topics]]
+//== Topics
+//
+//include::usage-scm.adoc[]
+//
+//include::usage-git.adoc[]
+//
+//include::changelogs.adoc[]
+//
+//include::searching.adoc[]
+//
+//include::extension-indicators.adoc[]
