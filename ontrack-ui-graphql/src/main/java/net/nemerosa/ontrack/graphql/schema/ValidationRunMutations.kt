@@ -9,19 +9,20 @@ import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataJSONInputException
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 
 @Component
 class ValidationRunMutations(
     private val structureService: StructureService,
     private val validationRunStatusService: ValidationRunStatusService,
-    private val validationDataTypeService: ValidationDataTypeService
+    private val validationDataTypeService: ValidationDataTypeService,
 ) : TypedMutationProvider() {
 
     override val mutations: List<Mutation> = listOf(
         simpleMutation(
             name = CREATE_VALIDATION_RUN_FOR_BUILD_BY_NAME,
             description = "Creating a validation run for a build identified by its name",
-            input = CreateValidationRunForBuildByNameInput::class,
+            input = CreateValidationRunInput::class,
             outputName = "validationRun",
             outputDescription = "Created validation run",
             outputType = ValidationRun::class
@@ -43,7 +44,7 @@ class ValidationRunMutations(
         simpleMutation(
             name = CREATE_VALIDATION_RUN_FOR_BUILD_BY_ID,
             description = "Creating a validation run for a build identified by its ID",
-            input = CreateValidationRunForBuildByIdInput::class,
+            input = CreateValidationRunByIdInput::class,
             outputName = "validationRun",
             outputDescription = "Created validation run",
             outputType = ValidationRun::class
@@ -66,7 +67,7 @@ class ValidationRunMutations(
         build: Build,
         validationStampName: String,
         dataTypeId: String?,
-        data: JsonNode?
+        data: JsonNode?,
     ): Any? = data?.run {
         // Gets the validation stamp
         val validationStamp: ValidationStamp = structureService.getOrCreateValidationStamp(
@@ -93,12 +94,12 @@ class ValidationRunMutations(
     }
 
     companion object {
-        const val CREATE_VALIDATION_RUN_FOR_BUILD_BY_ID = "createValidationRunForBuildById"
-        const val CREATE_VALIDATION_RUN_FOR_BUILD_BY_NAME = "createValidationRunForBuildByName"
+        const val CREATE_VALIDATION_RUN_FOR_BUILD_BY_ID = "createValidationRunById"
+        const val CREATE_VALIDATION_RUN_FOR_BUILD_BY_NAME = "createValidationRun"
     }
 }
 
-class CreateValidationRunForBuildByNameInput(
+class CreateValidationRunInput(
     @APIDescription("Project name")
     val project: String,
     @APIDescription("Branch name")
@@ -114,10 +115,12 @@ class CreateValidationRunForBuildByNameInput(
     @APIDescription("Type of the data to associated with the validation")
     val dataTypeId: String?,
     @APIDescription("Data to associated with the validation")
-    val data: JsonNode?
+    val data: JsonNode?,
+    @APIDescription("Run info")
+    val runInfo: RunInfoInput?,
 )
 
-class CreateValidationRunForBuildByIdInput(
+class CreateValidationRunByIdInput(
     @APIDescription("Build ID")
     val buildId: Int,
     @APIDescription("Validation stamp name")
@@ -129,5 +132,24 @@ class CreateValidationRunForBuildByIdInput(
     @APIDescription("Type of the data to associated with the validation")
     val dataTypeId: String?,
     @APIDescription("Data to associated with the validation")
-    val data: JsonNode?
+    val data: JsonNode?,
+    @APIDescription("Run info")
+    val runInfo: RunInfoInput?,
+)
+
+class RunInfoInput(
+    @APIDescription("Type of source (like \"github\")")
+    val sourceType: String?,
+    @APIDescription("URI to the source of the run (like the URL to a Jenkins job)")
+    val sourceUri: String?,
+    @APIDescription("Type of trigger (like \"scm\" or \"user\")")
+    val triggerType: String?,
+    @APIDescription("Data associated with the trigger (like a user ID or a commit)")
+    val triggerData: String?,
+    @APIDescription("Time of the run (in seconds)")
+    val runTime: Int?,
+    @APIDescription("User having initiated the run")
+    val user: String?,
+    @APIDescription("Time of the start of the run")
+    val timestamp: LocalDateTime?,
 )
