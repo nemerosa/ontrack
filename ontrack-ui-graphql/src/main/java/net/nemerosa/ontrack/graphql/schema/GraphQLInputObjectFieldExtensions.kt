@@ -33,6 +33,15 @@ fun optionalIntInputField(
     .build()
 
 
+fun requiredFloatInputField(
+    name: String,
+    description: String
+): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
+    .name(name)
+    .description(description)
+    .type(GraphQLNonNull(GraphQLFloat))
+    .build()
+
 fun requiredIntInputField(
     name: String,
     description: String
