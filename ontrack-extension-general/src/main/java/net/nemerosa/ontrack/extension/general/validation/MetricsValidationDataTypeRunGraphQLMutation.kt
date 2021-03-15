@@ -4,6 +4,7 @@ import graphql.schema.*
 import net.nemerosa.ontrack.graphql.schema.*
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.structure.RunInfoService
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.structure.ValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusService
@@ -15,9 +16,11 @@ class MetricsValidationDataTypeRunGraphQLMutation(
     structureService: StructureService,
     validationRunStatusService: ValidationRunStatusService,
     gqlInputMetricsEntry: GQLInputMetricsEntry,
+    runInfoService: RunInfoService,
 ) : AbstractTypedValidationRunMutationProvider<MetricsValidationData>(
     structureService,
-    validationRunStatusService
+    validationRunStatusService,
+    runInfoService,
 ) {
 
     override val mutationFragmentName: String = "Metrics"

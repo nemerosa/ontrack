@@ -2,7 +2,10 @@ package net.nemerosa.ontrack.extension.general.validation
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.toJsonMap
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.RunInfoInput
 import net.nemerosa.ontrack.model.structure.ValidationDataTypeConfig
 import kotlin.test.assertEquals
 
@@ -14,6 +17,7 @@ abstract class AbstractValidationDataTypeRunGraphQLMutationTestSupport<C> : Abst
         dataInput: String,
         expectedData: JsonNode,
         expectedStatus: String,
+        runInfo: RunInfoInput? = null,
     ) {
         testValidation(
             dataConfig = dataConfig,
@@ -27,7 +31,8 @@ abstract class AbstractValidationDataTypeRunGraphQLMutationTestSupport<C> : Abst
             },
             dataInput = dataInput,
             expectedData = expectedData,
-            expectedStatus = expectedStatus
+            expectedStatus = expectedStatus,
+            runInfo = runInfo,
         )
     }
 
@@ -37,6 +42,7 @@ abstract class AbstractValidationDataTypeRunGraphQLMutationTestSupport<C> : Abst
         dataInput: String,
         expectedData: JsonNode,
         expectedStatus: String,
+        runInfo: RunInfoInput? = null,
     ) {
         testValidation(
             dataConfig = dataConfig,
@@ -48,7 +54,8 @@ abstract class AbstractValidationDataTypeRunGraphQLMutationTestSupport<C> : Abst
             },
             dataInput = dataInput,
             expectedData = expectedData,
-            expectedStatus = expectedStatus
+            expectedStatus = expectedStatus,
+            runInfo = runInfo,
         )
     }
 
@@ -59,6 +66,7 @@ abstract class AbstractValidationDataTypeRunGraphQLMutationTestSupport<C> : Abst
         dataInput: String,
         expectedData: JsonNode,
         expectedStatus: String,
+        runInfo: RunInfoInput? = null,
     ) {
         asAdmin {
             project {
@@ -68,10 +76,11 @@ abstract class AbstractValidationDataTypeRunGraphQLMutationTestSupport<C> : Abst
                     )
                     build {
                         run("""
-                            mutation {
+                            mutation Mutation(${'$'}runInfo: RunInfoInput) {
                                 $mutationName(input: {
                                     ${buildInput(this)},
                                     validation: "${vs.name}",
+                                    runInfo: ${'$'}runInfo,
                                     $dataInput
                                 }) {
                                     validationRun {
@@ -89,13 +98,21 @@ abstract class AbstractValidationDataTypeRunGraphQLMutationTestSupport<C> : Abst
                                                 id
                                             }
                                         }
+                                        runInfo {
+                                            sourceType
+                                            sourceUri
+                                            triggerType
+                                            runTime
+                                        }
                                     }
                                     errors {
                                         message
                                     }
                                 }
                             }
-                        """).let { data ->
+                        """, mapOf(
+                            "runInfo" to runInfo.toJsonMap()
+                        )).let { data ->
                             val node = assertNoUserError(data, mutationName)
                             val run = node.path("validationRun")
 
@@ -107,6 +124,15 @@ abstract class AbstractValidationDataTypeRunGraphQLMutationTestSupport<C> : Abst
                             )
                             val status = run.path("validationRunStatuses").path(0).path("statusID").path("id").asText()
                             assertEquals(expectedStatus, status)
+
+                            // Run info check
+                            if (runInfo != null) {
+                                val riNode = run.path("runInfo")
+                                assertEquals(runInfo.sourceType, riNode.path("sourceType").asText())
+                                assertEquals(runInfo.sourceUri, riNode.path("sourceUri").asText())
+                                assertEquals(runInfo.triggerType, riNode.path("triggerType").asText())
+                                assertEquals(runInfo.runTime, riNode.path("runTime").asInt())
+                            }
                         }
                     }
                 }

@@ -4,6 +4,7 @@ import graphql.schema.GraphQLInputObjectField
 import net.nemerosa.ontrack.graphql.schema.AbstractTypedValidationRunMutationProvider
 import net.nemerosa.ontrack.graphql.schema.EnvMutationInput
 import net.nemerosa.ontrack.graphql.schema.requiredIntInputField
+import net.nemerosa.ontrack.model.structure.RunInfoService
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.structure.ValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusService
@@ -14,8 +15,12 @@ import kotlin.reflect.KClass
 class TestSummaryValidationDataTypeRunGraphQLMutation(
     structureService: StructureService,
     validationRunStatusService: ValidationRunStatusService,
-) : AbstractTypedValidationRunMutationProvider<TestSummaryValidationData>(structureService,
-    validationRunStatusService) {
+    runInfoService: RunInfoService,
+) : AbstractTypedValidationRunMutationProvider<TestSummaryValidationData>(
+    structureService,
+    validationRunStatusService,
+    runInfoService,
+) {
 
     override val mutationFragmentName: String = "Tests"
 

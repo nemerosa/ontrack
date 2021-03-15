@@ -1,13 +1,14 @@
 package net.nemerosa.ontrack.extension.general.validation
 
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.structure.RunInfoInput
 import net.nemerosa.ontrack.model.structure.config
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
-class CHMValidationDataTypeRunGraphQLMutationIT :
+class CHMLValidationDataTypeRunGraphQLMutationIT :
     AbstractValidationDataTypeRunGraphQLMutationTestSupport<CHMLValidationDataTypeConfig>() {
 
     @Autowired
@@ -54,13 +55,21 @@ class CHMValidationDataTypeRunGraphQLMutationIT :
                         "LOW" to 0,
                     )
         ).asJson()
+        // Run info
+        val runInfo = RunInfoInput(
+            sourceType = "github",
+            sourceUri = "URL to GitHub",
+            triggerType = "push",
+            runTime = 24
+        )
         //
         testValidationByName(
             dataConfig = dataConfig,
             mutationName = "validateBuildWithCHML",
             dataInput = dataInput,
             expectedData = expectedData,
-            expectedStatus = expectedStatus
+            expectedStatus = expectedStatus,
+            runInfo = runInfo,
         )
         //
         testValidationById(
@@ -68,7 +77,8 @@ class CHMValidationDataTypeRunGraphQLMutationIT :
             mutationName = "validateBuildByIdWithCHML",
             dataInput = dataInput,
             expectedData = expectedData,
-            expectedStatus = expectedStatus
+            expectedStatus = expectedStatus,
+            runInfo = runInfo,
         )
     }
 

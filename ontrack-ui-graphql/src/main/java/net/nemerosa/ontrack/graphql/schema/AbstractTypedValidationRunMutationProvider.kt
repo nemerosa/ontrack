@@ -19,6 +19,7 @@ import kotlin.reflect.KClass
 abstract class AbstractTypedValidationRunMutationProvider<T>(
     private val structureService: StructureService,
     private val validationRunStatusService: ValidationRunStatusService,
+    private val runInfoService: RunInfoService,
 ) : MutationProvider {
 
     override val mutations: List<Mutation>
@@ -93,7 +94,7 @@ abstract class AbstractTypedValidationRunMutationProvider<T>(
         val validation = getRequiredMutationInputField<String>(env, "validation")
         val input = EnvMutationInput(env)
         val data = readInput(input)
-        return structureService.newValidationRun(
+        val run = structureService.newValidationRun(
             build = build,
             validationRunRequest = ValidationRunRequest(
                 validationStampName = validation,
@@ -105,7 +106,13 @@ abstract class AbstractTypedValidationRunMutationProvider<T>(
                 data = data,
             )
         )
-        // TODO Run info
+        // Run info
+        val runInfo = input.getInputObject<RunInfoInput>("runInfo")
+        if (runInfo != null) {
+            runInfoService.setRunInfo(run, runInfo)
+        }
+        // OK
+        return run
     }
 
     /**
@@ -122,7 +129,9 @@ abstract class AbstractTypedValidationRunMutationProvider<T>(
         requiredStringInputField("validation", "Name of the validation stamp"),
         optionalStringInputField("status", "Status of the validation run"),
         optionalStringInputField("description", "Description of the validation run"),
-        // TODO Run info input
+        optionalRefInputField("runInfo",
+            "Optional run info to associated with this validation run",
+            RunInfoInput::class.toTypeRef())
     )
 
     private fun returnField(): GraphQLFieldDefinition = GraphQLFieldDefinition.newFieldDefinition()

@@ -4,6 +4,7 @@ import graphql.schema.GraphQLInputObjectField
 import net.nemerosa.ontrack.graphql.schema.AbstractTypedValidationRunMutationProvider
 import net.nemerosa.ontrack.graphql.schema.EnvMutationInput
 import net.nemerosa.ontrack.graphql.schema.optionalIntInputField
+import net.nemerosa.ontrack.model.structure.RunInfoService
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.structure.ValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusService
@@ -14,8 +15,12 @@ import kotlin.reflect.KClass
 class CHMValidationDataTypeRunGraphQLMutation(
     structureService: StructureService,
     validationRunStatusService: ValidationRunStatusService,
-) : AbstractTypedValidationRunMutationProvider<CHMLValidationDataTypeData>(structureService,
-    validationRunStatusService) {
+    runInfoService: RunInfoService,
+) : AbstractTypedValidationRunMutationProvider<CHMLValidationDataTypeData>(
+    structureService,
+    validationRunStatusService,
+    runInfoService,
+) {
 
     override val mutationFragmentName: String = "CHML"
 
