@@ -1,9 +1,16 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import com.fasterxml.jackson.databind.JsonNode
+import graphql.schema.GraphQLInputObjectType
+import graphql.schema.GraphQLInputType
+import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter
+import net.nemerosa.ontrack.graphql.support.TypeRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.json.JsonParseException
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataJSONInputException
@@ -16,6 +23,7 @@ class ValidationRunMutations(
     private val structureService: StructureService,
     private val validationRunStatusService: ValidationRunStatusService,
     private val validationDataTypeService: ValidationDataTypeService,
+    private val runInfoService: RunInfoService,
 ) : TypedMutationProvider() {
 
     override val mutations: List<Mutation> = listOf(
@@ -50,7 +58,7 @@ class ValidationRunMutations(
             outputType = ValidationRun::class
         ) { input ->
             val build = structureService.getBuild(ID.of(input.buildId))
-            structureService.newValidationRun(
+            val run = structureService.newValidationRun(
                 build = build,
                 validationRunRequest = ValidationRunRequest(
                     validationStampName = input.validationStamp,
@@ -60,6 +68,15 @@ class ValidationRunMutations(
                     description = input.description
                 )
             )
+            // Run info
+            if (input.runInfo != null) {
+                runInfoService.setRunInfo(
+                    entity = run,
+                    input = input.runInfo,
+                )
+            }
+            // OK
+            run
         }
     )
 
@@ -117,6 +134,7 @@ class CreateValidationRunInput(
     @APIDescription("Data to associated with the validation")
     val data: JsonNode?,
     @APIDescription("Run info")
+    @TypeRef
     val runInfo: RunInfoInput?,
 )
 
@@ -134,22 +152,22 @@ class CreateValidationRunByIdInput(
     @APIDescription("Data to associated with the validation")
     val data: JsonNode?,
     @APIDescription("Run info")
+    @TypeRef
     val runInfo: RunInfoInput?,
 )
 
-class RunInfoInput(
-    @APIDescription("Type of source (like \"github\")")
-    val sourceType: String?,
-    @APIDescription("URI to the source of the run (like the URL to a Jenkins job)")
-    val sourceUri: String?,
-    @APIDescription("Type of trigger (like \"scm\" or \"user\")")
-    val triggerType: String?,
-    @APIDescription("Data associated with the trigger (like a user ID or a commit)")
-    val triggerData: String?,
-    @APIDescription("Time of the run (in seconds)")
-    val runTime: Int?,
-    @APIDescription("User having initiated the run")
-    val user: String?,
-    @APIDescription("Time of the start of the run")
-    val timestamp: LocalDateTime?,
-)
+@Component
+class GQLInputRunInfoInput : GQLInputType<RunInfoInput> {
+
+    override fun createInputType(): GraphQLInputType = GraphQLInputObjectType.newInputObject()
+        .name(RunInfoInput::class.java.simpleName)
+        .description("Input for some run info")
+        .fields(GraphQLBeanConverter.asInputFields(RunInfoInput::class))
+        .build()
+
+    override fun convert(argument: Any?): RunInfoInput =
+        argument.asJson().parse()
+
+    override fun getTypeRef() = GraphQLTypeReference(RunInfoInput::class.java.simpleName)
+
+}

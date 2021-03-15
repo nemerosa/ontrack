@@ -44,6 +44,28 @@ object GraphQLBeanConverter {
                         .description(description)
                         .type(actualType)
                         .build()
+            } else {
+                val typeRef = property.findAnnotation<TypeRef>()
+                if (typeRef != null) {
+                    val javaType = property.returnType.javaType
+                    if (javaType is Class<*>) {
+                        val rootType = GraphQLTypeReference(javaType.simpleName)
+                        val actualType: GraphQLInputType = if (property.returnType.isMarkedNullable) {
+                            rootType
+                        } else {
+                            GraphQLNonNull(rootType)
+                        }
+                        fields += GraphQLInputObjectField.newInputObjectField()
+                            .name(name)
+                            .description(description)
+                            .type(actualType)
+                            .build()
+                    } else {
+                        throw IllegalStateException("Unsupported type for input type: $property")
+                    }
+                } else {
+                    throw IllegalStateException("Cannot create an input field out of $property since its type is not scalar and the property is not annotated with @TypeRef")
+                }
             }
         }
         // OK
