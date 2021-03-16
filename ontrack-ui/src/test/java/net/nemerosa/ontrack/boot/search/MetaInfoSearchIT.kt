@@ -171,7 +171,7 @@ class MetaInfoSearchIT : AbstractSearchTestSupport() {
                 results[0].apply {
                     assertEquals(original.entityDisplayName, title)
                     assertEquals("$name -> $value", description)
-                    assertEquals(results.map { it.accuracy }.max(), accuracy)
+                    assertEquals(results.map { it.accuracy }.maxOrNull(), accuracy)
                 }
                 // Prefixed & other values are also present
                 assertTrue(results.any { it.title == prefixed.entityDisplayName }, "Prefixed build is present")
