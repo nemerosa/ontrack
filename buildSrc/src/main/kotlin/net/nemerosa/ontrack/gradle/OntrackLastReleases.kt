@@ -17,14 +17,10 @@ open class OntrackLastReleases : AbstractOntrackTask() {
     var releaseCount: Int = 5
 
     @Input
-    var releasePattern: String = ".*"
+    var releaseBranchPattern: String = "release-.*"
 
     @Internal
     var releases: List<Build> = emptyList()
-
-    companion object {
-        val RELEASE_BRANCH = "release-.*".toRegex()
-    }
 
     @TaskAction
     fun run() {
@@ -35,11 +31,17 @@ open class OntrackLastReleases : AbstractOntrackTask() {
         val project = ontrack.project(ontrackProject)
         // List of releases
         val result = mutableListOf<Build>()
+        // Patterns
+        val releaseBranchRegex = "release-$releaseBranchPattern".toRegex()
+        val releaseBuildRegex = "${releaseBranchPattern}\\.[\\d]+".toRegex()
+        logger.debug("releaseBranchRegex=$releaseBranchRegex")
+        logger.debug("releaseBuildRegex=$releaseBuildRegex")
         // Gets all branches
         var count = 0
         project.branches.forEach { branch ->
             // Only release/ branches
-            if (count < releaseCount && branch.name.matches(RELEASE_BRANCH) && !branch.isDisabled) {
+            if (count < releaseCount && branch.name.matches(releaseBranchRegex) && !branch.isDisabled) {
+                logger.debug("Scanning branch ${branch.name}...")
                 // ... and gets the last RELEASE build for each of them
                 val builds = branch.standardFilter(mapOf(
                         "count" to 1,
@@ -47,13 +49,16 @@ open class OntrackLastReleases : AbstractOntrackTask() {
                 ))
                 if (builds.isNotEmpty()) {
                     val build = builds.first()
-                    if (build.name.matches(releasePattern.toRegex())) {
+                    logger.debug("Candidate build: ${build.name}")
+                    if (build.name.matches(releaseBuildRegex)) {
+                        logger.debug("Matched build: ${build.name}")
                         result += build
                         count++
                     }
                 }
             }
         }
+        logger.info("Releases: ${ result.map { it.name } }")
         this.releases = result
     }
 

@@ -3,6 +3,7 @@
 pipeline {
 
     environment {
+        ONTRACK = credentials("ONTRACK_SERVICE_ACCOUNT")
         ONTRACK_PROJECT_NAME = "ontrack"
         ONTRACK_BRANCH_NAME = ontrackBranchName(BRANCH_NAME)
         DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
@@ -646,7 +647,6 @@ pipeline {
             environment {
                 GITHUB_TOKEN = credentials("JENKINS_GITHUB_TOKEN")
                 GITTER_TOKEN = credentials("GITTER_TOKEN")
-                ONTRACK = credentials("ONTRACK_SERVICE_ACCOUNT")
             }
             when {
                 beforeAgent true
@@ -953,6 +953,8 @@ pipeline {
                         --profile \\
                         --console plain \\
                         --stacktrace \\
+                        -PontrackUser=${ONTRACK_USR} \\
+                        -PontrackPassword=${ONTRACK_PSW} \\
                         -PontrackVersion=${ONTRACK_VERSION} \\
                         -PontrackGitHubUri=${GITHUB_URI} \\
                         site

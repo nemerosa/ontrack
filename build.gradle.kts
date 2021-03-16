@@ -740,20 +740,28 @@ val release by tasks.registering {
 
 val siteOntrackLast2Releases by tasks.registering(OntrackLastReleases::class) {
     releaseCount = 1
-    releasePattern = "2\\.[\\d]+\\..*"
+    releaseBranchPattern = "2\\.[\\d]+"
 }
 
 val siteOntrackLast3Releases by tasks.registering(OntrackLastReleases::class) {
+    releaseCount = 2
+    releaseBranchPattern = "3\\.[\\d]+"
+}
+
+val siteOntrackLast4Releases by tasks.registering(OntrackLastReleases::class) {
     releaseCount = 4
-    releasePattern = "3\\.[\\d]+\\..*"
+    releaseBranchPattern = "4\\.[\\d]+(-rc|-beta)?"
 }
 
 val sitePagesDocJs by tasks.registering {
     dependsOn(siteOntrackLast2Releases)
     dependsOn(siteOntrackLast3Releases)
-    outputs.file(project.file("build/site/page/doc.js"))
+    dependsOn(siteOntrackLast4Releases)
+    outputs.file(project.file("ontrack-site/src/main/web/output/assets/web/assets/ontrack/doc.js"))
     doLast {
-        val allReleases = siteOntrackLast3Releases.get().releases + siteOntrackLast2Releases.get().releases
+        val allReleases = siteOntrackLast4Releases.get().releases +
+                siteOntrackLast3Releases.get().releases +
+                siteOntrackLast2Releases.get().releases
         val allVersions = allReleases.joinToString(",") { "'${it.name}'" }
         project.file("ontrack-site/src/main/web/output/assets/web/assets/ontrack/doc.js").writeText(
                 """const releases = [$allVersions];"""
