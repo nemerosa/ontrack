@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.graphql.support.TypeRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
@@ -15,7 +16,8 @@ import javax.validation.constraints.Pattern
 @Component
 class BuildMutations(
     private val structureService: StructureService,
-    private val securityService: SecurityService
+    private val securityService: SecurityService,
+    private val runInfoService: RunInfoService,
 ) : TypedMutationProvider() {
 
     override val mutations: List<Mutation> = listOf(
@@ -27,13 +29,19 @@ class BuildMutations(
             "build", "Created build", Build::class
         ) { input ->
             val branch = getBranch(input)
-            structureService.newBuild(
+            val build = structureService.newBuild(
                 Build.of(
                     branch = branch,
                     nameDescription = NameDescription(input.name, input.description),
                     signature = securityService.currentSignature
                 )
             )
+            // Run info
+            if (input.runInfo != null) {
+                runInfoService.setRunInfo(build, input.runInfo)
+            }
+            // OK
+            build
         },
         /**
          * Creating a build or getting it if it already exists
@@ -49,7 +57,7 @@ class BuildMutations(
 
     private fun createBuildOrGet(input: CreateBuildOrGetInput): Build {
         val branch = getBranch(input)
-        return structureService.findBuildByName(branch.project.name, branch.name, input.name).getOrNull()
+        val build = structureService.findBuildByName(branch.project.name, branch.name, input.name).getOrNull()
             ?: structureService.newBuild(
                 Build.of(
                     branch = branch,
@@ -57,6 +65,12 @@ class BuildMutations(
                     signature = securityService.currentSignature
                 )
             )
+        // Run info
+        if (input.runInfo != null) {
+            runInfoService.setRunInfo(build, input.runInfo)
+        }
+        // OK
+        return build
     }
 
     companion object {
@@ -136,7 +150,10 @@ data class CreateBuildInput(
     @APIDescription("Build name")
     val name: String,
     @APIDescription("Build description")
-    val description: String?
+    val description: String?,
+    @APIDescription("Optional run info")
+    @TypeRef
+    val runInfo: RunInfoInput?,
 ) : BuildInput
 
 data class CreateBuildOrGetInput(
@@ -153,5 +170,8 @@ data class CreateBuildOrGetInput(
     @APIDescription("Build name")
     val name: String,
     @APIDescription("Build description")
-    val description: String?
+    val description: String?,
+    @APIDescription("Optional run info")
+    @TypeRef
+    val runInfo: RunInfoInput?,
 ) : BuildInput

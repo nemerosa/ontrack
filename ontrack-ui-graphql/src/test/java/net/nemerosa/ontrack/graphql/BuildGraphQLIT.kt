@@ -2,10 +2,11 @@ package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.json.isNullOrNullNode
+import net.nemerosa.ontrack.json.toJsonMap
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.RunInfoInput
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -42,6 +43,47 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     assertTrue(build["id"].asInt() > 0, "ID is set")
                     assertEquals("1", build["name"].asText(), "Name is OK")
                     assertTrue(data["createBuild"]["errors"].isNullOrNullNode(), "No error")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a build with some run info`() {
+        asAdmin {
+            project project@{
+                branch branch@{
+                    val runInfo = RunInfoInput(runTime = 27)
+                    val data = run("""
+                        mutation CreateBuild(${'$'}runInfo: RunInfoInput) {
+                            createBuild(input: {branchId: ${this@branch.id}, name: "1", runInfo: ${'$'}runInfo}) {
+                                build {
+                                    id
+                                    name
+                                    runInfo {
+                                        runTime
+                                    }
+                                }
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """, mapOf(
+                        "runInfo" to runInfo.toJsonMap()
+                    ))
+                    // Checks the build has been created
+                    assertNotNull(
+                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                        "Build has been created")
+                    // Checks the data
+                    val node = assertNoUserError(data, "createBuild")
+                    val build = node["build"]
+                    assertTrue(build["id"].asInt() > 0, "ID is set")
+                    assertEquals("1", build["name"].asText(), "Name is OK")
+                    // Run info
+                    assertEquals(27, build.path("runInfo").path("runTime").asInt())
                 }
             }
         }
@@ -1007,7 +1049,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 // Looks for a non existing build
                 val data = asUserWithView {
                     run("""{
-                        builds(project: "${project.name}", branch: "${name}", name: "11") {
+                        builds(project: "${project.name}", branch: "$name", name: "11") {
                             id
                         }
                     }""")
