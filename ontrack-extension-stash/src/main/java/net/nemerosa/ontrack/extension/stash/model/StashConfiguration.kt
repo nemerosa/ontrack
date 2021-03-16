@@ -15,7 +15,7 @@ import java.util.function.Function
 
 /**
  * @property name Name of this configuration
- * @property url BitBucket URL
+ * @property url Bitbucket URL
  * @property user User name
  * @property password User password
  */
@@ -34,7 +34,7 @@ open class StashConfiguration(
     override fun getPassword(): String? = password
 
     /**
-     * Checks if this configuration denotes any BitBucket Cloud instance
+     * Checks if this configuration denotes any Bitbucket Cloud instance
      */
     val isCloud: Boolean
         @JsonIgnore
@@ -100,7 +100,7 @@ open class StashConfiguration(
                     .with(
                             Text.of("url")
                                     .label("URL")
-                                    .help("URL to the BitBucket instance (https://bitbucket.org for example)"))
+                                    .help("URL to the Bitbucket instance (https://bitbucket.org for example)"))
                     .with(
                             Text.of("user")
                                     .label("User")

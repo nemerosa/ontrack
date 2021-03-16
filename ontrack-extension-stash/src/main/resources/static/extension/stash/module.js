@@ -14,8 +14,8 @@ angular.module('ontrack.extension.stash', [
     })
     .controller('StashConfigurationsCtrl', function ($scope, $http, ot, otFormService, otAlertService, otConfigurationService) {
         var view = ot.view();
-        view.title = 'BitBucket configurations';
-        view.description = 'Management of the BitBucket configurations.';
+        view.title = 'Bitbucket configurations';
+        view.description = 'Management of the Bitbucket configurations.';
 
         // Loading the configurations
         function load() {
@@ -39,7 +39,7 @@ angular.module('ontrack.extension.stash', [
         $scope.createConfiguration = function () {
             otFormService.display({
                 uri: $scope.configurations._create,
-                title: "BitBucket configuration",
+                title: "Bitbucket configuration",
                 buttons: [ otConfigurationService.testButton($scope.configurations._test) ],
                 submit: function (data) {
                     return ot.call($http.post($scope.configurations._create, data));
@@ -51,7 +51,7 @@ angular.module('ontrack.extension.stash', [
         $scope.deleteConfiguration = function (configuration) {
             otAlertService.confirm({
                 title: 'Stash configuration',
-                message: "Do you really want to delete this BitBucket configuration? Some projects may still refer to it."
+                message: "Do you really want to delete this Bitbucket configuration? Some projects may still refer to it."
             }).then(
                 function success() {
                     ot.call($http.delete(configuration._delete)).then(load);
@@ -63,7 +63,7 @@ angular.module('ontrack.extension.stash', [
         $scope.updateConfiguration = function (configuration) {
             otFormService.display({
                 uri: configuration._update,
-                title: "BitBucket configuration",
+                title: "Bitbucket configuration",
                 buttons: [ otConfigurationService.testButton($scope.configurations._test) ],
                 submit: function (data) {
                     return ot.call($http.put(configuration._update, data));

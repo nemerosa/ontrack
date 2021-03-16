@@ -4,8 +4,8 @@ import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
 import net.nemerosa.ontrack.model.support.ConfigurationProperty
 
 /**
- * @property configuration Link to the BitBucket configuration
- * @property project Project in BitBucket
+ * @property configuration Link to the Bitbucket configuration
+ * @property project Project in Bitbucket
  * @property repository Repository in the project
  * @property indexationInterval Indexation interval
  * @property issueServiceConfigurationIdentifier ID to the [net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration] associated

@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 
 /**
- * GUI tests about the `stash` extension (BitBucket).
+ * GUI tests about the `stash` extension (Bitbucket).
  */
 @AcceptanceTestSuite
 class ACCBitBucketExtension extends AbstractACCDSL {
@@ -41,7 +41,7 @@ class ACCBitBucketExtension extends AbstractACCDSL {
         String configurationName = TestUtils.uid('C') + '.org'
         // Creating the configuration
         ontrack.config.stash configurationName, url: 'https://bitbucket.org', user: 'user', password: 'secret'
-        // Creates a project and configures it for BitBucket
+        // Creates a project and configures it for Bitbucket
         String name = TestUtils.uid('P')
         ontrack.project(name).config.stash(configurationName, 'PRJ', 'repos')
         // Gets the property

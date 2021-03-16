@@ -10,6 +10,6 @@ Out of the box, several SCM are supported:
 * <<usage-git,Generic Git repositories>>
 * <<usage-github,GitHub Cloud & Enterprise>>
 * <<usage-gitlab,GitLab>>
-* <<usage-bitbucket,BitBucket Cloud & Server>>
+* <<usage-bitbucket,Bitbucket Cloud & Server>>
 
 include::scm-catalog.adoc[]
