@@ -28,7 +28,7 @@ fun <T> T.asJson(): JsonNode = JsonUtils.format(this)!!
 /**
  * To a Map through JSON
  */
-fun <T> T.toJsonMap(): Map<String,*> = JsonUtils.toMap(asJson())
+fun JsonNode.toJsonMap(): Map<String,*> = JsonUtils.toMap(asJson())
 
 /**
  * Format as a string

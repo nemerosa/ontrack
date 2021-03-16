@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.json.toJsonMap
 import net.nemerosa.ontrack.model.structure.Build
@@ -71,7 +72,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     """, mapOf(
-                        "runInfo" to runInfo.toJsonMap()
+                        "runInfo" to runInfo.asJson().toJsonMap()
                     ))
                     // Checks the build has been created
                     assertNotNull(

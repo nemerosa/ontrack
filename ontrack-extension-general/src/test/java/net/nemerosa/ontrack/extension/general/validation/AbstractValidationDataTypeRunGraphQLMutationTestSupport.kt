@@ -111,7 +111,7 @@ abstract class AbstractValidationDataTypeRunGraphQLMutationTestSupport<C> : Abst
                                 }
                             }
                         """, mapOf(
-                            "runInfo" to runInfo.toJsonMap()
+                            "runInfo" to runInfo?.asJson()?.toJsonMap()
                         )).let { data ->
                             val node = assertNoUserError(data, mutationName)
                             val run = node.path("validationRun")
