@@ -461,4 +461,50 @@ class ValidationRunGraphQLIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `Creating a validation run by name with some run info`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                build {
+                    val data = run("""
+                        mutation CreateValidationRun {
+                            createValidationRun(input: {
+                                project: "${project.name}",
+                                branch: "${branch.name}",
+                                build: "$name",
+                                validationStamp: "${vs.name}",
+                                validationRunStatus: "PASSED",
+                                runInfo: {
+                                    sourceType: "github",
+                                    sourceUri: "url-to-github",
+                                    triggerType: "push",
+                                    runTime: 14
+                                }
+                            }) {
+                                validationRun {
+                                    runInfo {
+                                        sourceType
+                                        sourceUri
+                                        triggerType
+                                        runTime
+                                    }
+                                }
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """)
+                    val node = assertNoUserError(data, "createValidationRun")
+                    val runInfo = node.path("validationRun").path("runInfo")
+                    assertEquals("github", runInfo.path("sourceType").asText())
+                    assertEquals("url-to-github", runInfo.path("sourceUri").asText())
+                    assertEquals("push", runInfo.path("triggerType").asText())
+                    assertEquals(14, runInfo.path("runTime").asInt())
+                }
+            }
+        }
+    }
+
 }
