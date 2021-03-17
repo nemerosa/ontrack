@@ -31,16 +31,7 @@ class ValidationRunMutations(
             val build = (structureService.findBuildByName(input.project, input.branch, input.build)
                 .getOrNull()
                 ?: throw BuildNotFoundException(input.project, input.branch, input.build))
-            structureService.newValidationRun(
-                build = build,
-                validationRunRequest = ValidationRunRequest(
-                    validationStampName = input.validationStamp,
-                    validationRunStatusId = input.validationRunStatus?.let(validationRunStatusService::getValidationRunStatus),
-                    dataTypeId = input.dataTypeId,
-                    data = parseValidationRunData(build, input.validationStamp, input.dataTypeId, input.data),
-                    description = input.description
-                )
-            )
+            validate(build, input)
         },
         simpleMutation(
             name = CREATE_VALIDATION_RUN_FOR_BUILD_BY_ID,
@@ -51,27 +42,32 @@ class ValidationRunMutations(
             outputType = ValidationRun::class
         ) { input ->
             val build = structureService.getBuild(ID.of(input.buildId))
-            val run = structureService.newValidationRun(
-                build = build,
-                validationRunRequest = ValidationRunRequest(
-                    validationStampName = input.validationStamp,
-                    validationRunStatusId = input.validationRunStatus?.let(validationRunStatusService::getValidationRunStatus),
-                    dataTypeId = input.dataTypeId,
-                    data = parseValidationRunData(build, input.validationStamp, input.dataTypeId, input.data),
-                    description = input.description
-                )
-            )
-            // Run info
-            if (input.runInfo != null) {
-                runInfoService.setRunInfo(
-                    entity = run,
-                    input = input.runInfo,
-                )
-            }
-            // OK
-            run
+            validate(build, input)
         }
     )
+
+    private fun validate(build: Build, input: ValidationRunInput): ValidationRun {
+        val run = structureService.newValidationRun(
+            build = build,
+            validationRunRequest = ValidationRunRequest(
+                validationStampName = input.validationStamp,
+                validationRunStatusId = input.validationRunStatus?.let(validationRunStatusService::getValidationRunStatus),
+                dataTypeId = input.dataTypeId,
+                data = parseValidationRunData(build, input.validationStamp, input.dataTypeId, input.data),
+                description = input.description
+            )
+        )
+        // Run info
+        val runInfo = input.runInfo
+        if (runInfo != null) {
+            runInfoService.setRunInfo(
+                entity = run,
+                input = runInfo,
+            )
+        }
+        // OK
+        return run
+    }
 
     fun parseValidationRunData(
         build: Build,
@@ -109,6 +105,15 @@ class ValidationRunMutations(
     }
 }
 
+interface ValidationRunInput {
+    val validationStamp: String
+    val validationRunStatus: String?
+    val description: String?
+    val dataTypeId: String?
+    val data: JsonNode?
+    val runInfo: RunInfoInput?
+}
+
 class CreateValidationRunInput(
     @APIDescription("Project name")
     val project: String,
@@ -117,35 +122,34 @@ class CreateValidationRunInput(
     @APIDescription("Build name")
     val build: String,
     @APIDescription("Validation stamp name")
-    val validationStamp: String,
+    override val validationStamp: String,
     @APIDescription("Validation run status")
-    val validationRunStatus: String?,
+    override val validationRunStatus: String?,
     @APIDescription("Validation description")
-    val description: String?,
+    override val description: String?,
     @APIDescription("Type of the data to associated with the validation")
-    val dataTypeId: String?,
+    override val dataTypeId: String?,
     @APIDescription("Data to associated with the validation")
-    val data: JsonNode?,
+    override val data: JsonNode?,
     @APIDescription("Run info")
     @TypeRef
-    val runInfo: RunInfoInput?,
-)
+    override val runInfo: RunInfoInput?,
+): ValidationRunInput
 
 class CreateValidationRunByIdInput(
     @APIDescription("Build ID")
     val buildId: Int,
     @APIDescription("Validation stamp name")
-    val validationStamp: String,
+    override val validationStamp: String,
     @APIDescription("Validation run status")
-    val validationRunStatus: String?,
+    override val validationRunStatus: String?,
     @APIDescription("Validation description")
-    val description: String?,
+    override val description: String?,
     @APIDescription("Type of the data to associated with the validation")
-    val dataTypeId: String?,
+    override val dataTypeId: String?,
     @APIDescription("Data to associated with the validation")
-    val data: JsonNode?,
+    override val data: JsonNode?,
     @APIDescription("Run info")
     @TypeRef
-    val runInfo: RunInfoInput?,
-)
-
+    override val runInfo: RunInfoInput?,
+): ValidationRunInput
