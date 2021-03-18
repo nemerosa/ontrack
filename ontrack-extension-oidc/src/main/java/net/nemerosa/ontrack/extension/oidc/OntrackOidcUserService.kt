@@ -78,8 +78,9 @@ class OntrackOidcUserService(
         val groupFilterRegex = groupFilter.toRegex(RegexOption.IGNORE_CASE)
         // Gets the groups provided by OIDC
         val groups = oidcUser.getClaimAsStringList("groups")
-                .filter { groupFilterRegex.matches(it) }
-                .toSet()
+                ?.filter { groupFilterRegex.matches(it) }
+                ?.toSet()
+                ?: emptySet()
         // Registers the groups
         securityService.asAdmin {
             providedGroupsService.saveProvidedGroups(account.id(), authenticationSource, groups)

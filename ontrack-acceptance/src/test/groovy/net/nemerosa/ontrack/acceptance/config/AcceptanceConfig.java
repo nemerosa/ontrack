@@ -194,7 +194,9 @@ public class AcceptanceConfig {
         if (StringUtils.isNotBlank(sys)) {
             return sys;
         } else {
-            String envName = property.toUpperCase().replace(".", "_");
+            String envName = property.toUpperCase()
+                    .replace(".", "_")
+                    .replace("-", "_");
             String env = System.getenv(envName);
             if (StringUtils.isNotBlank(env)) {
                 return env;
@@ -210,7 +212,7 @@ public class AcceptanceConfig {
         if (value == null) {
             return defaultValue;
         } else {
-            return Boolean.valueOf(value);
+            return Boolean.parseBoolean(value);
         }
     }
 

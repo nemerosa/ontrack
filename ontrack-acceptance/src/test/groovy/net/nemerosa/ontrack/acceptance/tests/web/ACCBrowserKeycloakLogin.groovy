@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.admin.client.KeycloakBuilder
-import org.keycloak.admin.client.resource.RoleScopeResource
 import org.keycloak.admin.client.resource.UsersResource
 import org.keycloak.representations.idm.*
 

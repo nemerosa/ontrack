@@ -239,7 +239,7 @@ angular.module('ot.view.home', [
                         }
                     }, {
                         name: "GraphiQL",
-                        cls: 'ot-command-api',
+                        cls: 'ot-command-graphiql',
                         absoluteLink: "graphiql.html"
                     }
                 ];
