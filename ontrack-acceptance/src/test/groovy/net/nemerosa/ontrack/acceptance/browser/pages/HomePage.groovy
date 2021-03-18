@@ -8,8 +8,8 @@ import org.openqa.selenium.support.FindBy
 
 public class HomePage extends AbstractHeaderPage {
 
-    @FindBy(className = 'ot-command-graphiql')
-    protected WebElement commandGraphiql;
+    @FindBy(id = 'ot-command-graphiql')
+    protected WebElement commandGraphiql
 
     public HomePage(Browser browser) {
         super(browser);

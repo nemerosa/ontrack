@@ -238,8 +238,9 @@ angular.module('ot.view.home', [
                             $scope.showDisabled = false;
                         }
                     }, {
+                        id: 'ot-command-graphiql',
                         name: "GraphiQL",
-                        cls: 'ot-command-graphiql',
+                        cls: 'ot-command-api',
                         absoluteLink: "graphiql.html"
                     }
                 ];
