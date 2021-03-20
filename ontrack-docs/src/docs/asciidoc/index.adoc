@@ -23,6 +23,8 @@ include::installation.adoc[]
 
 include::setup.adoc[]
 
+include::authentication.adoc[]
+
 include::feeding.adoc[]
 
 include::usage.adoc[]
