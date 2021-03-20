@@ -25,7 +25,7 @@ class OntrackOidcUserService(
     internal fun linkOidcUser(clientRegistration: OntrackClientRegistration, oidcUser: OidcUser): OidcUser {
         val authenticationSource = OidcAuthenticationSourceProvider.asSource(clientRegistration)
         // Gets the user name (as email)
-        val email: String? = oidcUser.userInfo.email
+        val email: String? = oidcUser.userInfo?.email ?: oidcUser.email
         if (email.isNullOrBlank()) {
             throw OidcEmailRequiredException()
         }

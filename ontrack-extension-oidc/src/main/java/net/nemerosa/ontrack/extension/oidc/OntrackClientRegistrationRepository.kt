@@ -55,7 +55,7 @@ final class OntrackClientRegistrationRepository(
                 clientId = settings.clientId
                 clientSecret = settings.clientSecret
                 // See https://github.com/spring-projects/spring-security/issues/8514
-                scope = setOf("openid")
+                scope = setOf("openid", "profile", "email")
             }
         }
         return OAuth2ClientPropertiesRegistrationAdapter.getClientRegistrations(properties)
