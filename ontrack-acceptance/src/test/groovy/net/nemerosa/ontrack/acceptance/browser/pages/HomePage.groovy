@@ -8,8 +8,8 @@ import org.openqa.selenium.support.FindBy
 
 public class HomePage extends AbstractHeaderPage {
 
-    @FindBy(className = 'ot-command-api')
-    protected WebElement commandApi;
+    @FindBy(id = 'ot-command-graphiql')
+    protected WebElement commandGraphiql
 
     public HomePage(Browser browser) {
         super(browser);
@@ -18,7 +18,7 @@ public class HomePage extends AbstractHeaderPage {
     @Override
     void waitFor() {
         super.waitFor()
-        browser.waitUntil("API command") { commandApi.displayed }
+        browser.waitUntil("GraphiQL command") { commandGraphiql.displayed }
     }
 
     @Override

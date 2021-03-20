@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.admin.client.KeycloakBuilder
-import org.keycloak.admin.client.resource.RoleScopeResource
 import org.keycloak.admin.client.resource.UsersResource
 import org.keycloak.representations.idm.*
 
@@ -121,6 +120,23 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
             client.baseUrl = "${baseURL}/login/oauth2/code/$realm" as String
             client.webOrigins = [baseURL]
             client.directAccessGrantsEnabled = true
+
+            // Groups mapper
+            def groupProtocolMapperRepresentation = new ProtocolMapperRepresentation()
+            // groupProtocolMapperRepresentation.consentRequired = false
+            groupProtocolMapperRepresentation.name = "groups"
+            groupProtocolMapperRepresentation.protocol = "openid-connect"
+            groupProtocolMapperRepresentation.protocolMapper = "oidc-usermodel-realm-role-mapper"
+            groupProtocolMapperRepresentation.config = [
+                   "access.token.claim": "true",
+                   "claim.name": "groups",
+                   "id.token.claim": "true",
+                   "jsonType.label": "String",
+                   "multivalued": "true",
+                   // "user.attribute	"foo"
+            ]
+            client.protocolMappers = [ groupProtocolMapperRepresentation ]
+
             clientAdmin.create(client)
 
             ontrack.config.oidcSettings.createProvider(

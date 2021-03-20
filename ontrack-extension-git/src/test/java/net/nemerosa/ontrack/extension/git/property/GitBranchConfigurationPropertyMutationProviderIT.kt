@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.git.property
 
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
-import org.junit.Assert
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -16,7 +15,7 @@ class GitBranchConfigurationPropertyMutationProviderIT : AbstractGitTestSupport(
                 "release/1.0" // Creates branch
             )
 
-        } and { repo, commits ->
+        } and { repo, _ ->
             project {
                 gitProject(repo)
                 branch {
@@ -57,7 +56,7 @@ class GitBranchConfigurationPropertyMutationProviderIT : AbstractGitTestSupport(
                 "release/1.0" // Creates branch
             )
 
-        } and { repo, commits ->
+        } and { repo, _ ->
             project {
                 gitProject(repo)
                 branch {

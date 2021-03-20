@@ -18,7 +18,7 @@ services:
     image: influxdb:1.5.2
 
   keycloak:
-    image: quay.io/keycloak/keycloak:10.0.1
+    image: quay.io/keycloak/keycloak:12.0.4
     environment:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: admin
