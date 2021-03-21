@@ -7,19 +7,86 @@ import net.nemerosa.ontrack.extension.general.ReleaseProperty
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.model.structure.Signature
+import net.nemerosa.ontrack.test.assertPresent
 import org.junit.Test
 import java.time.Duration
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import kotlin.time.ExperimentalTime
-import kotlin.time.days
-import kotlin.time.toJavaDuration
 
 /**
  * Integration tests around the `promotionLevel` root query.
  */
 class PromotionLevelGraphQLIT : AbstractQLKTITSupport() {
+
+    @Test
+    fun `Creation of a promotion level`() {
+        asAdmin {
+            project {
+                branch {
+                    run("""
+                        mutation {
+                            setupPromotionLevel(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                promotion: "GOLD"
+                            }) {
+                                promotionLevel {
+                                    id
+                                }
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """).let { data ->
+                        val node = assertNoUserError(data, "setupPromotionLevel")
+                        assertTrue(node.path("promotionLevel").path("id").asInt() != 0, "PL created")
+
+                        assertPresent(structureService.findPromotionLevelByName(project.name, name, "GOLD")) {
+                            assertEquals("GOLD", it.name)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Update of a promotion level`() {
+        asAdmin {
+            project {
+                branch {
+                    val pl = promotionLevel()
+                    run("""
+                        mutation {
+                            setupPromotionLevel(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                promotion: "${pl.name}",
+                                description: "New description"
+                            }) {
+                                promotionLevel {
+                                    id
+                                }
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """).let { data ->
+                        val node = assertNoUserError(data, "setupPromotionLevel")
+                        assertEquals(pl.id(), node.path("promotionLevel").path("id").asInt(), "PL updated")
+
+                        assertPresent(structureService.findPromotionLevelByName(project.name, name, pl.name)) {
+                            assertEquals(pl.name, it.name)
+                            assertEquals("New description", it.description)
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @Test
     fun `Annotated description`() {
@@ -35,8 +102,10 @@ class PromotionLevelGraphQLIT : AbstractQLKTITSupport() {
                 }""")
                 val promotion = data["promotionLevel"]
                 assertEquals(pl.name, promotion["name"].textValue())
-                assertEquals("A description linking to https://documentation.org/reference", promotion["description"].textValue())
-                assertEquals("""A description linking to <a href="https://documentation.org/reference" target="_blank">https://documentation.org/reference</a>""", promotion["annotatedDescription"].textValue())
+                assertEquals("A description linking to https://documentation.org/reference",
+                    promotion["description"].textValue())
+                assertEquals("""A description linking to <a href="https://documentation.org/reference" target="_blank">https://documentation.org/reference</a>""",
+                    promotion["annotatedDescription"].textValue())
             }
         }
     }
@@ -223,9 +292,9 @@ class PromotionLevelGraphQLIT : AbstractQLKTITSupport() {
                 """
                 // Getting the first page
                 run(query, mapOf(
-                        "id" to pl.id(),
-                        "afterDate" to (refTime - Duration.ofDays(15L)),
-                        "beforeDate" to (refTime - Duration.ofDays(5L))
+                    "id" to pl.id(),
+                    "afterDate" to (refTime - Duration.ofDays(15L)),
+                    "beforeDate" to (refTime - Duration.ofDays(5L))
                 )).apply {
                     val field = path("promotionLevel").path("promotionRunsPaginated")
                     assertEquals(10, field["pageInfo"]["totalSize"].asInt())
