@@ -57,7 +57,7 @@ fun optionalBooleanInputField(
 ): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
     .name(name)
     .description(description)
-    .type(GraphQLNonNull(GraphQLBoolean))
+    .type(GraphQLBoolean)
     .build()
 
 fun requiredRefInputField(
