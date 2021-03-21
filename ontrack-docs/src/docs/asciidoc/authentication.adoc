@@ -1,0 +1,14 @@
+[[authentication]]
+== Authentication
+
+Ontrack supports the following authentication backends:
+
+* <<authentication-built-in,built-in>> (enabled by default)
+* <<authentication-ldap,LDAP>>
+* <<authentication-openid,OpenID>>
+
+include::authentication-built-in.adoc[]
+
+include::authentication-ldap.adoc[]
+
+include::authentication-openid.adoc[]

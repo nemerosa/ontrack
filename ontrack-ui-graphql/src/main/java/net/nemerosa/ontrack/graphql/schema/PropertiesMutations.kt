@@ -121,10 +121,11 @@ class PropertiesMutations(
             )
 
             override fun fetch(env: DataFetchingEnvironment): Any {
-                val id: Int = getRequiredMutationInputField(env, ARG_ID)
-                val value: T = provider.readInput(EnvMutationInput(env))
                 // Loads the entity
+                val id: Int = getRequiredMutationInputField(env, ARG_ID)
                 val entity: ProjectEntity = type.getEntityFn(structureService).apply(ID.of(id))
+                // Reads the property
+                val value: T = provider.readInput(entity, EnvMutationInput(env))
                 // Sets the property
                 propertyService.editProperty(entity, propertyType::class.java, value)
                 // OK
@@ -154,13 +155,14 @@ class PropertiesMutations(
             )
 
             override fun fetch(env: DataFetchingEnvironment): Any {
+                // Loads the entity
                 val names = type.names.associateWith { name ->
                     getRequiredMutationInputField<String>(env, name)
                 }
-                val value: T = provider.readInput(EnvMutationInput(env))
-                // Loads the entity
                 val entity: ProjectEntity = type.loadByNames(structureService, names)
                     ?: throw EntityNotFoundByNameException(type, names)
+                // Reads the property
+                val value: T = provider.readInput(entity, EnvMutationInput(env))
                 // Sets the property
                 propertyService.editProperty(entity, propertyType::class.java, value)
                 // OK
