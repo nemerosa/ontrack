@@ -1,10 +1,8 @@
-package net.nemerosa.ontrack.extension.general;
+package net.nemerosa.ontrack.extension.general
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Data
-public class AutoPromotionLevelProperty {
-
-    private final boolean autoCreate;
-
-}
+data class AutoPromotionLevelProperty(
+    @JsonProperty("autoCreate")
+    val isAutoCreate: Boolean
+)

@@ -6,15 +6,15 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class AutoValidationStampPropertyMutationProviderIT : AbstractQLKTITSupport() {
+class AutoPromotionLevelPropertyMutationProviderIT : AbstractQLKTITSupport() {
 
     @Test
-    fun `Setting the auto validation stamp property on a project by ID and then removing it`() {
+    fun `Setting the auto promotion level property on a project by ID and then removing it`() {
         asAdmin {
             project {
                 run("""
                     mutation {
-                        setProjectAutoValidationStampPropertyById(input: {
+                        setProjectAutoPromotionLevelPropertyById(input: {
                             id: $id,
                             isAutoCreate: true
                         }) {
@@ -24,15 +24,14 @@ class AutoValidationStampPropertyMutationProviderIT : AbstractQLKTITSupport() {
                         }
                     }
                 """).let { data ->
-                    assertNoUserError(data, "setProjectAutoValidationStampPropertyById")
-                    assertNotNull(getProperty(this, AutoValidationStampPropertyType::class.java)) { property ->
+                    assertNoUserError(data, "setProjectAutoPromotionLevelPropertyById")
+                    assertNotNull(getProperty(this, AutoPromotionLevelPropertyType::class.java)) { property ->
                         assertEquals(true, property.isAutoCreate)
-                        assertEquals(false, property.isAutoCreateIfNotPredefined)
                     }
                 }
                 run("""
                     mutation {
-                        deleteProjectAutoValidationStampPropertyById(input: {
+                        deleteProjectAutoPromotionLevelPropertyById(input: {
                             id: $id
                         }) {
                             errors {
@@ -41,23 +40,22 @@ class AutoValidationStampPropertyMutationProviderIT : AbstractQLKTITSupport() {
                         }
                     }
                 """).let { data ->
-                    assertNoUserError(data, "deleteProjectAutoValidationStampPropertyById")
-                    assertNull(getProperty(this, AutoValidationStampPropertyType::class.java))
+                    assertNoUserError(data, "deleteProjectAutoPromotionLevelPropertyById")
+                    assertNull(getProperty(this, AutoPromotionLevelPropertyType::class.java))
                 }
             }
         }
     }
 
     @Test
-    fun `Setting the auto validation stamp property on a project by name and then removing it`() {
+    fun `Setting the auto promotion level property on a project by name and then removing it`() {
         asAdmin {
             project {
                 run("""
                     mutation {
-                        setProjectAutoValidationStampProperty(input: {
+                        setProjectAutoPromotionLevelProperty(input: {
                             project: "${project.name}",
-                            isAutoCreate: true,
-                            isAutoCreateIfNotPredefined: true
+                            isAutoCreate: true
                         }) {
                             errors {
                                 message
@@ -65,15 +63,14 @@ class AutoValidationStampPropertyMutationProviderIT : AbstractQLKTITSupport() {
                         }
                     }
                 """).let { data ->
-                    assertNoUserError(data, "setProjectAutoValidationStampProperty")
-                    assertNotNull(getProperty(this, AutoValidationStampPropertyType::class.java)) { property ->
+                    assertNoUserError(data, "setProjectAutoPromotionLevelProperty")
+                    assertNotNull(getProperty(this, AutoPromotionLevelPropertyType::class.java)) { property ->
                         assertEquals(true, property.isAutoCreate)
-                        assertEquals(true, property.isAutoCreateIfNotPredefined)
                     }
                 }
                 run("""
                     mutation {
-                        deleteProjectAutoValidationStampProperty(input: {
+                        deleteProjectAutoPromotionLevelProperty(input: {
                             project: "${project.name}"
                         }) {
                             errors {
@@ -82,8 +79,8 @@ class AutoValidationStampPropertyMutationProviderIT : AbstractQLKTITSupport() {
                         }
                     }
                 """).let { data ->
-                    assertNoUserError(data, "deleteProjectAutoValidationStampProperty")
-                    assertNull(getProperty(this, AutoValidationStampPropertyType::class.java))
+                    assertNoUserError(data, "deleteProjectAutoPromotionLevelProperty")
+                    assertNull(getProperty(this, AutoPromotionLevelPropertyType::class.java))
                 }
             }
         }
