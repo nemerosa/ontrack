@@ -5,6 +5,7 @@ import graphql.schema.GraphQLInputObjectField
 import graphql.schema.GraphQLNonNull
 import net.nemerosa.ontrack.graphql.schema.MutationInput
 import net.nemerosa.ontrack.graphql.schema.PropertyMutationProvider
+import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.PropertyType
 import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
@@ -28,7 +29,7 @@ class MessagePropertyMutationProvider : PropertyMutationProvider<MessageProperty
             .build()
     )
 
-    override fun readInput(input: MutationInput) = MessageProperty(
+    override fun readInput(entity: ProjectEntity, input: MutationInput) = MessageProperty(
         MessageType.valueOf(input.getRequiredInput("type")),
         input.getRequiredInput("text")
     )

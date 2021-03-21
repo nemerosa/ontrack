@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.github.property
 import graphql.schema.GraphQLInputObjectField
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.graphql.schema.*
+import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.PropertyType
 import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
@@ -25,7 +26,7 @@ class GitHubProjectConfigurationPropertyMutationProvider(
             "Issue identifier to use, for example jira//name where name is the name of the JIRA configuration in Ontrack.")
     )
 
-    override fun readInput(input: MutationInput) = GitHubProjectConfigurationProperty(
+    override fun readInput(entity: ProjectEntity, input: MutationInput) = GitHubProjectConfigurationProperty(
         configuration = gitHubConfigurationService.getConfiguration(input.getRequiredInput("configuration")),
         repository = input.getRequiredInput("repository"),
         indexationInterval = input.getInput<Int>("indexationInterval") ?: 0,

@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
 import net.nemerosa.ontrack.graphql.schema.MutationInput
 import net.nemerosa.ontrack.graphql.schema.PropertyMutationProvider
+import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.PropertyType
 import net.nemerosa.ontrack.model.support.NoConfig
 import org.springframework.stereotype.Component
@@ -29,7 +30,7 @@ class GitBranchConfigurationPropertyMutationProvider(
             .build()
     )
 
-    override fun readInput(input: MutationInput) = GitBranchConfigurationProperty(
+    override fun readInput(entity: ProjectEntity, input: MutationInput) = GitBranchConfigurationProperty(
         branch = input.getRequiredInput(INPUT_BRANCH),
         buildCommitLink = ConfiguredBuildGitCommitLink(link, NoConfig.INSTANCE).toServiceConfiguration(),
         isOverride = false,

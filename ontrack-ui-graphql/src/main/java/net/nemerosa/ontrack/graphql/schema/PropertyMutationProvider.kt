@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.schema.GraphQLInputObjectField
+import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.PropertyType
 import kotlin.reflect.KClass
 
@@ -25,8 +26,8 @@ interface PropertyMutationProvider<T> {
     val inputFields: List<GraphQLInputObjectField>
 
     /**
-     * Given an
+     * Given an entity and the input of the mutation, returns the value of the property to set.
      */
-    fun readInput(input: MutationInput): T
+    fun readInput(entity: ProjectEntity, input: MutationInput): T
 
 }
