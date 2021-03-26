@@ -147,7 +147,11 @@ public class AutoPromotionEventListener implements EventListener {
         Optional<AutoPromotionProperty> oProperty = propertyService.getProperty(promotionLevel, AutoPromotionPropertyType.class).option();
         if (oProperty.isPresent()) {
             AutoPromotionProperty property = oProperty.get();
-            // Chek to be done only if the promotion level is not attributed yet
+            // Checks if the property is eligible
+            if (property.isEmpty()) {
+                return;
+            }
+            // Check to be done only if the promotion level is not attributed yet
             List<PromotionRun> runs = structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel);
             if (runs.isEmpty()) {
                 // Checks the status of each validation stamp

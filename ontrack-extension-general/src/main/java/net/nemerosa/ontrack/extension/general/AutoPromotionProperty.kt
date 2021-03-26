@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.general
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.model.structure.ValidationStamp
 import java.util.regex.Pattern
@@ -22,6 +23,16 @@ data class AutoPromotionProperty(
          */
         val promotionLevels: List<PromotionLevel>
 ) {
+
+    /**
+     * Checks if this property is empty of not
+     */
+    @JsonIgnore
+    fun isEmpty(): Boolean {
+        return validationStamps.isEmpty() &&
+                promotionLevels.isEmpty() &&
+                include.isBlank()
+    }
 
     operator fun contains(vs: ValidationStamp): Boolean {
         return (containsDirectValidationStamp(vs)
