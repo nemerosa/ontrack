@@ -74,17 +74,19 @@ public class AutoPromotionEventListener implements EventListener {
                     validationStamp -> (validationStampId != validationStamp.id())
             ).collect(Collectors.toList());
             if (keptValidationStamps.size() < property.getValidationStamps().size()) {
-                property = new AutoPromotionProperty(
+                AutoPromotionProperty editedProperty = new AutoPromotionProperty(
                         keptValidationStamps,
                         property.getInclude(),
                         property.getExclude(),
                         property.getPromotionLevels()
                 );
-                propertyService.editProperty(
-                        promotionLevel,
-                        AutoPromotionPropertyType.class,
-                        property
-                );
+                securityService.asAdmin(() -> {
+                    propertyService.editProperty(
+                            promotionLevel,
+                            AutoPromotionPropertyType.class,
+                            editedProperty
+                    );
+                });
             }
         }
     }
@@ -97,17 +99,19 @@ public class AutoPromotionEventListener implements EventListener {
                     pl -> (promotionLevelId != pl.id())
             ).collect(Collectors.toList());
             if (keptPromotionLevels.size() < property.getPromotionLevels().size()) {
-                property = new AutoPromotionProperty(
+                AutoPromotionProperty editedProperty = new AutoPromotionProperty(
                         property.getValidationStamps(),
                         property.getInclude(),
                         property.getExclude(),
                         keptPromotionLevels
                 );
-                propertyService.editProperty(
-                        promotionLevel,
-                        AutoPromotionPropertyType.class,
-                        property
-                );
+                securityService.asAdmin(() -> {
+                    propertyService.editProperty(
+                            promotionLevel,
+                            AutoPromotionPropertyType.class,
+                            editedProperty
+                    );
+                });
             }
         }
     }
