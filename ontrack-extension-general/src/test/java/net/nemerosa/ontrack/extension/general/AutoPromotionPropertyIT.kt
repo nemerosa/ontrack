@@ -24,6 +24,32 @@ class AutoPromotionPropertyIT : AbstractDSLTestSupport() {
     private lateinit var autoPromotionPropertyType: AutoPromotionPropertyType
 
     /**
+     * #850 - When the auto promotion is empty, do not promote automatically
+     */
+    @Test
+    fun `Empty auto promotion property does not trigger promotion`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                val pl = promotionLevel {
+                    setProperty(
+                        this,
+                        AutoPromotionPropertyType::class.java,
+                        AutoPromotionProperty(emptyList(), "", "", emptyList())
+                    )
+                }
+                build {
+                    // Validation
+                    validate(vs)
+                    // Checks that the build has not been promoted
+                    val runs = structureService.getPromotionRunsForBuildAndPromotionLevel(this, pl)
+                    assertTrue(runs.isEmpty(), "Build was not promoted")
+                }
+            }
+        }
+    }
+
+    /**
      * This test checks that a promotion level is not attributed twice on validation upon auto promotion.
      */
     @Test

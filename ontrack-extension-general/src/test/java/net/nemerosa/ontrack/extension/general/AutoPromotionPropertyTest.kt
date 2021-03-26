@@ -1,12 +1,10 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.nd
-import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.ValidationStamp
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class AutoPromotionPropertyTest {
@@ -19,6 +17,22 @@ class AutoPromotionPropertyTest {
                 Project.of(nd("P", "")).withId(ID.of(1)),
                 nd("B", "")
         ).withId(ID.of(1))
+    }
+
+    @Test
+    fun `Empty property`() {
+        val vs1 = ValidationStamp.of(
+            branch,
+            nd("VS1", "")
+        ).withId(ID.of(1))
+        val pl = PromotionLevel.of(
+            branch,
+            nd("PL1", "")
+        ).withId(ID.of(1))
+        assertTrue(AutoPromotionProperty(emptyList(), "", "", emptyList()).isEmpty())
+        assertFalse(AutoPromotionProperty(listOf(vs1), "", "", emptyList()).isEmpty())
+        assertFalse(AutoPromotionProperty(emptyList(), "", "", listOf(pl)).isEmpty())
+        assertFalse(AutoPromotionProperty(emptyList(), "CI.*", "", emptyList()).isEmpty())
     }
 
     @Test
