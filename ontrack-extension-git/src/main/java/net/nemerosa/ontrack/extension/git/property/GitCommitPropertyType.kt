@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
+import net.nemerosa.ontrack.model.structure.PropertySearchArguments
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -74,6 +75,21 @@ class GitCommitPropertyType(
     override fun onPropertyChanged(entity: ProjectEntity, value: GitCommitProperty) {
         if (entity is Build) {
             gitService.collectIndexableGitCommitForBuild(entity)
+        }
+    }
+
+    /**
+     * Search criteria
+     */
+    override fun getSearchArguments(token: String): PropertySearchArguments? {
+        return if (token.isNotBlank()) {
+            PropertySearchArguments(
+                jsonContext = null,
+                jsonCriteria = "pp.json->>'commit' = :token",
+                criteriaParams = mapOf("token" to token)
+            )
+        } else {
+            null
         }
     }
 }

@@ -1,11 +1,44 @@
 package net.nemerosa.ontrack.extension.git.property
 
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertNotNull
 
 class GitCommitPropertyTypeIT : AbstractGitTestSupport() {
+
+    @Test
+    fun `Build filter on commit`() {
+        createRepo {
+            commits(5)
+        } and { repo, commits ->
+            project {
+                gitProject(repo)
+                branch {
+                    gitBranch {
+                        commitAsProperty()
+                    }
+                    (1..5).forEach { index ->
+                        build(index.toString()) {
+                            gitCommitProperty(commits.getValue(index))
+                        }
+                    }
+                    // Looks for commit n°3
+                    val builds = buildFilterService.standardFilterProviderData(1)
+                        .withWithProperty(GitCommitPropertyType::class.java.name)
+                        .withWithPropertyValue(commits.getValue(3))
+                        .build()
+                        .filterBranchBuilds(this)
+                    assertEquals(
+                        listOf("3"),
+                        builds.map { it.name }
+                    )
+                }
+            }
+        }
+    }
 
     @Test
     fun onPropertyChanged() {
