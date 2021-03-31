@@ -18,12 +18,11 @@ import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityDefined
 import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityNew
-import net.nemerosa.ontrack.model.support.PropertyServiceHelper
+import net.nemerosa.ontrack.repository.CoreBuildFilterRepository
 import net.nemerosa.ontrack.repository.StatsRepository
 import net.nemerosa.ontrack.repository.StructureRepository
 import net.nemerosa.ontrack.service.ImageHelper.checkImage
 import org.apache.commons.lang3.StringUtils
-import org.apache.commons.lang3.StringUtils.isNotBlank
 import org.apache.commons.lang3.Validate
 import org.slf4j.LoggerFactory
 import org.springframework.security.access.AccessDeniedException
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 import java.util.function.BiFunction
-import java.util.function.Predicate
 
 @Service
 @Transactional(
@@ -51,7 +49,8 @@ class StructureServiceImpl(
         private val decorationService: DecorationService,
         private val promotionRunCheckService: PromotionRunCheckService,
         private val statsRepository: StatsRepository,
-        private val buildLinkListenerService: BuildLinkListenerService
+        private val buildLinkListenerService: BuildLinkListenerService,
+        private val coreBuildFilterRepository: CoreBuildFilterRepository
 ) : StructureService {
 
     private val logger = LoggerFactory.getLogger(StructureService::class.java)
@@ -365,68 +364,10 @@ class StructureServiceImpl(
     override fun buildSearch(projectId: ID, form: BuildSearchForm): List<Build> {
         // Gets the project
         val project = getProject(projectId)
-        // Collects the builds for this project
-        val builds = ArrayList<Build>()
-        // Filter for the builds
-        val buildPredicate = Predicate<Build> { build ->
-            // Build view
-            val buildViewSupplier = CachedSupplier.of { getBuildView(build, false) }
-            // Branch name
-            var accept: Boolean
-            accept = !isNotBlank(form.branchName) || Utils.safeRegexMatch(form.branchName, build.branch.name)
-            // Build name
-            if (accept && isNotBlank(form.buildName)) {
-                accept = if (form.isBuildExactMatch) {
-                    StringUtils.equals(form.buildName, build.name)
-                } else {
-                    Utils.safeRegexMatch(form.buildName, build.name)
-                }
-            }
-            // Promotion name
-            if (accept && isNotBlank(form.promotionName)) {
-                val buildView = buildViewSupplier.get()
-                accept = buildView.promotionRuns.stream()
-                        .anyMatch { run -> form.promotionName == run.promotionLevel.name }
-            }
-            // Validation stamp name
-            if (accept && isNotBlank(form.validationStampName)) {
-                val buildView = buildViewSupplier.get()
-                accept = buildView.validationStampRunViews.stream()
-                        .anyMatch { validationStampRunView -> validationStampRunView.hasValidationStamp(form.validationStampName, ValidationRunStatusID.PASSED) }
-            }
-            // Property & property value
-            if (accept && isNotBlank(form.property)) {
-                accept = PropertyServiceHelper.hasProperty(
-                        propertyService,
-                        build,
-                        form.property,
-                        form.propertyValue)
-            }
-            // Linked from
-            val linkedFrom = form.linkedFrom
-            if (accept && isNotBlank(linkedFrom)) {
-                val projectName = StringUtils.substringBefore(linkedFrom, ":")
-                val buildPattern = StringUtils.substringAfter(linkedFrom, ":")
-                accept = isLinkedFrom(build, projectName, buildPattern)
-            }
-            // Linked to
-            val linkedTo = form.linkedTo
-            if (accept && isNotBlank(linkedTo)) {
-                val projectName = StringUtils.substringBefore(linkedTo, ":")
-                val buildPattern = StringUtils.substringAfter(linkedTo, ":")
-                accept = isLinkedTo(build, projectName, buildPattern)
-            }
-            // Accepting the build into the list?
-            if (accept) {
-                builds.add(build)
-            }
-            // Maximum count reached?
-            builds.size < form.maximumCount
+        // Collects the builds for this project and this form
+        return coreBuildFilterRepository.projectSearch(project, form) { type ->
+            propertyService.getPropertyTypeByName<Any>(type)
         }
-        // Query
-        structureRepository.builds(project, buildPredicate)
-        // OK
-        return builds
     }
 
     override fun addBuildLink(fromBuild: Build, toBuild: Build) {

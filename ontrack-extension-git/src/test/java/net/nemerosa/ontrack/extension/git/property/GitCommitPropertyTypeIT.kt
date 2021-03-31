@@ -1,10 +1,9 @@
 package net.nemerosa.ontrack.extension.git.property
 
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
-import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
+import net.nemerosa.ontrack.model.structure.BuildSearchForm
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertNotNull
 
 class GitCommitPropertyTypeIT : AbstractGitTestSupport() {
@@ -31,6 +30,36 @@ class GitCommitPropertyTypeIT : AbstractGitTestSupport() {
                         .withWithPropertyValue(commits.getValue(3))
                         .build()
                         .filterBranchBuilds(this)
+                    assertEquals(
+                        listOf("3"),
+                        builds.map { it.name }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Build project search on commit`() {
+        createRepo {
+            commits(5)
+        } and { repo, commits ->
+            project {
+                gitProject(repo)
+                branch {
+                    gitBranch {
+                        commitAsProperty()
+                    }
+                    (1..5).forEach { index ->
+                        build(index.toString()) {
+                            gitCommitProperty(commits.getValue(index))
+                        }
+                    }
+                    // Looks for commit n°3 at project level
+                    val form = BuildSearchForm()
+                        .withProperty(GitCommitPropertyType::class.java.name)
+                        .withPropertyValue(commits.getValue(3))
+                    val builds = structureService.buildSearch(project.id, form)
                     assertEquals(
                         listOf("3"),
                         builds.map { it.name }

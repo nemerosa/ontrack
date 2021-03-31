@@ -6,7 +6,7 @@ package net.nemerosa.ontrack.model.structure
  * no search is performed for this value (negative result).
  *
  * @property jsonContext Expression to join with to the `PROPERTIES` table in order to
- *                       contrain the JSON scope, for example
+ *                       constrain the JSON scope, for example
  *                       `jsonb_array_elements(pp.json->'items') as item`.
  *                       Important: in the [jsonContext] context computation, the `PROPERTIES` table
  *                       is designed using the `pp` alias.
