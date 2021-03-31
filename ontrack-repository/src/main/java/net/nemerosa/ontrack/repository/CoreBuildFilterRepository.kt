@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.repository
 
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.PropertyType
-import net.nemerosa.ontrack.model.structure.StandardBuildFilterData
+import net.nemerosa.ontrack.model.structure.*
 import java.util.Optional
 import java.util.function.Function
 
@@ -11,6 +8,11 @@ import java.util.function.Function
  * Standard filter query.
  */
 interface CoreBuildFilterRepository {
+
+    /**
+     * Performs a standard filter at project level.
+     */
+    fun projectSearch(project: Project, form: BuildSearchForm, propertyTypeAccessor: (String) -> PropertyType<*>): List<Build>
 
     fun standardFilter(branch: Branch, data: StandardBuildFilterData, propertyTypeAccessor: (String) -> PropertyType<*>): List<Build>
 
