@@ -1,25 +1,26 @@
 <ot-view>
 
     <div class="row">
-        <div class="col-md-12">
-            <div class="btn-group btn-group-justified" role="group">
-                <a class="btn"
-                   role="button"
-                   ng-class="{
-                    'ot-build-links-direction-active': context.direction == 'using',
-                    'ot-build-links-direction-inactive': context.direction != 'using'
-                   }"
-                   ng-click="changeDirection('using')"
-                >This build uses</a>
-                <a class="btn"
-                   role="button"
-                   ng-class="{
-                    'ot-build-links-direction-active': context.direction == 'usedBy',
-                    'ot-build-links-direction-inactive': context.direction != 'usedBy'
-                   }"
-                   ng-click="changeDirection('usedBy')"
-                >This build is used by</a>
-            </div>
+        <div class="col-md-12 ot-view-title">
+            <button type="button" class="btn btn-default"
+                    ng-click="changeDirection()"
+                    title="Show the other direction for the dependencies">
+                <i class="fa fa-arrows-h" aria-hidden="true"></i>
+            </button>
+            <span ng-show="context.direction == 'using'">
+                Build
+                <a href="{{ build.branch.project.links._page }}">{{ build.branch.project.name }}</a>
+                / <a href="{{ build.branch.links._page }}">{{ build.branch.name }}</a>
+                / <a href="{{ build.links._page }}">{{ build.name }}</a>
+                is using...
+            </span>
+            <span ng-show="context.direction == 'usedBy'">
+                Build
+                <a href="{{ build.branch.project.links._page }}">{{ build.branch.project.name }}</a>
+                / <a href="{{ build.branch.links._page }}">{{ build.branch.name }}</a>
+                / <a href="{{ build.links._page }}">{{ build.name }}</a>
+                is used by...
+            </span>
         </div>
     </div>
 

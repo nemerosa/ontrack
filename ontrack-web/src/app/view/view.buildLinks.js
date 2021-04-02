@@ -15,6 +15,41 @@ angular.module('ot.view.buildLinks', [
             const buildId = $stateParams.buildId;
             const view = ot.view();
 
+            const buildFragment = `
+                fragment buildInfo on Build {
+                  id
+                  name
+                  links {
+                    _page
+                  }
+                  promotionRuns(lastPerLevel: true) {
+                    promotionLevel {
+                      name
+                      links {
+                        _image
+                      }
+                    }
+                  }
+                  branch {
+                    id
+                    name
+                    links {
+                      _page
+                    }
+                    project {
+                      id
+                      name
+                      links {
+                        _page
+                      }
+                    }
+                  }
+                  releaseProperty {
+                    value
+                  }
+                }
+            `;
+
             const usingQuery = `
                 query Downstream($buildId: Int!) {
                   builds(id: $buildId) {
@@ -67,32 +102,7 @@ angular.module('ot.view.buildLinks', [
                   }
                 }
                 
-                fragment buildInfo on Build {
-                  id
-                  name
-                  links {
-                    _page
-                  }
-                  promotionRuns(lastPerLevel: true) {
-                    promotionLevel {
-                      name
-                      links {
-                        _image
-                      }
-                    }
-                  }
-                  branch {
-                    id
-                    name
-                    project {
-                      id
-                      name
-                    }
-                  }
-                  releaseProperty {
-                    value
-                  }
-                }
+                ${buildFragment}
             `;
 
             const usedByQuery = `
@@ -147,32 +157,7 @@ angular.module('ot.view.buildLinks', [
                   }
                 }
                 
-                fragment buildInfo on Build {
-                  id
-                  name
-                  links {
-                    _page
-                  }
-                  promotionRuns(lastPerLevel: true) {
-                    promotionLevel {
-                      name
-                      links {
-                        _image
-                      }
-                    }
-                  }
-                  branch {
-                    id
-                    name
-                    project {
-                      id
-                      name
-                    }
-                  }
-                  releaseProperty {
-                    value
-                  }
-                }
+                ${buildFragment}
             `;
 
             const context = {
@@ -184,11 +169,13 @@ angular.module('ot.view.buildLinks', [
             $scope.context = context;
 
             // Changing the direction of the dependencies
-            $scope.changeDirection = (direction) => {
-                if (direction !== context.direction) {
-                    context.direction = direction;
-                    refreshGraph();
+            $scope.changeDirection = () => {
+                if (context.direction === 'using') {
+                    context.direction = 'usedBy';
+                } else {
+                    context.direction = 'using';
                 }
+                refreshGraph();
             };
 
             // Refreshes the chart
@@ -196,11 +183,12 @@ angular.module('ot.view.buildLinks', [
                 loadData().then(raw => {
                     // View setup
                     const build = raw.builds[0];
-                    view.title = `Build links for ${build.name}`;
+                    view.title = '';
                     view.breadcrumbs = ot.buildBreadcrumbs(build);
                     view.commands = [
                         ot.viewCloseCommand('/build/' + build.id)
                     ];
+                    $scope.build = build;
                     // Graph preparation
                     const data = transformData(raw, context.direction);
                     setGraphData(data, context.direction);
