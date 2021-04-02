@@ -180,28 +180,34 @@ angular.module('ot.view.buildLinks', [
 
             // Refreshes the chart
             const refreshGraph = () => {
-                loadData().then(raw => {
-                    // View setup
-                    const build = raw.builds[0];
-                    view.title = '';
-                    view.breadcrumbs = ot.buildBreadcrumbs(build);
-                    view.commands = [
-                        ot.viewCloseCommand('/build/' + build.id)
-                    ];
-                    $scope.build = build;
-                    // Graph preparation
-                    const data = transformData(raw, context.direction);
-                    setGraphData(data, context.direction);
-                });
-            };
-
-            // Sets the data into the graph
-            const setGraphData = (data, direction) => {
-                const chart = getOrCreateChart();
-                chart.showLoading();
-                const options = createOptionWithData(data, direction);
-                chart.setOption(options, true);
-                chart.hideLoading();
+                if (context.chart) {
+                    context.chart.showLoading();
+                }
+                try {
+                    loadData().then(raw => {
+                        // View setup
+                        if (!$scope.build) {
+                            const build = raw.builds[0];
+                            view.title = '';
+                            view.breadcrumbs = ot.buildBreadcrumbs(build);
+                            view.commands = [
+                                ot.viewCloseCommand('/build/' + build.id)
+                            ];
+                            $scope.build = build;
+                        }
+                        // Graph data preparation
+                        const data = transformData(raw, context.direction);
+                        // Graph setup
+                        const chart = getOrCreateChart();
+                        const options = createOptionWithData(data, context.direction);
+                        chart.clear();
+                        chart.setOption(options, true);
+                    });
+                } finally {
+                    if (context.chart) {
+                        context.chart.hideLoading();
+                    }
+                }
             };
 
             // Creates the chart option with some data
