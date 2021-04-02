@@ -160,9 +160,15 @@ angular.module('ot.view.buildLinks', [
                 ${buildFragment}
             `;
 
+            const parameter = $location.hash();
+            let initialDirection = 'using';
+            if (parameter === 'usedBy') {
+                initialDirection = 'usedBy';
+            }
+
             const context = {
                 // using or usedBy, depending on the direction we want to follow
-                direction: 'using',
+                direction: initialDirection,
                 // the chart, not initialized at first
                 chart: undefined
             };
@@ -178,6 +184,7 @@ angular.module('ot.view.buildLinks', [
                 } else {
                     context.direction = 'using';
                 }
+                $location.hash(context.direction);
                 refreshGraph();
             };
 
