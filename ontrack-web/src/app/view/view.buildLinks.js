@@ -82,11 +82,13 @@ angular.module('ot.view.buildLinks', [
                     }
                   }
                   branch {
+                    id
                     name
                     links {
                       _page
                     }
                     project {
+                      id
                       name
                       links {
                         _page
@@ -109,8 +111,14 @@ angular.module('ot.view.buildLinks', [
             // Refreshes the chart
             const refreshGraph = () => {
                 loadData().then(raw => {
+                    // View setup
                     const build = raw.builds[0];
                     view.title = `Build links for ${build.name}`;
+                    view.breadcrumbs = ot.buildBreadcrumbs(build);
+                    view.commands = [
+                        ot.viewCloseCommand('/build/' + build.id)
+                    ];
+                    // Graph preparation
                     const data = transformData(raw, context.direction);
                     setGraphData(data);
                 });
