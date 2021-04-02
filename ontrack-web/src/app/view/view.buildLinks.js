@@ -95,6 +95,86 @@ angular.module('ot.view.buildLinks', [
                 }
             `;
 
+            const usedByQuery = `
+                query Upstream($buildId: Int!) {
+                  builds(id: $buildId) {
+                    ...buildInfo
+                    usedBy {
+                      pageItems {
+                        ...buildInfo
+                        usedBy {
+                          pageItems {
+                            ...buildInfo
+                            usedBy {
+                              pageItems {
+                                ...buildInfo
+                                usedBy {
+                                  pageItems {
+                                    ...buildInfo
+                                    usedBy {
+                                      pageItems {
+                                        ...buildInfo
+                                        usedBy {
+                                          pageItems {
+                                            ...buildInfo
+                                            usedBy {
+                                              pageItems {
+                                                ...buildInfo
+                                                usedBy {
+                                                  pageItems {
+                                                    ...buildInfo
+                                                    usedBy {
+                                                      pageItems {
+                                                        ...buildInfo
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                
+                fragment buildInfo on Build {
+                  id
+                  name
+                  links {
+                    _page
+                  }
+                  promotionRuns(lastPerLevel: true) {
+                    promotionLevel {
+                      name
+                      links {
+                        _image
+                      }
+                    }
+                  }
+                  branch {
+                    id
+                    name
+                    project {
+                      id
+                      name
+                    }
+                  }
+                  releaseProperty {
+                    value
+                  }
+                }
+            `;
+
             const context = {
                 // using or usedBy, depending on the direction we want to follow
                 direction: 'using',
@@ -123,21 +203,21 @@ angular.module('ot.view.buildLinks', [
                     ];
                     // Graph preparation
                     const data = transformData(raw, context.direction);
-                    setGraphData(data);
+                    setGraphData(data, context.direction);
                 });
             };
 
             // Sets the data into the graph
-            const setGraphData = (data) => {
+            const setGraphData = (data, direction) => {
                 const chart = getOrCreateChart();
                 chart.showLoading();
-                const options = createOptionWithData(data);
-                chart.setOption(options);
+                const options = createOptionWithData(data, direction);
+                chart.setOption(options, true);
                 chart.hideLoading();
             };
 
             // Creates the chart option with some data
-            const createOptionWithData = (data) => {
+            const createOptionWithData = (data, direction) => {
                 return {
                     series: [
                         {
@@ -169,7 +249,7 @@ angular.module('ot.view.buildLinks', [
                             emphasis: {
                                 focus: 'ancestor'
                             },
-                            expandAndCollapse: false,
+                            expandAndCollapse: (direction === 'usedBy'),
                             animationDuration: 550,
                             animationDurationUpdate: 750
                         }
@@ -198,7 +278,7 @@ angular.module('ot.view.buildLinks', [
 
             // Event handling on the chart
             const initChartEventHandling = (chart) => {
-                chart.on('click', (params) => {
+                chart.on('dblclick', (params) => {
                     if (params.value && params.value.links && params.value.links._page) {
                         $window.open(params.value.links._page, "_blank");
                     }
@@ -208,11 +288,11 @@ angular.module('ot.view.buildLinks', [
             // Transforming the raw data into a graph
             const transformData = (raw, direction) => {
                 const build = raw.builds[0];
-                return transformBuildIntoNode(build, direction);
+                return transformBuildIntoNode(build, direction, 0);
             };
 
             // Transforming a `Build` into a node
-            const transformBuildIntoNode = (build, direction) => {
+            const transformBuildIntoNode = (build, direction, depth) => {
                 // Display name
                 let displayName = build.name;
                 if (build.releaseProperty.value && build.releaseProperty.value.name) {
@@ -229,7 +309,7 @@ angular.module('ot.view.buildLinks', [
                 };
                 // Promotions
                 let promotionsFormat = '';
-                if (build.promotionRuns) {
+                if (build.promotionRuns && build.promotionRuns.length > 0 ) {
                     const run = build.promotionRuns[build.promotionRuns.length - 1];
                     const promotion = run.promotionLevel.name;
                     const image = run.promotionLevel.links._image;
@@ -249,10 +329,14 @@ angular.module('ot.view.buildLinks', [
                     build.branch.project.name,
                     `${promotionsFormat}{buildName|${displayName}}`
                 ].join('\n');
+                // For direction = usedBy, collapse nodes when depth > 0
+                if (direction === 'usedBy' && depth > 0) {
+                    node.collapsed = true;
+                }
                 // Children
                 const children = build[direction];
                 if (children && children.pageItems) {
-                    node.children = children.pageItems.map((child) => transformBuildIntoNode(child, direction));
+                    node.children = children.pageItems.map((child) => transformBuildIntoNode(child, direction, depth + 1));
                 }
                 // OK
                 return node;
@@ -263,13 +347,18 @@ angular.module('ot.view.buildLinks', [
                 if (context.direction === 'using') {
                     return loadUsingData();
                 } else {
-                    throw 'Used by direction not supported yet';
+                    return loadUsedByData();
                 }
             };
 
             // Loading the raw data in the `using` direction
             const loadUsingData = () => {
                 return otGraphqlService.pageGraphQLCall(usingQuery, {buildId: buildId});
+            };
+
+            // Loading the raw data in the `usedBy` direction
+            const loadUsedByData = () => {
+                return otGraphqlService.pageGraphQLCall(usedByQuery, {buildId: buildId});
             };
 
             // Loading the data on load
