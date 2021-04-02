@@ -96,34 +96,34 @@ angular.module('ot.view.buildLinks', [
             `;
 
             const usedByQuery = `
-                query Upstream($buildId: Int!) {
+                query Upstream($buildId: Int!, $size: Int!) {
                   builds(id: $buildId) {
                     ...buildInfo
-                    usedBy {
+                    usedBy(size: $size) {
                       pageItems {
                         ...buildInfo
-                        usedBy {
+                        usedBy(size: $size) {
                           pageItems {
                             ...buildInfo
-                            usedBy {
+                            usedBy(size: $size) {
                               pageItems {
                                 ...buildInfo
-                                usedBy {
+                                usedBy(size: $size) {
                                   pageItems {
                                     ...buildInfo
-                                    usedBy {
+                                    usedBy(size: $size) {
                                       pageItems {
                                         ...buildInfo
-                                        usedBy {
+                                        usedBy(size: $size) {
                                           pageItems {
                                             ...buildInfo
-                                            usedBy {
+                                            usedBy(size: $size) {
                                               pageItems {
                                                 ...buildInfo
-                                                usedBy {
+                                                usedBy(size: $size) {
                                                   pageItems {
                                                     ...buildInfo
-                                                    usedBy {
+                                                    usedBy(size: $size) {
                                                       pageItems {
                                                         ...buildInfo
                                                       }
@@ -358,7 +358,10 @@ angular.module('ot.view.buildLinks', [
 
             // Loading the raw data in the `usedBy` direction
             const loadUsedByData = () => {
-                return otGraphqlService.pageGraphQLCall(usedByQuery, {buildId: buildId});
+                return otGraphqlService.pageGraphQLCall(usedByQuery, {
+                    buildId: buildId,
+                    size: 5 // Limit the history of "used by" links
+                });
             };
 
             // Loading the data on load
