@@ -1,5 +1,28 @@
 <ot-view>
 
+    <div class="row">
+        <div class="col-md-12">
+            <div class="btn-group btn-group-justified" role="group">
+                <a class="btn"
+                   role="button"
+                   ng-class="{
+                    'ot-build-links-direction-active': context.direction == 'using',
+                    'ot-build-links-direction-inactive': context.direction != 'using'
+                   }"
+                   ng-click="changeDirection('using')"
+                >This build uses</a>
+                <a class="btn"
+                   role="button"
+                   ng-class="{
+                    'ot-build-links-direction-active': context.direction == 'used-by',
+                    'ot-build-links-direction-inactive': context.direction != 'used-by'
+                   }"
+                   ng-click="changeDirection('used-by')"
+                >This build is used by</a>
+            </div>
+        </div>
+    </div>
+
     <div id="graph" style="width:100%; height:400px;"></div>
 
 </ot-view>

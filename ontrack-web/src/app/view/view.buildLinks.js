@@ -101,6 +101,15 @@ angular.module('ot.view.buildLinks', [
                 // the chart, not initialized at first
                 chart: undefined
             };
+            $scope.context = context;
+
+            // Changing the direction of the dependencies
+            $scope.changeDirection = (direction) => {
+                if (direction !== context.direction) {
+                    context.direction = direction;
+                    refreshGraph();
+                }
+            };
 
             // Refreshes the chart
             const refreshGraph = () => {
