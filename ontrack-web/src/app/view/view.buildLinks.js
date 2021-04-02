@@ -136,10 +136,6 @@ angular.module('ot.view.buildLinks', [
             // Creates the chart option with some data
             const createOptionWithData = (data) => {
                 return {
-                    tooltip: {
-                        trigger: 'item',
-                        triggerOn: 'mousemove'
-                    },
                     series: [
                         {
                             type: 'tree',
