@@ -288,6 +288,12 @@ angular.module('ot.view.build', [
                                 });
                             }
                         },
+                        {
+                            id: 'buildLinks',
+                            name: "Build links",
+                            cls: 'ot-command-build-links fa-rotate-90',
+                            link: `/build/${$stateParams.buildId}/links`
+                        },
                         ot.viewActionsCommand(build.links._actions),
                         ot.viewCloseCommand('/branch/' + build.branch.id)
                     ];
