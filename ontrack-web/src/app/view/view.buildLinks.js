@@ -168,6 +168,9 @@ angular.module('ot.view.buildLinks', [
             };
             $scope.context = context;
 
+            // Loading indicator
+            $scope.loadingData = false;
+
             // Changing the direction of the dependencies
             $scope.changeDirection = () => {
                 if (context.direction === 'using') {
@@ -183,8 +186,9 @@ angular.module('ot.view.buildLinks', [
                 if (context.chart) {
                     context.chart.showLoading();
                 }
-                try {
-                    loadData().then(raw => {
+                $scope.loadingData = true;
+                loadData().then(raw => {
+                    try {
                         // View setup
                         if (!$scope.build) {
                             const build = raw.builds[0];
@@ -202,12 +206,13 @@ angular.module('ot.view.buildLinks', [
                         const options = createOptionWithData(data, context.direction);
                         chart.clear();
                         chart.setOption(options, true);
-                    });
-                } finally {
-                    if (context.chart) {
-                        context.chart.hideLoading();
+                    } finally {
+                        $scope.loadingData = false;
+                        if (context.chart) {
+                            context.chart.hideLoading();
+                        }
                     }
-                }
+                });
             };
 
             // Creates the chart option with some data
@@ -303,7 +308,7 @@ angular.module('ot.view.buildLinks', [
                 };
                 // Promotions
                 let promotionsFormat = '';
-                if (build.promotionRuns && build.promotionRuns.length > 0 ) {
+                if (build.promotionRuns && build.promotionRuns.length > 0) {
                     const run = build.promotionRuns[build.promotionRuns.length - 1];
                     const promotion = run.promotionLevel.name;
                     const image = run.promotionLevel.links._image;

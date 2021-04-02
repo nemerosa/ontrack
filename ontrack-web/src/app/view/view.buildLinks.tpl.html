@@ -1,11 +1,13 @@
 <ot-view>
 
     <div class="row" ng-show="build">
-        <div class="col-md-12 ot-view-title">
+        <div class="col-md-12 ot-view-title" ng-class="{'text-muted': loadingData}">
             <button type="button" class="btn btn-default"
                     ng-click="changeDirection()"
+                    ng-disabled="loadingData"
                     title="Show the other direction for the dependencies">
-                <i class="fa fa-arrows-h" aria-hidden="true"></i>
+                <i class="fa fa-arrows-h" aria-hidden="true" ng-hide="loadingData"></i>
+                <span class="ot-loading-indicator" ng-show="loadingData"></span>
             </button>
             <span ng-show="context.direction == 'using'">
                 Build
