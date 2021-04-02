@@ -11,7 +11,7 @@ angular.module('ot.view.buildLinks', [
             controller: 'BuildLinksCtrl'
         });
     })
-    .controller('BuildLinksCtrl', function ($scope, $stateParams, ot, otGraphqlService) {
+    .controller('BuildLinksCtrl', function ($location, $scope, $stateParams, $window, ot, otGraphqlService) {
             const buildId = $stateParams.buildId;
             const view = ot.view();
 
@@ -84,15 +84,9 @@ angular.module('ot.view.buildLinks', [
                   branch {
                     id
                     name
-                    links {
-                      _page
-                    }
                     project {
                       id
                       name
-                      links {
-                        _page
-                      }
                     }
                   }
                   releaseProperty {
@@ -186,7 +180,20 @@ angular.module('ot.view.buildLinks', [
             // Creates & inits the chart
             const createChart = () => {
                 const graph = document.getElementById('graph');
-                return echarts.init(graph);
+                const chart = echarts.init(graph);
+                // Event handling
+                initChartEventHandling(chart);
+                // OK
+                return chart;
+            };
+
+            // Event handling on the chart
+            const initChartEventHandling = (chart) => {
+                chart.on('click', (params) => {
+                    if (params.value && params.value.links && params.value.links._page) {
+                        $window.open(params.value.links._page, "_blank");
+                    }
+                });
             };
 
             // Transforming the raw data into a graph
