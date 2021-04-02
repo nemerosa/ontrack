@@ -11,6 +11,8 @@ include::usage-promotion-levels.adoc[]
 
 include::usage-builds.adoc[]
 
+include::usage-build-links.adoc[]
+
 include::usage-validation-runs.adoc[]
 
 include::usage-properties.adoc[]
