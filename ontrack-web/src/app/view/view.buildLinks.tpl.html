@@ -1,0 +1,31 @@
+<ot-view>
+
+    <div class="row" ng-show="build">
+        <div class="col-md-12 ot-view-title" ng-class="{'text-muted': loadingData}">
+            <button type="button" class="btn btn-default"
+                    ng-click="changeDirection()"
+                    ng-disabled="loadingData"
+                    title="Show the other direction for the dependencies">
+                <i class="fa fa-arrows-h" aria-hidden="true" ng-hide="loadingData"></i>
+                <span class="ot-loading-indicator" ng-show="loadingData"></span>
+            </button>
+            <span ng-show="context.direction == 'using'">
+                Build
+                <a href="{{ build.branch.project.links._page }}">{{ build.branch.project.name }}</a>
+                / <a href="{{ build.branch.links._page }}">{{ build.branch.name }}</a>
+                / <a href="{{ build.links._page }}">{{ build.name }}</a>
+                is using...
+            </span>
+            <span ng-show="context.direction == 'usedBy'">
+                Build
+                <a href="{{ build.branch.project.links._page }}">{{ build.branch.project.name }}</a>
+                / <a href="{{ build.branch.links._page }}">{{ build.branch.name }}</a>
+                / <a href="{{ build.links._page }}">{{ build.name }}</a>
+                is used by...
+            </span>
+        </div>
+    </div>
+
+    <div id="graph" style="width:100%; height:800px;"></div>
+
+</ot-view>

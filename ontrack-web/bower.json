@@ -13,6 +13,9 @@
     "oclazyload": "~1.0.9",
     "moment": "2.8.3",
     "unibabel": "2.1.0",
-    "font-awesome": "4.6.3"
+    "font-awesome": "4.6.3",
+    "react": "15.3.2",
+    "fetch": "1.0.0",
+    "echarts": "5.0.2"
   }
 }
