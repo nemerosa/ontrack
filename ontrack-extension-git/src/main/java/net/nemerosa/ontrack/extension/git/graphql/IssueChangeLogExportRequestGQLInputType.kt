@@ -30,7 +30,7 @@ class IssueChangeLogExportRequestGQLInputType: GQLInputType<IssueChangeLogExport
                 (JIRA, GitHub...) that produces the issues.""".trimIndent())
             .fields(
                 listOf(
-                    stringInputField(IssueChangeLogExportRequest::format),
+                    stringInputField(IssueChangeLogExportRequest::format, nullable = true),
                     stringInputField(IssueChangeLogExportRequest::grouping, """
                         Specification for the grouping, none by default.
                         
@@ -54,13 +54,13 @@ class IssueChangeLogExportRequestGQLInputType: GQLInputType<IssueChangeLogExport
                         altGroup property.
                         
                         If the specification is empty, no grouping will be done.
-                    """.trimIndent()),
-                    stringInputField(IssueChangeLogExportRequest::exclude),
+                    """.trimIndent(), nullable = true),
+                    stringInputField(IssueChangeLogExportRequest::exclude, nullable = true),
                     stringInputField(IssueChangeLogExportRequest::altGroup, """
                         Title of the group to use when an issue does not belong to any group. It defaults to "Other".
                         If left empty, any issue not belonging to a group would be excluded from the export. This field
                         is not used when no grouping is specified.
-                    """.trimIndent()),
+                    """.trimIndent(), nullable = true),
                 )
             )
             .build()
