@@ -1,55 +1,45 @@
-package net.nemerosa.ontrack.extension.git.graphql;
+package net.nemerosa.ontrack.extension.git.graphql
 
-import graphql.schema.GraphQLObjectType;
-import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
-import net.nemerosa.ontrack.extension.git.service.GitService;
-import net.nemerosa.ontrack.graphql.schema.GQLType;
-import net.nemerosa.ontrack.graphql.schema.GQLTypeCache;
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import static net.nemerosa.ontrack.graphql.support.GraphqlUtils.fetcher;
+import graphql.schema.GraphQLObjectType
+import net.nemerosa.ontrack.extension.git.model.GitChangeLog
+import net.nemerosa.ontrack.extension.git.service.GitService
+import net.nemerosa.ontrack.graphql.schema.GQLType
+import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
+import net.nemerosa.ontrack.graphql.support.listType
+import org.springframework.stereotype.Component
 
 /**
+ * GraphQL type for a change log
  * @see net.nemerosa.ontrack.extension.git.model.GitChangeLog
  */
 @Component
-public class GitChangeLogGQLType implements GQLType {
+class GitChangeLogGQLType(
+    private val gitUICommitGQLType: GitUICommitGQLType,
+    private val gitService: GitService,
+) : GQLType {
 
-    public static final String GIT_CHANGE_LOG = "GitChangeLog";
+    override fun getTypeName(): String = GIT_CHANGE_LOG
 
-    private final GitUICommitGQLType gitUICommitGQLType;
-    private final GitService gitService;
-
-    @Autowired
-    public GitChangeLogGQLType(GitUICommitGQLType gitUICommitGQLType, GitService gitService) {
-        this.gitUICommitGQLType = gitUICommitGQLType;
-        this.gitService = gitService;
-    }
-
-    @Override
-    public String getTypeName() {
-        return GIT_CHANGE_LOG;
-    }
-
-    @Override
-    public GraphQLObjectType createType(GQLTypeCache cache) {
+    override fun createType(cache: GQLTypeCache): GraphQLObjectType {
         return GraphQLObjectType.newObject()
-                .name(GIT_CHANGE_LOG)
-                // Commits
-                .field(f -> f.name("commits")
-                        .description("List of commits in the change log")
-                        .type(GraphqlUtils.stdList(gitUICommitGQLType.getTypeRef()))
-                        .dataFetcher(fetcher(
-                                GitChangeLog.class,
-                                changeLog -> gitService.getChangeLogCommits(changeLog).getCommits()
-                        ))
-                )
-                // TODO Issues
-                // TODO File changes
-                // OK
-                .build();
+            .name(GIT_CHANGE_LOG)
+            // Commits
+            .field { f ->
+                f.name("commits")
+                    .description("List of commits in the change log")
+                    .type(listType(gitUICommitGQLType.typeRef))
+                    .dataFetcher { env ->
+                        val gitChangeLog: GitChangeLog = env.getSource()
+                        gitService.getChangeLogCommits(gitChangeLog).commits
+                    }
+            }
+            // TODO Issues
+            // TODO File changes
+            // OK
+            .build()
     }
 
+    companion object {
+        const val GIT_CHANGE_LOG = "GitChangeLog"
+    }
 }
