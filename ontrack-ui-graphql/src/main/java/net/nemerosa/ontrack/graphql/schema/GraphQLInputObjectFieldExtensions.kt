@@ -1,13 +1,14 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars.*
-import graphql.schema.GraphQLInputObjectField
-import graphql.schema.GraphQLNonNull
-import graphql.schema.GraphQLTypeReference
+import graphql.schema.*
+import net.nemerosa.ontrack.graphql.support.getPropertyDescription
+import net.nemerosa.ontrack.graphql.support.nullableInputType
+import kotlin.reflect.KProperty
 
 fun requiredStringInputField(
     name: String,
-    description: String
+    description: String,
 ): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
     .name(name)
     .description(description)
@@ -16,7 +17,7 @@ fun requiredStringInputField(
 
 fun optionalStringInputField(
     name: String,
-    description: String
+    description: String,
 ): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
     .name(name)
     .description(description)
@@ -25,7 +26,7 @@ fun optionalStringInputField(
 
 fun optionalIntInputField(
     name: String,
-    description: String
+    description: String,
 ): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
     .name(name)
     .description(description)
@@ -35,7 +36,7 @@ fun optionalIntInputField(
 
 fun requiredFloatInputField(
     name: String,
-    description: String
+    description: String,
 ): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
     .name(name)
     .description(description)
@@ -44,7 +45,7 @@ fun requiredFloatInputField(
 
 fun requiredIntInputField(
     name: String,
-    description: String
+    description: String,
 ): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
     .name(name)
     .description(description)
@@ -53,7 +54,7 @@ fun requiredIntInputField(
 
 fun optionalBooleanInputField(
     name: String,
-    description: String
+    description: String,
 ): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
     .name(name)
     .description(description)
@@ -63,7 +64,7 @@ fun optionalBooleanInputField(
 fun requiredRefInputField(
     name: String,
     description: String,
-    typeRef: GraphQLTypeReference
+    typeRef: GraphQLTypeReference,
 ): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
     .name(name)
     .description(description)
@@ -74,9 +75,40 @@ fun requiredRefInputField(
 fun optionalRefInputField(
     name: String,
     description: String,
-    typeRef: GraphQLTypeReference
+    typeRef: GraphQLTypeReference,
 ): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
     .name(name)
     .description(description)
     .type(typeRef)
     .build()
+
+fun optionalStringListInputField(
+    name: String,
+    description: String,
+): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
+    .name(name)
+    .description(description)
+    .type(GraphQLList(GraphQLNonNull(GraphQLString)))
+    .build()
+
+// ================================================================================================
+// Typed fields
+// ================================================================================================
+
+fun stringInputField(property: KProperty<String?>) : GraphQLInputObjectField =
+    inputField(property, GraphQLString)
+
+fun intInputField(property: KProperty<Int?>) : GraphQLInputObjectField =
+    inputField(property, GraphQLInt)
+
+fun stringListInputField(property: KProperty<List<String>?>) : GraphQLInputObjectField =
+    inputField(property, GraphQLList(GraphQLNonNull(GraphQLString)))
+
+fun inputField(property: KProperty<*>, type: GraphQLInputType): GraphQLInputObjectField {
+    val description = getPropertyDescription(property)
+    return GraphQLInputObjectField.newInputObjectField()
+        .name(property.name)
+        .description(description)
+        .type(nullableInputType(type, property.returnType.isMarkedNullable))
+        .build()
+}
