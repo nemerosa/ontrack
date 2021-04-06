@@ -8,6 +8,7 @@ dependencies {
     api(project(":ontrack-model"))
     api(project(":ontrack-test-utils"))
     api("org.springframework:spring-jdbc")
+    api("io.mockk:mockk:${Versions.mockkVersion}")
 
     implementation(project(":ontrack-extension-support"))
     implementation(project(":ontrack-ui-support"))
