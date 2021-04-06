@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.api.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.StringUtils.split
 import java.util.*
@@ -28,6 +29,7 @@ class IssueChangeLogExportRequest : BuildDiffRequest() {
     /**
      * Export format, "text" by default
      */
+    @APIDescription("Export format, \"text\" by default")
     var format = "text"
 
     /**
@@ -67,6 +69,7 @@ class IssueChangeLogExportRequest : BuildDiffRequest() {
     /**
      * Comma separated list of issue types to exclude from the export.
      */
+    @APIDescription("""Comma separated list of issue types to exclude from the export.""")
     var exclude = ""
 
     /**

@@ -95,8 +95,8 @@ fun optionalStringListInputField(
 // Typed fields
 // ================================================================================================
 
-fun stringInputField(property: KProperty<String?>) : GraphQLInputObjectField =
-    inputField(property, GraphQLString)
+fun stringInputField(property: KProperty<String?>, description: String? = null) : GraphQLInputObjectField =
+    inputField(property, GraphQLString, description)
 
 fun intInputField(property: KProperty<Int?>) : GraphQLInputObjectField =
     inputField(property, GraphQLInt)
@@ -104,11 +104,11 @@ fun intInputField(property: KProperty<Int?>) : GraphQLInputObjectField =
 fun stringListInputField(property: KProperty<List<String>?>) : GraphQLInputObjectField =
     inputField(property, GraphQLList(GraphQLNonNull(GraphQLString)))
 
-fun inputField(property: KProperty<*>, type: GraphQLInputType): GraphQLInputObjectField {
-    val description = getPropertyDescription(property)
+fun inputField(property: KProperty<*>, type: GraphQLInputType, description: String? = null): GraphQLInputObjectField {
+    val actualDescription = description ?: getPropertyDescription(property)
     return GraphQLInputObjectField.newInputObjectField()
         .name(property.name)
-        .description(description)
+        .description(actualDescription)
         .type(nullableInputType(type, property.returnType.isMarkedNullable))
         .build()
 }
