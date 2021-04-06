@@ -54,9 +54,14 @@ You can also set a list of <<model,promotion levels>> - a branch which is or has
 a promotion level will not be eligible for being disabled or deleted.
 
 In the sample above, the stale branches will be disabled after 60 days (not
-shown any longer by default), and after again 300 days, they will be deleted
-(so after 360 days in total). Branches which have at least one build being promoted to `PRODUCTION` will not
-be deleted or disabled.s
+shown any longer by default), and after again 360 days, they will be deleted
+(so after 390 days in total). Branches which have at least one build being promoted to `PRODUCTION` will not
+be deleted or disabled.
+
+Additional, two regular expressions can be used to add further protection against the disabling & deletion of the branches:
+
+* the first one ("includes") is used to select the branches which are _not_ eligible to disabling and deletion
+* the second expression ("excludes") can be used to refine the first expression, by matching branches which still must be disabled or deleted.
 
 Note that the _Stale branches_ property can also be set programmatically using
 the <<dsl-projectproperties-stale,DSL>>.
