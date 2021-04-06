@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component
 @Component
 class GitChangeLogGQLType(
     private val gitUICommitGQLType: GitUICommitGQLType,
+    private val gitChangeLogIssuesGQLType: GitChangeLogIssuesGQLType,
     private val gitService: GitService,
 ) : GQLType {
 
@@ -33,7 +34,16 @@ class GitChangeLogGQLType(
                         gitService.getChangeLogCommits(gitChangeLog).commits
                     }
             }
-            // TODO Issues
+            // Issues
+            .field { f ->
+                f.name("issues")
+                    .description("List of issues in the change log")
+                    .type(gitChangeLogIssuesGQLType.typeRef)
+                    .dataFetcher { env ->
+                        val gitChangeLog: GitChangeLog = env.getSource()
+                        gitService.getChangeLogIssues(gitChangeLog)
+                    }
+            }
             // TODO File changes
             // OK
             .build()
