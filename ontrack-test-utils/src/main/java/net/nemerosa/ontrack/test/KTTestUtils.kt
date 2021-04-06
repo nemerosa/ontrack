@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.test
 
+import com.fasterxml.jackson.databind.JsonNode
 import java.util.*
+import kotlin.test.assertTrue
 import kotlin.test.fail
 
 inline fun <reified T> assertIs(value: Any?, code: (T) -> Unit = {}) {
@@ -22,5 +24,21 @@ fun <T> assertPresent(o: Optional<T>, message: String = "Optional must be presen
 fun <T> assertNotPresent(o: Optional<T>, message: String = "Optional is not present") {
     if (o.isPresent) {
         fail(message)
+    }
+}
+
+fun assertJsonNull(node: JsonNode?, message: String = "Node is expected to be null") {
+    assertTrue(node == null || node.isNull, message)
+}
+
+fun assertJsonNotNull(
+    node: JsonNode?,
+    message: String = "Node is expected not to be null",
+    code: JsonNode.() -> Unit = {}
+) {
+    if (node == null || node.isNull) {
+        fail(message)
+    } else {
+        node.code()
     }
 }

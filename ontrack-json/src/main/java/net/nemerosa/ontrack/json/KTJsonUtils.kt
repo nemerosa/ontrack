@@ -95,3 +95,8 @@ inline fun <reified E : Enum<E>> JsonNode.getRequiredEnum(field: String): E =
  * or by being an instance of the [null node][JsonNode.isNull].
  */
 fun JsonNode?.isNullOrNullNode() = this == null || this.isNull
+
+/**
+ * Gets a string field
+ */
+fun JsonNode.getTextField(field: String) = path(field).asText()
