@@ -162,6 +162,61 @@ class StaleBranchesJobIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Not deleting a branch because of includes rule`() {
+        project {
+            branch("release-1.0") {
+                updateBranchSignature(time = Time.now().minusDays(20))
+                val pl = promotionLevel()
+                staleBranches(disabling = 5, deleting = 10, includes = "release-.*")
+                build {
+                    promote(pl)
+                    updateBuildSignature(time = Time.now().minusDays(18))
+                }
+                staleJobService.detectAndManageStaleBranches(JobRunListener.out(), project)
+                assertNotNull(structureService.findBranchByID(id), "Branch has not been deleted") {
+                    assertFalse(it.isDisabled, "Branch has not been disabled")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Not deleting a branch because of includes rule and excludes rule`() {
+        project {
+            branch("release-2.0") {
+                updateBranchSignature(time = Time.now().minusDays(20))
+                val pl = promotionLevel()
+                staleBranches(disabling = 5, deleting = 10, includes = "release-.*", excludes = "release-1.*")
+                build {
+                    promote(pl)
+                    updateBuildSignature(time = Time.now().minusDays(18))
+                }
+                staleJobService.detectAndManageStaleBranches(JobRunListener.out(), project)
+                assertNotNull(structureService.findBranchByID(id), "Branch has not been deleted") {
+                    assertFalse(it.isDisabled, "Branch has not been disabled")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Deleting a branch because of includes rule and excludes rule`() {
+        project {
+            branch("release-1.0") {
+                updateBranchSignature(time = Time.now().minusDays(20))
+                val pl = promotionLevel()
+                staleBranches(disabling = 5, deleting = 10, includes = "release-.*", excludes = "release-1.*")
+                build {
+                    promote(pl)
+                    updateBuildSignature(time = Time.now().minusDays(18))
+                }
+                staleJobService.detectAndManageStaleBranches(JobRunListener.out(), project)
+                assertNull(structureService.findBranchByID(id), "Branch has been deleted")
+            }
+        }
+    }
+
+    @Test
     fun `Deleting a branch even if promoted when not configured`() {
         project {
             branch {
@@ -193,14 +248,18 @@ class StaleBranchesJobIT : AbstractDSLTestSupport() {
     }
 
     private fun Project.staleBranches(
-            disabling: Int = 0,
-            deleting: Int? = null,
-            promotionsToKeep: List<String>? = null
+        disabling: Int = 0,
+        deleting: Int? = null,
+        promotionsToKeep: List<String>? = null,
+        includes: String? = null,
+        excludes: String? = null,
     ) {
         setProperty(project, StalePropertyType::class.java, StaleProperty(
-                disablingDuration = disabling,
-                deletingDuration = deleting,
-                promotionsToKeep = promotionsToKeep
+            disablingDuration = disabling,
+            deletingDuration = deleting,
+            promotionsToKeep = promotionsToKeep,
+            includes = includes,
+            excludes = excludes,
         ))
     }
 

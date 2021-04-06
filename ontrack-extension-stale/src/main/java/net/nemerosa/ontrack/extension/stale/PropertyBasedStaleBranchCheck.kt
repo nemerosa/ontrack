@@ -36,6 +36,8 @@ class PropertyBasedStaleBranchCheck(
         val disablingDuration = property.disablingDuration
         val deletionDuration = property.deletingDuration
         val promotionsToKeep = property.promotionsToKeep
+        val includesRegex = property.includes?.takeIf { it.isNotBlank() }?.toRegex()
+        val excludesRegex = property.excludes?.takeIf { it.isNotBlank() }?.toRegex()
         if (disablingDuration <= 0) {
             logger.debug("[{}] No disabling time being set - exiting.", branch.entityDisplayName)
             return null
@@ -56,14 +58,25 @@ class PropertyBasedStaleBranchCheck(
                 emptySet()
             }
             // Gets the last promotions for this branch
-            val lastPromotions: List<PromotionView> = structureService.getBranchStatusView(branch).promotions
-            val isProtected = lastPromotions.any { promotionView: PromotionView ->
-                (promotionView.promotionRun != null
-                        && promotionsToProtect.contains(promotionView.promotionLevel.name))
+            if (promotionsToProtect.isNotEmpty()) {
+                val lastPromotions: List<PromotionView> = structureService.getBranchStatusView(branch).promotions
+                val isProtected = lastPromotions.any { promotionView: PromotionView ->
+                    (promotionView.promotionRun != null
+                            && promotionsToProtect.contains(promotionView.promotionLevel.name))
+                }
+                if (isProtected) {
+                    logger.debug("[{}] Branch is promoted and is not eligible for staleness", branch.entityDisplayName)
+                    return StaleBranchStatus.KEEP
+                }
             }
-            if (isProtected) {
-                logger.debug("[{}] Branch is promoted and is not eligible for staleness", branch.entityDisplayName)
-                return StaleBranchStatus.KEEP
+            // Includes / excludes rules
+            if (includesRegex != null) {
+                if (includesRegex.matches(branch.name)) {
+                    if (excludesRegex == null || !excludesRegex.matches(branch.name)) {
+                        logger.debug("[{}] Branch is protected by includes/excludes rule", branch.entityDisplayName)
+                        return StaleBranchStatus.KEEP
+                    }
+                }
             }
             // Last date
             val lastTime: LocalDateTime = lastBuild?.signature?.time ?: branch.signature.time

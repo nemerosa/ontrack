@@ -11,6 +11,14 @@
     <b>{{property.value.disablingDuration + property.value.deletingDuration}}</b>
     day(s).
 </p>
+<p ng-if="property.value.includes">
+    Keeping branches matching:
+    <code>{{ property.value.includes }}</code>
+</p>
+<p ng-if="property.value.includes && property.value.excludes">
+    but excluding branches matching:
+    <code>{{ property.value.excludes }}</code>
+</p>
 <p ng-if="property.value.promotionsToKeep" class="ot-label-suite">
     Keeping branches promoted to:
     <span class="label label-info" ng-repeat="promotion in property.value.promotionsToKeep">

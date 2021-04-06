@@ -1,21 +1,45 @@
 package net.nemerosa.ontrack.extension.stale
 
-import net.nemerosa.ontrack.extension.stale.StaleProperty
-import net.nemerosa.ontrack.json.JsonUtils
-import net.nemerosa.ontrack.test.TestUtils
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import org.junit.Test
+import kotlin.test.assertEquals
 
 class StalePropertyTest {
     @Test
     fun backward_compatibility_of_json() {
-        val json = JsonUtils.`object`()
-                .with("disablingDuration", 30)
-                .with("deletingDuration", 0)
-                .end()
-        TestUtils.assertJsonRead(
-                StaleProperty(30, 0, null),
-                json,
-                StaleProperty::class.java
+        val json = mapOf(
+            "disablingDuration" to 30,
+            "deletingDuration" to 0,
+        ).asJson()
+        assertEquals(
+            StaleProperty(
+                disablingDuration = 30,
+                deletingDuration = 0,
+                promotionsToKeep = null,
+                includes = null,
+                excludes = null,
+            ),
+            json.parse()
+        )
+    }
+
+    @Test
+    fun `JSON backward compatibility after adding the includes and excludes properties`() {
+        val json = mapOf(
+            "disablingDuration" to 30,
+            "deletingDuration" to 90,
+            "promotionsToKeep" to listOf("PLATINUM"),
+        ).asJson()
+        assertEquals(
+            StaleProperty(
+                disablingDuration = 30,
+                deletingDuration = 90,
+                promotionsToKeep = listOf("PLATINUM"),
+                includes = null,
+                excludes = null,
+            ),
+            json.parse()
         )
     }
 }
