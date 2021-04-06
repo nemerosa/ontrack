@@ -52,6 +52,18 @@ class PullRequestStaleBranchCompleteCheckIT : AbstractGitTestSupport() {
         notAPR() withProperty propertyWithPromotionAndPromoted() withBuild medium() returns kept()
         notAPR() withProperty propertyWithPromotionAndPromoted() withBuild old() returns kept()
         //
+        notAPR() withProperty propertyWithMatchingIncludesAndNoExcludes() withBuild recent() returns kept()
+        notAPR() withProperty propertyWithMatchingIncludesAndNoExcludes() withBuild medium() returns kept()
+        notAPR() withProperty propertyWithMatchingIncludesAndNoExcludes() withBuild old() returns kept()
+        //
+        notAPR() withProperty propertyWithMatchingIncludesAndNotMatchingExcludes() withBuild recent() returns kept()
+        notAPR() withProperty propertyWithMatchingIncludesAndNotMatchingExcludes() withBuild medium() returns kept()
+        notAPR() withProperty propertyWithMatchingIncludesAndNotMatchingExcludes() withBuild old() returns kept()
+        //
+        notAPR() withProperty propertyWithMatchingIncludesAndMatchingExcludes() withBuild recent() returns kept()
+        notAPR() withProperty propertyWithMatchingIncludesAndMatchingExcludes() withBuild medium() returns disabled()
+        notAPR() withProperty propertyWithMatchingIncludesAndMatchingExcludes() withBuild old() returns deleted()
+        //
         validPR() withProperty none() withBuild recent() returns kept()
         validPR() withProperty none() withBuild medium() returns kept()
         validPR() withProperty none() withBuild old() returns kept()
@@ -236,7 +248,9 @@ class PullRequestStaleBranchCompleteCheckIT : AbstractGitTestSupport() {
                 setProperty(it, StalePropertyType::class.java, StaleProperty(
                         disablingDuration = 5,
                         deletingDuration = 10,
-                        promotionsToKeep = null
+                        promotionsToKeep = null,
+                        includes = null,
+                        excludes = null,
                 ))
             },
             branchConfiguration = {},
@@ -251,7 +265,9 @@ class PullRequestStaleBranchCompleteCheckIT : AbstractGitTestSupport() {
                 setProperty(it, StalePropertyType::class.java, StaleProperty(
                         disablingDuration = 5,
                         deletingDuration = 10,
-                        promotionsToKeep = listOf(promotionName)
+                        promotionsToKeep = listOf(promotionName),
+                        includes = null,
+                        excludes = null,
                 ))
             },
             branchConfiguration = {
@@ -266,7 +282,9 @@ class PullRequestStaleBranchCompleteCheckIT : AbstractGitTestSupport() {
                 setProperty(it, StalePropertyType::class.java, StaleProperty(
                         disablingDuration = 5,
                         deletingDuration = 10,
-                        promotionsToKeep = listOf(promotionName)
+                        promotionsToKeep = listOf(promotionName),
+                        includes = null,
+                        excludes = null,
                 ))
             },
             branchConfiguration = {
@@ -277,6 +295,87 @@ class PullRequestStaleBranchCompleteCheckIT : AbstractGitTestSupport() {
                         ?: error("Cannot find promotion level")
                 it.promote(promotion)
             }
+    )
+
+    private fun propertyWithMatchingIncludesAndNoExcludes() = PropertyConfiguration(
+            description = "stale property with include protection matching",
+            projectConfiguration = {
+                setProperty(it, StalePropertyType::class.java, StaleProperty(
+                        disablingDuration = 5,
+                        deletingDuration = 10,
+                        promotionsToKeep = listOf(promotionName),
+                        includes = "release-.*",
+                        excludes = null,
+                ))
+            },
+            branchConfiguration = {
+                structureService.saveBranch(
+                    Branch(
+                        id = it.id,
+                        name = "release-2.0",
+                        description = it.description,
+                        isDisabled = it.isDisabled,
+                        signature = it.signature,
+                        project = it.project,
+                    )
+                )
+                it.promotionLevel(promotionName)
+            },
+            buildConfiguration = {}
+    )
+
+    private fun propertyWithMatchingIncludesAndNotMatchingExcludes() = PropertyConfiguration(
+            description = "stale property with include protection matching and no exclude protection matching",
+            projectConfiguration = {
+                setProperty(it, StalePropertyType::class.java, StaleProperty(
+                        disablingDuration = 5,
+                        deletingDuration = 10,
+                        promotionsToKeep = listOf(promotionName),
+                        includes = "release-.*",
+                        excludes = "release-1.*",
+                ))
+            },
+            branchConfiguration = {
+                structureService.saveBranch(
+                    Branch(
+                        id = it.id,
+                        name = "release-2.0",
+                        description = it.description,
+                        isDisabled = it.isDisabled,
+                        signature = it.signature,
+                        project = it.project,
+                    )
+                )
+                it.promotionLevel(promotionName)
+            },
+            buildConfiguration = {}
+    )
+
+    private fun propertyWithMatchingIncludesAndMatchingExcludes() = PropertyConfiguration(
+            description = "stale property with include protection matching and exclude protection matching",
+            projectConfiguration = {
+                setProperty(it, StalePropertyType::class.java, StaleProperty(
+                        disablingDuration = 5,
+                        deletingDuration = 10,
+                        promotionsToKeep = listOf(promotionName),
+                        includes = "release-.*",
+                        excludes = "release-1.*",
+                ))
+            },
+            branchConfiguration = {
+                structureService.saveBranch(
+                    Branch(
+                        id = it.id,
+                        name = "release-1.0",
+                        description = it.description,
+                        isDisabled = it.isDisabled,
+                        signature = it.signature,
+                        project = it.project,
+                    )
+                )
+                it.promotionLevel(promotionName)
+            },
+            buildConfiguration = {}
     )
 
     private inner class BranchPRConfiguration(
