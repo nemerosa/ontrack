@@ -55,8 +55,12 @@ angular.module('ot.view.home', [
                 $scope.maxBranches = global.settings.homePage.maxBranches;
                 $scope.maxProjects = global.settings.homePage.maxProjects;
                 $scope.projectCount = global.entityCounts.projects;
+                // Must the projects be included?
+                $scope.includeProjects = $scope.projectCount <= $scope.maxProjects;
                 // Actual call
-                return otGraphqlService.pageGraphQLCall(`{
+                return otGraphqlService.pageGraphQLCall(` query HomePage(
+                    $includeProjects: Boolean!
+                ) {
                   userRootActions {
                     projectCreate
                   }
@@ -121,7 +125,7 @@ angular.module('ot.view.home', [
                       }
                     }
                   }
-                  projects {
+                  projects @include(if: $includeProjects) {
                     id
                     name
                     labels {
@@ -190,7 +194,9 @@ angular.module('ot.view.home', [
                     id
                   }
                 }
-                `);
+                `, {
+                    includeProjects: $scope.includeProjects
+                });
             }).then(function (data) {
 
                 $scope.projectsData = data;
