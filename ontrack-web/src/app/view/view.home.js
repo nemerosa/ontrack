@@ -39,141 +39,159 @@ angular.module('ot.view.home', [
         // Loading the project list
         function loadProjects() {
             $scope.loadingProjects = true;
+            // We start collecting some global settings
             otGraphqlService.pageGraphQLCall(`{
-              userRootActions {
-                projectCreate
-              }
-              labels {
-                id
-                category
-                name
-                description
-                color
-                foregroundColor
-                computedBy {
-                    id
-                    name
-                }
-                links {
-                    _update
-                    _delete
-                }
-              }
-              favouriteBranches: branches(favourite: true) {
-                project {
-                  name
-                  links {
-                    _page
-                  }
-                }
-                id
-                name
-                disabled
-                type
-                decorations {
-                  ...decorationContent
-                }
-                creation {
-                  time
-                }
-                links {
-                  _page
-                  _enable
-                  _disable
-                  _delete
-                  _unfavourite
-                  _favourite
-                }
-                latestBuild: builds(count: 1) {
-                  id
-                  name
-                  creation {
-                      time
-                  }
-                }
-                promotionLevels {
-                  id
-                  name
-                  image
-                  _image
-                  promotionRuns(first: 1) {
-                    build {
-                      id
-                      name
+                settings {
+                    homePage {
+                        maxBranches
+                        maxProjects
                     }
-                  }
                 }
-              }
-              projects {
-                id
-                name
-                labels {
-                  id
-                  category
-                  name
-                  description
-                  color
-                  foregroundColor
-                  computedBy {
+                entityCounts {
+                    projects
+                }
+            }`).then(global => {
+                // Storing the data
+                $scope.maxBranches = global.settings.homePage.maxBranches;
+                $scope.maxProjects = global.settings.homePage.maxProjects;
+                $scope.projectCount = global.entityCounts.projects;
+                // Actual call
+                return otGraphqlService.pageGraphQLCall(`{
+                  userRootActions {
+                    projectCreate
+                  }
+                  labels {
                     id
+                    category
                     name
-                  }
-                }
-                links {
-                  _favourite
-                  _unfavourite
-                }
-                decorations {
-                  ...decorationContent
-                }
-              }
-              projectFavourites: projects(favourites: true) {
-                id
-                name
-                disabled
-                decorations {
-                  ...decorationContent
-                }
-                links {
-                  _unfavourite
-                }
-                branches(useModel: true, count: ${maxBranches}) {
-                  id
-                  name
-                  type
-                  disabled
-                  decorations {
-                    ...decorationContent
-                  }
-                  latestPromotions: builds(lastPromotions: true, count: 1) {
-                    id
-                    name
-                    promotionRuns {
-                      promotionLevel {
+                    description
+                    color
+                    foregroundColor
+                    computedBy {
                         id
                         name
-                        image
-                        _image
+                    }
+                    links {
+                        _update
+                        _delete
+                    }
+                  }
+                  favouriteBranches: branches(favourite: true) {
+                    project {
+                      name
+                      links {
+                        _page
+                      }
+                    }
+                    id
+                    name
+                    disabled
+                    type
+                    decorations {
+                      ...decorationContent
+                    }
+                    creation {
+                      time
+                    }
+                    links {
+                      _page
+                      _enable
+                      _disable
+                      _delete
+                      _unfavourite
+                      _favourite
+                    }
+                    latestBuild: builds(count: 1) {
+                      id
+                      name
+                      creation {
+                          time
+                      }
+                    }
+                    promotionLevels {
+                      id
+                      name
+                      image
+                      _image
+                      promotionRuns(first: 1) {
+                        build {
+                          id
+                          name
+                        }
                       }
                     }
                   }
-                  latestBuild: builds(count: 1) {
+                  projects {
                     id
                     name
+                    labels {
+                      id
+                      category
+                      name
+                      description
+                      color
+                      foregroundColor
+                      computedBy {
+                        id
+                        name
+                      }
+                    }
+                    links {
+                      _favourite
+                      _unfavourite
+                    }
+                    decorations {
+                      ...decorationContent
+                    }
+                  }
+                  projectFavourites: projects(favourites: true) {
+                    id
+                    name
+                    disabled
+                    decorations {
+                      ...decorationContent
+                    }
+                    links {
+                      _unfavourite
+                    }
+                    branches(useModel: true, count: ${$scope.maxBranches}) {
+                      id
+                      name
+                      type
+                      disabled
+                      decorations {
+                        ...decorationContent
+                      }
+                      latestPromotions: builds(lastPromotions: true, count: 1) {
+                        id
+                        name
+                        promotionRuns {
+                          promotionLevel {
+                            id
+                            name
+                            image
+                            _image
+                          }
+                        }
+                      }
+                      latestBuild: builds(count: 1) {
+                        id
+                        name
+                      }
+                    }
                   }
                 }
-              }
-            }
-            
-            fragment decorationContent on Decoration {
-              decorationType
-              error
-              data
-              feature {
-                id
-              }
-            }
-            `).then(function (data) {
+                
+                fragment decorationContent on Decoration {
+                  decorationType
+                  error
+                  data
+                  feature {
+                    id
+                  }
+                }
+                `);
+            }).then(function (data) {
 
                 $scope.projectsData = data;
                 $scope.projectFavourites = data.projectFavourites;
