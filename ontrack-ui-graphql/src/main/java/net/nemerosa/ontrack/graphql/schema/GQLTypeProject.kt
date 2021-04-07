@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import graphql.Scalars.GraphQLBoolean
-import graphql.Scalars.GraphQLString
+import graphql.Scalars.*
 import graphql.schema.DataFetcher
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLArgument
@@ -77,6 +76,11 @@ class GQLTypeProject(
                                             .description("If set to true, filter on branch matching the project's branching model")
                                             .type(GraphQLBoolean)
                                 }
+                                .argument {
+                                    it.name(ARG_BRANCHES_COUNT)
+                                        .description("Maximum number of branches to return. No limit if not specified.")
+                                        .type(GraphQLInt)
+                                }
                                 .dataFetcher(projectBranchesFetcher())
                                 .build()
                 )
@@ -147,6 +151,7 @@ class GQLTypeProject(
                 val name: String? = environment.getArgument<String>("name")
                 val favorite: Boolean? = environment.getArgument(GRAPHQL_BRANCHES_FAVORITE_ARG)
                 val useModel: Boolean? = environment.getArgument(GRAPHQL_PROJECT_BRANCHES_USE_MODEL_ARG)
+                val count: Int? = environment.getArgument(ARG_BRANCHES_COUNT)
                 // Combined filter
                 var filter: (Branch) -> Boolean = { true }
                 // Name criteria
@@ -169,6 +174,7 @@ class GQLTypeProject(
                 structureService
                         .getBranchesForProject(source.id)
                         .filter(filter)
+                        .take(count ?: Int.MAX_VALUE)
             } else {
                 emptyList()
             }
@@ -181,6 +187,10 @@ class GQLTypeProject(
 
     companion object {
         const val PROJECT = "Project"
+        /**
+         * Maximum number of branches to return
+         */
+        const val ARG_BRANCHES_COUNT = "count"
     }
 
 }

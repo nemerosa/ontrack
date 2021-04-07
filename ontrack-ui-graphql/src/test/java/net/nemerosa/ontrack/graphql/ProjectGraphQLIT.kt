@@ -16,6 +16,36 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
     private lateinit var branchFavouriteService: BranchFavouriteService
 
     @Test
+    fun `Maximum number of branches`() {
+        asAdmin {
+            project {
+                // Creates 20 branches
+                repeat(20) {
+                    branch(name = "1.$it")
+                }
+                // Query for the last 10
+                run("""{
+                    projects(id: $id) {
+                        branches(count: 10) {
+                            name
+                        }
+                    }
+                }""").let { data ->
+                    val names = data.path("projects").path(0).path("branches").map {
+                        it.path("name").asText()
+                    }
+                    assertEquals(
+                        names,
+                        (19 downTo 10).map {
+                            "1.$it"
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Favourite branches for project`() {
         val account = doCreateAccount()
         project {

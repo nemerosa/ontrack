@@ -33,6 +33,8 @@ angular.module('ot.view.home', [
             label: undefined
         };
 
+        // Maximum number of branches to return per project favourite
+        const maxBranches = 5;
 
         // Loading the project list
         function loadProjects() {
@@ -135,7 +137,7 @@ angular.module('ot.view.home', [
                 links {
                   _unfavourite
                 }
-                branches(useModel: true) {
+                branches(useModel: true, count: ${maxBranches}) {
                   id
                   name
                   type
