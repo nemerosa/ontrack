@@ -33,30 +33,49 @@ angular.module('ot.view.home', [
             label: undefined
         };
 
-        // Loading the project list
-        function loadProjects() {
-            $scope.loadingProjects = true;
-            // We start collecting some global settings
-            otGraphqlService.pageGraphQLCall(`{
-                settings {
-                    homePage {
-                        maxBranches
-                        maxProjects
-                    }
+        // GraphQL fragment for the decorations
+        const decorationFragment = `
+            fragment decorationContent on Decoration {
+              decorationType
+              error
+              data
+              feature {
+                id
+              }
+            }
+        `;
+
+        // GraphQL fragment for the displayed projects
+        const projectFragment = `
+            fragment projectContent on Project {
+                id
+                name
+                labels {
+                  id
+                  category
+                  name
+                  description
+                  color
+                  foregroundColor
+                  computedBy {
+                    id
+                    name
+                  }
                 }
-                entityCounts {
-                    projects
+                links {
+                  _favourite
+                  _unfavourite
                 }
-            }`).then(global => {
-                // Storing the data
-                $scope.maxBranches = global.settings.homePage.maxBranches;
-                $scope.maxProjects = global.settings.homePage.maxProjects;
-                $scope.projectCount = global.entityCounts.projects;
-                // Must the projects be included?
-                $scope.includeProjects = $scope.projectCount <= $scope.maxProjects;
-                // Actual call
-                return otGraphqlService.pageGraphQLCall(` query HomePage(
-                    $includeProjects: Boolean!
+                decorations {
+                  ...decorationContent
+                }
+            }
+        `;
+
+        // Full GraphQL query
+        const fullQuery = ` query HomePage(
+                    $includeProjects: Boolean!,
+                    $maxBranches: Int!
                 ) {
                   userRootActions {
                     projectCreate
@@ -123,27 +142,7 @@ angular.module('ot.view.home', [
                     }
                   }
                   projects @include(if: $includeProjects) {
-                    id
-                    name
-                    labels {
-                      id
-                      category
-                      name
-                      description
-                      color
-                      foregroundColor
-                      computedBy {
-                        id
-                        name
-                      }
-                    }
-                    links {
-                      _favourite
-                      _unfavourite
-                    }
-                    decorations {
-                      ...decorationContent
-                    }
+                    ...projectContent
                   }
                   projectFavourites: projects(favourites: true) {
                     id
@@ -155,7 +154,7 @@ angular.module('ot.view.home', [
                     links {
                       _unfavourite
                     }
-                    branches(useModel: true, count: ${$scope.maxBranches}) {
+                    branches(useModel: true, count: $maxBranches) {
                       id
                       name
                       type
@@ -183,16 +182,49 @@ angular.module('ot.view.home', [
                   }
                 }
                 
-                fragment decorationContent on Decoration {
-                  decorationType
-                  error
-                  data
-                  feature {
-                    id
-                  }
+                ${projectFragment}
+                
+                ${decorationFragment}
+                `;
+
+        // Projects by name
+        const projectQuery = `
+            query ProjectQuery($name: String!) {
+                projects(name: $name) {
+                    ...projectContent
                 }
-                `, {
-                    includeProjects: $scope.includeProjects
+            }
+                
+            ${projectFragment}
+            
+            ${decorationFragment}
+        `;
+
+        // Loading the project list
+        function loadProjects() {
+            $scope.loadingProjects = true;
+            // We start collecting some global settings
+            otGraphqlService.pageGraphQLCall(`{
+                settings {
+                    homePage {
+                        maxBranches
+                        maxProjects
+                    }
+                }
+                entityCounts {
+                    projects
+                }
+            }`).then(global => {
+                // Storing the data
+                $scope.maxBranches = global.settings.homePage.maxBranches;
+                $scope.maxProjects = global.settings.homePage.maxProjects;
+                $scope.projectCount = global.entityCounts.projects;
+                // Must the projects be included?
+                $scope.includeProjects = $scope.projectCount <= $scope.maxProjects;
+                // Actual call
+                return otGraphqlService.pageGraphQLCall(fullQuery, {
+                    includeProjects: $scope.includeProjects,
+                    maxBranches: $scope.maxBranches
                 });
             }).then(function (data) {
 
@@ -257,6 +289,18 @@ angular.module('ot.view.home', [
             });
 
         }
+
+        // Search for the projects by name
+        $scope.onProjectSearch = () => {
+            if ($scope.projectFilter.name) {
+                $scope.loadingProjects = true;
+                otGraphqlService.pageGraphQLCall(projectQuery, { name: $scope.projectFilter.name}).then(data => {
+                    $scope.projectsData.projects = data.projects;
+                }).finally(() => {
+                    $scope.loadingProjects = false;
+                });
+            }
+        };
 
         // Creating a project
         $scope.createProject = function () {
