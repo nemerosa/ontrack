@@ -33,9 +33,6 @@ angular.module('ot.view.home', [
             label: undefined
         };
 
-        // Maximum number of branches to return per project favourite
-        const maxBranches = 5;
-
         // Loading the project list
         function loadProjects() {
             $scope.loadingProjects = true;
@@ -203,7 +200,9 @@ angular.module('ot.view.home', [
                 $scope.projectFavourites = data.projectFavourites;
                 $scope.favouriteBranches = data.favouriteBranches;
 
-                preloadLabelFilter();
+                if ($scope.includeProjects) {
+                    preloadLabelFilter();
+                }
 
                 // All branches disabled status computation
                 $scope.projectFavourites.forEach(function (projectFavourite) {

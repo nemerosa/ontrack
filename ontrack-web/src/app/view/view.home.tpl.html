@@ -175,8 +175,9 @@
             </table>
         </div>
     </div>
+
     <!-- When no project -->
-    <div class="row" ng-show="accessStatus == 'ok' && projectsData.projects.length == 0">
+    <div class="row" ng-show="accessStatus == 'ok' && includeProjects && projectsData.projects.length == 0">
         <div class="col-md-12">
             <div class="alert alert-info">
                 No project in the list.
@@ -187,22 +188,25 @@
             </div>
         </div>
     </div>
+
     <!-- List of projects -->
-    <div class="row" ng-if="projectsData.projects.length > 0">
+    <div class="row" ng-if="projectsData.projects.length > 0 || (!includeProjects && !loadingProjects)">
         <div class="col-md-12">
             <div class="row" ng-show="projectFavourites.length > 0 || favouriteBranches.length > 0">
                 <div class="col-md-12">
                     <h4>
-                        <span class="fa fa-book"></span>
-                        All projects
+                        <span class="fa fa-book" ng-if="includeProjects"></span>
+                        <span class="fa fa-search" ng-if="!includeProjects"></span>
+                        <span ng-if="includeProjects">All projects</span>
+                        <span ng-if="!includeProjects">Search for projects</span>
                     </h4>
                 </div>
             </div>
             <!-- All project filters -->
-            <div class="row">
+            <div class="row" ng-if="includeProjects">
                 <div class="col-md-12 ot-home-header">
                     <!-- Name filter -->
-                    <div class="ot-home-filter input-group col-md-3">
+                    <div class="ot-home-filter input-group col-md-3" ng-if="includeProjects">
                         <input class="form-control"
                                type="text"
                                ng-model="projectFilter.name"
@@ -224,7 +228,7 @@
                             </span>
                         </a>
                     </script>
-                    <div class="col-md-3 input-group" ng-if="projectsData.labels.length > 0">
+                    <div class="col-md-3 input-group" ng-if="projectsData.labels.length > 0 && includeProjects">
                         <input type="text" class="form-control"
                                placeholder="Label filter"
                                ng-model="projectFilter.label"
@@ -246,6 +250,34 @@
                                     </a>
                                 </li>
                             </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Search project filter -->
+            <div class="row" ng-if="!includeProjects">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p class="ot-description">
+                                There are too many projects (<strong>{{ projectCount }}</strong>) to display them all. Look for them using
+                                their name and mark them as favorites if you want a quick access to them.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <form class="ot-home-header form-inline" ng-submit="onProjectSearch()">
+                                <div class="input-group col-md-4">
+                                    <input class="form-control"
+                                           type="text"
+                                           ng-model="projectFilter.name"
+                                           placeholder="Look for projects"/>
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-default" type="submit"><span class="fa fa-search"></span></button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
