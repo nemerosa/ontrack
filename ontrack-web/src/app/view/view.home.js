@@ -189,7 +189,7 @@ angular.module('ot.view.home', [
 
         // Projects by name
         const projectQuery = `
-            query ProjectQuery(pattern: String!) {
+            query ProjectQuery($pattern: String!) {
                 projects(pattern: $pattern) {
                     ...projectContent
                 }
