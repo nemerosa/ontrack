@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.acceptance.browser.pages.HomePage
 import net.nemerosa.ontrack.acceptance.browser.pages.ProjectPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
+import org.junit.Before
 import org.junit.Test
 
 import static net.nemerosa.ontrack.acceptance.steps.BasicSteps.login
@@ -19,6 +20,11 @@ import static org.junit.Assert.assertEquals
 @AcceptanceTestSuite
 @AcceptanceTest([AcceptanceTestContext.PRODUCTION, AcceptanceTestContext.SMOKE, AcceptanceTestContext.BROWSER_TEST])
 class ACCBrowserBasic extends AcceptanceTestClient {
+
+    @Before
+    void 'Clear projects first'() {
+        deleteAllProjects()
+    }
 
     @Test
     @AcceptanceTest([AcceptanceTestContext.PRODUCTION, AcceptanceTestContext.SMOKE, AcceptanceTestContext.BROWSER_TEST])

@@ -84,6 +84,12 @@ class AcceptanceTestClient extends AcceptanceSupport {
         admin().post(nameDescription, "structure/projects/create").get()
     }
 
+    def deleteAllProjects() {
+        ontrack.projects.each { project ->
+            project.delete()
+        }
+    }
+
     def doDeleteProject(String name) {
         logger.debug "Deleting project ${name}"
         def project = admin().get("structure/entity/project/$name").get()
