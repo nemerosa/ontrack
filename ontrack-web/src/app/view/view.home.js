@@ -291,13 +291,15 @@ angular.module('ot.view.home', [
         }
 
         // Search for the projects by name
+        // TODO Fuzzy search is needed (name part only)
         $scope.onProjectSearch = () => {
             if ($scope.projectFilter.name) {
-                $scope.loadingProjects = true;
+                $scope.searchingProjects = true;
                 otGraphqlService.pageGraphQLCall(projectQuery, { name: $scope.projectFilter.name}).then(data => {
                     $scope.projectsData.projects = data.projects;
+                    $scope.searchingReturnsNoResult = (data.projects.length === 0);
                 }).finally(() => {
-                    $scope.loadingProjects = false;
+                    $scope.searchingProjects = false;
                 });
             }
         };

@@ -282,8 +282,25 @@
                     </div>
                 </div>
             </div>
+            <!-- Searching projects load indicator -->
+            <div class="row" ng-show="searchingProjects">
+                <div class="col-md-12">
+                    <div class="alert alert-info">
+                        <span class="ot-loading-indicator"></span>
+                        Looking for the projects...
+                    </div>
+                </div>
+            </div>
+            <!-- Searching projects returned no result -->
+            <div class="row" ng-show="searchingReturnsNoResult">
+                <div class="col-md-12">
+                    <div class="alert alert-warning">
+                        No project matching <strong>{{ projectFilter.name }}</strong> has been found.
+                    </div>
+                </div>
+            </div>
             <!-- List of projects -->
-            <div class="row">
+            <div class="row" ng-hide="searchingProjects">
                 <div class="col-md-3"
                      ng-repeat="project in projectsData.projects | filter:projectFilterFn"
                      ng-show="showDisabled || !project.disabled">
