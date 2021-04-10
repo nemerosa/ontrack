@@ -20,6 +20,46 @@ import kotlin.test.assertTrue
 class StructureServiceNewIT : AbstractDSLTestSupport() {
 
     @Test
+    fun `Looking for projects using a pattern`() {
+        val rootA = uid("P")
+        val rootB = uid("P")
+        repeat(5) {
+            project(name = NameDescription.nd("X${rootA}$it", ""))
+        }
+        repeat(5) {
+            project(name = NameDescription.nd("Y${rootB}$it", ""))
+        }
+        asAdmin {
+            val projects = structureService.findProjectsByNamePattern(rootA)
+            assertEquals(
+                (0..4).map { "X$rootA$it"},
+                projects.map { it.name }
+            )
+        }
+    }
+
+    @Test
+    fun `Looking for projects using a pattern is restricted by authorizations`() {
+        val rootA = uid("P")
+        val rootB = uid("P")
+        val projectsA = (0..4).map {
+            project(name = NameDescription.nd("X${rootA}$it", ""))
+        }
+        repeat(5) {
+            project(name = NameDescription.nd("Y${rootB}$it", ""))
+        }
+        withNoGrantViewToAll {
+            asUserWithView(*projectsA.take(3).toTypedArray()) {
+                val projects = structureService.findProjectsByNamePattern(rootA)
+                assertEquals(
+                    (0..2).map { "X$rootA$it"},
+                    projects.map { it.name }
+                )
+            }
+        }
+    }
+
+    @Test
     fun `Validation run status comment not editable by default`() {
         project {
             branch {

@@ -189,8 +189,8 @@ angular.module('ot.view.home', [
 
         // Projects by name
         const projectQuery = `
-            query ProjectQuery($name: String!) {
-                projects(name: $name) {
+            query ProjectQuery(pattern: String!) {
+                projects(pattern: $pattern) {
                     ...projectContent
                 }
             }
@@ -295,7 +295,7 @@ angular.module('ot.view.home', [
         $scope.onProjectSearch = () => {
             if ($scope.projectFilter.name) {
                 $scope.searchingProjects = true;
-                otGraphqlService.pageGraphQLCall(projectQuery, { name: $scope.projectFilter.name}).then(data => {
+                otGraphqlService.pageGraphQLCall(projectQuery, { pattern: $scope.projectFilter.name}).then(data => {
                     $scope.projectsData.projects = data.projects;
                     $scope.searchingReturnsNoResult = (data.projects.length === 0);
                 }).finally(() => {

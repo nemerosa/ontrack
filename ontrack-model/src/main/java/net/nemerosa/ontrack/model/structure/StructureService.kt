@@ -25,6 +25,14 @@ interface StructureService {
      */
     fun findProjectByID(projectId: ID): Project?
 
+    /**
+     * Finds a list of projects using part of their name
+     *
+     * @param pattern Part to look for, case-insensitive
+     * @return List of projects
+     */
+    fun findProjectsByNamePattern(pattern: String): List<Project>
+
     fun getProject(projectId: ID): Project
 
     fun saveProject(project: Project)

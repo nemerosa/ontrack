@@ -45,6 +45,13 @@ class GQLRootQueryProjects(
                                 .type(GraphQLString)
                                 .build()
                 )
+                .argument(
+                        newArgument()
+                                .name(ARG_NAME_PATTERN)
+                                .description("Part of the name of the project to look for")
+                                .type(GraphQLString)
+                                .build()
+                )
                 .argument { a ->
                     a.name(ARG_FAVOURITES)
                             .description("Favourite projects only")
@@ -64,6 +71,7 @@ class GQLRootQueryProjects(
         return DataFetcher { environment ->
             val id: Int? = environment.getArgument(ARG_ID)
             val name: String? = environment.getArgument(ARG_NAME)
+            val namePattern: String? = environment.getArgument(ARG_NAME_PATTERN)
             val favourites = GraphqlUtils.getBooleanArgument(environment, ARG_FAVOURITES, false)
             val labels: List<String>? = environment.getArgument<List<String>>(ARG_LABELS)
             // Per ID
@@ -76,7 +84,7 @@ class GQLRootQueryProjects(
                     // As list
                     return@DataFetcher listOf(project)
                 }
-                name != null -> {
+                !name.isNullOrBlank() -> {
                     // No other argument is expected
                     checkArgList(environment, ARG_NAME)
                     return@DataFetcher structureService
@@ -88,6 +96,11 @@ class GQLRootQueryProjects(
                     // No other argument is expected
                     checkArgList(environment, ARG_FAVOURITES)
                     return@DataFetcher projectFavouriteService.getFavouriteProjects()
+                }
+                !namePattern.isNullOrBlank() -> {
+                    // No other argument is expected
+                    checkArgList(environment, ARG_NAME_PATTERN)
+                    return@DataFetcher structureService.findProjectsByNamePattern(namePattern)
                 }
                 else -> {
                     // Filter to use
@@ -121,6 +134,7 @@ class GQLRootQueryProjects(
     companion object {
         const val ARG_ID = "id"
         const val ARG_NAME = "name"
+        const val ARG_NAME_PATTERN = "namePattern"
         const val ARG_FAVOURITES = "favourites"
         const val ARG_LABELS = "labels"
     }

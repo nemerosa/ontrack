@@ -82,6 +82,16 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
+    @NotNull
+    @Override
+    public List<Project> findProjectsByNamePattern(@NotNull String pattern) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM PROJECTS WHERE NAME ILIKE :pattern ORDER BY NAME",
+                params("pattern", "%" + pattern + "%"),
+                (rs, rowNum) -> toProject(rs)
+        );
+    }
+
     @Override
     @NotNull
     public Project getProject(ID projectId) {
