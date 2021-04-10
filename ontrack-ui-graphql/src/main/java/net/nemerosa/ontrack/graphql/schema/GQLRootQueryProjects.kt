@@ -134,7 +134,7 @@ class GQLRootQueryProjects(
     companion object {
         const val ARG_ID = "id"
         const val ARG_NAME = "name"
-        const val ARG_NAME_PATTERN = "namePattern"
+        const val ARG_NAME_PATTERN = "pattern"
         const val ARG_FAVOURITES = "favourites"
         const val ARG_LABELS = "labels"
     }
