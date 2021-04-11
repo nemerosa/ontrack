@@ -25,6 +25,8 @@ image::images/projects-labels-title.png[Project filter on project page,500]
 In the home page, projects can be filtered using labels. Several options
 are available.
 
+NOTE: if the number of projects is too high, only the search box for projects will be displayed. Filtering on label is not available in this case. See <<home-page>>.
+
 You can type parts of the label in the _Label_ filter box
 at the top of the project list. This displays a list
 of matching labels from which you can select an actual label:
