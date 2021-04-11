@@ -2,14 +2,13 @@ package net.nemerosa.ontrack.extension.oidc.casc
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.casc.context.AbstractCascContext
-import net.nemerosa.ontrack.casc.context.SubSecurityContext
+import net.nemerosa.ontrack.casc.context.SubConfigContext
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.oidc.settings.OIDCSettingsService
 import net.nemerosa.ontrack.extension.oidc.settings.OntrackOIDCProvider
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.getTextField
-import net.nemerosa.ontrack.json.parse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Component
 @Component
 class OIDCCascContext(
     private val oidcSettingsService: OIDCSettingsService,
-) : AbstractCascContext(), SubSecurityContext {
+) : AbstractCascContext(), SubConfigContext {
 
     private val logger: Logger = LoggerFactory.getLogger(OIDCCascContext::class.java)
 

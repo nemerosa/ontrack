@@ -4,11 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode
 import org.springframework.stereotype.Component
 
 @Component
-class SecurityContext(
-    private val subSecurityContexts: List<SubSecurityContext>,
+class AbstractHolderContext<T : SubCascContext>(
+    private val subContexts: List<T>,
 ) : AbstractCascContext() {
-
     override fun run(node: JsonNode, paths: List<String>) {
-        node.runSubCascContexts(paths, subSecurityContexts)
+        node.runSubCascContexts(paths, subContexts)
     }
 }

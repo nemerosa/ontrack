@@ -1,16 +1,11 @@
 package net.nemerosa.ontrack.casc.context
 
-import com.fasterxml.jackson.databind.JsonNode
 import org.springframework.stereotype.Component
 
 @Component
-class ConfigContext(
-    private val securityContext: SecurityContext,
-) : AbstractCascContext() {
+class ConfigContext(subContexts: List<SubConfigContext>) : AbstractHolderContext<SubConfigContext>(subContexts)
 
-    override fun run(node: JsonNode, paths: List<String>) {
-        node.run(paths,
-            "security" to securityContext
-        )
-    }
-}
+interface SubConfigContext : SubCascContext
+
+@Component
+class NOPSubConfigContext : NOPSubCascContext(), SubConfigContext

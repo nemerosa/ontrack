@@ -16,6 +16,9 @@ dependencies {
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
 
+    testRuntimeOnly(project(":ontrack-service"))
+    testRuntimeOnly(project(":ontrack-repository-impl"))
+
 }
 
 val testJar by tasks.registering(Jar::class) {
