@@ -22,6 +22,7 @@ dependencies {
     api(project(":ontrack-extension-support"))
 
     implementation(project(":ontrack-job"))
+    implementation(project(":ontrack-casc"))
     implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.commons:commons-text")
     implementation("commons-io:commons-io")

@@ -32,6 +32,7 @@ include(":ontrack-web")
 include(":ontrack-acceptance")
 include(":ontrack-postgresql-migration")
 include(":ontrack-docs")
+include(":ontrack-casc")
 
 // Core extensions
 include(":ontrack-extension-ldap")

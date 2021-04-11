@@ -44,7 +44,7 @@ interface OIDCSettingsService {
     /**
      * Gets a provider using its [ID][OntrackOIDCProvider.id]
      *
-     * @param id [ID][OntrackOIDCProvider.id] of the provider to delete
+     * @param id [ID][OntrackOIDCProvider.id] of the provider
      * @return Associated provider or `null` if not found
      */
     fun getProviderById(id: String): OntrackOIDCProvider?
