@@ -270,11 +270,12 @@
                             <form class="ot-home-header form-inline" ng-submit="onProjectSearch()">
                                 <div class="input-group col-md-4">
                                     <input class="form-control"
+                                           id="name-pattern"
                                            type="text"
                                            ng-model="projectFilter.name"
                                            placeholder="Look for projects"/>
                                     <div class="input-group-btn">
-                                        <button class="btn btn-default" type="submit"><span class="fa fa-search"></span></button>
+                                        <button class="btn btn-default" id="search-projects" type="submit"><span class="fa fa-search"></span></button>
                                     </div>
                                 </div>
                             </form>
@@ -294,7 +295,7 @@
             <!-- Searching projects returned no result -->
             <div class="row" ng-show="searchingReturnsNoResult">
                 <div class="col-md-12">
-                    <div class="alert alert-warning">
+                    <div class="alert alert-warning" id="no-search-result">
                         No project matching <strong>{{ projectFilter.name }}</strong> has been found.
                     </div>
                 </div>

@@ -2,14 +2,17 @@ package net.nemerosa.ontrack.acceptance.browser.pages
 
 import net.nemerosa.ontrack.acceptance.browser.Browser
 import net.nemerosa.ontrack.acceptance.browser.dialogs.ProjectDialog
+import org.mockito.internal.matchers.Find
 import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.FindBy
 
+import javax.xml.ws.WebEndpoint
+
 public class HomePage extends AbstractHeaderPage {
 
     @FindBy(className = 'ot-command-api')
-    protected WebElement commandApi;
+    protected WebElement commandApi
 
     public HomePage(Browser browser) {
         super(browser);
@@ -38,9 +41,12 @@ public class HomePage extends AbstractHeaderPage {
         return dialog
     }
 
-    public boolean isProjectPresent(String name) {
-        assert $(By.linkText(name)).displayed
-        true
+    boolean isProjectPresent(String name) {
+        return isElementDisplayed(By.linkText(name))
+    }
+
+    boolean isProjectSearchAvailable() {
+        return isElementDisplayed(By.id("name-pattern"))
     }
 
     ProjectPage goToProject(String name) {
@@ -50,5 +56,18 @@ public class HomePage extends AbstractHeaderPage {
 
     boolean isMenuLoaded() {
         $('.ot-command-project-new').displayed
+    }
+
+    void searchProject(String name) {
+        $('#name-pattern').sendKeys(name)
+        $('#search-projects').click()
+    }
+
+    boolean isNoSearchResultPresent() {
+        return isElementDisplayed(By.id("no-search-result"))
+    }
+
+    boolean isSearchProjectPresent() {
+        return isElementDisplayed(By.id("name-pattern"))
     }
 }

@@ -33,4 +33,14 @@ public abstract class AbstractModule {
         browser.findElement(By.cssSelector(css))
     }
 
+    boolean isElementDisplayed(By by) {
+        def elements = browser.findElements(by)
+        if (elements.isEmpty()) {
+            return false
+        } else {
+            def element = elements.first()
+            return element.isDisplayed()
+        }
+    }
+
 }

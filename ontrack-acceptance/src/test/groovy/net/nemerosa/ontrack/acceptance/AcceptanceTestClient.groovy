@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.acceptance.browser.Configuration
 import net.nemerosa.ontrack.client.JsonClient
 import net.nemerosa.ontrack.client.JsonClientImpl
 import net.nemerosa.ontrack.client.OTHttpClientBuilder
+import net.nemerosa.ontrack.dsl.HomePageSettings
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.OntrackConnection
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException
@@ -153,6 +154,28 @@ class AcceptanceTestClient extends AcceptanceSupport {
             closure(id, name)
         } finally {
             doDeleteProject name
+        }
+    }
+
+    void withNProjects(int n, Closure action) {
+        def projects = (1..n).collect {
+            String name = uid("P")
+            ontrack.project(name)
+        }
+        action(projects)
+    }
+
+    void withMaxProjects(int max, Closure action) {
+        def oldSettings = ontrack.config.homePageSettings
+        try {
+            def newSettings = new HomePageSettings(
+                    oldSettings.maxBranches,
+                    max
+            )
+            ontrack.config.homePageSettings = newSettings
+            action()
+        } finally {
+            ontrack.config.homePageSettings = oldSettings
         }
     }
 
