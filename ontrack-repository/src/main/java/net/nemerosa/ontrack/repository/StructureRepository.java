@@ -29,6 +29,15 @@ public interface StructureRepository {
     @Nullable
     Project findProjectByID(ID projectId);
 
+    /**
+     * Finds a list of projects using part of their name
+     *
+     * @param pattern Part to look for, case-insensitive
+     * @return List of projects
+     */
+    @NotNull
+    List<Project> findProjectsByNamePattern(@NotNull String pattern);
+
     @NotNull
     Project getProject(ID projectId);
 

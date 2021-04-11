@@ -277,6 +277,28 @@ class Config {
     }
 
     /**
+     * Home page settings
+     */
+
+    @DSLMethod("Gets the home page settings")
+    HomePageSettings getHomePageSettings() {
+        def json = ontrack.get('settings/home-page')
+        return new HomePageSettings(
+                json.maxBranches as int,
+                json.maxProjects as int
+        )
+    }
+
+    @DSLMethod("Sets the home page settings")
+    void setHomePageSettings(HomePageSettings homePageSettings) {
+        def json = [
+                maxBranches: homePageSettings.maxBranches,
+                maxProjects: homePageSettings.maxProjects,
+        ]
+        ontrack.put('settings/home-page', json)
+    }
+
+    /**
      * Gets an existing label
      */
     @DSLMethod(count = 2, value = "Gets an existing label or returns null")
