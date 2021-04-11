@@ -14,7 +14,7 @@ class CascStartup(
     private val cascConfigurationProperties: CascConfigurationProperties,
     private val resourceLoader: ResourceLoader,
     private val cascService: CascService,
-): StartupService {
+) : StartupService {
 
     private val logger: Logger = LoggerFactory.getLogger(CascStartup::class.java)
 
@@ -30,7 +30,7 @@ class CascStartup(
                 logger.info("No CasC resource is defined.")
                 return
             }
-            val parsedResources = locations.map { location ->
+            val parsedResources = locations.flatMap { location ->
                 logger.info("CasC resource: $location")
                 parseResource(location)
             }
@@ -42,13 +42,22 @@ class CascStartup(
         }
     }
 
-    private fun parseResource(location: String): String {
+    private fun parseResource(location: String): List<String> {
         val resource = resourceLoader.getResource(location)
         if (!resource.exists()) {
             error("Cannot find CasC resource at $location")
+        } else if (resource.isFile) {
+            val file = resource.file
+            if (file.exists() && file.isDirectory) {
+                return file.listFiles()?.map {
+                    it.readText()
+                } ?: emptyList()
+            }
         }
-        return resource.inputStream.use {
-            it.bufferedReader().readText()
-        }
+        return listOf(
+            resource.inputStream.use {
+                it.bufferedReader().readText()
+            }
+        )
     }
 }
