@@ -443,8 +443,15 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Saving current settings, runs some code and restores the format settings
      */
-    private inline fun <reified T> withSettings(code: () -> Unit) {
-        val settings: T = settingsService.getCachedSettings(T::class.java)
+    protected final inline fun <reified T: Any> withSettings(noinline code: () -> Unit) {
+        withSettings(T::class, code)
+    }
+
+    /**
+     * Saving current settings, runs some code and restores the format settings
+     */
+    protected fun <T: Any> withSettings(settingsClass: KClass<T>, code: () -> Unit) {
+        val settings: T = settingsService.getCachedSettings(settingsClass.java)
         // Runs the code
         code()
         // Restores the initial settings (only in case of success)

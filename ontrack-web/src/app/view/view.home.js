@@ -34,86 +34,20 @@ angular.module('ot.view.home', [
             label: undefined
         };
 
-
-        // Loading the project list
-        function loadProjects() {
-            $scope.loadingProjects = true;
-            otGraphqlService.pageGraphQLCall(`{
-              user {
-                actions {
-                  createProject {
-                    links {
-                      form {
-                        description
-                        method
-                        uri
-                      }
-                    }
-                    mutation
-                  }
-                }
-              }
-              labels {
+        // GraphQL fragment for the decorations
+        const decorationFragment = `
+            fragment decorationContent on Decoration {
+              decorationType
+              error
+              data
+              feature {
                 id
-                category
-                name
-                description
-                color
-                foregroundColor
-                computedBy {
-                    id
-                    name
-                }
-                links {
-                    _update
-                    _delete
-                }
               }
-              favouriteBranches: branches(favourite: true) {
-                project {
-                  name
-                  links {
-                    _page
-                  }
-                }
-                id
-                name
-                disabled
-                decorations {
-                  ...decorationContent
-                }
-                creation {
-                  time
-                }
-                links {
-                  _page
-                  _enable
-                  _disable
-                  _delete
-                  _unfavourite
-                  _favourite
-                }
-                latestBuild: builds(count: 1) {
-                  id
-                  name
-                  creation {
-                      time
-                  }
-                }
-                promotionLevels {
-                  id
-                  name
-                  image
-                  _image
-                  promotionRuns(first: 1) {
-                    build {
-                      id
-                      name
-                    }
-                  }
-                }
-              }
-              projects {
+            }
+        `;
+        // GraphQL fragment for the displayed projects
+        const projectFragment = `
+            fragment projectContent on Project {
                 id
                 name
                 favourite
@@ -142,62 +76,184 @@ angular.module('ot.view.home', [
                 decorations {
                   ...decorationContent
                 }
-              }
-              projectFavourites: projects(favourites: true) {
-                id
-                name
-                disabled
-                decorations {
-                  ...decorationContent
-                }
-                actions {
-                  unfavouriteProject {
-                    description
-                    mutation
-                  }
-                }
-                branches(useModel: true) {
-                  id
-                  name
-                  disabled
-                  decorations {
-                    ...decorationContent
-                  }
-                  latestPromotions: builds(lastPromotions: true, count: 1) {
-                    id
-                    name
-                    promotionRuns {
-                      promotionLevel {
-                        id
-                        name
-                        image
-                        _image
+            }
+        `;
+
+        // Full GraphQL query
+        const fullQuery = ` query HomePage(
+                    $includeProjects: Boolean!,
+                    $maxBranches: Int!
+                ) {
+                  user {
+                    actions {
+                      createProject {
+                        links {
+                          form {
+                            description
+                            method
+                            uri
+                          }
+                        }
+                        mutation
                       }
                     }
                   }
-                  latestBuild: builds(count: 1) {
+                  labels {
+                    id
+                    category
+                    name
+                    description
+                    color
+                    foregroundColor
+                    computedBy {
+                        id
+                        name
+                    }
+                    links {
+                        _update
+                        _delete
+                    }
+                  }
+                  favouriteBranches: branches(favourite: true) {
+                    project {
+                      name
+                      links {
+                        _page
+                      }
+                    }
                     id
                     name
+                    disabled
+                    decorations {
+                      ...decorationContent
+                    }
+                    creation {
+                      time
+                    }
+                    links {
+                      _page
+                      _enable
+                      _disable
+                      _delete
+                      _unfavourite
+                      _favourite
+                    }
+                    latestBuild: builds(count: 1) {
+                      id
+                      name
+                      creation {
+                          time
+                      }
+                    }
+                    promotionLevels {
+                      id
+                      name
+                      image
+                      _image
+                      promotionRuns(first: 1) {
+                        build {
+                          id
+                          name
+                        }
+                      }
+                    }
+                  }
+                  projects @include(if: $includeProjects) {
+                    ...projectContent
+                  }
+                  projectFavourites: projects(favourites: true) {
+                    id
+                    name
+                    disabled
+                    decorations {
+                      ...decorationContent
+                    }
+                    actions {
+                      unfavouriteProject {
+                        description
+                        mutation
+                      } 
+                    } 
+                    branches(useModel: true, count: $maxBranches) {
+                      id
+                      name
+                      disabled
+                      decorations {
+                        ...decorationContent
+                      }
+                      latestPromotions: builds(lastPromotions: true, count: 1) {
+                        id
+                        name
+                        promotionRuns {
+                          promotionLevel {
+                            id
+                            name
+                            image
+                            _image
+                          }
+                        }
+                      }
+                      latestBuild: builds(count: 1) {
+                        id
+                        name
+                      }
+                    }
                   }
                 }
-              }
+                
+                ${projectFragment}
+                
+                ${decorationFragment}
+                `;
+
+        // Projects by name
+        const projectQuery = `
+            query ProjectQuery($pattern: String!) {
+                projects(pattern: $pattern) {
+                    ...projectContent
+                }
             }
+                
+            ${projectFragment}
             
-            fragment decorationContent on Decoration {
-              decorationType
-              error
-              data
-              feature {
-                id
-              }
-            }
-            `).then(function (data) {
+            ${decorationFragment}
+        `;
+
+        // Loading the project list
+        function loadProjects() {
+            $scope.loadingProjects = true;
+            // We start collecting some global settings
+            otGraphqlService.pageGraphQLCall(`{
+                settings {
+                    homePage {
+                        maxBranches
+                        maxProjects
+                    }
+                }
+                entityCounts {
+                    projects
+                }
+            }`).then(global => {
+                // Storing the data
+                $scope.maxBranches = global.settings.homePage.maxBranches;
+                $scope.maxProjects = global.settings.homePage.maxProjects;
+                $scope.projectCount = global.entityCounts.projects;
+                // Must the projects be included?
+                $scope.includeProjects = $scope.projectCount <= $scope.maxProjects;
+                // Actual call
+                return otGraphqlService.pageGraphQLCall(fullQuery, {
+                    includeProjects: $scope.includeProjects,
+                    maxBranches: $scope.maxBranches
+                });
+            }).then(function (data) {
 
                 $scope.projectsData = data;
                 $scope.projectFavourites = data.projectFavourites;
                 $scope.favouriteBranches = data.favouriteBranches;
 
-                preloadLabelFilter();
+                if ($scope.includeProjects) {
+                    preloadLabelFilter();
+                }
 
                 // All branches disabled status computation
                 $scope.projectFavourites.forEach(function (projectFavourite) {
@@ -249,6 +305,20 @@ angular.module('ot.view.home', [
             });
 
         }
+
+        // Search for the projects by name
+        // TODO Fuzzy search is needed (name part only)
+        $scope.onProjectSearch = () => {
+            if ($scope.projectFilter.name) {
+                $scope.searchingProjects = true;
+                otGraphqlService.pageGraphQLCall(projectQuery, { pattern: $scope.projectFilter.name}).then(data => {
+                    $scope.projectsData.projects = data.projects;
+                    $scope.searchingReturnsNoResult = (data.projects.length === 0);
+                }).finally(() => {
+                    $scope.searchingProjects = false;
+                });
+            }
+        };
 
         // Creating a project
         $scope.createProject = function () {

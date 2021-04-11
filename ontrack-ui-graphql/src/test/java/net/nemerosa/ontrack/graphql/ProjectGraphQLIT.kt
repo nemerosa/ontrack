@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertNotPresent
+import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
@@ -18,6 +19,88 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var branchFavouriteService: BranchFavouriteService
+    @Test
+    fun `Looking for projects using a pattern`() {
+        val rootA = TestUtils.uid("P")
+        val rootB = TestUtils.uid("P")
+        repeat(5) {
+            project(name = NameDescription.nd("X${rootA}$it", ""))
+        }
+        repeat(5) {
+            project(name = NameDescription.nd("Y${rootB}$it", ""))
+        }
+        asAdmin {
+            run("""{
+                projects(pattern: "X$rootA") {
+                    name
+                }
+            }""").let { data ->
+                val names = data.path("projects").map { it.path("name").asText() }
+                assertEquals(
+                    (0..4).map { "X$rootA$it" },
+                    names
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Looking for projects using a pattern is restricted by authorizations`() {
+        val rootA = TestUtils.uid("P")
+        val rootB = TestUtils.uid("P")
+        val projectsA = (0..4).map {
+            project(name = NameDescription.nd("X${rootA}$it", ""))
+        }
+        repeat(5) {
+            project(name = NameDescription.nd("Y${rootB}$it", ""))
+        }
+        withNoGrantViewToAll {
+            asUserWithView(*projectsA.take(3).toTypedArray()) {
+                run("""{
+                    projects(pattern: "X$rootA") {
+                        name
+                    }
+                }""").let { data ->
+                    val names = data.path("projects").map { it.path("name").asText() }
+                    assertEquals(
+                        (0..2).map { "X$rootA$it" },
+                        names
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Maximum number of branches`() {
+        asAdmin {
+            project {
+                // Creates 20 branches
+                repeat(20) {
+                    branch(name = "1.$it")
+                }
+                // Query for the last 10
+                run("""{
+                    projects(id: $id) {
+                        branches(count: 10) {
+                            name
+                        }
+                    }
+                }""").let { data ->
+                    val names = data.path("projects").path(0).path("branches").map {
+                        it.path("name").asText()
+                    }
+                    assertEquals(
+                        names,
+                        (19 downTo 10).map {
+                            "1.$it"
+                        }
+                    )
+                }
+            }
+        }
+    }
+
 
     @Test
     fun `Creating a project`() {
@@ -465,8 +548,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
             }
             val branchIds: Set<Int> = data["projects"][0]["branches"].map { it["id"].asInt() }.toSet()
             assertEquals(
-                    setOf(fav.id()),
-                    branchIds
+                setOf(fav.id()),
+                branchIds
             )
         }
     }
@@ -560,14 +643,15 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }""")
-                    val validationRunStatuses = data["projects"][0]["branches"][0]["validationStamps"][0]["validationRuns"][0]["validationRunStatuses"]
+                    val validationRunStatuses =
+                        data["projects"][0]["branches"][0]["validationStamps"][0]["validationRuns"][0]["validationRunStatuses"]
                     assertEquals(
-                            listOf("EXPLAINED", "INVESTIGATING", "FAILED"),
-                            validationRunStatuses.map { it["statusID"]["id"].asText() }
+                        listOf("EXPLAINED", "INVESTIGATING", "FAILED"),
+                        validationRunStatuses.map { it["statusID"]["id"].asText() }
                     )
                     assertEquals(
-                            listOf("Explained", "Investigating", "Validation failed"),
-                            validationRunStatuses.map { it["description"].asText() }
+                        listOf("Explained", "Investigating", "Validation failed"),
+                        validationRunStatuses.map { it["description"].asText() }
                     )
                 }
             }

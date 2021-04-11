@@ -89,6 +89,12 @@ class StructureServiceImpl(
         }
     }
 
+    override fun findProjectsByNamePattern(pattern: String): List<Project> {
+        return structureRepository.findProjectsByNamePattern(pattern).filter {
+            securityService.isProjectFunctionGranted(it.id(), ProjectView::class.java)
+        }
+    }
+
     override fun getProject(projectId: ID): Project {
         securityService.checkProjectFunction(projectId.value, ProjectView::class.java)
         return structureRepository.getProject(projectId)
