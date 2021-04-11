@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.casc.context
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.casc.CascContext
+import net.nemerosa.ontrack.json.JsonParseException
+import net.nemerosa.ontrack.json.parse
 
 abstract class AbstractCascContext : CascContext {
 
@@ -24,6 +26,21 @@ abstract class AbstractCascContext : CascContext {
     ) {
         run(paths, subCascContexts.associateBy { it.field })
     }
+
+    /**
+     * Checked parsing of a JSON array
+     */
+    protected inline fun <reified T> JsonNode.mapEachTo(paths: List<String>) =
+        mapIndexed { index, child ->
+            try {
+                child.parse<T>()
+            } catch (ex: JsonParseException) {
+                throw IllegalStateException(
+                    "Cannot parse into ${T::class.qualifiedName}: ${path(paths + index.toString())}",
+                    ex
+                )
+            }
+        }
 
     /**
      * Known list of fields to handle

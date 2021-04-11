@@ -7,14 +7,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import net.nemerosa.ontrack.casc.context.OntrackContext
 import net.nemerosa.ontrack.json.merge
+import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
 class CascServiceImpl(
-    private val ontrackContext: OntrackContext
-): CascService {
+    private val ontrackContext: OntrackContext,
+    private val securityService: SecurityService,
+) : CascService {
 
     private val mapper = ObjectMapper(YAMLFactory())
 
@@ -41,7 +43,9 @@ class CascServiceImpl(
             error("Root of the Ontrack CasC must be `$ROOT`.")
         } else {
             // Starts running the CasC
-            ontrackContext.run(ontrack as ObjectNode, listOf(ROOT))
+            securityService.asAdmin {
+                ontrackContext.run(ontrack as ObjectNode, listOf(ROOT))
+            }
         }
     }
 

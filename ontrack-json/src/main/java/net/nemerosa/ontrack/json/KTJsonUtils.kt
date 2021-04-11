@@ -101,7 +101,18 @@ fun JsonNode?.isNullOrNullNode() = this == null || this.isNull
 /**
  * Gets a string field
  */
-fun JsonNode.getTextField(field: String) = path(field).asText()
+fun JsonNode.getTextField(field: String): String? = if (has(field)) {
+    get(field).asText()
+} else {
+    null
+}
+
+/**
+ * Gets a required string field
+ */
+fun JsonNode.getRequiredTextField(field: String): String =
+    getTextField(field)
+        ?: throw JsonParseException("Missing field $field")
 
 /**
  * Merging two JSON nodes
