@@ -1,5 +1,6 @@
-package net.nemerosa.ontrack.acceptance
+package net.nemerosa.ontrack.acceptance.tests.dsl
 
+import net.nemerosa.ontrack.acceptance.AbstractACCDSL
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.v4.ValidationRun
 import org.junit.Test

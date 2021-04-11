@@ -282,7 +282,7 @@ class Config {
 
     @DSLMethod("Gets the home page settings")
     HomePageSettings getHomePageSettings() {
-        def json = ontrack.get('settings/home-page')
+        def json = ontrack.get('rest/settings/home-page')
         return new HomePageSettings(
                 json.maxBranches as int,
                 json.maxProjects as int
@@ -295,7 +295,7 @@ class Config {
                 maxBranches: homePageSettings.maxBranches,
                 maxProjects: homePageSettings.maxProjects,
         ]
-        ontrack.put('settings/home-page', json)
+        ontrack.put('rest/settings/home-page', json)
     }
 
     /**

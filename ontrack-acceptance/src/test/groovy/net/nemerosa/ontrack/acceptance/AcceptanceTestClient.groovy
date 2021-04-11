@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.acceptance.browser.Configuration
 import net.nemerosa.ontrack.client.JsonClient
 import net.nemerosa.ontrack.client.JsonClientImpl
 import net.nemerosa.ontrack.client.OTHttpClientBuilder
+import net.nemerosa.ontrack.dsl.v4.HomePageSettings
 import net.nemerosa.ontrack.dsl.v4.Ontrack
 import net.nemerosa.ontrack.dsl.v4.OntrackConnection
 import net.nemerosa.ontrack.dsl.v4.http.OTMessageClientException
