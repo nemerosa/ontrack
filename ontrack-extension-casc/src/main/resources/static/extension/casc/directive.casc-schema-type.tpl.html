@@ -1,0 +1,20 @@
+<div ng-if="type.__type == 'object'">
+    <div ng-repeat="field in type.fields | orderBy: 'name'" style="padding-left: 2em;">
+        <p>
+            <strong><code>{{ field.name }}</code></strong>:
+            <ot-extension-casc-schema-type-simple type="field.type"></ot-extension-casc-schema-type-simple>
+            <strong ng-if="field.required"><i> (required)</i></strong>
+            <span class="ot-description">{{ field.description }}</span>
+        </p>
+        <ot-extension-casc-schema-type-object type="field.type"></ot-extension-casc-schema-type-object>
+    </div>
+</div><div ng-if="type.__type == 'array'">
+    <div style="padding-left: 2em;">
+        <p>
+            <strong><code>-</code></strong>:
+            <ot-extension-casc-schema-type-simple type="type.type"></ot-extension-casc-schema-type-simple>
+            <span class="ot-description">{{ type.type.description }}</span>
+        </p>
+        <ot-extension-casc-schema-type-object type="type.type"></ot-extension-casc-schema-type-object>
+    </div>
+</div>

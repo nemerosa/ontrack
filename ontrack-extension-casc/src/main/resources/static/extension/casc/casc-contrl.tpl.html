@@ -1,0 +1,24 @@
+<ot-view>
+
+    <!-- Schema management -->
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        CasC schema
+                        <button id="casc-schema-load" type="button" ng-disabled="loadingSchema" ng-click="loadSchema()" ng-if="!schema">
+                            <span class="ot-loading-indicator" ng-show="loadingSchema"></span>
+                            Load
+                        </button>
+                    </h3>
+                </div>
+                <div class="panel-body" ng-if="schema">
+                    <ot-extension-casc-schema-type type="schema"></ot-extension-casc-schema-type>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</ot-view>
