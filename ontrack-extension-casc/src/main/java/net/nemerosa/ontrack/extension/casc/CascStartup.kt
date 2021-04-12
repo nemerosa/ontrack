@@ -34,9 +34,13 @@ class CascStartup(
                 logger.info("CasC resource: $location")
                 parseResource(location)
             }
-            logger.info("CasC resources loaded, running the configuration")
-            cascService.runYaml(parsedResources)
-            logger.info("CasC ran successfully")
+            if (parsedResources.isNotEmpty()) {
+                logger.info("CasC resources loaded, running the configuration")
+                cascService.runYaml(parsedResources)
+                logger.info("CasC ran successfully")
+            } else {
+                logger.info("No CasC resource was found.")
+            }
         } else {
             logger.info("CasC is disabled")
         }
@@ -44,15 +48,16 @@ class CascStartup(
 
     private fun parseResource(location: String): List<String> {
         val resource = resourceLoader.getResource(location)
-        if (!resource.exists()) {
-            error("Cannot find CasC resource at $location")
-        } else if (resource.isFile) {
+        if (resource.isFile) {
             val file = resource.file
             if (file.exists() && file.isDirectory) {
                 return file.listFiles()?.map {
                     it.readText()
                 } ?: emptyList()
             }
+        }
+        if (!resource.exists()) {
+            error("Cannot find CasC resource at $location")
         }
         return listOf(
             resource.inputStream.use {

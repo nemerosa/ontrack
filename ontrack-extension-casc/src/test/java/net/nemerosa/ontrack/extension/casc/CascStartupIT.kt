@@ -14,7 +14,7 @@ class CascStartupIT : AbstractDSLTestSupport() {
     private lateinit var cascStartup: CascStartup
 
     @Autowired
-    private lateinit var cascConfigurationProperties: net.nemerosa.ontrack.extension.casc.CascConfigurationProperties
+    private lateinit var cascConfigurationProperties: CascConfigurationProperties
 
     @Test
     fun `Loading of one file`() {

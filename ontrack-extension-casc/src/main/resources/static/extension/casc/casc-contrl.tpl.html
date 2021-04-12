@@ -15,4 +15,31 @@
         </div>
     </div>
 
+    <!-- Content management -->
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Configuration as code
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <p><strong>Locations:</strong></p>
+                    <div class="alert alert-info" ng-show="loadingLocations">
+                        <span class="ot-loading-indicator"></span>
+                        Loading the indicators...
+                    </div>
+                    <ul ng-if="locations.length > 0">
+                        <li ng-repeat="location in locations">
+                            <code>{{ location }}</code>
+                        </li>
+                    </ul>
+                    <p ng-hide="loadingLocations" ng-if="locations.length == 0"><em>No location has been defined.</em></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </ot-view>

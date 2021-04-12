@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.extension.casc.graphql
 
+import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.casc.schema.CascSchemaService
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.json.asJson
 import org.springframework.stereotype.Component
 
@@ -29,6 +31,14 @@ class GQLTypeCasc(
                     .type(GQLScalarJSON.INSTANCE)
                     .dataFetcher { _ ->
                         cascSchemaService.schema.asJson()
+                    }
+            }
+            .field {
+                it.name("locations")
+                    .description("List of resources needed to define the configuration as code")
+                    .type(listType(GraphQLString))
+                    .dataFetcher { _ ->
+                        cascSchemaService.locations
                     }
             }
             .build()
