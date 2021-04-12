@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.casc.schema
 
 import net.nemerosa.ontrack.model.settings.HomePageSettings
+import net.nemerosa.ontrack.model.settings.SecuritySettings
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -14,6 +15,14 @@ class CascSchemaTest {
         assertEquals(
             "maxBranches",
             cascFieldName(HomePageSettings::maxBranches)
+        )
+    }
+
+    @Test
+    fun cascFieldNameWithJsonProperty() {
+        assertEquals(
+            "grantProjectViewToAll",
+            cascFieldName(SecuritySettings::isGrantProjectViewToAll)
         )
     }
 

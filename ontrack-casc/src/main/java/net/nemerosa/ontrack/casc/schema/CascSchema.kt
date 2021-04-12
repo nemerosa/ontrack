@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.casc.schema
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.casc.CascContext
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import kotlin.reflect.KClass
@@ -8,6 +9,7 @@ import kotlin.reflect.full.createType
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.javaGetter
 
 sealed class CascType(
     val description: String,
@@ -93,7 +95,9 @@ internal fun cascField(property: KProperty<*>): CascField {
     )
 }
 
-internal fun cascFieldName(property: KProperty<*>): String = property.name
+internal fun cascFieldName(property: KProperty<*>): String =
+    property.javaGetter?.getAnnotation(JsonProperty::class.java)?.value
+        ?: property.name
 
 internal fun cascFieldType(property: KProperty<*>): CascType =
     when {
