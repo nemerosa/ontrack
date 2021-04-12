@@ -10,6 +10,7 @@ import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaGetter
+import kotlin.reflect.jvm.jvmErasure
 
 sealed class CascType(
     val description: String,
@@ -26,7 +27,7 @@ class CascObject(
 
 class CascArray(
     description: String,
-    type: CascType,
+    val type: CascType,
 ) : CascType(description) {
     override val __type: String = "array"
 }
@@ -80,6 +81,14 @@ fun cascObject(
     }
 )
 
+fun cascArray(
+    description: String,
+    type: CascType,
+) = CascArray(
+    description,
+    type
+)
+
 // ====================================================================================
 // ====================================================================================
 // ====================================================================================
@@ -109,9 +118,9 @@ internal fun cascFieldName(property: KProperty<*>): String =
         ?: property.name
 
 internal fun cascFieldType(property: KProperty<*>): CascType =
-    when {
-        property.returnType.isSubtypeOf(String::class.createType()) -> cascString
-        property.returnType.isSubtypeOf(Boolean::class.createType()) -> cascBoolean
-        property.returnType.isSubtypeOf(Int::class.createType()) -> cascInt
+    when (property.returnType.jvmErasure) {
+        String::class -> cascString
+        Boolean::class -> cascBoolean
+        Int::class -> cascInt
         else -> error("Cannot get CasC type for $property")
     }
