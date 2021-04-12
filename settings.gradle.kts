@@ -32,7 +32,6 @@ include(":ontrack-web")
 include(":ontrack-acceptance")
 include(":ontrack-postgresql-migration")
 include(":ontrack-docs")
-include(":ontrack-casc")
 
 // Core extensions
 include(":ontrack-extension-ldap")
@@ -53,3 +52,4 @@ include(":ontrack-extension-vault")
 include(":ontrack-extension-influxdb")
 include(":ontrack-extension-sonarqube")
 include(":ontrack-extension-indicators")
+include(":ontrack-extension-casc")

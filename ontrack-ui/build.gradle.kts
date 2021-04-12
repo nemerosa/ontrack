@@ -22,7 +22,6 @@ dependencies {
     api(project(":ontrack-extension-support"))
 
     implementation(project(":ontrack-job"))
-    implementation(project(":ontrack-casc"))
     implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.commons:commons-text")
     implementation("commons-io:commons-io")
@@ -64,6 +63,7 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-influxdb"))
     runtimeOnly(project(":ontrack-extension-sonarqube"))
     runtimeOnly(project(":ontrack-extension-indicators"))
+    runtimeOnly(project(":ontrack-extension-casc"))
 }
 
 /**

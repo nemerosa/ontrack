@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.oidc.casc
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.casc.context.AbstractCascContext
-import net.nemerosa.ontrack.casc.context.SubConfigContext
-import net.nemerosa.ontrack.casc.schema.CascType
-import net.nemerosa.ontrack.casc.schema.cascArray
-import net.nemerosa.ontrack.casc.schema.cascObject
+import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
+import net.nemerosa.ontrack.extension.casc.context.SubConfigContext
+import net.nemerosa.ontrack.extension.casc.schema.CascType
+import net.nemerosa.ontrack.extension.casc.schema.cascArray
+import net.nemerosa.ontrack.extension.casc.schema.cascObject
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.oidc.settings.OIDCSettingsService
 import net.nemerosa.ontrack.extension.oidc.settings.OntrackOIDCProvider
