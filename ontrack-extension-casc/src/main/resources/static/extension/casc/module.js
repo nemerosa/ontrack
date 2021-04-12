@@ -15,8 +15,25 @@ angular.module('ontrack.extension.casc', [
         view.commands = [
             ot.viewCloseCommand('/home')
         ];
+    })
+    .config(function ($stateProvider) {
+        $stateProvider.state('casc-schema', {
+            url: '/extension/casc/casc-schema',
+            templateUrl: 'extension/casc/casc-schema.tpl.html',
+            controller: 'CascSchemaCtrl'
+        });
+    })
+    .controller('CascSchemaCtrl', function ($scope, ot, otGraphqlService) {
+        const view = ot.view();
+        view.title = "Configuration as Code Schema";
+        view.breadcrumbs = ot.homeBreadcrumbs().concat([
+            ['CasC', '#/extension/casc/casc-control']
+        ])
+        view.commands = [
+            ot.viewCloseCommand('/extension/casc/casc-control')
+        ];
 
-        $scope.loadSchema = () => {
+        const loadSchema = () => {
             $scope.loadingSchema = true;
             otGraphqlService.pageGraphQLCall(`
                 {
@@ -30,6 +47,8 @@ angular.module('ontrack.extension.casc', [
                 $scope.loadingSchema = false;
             })
         };
+
+        loadSchema();
     })
     .directive("otExtensionCascSchemaType", () => ({
         restrict: 'E',
