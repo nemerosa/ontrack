@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.extension.oidc.casc
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.casc.context.AbstractCascContext
 import net.nemerosa.ontrack.casc.context.SubConfigContext
+import net.nemerosa.ontrack.casc.schema.CascType
+import net.nemerosa.ontrack.casc.schema.cascObject
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.oidc.settings.OIDCSettingsService
 import net.nemerosa.ontrack.extension.oidc.settings.OntrackOIDCProvider
@@ -21,6 +23,9 @@ class OIDCCascContext(
     private val logger: Logger = LoggerFactory.getLogger(OIDCCascContext::class.java)
 
     override val field: String = "oidc"
+
+    override val type: CascType
+        get() = cascObject(OntrackOIDCProvider::class)
 
     override fun run(node: JsonNode, paths: List<String>) {
         val items = node.mapIndexed { index, child ->
