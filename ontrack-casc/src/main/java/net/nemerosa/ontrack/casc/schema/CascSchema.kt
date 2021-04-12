@@ -13,17 +13,23 @@ import kotlin.reflect.jvm.javaGetter
 
 sealed class CascType(
     val description: String,
-)
+) {
+    abstract val __type: String
+}
 
 class CascObject(
     val fields: List<CascField>,
     description: String,
-) : CascType(description)
+) : CascType(description) {
+    override val __type: String = "object"
+}
 
 class CascArray(
     description: String,
     type: CascType,
-) : CascType(description)
+) : CascType(description) {
+    override val __type: String = "array"
+}
 
 class CascField(
     val name: String,
@@ -32,11 +38,14 @@ class CascField(
     val required: Boolean,
 )
 
-sealed class CascScalar(description: String) : CascType(description)
+sealed class CascScalar(
+    override val __type: String,
+    description: String,
+) : CascType(description)
 
-class CascString : CascScalar("String type")
-class CascInt : CascScalar("Int type")
-class CascBoolean : CascScalar("Boolean type")
+class CascString : CascScalar("string", "String type")
+class CascInt : CascScalar("int", "Int type")
+class CascBoolean : CascScalar("boolean", "Boolean type")
 
 val cascString = CascString()
 val cascInt = CascInt()
