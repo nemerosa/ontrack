@@ -1,9 +1,12 @@
 package net.nemerosa.ontrack.extension.ldap
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import net.nemerosa.ontrack.model.annotations.APIDescription
 
+@APIDescription("LDAP settings")
 data class LDAPSettings(
         @JsonProperty("enabled")
+        @APIDescription("Is LDAP authentication enabled?")
         val isEnabled: Boolean,
         val url: String = "",
         val searchBase: String = "",
@@ -17,15 +20,15 @@ data class LDAPSettings(
         /**
          * The ID of the attribute which contains the name for a group
          */
-        val groupNameAttribute: String? = "cn",
+        val groupNameAttribute: String? = DEFAULT_GROUP_NAME_ATTRIBUTE,
         /**
          * The base DN from which the search for group membership should be performed
          */
-        val groupSearchBase: String? = "",
+        val groupSearchBase: String? = DEFAULT_GROUP_SEARCH_BASE,
         /**
          * The pattern to be used for the user search. {0} is the user's DN
          */
-        val groupSearchFilter: String? = "(member={0})"
+        val groupSearchFilter: String? = DEFAULT_GROUP_SEARCH_FILTER
 ) {
 
     fun withPassword(password: String): LDAPSettings {
@@ -76,6 +79,10 @@ data class LDAPSettings(
                 groupSearchBase = "",
                 groupSearchFilter = ""
         )
+
+        const val DEFAULT_GROUP_NAME_ATTRIBUTE = "cn"
+        const val DEFAULT_GROUP_SEARCH_BASE = ""
+        const val DEFAULT_GROUP_SEARCH_FILTER = "(member={0})"
     }
 
 }

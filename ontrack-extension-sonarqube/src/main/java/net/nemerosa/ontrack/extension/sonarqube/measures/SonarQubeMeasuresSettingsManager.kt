@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.extension.sonarqube.measures
 
+import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresSettings.Companion.DEFAULT_BLOCKER_THRESHOLD
+import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresSettings.Companion.DEFAULT_COVERAGE_THRESHOLD
+import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresSettings.Companion.DEFAULT_DISABLED
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.MultiStrings
 import net.nemerosa.ontrack.model.form.YesNo
@@ -63,7 +66,7 @@ class SonarQubeMeasuresSettingsManager(
                         YesNo.of("disabled")
                                 .help("Check to disable the collection of SonarQube measures")
                                 .label("Disable collection")
-                                .value(settings?.disabled ?: false)
+                                .value(settings?.disabled ?: DEFAULT_DISABLED)
                 )
                 .with(
                         IntField.of(SonarQubeMeasuresSettings::coverageThreshold.name)
@@ -71,14 +74,14 @@ class SonarQubeMeasuresSettingsManager(
                                 .label("Coverage threshold")
                                 .min(0)
                                 .max(100)
-                                .value(settings?.coverageThreshold ?: 80)
+                                .value(settings?.coverageThreshold ?: DEFAULT_COVERAGE_THRESHOLD)
                 )
                 .with(
                         IntField.of(SonarQubeMeasuresSettings::blockerThreshold.name)
                                 .help("Maximum number of blocker issues")
                                 .label("Blocker issues")
                                 .min(1)
-                                .value(settings?.blockerThreshold ?: 5)
+                                .value(settings?.blockerThreshold ?: DEFAULT_BLOCKER_THRESHOLD)
                 )
     }
 }

@@ -15,18 +15,18 @@ class SonarQubeMeasuresSettingsProvider(
                     ?.split("|")
                     ?: SonarQubeMeasuresSettings.DEFAULT_MEASURES,
             disabled = settingsRepository
-                    .getBoolean(SonarQubeMeasuresSettings::class.java, "disabled", false),
+                    .getBoolean(SonarQubeMeasuresSettings::class.java, "disabled", SonarQubeMeasuresSettings.DEFAULT_DISABLED),
             coverageThreshold = settingsRepository
                     .getInt(
                             SonarQubeMeasuresSettings::class.java,
                             SonarQubeMeasuresSettings::coverageThreshold.name,
-                            80
+                            SonarQubeMeasuresSettings.DEFAULT_COVERAGE_THRESHOLD
                     ),
             blockerThreshold = settingsRepository
                     .getInt(
                             SonarQubeMeasuresSettings::class.java,
                             SonarQubeMeasuresSettings::blockerThreshold.name,
-                            5
+                            SonarQubeMeasuresSettings.DEFAULT_BLOCKER_THRESHOLD
                     )
     )
 

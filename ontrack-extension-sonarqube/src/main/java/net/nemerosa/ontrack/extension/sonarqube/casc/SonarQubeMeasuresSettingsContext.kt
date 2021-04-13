@@ -31,10 +31,10 @@ class SonarQubeMeasuresSettingsContext(
         cascField(SonarQubeMeasuresSettings::blockerThreshold, required = false),
     )
 
-    override fun adjustNodeBeforeParsing(settings: SonarQubeMeasuresSettings, node: JsonNode): JsonNode =
+    override fun adjustNodeBeforeParsing(node: JsonNode): JsonNode =
         node.ifMissing(
-            settings::disabled,
-            settings::coverageThreshold,
-            settings::blockerThreshold,
+            SonarQubeMeasuresSettings::disabled to SonarQubeMeasuresSettings.DEFAULT_DISABLED,
+            SonarQubeMeasuresSettings::coverageThreshold to SonarQubeMeasuresSettings.DEFAULT_COVERAGE_THRESHOLD,
+            SonarQubeMeasuresSettings::blockerThreshold to SonarQubeMeasuresSettings.DEFAULT_BLOCKER_THRESHOLD,
         )
 }

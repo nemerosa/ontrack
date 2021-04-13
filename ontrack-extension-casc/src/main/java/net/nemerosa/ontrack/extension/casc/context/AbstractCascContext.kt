@@ -84,14 +84,11 @@ abstract class AbstractCascContext : CascContext {
     /**
      * Adapting an input JSON for missing non-required variables before parsing
      */
-    protected fun JsonNode.ifMissing(vararg properties: KProperty0<*>): JsonNode {
-        properties.forEach { property ->
+    protected fun JsonNode.ifMissing(vararg mappings: Pair<KProperty<*>, Any>): JsonNode {
+        mappings.forEach { (property, value) ->
             val name = cascFieldName(property)
             if (this is ObjectNode && !has(name)) {
-                val value = property.get()
-                if (value != null) {
-                    set<JsonNode>(name, value.asJson())
-                }
+                set<JsonNode>(name, value.asJson())
             }
         }
         return this

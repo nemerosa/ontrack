@@ -23,6 +23,10 @@ class SonarQubeMeasuresSettings(
                 COVERAGE
         )
 
+        const val DEFAULT_DISABLED = false
+        const val DEFAULT_COVERAGE_THRESHOLD = 80
+        const val DEFAULT_BLOCKER_THRESHOLD = 5
+
     }
 
 }
