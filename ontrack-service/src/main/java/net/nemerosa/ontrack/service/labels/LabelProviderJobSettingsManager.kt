@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.form.YesNo
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
+import net.nemerosa.ontrack.model.settings.LabelProviderJobSettings
 import net.nemerosa.ontrack.model.support.SettingsRepository
 import org.springframework.stereotype.Component
 
