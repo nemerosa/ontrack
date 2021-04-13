@@ -109,4 +109,39 @@ class CascGraphQLIT : AbstractQLKTITSupport() {
             }
         }
     }
+
+    @Test
+    fun `Reloading the configuration as code`() {
+        asAdmin {
+            withSettings<HomePageSettings> {
+                // Configuration
+                cascConfigurationProperties.locations = listOf(
+                    "classpath:casc/settings-home-page.yaml",
+                )
+                // Initial values
+                settingsManagerService.saveSettings(
+                    HomePageSettings(
+                        maxBranches = 2,
+                        maxProjects = 200,
+                    )
+                )
+                // Reloading
+                val data = run("""
+                    mutation {
+                        reloadCasc {
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                """)
+                // Checks there are no error
+                assertNoUserError(data, "reloadCasc")
+                // Checks the values have been updated
+                val settings = cachedSettingsService.getCachedSettings(HomePageSettings::class.java)
+                assertEquals(10, settings.maxBranches)
+                assertEquals(100, settings.maxProjects)
+            }
+        }
+    }
 }
