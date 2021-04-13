@@ -2,10 +2,12 @@ package net.nemerosa.ontrack.extension.casc.graphql
 
 import net.nemerosa.ontrack.extension.casc.CascConfigurationProperties
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.model.settings.HomePageSettings
 import net.nemerosa.ontrack.test.assertJsonNotNull
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class CascGraphQLIT : AbstractQLKTITSupport() {
 
@@ -52,6 +54,58 @@ class CascGraphQLIT : AbstractQLKTITSupport() {
                     ),
                     locations
                 )
+            }
+        }
+    }
+
+    @Test
+    fun `YAML rendering`() {
+        asAdmin {
+            withSettings<HomePageSettings> {
+                settingsManagerService.saveSettings(
+                    HomePageSettings(
+                        maxBranches = 2,
+                        maxProjects = 200,
+                    )
+                )
+                run("""
+                    {
+                        casc {
+                            yaml
+                        }
+                    }
+                """).let { data ->
+                    val yaml = data.path("casc").path("yaml").asText()
+                    assertTrue("maxBranches: 2" in yaml)
+                    assertTrue("maxProjects: 200" in yaml)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Rendering as JSON`() {
+        asAdmin {
+            withSettings<HomePageSettings> {
+                settingsManagerService.saveSettings(
+                    HomePageSettings(
+                        maxBranches = 2,
+                        maxProjects = 200,
+                    )
+                )
+                run("""
+                    {
+                        casc {
+                            json
+                        }
+                    }
+                """).let { data ->
+                    val json = data.path("casc").path("json")
+                    assertEquals(2,
+                        json.path("ontrack").path("config").path("settings").path("home-page").path("maxBranches").asInt())
+                    assertEquals(200,
+                        json.path("ontrack").path("config").path("settings").path("home-page").path("maxProjects").asInt())
+                }
             }
         }
     }

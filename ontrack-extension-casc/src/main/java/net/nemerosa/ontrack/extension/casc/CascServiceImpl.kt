@@ -31,12 +31,13 @@ class CascServiceImpl(
         run(parsed)
     }
 
-    override fun renderAsYaml(): String {
-        val root = mapOf(
-            ROOT to ontrackContext.render()
-        )
-        return mapper.writeValueAsString(root)
-    }
+    override fun renderAsJson() = mapOf(
+        ROOT to ontrackContext.render()
+    ).asJson()
+
+    override fun renderAsYaml(): String = mapper.writeValueAsString(
+        renderAsJson()
+    )
 
     private fun run(nodes: List<JsonNode>) {
         val merged = nodes.fold(NullNode.instance as JsonNode) { acc, r ->

@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.casc
 
+import com.fasterxml.jackson.databind.JsonNode
+
 /**
  * Runs some Configuration as Code.
  */
@@ -20,7 +22,12 @@ interface CascService {
     fun runYaml(yaml: List<String>)
 
     /**
-     * Renders the current settings as a YAML file
+     * Renders the current settings as a YAML content
      */
     fun renderAsYaml(): String
+
+    /**
+     * Renders the current settings as a JSON
+     */
+    fun renderAsJson(): JsonNode
 }
