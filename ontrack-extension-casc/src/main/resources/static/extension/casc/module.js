@@ -49,6 +49,29 @@ angular.module('ontrack.extension.casc', [
                 $scope.loadingYaml = false;
             })
         };
+
+        $scope.reload = () => {
+            $scope.reloading = true;
+            $scope.reloadError = "";
+            otGraphqlService.pageGraphQLCall(`
+                mutation {
+                    reloadCasc {
+                        errors {
+                            message
+                        }
+                    }
+                }
+            `).then(data => {
+                const errors = data.reloadCasc.errors;
+                if (errors && errors.length > 0) {
+                    $scope.reloadError = errors[0].message;
+                } else {
+                    $scope.loadYaml();
+                }
+            }).finally(() => {
+                $scope.reloading = false;
+            });
+        };
     })
     .config(function ($stateProvider) {
         $stateProvider.state('casc-schema', {

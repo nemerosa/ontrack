@@ -39,6 +39,19 @@
                     <p ng-hide="loadingLocations" ng-if="locations.length == 0"><em>No location has been defined.</em></p>
                 </div>
                 <div class="panel-body">
+                    <p><strong>Reload configuration:</strong></p>
+                    <p>
+                        <button class="btn btn-default" type="button" ng-disabled="reloading" ng-click="reload()">
+                            <span class="fa fa-refresh" ng-hide="reloading"></span>
+                            <span class="ot-loading-indicator" ng-show="reloading"></span>
+                            Reload configuration
+                        </button>
+                    </p>
+                    <div class="alert alert-danger" ng-if="reloadError" ng-hide="reloading">
+                        {{ reloadError }}
+                    </div>
+                </div>
+                <div class="panel-body">
                     <p><strong>Current configuration:</strong></p>
                     <p>
                         <button class="btn btn-default" type="button" ng-disabled="loadingYaml" ng-click="loadYaml()">
