@@ -9,4 +9,9 @@ interface CascContext {
 
     fun run(node: JsonNode, paths: List<String>)
 
+    /**
+     * Renders this context as JSON in order to generate the current settings.
+     */
+    fun render(): JsonNode
+
 }

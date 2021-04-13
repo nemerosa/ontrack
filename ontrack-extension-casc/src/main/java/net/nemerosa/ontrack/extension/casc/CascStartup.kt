@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.casc
 
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StartupService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -14,6 +15,7 @@ class CascStartup(
     private val cascConfigurationProperties: CascConfigurationProperties,
     private val resourceLoader: ResourceLoader,
     private val cascService: CascService,
+    private val securityService: SecurityService,
 ) : StartupService {
 
     private val logger: Logger = LoggerFactory.getLogger(CascStartup::class.java)
@@ -36,7 +38,9 @@ class CascStartup(
             }
             if (parsedResources.isNotEmpty()) {
                 logger.info("CasC resources loaded, running the configuration")
-                cascService.runYaml(parsedResources)
+                securityService.asAdmin {
+                    cascService.runYaml(parsedResources)
+                }
                 logger.info("CasC ran successfully")
             } else {
                 logger.info("No CasC resource was found.")

@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import net.nemerosa.ontrack.extension.casc.context.OntrackContext
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.merge
+import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -16,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 class CascServiceImpl(
     private val ontrackContext: OntrackContext,
     private val securityService: SecurityService,
-) : net.nemerosa.ontrack.extension.casc.CascService {
+) : CascService {
 
     private val mapper = ObjectMapper(YAMLFactory())
 
@@ -29,6 +31,13 @@ class CascServiceImpl(
         run(parsed)
     }
 
+    override fun renderAsYaml(): String {
+        val root = mapOf(
+            ROOT to ontrackContext.render()
+        )
+        return mapper.writeValueAsString(root)
+    }
+
     private fun run(nodes: List<JsonNode>) {
         val merged = nodes.fold(NullNode.instance as JsonNode) { acc, r ->
             acc.merge(r)
@@ -37,6 +46,7 @@ class CascServiceImpl(
     }
 
     private fun run(node: JsonNode) {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
         // We want the root to be `ontrack`
         val ontrack = node.path(ROOT)
         if (ontrack.isNull || !ontrack.isObject) {

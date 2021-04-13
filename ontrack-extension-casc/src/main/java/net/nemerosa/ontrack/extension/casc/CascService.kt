@@ -18,4 +18,9 @@ interface CascService {
      * @param yaml List of YAML content
      */
     fun runYaml(yaml: List<String>)
+
+    /**
+     * Renders the current settings as a YAML file
+     */
+    fun renderAsYaml(): String
 }

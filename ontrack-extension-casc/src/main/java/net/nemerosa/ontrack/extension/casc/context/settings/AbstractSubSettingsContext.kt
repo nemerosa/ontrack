@@ -5,7 +5,9 @@ import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
 import net.nemerosa.ontrack.extension.casc.schema.CascType
 import net.nemerosa.ontrack.extension.casc.schema.cascObject
 import net.nemerosa.ontrack.json.JsonParseException
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseInto
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.settings.SettingsManagerService
 import kotlin.reflect.KClass
 
@@ -13,6 +15,7 @@ abstract class AbstractSubSettingsContext<T : Any>(
     override val field: String,
     private val settingsClass: KClass<T>,
     private val settingsManagerService: SettingsManagerService,
+    private val cachedSettingsService: CachedSettingsService,
 ) : AbstractCascContext(), SubSettingsContext {
 
     override val type: CascType
@@ -33,4 +36,6 @@ abstract class AbstractSubSettingsContext<T : Any>(
     }
 
     private fun parseSettings(node: JsonNode): T = node.parseInto(settingsClass)
+
+    override fun render(): JsonNode = cachedSettingsService.getCachedSettings(settingsClass.java).asJson()
 }

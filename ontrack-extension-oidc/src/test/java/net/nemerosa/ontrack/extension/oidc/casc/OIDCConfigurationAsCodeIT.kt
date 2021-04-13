@@ -23,9 +23,9 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestSupport() {
                         - id: $id
                           name: My Keycloak
                           description: My Keycloak instance
-                          issuer-id: some-issuer-id
-                          client-id: some-client-id
-                          group-filter: ontrack-.*
+                          issuerId: some-issuer-id
+                          clientId: some-client-id
+                          groupFilter: ontrack-.*
         """.trimIndent())
         // Checks the OIDC provider has been registered
         asAdmin {
@@ -51,8 +51,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestSupport() {
                         - id: $id
                           name: My Keycloak
                           description: My Keycloak instance
-                          issuer-id: some-issuer-id
-                          client-id: some-client-id
+                          issuerId: some-issuer-id
+                          clientId: some-client-id
         """.trimIndent())
         // Checks the OIDC provider has been registered
         asAdmin {
@@ -78,8 +78,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestSupport() {
                         - id: $id
                           name: My Keycloak
                           description: My Keycloak instance
-                          issuer-id: some-issuer-id
-                          client-id: some-client-id
+                          issuerId: some-issuer-id
+                          clientId: some-client-id
         """.trimIndent()
         // Once
         casc(yaml)
@@ -122,8 +122,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestSupport() {
                         - id: $id
                           name: My Keycloak
                           description: My Keycloak instance
-                          issuer-id: some-issuer-id
-                          client-id: some-client-id
+                          issuerId: some-issuer-id
+                          clientId: some-client-id
         """.trimIndent())
         // Checks the OIDC provider has been registered
         asAdmin {
@@ -145,8 +145,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestSupport() {
                         - id: $id
                           name: My Keycloak
                           description: My Keycloak instance
-                          issuer-id: some-issuer-id
-                          client-id: another-client-id
+                          issuerId: some-issuer-id
+                          clientId: another-client-id
         """.trimIndent())
         // Checks the OIDC provider is still registered with the new values
         asAdmin {
@@ -173,13 +173,13 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestSupport() {
                         - id: ${id}1
                           name: My Keycloak 1
                           description: My Keycloak instance 1
-                          issuer-id: some-issuer-id-1
-                          client-id: some-client-id-1
+                          issuerId: some-issuer-id-1
+                          clientId: some-client-id-1
                         - id: ${id}2
                           name: My Keycloak 2
                           description: My Keycloak instance 2
-                          issuer-id: some-issuer-id-2
-                          client-id: some-client-id-2
+                          issuerId: some-issuer-id-2
+                          clientId: some-client-id-2
         """.trimIndent())
         // Checks the OIDC providers have been registered
         asAdmin {
@@ -208,13 +208,13 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestSupport() {
                         - id: ${id}1
                           name: My Keycloak 1
                           description: My Keycloak instance 1
-                          issuer-id: some-issuer-id-1
-                          client-id: some-client-id-1
+                          issuerId: some-issuer-id-1
+                          clientId: some-client-id-1
                         - id: ${id}2
                           name: My Keycloak 2
                           description: My Keycloak instance 2
-                          issuer-id: some-issuer-id-2
-                          client-id: some-client-id-2
+                          issuerId: some-issuer-id-2
+                          clientId: some-client-id-2
         """.trimIndent())
         // Checks the OIDC providers have been registered
         asAdmin {
@@ -239,8 +239,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestSupport() {
                         - id: ${id}2
                           name: My Keycloak 2
                           description: My Keycloak instance 2
-                          issuer-id: some-issuer-id-2
-                          client-id: some-client-id-2
+                          issuerId: some-issuer-id-2
+                          clientId: some-client-id-2
         """.trimIndent())
         // Checks the OIDC provider has been removed
         asAdmin {

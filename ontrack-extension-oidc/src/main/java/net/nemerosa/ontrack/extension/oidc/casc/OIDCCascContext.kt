@@ -1,17 +1,18 @@
 package net.nemerosa.ontrack.extension.oidc.casc
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ObjectNode
+import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
 import net.nemerosa.ontrack.extension.casc.context.SubConfigContext
 import net.nemerosa.ontrack.extension.casc.schema.CascType
 import net.nemerosa.ontrack.extension.casc.schema.cascArray
 import net.nemerosa.ontrack.extension.casc.schema.cascObject
-import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.oidc.settings.OIDCSettingsService
 import net.nemerosa.ontrack.extension.oidc.settings.OntrackOIDCProvider
 import net.nemerosa.ontrack.json.JsonParseException
-import net.nemerosa.ontrack.json.getRequiredTextField
-import net.nemerosa.ontrack.json.getTextField
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -66,14 +67,13 @@ class OIDCCascContext(
         }
     }
 
-    private fun JsonNode.parseItem() = OntrackOIDCProvider(
-        id = getRequiredTextField("id"),
-        name = getRequiredTextField("name"),
-        description = getTextField("description") ?: "",
-        issuerId = getRequiredTextField("issuer-id"),
-        clientId = getRequiredTextField("client-id"),
-        clientSecret = getTextField("client-secret") ?: "",
-        groupFilter = getTextField("group-filter"),
-    )
+    override fun render(): JsonNode = oidcSettingsService.providers.asJson()
+
+    private fun JsonNode.parseItem(): OntrackOIDCProvider {
+        if (this is ObjectNode && !has(OntrackOIDCProvider::clientSecret.name)) {
+            put(OntrackOIDCProvider::clientSecret.name, "")
+        }
+        return parse()
+    }
 
 }
