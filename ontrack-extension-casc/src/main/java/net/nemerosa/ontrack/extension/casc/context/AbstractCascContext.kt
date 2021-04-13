@@ -1,18 +1,24 @@
 package net.nemerosa.ontrack.extension.casc.context
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ObjectNode
 import net.nemerosa.ontrack.extension.casc.CascContext
+import net.nemerosa.ontrack.extension.casc.schema.cascFieldName
 import net.nemerosa.ontrack.json.JsonParseException
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import kotlin.reflect.KProperty
+import kotlin.reflect.KProperty0
+import kotlin.reflect.KProperty1
 
-abstract class AbstractCascContext : net.nemerosa.ontrack.extension.casc.CascContext {
+abstract class AbstractCascContext : CascContext {
 
     /**
      * Known list of fields to handle
      */
     protected fun JsonNode.run(
         paths: List<String>,
-        vararg mapping: Pair<String, net.nemerosa.ontrack.extension.casc.CascContext>,
+        vararg mapping: Pair<String, CascContext>,
     ) {
         run(paths, mapping.toMap())
     }
@@ -47,7 +53,7 @@ abstract class AbstractCascContext : net.nemerosa.ontrack.extension.casc.CascCon
      */
     protected fun JsonNode.run(
         paths: List<String>,
-        mapping: Map<String, net.nemerosa.ontrack.extension.casc.CascContext>,
+        mapping: Map<String, CascContext>,
     ) {
         fields().forEach { (name, value) ->
             val context = mapping[name]
@@ -66,12 +72,28 @@ abstract class AbstractCascContext : net.nemerosa.ontrack.extension.casc.CascCon
         val node: JsonNode,
         val paths: List<String>,
     ) {
-        fun runWith(context: net.nemerosa.ontrack.extension.casc.CascContext) {
+        fun runWith(context: CascContext) {
             context.run(node, paths)
         }
     }
 
-    protected infix fun SubContext?.run(context: net.nemerosa.ontrack.extension.casc.CascContext) {
+    protected infix fun SubContext?.run(context: CascContext) {
         this?.runWith(context)
+    }
+
+    /**
+     * Adapting an input JSON for missing non-required variables before parsing
+     */
+    protected fun JsonNode.ifMissing(vararg properties: KProperty0<*>): JsonNode {
+        properties.forEach { property ->
+            val name = cascFieldName(property)
+            if (this is ObjectNode && !has(name)) {
+                val value = property.get()
+                if (value != null) {
+                    set<JsonNode>(name, value.asJson())
+                }
+            }
+        }
+        return this
     }
 }

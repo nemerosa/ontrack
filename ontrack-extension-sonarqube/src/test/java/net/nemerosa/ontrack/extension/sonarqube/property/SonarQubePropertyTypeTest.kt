@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.sonarqube.property
 
 import com.nhaarman.mockitokotlin2.whenever
+import net.nemerosa.ontrack.extension.casc.CascExtensionFeature
 import net.nemerosa.ontrack.extension.indicators.IndicatorsExtensionFeature
 import net.nemerosa.ontrack.extension.sonarqube.SonarQubeExtensionFeature
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfiguration
@@ -22,7 +23,7 @@ class SonarQubePropertyTypeTest {
     )
 
     private val type = SonarQubePropertyType(
-            SonarQubeExtensionFeature(IndicatorsExtensionFeature()),
+            SonarQubeExtensionFeature(IndicatorsExtensionFeature(), CascExtensionFeature()),
             configurationService
     )
 

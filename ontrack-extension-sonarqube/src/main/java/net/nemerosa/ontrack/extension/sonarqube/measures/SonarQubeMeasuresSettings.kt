@@ -15,8 +15,8 @@ class SonarQubeMeasuresSettings(
 ) : SonarQubeMeasuresList {
 
     companion object {
-        val BLOCKER_VIOLATIONS = "blocker_violations"
-        val COVERAGE = "coverage"
+        const val BLOCKER_VIOLATIONS = "blocker_violations"
+        const val COVERAGE = "coverage"
 
         val DEFAULT_MEASURES = listOf(
                 BLOCKER_VIOLATIONS,

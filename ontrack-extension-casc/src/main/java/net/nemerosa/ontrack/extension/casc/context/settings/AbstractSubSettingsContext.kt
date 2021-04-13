@@ -35,7 +35,14 @@ abstract class AbstractSubSettingsContext<T : Any>(
         settingsManagerService.saveSettings(settings)
     }
 
-    private fun parseSettings(node: JsonNode): T = node.parseInto(settingsClass)
+    private fun parseSettings(node: JsonNode): T = adjustNodeBeforeParsing(node).parseInto(settingsClass)
+
+    private fun adjustNodeBeforeParsing(node: JsonNode): JsonNode {
+        val settings: T = cachedSettingsService.getCachedSettings(settingsClass.java)
+        return adjustNodeBeforeParsing(settings, node)
+    }
+
+    protected open fun adjustNodeBeforeParsing(settings: T, node: JsonNode): JsonNode = node
 
     override fun render(): JsonNode = cachedSettingsService.getCachedSettings(settingsClass.java).asJson()
 }

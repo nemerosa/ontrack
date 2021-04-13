@@ -64,7 +64,15 @@ class DescribedCascType(
     fun required() = DescribedCascType(type, description, required = true)
 }
 
-fun net.nemerosa.ontrack.extension.casc.CascContext.with(description: String) = DescribedCascType(type, description)
+fun CascContext.with(description: String) = DescribedCascType(type, description)
+
+fun cascObject(
+    description: String,
+    vararg fields: CascField,
+) = CascObject(
+    fields.toList(),
+    description
+)
 
 fun cascObject(
     description: String,
@@ -89,6 +97,18 @@ fun cascArray(
     type
 )
 
+fun cascField(
+    name: String,
+    type: CascType,
+    description: String,
+    required: Boolean,
+) = CascField(
+    name = name,
+    type = type,
+    description = description,
+    required = required,
+)
+
 // ====================================================================================
 // ====================================================================================
 // ====================================================================================
@@ -103,17 +123,24 @@ fun cascObject(type: KClass<*>): CascType {
     )
 }
 
-internal fun cascField(property: KProperty<*>): CascField {
-    val description = property.findAnnotation<APIDescription>()?.value ?: property.name
+fun cascField(
+    property: KProperty<*>,
+    type: CascType = cascFieldType(property),
+    description: String? = null,
+    required: Boolean? = null,
+): CascField {
+    val actualDescription = description
+        ?: property.findAnnotation<APIDescription>()?.value
+        ?: property.name
     return CascField(
         name = cascFieldName(property),
-        type = cascFieldType(property),
-        description = description,
-        required = !property.returnType.isMarkedNullable,
+        type = type,
+        description = actualDescription,
+        required = required ?: !property.returnType.isMarkedNullable,
     )
 }
 
-internal fun cascFieldName(property: KProperty<*>): String =
+fun cascFieldName(property: KProperty<*>): String =
     property.javaGetter?.getAnnotation(JsonProperty::class.java)?.value
         ?: property.name
 
