@@ -38,6 +38,19 @@
                     </ul>
                     <p ng-hide="loadingLocations" ng-if="locations.length == 0"><em>No location has been defined.</em></p>
                 </div>
+                <div class="panel-body">
+                    <p><strong>Current configuration:</strong></p>
+                    <p>
+                        <button class="btn btn-default" type="button" ng-disabled="loadingYaml" ng-click="loadYaml()">
+                            <span class="fa fa-refresh" ng-hide="loadingYaml"></span>
+                            <span class="ot-loading-indicator" ng-show="loadingYaml"></span>
+                            Load
+                        </button>
+                    </p>
+                    <p>
+                        <textarea class="form-control" rows="30" ng-if="yaml" ng-model="yaml" readonly></textarea>
+                    </p>
+                </div>
             </div>
         </div>
     </div>

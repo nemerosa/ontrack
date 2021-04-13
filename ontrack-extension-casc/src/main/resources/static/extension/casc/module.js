@@ -16,6 +16,8 @@ angular.module('ontrack.extension.casc', [
             ot.viewCloseCommand('/home')
         ];
 
+        $scope.yaml = "";
+
         const loadLocations = () => {
             $scope.loadingLocations = true;
             otGraphqlService.pageGraphQLCall(`
@@ -32,6 +34,21 @@ angular.module('ontrack.extension.casc', [
         };
 
         loadLocations();
+
+        $scope.loadYaml = () => {
+            $scope.loadingYaml = true;
+            otGraphqlService.pageGraphQLCall(`
+                {
+                    casc {
+                        yaml
+                    }
+                }
+            `).then(data => {
+                $scope.yaml = data.casc.yaml;
+            }).finally(() => {
+                $scope.loadingYaml = false;
+            })
+        };
     })
     .config(function ($stateProvider) {
         $stateProvider.state('casc-schema', {
