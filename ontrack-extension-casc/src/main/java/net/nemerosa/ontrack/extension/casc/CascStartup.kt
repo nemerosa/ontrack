@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StartupService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
 
 /**
@@ -13,8 +12,7 @@ import org.springframework.stereotype.Component
 @Component
 class CascStartup(
     private val cascConfigurationProperties: CascConfigurationProperties,
-    private val resourceLoader: ResourceLoader,
-    private val cascService: CascService,
+    private val cascLoadingService: CascLoadingService,
     private val securityService: SecurityService,
 ) : StartupService {
 
@@ -28,45 +26,11 @@ class CascStartup(
         logger.info("CasC startup")
         if (cascConfigurationProperties.enabled) {
             val locations = cascConfigurationProperties.locations
-            if (locations.isEmpty()) {
-                logger.info("No CasC resource is defined.")
-                return
-            }
-            val parsedResources = locations.flatMap { location ->
-                logger.info("CasC resource: $location")
-                parseResource(location)
-            }
-            if (parsedResources.isNotEmpty()) {
-                logger.info("CasC resources loaded, running the configuration")
-                securityService.asAdmin {
-                    cascService.runYaml(parsedResources)
-                }
-                logger.info("CasC ran successfully")
-            } else {
-                logger.info("No CasC resource was found.")
+            securityService.asAdmin {
+                cascLoadingService.load(locations)
             }
         } else {
             logger.info("CasC is disabled")
         }
-    }
-
-    private fun parseResource(location: String): List<String> {
-        val resource = resourceLoader.getResource(location)
-        if (resource.isFile) {
-            val file = resource.file
-            if (file.exists() && file.isDirectory) {
-                return file.listFiles()?.map {
-                    it.readText()
-                } ?: emptyList()
-            }
-        }
-        if (!resource.exists()) {
-            error("Cannot find CasC resource at $location")
-        }
-        return listOf(
-            resource.inputStream.use {
-                it.bufferedReader().readText()
-            }
-        )
     }
 }
