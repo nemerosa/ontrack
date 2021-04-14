@@ -15,7 +15,9 @@ abstract class AbstractCascTestSupport : AbstractDSLTestSupport() {
      * Runs a CasC from a series of YAML texts
      */
     protected fun casc(vararg yaml: String) {
-        cascService.runYaml(*yaml)
+        asAdmin {
+            cascService.runYaml(*yaml)
+        }
     }
 
 

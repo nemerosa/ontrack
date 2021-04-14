@@ -13,7 +13,9 @@ class CascSchemaIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Overall schema`() {
-        val schema = cascSchemaService.schema
+        val schema = asAdmin {
+            cascSchemaService.schema
+        }
         assertIs<CascObject>(schema) { root ->
             val ontrack = root.fields.find { it.name == "ontrack" }
             assertNotNull(ontrack) {
