@@ -12,6 +12,7 @@ dependencies {
 
     implementation(project(":ontrack-ui-graphql"))
     implementation("org.apache.commons:commons-lang3")
+    implementation(project(":ontrack-extension-casc"))
 
     testImplementation(project(":ontrack-test-utils"))
     testImplementation(project(":ontrack-it-utils"))
@@ -19,6 +20,7 @@ dependencies {
     testImplementation("org.codehaus.groovy:groovy")
     testImplementation(project(path = ":ontrack-extension-issues", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
