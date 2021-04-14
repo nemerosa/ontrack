@@ -30,7 +30,7 @@ angular.module('ontrack.extension.casc', [
                 $scope.locations = data.casc.locations;
             }).finally(() => {
                 $scope.loadingLocations = false;
-            })
+            });
         };
 
         loadLocations();
@@ -47,7 +47,7 @@ angular.module('ontrack.extension.casc', [
                 $scope.yaml = data.casc.yaml;
             }).finally(() => {
                 $scope.loadingYaml = false;
-            })
+            });
         };
 
         $scope.reload = () => {
@@ -85,7 +85,7 @@ angular.module('ontrack.extension.casc', [
         view.title = "Configuration as Code Schema";
         view.breadcrumbs = ot.homeBreadcrumbs().concat([
             ['CasC', '#/extension/casc/casc-control']
-        ])
+        ]);
         view.commands = [
             ot.viewCloseCommand('/extension/casc/casc-control')
         ];
@@ -102,7 +102,7 @@ angular.module('ontrack.extension.casc', [
                 $scope.schema = data.casc.schema;
             }).finally(() => {
                 $scope.loadingSchema = false;
-            })
+            });
         };
 
         loadSchema();
