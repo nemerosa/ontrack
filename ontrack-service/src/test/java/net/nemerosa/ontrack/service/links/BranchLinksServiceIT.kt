@@ -174,6 +174,25 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Max links per level`() {
+        val dependencies = (1..10).map { build("$it") }
+        project {
+            val branch = branch {
+                build {
+                    dependencies.forEach { linkTo(it) }
+                }
+            }
+            withBranchLinkSettings(maxLinksPerLevel = 5) {
+                val node = branchLinksService.getBranchLinks(branch, BranchLinksDirection.USING)
+                assertEquals(
+                    dependencies.takeLast(5).map { it.branch.name }.toSet(), // Taking only the five first links
+                    node.edges.map { it.linkedTo.branch.name }.toSet()
+                )
+            }
+        }
+    }
+
     private fun build(name: String = "build") = project<Build> {
         branch<Build> {
             build(name)
