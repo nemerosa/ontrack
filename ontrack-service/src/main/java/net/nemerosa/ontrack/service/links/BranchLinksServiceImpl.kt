@@ -30,7 +30,7 @@ class BranchLinksServiceImpl(
         // Processing stack
         val stack = ArrayDeque<Item>()
         // Gets the N builds of the branch
-        fillStackFromBranch(branch, settings.history, stack)
+        fillStackFromBranch(0, branch, settings.history, stack)
         // Starts processing the stack
         while (stack.isNotEmpty()) {
             // Gets the current item
@@ -51,7 +51,7 @@ class BranchLinksServiceImpl(
                     // Links this node to the current one
                     node.branches += nextNode
                     // Takes the branch N first builds to fill the stack
-                    fillStackFromBranch(nextBranch, settings.history, stack)
+                    fillStackFromBranch(item.depth + 1, nextBranch, settings.history, stack)
                 }
             }
         }
@@ -63,13 +63,13 @@ class BranchLinksServiceImpl(
         TODO("Not yet implemented")
     }
 
-    private fun fillStackFromBranch(branch: Branch, history: Int, stack: Deque<Item>) {
+    private fun fillStackFromBranch(depth: Int, branch: Branch, history: Int, stack: Deque<Item>) {
         // Gets the N builds of the branch
         val builds = getBuilds(branch, history)
         // Puts these builds onto the stack
         builds.forEach { build ->
             stack.push(
-                Item(0, build)
+                Item(depth, build)
             )
         }
     }
