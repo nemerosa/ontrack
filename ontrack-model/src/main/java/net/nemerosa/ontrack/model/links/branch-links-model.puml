@@ -2,6 +2,7 @@
 
 class BranchLinksNode {
     branch: Branch
+    build: Build?
 }
 
 class BranchLinksEdge {
@@ -30,6 +31,7 @@ BranchLinksDecorationProvider .up.> BranchLinksDecoration: provides
 
 interface BranchLinksService {
     getBranchLinks(branch: Branch, direction: BranchLinksDirection): BranchLinksNode
+    getBuildLinks(build: Build, direction: BranchLinksDirection): BranchLinksNode
 }
 
 enum BranchLinksDirection {
