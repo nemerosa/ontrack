@@ -272,6 +272,25 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Build graph with one unfilled layer`() {
+        withLinks {
+
+            build("component", 1) linkTo build("library", 1)
+            build("component", 2)
+
+            assertBuildLinks(build("component", 2), BranchLinksDirection.USING) {
+                assertLinkedToNoBuild(branch("library"))
+            }
+
+            // Filling the gap
+            build("component", 2) linkTo build("library", 1)
+            assertBuildLinks(build("component", 2), BranchLinksDirection.USING) {
+                assertLinkedTo(build("library", 1))
+            }
+        }
+    }
+
+    @Test
     fun `Build graph with two layers`() {
         withLinks {
             build("project", 1) linkTo build("component", 1)
@@ -279,6 +298,49 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
             assertBuildLinks(build("project", 1), BranchLinksDirection.USING) {
                 assertLinkedTo(build("component", 1)) {
                     assertLinkedTo(build("library", 1))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Build graph with two layers with progressive fill`() {
+        withLinks {
+            build("project", 1) linkTo build("component", 1)
+            build("component", 1) linkTo build("library", 1)
+
+            val library = build("library", 2)
+            assertBuildLinks(library, BranchLinksDirection.USED_BY) {
+                assertLinkedToNoBuild(branch("component")) {
+                    assertLinkedToNoBuild(branch("project"))
+                }
+            }
+
+            val component = build("component", 2)
+            assertBuildLinks(library, BranchLinksDirection.USED_BY) {
+                assertLinkedToNoBuild(branch("component")) {
+                    assertLinkedToNoBuild(branch("project"))
+                }
+            }
+
+            component linkTo library
+            assertBuildLinks(library, BranchLinksDirection.USED_BY) {
+                assertLinkedTo(component) {
+                    assertLinkedToNoBuild(branch("project"))
+                }
+            }
+
+            val project = build("project", 2)
+            assertBuildLinks(library, BranchLinksDirection.USED_BY) {
+                assertLinkedTo(component) {
+                    assertLinkedToNoBuild(branch("project"))
+                }
+            }
+
+            project linkTo component
+            assertBuildLinks(library, BranchLinksDirection.USED_BY) {
+                assertLinkedTo(component) {
+                    assertLinkedTo(project)
                 }
             }
         }
@@ -347,6 +409,19 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
             val edge = node.edges.find { it.linkedTo.branch.id == target.branch.id }
             assertNotNull(edge,
                 "Cannot find any link between ${node.branch.entityDisplayName} and ${target.branch.entityDisplayName}") {
+                // Checks the build
+                assertEquals(target.id, it.linkedTo.build?.id, "Expected ${target.entityDisplayName} under node ${target.branch.entityDisplayName}")
+                // Going on
+                BuildNodeTestContext(it.linkedTo).code()
+            }
+        }
+
+        fun assertLinkedToNoBuild(target: Branch, code: BuildNodeTestContext.() -> Unit = {}) {
+            val edge = node.edges.find { it.linkedTo.branch.id == target.id }
+            assertNotNull(edge,
+                "Cannot find any link between ${node.branch.entityDisplayName} and ${target.entityDisplayName}") {
+                assertNull(it.linkedTo.build, "Node for ${target.entityDisplayName} has no build")
+                // Going on
                 BuildNodeTestContext(it.linkedTo).code()
             }
         }
