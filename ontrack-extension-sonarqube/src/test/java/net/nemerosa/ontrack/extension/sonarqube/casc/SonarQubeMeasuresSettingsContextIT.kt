@@ -38,9 +38,9 @@ class SonarQubeMeasuresSettingsContextIT : AbstractCascTestSupport() {
                     ),
                     settings.measures
                 )
-                assertEquals(true, settings.disabled)
-                assertEquals(20, settings.coverageThreshold)
-                assertEquals(1, settings.blockerThreshold)
+                assertEquals(false, settings.disabled)
+                assertEquals(80, settings.coverageThreshold)
+                assertEquals(5, settings.blockerThreshold)
             }
         }
     }
