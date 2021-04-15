@@ -59,8 +59,39 @@ class BranchLinksServiceImpl(
         return graphToNode(graph, direction)
     }
 
-    override fun getBuildLinks(branch: Branch, direction: BranchLinksDirection): BranchLinksNode {
-        TODO("Not yet implemented")
+    override fun getBuildLinks(build: Build, direction: BranchLinksDirection): BranchLinksNode {
+        // Gets the model for the branch
+        val branchGraph = getBranchLinks(build.branch, direction)
+        // Visits the whole graph and replace the node & edges as we go
+        return populate(branchGraph, build, direction)
+    }
+
+    private fun populate(node: BranchLinksNode, build: Build, direction: BranchLinksDirection): BranchLinksNode {
+        // Recomputes the edges
+        val edges = node.edges.map { edge ->
+            populate(edge, build, direction)
+        }
+        // OK
+        return BranchLinksNode(
+            node.branch,
+            build,
+            edges
+        )
+    }
+
+    private fun populate(edge: BranchLinksEdge, build: Build, direction: BranchLinksDirection): BranchLinksEdge {
+        // Gets the target build if any
+        val target = getEdgeBuild(build, edge.linkedTo.branch, direction)
+        // If no build, we return the edge as it is
+        return if (target == null) {
+            edge
+        } else {
+            BranchLinksEdge(
+                direction = direction,
+                linkedTo = populate(edge.linkedTo, target, direction),
+                decorations = edge.decorations // TODO Populate with build
+            )
+        }
     }
 
     private fun fillStackFromBranch(depth: Int, branch: Branch, history: Int, stack: Deque<Item>) {
@@ -85,6 +116,18 @@ class BranchLinksServiceImpl(
                 structureService.getBuildsUsing(build, 0, maxLinksPerLevel).pageItems
         }
 
+    private fun getEdgeBuild(build: Build, target: Branch, direction: BranchLinksDirection): Build? =
+        when (direction) {
+            BranchLinksDirection.USING ->
+                structureService.getBuildsUsedBy(build, 0, 1) {
+                    it.branch.id == target.id
+                }.pageItems.firstOrNull()
+            BranchLinksDirection.USED_BY ->
+                structureService.getBuildsUsing(build, 0, 1) {
+                    it.branch.id == target.id
+                }.pageItems.firstOrNull()
+        }
+
     private class Item(
         val depth: Int,
         val build: Build
@@ -103,7 +146,7 @@ class BranchLinksServiceImpl(
                 BranchLinksEdge(
                     direction = direction,
                     linkedTo = graphToNode(child, direction),
-                    decorations = emptyList()
+                    decorations = emptyList() // TODO Computes decoration at branch level
                 )
             }
         )

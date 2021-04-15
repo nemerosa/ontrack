@@ -196,7 +196,22 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `Deep graph`() {
+    fun `One layer branch graph`() {
+        withLinks {
+            build("component", 1) linkTo build("library", 1)
+
+            assertBranchLinks(branch("component"), BranchLinksDirection.USING) {
+                assertLinkedTo(branch("library"))
+            }
+
+            assertBranchLinks(branch("library"), BranchLinksDirection.USED_BY) {
+                assertLinkedTo(branch("component"))
+            }
+        }
+    }
+
+    @Test
+    fun `Deep branch graph`() {
         withLinks {
 
             build("chart", 1) linkTo build("aggregator", 2)
@@ -244,6 +259,31 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Build graph with one layer`() {
+        withLinks {
+
+            build("component", 1) linkTo build("library", 1)
+
+            assertBuildLinks(build("component", 1), BranchLinksDirection.USING) {
+                assertLinkedTo(build("library", 1))
+            }
+        }
+    }
+
+    @Test
+    fun `Build graph with two layers`() {
+        withLinks {
+            build("project", 1) linkTo build("component", 1)
+            build("component", 1) linkTo build("library", 1)
+            assertBuildLinks(build("project", 1), BranchLinksDirection.USING) {
+                assertLinkedTo(build("component", 1)) {
+                    assertLinkedTo(build("library", 1))
+                }
+            }
+        }
+    }
+
     private fun withLinks(
         code: WithLinksContext.() -> Unit
     ) {
@@ -273,21 +313,41 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
                 branch(id).build("$id-$no")
             }
 
-        fun assertBranchLinks(branch: Branch, direction: BranchLinksDirection, code: NodeTestContext.() -> Unit) {
+        fun assertBranchLinks(branch: Branch, direction: BranchLinksDirection, code: BranchNodeTestContext.() -> Unit) {
             val node = branchLinksService.getBranchLinks(branch, direction)
-            NodeTestContext(node).code()
+            assertEquals(branch.id, node.branch.id, "Node on the same branch")
+            BranchNodeTestContext(node).code()
+        }
+
+        fun assertBuildLinks(build: Build, direction: BranchLinksDirection, code: BuildNodeTestContext.() -> Unit) {
+            val node = branchLinksService.getBuildLinks(build, direction)
+            assertEquals(build.branch.id, node.branch.id, "Node on the same branch")
+            assertEquals(build.id, node.build?.id, "Node on the same build")
+            BuildNodeTestContext(node).code()
         }
 
     }
 
-    private class NodeTestContext(
+    private class BranchNodeTestContext(
         private val node: BranchLinksNode
     ) {
-        fun assertLinkedTo(target: Branch, code: NodeTestContext.() -> Unit = {}) {
+        fun assertLinkedTo(target: Branch, code: BranchNodeTestContext.() -> Unit = {}) {
             val edge = node.edges.find { it.linkedTo.branch.id == target.id }
             assertNotNull(edge,
                 "Cannot find any link between ${node.branch.entityDisplayName} and ${target.entityDisplayName}") {
-                NodeTestContext(it.linkedTo).code()
+                BranchNodeTestContext(it.linkedTo).code()
+            }
+        }
+    }
+
+    private class BuildNodeTestContext(
+        private val node: BranchLinksNode
+    ) {
+        fun assertLinkedTo(target: Build, code: BuildNodeTestContext.() -> Unit = {}) {
+            val edge = node.edges.find { it.linkedTo.branch.id == target.branch.id }
+            assertNotNull(edge,
+                "Cannot find any link between ${node.branch.entityDisplayName} and ${target.branch.entityDisplayName}") {
+                BuildNodeTestContext(it.linkedTo).code()
             }
         }
     }

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.links
 
 import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Build
 
 /**
  * Service to compute links between branches.
@@ -24,10 +25,10 @@ interface BranchLinksService {
      * The [abstract graph][getBranchLinks] is computed first and is used as a _skeleton_ for the
      * build graph.
      *
-     * @param Build Build to start from
+     * @param build Build to start from
      * @param direction Direction to follow for the build links
      * @return Node for this build
      */
-    fun getBuildLinks(branch: Branch, direction: BranchLinksDirection): BranchLinksNode
+    fun getBuildLinks(build: Build, direction: BranchLinksDirection): BranchLinksNode
 
 }
