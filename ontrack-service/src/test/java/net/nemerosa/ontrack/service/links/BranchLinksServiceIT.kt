@@ -198,6 +198,12 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Deep graph`() {
         withLinks {
+
+            build("chart", 1) linkTo build("aggregator", 2)
+
+            build("aggregator", 1) linkTo build("project", 1)
+            build("aggregator", 2) linkTo build("project", 3)
+
             build("project", 1) linkTo build("component", 1)
             build("project", 1) linkTo build("component", 1)
             build("project", 2) linkTo build("component", 2)
@@ -207,11 +213,33 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
             build("component", 1) linkTo build("library", 1)
             build("component", 2) linkTo build("library", 3)
 
-            assertBranchLinks(branch("project"), BranchLinksDirection.USING) {
-                assertLinkedTo(branch("component")) {
-                    assertLinkedTo(branch("library"))
+            assertBranchLinks(branch("chart"), BranchLinksDirection.USING) {
+                assertLinkedTo(branch("aggregator")) {
+                    assertLinkedTo(branch("project")) {
+                        assertLinkedTo(branch("component")) {
+                            assertLinkedTo(branch("library"))
+                        }
+                        assertLinkedTo(branch("other-library"))
+                    }
                 }
-                assertLinkedTo(branch("other-library"))
+            }
+
+            assertBranchLinks(branch("library"), BranchLinksDirection.USED_BY) {
+                assertLinkedTo(branch("component")) {
+                    assertLinkedTo(branch("project")) {
+                        assertLinkedTo(branch("aggregator")) {
+                            assertLinkedTo(branch("chart"))
+                        }
+                    }
+                }
+            }
+
+            assertBranchLinks(branch("other-library"), BranchLinksDirection.USED_BY) {
+                assertLinkedTo(branch("project")) {
+                    assertLinkedTo(branch("aggregator")) {
+                        assertLinkedTo(branch("chart"))
+                    }
+                }
             }
         }
     }
@@ -228,7 +256,7 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
 
         val project = mutableMapOf<String, Project>()
         val branches = mutableMapOf<String, Branch>()
-        val builds = mutableMapOf<Pair<String,Int>, Build>()
+        val builds = mutableMapOf<Pair<String, Int>, Build>()
 
         fun project(id: String): Project =
             project.getOrPut(id) {
@@ -257,7 +285,8 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
     ) {
         fun assertLinkedTo(target: Branch, code: NodeTestContext.() -> Unit = {}) {
             val edge = node.edges.find { it.linkedTo.branch.id == target.id }
-            assertNotNull(edge, "Cannot find any link between ${node.branch.entityDisplayName} and ${target.entityDisplayName}") {
+            assertNotNull(edge,
+                "Cannot find any link between ${node.branch.entityDisplayName} and ${target.entityDisplayName}") {
                 NodeTestContext(it.linkedTo).code()
             }
         }
