@@ -281,7 +281,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         linkTo(build)
     }
 
-    fun Build.linkTo(build: Build) {
+    infix fun Build.linkTo(build: Build) {
         structureService.addBuildLink(
                 this,
                 build

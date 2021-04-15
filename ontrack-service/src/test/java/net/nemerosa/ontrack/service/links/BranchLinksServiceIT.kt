@@ -2,15 +2,17 @@ package net.nemerosa.ontrack.service.links
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.links.BranchLinksDirection
+import net.nemerosa.ontrack.model.links.BranchLinksNode
 import net.nemerosa.ontrack.model.links.BranchLinksService
 import net.nemerosa.ontrack.model.links.BranchLinksSettings
+import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
-import kotlin.test.assertSame
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class BranchLinksServiceIT : AbstractDSLTestSupport() {
 
@@ -189,6 +191,74 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
                     dependencies.takeLast(5).map { it.branch.name }.toSet(), // Taking only the five first links
                     node.edges.map { it.linkedTo.branch.name }.toSet()
                 )
+            }
+        }
+    }
+
+    @Test
+    fun `Deep graph`() {
+        withLinks {
+            build("project", 1) linkTo build("component", 1)
+            build("project", 1) linkTo build("component", 1)
+            build("project", 2) linkTo build("component", 2)
+            build("project", 3) linkTo build("component", 2)
+            build("project", 3) linkTo build("other-library", 1)
+
+            build("component", 1) linkTo build("library", 1)
+            build("component", 2) linkTo build("library", 3)
+
+            assertBranchLinks(branch("project"), BranchLinksDirection.USING) {
+                assertLinkedTo(branch("component")) {
+                    assertLinkedTo(branch("library"))
+                }
+                assertLinkedTo(branch("other-library"))
+            }
+        }
+    }
+
+    private fun withLinks(
+        code: WithLinksContext.() -> Unit
+    ) {
+        asAdmin {
+            WithLinksContext().code()
+        }
+    }
+
+    private inner class WithLinksContext {
+
+        val project = mutableMapOf<String, Project>()
+        val branches = mutableMapOf<String, Branch>()
+        val builds = mutableMapOf<Pair<String,Int>, Build>()
+
+        fun project(id: String): Project =
+            project.getOrPut(id) {
+                project(NameDescription.nd(id + uid("x"), ""))
+            }
+
+        fun branch(id: String): Branch =
+            branches.getOrPut(id) {
+                project(id).branch("main")
+            }
+
+        fun build(id: String, no: Int): Build =
+            builds.getOrPut(id to no) {
+                branch(id).build("$id-$no")
+            }
+
+        fun assertBranchLinks(branch: Branch, direction: BranchLinksDirection, code: NodeTestContext.() -> Unit) {
+            val node = branchLinksService.getBranchLinks(branch, direction)
+            NodeTestContext(node).code()
+        }
+
+    }
+
+    private class NodeTestContext(
+        private val node: BranchLinksNode
+    ) {
+        fun assertLinkedTo(target: Branch, code: NodeTestContext.() -> Unit = {}) {
+            val edge = node.edges.find { it.linkedTo.branch.id == target.id }
+            assertNotNull(edge, "Cannot find any link between ${node.branch.entityDisplayName} and ${target.entityDisplayName}") {
+                NodeTestContext(it.linkedTo).code()
             }
         }
     }
