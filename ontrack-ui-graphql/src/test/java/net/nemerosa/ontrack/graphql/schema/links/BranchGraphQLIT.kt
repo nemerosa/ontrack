@@ -169,4 +169,225 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `Build graph in 'using' direction with one filled layer`() {
+        withLinks {
+            build("project", 1) linkTo build("component", 1)
+
+            run("""query {
+                builds(id: ${build("project", 1).id}) {
+                    graph(direction: USING) {
+                        ...nodeContent
+                        edges {
+                            linkedTo {
+                                ...nodeContent
+                                edges {
+                                    linkedTo {
+                                        ...nodeContent
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            fragment nodeContent on BranchLinksNode {
+                branch {
+                    name
+                    project {
+                        name
+                    }
+                }
+                build {
+                    name
+                }
+            }
+            """).let { data ->
+                assertEquals(
+                    mapOf(
+                        "builds" to listOf(
+                            mapOf(
+                                "graph" to mapOf(
+                                    "branch" to mapOf(
+                                        "name" to build("project", 1).branch.name,
+                                        "project" to mapOf(
+                                            "name" to build("project", 1).project.name
+                                        )
+                                    ),
+                                    "build" to mapOf(
+                                        "name" to build("project", 1).name
+                                    ),
+                                    "edges" to listOf(
+                                        mapOf(
+                                            "linkedTo" to mapOf(
+                                                "branch" to mapOf(
+                                                    "name" to build("component", 1).branch.name,
+                                                    "project" to mapOf(
+                                                        "name" to build("component", 1).project.name
+                                                    )
+                                                ),
+                                                "build" to mapOf(
+                                                    "name" to build("component", 1).name
+                                                ),
+                                                "edges" to emptyList<String>())
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ).asJson(),
+                    data
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Build graph in 'used by' direction with one filled layer`() {
+        withLinks {
+            build("project", 1) linkTo build("component", 1)
+
+            run("""query {
+                builds(id: ${build("component", 1).id}) {
+                    graph(direction: USED_BY) {
+                        ...nodeContent
+                        edges {
+                            linkedTo {
+                                ...nodeContent
+                                edges {
+                                    linkedTo {
+                                        ...nodeContent
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            fragment nodeContent on BranchLinksNode {
+                branch {
+                    name
+                    project {
+                        name
+                    }
+                }
+                build {
+                    name
+                }
+            }
+            """).let { data ->
+                assertEquals(
+                    mapOf(
+                        "builds" to listOf(
+                            mapOf(
+                                "graph" to mapOf(
+                                    "branch" to mapOf(
+                                        "name" to build("component", 1).branch.name,
+                                        "project" to mapOf(
+                                            "name" to build("component", 1).project.name
+                                        )
+                                    ),
+                                    "build" to mapOf(
+                                        "name" to build("component", 1).name
+                                    ),
+                                    "edges" to listOf(
+                                        mapOf(
+                                            "linkedTo" to mapOf(
+                                                "branch" to mapOf(
+                                                    "name" to build("project", 1).branch.name,
+                                                    "project" to mapOf(
+                                                        "name" to build("project", 1).project.name
+                                                    )
+                                                ),
+                                                "build" to mapOf(
+                                                    "name" to build("project", 1).name
+                                                ),
+                                                "edges" to emptyList<String>())
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ).asJson(),
+                    data
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Build graph in 'used by' direction with one unfilled layer`() {
+        withLinks {
+            build("project", 1) linkTo build("component", 1)
+            build("component", 2)
+
+            run("""query {
+                builds(id: ${build("component", 2).id}) {
+                    graph(direction: USED_BY) {
+                        ...nodeContent
+                        edges {
+                            linkedTo {
+                                ...nodeContent
+                                edges {
+                                    linkedTo {
+                                        ...nodeContent
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            fragment nodeContent on BranchLinksNode {
+                branch {
+                    name
+                    project {
+                        name
+                    }
+                }
+                build {
+                    name
+                }
+            }
+            """).let { data ->
+                assertEquals(
+                    mapOf(
+                        "builds" to listOf(
+                            mapOf(
+                                "graph" to mapOf(
+                                    "branch" to mapOf(
+                                        "name" to build("component", 2).branch.name,
+                                        "project" to mapOf(
+                                            "name" to build("component", 2).project.name
+                                        )
+                                    ),
+                                    "build" to mapOf(
+                                        "name" to build("component", 2).name
+                                    ),
+                                    "edges" to listOf(
+                                        mapOf(
+                                            "linkedTo" to mapOf(
+                                                "branch" to mapOf(
+                                                    "name" to build("project", 1).branch.name,
+                                                    "project" to mapOf(
+                                                        "name" to build("project", 1).project.name
+                                                    )
+                                                ),
+                                                "build" to null,
+                                                "edges" to emptyList<String>())
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ).asJson(),
+                    data
+                )
+            }
+        }
+    }
+
 }
