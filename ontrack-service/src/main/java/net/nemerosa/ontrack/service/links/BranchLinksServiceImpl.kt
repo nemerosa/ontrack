@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.service.links
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.api.BranchLinksDecorationExtension
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.links.*
+import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
@@ -12,6 +14,8 @@ import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.system.measureTimeMillis
 
 @Service
 @Transactional(readOnly = true)
@@ -19,7 +23,8 @@ class BranchLinksServiceImpl(
     private val cachedSettingsService: CachedSettingsService,
     private val buildFilterService: BuildFilterService,
     private val structureService: StructureService,
-    private val extensionManager: ExtensionManager
+    private val extensionManager: ExtensionManager,
+    private val metricsExportService: MetricsExportService
 ) : BranchLinksService {
 
     private val providers: Collection<BranchLinksDecorationExtension> by lazy {
@@ -35,7 +40,10 @@ class BranchLinksServiceImpl(
         val index = mutableMapOf<ID, Node>()
         index[branch.id] = graph
         // Processing stack
-        val stack = ArrayDeque<Item>()
+        val stack = MaxArrayDeque<Item>()
+
+        // Starting the processing
+        val start = System.currentTimeMillis()
         // Gets the N builds of the branch
         fillStackFromBranch(0, branch, settings.history, stack)
         // Starts processing the stack
@@ -63,7 +71,23 @@ class BranchLinksServiceImpl(
             }
         }
         // Converts the graph in progress to a node
-        return graphToNode(graph, direction)
+        val node = graphToNode(graph, direction)
+        // Metrics
+        val end = System.currentTimeMillis()
+        metricsExportService.exportMetrics(
+            metric = METRIC_BRANCH_GRAPH,
+            tags = mapOf(
+                "project" to branch.project.name,
+                "branch" to branch.name
+            ),
+            fields = mapOf(
+                "elapsedMs" to (end - start).toDouble(),
+                "maxStack" to stack.max.toDouble()
+            ),
+            timestamp = Time.now()
+        )
+        // OK
+        return node
     }
 
     override fun getBuildLinks(build: Build, direction: BranchLinksDirection): BranchLinksNode {
@@ -166,5 +190,21 @@ class BranchLinksServiceImpl(
                 }
             }
         )
+
+    private class MaxArrayDeque<T>: ArrayDeque<T>() {
+
+        private val _max = AtomicInteger(0)
+
+        override fun push(e: T) {
+            super.push(e)
+            _max.incrementAndGet()
+        }
+
+        val max: Int get() = _max.get()
+    }
+
+    companion object {
+        const val METRIC_BRANCH_GRAPH = "ontrack_graph_branch"
+    }
 
 }
