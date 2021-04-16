@@ -1,9 +1,14 @@
-package net.nemerosa.ontrack.model.links
+package net.nemerosa.ontrack.extension.api
+
+import net.nemerosa.ontrack.model.extension.Extension
+import net.nemerosa.ontrack.model.links.BranchLinksDecoration
+import net.nemerosa.ontrack.model.links.BranchLinksDirection
+import net.nemerosa.ontrack.model.links.BranchLinksNode
 
 /**
- * Given two nodes in a graph of branch links, provides a decoration for the edge.
+ * Extension to enrich edge decorations in build graph.
  */
-interface BranchLinksDecorationProvider {
+interface BranchLinksDecorationExtension : Extension {
 
     /**
      * ID for this provider

@@ -1,20 +1,14 @@
 package net.nemerosa.ontrack.service.links
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.model.links.*
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.it.links.AbstractBranchLinksTestSupport
+import net.nemerosa.ontrack.model.links.BranchLinksDirection
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
 
-class BranchLinksServiceIT : AbstractDSLTestSupport() {
-
-    @Autowired
-    private lateinit var branchLinksService: BranchLinksService
+class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
 
     @Test
     fun `No build links makes for one single node for the abstract graph`() {
@@ -339,154 +333,6 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
                 assertLinkedTo(component) {
                     assertLinkedTo(project)
                 }
-            }
-        }
-    }
-
-    @Test
-    fun `Link and time decoration`() {
-        withLinks {
-            val component = build("component", 1)
-            val library = build("library", 1)
-            component linkTo library
-            assertBuildLinks(component, BranchLinksDirection.USING) {
-                assertEdge(library) {
-                    assertDecoration("link") {
-                        assertEquals("Linked", text)
-                    }
-                    assertDecoration("time") {
-                        assertTrue(text.isNotBlank(), "Time is displayed")
-                    }
-                }
-            }
-        }
-    }
-
-    private fun withLinks(
-        code: WithLinksContext.() -> Unit
-    ) {
-        asAdmin {
-            WithLinksContext().code()
-        }
-    }
-
-    private inner class WithLinksContext {
-
-        val project = mutableMapOf<String, Project>()
-        val branches = mutableMapOf<String, Branch>()
-        val builds = mutableMapOf<Pair<String, Int>, Build>()
-
-        fun project(id: String): Project =
-            project.getOrPut(id) {
-                project(NameDescription.nd(id + uid("x"), ""))
-            }
-
-        fun branch(id: String): Branch =
-            branches.getOrPut(id) {
-                project(id).branch("main")
-            }
-
-        fun build(id: String, no: Int): Build =
-            builds.getOrPut(id to no) {
-                branch(id).build("$id-$no")
-            }
-
-        fun assertBranchLinks(branch: Branch, direction: BranchLinksDirection, code: BranchNodeTestContext.() -> Unit) {
-            val node = branchLinksService.getBranchLinks(branch, direction)
-            assertEquals(branch.id, node.branch.id, "Node on the same branch")
-            BranchNodeTestContext(node).code()
-        }
-
-        fun assertBuildLinks(build: Build, direction: BranchLinksDirection, code: BuildNodeTestContext.() -> Unit) {
-            val node = branchLinksService.getBuildLinks(build, direction)
-            assertEquals(build.branch.id, node.branch.id, "Node on the same branch")
-            assertEquals(build.id, node.build?.id, "Node on the same build")
-            BuildNodeTestContext(node).code()
-        }
-
-    }
-
-    private class BranchNodeTestContext(
-        private val node: BranchLinksNode
-    ) {
-        fun assertLinkedTo(target: Branch, code: BranchNodeTestContext.() -> Unit = {}) {
-            val edge = node.edges.find { it.linkedTo.branch.id == target.id }
-            assertNotNull(edge,
-                "Cannot find any link between ${node.branch.entityDisplayName} and ${target.entityDisplayName}") {
-                BranchNodeTestContext(it.linkedTo).code()
-            }
-        }
-    }
-
-    private class EdgeTestContext(
-        private val edge: BranchLinksEdge
-    ) {
-        fun assertDecoration(id: String, code: BranchLinksDecoration.() -> Unit = {}) {
-            val decoration = edge.decorations.find { it.id == id }
-            assertNotNull(decoration, "Decoration $id is present") {
-                it.code()
-            }
-        }
-    }
-
-    private class BuildNodeTestContext(
-        private val node: BranchLinksNode
-    ) {
-        fun assertEdge(target: Build, code: EdgeTestContext.() -> Unit = {}) {
-            val edge = node.edges.find { it.linkedTo.branch.id == target.branch.id }
-            assertNotNull(edge,
-                "Cannot find any link between ${node.branch.entityDisplayName} and ${target.branch.entityDisplayName}") {
-                // Checks the build
-                assertEquals(target.id, it.linkedTo.build?.id, "Expected ${target.entityDisplayName} under node ${target.branch.entityDisplayName}")
-                // Going on
-                EdgeTestContext(it).code()
-            }
-        }
-
-        fun assertLinkedTo(target: Build, code: BuildNodeTestContext.() -> Unit = {}) {
-            val edge = node.edges.find { it.linkedTo.branch.id == target.branch.id }
-            assertNotNull(edge,
-                "Cannot find any link between ${node.branch.entityDisplayName} and ${target.branch.entityDisplayName}") {
-                // Checks the build
-                assertEquals(target.id, it.linkedTo.build?.id, "Expected ${target.entityDisplayName} under node ${target.branch.entityDisplayName}")
-                // Going on
-                BuildNodeTestContext(it.linkedTo).code()
-            }
-        }
-
-        fun assertLinkedToNoBuild(target: Branch, code: BuildNodeTestContext.() -> Unit = {}) {
-            val edge = node.edges.find { it.linkedTo.branch.id == target.id }
-            assertNotNull(edge,
-                "Cannot find any link between ${node.branch.entityDisplayName} and ${target.entityDisplayName}") {
-                assertNull(it.linkedTo.build, "Node for ${target.entityDisplayName} has no build")
-                // Going on
-                BuildNodeTestContext(it.linkedTo).code()
-            }
-        }
-    }
-
-    private fun build(name: String = "build") = project<Build> {
-        branch<Build> {
-            build(name)
-        }
-    }
-
-    private fun withBranchLinkSettings(
-        depth: Int = BranchLinksSettings.DEFAULT_DEPTH,
-        history: Int = BranchLinksSettings.DEFAULT_HISTORY,
-        maxLinksPerLevel: Int = BranchLinksSettings.DEFAULT_MAX_LINKS_PER_LEVEL,
-        code: () -> Unit
-    ) {
-        asAdmin {
-            withSettings<BranchLinksSettings> {
-                settingsManagerService.saveSettings(
-                    BranchLinksSettings(
-                        depth = depth,
-                        history = history,
-                        maxLinksPerLevel = maxLinksPerLevel
-                    )
-                )
-                code()
             }
         }
     }

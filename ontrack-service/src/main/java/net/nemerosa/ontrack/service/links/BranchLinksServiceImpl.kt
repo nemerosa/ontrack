@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.service.links
 
+import net.nemerosa.ontrack.extension.api.BranchLinksDecorationExtension
+import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.links.*
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -17,8 +19,12 @@ class BranchLinksServiceImpl(
     private val cachedSettingsService: CachedSettingsService,
     private val buildFilterService: BuildFilterService,
     private val structureService: StructureService,
-    private val branchLinksDecorationProviders: List<BranchLinksDecorationProvider>
+    private val extensionManager: ExtensionManager
 ) : BranchLinksService {
+
+    private val providers: Collection<BranchLinksDecorationExtension> by lazy {
+        extensionManager.getExtensions(BranchLinksDecorationExtension::class.java)
+    }
 
     override fun getBranchLinks(branch: Branch, direction: BranchLinksDirection): BranchLinksNode {
         // Settings
@@ -88,7 +94,7 @@ class BranchLinksServiceImpl(
             edge
         } else {
             val newLinkedNode = populate(edge.linkedTo, target, direction)
-            val decorations = branchLinksDecorationProviders.mapNotNull { provider ->
+            val decorations = providers.mapNotNull { provider ->
                 provider.getDecoration(source, newLinkedNode, direction)
             }
             BranchLinksEdge(
@@ -149,7 +155,7 @@ class BranchLinksServiceImpl(
             build = null,
             edges = node.branches.map { child ->
                 graphToNode(child, direction).run {
-                    val decorations = branchLinksDecorationProviders.mapNotNull { provider ->
+                    val decorations = providers.mapNotNull { provider ->
                         provider.getDecoration(BranchLinksNode(node.branch, null, emptyList()), this, direction)
                     }
                     BranchLinksEdge(

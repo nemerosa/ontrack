@@ -1,7 +1,9 @@
-package net.nemerosa.ontrack.service.links.decorations
+package net.nemerosa.ontrack.extension.general.links
 
+import net.nemerosa.ontrack.extension.api.BranchLinksDecorationExtension
+import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
+import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.links.BranchLinksDecoration
-import net.nemerosa.ontrack.model.links.BranchLinksDecorationProvider
 import net.nemerosa.ontrack.model.links.BranchLinksDirection
 import net.nemerosa.ontrack.model.links.BranchLinksNode
 import net.nemerosa.ontrack.model.structure.Build
@@ -10,7 +12,9 @@ import org.springframework.stereotype.Component
 import java.time.Duration
 
 @Component
-class TimeBranchLinksDecorationProvider : BranchLinksDecorationProvider {
+class TimeBranchLinksDecorationProvider(
+    extensionFeature: GeneralExtensionFeature
+) : AbstractExtension(extensionFeature), BranchLinksDecorationExtension {
 
     override val id: String = "time"
 

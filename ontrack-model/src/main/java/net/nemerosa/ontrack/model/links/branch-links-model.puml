@@ -22,12 +22,12 @@ class BranchLinksDecoration {
 
 BranchLinksEdge *--> BranchLinksDecoration: decorations "0..*"
 
-interface BranchLinksDecorationProvider {
+interface BranchLinksDecorationExtension {
     id: String
     getDecoration(source: BranchLinksNode, target: BranchLinksNode, direction: BranchLinksDirection): BranchLinksDecoration?
 }
 
-BranchLinksDecorationProvider .up.> BranchLinksDecoration: provides
+BranchLinksDecorationExtension .up.> BranchLinksDecoration: provides
 
 interface BranchLinksService {
     getBranchLinks(branch: Branch, direction: BranchLinksDirection): BranchLinksNode
