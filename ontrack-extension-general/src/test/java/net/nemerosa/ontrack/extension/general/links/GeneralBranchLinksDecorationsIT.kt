@@ -18,11 +18,11 @@ class GeneralBranchLinksDecorationsIT : AbstractBranchLinksTestSupport() {
                 assertEdge(library) {
                     assertDecoration("link") {
                         assertEquals("Linked", text)
-                        // assertEquals("", iconUrl)
+                        assertEquals("link", icon)
                     }
                     assertDecoration("time") {
                         assertTrue(text.isNotBlank(), "Time is displayed")
-                        // assertEquals("", iconUrl)
+                        assertEquals("time", icon)
                     }
                 }
             }

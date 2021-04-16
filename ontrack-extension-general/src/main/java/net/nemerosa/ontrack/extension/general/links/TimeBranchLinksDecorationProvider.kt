@@ -13,7 +13,7 @@ import java.time.Duration
 
 @Component
 class TimeBranchLinksDecorationProvider(
-    extensionFeature: GeneralExtensionFeature
+    val extensionFeature: GeneralExtensionFeature
 ) : AbstractExtension(extensionFeature), BranchLinksDecorationExtension {
 
     override val id: String = "time"
@@ -25,9 +25,11 @@ class TimeBranchLinksDecorationProvider(
     ): BranchLinksDecoration? =
         if (source.build != null && target.build != null) {
             BranchLinksDecoration(
+                feature = extensionFeature.featureDescription,
                 id = id,
                 text = displayTime(source.build!!, target.build!!),
-                description = "Time between the two builds"
+                description = "Time between the two builds",
+                icon = "time"
             )
         } else {
             null

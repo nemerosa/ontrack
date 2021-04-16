@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class LinkBranchLinksDecorationProvider(
-    extensionFeature: GeneralExtensionFeature
+    val extensionFeature: GeneralExtensionFeature
 ) : AbstractExtension(extensionFeature), BranchLinksDecorationExtension {
 
     override val id: String = "link"
@@ -22,9 +22,11 @@ class LinkBranchLinksDecorationProvider(
     ): BranchLinksDecoration? =
         if (source.build != null && target.build != null) {
             BranchLinksDecoration(
+                feature = extensionFeature.featureDescription,
                 id = id,
                 text = "Linked",
-                description = "A link is present between those two builds"
+                description = "A link is present between those two builds",
+                icon = "link"
             )
         } else {
             null
