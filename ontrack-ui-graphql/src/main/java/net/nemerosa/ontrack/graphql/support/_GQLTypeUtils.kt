@@ -1,9 +1,14 @@
 package net.nemerosa.ontrack.graphql.support
 
+import graphql.Scalars
 import graphql.Scalars.*
+import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
+import graphql.schema.GraphQLOutputType
+import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.findAnnotation
@@ -33,9 +38,29 @@ fun TypeBuilder.booleanField(property: KProperty<Boolean>, description: String? 
 
 fun <T> TypeBuilder.field(property: KProperty<T?>, type: GQLType, description: String? = null): GraphQLObjectType.Builder =
         field {
+            val outputType: GraphQLOutputType = if (property.returnType.isMarkedNullable) {
+                type.typeRef
+            } else {
+                GraphQLNonNull(type.typeRef)
+            }
             it.name(property.name)
                     .description(getDescription(property, description))
-                    .type(type.typeRef)
+                    .type(outputType)
+        }
+
+fun <T> TypeBuilder.field(property: KProperty<T?>, typeName: String, description: String? = null): GraphQLObjectType.Builder =
+    field(property, GraphQLTypeReference(typeName), description)
+
+fun <T> TypeBuilder.field(property: KProperty<T?>, ref: GraphQLTypeReference, description: String? = null): GraphQLObjectType.Builder =
+        field {
+            val outputType: GraphQLOutputType = if (property.returnType.isMarkedNullable) {
+                ref
+            } else {
+                GraphQLNonNull(ref)
+            }
+            it.name(property.name)
+                    .description(getDescription(property, description))
+                    .type(outputType)
         }
 
 fun <E : Enum<E>> TypeBuilder.enumAsStringField(property: KProperty<E?>, description: String? = null): GraphQLObjectType.Builder =
@@ -56,15 +81,31 @@ fun <R, T> TypeBuilder.intField(property: KProperty1<R, T?>, description: String
                     }
         }
 
-fun TypeBuilder.stringField(property: KProperty<String?>, description: String): GraphQLObjectType.Builder =
-        field { it.name(property.name).description(description).type(GraphQLString) }
+fun TypeBuilder.stringField(property: KProperty<String?>, description: String? = null): GraphQLObjectType.Builder =
+        field {
+            it.name(property.name)
+                .description(getDescription(property, description))
+                .type(nullableOutputType(GraphQLString, property.returnType.isMarkedNullable))
+        }
 
 fun TypeBuilder.creationField(name: String, description: String): GraphQLObjectType.Builder =
         field {
             it.name(name).description(description).type(GraphQLString)
         }
 
+fun getDescription(type: KClass<*>, description: String? = null) =
+    description
+        ?: type.findAnnotation<APIDescription>()?.value
+        ?: type.java.simpleName
+
 fun getDescription(property: KProperty<*>, defaultDescription: String? = null): String? =
         defaultDescription
                 ?: property.findAnnotation<APIDescription>()?.value
                 ?: "${property.name} property"
+
+fun nullableOutputType(type: GraphQLOutputType, nullable: Boolean) =
+    if (nullable) {
+        type
+    } else {
+        GraphQLNonNull(type)
+    }
