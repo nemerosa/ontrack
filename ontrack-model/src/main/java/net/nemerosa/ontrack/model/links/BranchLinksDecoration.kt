@@ -12,7 +12,7 @@ package net.nemerosa.ontrack.model.links
 class BranchLinksDecoration(
     val id: String,
     val text: String,
-    val description: String?,
-    val iconUrl: String?,
-    val url: String?
+    val description: String? = null,
+    val iconUrl: String? = null,
+    val url: String? = null
 )

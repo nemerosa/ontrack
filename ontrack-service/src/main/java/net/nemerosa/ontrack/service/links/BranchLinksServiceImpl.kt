@@ -16,7 +16,8 @@ import java.util.*
 class BranchLinksServiceImpl(
     private val cachedSettingsService: CachedSettingsService,
     private val buildFilterService: BuildFilterService,
-    private val structureService: StructureService
+    private val structureService: StructureService,
+    private val branchLinksDecorationProviders: List<BranchLinksDecorationProvider>
 ) : BranchLinksService {
 
     override fun getBranchLinks(branch: Branch, direction: BranchLinksDirection): BranchLinksNode {
@@ -69,7 +70,7 @@ class BranchLinksServiceImpl(
     private fun populate(node: BranchLinksNode, build: Build, direction: BranchLinksDirection): BranchLinksNode {
         // Recomputes the edges
         val edges = node.edges.map { edge ->
-            populate(edge, build, direction)
+            populate(edge, BranchLinksNode(node.branch, build, node.edges), direction)
         }
         // OK
         return BranchLinksNode(
@@ -79,17 +80,21 @@ class BranchLinksServiceImpl(
         )
     }
 
-    private fun populate(edge: BranchLinksEdge, build: Build, direction: BranchLinksDirection): BranchLinksEdge {
+    private fun populate(edge: BranchLinksEdge, source: BranchLinksNode, direction: BranchLinksDirection): BranchLinksEdge {
         // Gets the target build if any
-        val target = getEdgeBuild(build, edge.linkedTo.branch, direction)
+        val target = source.build?.let { getEdgeBuild(it, edge.linkedTo.branch, direction) }
         // If no build, we return the edge as it is
         return if (target == null) {
             edge
         } else {
+            val newLinkedNode = populate(edge.linkedTo, target, direction)
+            val decorations = branchLinksDecorationProviders.mapNotNull { provider ->
+                provider.getDecoration(source, newLinkedNode, direction)
+            }
             BranchLinksEdge(
                 direction = direction,
-                linkedTo = populate(edge.linkedTo, target, direction),
-                decorations = edge.decorations // TODO Populate with build
+                linkedTo = newLinkedNode,
+                decorations = decorations
             )
         }
     }
@@ -143,11 +148,16 @@ class BranchLinksServiceImpl(
             branch = node.branch,
             build = null,
             edges = node.branches.map { child ->
-                BranchLinksEdge(
-                    direction = direction,
-                    linkedTo = graphToNode(child, direction),
-                    decorations = emptyList() // TODO Computes decoration at branch level
-                )
+                graphToNode(child, direction).run {
+                    val decorations = branchLinksDecorationProviders.mapNotNull { provider ->
+                        provider.getDecoration(BranchLinksNode(node.branch, null, emptyList()), this, direction)
+                    }
+                    BranchLinksEdge(
+                        direction = direction,
+                        linkedTo = this,
+                        decorations = decorations
+                    )
+                }
             }
         )
 

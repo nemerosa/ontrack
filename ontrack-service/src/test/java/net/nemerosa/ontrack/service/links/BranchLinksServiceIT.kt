@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.service.links
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.model.links.BranchLinksDirection
-import net.nemerosa.ontrack.model.links.BranchLinksNode
-import net.nemerosa.ontrack.model.links.BranchLinksService
-import net.nemerosa.ontrack.model.links.BranchLinksSettings
+import net.nemerosa.ontrack.model.links.*
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -346,6 +343,25 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Link and time decoration`() {
+        withLinks {
+            val component = build("component", 1)
+            val library = build("library", 1)
+            component linkTo library
+            assertBuildLinks(component, BranchLinksDirection.USING) {
+                assertEdge(library) {
+                    assertDecoration("link") {
+                        assertEquals("Linked", text)
+                    }
+                    assertDecoration("time") {
+                        assertTrue(text.isNotBlank(), "Time is displayed")
+                    }
+                }
+            }
+        }
+    }
+
     private fun withLinks(
         code: WithLinksContext.() -> Unit
     ) {
@@ -402,9 +418,31 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
         }
     }
 
+    private class EdgeTestContext(
+        private val edge: BranchLinksEdge
+    ) {
+        fun assertDecoration(id: String, code: BranchLinksDecoration.() -> Unit = {}) {
+            val decoration = edge.decorations.find { it.id == id }
+            assertNotNull(decoration, "Decoration $id is present") {
+                it.code()
+            }
+        }
+    }
+
     private class BuildNodeTestContext(
         private val node: BranchLinksNode
     ) {
+        fun assertEdge(target: Build, code: EdgeTestContext.() -> Unit = {}) {
+            val edge = node.edges.find { it.linkedTo.branch.id == target.branch.id }
+            assertNotNull(edge,
+                "Cannot find any link between ${node.branch.entityDisplayName} and ${target.branch.entityDisplayName}") {
+                // Checks the build
+                assertEquals(target.id, it.linkedTo.build?.id, "Expected ${target.entityDisplayName} under node ${target.branch.entityDisplayName}")
+                // Going on
+                EdgeTestContext(it).code()
+            }
+        }
+
         fun assertLinkedTo(target: Build, code: BuildNodeTestContext.() -> Unit = {}) {
             val edge = node.edges.find { it.linkedTo.branch.id == target.branch.id }
             assertNotNull(edge,
