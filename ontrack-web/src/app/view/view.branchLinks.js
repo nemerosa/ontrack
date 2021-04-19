@@ -298,9 +298,15 @@ angular.module('ot.view.branchLinks', [
                     branches(id: $branchId) {
                       id
                       name
+                      links {
+                        _page
+                      }
                       project {
                         id
                         name
+                        links {
+                          _page
+                        }
                       }
                       builds(count: 1) {
                         name
