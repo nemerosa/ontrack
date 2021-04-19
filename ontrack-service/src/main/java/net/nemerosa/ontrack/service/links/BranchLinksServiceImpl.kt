@@ -168,15 +168,18 @@ class BranchLinksServiceImpl(
                 structureService.getBuildsUsing(build, 0, maxLinksPerLevel).pageItems
         }
 
+    /**
+     * Gets the build target for the same project than the one defined by the branch graph.
+     */
     private fun getEdgeBuild(build: Build, target: Branch, direction: BranchLinksDirection): Build? =
         when (direction) {
             BranchLinksDirection.USING ->
                 structureService.getBuildsUsedBy(build, 0, 1) {
-                    it.branch.id == target.id
+                    it.project.id == target.project.id
                 }.pageItems.firstOrNull()
             BranchLinksDirection.USED_BY ->
                 structureService.getBuildsUsing(build, 0, 1) {
-                    it.branch.id == target.id
+                    it.project.id == target.project.id
                 }.pageItems.firstOrNull()
         }
 
