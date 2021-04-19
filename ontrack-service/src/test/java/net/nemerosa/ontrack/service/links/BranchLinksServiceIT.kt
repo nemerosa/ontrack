@@ -350,14 +350,21 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
                     build("chart", it) linkTo build("aggregator", it)
                     build("aggregator", it) linkTo build("project", it)
                     build("project", it) linkTo build("component", it)
+                    build("project", it) linkTo build("library-1", it)
                     build("component", it) linkTo build("library", it)
+                    build("component", it) linkTo build("library-2", it)
+                    build("library", it) linkTo build("library-3", it)
                 }
 
                 assertBranchLinks(branch("chart"), BranchLinksDirection.USING) {
                     assertLinkedTo(branch("aggregator")) {
                         assertLinkedTo(branch("project")) {
+                            assertLinkedTo(branch("library-1"))
                             assertLinkedTo(branch("component")) {
-                                assertLinkedTo(branch("library"))
+                                assertLinkedTo(branch("library")) {
+                                    assertLinkedTo(branch("library-3"))
+                                }
+                                assertLinkedTo(branch("library-2"))
                             }
                         }
                     }
@@ -371,8 +378,8 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
                     "branch" to branch("chart").name
                 ),
                 fields = mapOf(
-                    "stack" to 50.0, // Instead of 3,200,000 if no caching...
-                    "branches" to 5.0
+                    "stack" to 80.0,
+                    "branches" to 8.0
                 )
             )
         }
