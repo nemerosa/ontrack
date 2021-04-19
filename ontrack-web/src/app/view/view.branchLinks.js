@@ -175,7 +175,7 @@ angular.module('ot.view.branchLinks', [
                 // Display name is the build name unless there is a release property attached to the build
                 let displayName = graph.build.name;
                 node.value = graph.build.id;
-                if (graph.build.releaseProperty.value && graph.build.releaseProperty.value.name) {
+                if (graph.build.releaseProperty && graph.build.releaseProperty.value && graph.build.releaseProperty.value.name) {
                     displayName = graph.build.releaseProperty.value.name;
                 }
                 // Promotions
@@ -200,7 +200,38 @@ angular.module('ot.view.branchLinks', [
             }
             // Label formatter
             node.label.formatter = formatterLines.join('\n');
-            // TODO Edges
+            // Edges
+            node.children = graph.edges.map(edge => transformEdge(edge, direction, depth));
+            // OK
+            return node;
+        };
+
+        // Edge transformation
+        const transformEdge = (edge, direction, depth) => {
+            // Direction of the link as the name
+            let name;
+            if (direction === 'USING') {
+                name = '>>> using >>>';
+            } else {
+                name = '<<< used by <<<';
+            }
+            // Initial node
+            const node = {
+                name: name
+            };
+            // Label
+            node.label = {
+                rich: {}
+            };
+            // Format lines
+            const formatterLines = [];
+            // TODO Decorations on the edge
+            // Label formatter
+            node.label.formatter = formatterLines.join('\n');
+            // Linked node as a child
+            node.children = [
+                transformGraphIntoNode(edge.linkedTo, direction, depth + 1)
+            ];
             // OK
             return node;
         };
@@ -243,6 +274,12 @@ angular.module('ot.view.branchLinks', [
                   $direction: BranchLinksDirection!
                 ) {
                     branches(id: $branchId) {
+                      id
+                      name
+                      project {
+                        id
+                        name
+                      }
                       builds(count: 1) {
                         name
                         graph(direction: $direction) {
@@ -297,7 +334,7 @@ angular.module('ot.view.branchLinks', [
             `;
         };
 
-        const query = buildQuery(1);
+        const query = buildQuery(10);
 
         // Loading the data on load
         refreshGraph();
