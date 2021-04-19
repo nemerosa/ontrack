@@ -89,7 +89,13 @@ angular.module('ot.view.branchLinks', [
                         left: '20%',
                         bottom: '1%',
                         right: '20%',
-                        symbolSize: 25,
+                        symbolSize: (value) => {
+                            if (value === 'edge') {
+                                return 3;
+                            } else {
+                                return 25;
+                            }
+                        },
                         label: {
                             position: 'top',
                             verticalAlign: 'middle',
@@ -217,7 +223,8 @@ angular.module('ot.view.branchLinks', [
             }
             // Initial node
             const node = {
-                name: name
+                name: name,
+                value: 'edge'
             };
             // Label
             node.label = {
