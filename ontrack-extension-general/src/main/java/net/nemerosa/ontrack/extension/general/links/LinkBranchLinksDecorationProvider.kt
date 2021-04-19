@@ -24,7 +24,7 @@ class LinkBranchLinksDecorationProvider(
             BranchLinksDecoration(
                 feature = extensionFeature.featureDescription,
                 id = id,
-                text = "Linked",
+                text = "",
                 description = "A link is present between those two builds",
                 icon = "link"
             )

@@ -17,7 +17,7 @@ class GeneralBranchLinksDecorationsIT : AbstractBranchLinksTestSupport() {
             assertBuildLinks(component, BranchLinksDirection.USING) {
                 assertEdge(library) {
                     assertDecoration("link") {
-                        assertEquals("Linked", text)
+                        assertEquals("", text)
                         assertEquals("link", icon)
                     }
                     assertDecoration("time") {
