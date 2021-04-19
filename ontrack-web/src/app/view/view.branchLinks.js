@@ -245,9 +245,8 @@ angular.module('ot.view.branchLinks', [
             node.label = {
                 rich: {}
             };
-            // Format lines
-            const formatterLines = [];
-            // TODO Decorations on the edge
+            // Decorations on the edge
+            const formatterLines = edge.decorations.map(decoration => getDecorationFormatter(decoration, node.label.rich));
             // Label formatter
             node.label.formatter = formatterLines.join('\n');
             // Linked node as a child
@@ -256,6 +255,14 @@ angular.module('ot.view.branchLinks', [
             ];
             // OK
             return node;
+        };
+
+        // Gets the formatting line for a decoration
+        // @param decoration The decoration object
+        // @param classes The style container (as in node.label.rich)
+        const getDecorationFormatter = (decoration, classes) => {
+            // TODO Icons, links, etc.
+            return decoration.text;
         };
 
         // Loading the raw data
