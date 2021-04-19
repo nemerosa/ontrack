@@ -1,14 +1,19 @@
 package net.nemerosa.ontrack.service.links
 
+import net.nemerosa.ontrack.extension.api.support.TestMetricsExportExtension
 import net.nemerosa.ontrack.it.links.AbstractBranchLinksTestSupport
 import net.nemerosa.ontrack.model.links.BranchLinksDirection
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
+
+    @Autowired
+    private lateinit var testMetricsExportExtension: TestMetricsExportExtension
 
     @Test
     fun `No build links makes for one single node for the abstract graph`() {
@@ -334,6 +339,42 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
                     assertLinkedTo(project)
                 }
             }
+        }
+    }
+
+    @Test
+    fun `Branches are processed only once`() {
+        withLinks {
+            testMetricsExportExtension.with {
+                (1..20).forEach {
+                    build("chart", it) linkTo build("aggregator", it)
+                    build("aggregator", it) linkTo build("project", it)
+                    build("project", it) linkTo build("component", it)
+                    build("component", it) linkTo build("library", it)
+                }
+
+                assertBranchLinks(branch("chart"), BranchLinksDirection.USING) {
+                    assertLinkedTo(branch("aggregator")) {
+                        assertLinkedTo(branch("project")) {
+                            assertLinkedTo(branch("component")) {
+                                assertLinkedTo(branch("library"))
+                            }
+                        }
+                    }
+                }
+            }
+
+            testMetricsExportExtension.assertHasMetric(
+                metric = "ontrack_graph_branch",
+                tags = mapOf(
+                    "project" to project("chart").name,
+                    "branch" to branch("chart").name
+                ),
+                fields = mapOf(
+                    "stack" to 50.0, // Instead of 3,200,000 if no caching...
+                    "branches" to 5.0
+                )
+            )
         }
     }
 

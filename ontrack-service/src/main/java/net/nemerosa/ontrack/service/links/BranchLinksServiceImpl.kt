@@ -11,11 +11,12 @@ import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.system.measureTimeMillis
 
 @Service
 @Transactional(readOnly = true)
@@ -26,6 +27,8 @@ class BranchLinksServiceImpl(
     private val extensionManager: ExtensionManager,
     private val metricsExportService: MetricsExportService
 ) : BranchLinksService {
+
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     private val providers: Collection<BranchLinksDecorationExtension> by lazy {
         extensionManager.getExtensions(BranchLinksDecorationExtension::class.java)
@@ -41,6 +44,8 @@ class BranchLinksServiceImpl(
         index[branch.id] = graph
         // Processing stack
         val stack = MaxArrayDeque<Item>()
+        // Index of branches which have already been processed
+        val alreadyProcessed = mutableSetOf<ID>()
 
         // Starting the processing
         val start = System.currentTimeMillis()
@@ -50,6 +55,17 @@ class BranchLinksServiceImpl(
         while (stack.isNotEmpty()) {
             // Gets the current item
             val item = stack.pop()
+            // Has this branch already been processed
+            val processed = item.build.branch.id in alreadyProcessed
+            if (processed) {
+                continue
+            } else {
+                alreadyProcessed += item.build.branch.id
+            }
+            // Processing logging
+            if (logger.isDebugEnabled) {
+                logger.debug("item={}", item)
+            }
             // Gets the corresponding node in the graph
             val node = index[item.build.branch.id]
                 ?: error("Cannot find indexed node for ${item.build.branch.entityDisplayName}")
@@ -82,7 +98,8 @@ class BranchLinksServiceImpl(
             ),
             fields = mapOf(
                 "elapsedMs" to (end - start).toDouble(),
-                "maxStack" to stack.max.toDouble()
+                "stack" to stack.max.toDouble(),
+                "branches" to alreadyProcessed.size.toDouble()
             ),
             timestamp = Time.now()
         )
@@ -166,7 +183,9 @@ class BranchLinksServiceImpl(
     private class Item(
         val depth: Int,
         val build: Build
-    )
+    ) {
+        override fun toString(): String = "${build.entityDisplayName} (depth = $depth)"
+    }
 
     private class Node(
         val branch: Branch,
