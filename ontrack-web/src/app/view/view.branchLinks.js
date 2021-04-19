@@ -90,7 +90,7 @@ angular.module('ot.view.branchLinks', [
                         bottom: '1%',
                         right: '20%',
                         symbolSize: (value) => {
-                            if (value === 'edge') {
+                            if (value && value.type === 'edge') {
                                 return 3;
                             } else {
                                 return 25;
@@ -147,8 +147,9 @@ angular.module('ot.view.branchLinks', [
         // Event handling on the chart
         const initChartEventHandling = (chart) => {
             chart.on('dblclick', (params) => {
-                if (params.value && params.value.links && params.value.links._page) {
-                    $window.open(params.value.links._page, "_blank");
+                console.log("params.value = ", params.value);
+                if (params.value && params.value.page) {
+                    $window.open(params.value.page, "_blank");
                 }
             });
         };
@@ -163,10 +164,23 @@ angular.module('ot.view.branchLinks', [
 
         // Transforming a `BranchLinksNode` into a chart node
         const transformGraphIntoNode = (graph, direction, depth) => {
+            // Value is the build ID or the branch ID
+            let value;
+            if (graph.build) {
+                value = {
+                    type: 'build',
+                    page: graph.build.links._page
+                };
+            } else {
+                value = {
+                    type: 'branch',
+                    page: graph.branch.links._page
+                };
+            }
             // Initial node
             const node = {
-                name: graph.branch.name
-                // No value initially
+                name: graph.branch.name,
+                value: value
             };
             // Label
             node.label = {
@@ -180,7 +194,6 @@ angular.module('ot.view.branchLinks', [
             if (graph.build) {
                 // Display name is the build name unless there is a release property attached to the build
                 let displayName = graph.build.name;
-                node.value = graph.build.id;
                 if (graph.build.releaseProperty && graph.build.releaseProperty.value && graph.build.releaseProperty.value.name) {
                     displayName = graph.build.releaseProperty.value.name;
                 }
@@ -224,7 +237,9 @@ angular.module('ot.view.branchLinks', [
             // Initial node
             const node = {
                 name: name,
-                value: 'edge'
+                value: {
+                    type: 'edge'
+                }
             };
             // Label
             node.label = {
