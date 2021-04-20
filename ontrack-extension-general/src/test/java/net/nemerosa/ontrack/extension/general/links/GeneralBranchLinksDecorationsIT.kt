@@ -9,17 +9,13 @@ import kotlin.test.assertTrue
 class GeneralBranchLinksDecorationsIT : AbstractBranchLinksTestSupport() {
 
     @Test
-    fun `Link and time decoration`() {
+    fun `Time decoration`() {
         withLinks {
             val component = build("component", 1)
             val library = build("library", 1)
             component linkTo library
             assertBuildLinks(component, BranchLinksDirection.USING) {
                 assertEdge(library) {
-                    assertDecoration("link") {
-                        assertEquals("", text)
-                        assertEquals("link", icon)
-                    }
                     assertDecoration("time") {
                         assertTrue(text.isNotBlank(), "Time is displayed")
                         assertEquals("time", icon)
