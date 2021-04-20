@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeBranchLinksDecoration(
-    private val gqlTypeExtensionFeatureDescription: GQLTypeExtensionFeatureDescription
+    private val gqlTypeExtensionFeatureDescription: GQLTypeExtensionFeatureDescription,
+    private val gqlEnumBranchLinksDecorationLabel: GQLEnumBranchLinksDecorationLabel
 ): GQLType {
 
     override fun getTypeName(): String = BranchLinksDecoration::class.java.simpleName
@@ -26,5 +27,6 @@ class GQLTypeBranchLinksDecoration(
             .stringField(BranchLinksDecoration::description)
             .stringField(BranchLinksDecoration::icon)
             .stringField(BranchLinksDecoration::url)
+            .field(BranchLinksDecoration::label, gqlEnumBranchLinksDecorationLabel.getTypeRef())
             .build()
 }

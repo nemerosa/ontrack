@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.api.BranchLinksDecorationExtension
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.links.BranchLinksDecoration
+import net.nemerosa.ontrack.model.links.BranchLinksDecorationLabel
 import net.nemerosa.ontrack.model.links.BranchLinksDirection
 import net.nemerosa.ontrack.model.links.BranchLinksNode
 import org.springframework.stereotype.Component
@@ -26,7 +27,8 @@ class LinkBranchLinksDecorationProvider(
                 id = id,
                 text = "",
                 description = "A link is present between those two builds",
-                icon = "link"
+                icon = "link",
+                label = BranchLinksDecorationLabel.ICON
             )
         } else {
             null

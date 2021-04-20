@@ -91,7 +91,7 @@ angular.module('ot.view.branchLinks', [
                         right: '20%',
                         symbolSize: (value) => {
                             if (value && value.type === 'edge') {
-                                return 3;
+                                return 6;
                             } else {
                                 return 25;
                             }
@@ -102,7 +102,7 @@ angular.module('ot.view.branchLinks', [
                             align: 'center',
                             fontSize: 12,
                             rich: {
-                                buildName: {
+                                decorationText: {
                                     padding: [0, 0, 0, 8]
                                 }
                             }
@@ -241,14 +241,16 @@ angular.module('ot.view.branchLinks', [
                     type: 'edge'
                 }
             };
-            // Label
+
+            // Decoration label
             node.label = {
                 rich: {}
             };
-            // Decorations on the edge
-            const formatterLines = edge.decorations.map(decoration => getDecorationFormatter(decoration, node.label.rich));
-            // Label formatter
+            const formatterLines = edge.decorations.map(decoration => getDecorationFormatterForLabel(decoration, node.label.rich)).filter(line => line);
             node.label.formatter = formatterLines.join('\n');
+
+            // TODO Decoration tooltip
+
             // Linked node as a child
             node.children = [
                 transformGraphIntoNode(edge.linkedTo, direction, depth + 1)
@@ -257,12 +259,28 @@ angular.module('ot.view.branchLinks', [
             return node;
         };
 
-        // Gets the formatting line for a decoration
-        // @param decoration The decoration object
-        // @param classes The style container (as in node.label.rich)
-        const getDecorationFormatter = (decoration, classes) => {
-            // TODO Icons, links, etc.
-            return decoration.text;
+        const getDecorationFormatterForLabel = (decoration, classes) => {
+            if (decoration.label === 'NONE') {
+                return '';
+            } else {
+                let line = '';
+                if ((decoration.label === 'ICON' || decoration.label === 'ALL') && decoration.icon) {
+                    const className = `${decoration.feature.id}_${decoration.id}_${decoration.icon}`;
+                    const iconUrl = `/extension/${decoration.feature.id}/graph/${decoration.id}/${decoration.icon}.png`;
+                    classes[className] = {
+                        backgroundColor: {
+                            image: iconUrl
+                        },
+                        height: 16,
+                        weight: 16
+                    };
+                    line += `{${className}|}`;
+                }
+                if ((decoration.label === 'TEXT' || decoration.label === 'ALL') && decoration.text) {
+                    line += `{decorationText|${decoration.text}}`;
+                }
+                return line;
+            }
         };
 
         // Loading the raw data
@@ -333,6 +351,7 @@ angular.module('ot.view.branchLinks', [
                   description
                   icon
                   url
+                  label
                 }
                 
                 fragment nodeContent on BranchLinksNode {
