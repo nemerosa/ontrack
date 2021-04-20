@@ -392,6 +392,9 @@ angular.module('ot.view.branchLinks', [
                     links {
                       _page
                     }
+                    releaseProperty {
+                        value
+                    }
                     promotionRuns(lastPerLevel: true) {
                       promotionLevel {
                         name
