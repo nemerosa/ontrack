@@ -81,6 +81,11 @@ angular.module('ot.view.branchLinks', [
         // Creates the chart option with some data
         const createOptionWithData = (data) => {
             return {
+                tooltip: {
+                    trigger: 'item',
+                    triggerOn: 'click',
+                    show: false // Managed at data node level
+                },
                 series: [
                     {
                         type: 'tree',
@@ -249,7 +254,14 @@ angular.module('ot.view.branchLinks', [
             const formatterLines = edge.decorations.map(decoration => getDecorationFormatterForLabel(decoration, node.label.rich)).filter(line => line);
             node.label.formatter = formatterLines.join('\n');
 
-            // TODO Decoration tooltip
+            // Decoration tooltip
+            const tooltipLines = edge.decorations.map(decoration => getDecorationFormatterForTooltip(decoration)).filter(line => line);
+            if (tooltipLines.length > 0) {
+                node.tooltip = {
+                    show: true,
+                    formatter: tooltipLines.join('\n')
+                };
+            }
 
             // Linked node as a child
             node.children = [
@@ -259,6 +271,37 @@ angular.module('ot.view.branchLinks', [
             return node;
         };
 
+        const getDecorationFormatterForTooltip = (decoration) => {
+            // No decoration when no text
+            if (!decoration.text) {
+                return '';
+            }
+
+            let line = '<p>';
+
+            // Icon
+            if (decoration.icon) {
+                const iconUrl = getDecorationIconUrl(decoration);
+                line += `<img src="${iconUrl}" width="16" height="16" alt="${decoration.icon}"/> `;
+            }
+
+            // Link
+            if (decoration.url) {
+                line += `<a href="${decoration.url}">`;
+            }
+
+            // Text
+            line += `<span title="${decoration.description}">${decoration.text}</span>`;
+
+            // Closing the link
+            if (decoration.url) {
+                line += '</a>';
+            }
+
+            line += '</p>';
+            return line;
+        };
+
         const getDecorationFormatterForLabel = (decoration, classes) => {
             if (decoration.label === 'NONE') {
                 return '';
@@ -266,7 +309,7 @@ angular.module('ot.view.branchLinks', [
                 let line = '';
                 if ((decoration.label === 'ICON' || decoration.label === 'ALL') && decoration.icon) {
                     const className = `${decoration.feature.id}_${decoration.id}_${decoration.icon}`;
-                    const iconUrl = `/extension/${decoration.feature.id}/graph/${decoration.id}/${decoration.icon}.png`;
+                    const iconUrl = getDecorationIconUrl(decoration);
                     classes[className] = {
                         backgroundColor: {
                             image: iconUrl
@@ -280,6 +323,14 @@ angular.module('ot.view.branchLinks', [
                     line += `{decorationText|${decoration.text}}`;
                 }
                 return line;
+            }
+        };
+
+        const getDecorationIconUrl = (decoration) => {
+            if (decoration.icon) {
+                return `/extension/${decoration.feature.id}/graph/${decoration.id}/${decoration.icon}.png`;
+            } else {
+                return '';
             }
         };
 
