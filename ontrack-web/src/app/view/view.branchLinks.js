@@ -94,17 +94,17 @@ angular.module('ot.view.branchLinks', [
                         left: '20%',
                         bottom: '1%',
                         right: '20%',
-                        symbolSize: (value) => {
-                            if (value && value.type === 'edge') {
-                                return 6;
-                            } else {
-                                return 25;
-                            }
-                        },
+                        symbol: 'none',
+                        symbolSize: 1,
                         label: {
-                            position: 'top',
+                            backgroundColor: 'white',
+                            borderColor: '#CCCCCC',
+                            borderWidth: 1,
+                            padding: 5,
+                            borderRadius: 5,
+                            align: 'left',
+                            position: 'inside',
                             verticalAlign: 'middle',
-                            align: 'center',
                             fontSize: 12,
                             rich: {
                                 decorationText: {
@@ -220,7 +220,7 @@ angular.module('ot.view.branchLinks', [
                     }
                 }
                 // Build line
-                formatterLines.push(`${promotionsFormat}{buildName|${displayName}}`);
+                formatterLines.push(`${promotionsFormat}{decorationText|${displayName}}`);
             }
             // Decoration labels
             if (edge) {
