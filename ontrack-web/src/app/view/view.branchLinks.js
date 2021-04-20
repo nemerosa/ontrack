@@ -2,7 +2,8 @@ angular.module('ot.view.branchLinks', [
     'ui.router',
     'ot.service.core',
     'ot.service.structure',
-    'ot.service.graphql'
+    'ot.service.graphql',
+    'ot.service.task'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('branchLinks', {
@@ -11,7 +12,7 @@ angular.module('ot.view.branchLinks', [
             controller: 'BranchLinksCtrl'
         });
     })
-    .controller('BranchLinksCtrl', function ($location, $scope, $stateParams, $window, ot, otGraphqlService) {
+    .controller('BranchLinksCtrl', function ($location, $scope, $stateParams, $window, ot, otGraphqlService, otTaskService) {
         const branchId = $stateParams.branchId;
         const view = ot.view();
 
@@ -45,7 +46,7 @@ angular.module('ot.view.branchLinks', [
 
 
         // Refreshes the chart
-        const refreshGraph = () => {
+        const refreshGraph = (merge) => {
             if (context.chart) {
                 context.chart.showLoading();
             }
@@ -68,7 +69,7 @@ angular.module('ot.view.branchLinks', [
                     const chart = getOrCreateChart();
                     const options = createOptionWithData(data);
                     chart.clear();
-                    chart.setOption(options, true);
+                    chart.setOption(options, !merge);
                 } finally {
                     $scope.loadingData = false;
                     if (context.chart) {
@@ -152,7 +153,6 @@ angular.module('ot.view.branchLinks', [
         // Event handling on the chart
         const initChartEventHandling = (chart) => {
             chart.on('dblclick', (params) => {
-                console.log("params.value = ", params.value);
                 if (params.value && params.value.page) {
                     $window.open(params.value.page, "_blank");
                 }
@@ -412,5 +412,9 @@ angular.module('ot.view.branchLinks', [
 
         // Loading the data on load
         refreshGraph();
+
+        // Refreshing the graph regularly
+        const interval = 60 * 1000; // 60 seconds
+        otTaskService.register(`Branch links ${branchId}`, () => refreshGraph(true), interval);
     })
 ;
