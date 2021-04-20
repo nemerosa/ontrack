@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.api.BranchLinksDecorationExtension
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.links.BranchLinksDecoration
-import net.nemerosa.ontrack.model.links.BranchLinksDecorationLabel
 import net.nemerosa.ontrack.model.links.BranchLinksDirection
 import net.nemerosa.ontrack.model.links.BranchLinksNode
 import net.nemerosa.ontrack.model.structure.Build
@@ -30,8 +29,7 @@ class TimeBranchLinksDecorationProvider(
                 id = id,
                 text = displayTime(source.build!!, target.build!!),
                 description = "Time between the two builds",
-                icon = "time",
-                label = BranchLinksDecorationLabel.NONE
+                icon = "time"
             )
         } else {
             null

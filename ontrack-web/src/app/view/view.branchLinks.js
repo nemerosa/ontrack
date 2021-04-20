@@ -164,11 +164,11 @@ angular.module('ot.view.branchLinks', [
             const branch = raw.branches[0];
             // TODO Case when there is no build
             const build = branch.builds[0];
-            return transformGraphIntoNode(build.graph, direction, 0);
+            return transformGraphIntoNode(build.graph, null, direction, 0);
         };
 
         // Transforming a `BranchLinksNode` into a chart node
-        const transformGraphIntoNode = (graph, direction, depth) => {
+        const transformGraphIntoNode = (graph, edge, direction, depth) => {
             // Value is the build ID or the branch ID
             let value;
             if (graph.build) {
@@ -222,58 +222,39 @@ angular.module('ot.view.branchLinks', [
                 // Build line
                 formatterLines.push(`${promotionsFormat}{buildName|${displayName}}`);
             }
-            // Label formatter
-            node.label.formatter = formatterLines.join('\n');
-            // Edges
-            node.children = graph.edges.map(edge => transformEdge(edge, direction, depth));
-            // OK
-            return node;
-        };
-
-        // Edge transformation
-        const transformEdge = (edge, direction, depth) => {
-            // Direction of the link as the name
-            let name;
-            if (direction === 'USING') {
-                name = '>>> using >>>';
-            } else {
-                name = '<<< used by <<<';
+            // Decoration labels
+            if (edge) {
+                edge.decorations.forEach(decoration => {
+                    const line = getDecorationFormatterForLabel(decoration, node.label.rich);
+                    if (line) {
+                        formatterLines.push(line);
+                    }
+                });
             }
-            // Initial node
-            const node = {
-                name: name,
-                value: {
-                    type: 'edge'
-                }
-            };
-
-            // Decoration label
-            node.label = {
-                rich: {}
-            };
-            const formatterLines = edge.decorations.map(decoration => getDecorationFormatterForLabel(decoration, node.label.rich)).filter(line => line);
+            // Label formatter
             node.label.formatter = formatterLines.join('\n');
 
             // Decoration tooltip
-            const tooltipLines = edge.decorations.map(decoration => getDecorationFormatterForTooltip(decoration)).filter(line => line);
-            if (tooltipLines.length > 0) {
-                node.tooltip = {
-                    show: true,
-                    formatter: tooltipLines.join('\n')
-                };
+            if (edge) {
+                const tooltipLines = edge.decorations.map(decoration => getDecorationFormatterForTooltip(decoration)).filter(line => line);
+                if (tooltipLines.length > 0) {
+                    node.tooltip = {
+                        show: true,
+                        formatter: tooltipLines.join('\n')
+                    };
+                }
             }
 
-            // Linked node as a child
-            node.children = [
-                transformGraphIntoNode(edge.linkedTo, direction, depth + 1)
-            ];
+            // Edges
+            node.children = graph.edges.map(edge => transformGraphIntoNode(edge.linkedTo, edge, direction, depth));
+
             // OK
             return node;
         };
 
         const getDecorationFormatterForTooltip = (decoration) => {
-            // No decoration when no text
-            if (!decoration.text) {
+            // No decoration when no text or no link
+            if (!decoration.text || !decoration.url) {
                 return '';
             }
 
@@ -285,45 +266,31 @@ angular.module('ot.view.branchLinks', [
                 line += `<img src="${iconUrl}" width="16" height="16" alt="${decoration.icon}"/> `;
             }
 
-            // Link
-            if (decoration.url) {
-                line += `<a href="${decoration.url}">`;
-            }
-
             // Text
-            line += `<span title="${decoration.description}">${decoration.text}</span>`;
-
-            // Closing the link
-            if (decoration.url) {
-                line += '</a>';
-            }
+            line += `<a href="${decoration.url}"><span title="${decoration.description}">${decoration.text}</span></a>`;
 
             line += '</p>';
             return line;
         };
 
         const getDecorationFormatterForLabel = (decoration, classes) => {
-            if (decoration.label === 'NONE') {
-                return '';
-            } else {
-                let line = '';
-                if ((decoration.label === 'ICON' || decoration.label === 'ALL') && decoration.icon) {
-                    const className = `${decoration.feature.id}_${decoration.id}_${decoration.icon}`;
-                    const iconUrl = getDecorationIconUrl(decoration);
-                    classes[className] = {
-                        backgroundColor: {
-                            image: iconUrl
-                        },
-                        height: 16,
-                        weight: 16
-                    };
-                    line += `{${className}|}`;
-                }
-                if ((decoration.label === 'TEXT' || decoration.label === 'ALL') && decoration.text) {
-                    line += `{decorationText|${decoration.text}}`;
-                }
-                return line;
+            let line = '';
+            if (decoration.icon) {
+                const className = `${decoration.feature.id}_${decoration.id}_${decoration.icon}`;
+                const iconUrl = getDecorationIconUrl(decoration);
+                classes[className] = {
+                    backgroundColor: {
+                        image: iconUrl
+                    },
+                    height: 16,
+                    weight: 16
+                };
+                line += `{${className}|}`;
             }
+            if (decoration.text) {
+                line += `{decorationText|${decoration.text}}`;
+            }
+            return line;
         };
 
         const getDecorationIconUrl = (decoration) => {
@@ -402,7 +369,6 @@ angular.module('ot.view.branchLinks', [
                   description
                   icon
                   url
-                  label
                 }
                 
                 fragment nodeContent on BranchLinksNode {

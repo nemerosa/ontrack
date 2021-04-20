@@ -12,7 +12,6 @@ import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription
  * @property description Optional longer text, typically used as a tooltip
  * @property icon Optional name to an image for the decoration. This name is used together with the [feature] and the [id] to build a URL on the client side
  * @property url Optional link from the decoration to another page
- * @property label Indicates how the label of the decoration must be displayed
  */
 @APIDescription("Decoration for the edge between two nodes on a branch links graph.")
 class BranchLinksDecoration(
@@ -27,7 +26,5 @@ class BranchLinksDecoration(
     @APIDescription("Optional name to an image for the decoration. This name is used together with the [feature] and the [id] to build a URL on the client side")
     val icon: String? = null,
     @APIDescription("Optional link from the decoration to another page")
-    val url: String? = null,
-    @APIDescription("Indicates how the label of the decoration must be displayed")
-    val label: BranchLinksDecorationLabel = BranchLinksDecorationLabel.NONE
+    val url: String? = null
 )
