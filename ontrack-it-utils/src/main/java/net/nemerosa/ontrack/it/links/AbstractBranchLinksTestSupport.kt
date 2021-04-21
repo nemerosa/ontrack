@@ -46,13 +46,13 @@ abstract class AbstractBranchLinksTestSupport : AbstractDSLTestSupport() {
 
         fun assertBranchLinks(branch: Branch, direction: BranchLinksDirection, code: BranchNodeTestContext.() -> Unit) {
             val node = branchLinksService.getBranchLinks(branch, direction)
-            assertEquals(branch.id, node.branch.id, "Node on the same branch")
+            assertEquals(branch.project.id, node.project.id, "Node on the same project")
             BranchNodeTestContext(node).code()
         }
 
         fun assertBuildLinks(build: Build, direction: BranchLinksDirection, code: BuildNodeTestContext.() -> Unit) {
             val node = branchLinksService.getBuildLinks(build, direction)
-            assertEquals(build.branch.id, node.branch.id, "Node on the same branch")
+            assertEquals(build.project.id, node.project.id, "Node on the same project")
             assertEquals(build.id, node.build?.id, "Node on the same build")
             BuildNodeTestContext(node).code()
         }
@@ -60,12 +60,12 @@ abstract class AbstractBranchLinksTestSupport : AbstractDSLTestSupport() {
     }
 
     protected class BranchNodeTestContext(
-        protected val node: BranchLinksNode
+        val node: BranchLinksNode
     ) {
         fun assertLinkedTo(target: Branch, code: BranchNodeTestContext.() -> Unit = {}) {
-            val edge = node.edges.find { it.linkedTo.branch.id == target.id }
+            val edge = node.edges.find { it.linkedTo.project.id == target.project.id }
             assertNotNull(edge,
-                "Cannot find any link between ${node.branch.entityDisplayName} and ${target.entityDisplayName}") {
+                "Cannot find any link between ${node.project.entityDisplayName} and ${target.entityDisplayName}") {
                 BranchNodeTestContext(it.linkedTo).code()
             }
         }
@@ -86,31 +86,35 @@ abstract class AbstractBranchLinksTestSupport : AbstractDSLTestSupport() {
         protected val node: BranchLinksNode
     ) {
         fun assertEdge(target: Build, code: EdgeTestContext.() -> Unit = {}) {
-            val edge = node.edges.find { it.linkedTo.branch.id == target.branch.id }
+            val edge = node.edges.find { it.linkedTo.project.id == target.project.id }
             assertNotNull(edge,
-                "Cannot find any link between ${node.branch.entityDisplayName} and ${target.branch.entityDisplayName}") {
+                "Cannot find any link between ${node.project.entityDisplayName} and ${target.project.entityDisplayName}") {
                 // Checks the build
-                assertEquals(target.id, it.linkedTo.build?.id, "Expected ${target.entityDisplayName} under node ${target.branch.entityDisplayName}")
+                assertEquals(target.id,
+                    it.linkedTo.build?.id,
+                    "Expected ${target.entityDisplayName} under node ${target.branch.entityDisplayName}")
                 // Going on
                 EdgeTestContext(it).code()
             }
         }
 
         fun assertLinkedTo(target: Build, code: BuildNodeTestContext.() -> Unit = {}) {
-            val edge = node.edges.find { it.linkedTo.branch.id == target.branch.id }
+            val edge = node.edges.find { it.linkedTo.project.id == target.project.id }
             assertNotNull(edge,
-                "Cannot find any link between ${node.branch.entityDisplayName} and ${target.branch.entityDisplayName}") {
+                "Cannot find any link between ${node.project.entityDisplayName} and ${target.project.entityDisplayName}") {
                 // Checks the build
-                assertEquals(target.id, it.linkedTo.build?.id, "Expected ${target.entityDisplayName} under node ${target.branch.entityDisplayName}")
+                assertEquals(target.id,
+                    it.linkedTo.build?.id,
+                    "Expected ${target.entityDisplayName} under node ${target.branch.entityDisplayName}")
                 // Going on
                 BuildNodeTestContext(it.linkedTo).code()
             }
         }
 
         fun assertLinkedToNoBuild(target: Branch, code: BuildNodeTestContext.() -> Unit = {}) {
-            val edge = node.edges.find { it.linkedTo.branch.id == target.id }
+            val edge = node.edges.find { it.linkedTo.project.id == target.id }
             assertNotNull(edge,
-                "Cannot find any link between ${node.branch.entityDisplayName} and ${target.entityDisplayName}") {
+                "Cannot find any link between ${node.project.entityDisplayName} and ${target.project.entityDisplayName}") {
                 assertNull(it.linkedTo.build, "Node for ${target.entityDisplayName} has no build")
                 // Going on
                 BuildNodeTestContext(it.linkedTo).code()
