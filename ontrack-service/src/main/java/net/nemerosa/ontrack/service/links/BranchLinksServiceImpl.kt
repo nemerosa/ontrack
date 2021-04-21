@@ -7,10 +7,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.links.*
 import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.structure.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -38,10 +35,10 @@ class BranchLinksServiceImpl(
         // Settings
         val settings: BranchLinksSettings = cachedSettingsService.getCachedSettings(BranchLinksSettings::class.java)
         // Graph in progress
-        val graph = Node(branch)
-        // Index of nodes per branch
+        val graph = Node(branch.project)
+        // Index of nodes per project
         val index = mutableMapOf<ID, Node>()
-        index[branch.id] = graph
+        index[branch.project.id] = graph
         // Processing stack
         val stack = MaxArrayDeque<Item>()
         // Index of branches which have already been processed
@@ -49,7 +46,7 @@ class BranchLinksServiceImpl(
 
         // Starting the processing
         val start = System.currentTimeMillis()
-        // Puts the current on the stack
+        // Puts the current project on the stack
         stack.push(Item(0, branch))
         // Starts processing the stack
         while (stack.isNotEmpty()) {
@@ -62,8 +59,8 @@ class BranchLinksServiceImpl(
                 logger.debug("item={}", item)
             }
             // Gets the corresponding node in the graph
-            val node = index[item.branch.id]
-                ?: error("Cannot find indexed node for ${item.branch.entityDisplayName}")
+            val node = index[item.branch.project.id]
+                ?: error("Cannot find indexed node for ${item.branch.project.entityDisplayName}")
             // Gets the following branches using the current direction
             if (item.depth < settings.depth) {
                 // Gets the next branches using the build links
@@ -72,12 +69,14 @@ class BranchLinksServiceImpl(
                 nextBranches.forEach { nextBranch ->
                     // If not already processed
                     if (nextBranch.id !in alreadyProcessed) {
-                        // Make sure we have a node for its branch
-                        val nextNode = index.getOrPut(nextBranch.id) {
-                            Node(nextBranch)
+                        // Make sure we have a node for its project
+                        val nextNode = index.getOrPut(nextBranch.project.id) {
+                            Node(nextBranch.project)
                         }
-                        // Links this node to the current one
-                        node.branches += nextNode
+                        // Links this node to the current one (if not already there)
+                        if (node.projects.none { it.project.id == nextBranch.project.id }) {
+                            node.projects += nextNode
+                        }
                         // Adds the branch to the stack
                         stack.push(Item(item.depth + 1, nextBranch))
                     }
@@ -115,11 +114,11 @@ class BranchLinksServiceImpl(
     private fun populate(node: BranchLinksNode, build: Build, direction: BranchLinksDirection): BranchLinksNode {
         // Recomputes the edges
         val edges = node.edges.map { edge ->
-            populate(edge, BranchLinksNode(node.branch, build, node.edges), direction)
+            populate(edge, BranchLinksNode(node.project, build, node.edges), direction)
         }
         // OK
         return BranchLinksNode(
-            node.branch,
+            node.project,
             build,
             edges
         )
@@ -127,7 +126,7 @@ class BranchLinksServiceImpl(
 
     private fun populate(edge: BranchLinksEdge, source: BranchLinksNode, direction: BranchLinksDirection): BranchLinksEdge {
         // Gets the target build if any
-        val target = source.build?.let { getEdgeBuild(it, edge.linkedTo.branch, direction) }
+        val target = source.build?.let { getEdgeBuild(it, edge.linkedTo.project, direction) }
         // If no build, we return the edge as it is
         return if (target == null) {
             edge
@@ -175,15 +174,15 @@ class BranchLinksServiceImpl(
     /**
      * Gets the build target for the same project than the one defined by the branch graph.
      */
-    private fun getEdgeBuild(build: Build, target: Branch, direction: BranchLinksDirection): Build? =
+    private fun getEdgeBuild(build: Build, target: Project, direction: BranchLinksDirection): Build? =
         when (direction) {
             BranchLinksDirection.USING ->
                 structureService.getBuildsUsedBy(build, 0, 1) {
-                    it.project.id == target.project.id
+                    it.project.id == target.id
                 }.pageItems.firstOrNull()
             BranchLinksDirection.USED_BY ->
                 structureService.getBuildsUsing(build, 0, 1) {
-                    it.project.id == target.project.id
+                    it.project.id == target.id
                 }.pageItems.firstOrNull()
         }
 
@@ -195,18 +194,18 @@ class BranchLinksServiceImpl(
     }
 
     private class Node(
-        val branch: Branch,
-        val branches: MutableList<Node> = mutableListOf()
+        val project: Project,
+        val projects: MutableList<Node> = mutableListOf()
     )
 
     private fun graphToNode(node: Node, direction: BranchLinksDirection): BranchLinksNode =
         BranchLinksNode(
-            branch = node.branch,
+            project = node.project,
             build = null,
-            edges = node.branches.map { child ->
+            edges = node.projects.map { child ->
                 graphToNode(child, direction).run {
                     val decorations = providers.mapNotNull { provider ->
-                        provider.getDecoration(BranchLinksNode(node.branch, null, emptyList()), this, direction)
+                        provider.getDecoration(BranchLinksNode(node.project, null, emptyList()), this, direction)
                     }
                     BranchLinksEdge(
                         direction = direction,

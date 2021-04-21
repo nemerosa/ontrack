@@ -3,10 +3,7 @@ package net.nemerosa.ontrack.graphql.schema.links
 import graphql.schema.GraphQLList
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
-import net.nemerosa.ontrack.graphql.schema.GQLType
-import net.nemerosa.ontrack.graphql.schema.GQLTypeBranch
-import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
-import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
+import net.nemerosa.ontrack.graphql.schema.*
 import net.nemerosa.ontrack.graphql.support.field
 import net.nemerosa.ontrack.graphql.support.getDescription
 import net.nemerosa.ontrack.model.links.BranchLinksNode
@@ -27,7 +24,7 @@ class GQLTypeBranchLinksNode(
         GraphQLObjectType.newObject()
             .name(TYPENAME)
             .description(getDescription(BranchLinksNode::class))
-            .field(BranchLinksNode::branch, GQLTypeBranch.BRANCH)
+            .field(BranchLinksNode::project, GQLTypeProject.PROJECT)
             .field(BranchLinksNode::build, GQLTypeBuild.BUILD)
             // TODO V4 Use listField
             .field {
