@@ -41,13 +41,62 @@ angular.module('ot.view.branchLinks', [
                 context.direction = 'USING';
             }
             $location.hash(context.direction);
-            refreshGraph();
+            refreshGraph(true);
         };
 
+        // Chart options
+        const options = {
+            tooltip: {
+                trigger: 'item',
+                    triggerOn: 'click',
+                    show: false // Managed at data node level
+            },
+            series: [
+                {
+                    type: 'tree',
+                    data: [],
+                    top: '1%',
+                    left: '20%',
+                    bottom: '1%',
+                    right: '20%',
+                    symbol: 'none',
+                    symbolSize: 1,
+                    label: {
+                        backgroundColor: 'white',
+                        borderColor: '#CCCCCC',
+                        borderWidth: 1,
+                        padding: 5,
+                        borderRadius: 5,
+                        align: 'left',
+                        position: 'inside',
+                        verticalAlign: 'middle',
+                        fontSize: 12,
+                        rich: {
+                            decorationText: {
+                                padding: [0, 0, 0, 8]
+                            }
+                        }
+                    },
+                    leaves: {
+                        label: {
+                            position: 'top',
+                            verticalAlign: 'middle',
+                            align: 'center'
+                        }
+                    },
+                    emphasis: {
+                        focus: 'ancestor'
+                    },
+                    expandAndCollapse: false,
+                    animationDuration: 550,
+                    animationDurationUpdate: 750
+                }
+            ]
+        };
 
         // Refreshes the chart
-        const refreshGraph = (merge) => {
-            if (context.chart) {
+        const refreshGraph = (clear) => {
+            if (context.chart && clear) {
                 context.chart.showLoading();
             }
             $scope.loadingData = true;
@@ -67,12 +116,14 @@ angular.module('ot.view.branchLinks', [
                     const data = transformData(raw, context.direction);
                     // Graph setup
                     const chart = getOrCreateChart();
-                    const options = createOptionWithData(data);
-                    chart.clear();
-                    chart.setOption(options, !merge);
+                    createOptionWithData(data);
+                    if (clear) {
+                        chart.clear();
+                    }
+                    chart.setOption(options);
                 } finally {
                     $scope.loadingData = false;
-                    if (context.chart) {
+                    if (context.chart && clear) {
                         context.chart.hideLoading();
                     }
                 }
@@ -81,54 +132,7 @@ angular.module('ot.view.branchLinks', [
 
         // Creates the chart option with some data
         const createOptionWithData = (data) => {
-            return {
-                tooltip: {
-                    trigger: 'item',
-                    triggerOn: 'click',
-                    show: false // Managed at data node level
-                },
-                series: [
-                    {
-                        type: 'tree',
-                        data: [data],
-                        top: '1%',
-                        left: '20%',
-                        bottom: '1%',
-                        right: '20%',
-                        symbol: 'none',
-                        symbolSize: 1,
-                        label: {
-                            backgroundColor: 'white',
-                            borderColor: '#CCCCCC',
-                            borderWidth: 1,
-                            padding: 5,
-                            borderRadius: 5,
-                            align: 'left',
-                            position: 'inside',
-                            verticalAlign: 'middle',
-                            fontSize: 12,
-                            rich: {
-                                decorationText: {
-                                    padding: [0, 0, 0, 8]
-                                }
-                            }
-                        },
-                        leaves: {
-                            label: {
-                                position: 'top',
-                                verticalAlign: 'middle',
-                                align: 'center'
-                            }
-                        },
-                        emphasis: {
-                            focus: 'ancestor'
-                        },
-                        expandAndCollapse: false,
-                        animationDuration: 550,
-                        animationDurationUpdate: 750
-                    }
-                ]
-            };
+            options.series[0].data = [data];
         };
 
         // Gets the chart or creates it
@@ -162,7 +166,12 @@ angular.module('ot.view.branchLinks', [
         // Transforming the raw data into a graph
         const transformData = (raw, direction) => {
             const branch = raw.branches[0];
-            // TODO Case when there is no build
+            // Case when there is no build
+            if (branch.builds.length === 0) {
+                return {
+                    name: branch.name
+                };
+            }
             const build = branch.builds[0];
             return transformGraphIntoNode(build.graph, null, direction, 0);
         };
@@ -411,10 +420,10 @@ angular.module('ot.view.branchLinks', [
         const query = buildQuery(10);
 
         // Loading the data on load
-        refreshGraph();
+        refreshGraph(true);
 
         // Refreshing the graph regularly
         const interval = 60 * 1000; // 60 seconds
-        otTaskService.register(`Branch links ${branchId}`, () => refreshGraph(true), interval);
+        otTaskService.register(`Branch links ${branchId}`, () => refreshGraph(false), interval);
     })
 ;
