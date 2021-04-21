@@ -49,40 +49,38 @@ class BranchLinksServiceImpl(
 
         // Starting the processing
         val start = System.currentTimeMillis()
-        // Gets the N builds of the branch
-        fillStackFromBranch(0, branch, settings.history, stack)
+        // Puts the current on the stack
+        stack.push(Item(0, branch))
         // Starts processing the stack
         while (stack.isNotEmpty()) {
             // Gets the current item
             val item = stack.pop()
-            // Has this branch already been processed
-            val processed = item.build.branch.id in alreadyProcessed
-            if (processed) {
-                continue
-            } else {
-                alreadyProcessed += item.build.branch.id
-            }
+            // Processing this branch
+            alreadyProcessed += item.branch.id
             // Processing logging
             if (logger.isDebugEnabled) {
                 logger.debug("item={}", item)
             }
             // Gets the corresponding node in the graph
-            val node = index[item.build.branch.id]
-                ?: error("Cannot find indexed node for ${item.build.branch.entityDisplayName}")
-            // Gets the following builds using the current direction
+            val node = index[item.branch.id]
+                ?: error("Cannot find indexed node for ${item.branch.entityDisplayName}")
+            // Gets the following branches using the current direction
             if (item.depth < settings.depth) {
-                val nextBuilds = getNextBuilds(item.build, direction, settings.maxLinksPerLevel)
-                // For every next build...
-                nextBuilds.forEach { nextBuild ->
-                    val nextBranch: Branch = nextBuild.branch
-                    // Make sure we have a node for its branch
-                    val nextNode = index.getOrPut(nextBranch.id) {
-                        Node(nextBranch)
+                // Gets the next branches using the build links
+                val nextBranches: List<Branch> = getNextBranches(item.branch, direction, settings.history, settings.maxLinksPerLevel)
+                // For every next branch...
+                nextBranches.forEach { nextBranch ->
+                    // If not already processed
+                    if (nextBranch.id !in alreadyProcessed) {
+                        // Make sure we have a node for its branch
+                        val nextNode = index.getOrPut(nextBranch.id) {
+                            Node(nextBranch)
+                        }
+                        // Links this node to the current one
+                        node.branches += nextNode
+                        // Adds the branch to the stack
+                        stack.push(Item(item.depth + 1, nextBranch))
                     }
-                    // Links this node to the current one
-                    node.branches += nextNode
-                    // Takes the branch N first builds to fill the stack
-                    fillStackFromBranch(item.depth + 1, nextBranch, settings.history, stack)
                 }
             }
         }
@@ -146,15 +144,21 @@ class BranchLinksServiceImpl(
         }
     }
 
-    private fun fillStackFromBranch(depth: Int, branch: Branch, history: Int, stack: Deque<Item>) {
-        // Gets the N builds of the branch
+    private fun getNextBranches(branch: Branch, direction: BranchLinksDirection, history: Int, maxLinksPerLevel: Int): List<Branch> {
+        // List of branches
+        val branches = mutableMapOf<ID, Branch>()
+        // Gets the first N builds for this branch
         val builds = getBuilds(branch, history)
-        // Puts these builds onto the stack
+        // For each build, collects the links
         builds.forEach { build ->
-            stack.push(
-                Item(depth, build)
-            )
+            val nextBuilds = getNextBuilds(build, direction, maxLinksPerLevel)
+            // Collects the branches for each of those next builds
+            nextBuilds.forEach { nextBuild ->
+                branches[nextBuild.branch.id] = nextBuild.branch
+            }
         }
+        // OK
+        return branches.values.toList()
     }
 
     private fun getBuilds(branch: Branch, history: Int): List<Build> =
@@ -185,9 +189,9 @@ class BranchLinksServiceImpl(
 
     private class Item(
         val depth: Int,
-        val build: Build
+        val branch: Branch
     ) {
-        override fun toString(): String = "${build.entityDisplayName} (depth = $depth)"
+        override fun toString(): String = "${branch.entityDisplayName} (depth = $depth)"
     }
 
     private class Node(

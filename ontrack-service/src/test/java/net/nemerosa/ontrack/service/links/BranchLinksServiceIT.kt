@@ -378,10 +378,27 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
                     "branch" to branch("chart").name
                 ),
                 fields = mapOf(
-                    "stack" to 80.0,
+                    "stack" to 8.0,
                     "branches" to 8.0
                 )
             )
+        }
+    }
+
+    @Test
+    fun `Branches are the unit of processing`() {
+        withLinks {
+
+            build("component", 1) linkTo build("library", 1)
+
+            build("component", 2) linkTo build("library", 2)
+            build("project", 2) linkTo build("component", 2)
+
+            assertBranchLinks(branch("library"), BranchLinksDirection.USED_BY) {
+                assertLinkedTo(branch("component")) {
+                    assertLinkedTo(branch("project"))
+                }
+            }
         }
     }
 
