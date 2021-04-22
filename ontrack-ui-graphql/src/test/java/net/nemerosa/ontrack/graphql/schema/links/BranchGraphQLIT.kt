@@ -390,4 +390,130 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `Discarding old branches when building the graph`() {
+        withBranchLinkSettings(history = 2) {
+            withLinks {
+
+                val component = project("component")
+                val componentFeature = component.branch(name = "feature")
+                val componentFeature1 = componentFeature.build("1")
+                val componentMain = component.branch(name = "main")
+                val componentMain1 = componentMain.build("21")
+                val componentMain2 = componentMain.build("22")
+
+                val projectA = "projectA"
+                build(projectA, 1) linkTo componentFeature1
+                build(projectA, 2) linkTo componentFeature1
+                build(projectA, 3) linkTo componentMain1
+                build(projectA, 4) linkTo componentMain2
+
+                val query = """
+                    query Graph(${'$'}branchId: Int!) {
+                        branches(id: ${'$'}branchId) {
+                            graph(direction: USING) {
+                                branch {
+                                    name
+                                    project {
+                                        name
+                                    }
+                                }
+                                edges {
+                                    linkedTo {
+                                        branch {
+                                            name
+                                            project {
+                                                name
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                """
+
+                run(query, mapOf("branchId" to branch(projectA).id())).let { data ->
+                    assertEquals(
+                        mapOf(
+                            "branches" to listOf(
+                                mapOf(
+                                    "graph" to mapOf(
+                                        "branch" to mapOf(
+                                            "name" to branch(projectA).name,
+                                            "project" to mapOf(
+                                                "name" to project(projectA).name
+                                            )
+                                        ),
+                                        "edges" to listOf(
+                                            mapOf(
+                                                "linkedTo" to mapOf(
+                                                    "branch" to mapOf(
+                                                        "name" to componentMain.name,
+                                                        "project" to mapOf(
+                                                            "name" to component.name
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ).asJson(),
+                        data
+                    )
+                }
+
+                val projectB = "projectB"
+                build(projectB, 1) linkTo componentFeature1
+                build(projectB, 2) linkTo componentFeature1
+                build(projectB, 3) linkTo componentMain1
+
+                run(query, mapOf("branchId" to branch(projectB).id())).let { data ->
+                    assertEquals(
+                        mapOf(
+                            "branches" to listOf(
+                                mapOf(
+                                    "graph" to mapOf(
+                                        "branch" to mapOf(
+                                            "name" to branch(projectB).name,
+                                            "project" to mapOf(
+                                                "name" to project(projectB).name
+                                            )
+                                        ),
+                                        "edges" to listOf(
+                                            mapOf(
+                                                "linkedTo" to mapOf(
+                                                    "branch" to mapOf(
+                                                        "name" to componentMain.name,
+                                                        "project" to mapOf(
+                                                            "name" to component.name
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                            mapOf(
+                                                "linkedTo" to mapOf(
+                                                    "branch" to mapOf(
+                                                        "name" to componentFeature.name,
+                                                        "project" to mapOf(
+                                                            "name" to component.name
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ).asJson(),
+                        data
+                    )
+                }
+
+            }
+        }
+    }
+
 }
