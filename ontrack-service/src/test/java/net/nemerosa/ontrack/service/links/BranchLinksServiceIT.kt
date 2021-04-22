@@ -7,7 +7,6 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
-import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
@@ -20,7 +19,7 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
         val build = build("build")
         asUserWithView(build) {
             val node = branchLinksService.getBranchLinks(build.branch, BranchLinksDirection.USING)
-            assertEquals(build.project.id, node.project.id)
+            assertEquals(build.branch.id, node.branch.id)
             assertNull(node.build, "No build")
             assertTrue(node.edges.isEmpty(), "No edge")
         }
@@ -38,7 +37,7 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
 
         asUserWithView(project, component, library) {
             val projectNode = branchLinksService.getBranchLinks(project.branch, BranchLinksDirection.USING)
-            assertEquals(project.project.id, projectNode.project.id)
+            assertEquals(project.branch.id, projectNode.branch.id)
             assertNull(projectNode.build, "Abstract graph nodes don't contain builds")
             assertEquals(1, projectNode.edges.size)
 
@@ -46,7 +45,7 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
             assertEquals(BranchLinksDirection.USING, projectEdge.direction)
 
             val componentNode = projectEdge.linkedTo
-            assertEquals(component.project.id, componentNode.project.id)
+            assertEquals(component.branch.id, componentNode.branch.id)
             assertNull(componentNode.build, "Abstract graph nodes don't contain builds")
             assertEquals(1, componentNode.edges.size)
 
@@ -54,7 +53,7 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
             assertEquals(BranchLinksDirection.USING, componentEdge.direction)
 
             val libraryNode = componentEdge.linkedTo
-            assertEquals(library.project.id, libraryNode.project.id)
+            assertEquals(library.branch.id, libraryNode.branch.id)
             assertNull(libraryNode.build, "Abstract graph nodes don't contain builds")
             assertEquals(0, libraryNode.edges.size)
         }
@@ -72,7 +71,7 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
 
         asUserWithView(project, component, library) {
             val libraryNode = branchLinksService.getBranchLinks(library.branch, BranchLinksDirection.USED_BY)
-            assertEquals(library.project.id, libraryNode.project.id)
+            assertEquals(library.branch.id, libraryNode.branch.id)
             assertNull(libraryNode.build, "Abstract graph nodes don't contain builds")
             assertEquals(1, libraryNode.edges.size)
 
@@ -80,7 +79,7 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
             assertEquals(BranchLinksDirection.USED_BY, componentEdge.direction)
 
             val componentNode = componentEdge.linkedTo
-            assertEquals(component.project.id, componentNode.project.id)
+            assertEquals(component.branch.id, componentNode.branch.id)
             assertNull(componentNode.build, "Abstract graph nodes don't contain builds")
             assertEquals(1, componentNode.edges.size)
 
@@ -88,7 +87,7 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
             assertEquals(BranchLinksDirection.USED_BY, projectEdge.direction)
 
             val projectNode = projectEdge.linkedTo
-            assertEquals(project.project.id, projectNode.project.id)
+            assertEquals(project.branch.id, projectNode.branch.id)
             assertNull(projectNode.build, "Abstract graph nodes don't contain builds")
             assertEquals(0, projectNode.edges.size)
         }
@@ -106,7 +105,7 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
             }
 
             val libraryNode = branchLinksService.getBranchLinks(library.branch, BranchLinksDirection.USED_BY)
-            assertEquals(library.project.id, libraryNode.project.id)
+            assertEquals(library.branch.id, libraryNode.branch.id)
             assertNull(libraryNode.build, "Abstract graph nodes don't contain builds")
             assertEquals(1, libraryNode.edges.size)
 
@@ -114,7 +113,7 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
             assertEquals(BranchLinksDirection.USED_BY, componentEdge.direction)
 
             val componentNode = componentEdge.linkedTo
-            assertEquals(component.project.id, componentNode.project.id)
+            assertEquals(component.branch.id, componentNode.branch.id)
             assertNull(componentNode.build, "Abstract graph nodes don't contain builds")
             assertEquals(0, componentNode.edges.size) // We don't go further because depth = 1
         }
@@ -139,8 +138,8 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
             }
             val node = branchLinksService.getBranchLinks(branch, BranchLinksDirection.USING)
             assertEquals(
-                listOf(a, b, c).map { it.project.name }.toSet(),
-                node.edges.map { it.linkedTo.project.name }.toSet()
+                listOf(a, b, c).map { it.branch.name }.toSet(),
+                node.edges.map { it.linkedTo.branch.name }.toSet()
             )
         }
     }
@@ -165,8 +164,8 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
             withBranchLinkSettings(history = 2) {
                 val node = branchLinksService.getBranchLinks(branch, BranchLinksDirection.USING)
                 assertEquals(
-                    listOf(b, c).map { it.project.name }.toSet(), // History = 2, 3rd build's not taken
-                    node.edges.map { it.linkedTo.project.name }.toSet()
+                    listOf(b, c).map { it.branch.name }.toSet(), // History = 2, 3rd build's not taken
+                    node.edges.map { it.linkedTo.branch.name }.toSet()
                 )
             }
         }
@@ -184,8 +183,8 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
             withBranchLinkSettings(maxLinksPerLevel = 5) {
                 val node = branchLinksService.getBranchLinks(branch, BranchLinksDirection.USING)
                 assertEquals(
-                    dependencies.takeLast(5).map { it.project.name }.toSet(), // Taking only the five first links
-                    node.edges.map { it.linkedTo.project.name }.toSet()
+                    dependencies.takeLast(5).map { it.branch.name }.toSet(), // Taking only the five first links
+                    node.edges.map { it.linkedTo.branch.name }.toSet()
                 )
             }
         }
@@ -398,6 +397,78 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
                 assertLinkedTo(branch("component")) {
                     assertLinkedTo(branch("project"))
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Keeping all branches when building the graph`() {
+        withLinks {
+
+            val component = project("component")
+            val componentFeature = component.branch(name = "feature")
+            val componentFeature1 = componentFeature.build("1")
+            val componentMain = component.branch(name = "main")
+            val componentMain1 = componentMain.build("21")
+            val componentMain2 = componentMain.build("22")
+
+            val projectA = "projectA"
+            build(projectA, 1) linkTo componentMain1
+            build(projectA, 2) linkTo componentFeature1
+            build(projectA, 3) linkTo componentFeature1
+            build(projectA, 4) linkTo componentMain2
+
+            assertBranchLinks(branch(projectA), BranchLinksDirection.USING) {
+                assertLinkedTo(componentMain)
+                assertLinkedTo(componentFeature)
+            }
+
+            val projectB = "projectB"
+            build(projectB, 1) linkTo componentMain1
+            build(projectB, 2) linkTo componentFeature1
+            build(projectB, 3) linkTo componentFeature1
+
+            assertBranchLinks(branch(projectB), BranchLinksDirection.USING) {
+                assertLinkedTo(componentMain)
+                assertLinkedTo(componentFeature)
+            }
+
+        }
+    }
+
+    @Test
+    fun `Discarding old branches when building the graph`() {
+        withBranchLinkSettings(history = 2) {
+            withLinks {
+
+                val component = project("component")
+                val componentFeature = component.branch(name = "feature")
+                val componentFeature1 = componentFeature.build("1")
+                val componentMain = component.branch(name = "main")
+                val componentMain1 = componentMain.build("21")
+                val componentMain2 = componentMain.build("22")
+
+                val projectA = "projectA"
+                build(projectA, 1) linkTo componentFeature1
+                build(projectA, 2) linkTo componentFeature1
+                build(projectA, 3) linkTo componentMain1
+                build(projectA, 4) linkTo componentMain2
+
+                assertBranchLinks(branch(projectA), BranchLinksDirection.USING) {
+                    assertLinkedTo(componentMain)
+                    assertNotLinkedTo(componentFeature) // Feature branch is gone from history
+                }
+
+                val projectB = "projectB"
+                build(projectB, 1) linkTo componentFeature1
+                build(projectB, 2) linkTo componentFeature1
+                build(projectB, 3) linkTo componentMain1
+
+                assertBranchLinks(branch(projectB), BranchLinksDirection.USING) {
+                    assertLinkedTo(componentMain)
+                    assertLinkedTo(componentFeature) // Feature branch is still part of the history
+                }
+
             }
         }
     }
