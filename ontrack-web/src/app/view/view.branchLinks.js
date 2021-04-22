@@ -187,23 +187,28 @@ angular.module('ot.view.branchLinks', [
                 };
             } else {
                 value = {
-                    type: 'project',
-                    page: graph.project.links._page
+                    type: 'branch',
+                    page: graph.branch.links._page
                 };
             }
             // Initial node
             const node = {
-                name: graph.project.name,
+                name: graph.branch.name,
                 value: value
             };
             // Label
             node.label = {
-                rich: {}
+                rich: {
+                    projectName: {
+                        fontWeight: 'bold'
+                    }
+                }
             };
             // Format lines
             const formatterLines = [];
-            // Project name as a line
-            formatterLines.push(graph.project.name);
+            // Project & branch name as a line
+            formatterLines.push(`{projectName|${graph.branch.project.name}}`);
+            formatterLines.push(graph.branch.name);
             // Display name in case of a build
             if (graph.build) {
                 // Display name is the build name unless there is a release property attached to the build
@@ -381,11 +386,18 @@ angular.module('ot.view.branchLinks', [
                 }
                 
                 fragment nodeContent on BranchLinksNode {
-                  project {
+                  branch {
                     id
                     name
                     links {
                       _page
+                    }
+                    project {
+                      id
+                      name
+                      links {
+                        _page
+                      }
                     }
                   }
                   build {
