@@ -52,7 +52,7 @@ abstract class AbstractBranchLinksTestSupport : AbstractDSLTestSupport() {
 
         fun assertBuildLinks(build: Build, direction: BranchLinksDirection, code: BuildNodeTestContext.() -> Unit) {
             val node = branchLinksService.getBuildLinks(build, direction)
-            assertEquals(build.branch.id, node.branch.id, "Node on the same project")
+            assertEquals(build.branch.id, node.branch.id, "Node on the same branch")
             assertEquals(build.id, node.build?.id, "Node on the same build")
             BuildNodeTestContext(node).code()
         }
@@ -92,7 +92,7 @@ abstract class AbstractBranchLinksTestSupport : AbstractDSLTestSupport() {
         val node: BranchLinksNode
     ) {
         fun assertEdge(target: Build, code: EdgeTestContext.() -> Unit = {}) {
-            val edge = node.edges.find { it.linkedTo.branch.id == target.project.id }
+            val edge = node.edges.find { it.linkedTo.branch.id == target.branch.id }
             assertNotNull(edge,
                 "Cannot find any link between ${node.branch.entityDisplayName} and ${target.entityDisplayName}") {
                 // Checks the build
