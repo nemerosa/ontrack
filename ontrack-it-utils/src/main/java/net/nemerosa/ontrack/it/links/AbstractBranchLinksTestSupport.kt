@@ -112,7 +112,7 @@ abstract class AbstractBranchLinksTestSupport : AbstractDSLTestSupport() {
         }
 
         fun assertLinkedToNoBuild(target: Branch, code: BuildNodeTestContext.() -> Unit = {}) {
-            val edge = node.edges.find { it.linkedTo.project.id == target.id }
+            val edge = node.edges.find { it.linkedTo.project.id == target.project.id }
             assertNotNull(edge,
                 "Cannot find any link between ${node.project.entityDisplayName} and ${target.project.entityDisplayName}") {
                 assertNull(it.linkedTo.build, "Node for ${target.entityDisplayName} has no build")
