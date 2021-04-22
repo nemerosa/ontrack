@@ -35,11 +35,8 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
             }
             
             fragment nodeContent on BranchLinksNode {
-                branch {
+                project {
                     name
-                    project {
-                        name
-                    }
                 }
             }
             """).let { data ->
@@ -48,29 +45,20 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
                         "branches" to listOf(
                             mapOf(
                                 "graph" to mapOf(
-                                    "branch" to mapOf(
-                                        "name" to project.branch.name,
-                                        "project" to mapOf(
-                                            "name" to project.project.name
-                                        )
+                                    "project" to mapOf(
+                                        "name" to project.project.name
                                     ),
                                     "edges" to listOf(
                                         mapOf(
                                             "linkedTo" to mapOf(
-                                                "branch" to mapOf(
-                                                    "name" to component.branch.name,
-                                                    "project" to mapOf(
-                                                        "name" to component.project.name
-                                                    )
+                                                "project" to mapOf(
+                                                    "name" to component.project.name
                                                 ),
                                                 "edges" to listOf(
                                                     mapOf(
                                                         "linkedTo" to mapOf(
-                                                            "branch" to mapOf(
-                                                                "name" to library.branch.name,
-                                                                "project" to mapOf(
-                                                                    "name" to library.project.name
-                                                                )
+                                                            "project" to mapOf(
+                                                                "name" to library.project.name
                                                             )
                                                         )
                                                     )
@@ -116,11 +104,8 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
             }
             
             fragment nodeContent on BranchLinksNode {
-                branch {
+                project {
                     name
-                    project {
-                        name
-                    }
                 }
             }
             """).let { data ->
@@ -129,29 +114,20 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
                         "branches" to listOf(
                             mapOf(
                                 "graph" to mapOf(
-                                    "branch" to mapOf(
-                                        "name" to library.branch.name,
-                                        "project" to mapOf(
-                                            "name" to library.project.name
-                                        )
+                                    "project" to mapOf(
+                                        "name" to library.project.name
                                     ),
                                     "edges" to listOf(
                                         mapOf(
                                             "linkedTo" to mapOf(
-                                                "branch" to mapOf(
-                                                    "name" to component.branch.name,
-                                                    "project" to mapOf(
-                                                        "name" to component.project.name
-                                                    )
+                                                "project" to mapOf(
+                                                    "name" to component.project.name
                                                 ),
                                                 "edges" to listOf(
                                                     mapOf(
                                                         "linkedTo" to mapOf(
-                                                            "branch" to mapOf(
-                                                                "name" to project.branch.name,
-                                                                "project" to mapOf(
-                                                                    "name" to project.project.name
-                                                                )
+                                                            "project" to mapOf(
+                                                                "name" to project.project.name
                                                             )
                                                         )
                                                     )
@@ -193,11 +169,8 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
             }
             
             fragment nodeContent on BranchLinksNode {
-                branch {
+                project {
                     name
-                    project {
-                        name
-                    }
                 }
                 build {
                     name
@@ -209,11 +182,8 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
                         "builds" to listOf(
                             mapOf(
                                 "graph" to mapOf(
-                                    "branch" to mapOf(
-                                        "name" to build("project", 1).branch.name,
-                                        "project" to mapOf(
-                                            "name" to build("project", 1).project.name
-                                        )
+                                    "project" to mapOf(
+                                        "name" to build("project", 1).project.name
                                     ),
                                     "build" to mapOf(
                                         "name" to build("project", 1).name
@@ -221,11 +191,8 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
                                     "edges" to listOf(
                                         mapOf(
                                             "linkedTo" to mapOf(
-                                                "branch" to mapOf(
-                                                    "name" to build("component", 1).branch.name,
-                                                    "project" to mapOf(
-                                                        "name" to build("component", 1).project.name
-                                                    )
+                                                "project" to mapOf(
+                                                    "name" to build("component", 1).project.name
                                                 ),
                                                 "build" to mapOf(
                                                     "name" to build("component", 1).name
@@ -267,11 +234,8 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
             }
             
             fragment nodeContent on BranchLinksNode {
-                branch {
+                project {
                     name
-                    project {
-                        name
-                    }
                 }
                 build {
                     name
@@ -283,11 +247,8 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
                         "builds" to listOf(
                             mapOf(
                                 "graph" to mapOf(
-                                    "branch" to mapOf(
-                                        "name" to build("component", 1).branch.name,
-                                        "project" to mapOf(
-                                            "name" to build("component", 1).project.name
-                                        )
+                                    "project" to mapOf(
+                                        "name" to build("component", 1).project.name
                                     ),
                                     "build" to mapOf(
                                         "name" to build("component", 1).name
@@ -295,11 +256,8 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
                                     "edges" to listOf(
                                         mapOf(
                                             "linkedTo" to mapOf(
-                                                "branch" to mapOf(
-                                                    "name" to build("project", 1).branch.name,
-                                                    "project" to mapOf(
-                                                        "name" to build("project", 1).project.name
-                                                    )
+                                                "project" to mapOf(
+                                                    "name" to build("project", 1).project.name
                                                 ),
                                                 "build" to mapOf(
                                                     "name" to build("project", 1).name
@@ -342,11 +300,8 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
             }
             
             fragment nodeContent on BranchLinksNode {
-                branch {
+                project {
                     name
-                    project {
-                        name
-                    }
                 }
                 build {
                     name
@@ -358,11 +313,8 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
                         "builds" to listOf(
                             mapOf(
                                 "graph" to mapOf(
-                                    "branch" to mapOf(
-                                        "name" to build("component", 2).branch.name,
-                                        "project" to mapOf(
-                                            "name" to build("component", 2).project.name
-                                        )
+                                    "project" to mapOf(
+                                        "name" to build("component", 2).project.name
                                     ),
                                     "build" to mapOf(
                                         "name" to build("component", 2).name
@@ -370,11 +322,8 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
                                     "edges" to listOf(
                                         mapOf(
                                             "linkedTo" to mapOf(
-                                                "branch" to mapOf(
-                                                    "name" to build("project", 1).branch.name,
-                                                    "project" to mapOf(
-                                                        "name" to build("project", 1).project.name
-                                                    )
+                                                "project" to mapOf(
+                                                    "name" to build("project", 1).project.name
                                                 ),
                                                 "build" to null,
                                                 "edges" to emptyList<String>())
