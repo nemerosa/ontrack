@@ -11,9 +11,9 @@ import net.nemerosa.ontrack.model.form.YesNo
  * @property isGrantProjectParticipationToAll `true` when all authenticated users have a participant access to all projects.
  */
 class SecuritySettings(
-        @JsonProperty("grantProjectViewToAll")
+        @get:JsonProperty("grantProjectViewToAll")
         val isGrantProjectViewToAll: Boolean,
-        @JsonProperty("grantProjectParticipationToAll")
+        @get:JsonProperty("grantProjectParticipationToAll")
         val isGrantProjectParticipationToAll: Boolean
 ) {
     fun form(): Form =

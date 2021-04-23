@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
 import net.nemerosa.ontrack.model.labels.LabelProviderService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
+import net.nemerosa.ontrack.model.settings.LabelProviderJobSettings
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component

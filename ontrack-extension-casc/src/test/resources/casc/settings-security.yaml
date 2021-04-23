@@ -1,0 +1,6 @@
+ontrack:
+  config:
+    settings:
+      security:
+        grantProjectViewToAll: true
+        grantProjectParticipationToAll: true

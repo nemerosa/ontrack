@@ -1,0 +1,6 @@
+ontrack:
+  config:
+    settings:
+      home-page:
+        maxBranches: 10
+        maxProjects: 100

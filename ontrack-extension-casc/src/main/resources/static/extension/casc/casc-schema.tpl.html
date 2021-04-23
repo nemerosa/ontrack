@@ -1,0 +1,18 @@
+<ot-view>
+
+    <div class="row" ng-show="loadingSchema">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the schema...
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-if="schema">
+        <div class="col-md-12">
+            <ot-extension-casc-schema-type type="schema"></ot-extension-casc-schema-type>
+        </div>
+    </div>
+
+</ot-view>

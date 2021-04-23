@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.labels
 
+import net.nemerosa.ontrack.model.settings.LabelProviderJobSettings
 import net.nemerosa.ontrack.model.settings.SettingsProvider
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.support.SettingsRepository

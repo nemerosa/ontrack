@@ -1,0 +1,71 @@
+<ot-view>
+
+    <!-- Schema management -->
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        CasC schema
+                        <a href="#/extension/casc/casc-schema" class="btn btn-default">Show</a>
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content management -->
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Configuration as code
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <p><strong>Locations:</strong></p>
+                    <div class="alert alert-info" ng-show="loadingLocations">
+                        <span class="ot-loading-indicator"></span>
+                        Loading the indicators...
+                    </div>
+                    <ul ng-if="locations.length > 0">
+                        <li ng-repeat="location in locations">
+                            <code>{{ location }}</code>
+                        </li>
+                    </ul>
+                    <p ng-hide="loadingLocations" ng-if="locations.length == 0"><em>No location has been defined.</em></p>
+                </div>
+                <div class="panel-body">
+                    <p><strong>Reload configuration:</strong></p>
+                    <p>
+                        <button class="btn btn-default" type="button" ng-disabled="reloading" ng-click="reload()">
+                            <span class="fa fa-refresh" ng-hide="reloading"></span>
+                            <span class="ot-loading-indicator" ng-show="reloading"></span>
+                            Reload configuration
+                        </button>
+                    </p>
+                    <div class="alert alert-danger" ng-if="reloadError" ng-hide="reloading">
+                        {{ reloadError }}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <p><strong>Current configuration:</strong></p>
+                    <p>
+                        <button class="btn btn-default" type="button" ng-disabled="loadingYaml" ng-click="loadYaml()">
+                            <span class="fa fa-refresh" ng-hide="loadingYaml"></span>
+                            <span class="ot-loading-indicator" ng-show="loadingYaml"></span>
+                            Load
+                        </button>
+                    </p>
+                    <p>
+                        <textarea class="form-control" rows="30" ng-if="yaml" ng-model="yaml" readonly></textarea>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</ot-view>

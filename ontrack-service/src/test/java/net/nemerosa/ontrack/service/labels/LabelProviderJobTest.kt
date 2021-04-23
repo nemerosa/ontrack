@@ -7,6 +7,7 @@ import com.nhaarman.mockitokotlin2.whenever
 import net.nemerosa.ontrack.model.labels.LabelProviderService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
+import net.nemerosa.ontrack.model.settings.LabelProviderJobSettings
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService

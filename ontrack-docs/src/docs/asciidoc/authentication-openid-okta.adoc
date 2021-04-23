@@ -39,8 +39,8 @@ On the Ontrack side, as an administrator:
 ** Name: a display name, which will be used on the login page
 ** Description: used as a tooltip on the login page
 ** Issuer ID: `https://<okta domain>.okta.com/oauth2/default`
-** Client ID of the application in Ontrack
-** Client secret of the application in Ontrack
+** Client ID of the application in Okta
+** Client secret of the application in Okta
 ** Group filter: regular expression to filter the group list sent by Okta in the `groups` claim
 
 In the OIDC provider list, you can optionally set a picture for this configuration. This picture will be used on the login page. For example:
@@ -50,3 +50,8 @@ image::images/authentication-okta-login.png[Okta login,30%]
 When the users click on the button, they will be redirected to Okta for authentication.
 
 Upon a first connection, an account will be created automatically on Ontrack, based on the information returned by Okta.
+
+[TIP]
+====
+Okta is better configured using <<casc,Configuration as Code>>. See some examples <<casc-example,here>>.
+====

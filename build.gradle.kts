@@ -337,7 +337,7 @@ configure(coreProjects) p@{
         mustRunAfter("test")
         include("**/*IT.class")
         minHeapSize = "512m"
-        maxHeapSize = "4096m"
+        maxHeapSize = "3072m"
         dependsOn(":preIntegrationTest")
         finalizedBy(":postIntegrationTest")
         /**

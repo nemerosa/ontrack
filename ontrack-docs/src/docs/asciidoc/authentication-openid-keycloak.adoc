@@ -34,3 +34,8 @@ image::images/authentication-keycloak-login.png[Keycloak login,30%]
 When the users click on the button, they will be redirected to Keycloak for authentication.
 
 Upon a first connection, an account will be created automatically on Ontrack, based on the information returned by Keycloak.
+
+[TIP]
+====
+Keycloak is better configured using <<casc,Configuration as Code>>. See some examples <<casc-example,here>>.
+====

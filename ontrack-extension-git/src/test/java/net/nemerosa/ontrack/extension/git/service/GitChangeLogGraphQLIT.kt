@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.extension.issues.support.MockIssue
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.support.MockIssueStatus
+import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.test.assertJsonNotNull
@@ -146,7 +147,7 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
                                     list.forEach { item ->
                                         val issue = item.path("issue")
                                         assertJsonNotNull(issue) {
-                                            val key = issue.getTextField("key").toInt()
+                                            val key = issue.getRequiredTextField("key").toInt()
                                             assertEquals("#$key", issue.getTextField("displayKey"))
                                             assertEquals("Issue #$key", issue.getTextField("summary"))
                                             assertEquals("uri:issue/$key", issue.getTextField("url"))
