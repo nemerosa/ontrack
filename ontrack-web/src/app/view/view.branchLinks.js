@@ -283,7 +283,11 @@ angular.module('ot.view.branchLinks', [
             }
 
             // Text
-            line += `<a href="${decoration.url}" target="_blank"><span title="${decoration.description}">${decoration.text}</span></a>`;
+            line += `<a href="${decoration.url}" target="_blank"><span>${decoration.text}</span></a>`;
+            // Description
+            if (decoration.description) {
+                line += ` <span>${decoration.description}</span>`;
+            }
 
             line += '</p>';
             return line;
