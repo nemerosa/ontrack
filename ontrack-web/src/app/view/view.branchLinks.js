@@ -48,8 +48,10 @@ angular.module('ot.view.branchLinks', [
         const options = {
             tooltip: {
                 trigger: 'item',
-                    triggerOn: 'click',
-                    show: false // Managed at data node level
+                triggerOn: 'click',
+                enterable: true,
+                alwaysShowContent: true,
+                show: false // Managed at data node level
             },
             series: [
                 {
@@ -281,7 +283,7 @@ angular.module('ot.view.branchLinks', [
             }
 
             // Text
-            line += `<a href="${decoration.url}"><span title="${decoration.description}">${decoration.text}</span></a>`;
+            line += `<a href="${decoration.url}" target="_blank"><span title="${decoration.description}">${decoration.text}</span></a>`;
 
             line += '</p>';
             return line;
