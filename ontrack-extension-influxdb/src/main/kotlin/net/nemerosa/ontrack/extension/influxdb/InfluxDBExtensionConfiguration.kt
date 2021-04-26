@@ -4,13 +4,9 @@ import net.nemerosa.ontrack.extension.influxdb.metrics.InfluxDBMetricsExportExte
 import net.nemerosa.ontrack.extension.influxdb.runinfo.InfluxDBRunInfoListener
 import net.nemerosa.ontrack.extension.influxdb.validation.data.InfluxDBValidationRunMetricsExtension
 import net.nemerosa.ontrack.model.structure.ValidationDataTypeService
-import okhttp3.OkHttpClient
-import org.influxdb.BatchOptions
 import org.influxdb.InfluxDB
-import org.influxdb.InfluxDBFactory
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -19,16 +15,6 @@ import org.springframework.context.annotation.Configuration
 class InfluxDBExtensionConfiguration(
         private val influxDBExtensionProperties: InfluxDBExtensionProperties
 ) {
-
-    private val logger = LoggerFactory.getLogger(InfluxDBExtensionConfiguration::class.java)
-
-    @Bean
-    @ConditionalOnMissingBean(InfluxDB::class)
-    @ConditionalOnProperty(prefix = INFLUXDB_EXTENSION_PROPERTIES_PREFIX, name = ["enabled"], havingValue = "true", matchIfMissing = false)
-    @Deprecated("Use the [InfluxDBConnection] wrapper instead")
-    fun influxDB(influxDBConnection: InfluxDBConnection): InfluxDB {
-        return influxDBConnection.current
-    }
 
     @Bean
     @ConditionalOnProperty(prefix = INFLUXDB_EXTENSION_PROPERTIES_PREFIX, name = ["enabled"], havingValue = "true", matchIfMissing = false)
