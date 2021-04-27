@@ -1,0 +1,33 @@
+<ot-view>
+
+    <div class="row" ng-show="loadingStatus">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the status...
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-if="status">
+        <div class="col-md-12">
+            <p>
+                <strong>URL</strong>: {{ status.url }}
+            </p>
+            <p>
+                <strong>Database</strong>: {{ status.db }}
+            </p>
+            <p>
+                <span ng-if="!status.status" class="text-danger"><i class="fa fa-exclamation-circle"></i> DOWN</span>
+                <span ng-if="status.status" class="text-success"><i class="fa fa-check"></i> UP</span>
+            </p>
+            <p>
+                <button id="reset" type="button" class="btn btn-warning" ng-click="reset()" ng-disabled="loadingStatus">
+                    <span class="fa fa-refresh"></span>
+                    Reset connection
+                </button>
+            </p>
+        </div>
+    </div>
+
+</ot-view>

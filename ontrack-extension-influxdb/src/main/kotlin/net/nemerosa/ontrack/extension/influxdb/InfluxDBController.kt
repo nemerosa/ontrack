@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.influxdb
 
 import net.nemerosa.ontrack.model.security.ApplicationManagement
 import net.nemerosa.ontrack.model.security.SecurityService
-import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/extension/influxdb")
 class InfluxDBController(
-    private val influxDBExtensionHealthIndicator: InfluxDBExtensionHealthIndicator,
+    private val influxDBExtensionProperties: InfluxDBExtensionProperties,
     private val influxDBConnection: InfluxDBConnection,
     private val securityService: SecurityService
 ) {
@@ -26,9 +25,13 @@ class InfluxDBController(
      * Gets the status of the current connection
      */
     @GetMapping("")
-    fun getStatus(): Health {
+    fun getStatus(): InfluxDBStatus {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
-        return influxDBExtensionHealthIndicator.health()
+        return InfluxDBStatus(
+            url = influxDBExtensionProperties.uri,
+            db = influxDBExtensionProperties.db,
+            status = influxDBConnection.isValid
+        )
     }
 
     /**
@@ -40,4 +43,11 @@ class InfluxDBController(
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
         influxDBConnection.reset()
     }
+
+    class InfluxDBStatus(
+        val url: String,
+        val db: String,
+        val status: Boolean
+    )
+
 }
