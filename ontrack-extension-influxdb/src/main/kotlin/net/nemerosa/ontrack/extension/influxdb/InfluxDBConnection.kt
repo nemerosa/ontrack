@@ -30,4 +30,9 @@ interface InfluxDBConnection {
      */
     val isValid: Boolean
 
+    /**
+     * Forces a reconnection at the next attempt
+     */
+    fun reset()
+
 }

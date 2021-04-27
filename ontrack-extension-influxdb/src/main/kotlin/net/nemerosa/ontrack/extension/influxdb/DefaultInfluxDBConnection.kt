@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.influxdb
 
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.model.security.ApplicationManagement
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StartupService
 import okhttp3.OkHttpClient
 import org.influxdb.BatchOptions
@@ -15,7 +17,8 @@ import kotlin.concurrent.read
 import kotlin.concurrent.write
 
 class DefaultInfluxDBConnection(
-    private val influxDBExtensionProperties: InfluxDBExtensionProperties
+    private val influxDBExtensionProperties: InfluxDBExtensionProperties,
+    private val securityService: SecurityService
 ) : InfluxDBConnection, StartupService {
 
     private val logger: Logger = LoggerFactory.getLogger(DefaultInfluxDBConnection::class.java)
@@ -52,6 +55,11 @@ class DefaultInfluxDBConnection(
 
     override val isValid: Boolean
         get() = internalConnection?.check() ?: false
+
+    override fun reset() {
+        securityService.checkGlobalFunction(ApplicationManagement::class.java)
+        renew()
+    }
 
     private fun checkAndGet(): InfluxDB? {
         val influxDB = getOrCreate()

@@ -18,6 +18,10 @@ server:
 
 # Management
 management:
+  # Exposes details about health
+  endpoint:
+    health:
+      show-details: always
   # Custom URL for the management end points
   endpoints:
     web:
