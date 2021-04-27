@@ -30,7 +30,7 @@ class DefaultInfluxDBConnection(
     override fun startupOrder(): Int = StartupService.SYSTEM_REGISTRATION
 
     override fun start() {
-        if (isValid) {
+        if (current != null && isValid) {
             logger.info("InfluxDB connection to ${influxDBExtensionProperties.uri} is OK")
         } else {
             logger.error("InfluxDB connection to ${influxDBExtensionProperties.uri} is not OK")
@@ -51,7 +51,7 @@ class DefaultInfluxDBConnection(
         get() = checkAndGet()
 
     override val isValid: Boolean
-        get() = check()
+        get() = internalConnection?.check() ?: false
 
     private fun checkAndGet(): InfluxDB? {
         val influxDB = getOrCreate()
@@ -67,8 +67,6 @@ class DefaultInfluxDBConnection(
         }
         return influxDB
     }
-
-    private fun check(): Boolean = getOrCreate()?.check() ?: false
 
     private fun InfluxDB.check(): Boolean {
         val pong = ping()
