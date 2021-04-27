@@ -15,8 +15,10 @@ interface InfluxDBConnection {
      *
      * The connection may be renewed at any time to deal with instabilities
      * with the connectivity to the InfluxDB backend.
+     *
+     * Is `null` is the connection to InfluxDB could not be established.
      */
-    val current: InfluxDB
+    val current: InfluxDB?
 
     /**
      * Uses the [current] connection to run a safe operation with InfluxDB (no fail)
