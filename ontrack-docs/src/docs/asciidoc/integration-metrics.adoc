@@ -187,3 +187,26 @@ is automatically sent to create timed values:
 
 * <<run-info-export-influxdb,run info>>
 * <<validation-runs-data-metrics,validation run data>>
+
+[[monitoring-metrics-influxdb-management]]
+====== InfluxDB management
+
+In case the connection to InfluxDB drops, Ontrack will re-attempt to reconnect after 15 minutes by default.
+
+[NOTE]
+====
+The retry period can be configured using the `ontrack.influxdb.validity` <<configuration-properties,configuration property>>. For example, to set to one hour:
+
+[source,properties]
+----
+ontrack.influxdb.validity = 1h
+----
+====
+
+You can force Ontrack to reconnect using several ways:
+
+* through the `POST /manage/influxdb` management end point if you have access to it (depending on your installation)
+* through the `POST /extension/influxdb` HTTP end point if you're an administrator
+* through the UI under the _InfluxDB status" user menu:
+
+image::images/influxdb-status-ui.png[InfluxDB status UI]

@@ -22,6 +22,11 @@ management:
   server:
     port: 8800
   # Custom URL for the management end points and definition of exposure
+  # Exposes details about health
+  endpoint:
+    health:
+      show-details: always
+  # Custom URL for the management end points
   endpoints:
     web:
       exposure:

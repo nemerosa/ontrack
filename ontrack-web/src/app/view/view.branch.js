@@ -367,6 +367,12 @@ angular.module('ot.view.branch', [
                             });
                         }
                     },
+                    {
+                        id: 'branchLinks',
+                        name: "Branch links",
+                        cls: 'ot-command-branch-links fa-rotate-90',
+                        link: `/branch/${$scope.branch.id}/links`
+                    },
                     ot.viewCloseCommand('/project/' + branchResource.project.id),
                     ot.viewActionsCommand(
                         $scope.branch._actions,
@@ -399,7 +405,7 @@ angular.module('ot.view.branch', [
                 });
             }
             // Copy from branch
-            if (branch._copy) { 
+            if (branch._copy) {
                 tools.push({
                     id: 'branch-copy',
                     name: "Copy config. from branch",

@@ -1,17 +1,15 @@
 package net.nemerosa.ontrack.extension.influxdb
 
-import org.influxdb.InfluxDB
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
 
 class InfluxDBExtensionHealthIndicator(
-        private val influxDB: InfluxDB
+    private val influxDBConnection: InfluxDBConnection
 ) : HealthIndicator {
 
     override fun health(): Health {
         val ok: Boolean = try {
-            val pong = influxDB.ping()
-            pong != null && pong.isGood
+            influxDBConnection.isValid
         } catch (ex: Exception) {
             false
         }
