@@ -2,20 +2,20 @@ package net.nemerosa.ontrack.extension.influxdb.validation.data
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.api.ValidationRunMetricsExtension
+import net.nemerosa.ontrack.extension.influxdb.InfluxDBConnection
 import net.nemerosa.ontrack.extension.influxdb.InfluxDBExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.structure.ValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationDataTypeService
 import net.nemerosa.ontrack.model.structure.ValidationRun
 import net.nemerosa.ontrack.model.structure.ValidationRunData
-import org.influxdb.InfluxDB
 import org.influxdb.dto.Point
 import java.util.concurrent.TimeUnit
 
 class InfluxDBValidationRunMetricsExtension(
         influxDBExtensionFeature: InfluxDBExtensionFeature,
         private val validationDataTypeService: ValidationDataTypeService,
-        private val influxDB: InfluxDB
+        private val influxDBConnection: InfluxDBConnection
 ) : AbstractExtension(influxDBExtensionFeature), ValidationRunMetricsExtension {
 
     override fun onValidationRun(validationRun: ValidationRun) {
@@ -33,23 +33,25 @@ class InfluxDBValidationRunMetricsExtension(
         if (dataType != null) {
             val metrics: Map<String, *>? = dataType.getMetrics(validationRunData.data)
             if (metrics != null && metrics.isNotEmpty()) {
-                influxDB.write(
+                influxDBConnection.safe {
+                    write(
                         Point.measurement("ontrack_value_validation_data")
-                                // Tags
-                                .tag("project", validationRun.project.name)
-                                .tag("branch", validationRun.validationStamp.branch.name)
-                                .tag("build", validationRun.build.name)
-                                .tag("validation", validationRun.validationStamp.name)
-                                .tag("status", validationRun.lastStatus.statusID.id)
-                                // Type
-                                .tag("type", validationRunData.descriptor.id)
-                                // Fields
-                                .fields(metrics)
-                                // OK
-                                .time(Time.toEpochMillis(validationRun.signature.time), TimeUnit.MILLISECONDS)
-                                .build()
-                )
-                influxDB.flush()
+                            // Tags
+                            .tag("project", validationRun.project.name)
+                            .tag("branch", validationRun.validationStamp.branch.name)
+                            .tag("build", validationRun.build.name)
+                            .tag("validation", validationRun.validationStamp.name)
+                            .tag("status", validationRun.lastStatus.statusID.id)
+                            // Type
+                            .tag("type", validationRunData.descriptor.id)
+                            // Fields
+                            .fields(metrics)
+                            // OK
+                            .time(Time.toEpochMillis(validationRun.signature.time), TimeUnit.MILLISECONDS)
+                            .build()
+                    )
+                    flush()
+                }
             }
         }
     }

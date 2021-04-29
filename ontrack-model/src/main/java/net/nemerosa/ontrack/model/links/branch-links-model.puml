@@ -1,0 +1,45 @@
+@startuml
+
+class BranchLinksNode {
+    branch: Branch
+    build: Build?
+}
+
+class BranchLinksEdge {
+    direction: BranchLinksDirection
+}
+
+BranchLinksNode *--> BranchLinksEdge: edges "0..*""
+BranchLinksEdge o--> BranchLinksNode: linkedTo "1"
+
+class BranchLinksDecoration {
+    id: String
+    text: String
+    description: String?
+    iconUrl: String?
+    link: String?
+}
+
+BranchLinksEdge *--> BranchLinksDecoration: decorations "0..*"
+
+interface BranchLinksDecorationExtension {
+    id: String
+    getDecoration(source: BranchLinksNode, target: BranchLinksNode, direction: BranchLinksDirection): BranchLinksDecoration?
+}
+
+BranchLinksDecorationExtension .up.> BranchLinksDecoration: provides
+
+interface BranchLinksService {
+    getBranchLinks(branch: Branch, direction: BranchLinksDirection): BranchLinksNode
+    getBuildLinks(build: Build, direction: BranchLinksDirection): BranchLinksNode
+}
+
+enum BranchLinksDirection {
+    using
+    usedBy
+}
+
+BranchLinksService .left.> BranchLinksNode: computes
+BranchLinksService .down.> BranchLinksDirection: uses
+
+@enduml

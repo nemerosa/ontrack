@@ -8,10 +8,7 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class AdminQLIT : AbstractQLKTITSupport() {
 
@@ -22,7 +19,7 @@ class AdminQLIT : AbstractQLKTITSupport() {
     private lateinit var tokensService: TokensService
 
     private val JsonNode.name: String? get() = get("name").asText()
-    private val JsonNode.id: Int? get() = get("id").asInt()
+    private val JsonNode.id: Int get() = get("id").asInt()
 
     @Test(expected = AccessDeniedException::class)
     fun `List of groups needs authorisation`() {
@@ -215,14 +212,16 @@ class AdminQLIT : AbstractQLKTITSupport() {
                 }
             }""")
         }
-        val projects = data["accounts"].first()["authorizedProjects"]
-        assertEquals(2, projects.size())
+        val authorizedProjects = data.path("accounts").first().path("authorizedProjects")
+        assertEquals(2, authorizedProjects.size())
 
-        assertEquals("PARTICIPANT", projects.get(0)["role"]["id"].asText())
-        assertEquals(p1.name, projects.get(0)["project"].name)
-
-        assertEquals("OWNER", projects.get(1)["role"]["id"].asText())
-        assertEquals(p2.name, projects.get(1)["project"].name)
+        authorizedProjects.forEach { authorizedProject ->
+            when (authorizedProject.path("project").path("name").asText()) {
+                p1.name -> assertEquals("PARTICIPANT", authorizedProject.path("role").path("id").asText())
+                p2.name -> assertEquals("OWNER", authorizedProject.path("role").path("id").asText())
+                else -> fail("Unexpected project in the list")
+            }
+        }
     }
 
     @Test
