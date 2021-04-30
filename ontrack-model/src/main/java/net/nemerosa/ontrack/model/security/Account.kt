@@ -11,20 +11,24 @@ data class Account(
         val fullName: String,
         val email: String,
         val authenticationSource: AuthenticationSource,
-        val role: SecurityRole
+        val role: SecurityRole,
+        val disabled: Boolean,
+        val locked: Boolean,
 ) : Entity, Serializable {
 
     companion object {
 
         @JvmStatic
-        fun of(name: String, fullName: String, email: String, role: SecurityRole, authenticationSource: AuthenticationSource) =
+        fun of(name: String, fullName: String, email: String, role: SecurityRole, authenticationSource: AuthenticationSource, disabled: Boolean, locked: Boolean) =
                 Account(
                         ID.NONE,
                         name,
                         fullName,
                         email,
                         authenticationSource,
-                        role
+                        role,
+                        disabled = disabled,
+                        locked = locked,
                 )
 
     }
@@ -35,7 +39,9 @@ data class Account(
             fullName,
             email,
             authenticationSource,
-            role
+            role,
+            disabled = disabled,
+            locked = locked,
     )
 
     fun update(input: AccountInput) =
@@ -45,7 +51,9 @@ data class Account(
                     input.fullName,
                     input.email,
                     authenticationSource,
-                    role
+                    role,
+                    disabled = disabled,
+                    locked = locked,
             )
 
     /**

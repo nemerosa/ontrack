@@ -42,7 +42,7 @@ public class ResourceAccountTest {
                         .end(),
                 Resource.of(
                         ConnectedAccount.of(
-                                Account.of("admin", "Administrator", "", SecurityRole.ADMINISTRATOR, AuthenticationSource.none())
+                                Account.of("admin", "Administrator", "", SecurityRole.ADMINISTRATOR, AuthenticationSource.none(), false, false)
                                         .withId(ID.of(1))
                         ),
                         URI.create("urn:user")

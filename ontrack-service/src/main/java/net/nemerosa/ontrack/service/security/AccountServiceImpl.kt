@@ -86,7 +86,9 @@ class AccountServiceImpl(
                 input.fullName,
                 input.email,
                 SecurityRole.USER,
-                authenticationSource
+                authenticationSource,
+                disabled = false,
+                locked = false,
         )
         // Saves it
         account = accountRepository.newAccount(account)

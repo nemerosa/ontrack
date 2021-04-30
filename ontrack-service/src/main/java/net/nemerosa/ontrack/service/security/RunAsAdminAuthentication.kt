@@ -41,7 +41,9 @@ class RunAsAdminAuthentication(
                     account.fullName,
                     account.email,
                     SecurityRole.ADMINISTRATOR,
-                    account.authenticationSource
+                    account.authenticationSource,
+                    disabled = false,
+                    locked = false,
             ).withId(account.id)
         } else {
             this.account = of(
@@ -49,7 +51,9 @@ class RunAsAdminAuthentication(
                     "Run-as Admin",
                     "",
                     SecurityRole.ADMINISTRATOR,
-                    BuiltinAuthenticationSourceProvider.SOURCE
+                    BuiltinAuthenticationSourceProvider.SOURCE,
+                    disabled = false,
+                    locked = false,
             ).withId(ID.of(1))
         }
     }

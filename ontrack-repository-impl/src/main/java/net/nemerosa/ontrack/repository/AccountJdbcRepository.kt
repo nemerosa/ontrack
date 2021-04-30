@@ -43,7 +43,9 @@ class AccountJdbcRepository(
                     rs.getString("fullName"),
                     rs.getString("email"),
                     getEnum(SecurityRole::class.java, rs, "role"),
-                    authenticationSource
+                    authenticationSource,
+                    disabled = rs.getBoolean("disabled"),
+                    locked = rs.getBoolean("locked"),
             ).withId(id(rs))
         }
     }
