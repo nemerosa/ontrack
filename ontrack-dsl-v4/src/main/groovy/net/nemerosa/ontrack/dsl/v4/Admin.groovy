@@ -179,8 +179,18 @@ class Admin {
         group
     }
 
-    protected Account findAccountByName(String name) {
+    @DSLMethod("Gets an account using its name")
+    Account findAccountByName(String name) {
         def account = getAccounts().find { it.name == name }
+        if (account == null) {
+            throw new AccountNameNotFoundException(name)
+        }
+        account
+    }
+
+    @DSLMethod("Gets an account using its ID")
+    Account findAccountById(int id) {
+        def account = getAccounts().find { it.id == id }
         if (account == null) {
             throw new AccountGroupNameNotFoundException(name)
         }

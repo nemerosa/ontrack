@@ -315,6 +315,15 @@ class Ontrack {
         ])
     }
 
+    @DSLMethod("Checks data for user errors")
+    def checkNoUserError(Object data, String field) {
+        def node = data[field]
+        if (node && node.errors && node.errors.size() > 0) {
+            def message = node.errors[0].message as String
+            throw new GraphQLUserErrorException(message)
+        }
+    }
+
     protected String asJSON(Object data) {
         return objectMapper.writeValueAsString(data)
     }

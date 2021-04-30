@@ -16,6 +16,46 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 class ACCDSLAccounts extends AbstractACCDSL {
 
     @Test
+    void 'Disabling an account'() {
+        // Account
+        def name = uid('A')
+        def account = ontrack.admin.account(name, "Damien Coraboeuf", "dcoraboeuf@nemerosa.net", "xxxx")
+        assert !account.disabled: "Account is not disabled"
+        // Disabling the account
+        account.disable()
+        // Checks it's disabled
+        ontrack.admin.findAccountById(account.id).with {
+            assert it.disabled: "Account is disabled"
+        }
+        // Enabling the account
+        account.enable()
+        // Checks it's not disabled any longer
+        ontrack.admin.findAccountById(account.id).with {
+            assert !it.disabled: "Account is enabled"
+        }
+    }
+
+    @Test
+    void 'Locking an account'() {
+        // Account
+        def name = uid('A')
+        def account = ontrack.admin.account(name, "Damien Coraboeuf", "dcoraboeuf@nemerosa.net", "xxxx")
+        assert !account.locked: "Account is not locked"
+        // Locking the account
+        account.lock()
+        // Checks it's locked
+        ontrack.admin.findAccountById(account.id).with {
+            assert it.locked: "Account is locked"
+        }
+        // Unlocking the account
+        account.unlock()
+        // Checks it's not locked any longer
+        ontrack.admin.findAccountById(account.id).with {
+            assert !it.locked: "Account is unlocked"
+        }
+    }
+
+    @Test
     void 'Creation of accounts'() {
         // Account
         def name = uid('A')
