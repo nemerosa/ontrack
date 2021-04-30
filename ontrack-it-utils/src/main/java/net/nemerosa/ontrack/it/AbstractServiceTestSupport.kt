@@ -15,8 +15,6 @@ import net.nemerosa.ontrack.model.structure.Signature.Companion.of
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.TestingAuthenticationToken
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
@@ -515,25 +513,4 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     )
 }
 
-private class TestOntrackUser(
-        private val account: Account
-) : OntrackUser {
-
-    override val accountId: Int = account.id()
-
-    override fun getAuthorities(): Collection<GrantedAuthority> =
-            AuthorityUtils.createAuthorityList(account.role.roleName)
-
-    override fun isEnabled(): Boolean = !account.disabled
-
-    override fun getUsername(): String = account.name
-
-    override fun isCredentialsNonExpired(): Boolean = true
-
-    override fun getPassword(): String = ""
-
-    override fun isAccountNonExpired(): Boolean = true
-
-    override fun isAccountNonLocked(): Boolean = true
-
-}
+private class TestOntrackUser(account: Account) : AccountOntrackUser(account)
