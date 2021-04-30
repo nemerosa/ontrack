@@ -161,4 +161,20 @@ class AccountJdbcRepository(
             toAccount(rs)
         }
     }
+
+    override fun setAccountDisabled(id: ID, disabled: Boolean) {
+        namedParameterJdbcTemplate!!.update(
+            "UPDATE ACCOUNTS SET DISABLED = :disabled WHERE ID = :id",
+            params("id", id.get())
+                .addValue("disabled", disabled)
+        )
+    }
+
+    override fun setAccountLocked(id: ID, locked: Boolean) {
+        namedParameterJdbcTemplate!!.update(
+            "UPDATE ACCOUNTS SET LOCKED = :locked WHERE ID = :id",
+            params("id", id.get())
+                .addValue("locked", locked)
+        )
+    }
 }
