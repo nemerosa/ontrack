@@ -5,6 +5,7 @@ import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.schema.security.GQLTypeAuthenticationSource
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
+import net.nemerosa.ontrack.graphql.support.booleanField
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.stereotype.Component
@@ -65,6 +66,8 @@ class GQLTypeAccount(
                                 }
                             }
                 }
+                .booleanField(Account::disabled, "Is this account disabled?")
+                .booleanField(Account::locked, "Is this account locked (meaning that no change can be performed)?")
                 // Links
                 .fields(Account::class.java.graphQLFieldContributions(fieldContributors))
                 // OK
