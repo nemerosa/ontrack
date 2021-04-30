@@ -24,6 +24,8 @@ class UserServiceImpl(
             throw AccessDeniedException("Must be logged to change password.")
         } else if (!user.account.authenticationSource.isAllowingPasswordChange) {
             throw AccessDeniedException("Password change is not allowed from ontrack.")
+        } else if (user.account.locked) {
+            throw AccessDeniedException("User is locked.")
         } else {
             val existing = accountRepository.findBuiltinAccount(user.account.name)
             if (existing != null && existing.account.id() == user.account.id()) {

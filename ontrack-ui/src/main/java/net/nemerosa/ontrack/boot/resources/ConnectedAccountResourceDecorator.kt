@@ -19,7 +19,7 @@ class ConnectedAccountResourceDecorator : AbstractResourceDecorator<ConnectedAcc
                 .link(
                         "_changePassword",
                         on(UserController::class.java).changePasswordForm,
-                        account.isLogged && account.account.authenticationSource.isAllowingPasswordChange
+                        account.isLogged && !account.account.locked && account.account.authenticationSource.isAllowingPasswordChange
                 )
                 // Getting the token value
                 .link(
