@@ -524,7 +524,7 @@ private class TestOntrackUser(
     override fun getAuthorities(): Collection<GrantedAuthority> =
             AuthorityUtils.createAuthorityList(account.role.roleName)
 
-    override fun isEnabled(): Boolean = true
+    override fun isEnabled(): Boolean = !account.disabled
 
     override fun getUsername(): String = account.name
 
