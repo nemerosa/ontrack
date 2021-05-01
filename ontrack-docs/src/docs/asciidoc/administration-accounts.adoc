@@ -1,0 +1,2 @@
+[[administration-accounts]]
+=== Accounts management

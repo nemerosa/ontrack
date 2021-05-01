@@ -1,12 +1,12 @@
 [[administration]]
 == Administration
 
-include::security.adoc[]
+include::administration-accounts.adoc[]
 
-include::ldap.adoc[]
+// TODO include::security.adoc[]
 
-include::admin-console.adoc[]
+// TODO include::admin-console.adoc[]
 
-include::admin-log-entries.adoc[]
+// TODO include::admin-log-entries.adoc[]
 
-include::admin-status.adoc[]
+// TODO include::admin-status.adoc[]
