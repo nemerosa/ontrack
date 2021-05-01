@@ -1,18 +1,19 @@
 [[integrations]]
 == Integrations
 
-include::integration-elasticsearch.adoc[]
+Ontrack interfaces with several systems, both for its own functioning and for collecting data.
+
+
+include::integration-jira.adoc[]
+
+include::integration-artifactory.adoc[]
+
+include::integration-sonarqube.adoc[]
 
 include::integration-jenkins.adoc[]
 
-include::integration-metrics.adoc[]
+// TODO include::integration-graphql.adoc[]
 
-include::integration-management.adoc[]
+// TODO include::integration-encryption.adoc[]
 
-include::integration-graphql.adoc[]
-
-include::integration-encryption.adoc[]
-
-include::integration-run-info.adoc[]
-
-include::integration-sonarqube.adoc[]
+// TODO include::integration-run-info.adoc[]
