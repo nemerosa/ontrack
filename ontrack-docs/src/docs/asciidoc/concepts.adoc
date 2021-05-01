@@ -1,4 +1,6 @@
 [[model]]
+== Concepts
+
 The root entity in Ontrack is the _project_.
 
 [plantuml,"model",png]
