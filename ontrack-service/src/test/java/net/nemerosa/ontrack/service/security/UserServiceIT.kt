@@ -34,7 +34,9 @@ class UserServiceIT : AbstractDSLTestSupport() {
                 fullName = account.fullName,
                 email = account.email,
                 password = "new-password",
-                groups = emptyList()
+                groups = emptyList(),
+                disabled = false,
+                locked = false,
             ))
         }
     }

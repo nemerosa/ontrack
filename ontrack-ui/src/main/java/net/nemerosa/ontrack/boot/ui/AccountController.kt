@@ -44,6 +44,18 @@ class AccountController(
                     MultiSelection.of("groups").label("Groups")
                             .items(accountService.getAccountGroupsForSelection(ID.NONE))
             )
+            .with(
+                YesNo.of(Account::disabled.name)
+                    .label("Disabled")
+                    .help("Is this account disabled? If disabled, it cannot be used to access Ontrack any longer.")
+                    .value(false)
+            )
+            .with(
+                YesNo.of(Account::locked.name)
+                    .label("Locked")
+                    .help("Is this account locked? If locked, it can be updated only by an administrator.")
+                    .value(false)
+            )
 
     /**
      * Creation of a built-in account
@@ -84,6 +96,8 @@ class AccountController(
                 .fill("name", account.name)
                 .fill("fullName", account.fullName)
                 .fill("email", account.email)
+                .fill(Account::disabled.name, account.disabled)
+                .fill(Account::locked.name, account.locked)
     }
 
     /**

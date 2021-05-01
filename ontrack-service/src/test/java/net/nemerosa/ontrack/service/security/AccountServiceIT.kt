@@ -12,6 +12,54 @@ import kotlin.test.assertTrue
 class AccountServiceIT : AbstractDSLTestSupport() {
 
     @Test
+    fun `Creating a disabled account`() {
+        val account = doCreateAccount(disabled = true)
+        assertTrue(account.disabled, "Account is disabled")
+    }
+
+    @Test
+    fun `Creating a locked account`() {
+        val account = doCreateAccount(locked = true)
+        assertTrue(account.locked, "Account is locked")
+    }
+
+    @Test
+    fun `Disabling an account using update`() {
+        val account = doCreateAccount()
+        asUserWith<AccountManagement> {
+            accountService.updateAccount(account.id, AccountInput(
+                name = account.name,
+                fullName = account.fullName,
+                email = account.email,
+                password = "test",
+                groups = emptyList(),
+                disabled = true,
+                locked = false
+            )).let {
+                assertEquals(true, it.disabled, "Account is now disabled")
+            }
+        }
+    }
+
+    @Test
+    fun `Locking an account using update`() {
+        val account = doCreateAccount()
+        asUserWith<AccountManagement> {
+            accountService.updateAccount(account.id, AccountInput(
+                name = account.name,
+                fullName = account.fullName,
+                email = account.email,
+                password = "test",
+                groups = emptyList(),
+                disabled = false,
+                locked = true
+            )).let {
+                assertEquals(true, it.locked, "Account is now locked")
+            }
+        }
+    }
+
+    @Test
     fun `Disabling an account`() {
         val account = doCreateAccount()
         assertFalse(account.disabled, "Accounts are enabled by default")

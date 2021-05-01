@@ -61,14 +61,16 @@ class AccountJdbcRepository(
     override fun newAccount(account: Account): Account {
         return try {
             val id = dbCreate(
-                    "INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL, PROVIDER, SOURCE, PASSWORD, ROLE) " +
-                            "VALUES (:name, :fullName, :email, :provider, :source, :password, :role)",
+                    "INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL, PROVIDER, SOURCE, PASSWORD, ROLE, DISABLED, LOCKED) " +
+                            "VALUES (:name, :fullName, :email, :provider, :source, :password, :role, :disabled, :locked)",
                     account.authenticationSource.asParams()
                             .addValue("name", account.name)
                             .addValue("fullName", account.fullName)
                             .addValue("email", account.email)
                             .addValue("password", "")
                             .addValue("role", account.role.name)
+                            .addValue("disabled", account.disabled)
+                            .addValue("locked", account.locked)
             )
             account.withId(of(id))
         } catch (ex: DuplicateKeyException) {
@@ -79,12 +81,14 @@ class AccountJdbcRepository(
     override fun saveAccount(account: Account) {
         try {
             namedParameterJdbcTemplate!!.update(
-                    "UPDATE ACCOUNTS SET NAME = :name, FULLNAME = :fullName, EMAIL = :email " +
+                    "UPDATE ACCOUNTS SET NAME = :name, FULLNAME = :fullName, EMAIL = :email, DISABLED = :disabled, LOCKED = :locked " +
                             "WHERE ID = :id",
                     params("id", account.id())
                             .addValue("name", account.name)
                             .addValue("fullName", account.fullName)
                             .addValue("email", account.email)
+                            .addValue("disabled", account.disabled)
+                            .addValue("locked", account.locked)
             )
         } catch (ex: DuplicateKeyException) {
             throw AccountNameAlreadyDefinedException(account.name)

@@ -46,7 +46,9 @@ class OntrackOidcUserService(
                         fullName = fullName,
                         email = email,
                         password = "",
-                        groups = emptyList()
+                        groups = emptyList(),
+                        disabled = false,
+                        locked = false,
                     ),
                     authenticationSource
                 )

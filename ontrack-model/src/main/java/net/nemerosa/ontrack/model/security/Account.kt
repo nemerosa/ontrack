@@ -52,8 +52,8 @@ data class Account(
                     input.email,
                     authenticationSource,
                     role,
-                    disabled = disabled,
-                    locked = locked,
+                    disabled = input.disabled,
+                    locked = input.locked,
             )
 
     /**
