@@ -22,5 +22,7 @@ data class AccountInput(
          * List of selected groups. It can be `null`, meaning that the list of groups
          * must be empty.
          */
-        val groups: Collection<Int>?
+        val groups: Collection<Int>?,
+        val disabled: Boolean,
+        val locked: Boolean,
 )

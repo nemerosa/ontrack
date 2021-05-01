@@ -1,17 +1,44 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
-import net.nemerosa.ontrack.model.security.ProjectCreation
-import net.nemerosa.ontrack.model.security.Roles
-import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
-import net.nemerosa.ontrack.model.security.ValidationRunStatusCommentEditOwn
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.model.security.*
 import org.apache.commons.lang3.StringUtils
 import org.junit.Test
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContextHolder
 import kotlin.test.*
 
-class SecurityServiceIT : AbstractServiceTestSupport() {
+class SecurityServiceIT : AbstractDSLTestSupport() {
+
+    @Test
+    fun `Disabled accounts cannot access functions in any way`() {
+        val project = project()
+        val initialAccount = doCreateAccountWithGlobalRole(Roles.GLOBAL_ADMINISTRATOR)
+        val account = asAdmin {
+            accountService.setAccountDisabled(initialAccount.id, true)
+            accountService.getAccount(initialAccount.id)
+        }
+        asFixedAccount(account) {
+            // Checks all global functions
+            RolesService.defaultGlobalFunctions.forEach { fn ->
+                assertFalse(securityService.isGlobalFunctionGranted(fn), "${fn.simpleName} must not be granted")
+            }
+            // Checks all project functions in lock mode
+            withNoGrantViewToAll {
+                RolesService.defaultProjectFunctions.forEach { fn ->
+                    assertFalse(securityService.isProjectFunctionGranted(project, fn),
+                        "${fn.simpleName} must not be granted on project")
+                }
+            }
+            // Checks all project functions in unlock mode
+            withGrantViewToAll {
+                RolesService.defaultProjectFunctions.forEach { fn ->
+                    assertFalse(securityService.isProjectFunctionGranted(project, fn),
+                        "${fn.simpleName} must not be granted on project")
+                }
+            }
+        }
+    }
 
     @Test
     fun currentAccount() {

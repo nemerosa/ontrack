@@ -35,6 +35,8 @@ public class ResourceAccountTest {
                                         .with("groupMappingSupported", false)
                                         .end())
                                 .with("role", "ADMINISTRATOR")
+                                .with("disabled", false)
+                                .with("locked", false)
                                 .with("defaultAdmin", true)
                                 .end())
                         .with("actions", array().end())
@@ -42,7 +44,7 @@ public class ResourceAccountTest {
                         .end(),
                 Resource.of(
                         ConnectedAccount.of(
-                                Account.of("admin", "Administrator", "", SecurityRole.ADMINISTRATOR, AuthenticationSource.none())
+                                Account.of("admin", "Administrator", "", SecurityRole.ADMINISTRATOR, AuthenticationSource.none(), false, false)
                                         .withId(ID.of(1))
                         ),
                         URI.create("urn:user")

@@ -90,7 +90,9 @@ class ProvidedGroupAccountGroupContributorTest {
 
     private fun createAccount(authenticationSource: AuthenticationSource): Account {
         return Account(
-                ID.of(1), "user", "User", "user@test.com", authenticationSource, SecurityRole.USER
+                ID.of(1), "user", "User", "user@test.com", authenticationSource, SecurityRole.USER,
+                disabled = false,
+                locked = false,
         )
     }
 

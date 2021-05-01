@@ -3,6 +3,8 @@
 
 include::administration-accounts.adoc[]
 
+include::administration-management.adoc[]
+
 // TODO include::security.adoc[]
 
 // TODO include::admin-console.adoc[]

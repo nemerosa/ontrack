@@ -50,7 +50,9 @@ class UserServiceImplTest {
                 "Test user",
                 "test@test.com",
                 SecurityRole.USER,
-                authenticationSourceWithPasswordChangeAllowed(false)
+                authenticationSourceWithPasswordChangeAllowed(false),
+                disabled = false,
+                locked = false,
         )
         whenever(user.account).thenReturn(account)
         whenever(securityService.currentAccount).thenReturn(user)
@@ -64,7 +66,9 @@ class UserServiceImplTest {
                 "Test user",
                 "test@test.com",
                 SecurityRole.USER,
-                authenticationSourceWithPasswordChangeAllowed(true)
+                authenticationSourceWithPasswordChangeAllowed(true),
+                disabled = false,
+                locked = false,
         ).withId(ID.of(1))
         whenever(user.account).thenReturn(account)
         whenever(securityService.currentAccount).thenReturn(user)
@@ -79,7 +83,9 @@ class UserServiceImplTest {
                 "Test user",
                 "test@test.com",
                 SecurityRole.USER,
-                authenticationSourceWithPasswordChangeAllowed(true)
+                authenticationSourceWithPasswordChangeAllowed(true),
+                disabled = false,
+                locked = false,
         ).withId(ID.of(1))
         val builtinAccount = BuiltinAccount(account, "old-encoded")
         whenever(user.account).thenReturn(account)
@@ -96,7 +102,9 @@ class UserServiceImplTest {
                 "Test user",
                 "test@test.com",
                 SecurityRole.USER,
-                authenticationSourceWithPasswordChangeAllowed(true)
+                authenticationSourceWithPasswordChangeAllowed(true),
+                disabled = false,
+                locked = false,
         ).withId(ID.of(1))
         val builtinAccount = BuiltinAccount(account, "old-encoded")
         whenever(user.account).thenReturn(account)

@@ -19,7 +19,7 @@ public class AccountTest {
     }
 
     private Account baseAccount() {
-        return Account.of("test", "Test", "test@test.com", SecurityRole.USER, AuthenticationSource.none());
+        return Account.of("test", "Test", "test@test.com", SecurityRole.USER, AuthenticationSource.none(), false, false);
     }
 
 }

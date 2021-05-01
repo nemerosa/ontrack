@@ -239,4 +239,14 @@ public interface AccountService {
      * @param source Source to delete accounts from
      */
     void deleteAccountBySource(@NotNull AuthenticationSource source);
+
+    /**
+     * Disabled / enables an account
+     */
+    void setAccountDisabled(@NotNull ID id, boolean disabled);
+
+    /**
+     * Locks / unlocks an account
+     */
+    void setAccountLocked(@NotNull ID id, boolean locked);
 }

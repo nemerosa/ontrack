@@ -43,7 +43,9 @@ class AccountJdbcRepository(
                     rs.getString("fullName"),
                     rs.getString("email"),
                     getEnum(SecurityRole::class.java, rs, "role"),
-                    authenticationSource
+                    authenticationSource,
+                    disabled = rs.getBoolean("disabled"),
+                    locked = rs.getBoolean("locked"),
             ).withId(id(rs))
         }
     }
@@ -59,14 +61,16 @@ class AccountJdbcRepository(
     override fun newAccount(account: Account): Account {
         return try {
             val id = dbCreate(
-                    "INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL, PROVIDER, SOURCE, PASSWORD, ROLE) " +
-                            "VALUES (:name, :fullName, :email, :provider, :source, :password, :role)",
+                    "INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL, PROVIDER, SOURCE, PASSWORD, ROLE, DISABLED, LOCKED) " +
+                            "VALUES (:name, :fullName, :email, :provider, :source, :password, :role, :disabled, :locked)",
                     account.authenticationSource.asParams()
                             .addValue("name", account.name)
                             .addValue("fullName", account.fullName)
                             .addValue("email", account.email)
                             .addValue("password", "")
                             .addValue("role", account.role.name)
+                            .addValue("disabled", account.disabled)
+                            .addValue("locked", account.locked)
             )
             account.withId(of(id))
         } catch (ex: DuplicateKeyException) {
@@ -77,12 +81,14 @@ class AccountJdbcRepository(
     override fun saveAccount(account: Account) {
         try {
             namedParameterJdbcTemplate!!.update(
-                    "UPDATE ACCOUNTS SET NAME = :name, FULLNAME = :fullName, EMAIL = :email " +
+                    "UPDATE ACCOUNTS SET NAME = :name, FULLNAME = :fullName, EMAIL = :email, DISABLED = :disabled, LOCKED = :locked " +
                             "WHERE ID = :id",
                     params("id", account.id())
                             .addValue("name", account.name)
                             .addValue("fullName", account.fullName)
                             .addValue("email", account.email)
+                            .addValue("disabled", account.disabled)
+                            .addValue("locked", account.locked)
             )
         } catch (ex: DuplicateKeyException) {
             throw AccountNameAlreadyDefinedException(account.name)
@@ -158,5 +164,21 @@ class AccountJdbcRepository(
         ) { rs: ResultSet, _ ->
             toAccount(rs)
         }
+    }
+
+    override fun setAccountDisabled(id: ID, disabled: Boolean) {
+        namedParameterJdbcTemplate!!.update(
+            "UPDATE ACCOUNTS SET DISABLED = :disabled WHERE ID = :id",
+            params("id", id.get())
+                .addValue("disabled", disabled)
+        )
+    }
+
+    override fun setAccountLocked(id: ID, locked: Boolean) {
+        namedParameterJdbcTemplate!!.update(
+            "UPDATE ACCOUNTS SET LOCKED = :locked WHERE ID = :id",
+            params("id", id.get())
+                .addValue("locked", locked)
+        )
     }
 }

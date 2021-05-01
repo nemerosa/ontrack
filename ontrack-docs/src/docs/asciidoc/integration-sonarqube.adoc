@@ -1,5 +1,5 @@
 [[integration-sonarqube]]
-=== Integration with SonarQube
+=== SonarQube integration
 
 It's possible to configure <<model,projects>> so that any build which has been scanned by SonarQube gets some measures registered in Ontrack and those same measures can then be exported to some event storage like
 <<monitoring-metrics-influxdb,InfluxDB>>.

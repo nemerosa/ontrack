@@ -1,9 +1,10 @@
 [[integration-jenkins]]
 === Integration with Jenkins
 
-The best way to integration Ontrack with your Jenkins instance is to use the
-https://wiki.jenkins-ci.org/display/JENKINS/Ontrack+plugin[Ontrack plug-in].
+Jenkins can inject data into Ontrack - see <<feeding-jenkins>> for this purpose. But Ontrack can also link builds to Jenkins by:
 
-Look at its
-https://wiki.jenkins-ci.org/display/JENKINS/Ontrack+plugin[documentation]
-for details about its configuration and how to use it.
+* defining a Jenkins configuration
+* setting a link to a Jenkins folder at project or branch level
+* setting a link to a Jenkins build at build level
+
+// TODO Complete the doc

@@ -46,6 +46,8 @@ angular.module('ot.view.admin.accounts', [
                   valid
                   validUntil
                 }
+                disabled
+                locked
                 links {
                   _update
                   _delete

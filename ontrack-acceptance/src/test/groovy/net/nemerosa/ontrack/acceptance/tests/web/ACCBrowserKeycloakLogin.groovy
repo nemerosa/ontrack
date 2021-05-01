@@ -30,6 +30,31 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Login with Keycloak is not possible when account is disabled'() {
+        withKeycloakConfigured { realm, _, userSimple ->
+            browser { browser ->
+                // Login once to register the user
+                def loginPage = goTo(LoginPage, [:])
+                assert loginPage.hasExtension(realm): "OIDC extension is present"
+                def keycloakLoginPage = loginPage.useExtension(realm)
+                def homePage = keycloakLoginPage.login(userSimple, "secret")
+                def userName = homePage.header.userName
+                assert userName == "User ${userSimple}"
+                // Logout
+                homePage.logout()
+                // Disabling the user
+                ontrack.admin.findAccountByName("${userSimple.toLowerCase()}@nemerosa.net").disable()
+                // Trying to log again
+                loginPage = goTo(LoginPage, [:])
+                loginPage.useExtensionWithoutCheck(realm)
+                // Keycloak is still OK
+                // keycloakLoginPage.login(userSimple, "secret")
+                assert loginPage.invalidCredentialsDisplayed: "Login is rejected"
+            }
+        }
+    }
+
+    @Test
     void 'Login with Keycloak and sets as admin'() {
         withKeycloakConfigured { String realm, userAdmin, _ ->
             browser { browser ->

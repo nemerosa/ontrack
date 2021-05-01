@@ -15,8 +15,6 @@ import net.nemerosa.ontrack.model.structure.Signature.Companion.of
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.TestingAuthenticationToken
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
@@ -59,7 +57,11 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         return doCreateAccount(listOf(accountGroup))
     }
 
-    protected fun doCreateAccount(accountGroups: List<AccountGroup> = emptyList()): Account {
+    protected fun doCreateAccount(
+        accountGroups: List<AccountGroup> = emptyList(),
+        disabled: Boolean = false,
+        locked: Boolean = false,
+    ): Account {
         return asUser().with(AccountManagement::class.java).call {
             val name = uid("A")
             accountService.create(
@@ -68,7 +70,9 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
                             "Test $name",
                             "$name@test.com",
                             "test",
-                            accountGroups.map { it.id() }
+                            accountGroups.map { it.id() },
+                            disabled = disabled,
+                            locked = locked,
                     )
             )
         }
@@ -501,7 +505,9 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
                                 "$name von Test",
                                 "$name@test.com",
                                 "xxx",
-                                emptyList()
+                                emptyList(),
+                                disabled = false,
+                                locked = false,
                         )
                 )
             }
@@ -515,25 +521,4 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     )
 }
 
-private class TestOntrackUser(
-        private val account: Account
-) : OntrackUser {
-
-    override val accountId: Int = account.id()
-
-    override fun getAuthorities(): Collection<GrantedAuthority> =
-            AuthorityUtils.createAuthorityList(account.role.roleName)
-
-    override fun isEnabled(): Boolean = true
-
-    override fun getUsername(): String = account.name
-
-    override fun isCredentialsNonExpired(): Boolean = true
-
-    override fun getPassword(): String = ""
-
-    override fun isAccountNonExpired(): Boolean = true
-
-    override fun isAccountNonLocked(): Boolean = true
-
-}
+private class TestOntrackUser(account: Account) : AccountOntrackUser(account)

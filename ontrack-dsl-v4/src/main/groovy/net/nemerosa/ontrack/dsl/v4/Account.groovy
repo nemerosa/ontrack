@@ -47,4 +47,78 @@ class Account extends AbstractResource {
         }
     }
 
+    @DSLMethod("Is this account disabled?")
+    boolean isDisabled() {
+        return node.disabled
+    }
+
+    @DSLMethod("Is this account locked?")
+    boolean isLocked() {
+        return node.locked
+    }
+
+    @DSLMethod("Disables this account")
+    void disable() {
+        ontrack.checkNoUserError(
+                ontrack.graphQLQuery('''
+                    mutation DisableAccount($id: Int!) {
+                        disableAccount(input: {id: $id}) {
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                ''', [id: id]),
+                "disableAccount"
+        )
+    }
+
+    @DSLMethod("Enables this account")
+    void enable() {
+        ontrack.checkNoUserError(
+                ontrack.graphQLQuery('''
+                    mutation EnableAccount($id: Int!) {
+                        enableAccount(input: {id: $id}) {
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                ''', [id: id]),
+                "enableAccount"
+        )
+    }
+
+    @DSLMethod("Locks this account")
+    void lock() {
+        ontrack.checkNoUserError(
+                ontrack.graphQLQuery('''
+                    mutation LockAccount($id: Int!) {
+                        lockAccount(input: {id: $id}) {
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                ''', [id: id]),
+                "lockAccount"
+        )
+    }
+
+    @DSLMethod("Unlocks this account")
+    void unlock() {
+        ontrack.checkNoUserError(
+                ontrack.graphQLQuery('''
+                    mutation UnlockAccount($id: Int!) {
+                        unlockAccount(input: {id: $id}) {
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                ''', [id: id]),
+                "unlockAccount"
+        )
+    }
+
 }
