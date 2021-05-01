@@ -35,6 +35,8 @@ public class ResourceAccountTest {
                                         .with("groupMappingSupported", false)
                                         .end())
                                 .with("role", "ADMINISTRATOR")
+                                .with("disabled", false)
+                                .with("locked", false)
                                 .with("defaultAdmin", true)
                                 .end())
                         .with("actions", array().end())
