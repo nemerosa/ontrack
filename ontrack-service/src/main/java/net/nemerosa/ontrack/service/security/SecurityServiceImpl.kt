@@ -36,7 +36,7 @@ class SecurityServiceImpl : SecurityService {
         // Gets the user
         val user = currentAccount
         // Checks
-        return user != null && user.isGranted(fn)
+        return user != null && user.isEnabled && user.isGranted(fn)
     }
 
     override fun checkProjectFunction(projectId: Int, fn: Class<out ProjectFunction>) {
@@ -49,7 +49,7 @@ class SecurityServiceImpl : SecurityService {
         // Gets the user
         val user = currentAccount
         // Checks
-        return user != null && user.isGranted(projectId, fn)
+        return user != null && user.isEnabled && user.isGranted(projectId, fn)
     }
 
     override val autoProjectFunctions: Set<KClass<out ProjectFunction>>

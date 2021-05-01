@@ -41,7 +41,9 @@ class BuildFilterJdbcRepositoryIT : AbstractRepositoryTestSupport() {
                         "Test user",
                         "test@test.com",
                         SecurityRole.USER,
-                        authenticationSource
+                        authenticationSource,
+                        disabled = false,
+                        locked = false,
                 )
         )
     }

@@ -27,7 +27,6 @@ class AccountServiceImpl(
         private val accountRepository: AccountRepository,
         private val accountGroupRepository: AccountGroupRepository,
         private val securityService: SecurityService,
-        private val authenticationSourceRepository: AuthenticationSourceRepository,
         private val accountGroupContributors: List<AccountGroupContributor>
 ) : AccountService {
 
@@ -86,7 +85,9 @@ class AccountServiceImpl(
                 input.fullName,
                 input.email,
                 SecurityRole.USER,
-                authenticationSource
+                authenticationSource,
+                disabled = input.disabled,
+                locked = input.locked,
         )
         // Saves it
         account = accountRepository.newAccount(account)
@@ -395,6 +396,16 @@ class AccountServiceImpl(
     override fun deleteAccountBySource(source: AuthenticationSource) {
         securityService.checkGlobalFunction(AccountManagement::class.java)
         accountRepository.deleteAccountBySource(source)
+    }
+
+    override fun setAccountDisabled(id: ID, disabled: Boolean) {
+        securityService.checkGlobalFunction(AccountManagement::class.java)
+        accountRepository.setAccountDisabled(id, disabled)
+    }
+
+    override fun setAccountLocked(id: ID, locked: Boolean) {
+        securityService.checkGlobalFunction(AccountManagement::class.java)
+        accountRepository.setAccountLocked(id, locked)
     }
 
     private fun getGroupACL(group: AccountGroup): Authorisations =

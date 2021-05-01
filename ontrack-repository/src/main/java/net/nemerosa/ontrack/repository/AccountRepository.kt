@@ -73,4 +73,14 @@ interface AccountRepository {
      * @param source Source to delete accounts from
      */
     fun deleteAccountBySource(source: AuthenticationSource)
+
+    /**
+     * Disabled / enables an account
+     */
+    fun setAccountDisabled(id: ID, disabled: Boolean)
+
+    /**
+     * Locks / unlocks an account
+     */
+    fun setAccountLocked(id: ID, locked: Boolean)
 }

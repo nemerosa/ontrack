@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.oidc
 
 import net.nemerosa.ontrack.extension.oidc.settings.OIDCSettingsService
 import net.nemerosa.ontrack.model.security.*
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.authentication.DisabledException
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService
@@ -9,10 +11,10 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 
 class OntrackOidcUserService(
-        private val accountService: AccountService,
-        private val securityService: SecurityService,
-        private val providedGroupsService: ProvidedGroupsService,
-        private val oidcSettingsService: OIDCSettingsService
+    private val accountService: AccountService,
+    private val securityService: SecurityService,
+    private val providedGroupsService: ProvidedGroupsService,
+    private val oidcSettingsService: OIDCSettingsService,
 ) : OidcUserService() {
 
     override fun loadUser(userRequest: OidcUserRequest): OidcUser {
@@ -39,14 +41,16 @@ class OntrackOidcUserService(
             val account: Account = securityService.asAdmin {
                 // Creates the account
                 accountService.create(
-                        AccountInput(
-                                name = email,
-                                fullName = fullName,
-                                email = email,
-                                password = "",
-                                groups = emptyList()
-                        ),
-                        authenticationSource
+                    AccountInput(
+                        name = email,
+                        fullName = fullName,
+                        email = email,
+                        password = "",
+                        groups = emptyList(),
+                        disabled = false,
+                        locked = false,
+                    ),
+                    authenticationSource
                 )
             }
             createOntrackAuthenticatedUser(account, oidcUser, clientRegistration, authenticationSource)
@@ -61,26 +65,30 @@ class OntrackOidcUserService(
     }
 
     private fun createOntrackAuthenticatedUser(
-            account: Account,
-            oidcUser: OidcUser,
-            clientRegistration: OntrackClientRegistration,
-            authenticationSource: AuthenticationSource
+        account: Account,
+        oidcUser: OidcUser,
+        clientRegistration: OntrackClientRegistration,
+        authenticationSource: AuthenticationSource,
     ): OidcUser {
+        // If the account is disabled, fails the authentication
+        if (account.disabled) {
+            throw DisabledException("Account is disabled.")
+        }
         // Wrapping the account
         val ontrackUser = AccountOntrackUser(account)
         // Filter on the groups
         val groupFilter = securityService.asAdmin {
             oidcSettingsService
-                    .getProviderById(clientRegistration.registrationId)
-                    ?.groupFilter
-                    ?: ".*"
+                .getProviderById(clientRegistration.registrationId)
+                ?.groupFilter
+                ?: ".*"
         }
         val groupFilterRegex = groupFilter.toRegex(RegexOption.IGNORE_CASE)
         // Gets the groups provided by OIDC
         val groups = oidcUser.getClaimAsStringList("groups")
-                ?.filter { groupFilterRegex.matches(it) }
-                ?.toSet()
-                ?: emptySet()
+            ?.filter { groupFilterRegex.matches(it) }
+            ?.toSet()
+            ?: emptySet()
         // Registers the groups
         securityService.asAdmin {
             providedGroupsService.saveProvidedGroups(account.id(), authenticationSource, groups)
@@ -92,6 +100,8 @@ class OntrackOidcUserService(
     }
 }
 
-class OidcEmailRequiredException : AuthenticationException("The user email is required as part of the OIDC user information.")
+class OidcEmailRequiredException :
+    AuthenticationException("The user email is required as part of the OIDC user information.")
 
-class OidcNonOidcExistingUserException(email: String) : AuthenticationException("The user with email `$email` already exists and is not an OIDC user.")
+class OidcNonOidcExistingUserException(email: String) :
+    AuthenticationException("The user with email `$email` already exists and is not an OIDC user.")

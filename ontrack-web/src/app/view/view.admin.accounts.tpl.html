@@ -43,6 +43,7 @@
                 <th>Source</th>
                 <th>Role</th>
                 <th>Groups</th>
+                <th>Status</th>
                 <th>Token</th>
                 <th>&nbsp;</th>
             </tr>
@@ -71,6 +72,16 @@
                         {{accountGroup.name}}
                     </span>
                     <span ng-hide="account.groups" class="ot-description">No group</span>
+                </td>
+                <td>
+                    <span ng-if="account.disabled">
+                        <span class="fa fa-times text-danger"></span>
+                        Disabled
+                    </span>
+                    <span ng-if="account.locked">
+                        <span class="fa fa-lock text-info"></span>
+                        Locked
+                    </span>
                 </td>
                 <td>
                     <span ng-if="!account.token"

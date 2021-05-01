@@ -142,7 +142,9 @@ class LDAPAuthenticationIT : AbstractDSLTestSupport() {
                             fullName = "The enemy",
                             email = "sauron@mordor.com",
                             password = "the-ring",
-                            groups = emptyList()
+                            groups = emptyList(),
+                            disabled = false,
+                            locked = false,
                     )
             )
         }

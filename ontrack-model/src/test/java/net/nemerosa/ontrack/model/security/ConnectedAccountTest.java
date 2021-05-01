@@ -20,12 +20,12 @@ public class ConnectedAccountTest {
 
     @Test(expected = IllegalStateException.class)
     public void of_not_defined() {
-        ConnectedAccount.of(Account.of("test", "Test", "test@test.com", SecurityRole.USER, AuthenticationSource.none()));
+        ConnectedAccount.of(Account.of("test", "Test", "test@test.com", SecurityRole.USER, AuthenticationSource.none(), false, false));
     }
 
     @Test
     public void of() {
-        Account test = Account.of("test", "Test", "test@test.com", SecurityRole.USER, AuthenticationSource.none()).withId(ID.of(2));
+        Account test = Account.of("test", "Test", "test@test.com", SecurityRole.USER, AuthenticationSource.none(), false, false).withId(ID.of(2));
         assertSame(ConnectedAccount.of(test).getAccount(), test);
     }
 

@@ -61,7 +61,9 @@ class TokenHeaderAuthenticationProviderTest {
                         "User",
                         "user@test.com",
                         BuiltinAuthenticationSourceProvider.SOURCE,
-                        SecurityRole.USER
+                        SecurityRole.USER,
+                        disabled = false,
+                        locked = false,
                 ),
                 token = Token(
                         "xxx",
@@ -85,7 +87,9 @@ class TokenHeaderAuthenticationProviderTest {
                         "User",
                         "user@test.com",
                         BuiltinAuthenticationSourceProvider.SOURCE,
-                        SecurityRole.USER
+                        SecurityRole.USER,
+                        disabled = false,
+                        locked = false,
                 ),
                 token = Token(
                         "xxx",
