@@ -27,6 +27,8 @@ include::authentication.adoc[]
 
 include::concepts.adoc[]
 
+include::security.adoc[]
+
 include::feeding.adoc[]
 
 include::integrations.adoc[]
