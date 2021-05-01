@@ -81,7 +81,9 @@ class LDAPCachedAuthenticationProvider(
                                     fullName = userDetails.fullName,
                                     email = userDetails.email,
                                     password = "",
-                                    groups = emptyList()
+                                    groups = emptyList(),
+                                    disabled = false,
+                                    locked = false,
                             ),
                             LDAPAuthenticationSourceProvider.SOURCE
                     )
