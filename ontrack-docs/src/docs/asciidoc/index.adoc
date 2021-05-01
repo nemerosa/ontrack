@@ -27,6 +27,8 @@ include::authentication.adoc[]
 
 include::feeding.adoc[]
 
+include::integrations.adoc[]
+
 include::usage.adoc[]
 
 include::api.adoc[]

@@ -1,2 +1,5 @@
 [[api]]
 == Ontrack API
+
+[[api-graphql]]
+=== Ontrack GraphQL API
