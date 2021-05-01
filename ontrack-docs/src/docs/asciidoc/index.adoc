@@ -31,4 +31,6 @@ include::usage.adoc[]
 
 include::api.adoc[]
 
+include::administration.adoc[]
+
 // ========================================================
