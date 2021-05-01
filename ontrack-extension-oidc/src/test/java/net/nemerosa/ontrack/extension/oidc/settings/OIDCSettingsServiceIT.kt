@@ -173,7 +173,9 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
                             fullName = "Test $name",
                             email = "$name@nemerosa.net",
                             password = null,
-                            groups = null
+                            groups = null,
+                            disabled = false,
+                            locked = false,
                     ),
                     OidcAuthenticationSourceProvider.asSource(provider)
             )
@@ -201,7 +203,9 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
                             fullName = "Test $name",
                             email = "$name@nemerosa.net",
                             password = null,
-                            groups = null
+                            groups = null,
+                            disabled = false,
+                            locked = false,
                     ),
                     source
             )

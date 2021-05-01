@@ -125,7 +125,9 @@ class AdminQLIT : AbstractQLKTITSupport() {
                     a.fullName,
                     a.email,
                     "",
-                    listOf(g.id())
+                    listOf(g.id()),
+                    disabled = false,
+                    locked = false,
             ))
             val data = run("""{ accounts(group: "${g.name}") { id }}""")
             assertEquals(a.id(), data["accounts"].first()["id"].asInt())
@@ -143,7 +145,9 @@ class AdminQLIT : AbstractQLKTITSupport() {
                     a.fullName,
                     a.email,
                     "",
-                    listOf(g1.id(), g2.id())
+                    listOf(g1.id(), g2.id()),
+                    disabled = false,
+                    locked = false,
             ))
             val data = run("""{ accounts(id: ${a.id}) { groups { name } } }""")
             assertEquals(listOf(g1.name, g2.name), data["accounts"].first()["groups"].map { it.name })

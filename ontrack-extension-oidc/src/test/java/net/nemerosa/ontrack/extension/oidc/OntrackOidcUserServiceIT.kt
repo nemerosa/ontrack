@@ -235,7 +235,9 @@ class OntrackOidcUserServiceIT : AbstractDSLTestSupport() {
                             fullName = fullName,
                             email = email,
                             password = null,
-                            groups = emptySet()
+                            groups = emptySet(),
+                            disabled = false,
+                            locked = false,
                     ),
                     AuthenticationSource(
                             provider = "oidc",
