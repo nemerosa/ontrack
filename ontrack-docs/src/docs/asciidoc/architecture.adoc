@@ -66,7 +66,7 @@ include::architecture-ui-forms.adoc[]
 [[architecture-model]]
 ==== Model
 
-include::model.adoc[]
+include::concepts.adoc[]
 
 [[architecture-model-filtering]]
 ==== Model filtering

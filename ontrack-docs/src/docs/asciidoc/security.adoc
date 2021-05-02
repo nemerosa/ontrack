@@ -1,19 +1,16 @@
 [[security]]
-=== Security
+== Security
 
-The Ontrack security is based on accounts and account groups, and on
-authorizations granted to them.
+The Ontrack security is based on accounts and account groups, and on authorizations granted to them.
 
 [[security-concepts]]
-==== Concepts
+=== Concepts
 
-Each action in Ontrack is associated with an _authorisation function_ and those
-functions are grouped together in _roles_ which are granted to _accounts_ and
-_account groups_.
+Each action in Ontrack is associated with an _authorisation function_ and those functions are grouped together in _roles_ which are granted to _accounts_ and _account groups_.
 
-An _account_ can belong to several _account groups_ and his set of final
-_authorisation functions_ will be the aggregation of the rights given to the
-account and to the groups.
+An _account_ can belong to several _account groups_ and his set of final _authorisation functions_ will be the aggregation of the rights given to the account and to the groups.
+
+See <<administration-accounts>> to manage accounts and groups.
 
 [[security-roles]]
 ==== Roles
@@ -27,7 +24,7 @@ Ontrack distinguishes between _global roles_ and _project_ roles.
 and functions - see <<extending-security>> for details.
 
 [[security-roles-global]]
-===== Global roles
+==== Global roles
 
 An **ADMINISTRATOR** has access to all the functions of Ontrack, in all
 projects. At least such a role should be defined.
@@ -75,7 +72,7 @@ Creation:
 Global permissions are created or deleted, not updated.
 
 [[security-roles-project]]
-===== Project roles
+==== Project roles
 
 A project **OWNER** can perform all operations on a project but to delete it.
 
@@ -117,58 +114,32 @@ Project permissions are created or deleted, not updated.
 [[security-accounts]]
 ==== Accounts
 
-Accounts are created with either:
+Accounts are created:
 
-* built-in authentication, with a password stored and encrypted in Ontrack
+* by an administrator in the <<authentication-built-in,built-in authentication system>>, with a password stored and encrypted in Ontrack
 itself
-* <<ldap,LDAP setup>>
-
-[[security-accounts-builtin]]
-===== Built-in accounts
-
-An _administrator_ can create accounts. He must give them:
-
-* a unique name
-* a unique email
-* a display name
-* an initial password
-
-Any user can change his own password by going to the _Change password_ menu.
-
-The _administrator_ can give an account a list of global or project roles.
-
-[[security-accounts-ldap]]
-===== LDAP accounts
-
-Accounts whose authentication is managed by the LDAP are not created directly
-but are instead created at first successful login.
-
-As for the other types of accounts, the _administrator_ can give them a list
-of global or project roles.
+* upon login when using external authentication systems like a <<authentication-ldap,LDAP>> or <<authentication-openid,Open ID provider>>.
 
 [[security-groups]]
 ==== Account groups
 
-An _administrator_ can create groups using a name and a description, and assign
-them a list of global or project roles.
+An _administrator_ can create groups using a name and a description, and assign them a list of global or project roles.
 
 An account can be assigned to several groups.
 
-NOTE: If LDAP is enabled, some LDAP groups can be <<ldap-mapping,mapped>> to
-the account groups.
+NOTE: If an external authentication system, like a <<authentication-ldap,LDAP>> or <<authentication-openid,Open ID provider>>, is enabled, the external groups can be mapped to the account groups.
 
 [[security-general]]
-==== General settings
+=== General settings
 
-By default, all users (including anonymous ones) have access to all the
-projects, at least in read only mode.
+By default, all authenticated users have access to all the projects, in read only mode.
 
-You can disable this anonymous access by goint go to the _Settings_ and click
+You can disable this global access by going to the _Settings_ and click
 the _Edit_ button in the _General_ section. There you can set the
 _Grants project view to all_ option to _No_.
 
 [[security-extending]]
-==== Extending the security
+=== Extending the security
 
 <<extending,Extensions>> can extend the security model beyond what
 if defined in the Ontrack core. See
