@@ -18,10 +18,31 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 class WebSecurityConfig {
 
     /**
-     * API login
+     * Management end points are accessible on a separate port without any authentication needed
      */
     @Configuration
     @Order(1)
+    @ConditionalOnWebApplication
+    class ActuatorWebSecurityConfigurationAdapter : WebSecurityConfigurerAdapter() {
+        override fun configure(http: HttpSecurity) {
+            http {
+                securityMatcher("/manage/**")
+                // Disables CSRF for the actuator calls
+                csrf {
+                    disable()
+                }
+                authorizeRequests {
+                    authorize(EndpointRequest.toAnyEndpoint(), permitAll)
+                }
+            }
+        }
+    }
+
+    /**
+     * API login
+     */
+    @Configuration
+    @Order(2)
     @ConditionalOnWebApplication
     class ApiWebSecurityConfigurationAdapter(
             private val tokensService: TokensService
@@ -60,10 +81,6 @@ class WebSecurityConfig {
                 // Enabling JS Cookies for CSRF protection (for AngularJS)
                 csrf {
                     csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse()
-                }
-                // Management end points are accessible on a separate port without any authentication needed
-                authorizeRequests {
-                    authorize(EndpointRequest.toAnyEndpoint(), permitAll)
                 }
                 // Excludes assets and login page from authentication
                 authorizeRequests {
