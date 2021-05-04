@@ -30,7 +30,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus
+        include: "*"
       base-path: "/manage"
   # Default settings for the metrics
   metrics:

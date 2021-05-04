@@ -23,7 +23,7 @@ class UserServiceImpl(
         return if (user == null) {
             throw AccessDeniedException("Must be logged to change password.")
         } else if (!user.account.authenticationSource.isAllowingPasswordChange) {
-            throw AccessDeniedException("Password change is not allowed from ontrack.")
+            throw AccessDeniedException("Password change is not allowed.")
         } else if (user.account.locked) {
             throw AccessDeniedException("User is locked.")
         } else {
