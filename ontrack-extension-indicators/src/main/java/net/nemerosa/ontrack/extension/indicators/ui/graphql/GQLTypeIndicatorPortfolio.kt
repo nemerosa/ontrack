@@ -1,10 +1,14 @@
 package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
+import graphql.Scalars.GraphQLString
+import graphql.schema.GraphQLList
+import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategoryService
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolio
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
+import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorViewService
 import net.nemerosa.ontrack.extension.indicators.stats.IndicatorStatsService
 import net.nemerosa.ontrack.graphql.schema.*
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
@@ -19,6 +23,7 @@ class GQLTypeIndicatorPortfolio(
         private val indicatorCategoryService: IndicatorCategoryService,
         private val indicatorCategoryStats: GQLTypeIndicatorCategoryStats,
         private val indicatorStatsService: IndicatorStatsService,
+        private val indicatorViewService: IndicatorViewService,
         private val fieldContributors: List<GQLFieldContributor>
 ) : GQLType {
 
@@ -72,6 +77,7 @@ class GQLTypeIndicatorPortfolio(
                                     indicatorStatsService.getStatsPortfolio(portfolio, duration)
                                 }
                     }
+                    // TODO V4 Removal
                     // Stats
                     .field {
                         it.name("globalStats")
@@ -84,6 +90,27 @@ class GQLTypeIndicatorPortfolio(
                                     val portfolio: IndicatorPortfolio = env.getSource()
                                     indicatorStatsService.getGlobalStats(portfolio, duration)
                                 }
+                    }
+                    // Stats for a view
+                    .field {
+                        it.name("viewStats")
+                            .description("Indicators stats for a given view for this portfolio")
+                            .argument { arg ->
+                                arg.name("name")
+                                    .description("Name of the indicator view")
+                                    .type(GraphQLString)
+                            }
+                            .type(GraphQLList(GraphQLNonNull(indicatorCategoryStats.typeRef)))
+                            .dataFetcher { env ->
+                                val portfolio: IndicatorPortfolio = env.getSource()
+                                val name: String? = env.getArgument<String?>("name")?.takeIf { it.isNotBlank() }
+                                val view = name?.run {
+                                    indicatorViewService.findIndicatorViewByName(this)
+                                }
+                                view?.run {
+                                    indicatorStatsService.getPortfolioViewStats(portfolio, this)
+                                }
+                            }
                     }
                     // Links
                     .fields(IndicatorPortfolio::class.java.graphQLFieldContributions(fieldContributors))
