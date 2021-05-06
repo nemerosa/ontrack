@@ -76,6 +76,7 @@ class GQLTypeIndicatorPortfolio(
                     .field {
                         it.name("globalStats")
                                 .description("Global indicator stats")
+                                .deprecate("Use indicator views")
                                 .type(stdList(indicatorCategoryStats.typeRef))
                                 .durationArgument()
                                 .dataFetcher { env ->

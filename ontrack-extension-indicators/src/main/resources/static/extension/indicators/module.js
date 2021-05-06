@@ -631,6 +631,7 @@ angular.module('ontrack.extension.indicators', [
             controller: 'PortfolioGlobalIndicatorsCtrl'
         });
     })
+    // TODO V4 Remove this view
     .controller('PortfolioGlobalIndicatorsCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService) {
         $scope.loadingPortfolioGlobalIndicators = true;
 
