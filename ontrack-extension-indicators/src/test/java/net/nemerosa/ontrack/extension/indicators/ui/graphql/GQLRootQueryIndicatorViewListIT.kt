@@ -8,7 +8,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class GQLRootQueryIndicatorViewsIT : AbstractIndicatorsTestSupport() {
+class GQLRootQueryIndicatorViewListIT : AbstractIndicatorsTestSupport() {
 
     @Test
     fun `List of indicator views`() {
@@ -32,16 +32,18 @@ class GQLRootQueryIndicatorViewsIT : AbstractIndicatorsTestSupport() {
         asAdmin {
             run(
                 """{
-                    indicatorViews {
-                        name
-                        categories {
-                            id
+                    indicatorViewList {
+                        views {
                             name
+                            categories {
+                                id
+                                name
+                            }
                         }
                     }
                 }"""
             ).let { data ->
-                val view = data.path("indicatorViews").find { it.path("name").asText() == name }
+                val view = data.path("indicatorViewList").path("views").find { it.path("name").asText() == name }
                 assertNotNull(view) {
                     assertEquals(
                         listOf(

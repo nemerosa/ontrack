@@ -3,21 +3,20 @@ package net.nemerosa.ontrack.extension.indicators.ui.graphql
 import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorViewService
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import org.springframework.stereotype.Component
 
 @Component
-class GQLRootQueryIndicatorViews(
+class GQLRootQueryIndicatorViewList(
     private val indicatorViewService: IndicatorViewService,
-    private val gqlTypeIndicatorView: GQLTypeIndicatorView
+    private val gqlTypeIndicatorViewList: GQLTypeIndicatorViewList
 ) : GQLRootQuery {
     override fun getFieldDefinition(): GraphQLFieldDefinition =
         GraphQLFieldDefinition.newFieldDefinition()
-            .name("indicatorViews")
+            .name("indicatorViewList")
             .description("List of indicator views.")
-            .type(stdList(gqlTypeIndicatorView.typeRef))
+            .type(gqlTypeIndicatorViewList.typeRef)
             .dataFetcher {
-                indicatorViewService.getIndicatorViews()
+                IndicatorViewList.INSTANCE
             }
             .build()
 
