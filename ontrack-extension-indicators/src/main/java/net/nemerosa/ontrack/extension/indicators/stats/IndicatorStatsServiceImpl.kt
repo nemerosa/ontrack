@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.indicators.model.*
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorCategoryStats
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolio
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
+import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorView
 import net.nemerosa.ontrack.model.structure.Project
 import org.springframework.stereotype.Service
 import java.time.Duration
@@ -41,6 +42,23 @@ class IndicatorStatsServiceImpl(
         // Gets the projects for this portfolio
         val projects = indicatorPortfolioService.getPortfolioProjects(portfolio)
         // For each category
+        return categories.map { category ->
+            indicatorCategoryStats(category, projects, previous)
+        }
+    }
+
+    override fun getPortfolioViewStats(
+        portfolio: IndicatorPortfolio,
+        indicatorView: IndicatorView,
+        previous: Duration?
+    ): List<IndicatorCategoryStats> {
+        // Gets the view categories
+        val categories = indicatorView.categories.mapNotNull {
+            indicatorCategoryService.findCategoryById(it)
+        }
+        // Gets the projects for this portfolio
+        val projects = indicatorPortfolioService.getPortfolioProjects(portfolio)
+        // For each category in the view
         return categories.map { category ->
             indicatorCategoryStats(category, projects, previous)
         }

@@ -3,7 +3,9 @@ package net.nemerosa.ontrack.extension.indicators.stats
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
+import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorView
 import net.nemerosa.ontrack.extension.indicators.portfolio.PortfolioGlobalIndicators
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.Duration
@@ -356,6 +358,97 @@ class IndicatorStatsServiceIT : AbstractIndicatorsTestSupport() {
         }
         // Gets the stats for this portfolio and period
         val categoryStats = indicatorStatsService.getGlobalStats(portfolio, duration)
+        assertEquals(2, categoryStats.size)
+        // First category
+        categoryStats[0].apply {
+            assertEquals(category1, category)
+            assertEquals(60, stats.avg?.value)
+            assertNotNull(previousStats) {
+                assertEquals(33, it.stats.avg?.value)
+                assertEquals(IndicatorTrend.GROWTH, it.avgTrend)
+                assertEquals(duration, it.period)
+            }
+        }
+        // Second category
+        categoryStats[1].apply {
+            assertEquals(category2, category)
+            assertEquals(40, stats.avg?.value)
+            assertNotNull(previousStats) {
+                assertEquals(0, it.stats.avg?.value)
+                assertEquals(IndicatorTrend.GROWTH, it.avgTrend)
+                assertEquals(duration, it.period)
+            }
+        }
+    }
+
+    @Test
+    fun `Stats and trend for a portfolio and an indicator view`() {
+        // Trend times
+        val duration = Duration.ofDays(7)
+        val lastTime = Time.now() - Duration.ofDays(1)
+        val pastTime = lastTime - duration
+        // Categories & types
+        val category1 = category()
+        val type11 = category1.booleanType()
+        val type12 = category1.booleanType()
+        val category2 = category()
+        val type21 = category2.booleanType()
+        val type22 = category2.booleanType()
+        // Label to use
+        val label = label()
+        // Portfolio definition
+        val portfolio = portfolio(
+                label = label
+        )
+        // Indicator view
+        val indicatorView = asAdmin {
+            val viewName = uid("V")
+            IndicatorView(
+                name = viewName,
+                categories = listOf(category1.id, category2.id)
+            ).apply {
+                indicatorViewService.saveIndicatorView(this)
+            }
+        }
+        // Projects, labels & indicator values
+        project {
+            labels = listOf(label)
+            // Past
+            indicator(type11, null, pastTime)
+            indicator(type12, null, pastTime)
+            indicator(type21, false, pastTime)
+            indicator(type22, false, pastTime)
+            // Current
+            indicator(type11, false, lastTime)
+            indicator(type12, false, lastTime)
+            indicator(type21, false, lastTime)
+            indicator(type22, true, lastTime)
+        }
+        project {
+            labels = listOf(label)
+            // Past
+            indicator(type11, false, pastTime)
+            indicator(type12, false, pastTime)
+            indicator(type21, false, pastTime)
+            indicator(type22, false, pastTime)
+            // Current
+            indicator(type11, true, lastTime)
+            indicator(type12, true, lastTime)
+            indicator(type21, false, lastTime)
+            indicator(type22, true, lastTime)
+        }
+        project {
+            labels = listOf(label)
+            // Partial indicators only
+            // Past
+            indicator(type11, true, pastTime)
+            indicator(type21, false, pastTime)
+            // Current
+            indicator(type11, true, lastTime)
+            indicator(type21, false, lastTime)
+        }
+        // Gets the stats for this portfolio and period
+        val categoryStats = indicatorStatsService.getPortfolioViewStats(portfolio, indicatorView, duration)
         assertEquals(2, categoryStats.size)
         // First category
         categoryStats[0].apply {

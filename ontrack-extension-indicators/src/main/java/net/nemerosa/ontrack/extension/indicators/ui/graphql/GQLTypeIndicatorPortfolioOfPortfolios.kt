@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import org.springframework.stereotype.Component
 
 @Component
+@Deprecated("Use indicator views")
 class GQLTypeIndicatorPortfolioOfPortfolios(
         private val indicatorPortfolioService: IndicatorPortfolioService,
         private val indicatorPortfolio: GQLTypeIndicatorPortfolio,
