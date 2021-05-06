@@ -141,7 +141,9 @@ class IndicatorPortfolioServiceImpl(
 
     companion object {
         private val STORE = IndicatorPortfolio::class.java.name
+        @Deprecated("Use views")
         private val STORE_PORTFOLIO_OF_PORTFOLIOS = IndicatorPortfolioOfPortfolios::class.java.name
+        @Deprecated("Use views")
         private const val PORTFOLIO_OF_PORTFOLIOS = "0"
     }
 

@@ -11,6 +11,7 @@ interface IndicatorStatsService {
     /**
      * Gets global stats for a portfolio
      */
+    @Deprecated("Use indicator views")
     fun getGlobalStats(portfolio: IndicatorPortfolio, previous: Duration? = null): List<IndicatorCategoryStats>
 
     /**
