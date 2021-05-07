@@ -67,6 +67,7 @@ class GQLRootQueryIndicatorPortfoliosIT : AbstractIndicatorsTestSupport() {
         asAdmin {
             indicatorViewService.saveIndicatorView(
                 IndicatorView(
+                    id = "",
                     name = viewName,
                     categories = listOf(
                         category.id

@@ -159,8 +159,8 @@ class IndicatorStatsServiceIT : AbstractIndicatorsTestSupport() {
         val label = label()
         // Portfolio definition
         val portfolio = portfolio(
-                categories = listOf(category1, category2),
-                label = label
+            categories = listOf(category1, category2),
+            label = label
         )
         // Projects, labels & indicator values
         project {
@@ -229,8 +229,8 @@ class IndicatorStatsServiceIT : AbstractIndicatorsTestSupport() {
         val label = label()
         // Portfolio definition
         val portfolio = portfolio(
-                categories = listOf(category1, category2),
-                label = label
+            categories = listOf(category1, category2),
+            label = label
         )
         // Projects, labels & indicator values
         project {
@@ -311,12 +311,12 @@ class IndicatorStatsServiceIT : AbstractIndicatorsTestSupport() {
         val label = label()
         // Portfolio definition
         val portfolio = portfolio(
-                label = label
+            label = label
         )
         // Global portfolio categories
         asAdmin {
             indicatorPortfolioService.savePortfolioOfPortfolios(
-                    PortfolioGlobalIndicators(listOf(category1.id, category2.id))
+                PortfolioGlobalIndicators(listOf(category1.id, category2.id))
             )
         }
         // Projects, labels & indicator values
@@ -398,17 +398,18 @@ class IndicatorStatsServiceIT : AbstractIndicatorsTestSupport() {
         val label = label()
         // Portfolio definition
         val portfolio = portfolio(
-                label = label
+            label = label
         )
         // Indicator view
         val indicatorView = asAdmin {
             val viewName = uid("V")
-            IndicatorView(
-                name = viewName,
-                categories = listOf(category1.id, category2.id)
-            ).apply {
-                indicatorViewService.saveIndicatorView(this)
-            }
+            indicatorViewService.saveIndicatorView(
+                IndicatorView(
+                    id = "",
+                    name = viewName,
+                    categories = listOf(category1.id, category2.id)
+                )
+            )
         }
         // Projects, labels & indicator values
         project {

@@ -12,8 +12,11 @@ interface IndicatorViewService {
 
     /**
      * Creates or updates an indicator view
+     *
+     * @param view View to create or update
+     * @return Created or updated view
      */
-    fun saveIndicatorView(view: IndicatorView)
+    fun saveIndicatorView(view: IndicatorView): IndicatorView
 
     /**
      * Gets a view using its name

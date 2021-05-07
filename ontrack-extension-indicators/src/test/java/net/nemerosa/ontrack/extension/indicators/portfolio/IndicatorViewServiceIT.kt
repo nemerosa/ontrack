@@ -17,7 +17,7 @@ class IndicatorViewServiceIT : AbstractIndicatorsTestSupport() {
         val categories = (1..3).map { category() }
         val name = uid("V")
         asAdmin {
-            indicatorViewService.saveIndicatorView(IndicatorView(name, categories.map { it.id }))
+            indicatorViewService.saveIndicatorView(IndicatorView("", name, categories.map { it.id }))
             assertNotNull(
                 indicatorViewService.getIndicatorViews().find { it.name == name },
                 "View has been created"
@@ -38,8 +38,8 @@ class IndicatorViewServiceIT : AbstractIndicatorsTestSupport() {
         val subset = categories.take(2)
         val name = uid("V")
         asAdmin {
-            indicatorViewService.saveIndicatorView(IndicatorView(name, categories.map { it.id }))
-            indicatorViewService.saveIndicatorView(IndicatorView(name, subset.map { it.id }))
+            val id = indicatorViewService.saveIndicatorView(IndicatorView("", name, categories.map { it.id })).id
+            indicatorViewService.saveIndicatorView(IndicatorView(id, name, subset.map { it.id }))
             assertNotNull(indicatorViewService.findIndicatorViewByName(name), "View has been updated") { view ->
                 assertEquals(name, view.name)
                 assertEquals(subset.map { it.id }, view.categories)
@@ -52,7 +52,7 @@ class IndicatorViewServiceIT : AbstractIndicatorsTestSupport() {
         val categories = (1..3).map { category() }
         val name = uid("V")
         asAdmin {
-            indicatorViewService.saveIndicatorView(IndicatorView(name, categories.map { it.id }))
+            indicatorViewService.saveIndicatorView(IndicatorView("", name, categories.map { it.id }))
             assertNotNull(indicatorViewService.findIndicatorViewByName(name), "View has been created")
             indicatorViewService.deleteIndicatorView(name)
             assertNull(indicatorViewService.findIndicatorViewByName(name), "View has been deleted")
@@ -64,7 +64,7 @@ class IndicatorViewServiceIT : AbstractIndicatorsTestSupport() {
         val categories = (1..3).map { category() }
         val name = uid("V")
         asAdmin {
-            indicatorViewService.saveIndicatorView(IndicatorView(name, categories.map { it.id }))
+            indicatorViewService.saveIndicatorView(IndicatorView("", name, categories.map { it.id }))
         }
         asUser().call {
             assertNotNull(indicatorViewService.getIndicatorViews().find { it.name == name }, "View has been created")
@@ -77,11 +77,11 @@ class IndicatorViewServiceIT : AbstractIndicatorsTestSupport() {
         val categories = (1..3).map { category() }
         val name = uid("V")
         asUserWith<IndicatorViewManagement> {
-            indicatorViewService.saveIndicatorView(IndicatorView(name, categories.map { it.id }))
+            indicatorViewService.saveIndicatorView(IndicatorView("", name, categories.map { it.id }))
         }
         asUser().call {
             assertFailsWith<AccessDeniedException> {
-                indicatorViewService.saveIndicatorView(IndicatorView(name, categories.map { it.id }))
+                indicatorViewService.saveIndicatorView(IndicatorView("", name, categories.map { it.id }))
             }
         }
     }

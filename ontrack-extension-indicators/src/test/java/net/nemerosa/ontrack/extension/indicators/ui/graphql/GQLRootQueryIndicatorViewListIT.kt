@@ -20,6 +20,7 @@ class GQLRootQueryIndicatorViewListIT : AbstractIndicatorsTestSupport() {
         asAdmin {
             indicatorViewService.saveIndicatorView(
                 IndicatorView(
+                    id = "",
                     name = name,
                     categories = listOf(
                         category1.id,

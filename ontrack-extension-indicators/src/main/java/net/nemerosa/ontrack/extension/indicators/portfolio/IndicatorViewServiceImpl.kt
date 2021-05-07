@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 @Service
 @Transactional
@@ -17,17 +18,53 @@ class IndicatorViewServiceImpl(
     override fun getIndicatorViews(): List<IndicatorView> =
         storageService.getData(STORE_INDICATOR_VIEWS, IndicatorView::class.java).values.sortedBy { it.name }
 
-    override fun saveIndicatorView(view: IndicatorView) {
+    override fun saveIndicatorView(view: IndicatorView): IndicatorView {
         securityService.checkGlobalFunction(IndicatorViewManagement::class.java)
-        storageService.store(
-            STORE_INDICATOR_VIEWS,
-            view.name,
-            view
-        )
+
+        return if (view.id.isNotBlank()) {
+            // Gets the existing record
+            val existing = findIndicatorViewById(view.id)
+            if (existing != null) {
+                // Update
+                updateIndicatorView(view)
+            } else {
+                throw IndicatorViewIDNotFoundException(view.id)
+            }
+        } else {
+            // Creation
+            createIndicatorView(view)
+        }
     }
 
+    private fun createIndicatorView(view: IndicatorView): IndicatorView {
+        val existing = findIndicatorViewByName(view.name)
+        if (existing != null) {
+            throw IndicatorViewNameAlreadyExistsException(view.name)
+        }
+        val uuid = UUID.randomUUID().toString()
+        val record = IndicatorView(
+            id = uuid,
+            name = view.name,
+            categories = view.categories
+        )
+        storageService.store(STORE_INDICATOR_VIEWS, uuid, record)
+        return view
+    }
+
+    private fun updateIndicatorView(view: IndicatorView): IndicatorView {
+        val existing = findIndicatorViewByName(view.name)
+        if (existing != null && existing.id != view.id) {
+            throw IndicatorViewNameAlreadyExistsException(view.name)
+        }
+        storageService.store(STORE_INDICATOR_VIEWS, view.id, view)
+        return view
+    }
+
+    private fun findIndicatorViewById(id: String): IndicatorView? =
+        storageService.retrieve(STORE_INDICATOR_VIEWS, id, IndicatorView::class.java).getOrNull()
+
     override fun findIndicatorViewByName(name: String): IndicatorView? =
-        storageService.retrieve(STORE_INDICATOR_VIEWS, name, IndicatorView::class.java).getOrNull()
+        getIndicatorViews().findLast { it.name == name }
 
     override fun deleteIndicatorView(name: String) {
         securityService.checkGlobalFunction(IndicatorViewManagement::class.java)
