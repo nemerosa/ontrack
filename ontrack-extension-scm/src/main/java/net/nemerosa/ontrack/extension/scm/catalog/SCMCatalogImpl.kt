@@ -45,7 +45,8 @@ class SCMCatalogImpl(
                         repository = source.repository,
                         repositoryPage = source.repositoryPage,
                         lastActivity = source.lastActivity,
-                        timestamp = Time.now()
+                        timestamp = Time.now(),
+                        teams = source.teams
                 )
                 // Stores the entry
                 storageService.store(

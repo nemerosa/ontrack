@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.scm.catalog.api
 
 import graphql.Scalars.GraphQLBoolean
 import graphql.Scalars.GraphQLString
+import graphql.schema.GraphQLList
+import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
@@ -14,7 +16,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeSCMCatalogEntry(
-        private val catalogLinkService: CatalogLinkService
+        private val catalogLinkService: CatalogLinkService,
+        private val scmCatalogTeam: GQLTypeSCMCatalogTeam
 ) : GQLType {
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType =
@@ -68,6 +71,11 @@ class GQLTypeSCMCatalogEntry(
                                     val entry = env.getSource<SCMCatalogEntry>()
                                     catalogLinkService.getLinkedProject(entry)
                                 }
+                    }
+                    .field {
+                        it.name(SCMCatalogEntry::teams.name)
+                            .description("List of teams this entry belongs to")
+                            .type(GraphQLList(GraphQLNonNull(scmCatalogTeam.typeRef)))
                     }
                     .build()
 

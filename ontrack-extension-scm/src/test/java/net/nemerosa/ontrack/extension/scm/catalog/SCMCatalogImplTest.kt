@@ -154,12 +154,13 @@ class SCMCatalogImplTest {
     }
 
     private fun entry(name: String, scm: String = "scm") = SCMCatalogEntry(
-            scm,
-            "config",
-            name,
-            "https://scm/$name",
-            Time.now(),
-            Time.now()
+        scm = scm,
+        config = "config",
+        repository = name,
+        repositoryPage = "https://scm/$name",
+        lastActivity = Time.now(),
+        timestamp = Time.now(),
+        teams = null
     )
 
     private fun source(name: String) = SCMCatalogSource(

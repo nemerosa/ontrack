@@ -9,10 +9,12 @@ import java.time.LocalDateTime
  * @param repository Name of the SCM repository (for example: "nemerosa/ontrack")
  * @param repositoryPage URL to the web repository page (a GitHub repository page for example)
  * @param lastActivity Timestamp for the last activity on this repository
+ * @param teams List of teams this SCM entry belongs to
  */
 data class SCMCatalogSource(
         val config: String,
         val repository: String,
         val repositoryPage: String?,
-        val lastActivity: LocalDateTime?
+        val lastActivity: LocalDateTime?,
+        val teams: List<SCMCatalogTeam>? = null
 )

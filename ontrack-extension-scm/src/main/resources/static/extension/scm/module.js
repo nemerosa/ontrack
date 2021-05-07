@@ -515,6 +515,7 @@ angular.module('ontrack.extension.scm', [
             link: "ENTRY",
             beforeLastActivity: null,
             afterLastActivity: null,
+            team: null,
             sortOn: null,
             sortAscending: true
         };
@@ -528,8 +529,8 @@ angular.module('ontrack.extension.scm', [
         };
 
         const query = `
-            query CatalogInfo($offset: Int!, $size: Int!, $scm: String, $config: String, $repository: String, $link: String, $project: String, $sortOn: String, $sortAscending: Boolean, $beforeLastActivity: String, $afterLastActivity: String) {
-                scmCatalog(offset: $offset, size: $size, scm: $scm, config: $config, repository: $repository, link: $link, project: $project, sortOn: $sortOn, sortAscending: $sortAscending, beforeLastActivity: $beforeLastActivity, afterLastActivity: $afterLastActivity) {
+            query CatalogInfo($offset: Int!, $size: Int!, $scm: String, $config: String, $repository: String, $link: String, $project: String, $sortOn: String, $sortAscending: Boolean, $beforeLastActivity: String, $afterLastActivity: String, $team: String) {
+                scmCatalog(offset: $offset, size: $size, scm: $scm, config: $config, repository: $repository, link: $link, project: $project, sortOn: $sortOn, sortAscending: $sortAscending, beforeLastActivity: $beforeLastActivity, afterLastActivity: $afterLastActivity, team: $team) {
                     pageInfo {
                       totalSize
                       currentOffset
@@ -553,6 +554,13 @@ angular.module('ontrack.extension.scm', [
                         repositoryPage
                         lastActivity
                         timestamp
+                        teams {
+                          id
+                          name
+                          description
+                          url
+                          role
+                        }
                       }
                       project {
                         id
@@ -610,6 +618,7 @@ angular.module('ontrack.extension.scm', [
             $scope.queryVariables.repository = "";
             $scope.queryVariables.project = "";
             $scope.queryVariables.link = "ENTRY";
+            $scope.queryVariables.team = null;
             loadCatalog();
         };
 
