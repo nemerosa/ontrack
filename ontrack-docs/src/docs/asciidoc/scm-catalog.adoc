@@ -179,3 +179,8 @@ organizations to authorise for collection. For example, below,
 only the `nemerosa` organization is allowed:
 
 image::images/scm-catalog-github.png[200,GitHub SCM Catalog]
+
+[CAUTION]
+====
+When trying to get the teams for GitHub, the GitHub token needs to have `read:org` in its organization scope.
+====
