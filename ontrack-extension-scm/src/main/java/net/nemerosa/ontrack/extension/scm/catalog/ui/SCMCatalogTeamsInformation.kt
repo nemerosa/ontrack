@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import org.springframework.stereotype.Component
-import java.util.*
 
 /**
  * Displays the list of SCM teams an Ontrack project belongs to.
@@ -19,19 +18,17 @@ class SCMCatalogTeamsInformation(
     private val catalogLinkService: CatalogLinkService
 ) : AbstractExtension(extensionFeature), EntityInformationExtension {
 
-    override fun getInformation(entity: ProjectEntity): Optional<EntityInformation> =
+    override fun getInformation(entity: ProjectEntity): EntityInformation? =
         if (entity is Project) {
-            Optional.ofNullable(
-                catalogLinkService.getSCMCatalogEntry(entity)
-                    ?.run {
-                        teams
-                    }
-                    ?.run {
-                        EntityInformation(this@SCMCatalogTeamsInformation, this)
-                    }
-            )
+            catalogLinkService.getSCMCatalogEntry(entity)
+                ?.run {
+                    teams
+                }
+                ?.run {
+                    EntityInformation(this@SCMCatalogTeamsInformation, this)
+                }
         } else {
-            Optional.empty()
+            null
         }
 
 }
