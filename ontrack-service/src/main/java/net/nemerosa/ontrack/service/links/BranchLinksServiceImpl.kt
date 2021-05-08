@@ -41,8 +41,6 @@ class BranchLinksServiceImpl(
         index[branch.id] = graph
         // Processing stack
         val stack = MaxArrayDeque<Item>()
-        // Index of branches which have already been processed
-        val alreadyProcessed = mutableSetOf<ID>()
 
         // Starting the processing
         val start = System.currentTimeMillis()
@@ -52,8 +50,6 @@ class BranchLinksServiceImpl(
         while (stack.isNotEmpty()) {
             // Gets the current item
             val item = stack.pop()
-            // Processing this branch
-            alreadyProcessed += item.branch.id
             // Processing logging
             if (logger.isDebugEnabled) {
                 logger.debug("item={}", item)
@@ -68,7 +64,7 @@ class BranchLinksServiceImpl(
                 // For every next branch...
                 nextBranches.forEach { nextBranch ->
                     // If not already processed
-                    if (nextBranch.id !in alreadyProcessed) {
+                    if (!node.isBranchAlreadyProcessed(nextBranch)) {
                         // Make sure we have a node for its branch
                         val nextNode = index.getOrPut(nextBranch.id) {
                             Node(nextBranch)
@@ -93,8 +89,7 @@ class BranchLinksServiceImpl(
             ),
             fields = mapOf(
                 "elapsedMs" to (end - start).toDouble(),
-                "stack" to stack.max.toDouble(),
-                "branches" to alreadyProcessed.size.toDouble()
+                "stack" to stack.max.toDouble()
             ),
             timestamp = Time.now()
         )
@@ -194,7 +189,12 @@ class BranchLinksServiceImpl(
     private class Node(
         val branch: Branch,
         val branches: MutableList<Node> = mutableListOf()
-    )
+    ) {
+        fun isBranchAlreadyProcessed(nextBranch: Branch) =
+            branches.any {
+                it.branch.id == nextBranch.id
+            }
+    }
 
     private fun graphToNode(node: Node, direction: BranchLinksDirection): BranchLinksNode =
         BranchLinksNode(

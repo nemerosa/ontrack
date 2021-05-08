@@ -13,6 +13,7 @@ object CatalogFixtures {
             repositoryPage = "uri:$repository",
             scm = scm,
             lastActivity = Time.now(),
-            timestamp = Time.now()
+            timestamp = Time.now(),
+            teams = null
     )
 }

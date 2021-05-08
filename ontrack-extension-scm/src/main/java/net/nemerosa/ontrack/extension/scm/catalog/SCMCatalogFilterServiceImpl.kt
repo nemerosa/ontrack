@@ -11,10 +11,10 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class SCMCatalogFilterServiceImpl(
-        private val scmCatalog: SCMCatalog,
-        private val catalogLinkService: CatalogLinkService,
-        private val structureService: StructureService,
-        private val securityService: SecurityService
+    private val scmCatalog: SCMCatalog,
+    private val catalogLinkService: CatalogLinkService,
+    private val structureService: StructureService,
+    private val securityService: SecurityService
 ) : SCMCatalogFilterService {
 
     override fun indexCatalogProjectEntries(): Map<SCMCatalogProjectFilterLink, Int> {
@@ -68,12 +68,26 @@ class SCMCatalogFilterServiceImpl(
         val entryAfterLastActivityFilter: (SCMCatalogEntry) -> Boolean = filter.afterLastActivity?.let {
             { entry: SCMCatalogEntry -> entry.lastActivity != null && entry.lastActivity.toLocalDate() >= it }
         } ?: { true }
+
+        val entryTeamFilter: (SCMCatalogEntry) -> Boolean = { entry: SCMCatalogEntry ->
+            when {
+                filter.team.isNullOrBlank() -> true
+                filter.team == "-" -> entry.teams.isNullOrEmpty()
+                else -> entry.teams?.any {
+                    it.id.contains(filter.team, ignoreCase = true) ||
+                            (it.name?.contains(filter.team, ignoreCase = true) ?: false)
+                } ?: false
+            }
+            // No filter
+        }
+
         val entryFilter: (SCMCatalogEntry) -> Boolean = entryScmFilter and
                 entryConfigFilter and
                 entryRepositoryFilter and
                 entryLinkFilter and
                 entryBeforeLastActivityFilter and
-                entryAfterLastActivityFilter
+                entryAfterLastActivityFilter and
+                entryTeamFilter
 
         val entries: () -> Sequence<SCMCatalogEntryOrProject> = {
             scmCatalog.catalogEntries.filter(entryFilter).map { entry ->
@@ -118,13 +132,13 @@ class SCMCatalogFilterServiceImpl(
         // Sorting
         val sortOn = filter.sortOn ?: SCMCatalogProjectFilterSort.REPOSITORY
         val comparator: Comparator<SCMCatalogEntryOrProject> =
-                compareBy(sortOn.sortingSelector).run {
-                    if (filter.sortAscending) {
-                        this
-                    } else {
-                        reversed()
-                    }
+            compareBy(sortOn.sortingSelector).run {
+                if (filter.sortAscending) {
+                    this
+                } else {
+                    reversed()
                 }
+            }
 
         // Sorting & truncating
         return allEntries.sortedWith(comparator).drop(filter.offset).take(filter.size).toList()

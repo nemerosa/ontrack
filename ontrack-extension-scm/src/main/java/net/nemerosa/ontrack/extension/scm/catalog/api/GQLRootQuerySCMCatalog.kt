@@ -63,6 +63,10 @@ class GQLRootQuerySCMCatalog(
                             GraphQLArgument.newArgument().name(ARG_AFTER_LAST_ACTIVITY)
                                     .description("Selects entries whose last activity is after this date.")
                                     .type(GraphQLString)
+                                    .build(),
+                            GraphQLArgument.newArgument().name(ARG_TEAM)
+                                    .description("ID of the SCM team. Empty string to select entries without a team.")
+                                    .type(GraphQLString)
                                     .build()
                     )
             )
@@ -77,6 +81,7 @@ class GQLRootQuerySCMCatalog(
         val project: String? = env.getArgument<String>(ARG_PROJECT)
         val beforeLastActivity: LocalDate? = env.getArgument<String?>(ARG_BEFORE_LAST_ACTIVITY)?.run { JDKLocalDateDeserializer.parse(this) }
         val afterLastActivity: LocalDate? = env.getArgument<String?>(ARG_AFTER_LAST_ACTIVITY)?.run { JDKLocalDateDeserializer.parse(this) }
+        val team: String? = env.getArgument(ARG_TEAM)
         val sortOn: SCMCatalogProjectFilterSort? = env.getArgument<String?>(ARG_SORT_ON)?.run { SCMCatalogProjectFilterSort.valueOf(this) }
         val sortAscending: Boolean = env.getArgument(ARG_SORT_ASCENDING) ?: true
         val filter = SCMCatalogProjectFilter(
@@ -89,6 +94,7 @@ class GQLRootQuerySCMCatalog(
                 project = project,
                 beforeLastActivity = beforeLastActivity,
                 afterLastActivity = afterLastActivity,
+                team = team,
                 sortOn = sortOn,
                 sortAscending = sortAscending
         )
@@ -105,6 +111,7 @@ class GQLRootQuerySCMCatalog(
         private const val ARG_SORT_ASCENDING = "sortAscending"
         private const val ARG_BEFORE_LAST_ACTIVITY = "beforeLastActivity"
         private const val ARG_AFTER_LAST_ACTIVITY = "afterLastActivity"
+        private const val ARG_TEAM = "team"
     }
 
 }

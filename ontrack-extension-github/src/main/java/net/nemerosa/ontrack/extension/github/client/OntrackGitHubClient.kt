@@ -2,8 +2,10 @@ package net.nemerosa.ontrack.extension.github.client
 
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.model.GitHubIssue
+import net.nemerosa.ontrack.extension.github.model.GitHubTeam
 import net.nemerosa.ontrack.extension.github.model.GitHubUser
 import org.eclipse.egit.github.core.client.GitHubClient
+import org.springframework.web.client.RestTemplate
 import java.time.LocalDateTime
 
 
@@ -43,7 +45,13 @@ interface OntrackGitHubClient {
      * Gets the underlying / native GitHub client so that extensions
      * can add features.
      */
+    @Deprecated("Prefer using the RestTemplate")
     fun createGitHubClient(): GitHubClient
+
+    /**
+     * Creates a [RestTemplate] for accessing GitHub.
+     */
+    fun createGitHubRestTemplate(): RestTemplate
 
     /**
      * Gets a pull request using its ID
@@ -58,4 +66,12 @@ interface OntrackGitHubClient {
      * Gets the last modified date for a given [repository][repo].
      */
     fun getRepositoryLastModified(repo: String): LocalDateTime?
+
+    /**
+     * Gets the list of teams for a repository
+     *
+     * @param repo Repository (org/name)
+     * @return List of teams or `null` if the teams cannot be accessed
+     */
+    fun getRepositoryTeams(repo: String): List<GitHubTeam>?
 }

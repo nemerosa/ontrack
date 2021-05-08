@@ -80,6 +80,30 @@ is enabled, the following <<projects-labels,labels>> will be set for projects:
 Those labels can be used to filter _orphan_ projects on the
 home page for example, or in GraphQL queries.
 
+[[scm-catalog-teams]]
+===== Teams
+
+For SCM which allow for this, the SCM catalog collects the list of teams for each repositoy.
+
+[NOTE]
+====
+The teams collection is only enabled for GitHub right now.
+
+When trying to get the teams for GitHub, the GitHub token needs to have `read:org` in its organization scope.
+====
+
+The teams do appear in the SCM catalog list and can be used to filter the SCM catalog entries:
+
+image::images/scm-catalog-teams-list.png[Teams in list]
+
+Each team is associated with a link to its page in the SCM.
+
+The teams information is also available in the Ontrack project page:
+
+image::images/scm-catalog-teams-project.png[Teams in project page]
+
+On this page, the role of the team for this project is also displayed, but usually, more details can be accessed by following the link to the SCM team page.
+
 [[scm-catalog-graphql]]
 ===== GraphQL schema
 
