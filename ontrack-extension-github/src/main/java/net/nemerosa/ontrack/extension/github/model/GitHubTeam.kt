@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 data class GitHubTeam(
     val slug: String,
     val name: String,
-    val description: String,
+    val description: String?,
     val html_url: String,
     val permission: String
 )
