@@ -6,10 +6,10 @@ import net.nemerosa.ontrack.model.events.EventListener
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.PropertyService
+import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.ConfigurationProperty
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
-import net.nemerosa.ontrack.repository.PropertyRepository
 import org.springframework.stereotype.Component
 
 /**
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component
 @Component
 class ConfigurationPropertyCleanupListener(
     private val propertyService: PropertyService,
-    private val propertyRepository: PropertyRepository,
+    private val structureService: StructureService,
     private val securityService: SecurityService
 ) : EventListener {
 
@@ -45,11 +45,12 @@ class ConfigurationPropertyCleanupListener(
         configurationName: String,
         configurationType: String
     ) {
-        propertyService.forEachEntityWithProperty(propertyType) { entity, property ->
+        propertyService.forEachEntityWithProperty(propertyType) { entityId, property ->
             if (property is ConfigurationProperty<*>) {
                 val configuration = property.getConfiguration()
                 if (configuration::class.java.name == configurationType && configuration.getName() == configurationName) {
-                    propertyRepository.deleteProperty(propertyType.getTypeName(), entity.type, ID.of(entity.id))
+                    val entity = entityId.type.getEntityFn(structureService).apply(ID.of(entityId.id))
+                    propertyService.deleteProperty(entity, propertyType.getTypeName())
                 }
             }
         }
