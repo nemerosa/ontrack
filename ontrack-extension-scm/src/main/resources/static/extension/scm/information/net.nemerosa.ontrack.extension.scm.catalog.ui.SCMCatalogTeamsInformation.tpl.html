@@ -1,0 +1,16 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        SCM teams
+    </div>
+    <div class="panel-body">
+        <p ng-if="!value.data">No team could be detected</p>
+        <p ng-if="value.data.length == 0">No team.</p>
+        <ul ng-if="value.data.length > 0">
+            <li ng-repeat="team in value.data">
+                <a ng-if="team.url" href="{{ team.url }}">{{ team.name }}</a>
+                <span ng-if="!team.url">{{ team.name }}</span>
+                <span ng-if="team.role" class="ot-description">({{ team.role }})</span>
+            </li>
+        </ul>
+    </div>
+</div>
