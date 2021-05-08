@@ -213,6 +213,17 @@ class PropertyServiceImpl(
         }
     }
 
+    override fun <T> forEachEntityWithProperty(propertyType: PropertyType<T>, consumer: (ProjectEntityID, T) -> Unit) {
+        propertyRepository.forEachEntityWithProperty(
+                propertyType.typeName
+        ) { t: TProperty ->
+            consumer(
+                    ProjectEntityID(t.entityType, t.entityId.value),
+                    propertyType.fromStorage(t.json)
+            )
+        }
+    }
+
     override fun <T> findBuildByBranchAndSearchkey(branchId: ID, propertyType: Class<out PropertyType<T>>, searchKey: String): ID? {
         // Gets the property type by name
         val actualPropertyType: PropertyType<T> = getPropertyTypeByName(propertyType.name)

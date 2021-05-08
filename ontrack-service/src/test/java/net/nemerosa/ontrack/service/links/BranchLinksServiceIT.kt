@@ -377,10 +377,64 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
                     "branch" to branch("chart").name
                 ),
                 fields = mapOf(
-                    "stack" to 8.0,
-                    "branches" to 8.0
+                    "stack" to 8.0
                 )
             )
+        }
+    }
+
+    @Test
+    fun `Branches are processed independently on each graph path`() {
+
+        /**
+         * Building the following graph:
+         *
+         * project/main/1 ==> component/main/1 ==> library/release/1
+         * project/main/2 ==> component/release/1 ==> library/release/1
+         */
+
+        val project = project()
+        val projectMain = project.branch("main")
+        val projectMain1 = projectMain.build("1")
+        val projectMain2 = projectMain.build("2")
+
+        val component = project()
+        val componentMain = component.branch("main")
+        val componentMain1 = componentMain.build("1")
+        val componentRelease = component.branch("release")
+        val componentRelease1 = componentRelease.build("1")
+
+        val library = project()
+        val libraryRelease = library.branch("release")
+        val libraryRelease1 = libraryRelease.build("1")
+
+        asAdmin {
+            projectMain1.linkTo(componentMain1)
+            projectMain2.linkTo(componentRelease1)
+
+            componentMain1.linkTo(libraryRelease1)
+            componentRelease1.linkTo(libraryRelease1)
+        }
+
+        /**
+         * Computing the graph for project/main
+         */
+
+        withLinks {
+            assertBranchLinks(projectMain, BranchLinksDirection.USING) {
+                /**
+                 * We expect the following dependencies:
+                 *
+                 * project/main --- component/main --- library/release
+                 *              \--- component/release --- library/release
+                 */
+                assertLinkedTo(componentMain) {
+                    assertLinkedTo(libraryRelease)
+                }
+                assertLinkedTo(componentRelease) {
+                    assertLinkedTo(libraryRelease)
+                }
+            }
         }
     }
 

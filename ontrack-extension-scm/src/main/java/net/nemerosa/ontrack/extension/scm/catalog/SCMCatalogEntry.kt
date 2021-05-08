@@ -13,6 +13,7 @@ import java.time.LocalDateTime
  * @param repositoryPage URL to the web repository page (a GitHub repository page for example)
  * @param lastActivity Timestamp for the last activity on this repository
  * @param timestamp Timestamp for the collection of the information
+ * @param teams List of teams assigned to this entry
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SCMCatalogEntry(
@@ -21,7 +22,8 @@ data class SCMCatalogEntry(
         val repository: String,
         val repositoryPage: String?,
         val lastActivity: LocalDateTime?,
-        val timestamp: LocalDateTime
+        val timestamp: LocalDateTime,
+        val teams: List<SCMCatalogTeam>?
 ) : Comparable<SCMCatalogEntry> {
     @get:JsonIgnore
     val key: String

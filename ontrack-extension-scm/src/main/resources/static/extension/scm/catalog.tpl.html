@@ -12,7 +12,7 @@
     <table class="table table-hover table-condensed" ng-show="data">
         <thead>
         <tr>
-            <td colspan="6">
+            <td colspan="7">
                 <form class="form-inline">
                     <button class="btn btn-default" type="button" ng-click="navigate(data.scmCatalog.pageInfo.previousPage)" ng-disabled="!data.scmCatalog.pageInfo.previousPage">
                         <span class="fa fa-step-backward"></span>
@@ -76,6 +76,12 @@
                                is-open="catalog-filter-before-last-activity-opened"
                         />
                     </div>
+                    <!-- Team filter -->
+                    <div class="form-group">
+                        <label for="catalog-filter-team">Team</label>
+                        <input id="catalog-filter-team" class="form-control" type="text" ng-model="queryVariables.team" />
+                        <span class="fa fa-question-circle" title="Enter `-` for searching for entries without any team."></span>
+                    </div>
                     <!-- Search button -->
                     <div class="form-group">
                         <button type="button"
@@ -109,7 +115,7 @@
         </thead>
         <tbody ng-if="data.scmCatalog.pageInfo.currentSize == 0">
         <tr class="alert alert-warning">
-            <td colspan="6">
+            <td colspan="7">
                 No SCM catalog entry was collected or the filter is too restrictive.
             </td>
         </tr>
@@ -131,6 +137,7 @@
                 <span class="fa fa-sort-desc" ng-if="catalogSortOn == 'LAST_ACTIVITY' && !catalogSortAscending"></span>
                 <span class="fa fa-sort text-muted" ng-if="catalogSortOn != 'LAST_ACTIVITY'"></span>
             </th>
+            <th>Team(s)</th>
             <th>Collection time</th>
         </tr>
         </thead>
@@ -148,6 +155,12 @@
                 <span ng-if="item.entry.lastActivity">
                 {{item.entry.lastActivity | date:'mediumDate'}}
                 </span>
+            </td>
+            <td>
+                <span ng-if="!item.entry.teams || item.entry.teams.length == 0">-</span>
+                <p ng-repeat="team in item.entry.teams">
+                    <a href="{{ team.url }}">{{ team.name }}</a>
+                </p>
             </td>
             <td title="Collection timestamp">
                 {{item.entry.timestamp | date:'mediumDate'}}

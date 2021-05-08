@@ -72,6 +72,14 @@ class ProjectProperties extends ProjectEntityProperties {
     }
 
     /**
+     * Gets the GitHub property on a project
+     */
+    @DSLMethod("Gets the GitHub property on a project")
+    def getGitHub() {
+        return property('net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType', false)
+    }
+
+    /**
      * GitLab configuration
      */
 
@@ -122,7 +130,7 @@ class ProjectProperties extends ProjectEntityProperties {
 
     @DSLMethod(see = "stash")
     def getStash() {
-        property('net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType')
+        property('net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType', false)
     }
 
     /**
