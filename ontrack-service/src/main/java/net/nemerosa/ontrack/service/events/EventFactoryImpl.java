@@ -317,6 +317,7 @@ public class EventFactoryImpl implements EventFactory {
     public <T extends Configuration<T>> Event deleteConfiguration(T configuration) {
         return Event.of(DELETE_CONFIGURATION)
                 .with("configuration", configuration.getName())
+                .with("configurationType", configuration.getClass().getName())
                 .get();
     }
 }

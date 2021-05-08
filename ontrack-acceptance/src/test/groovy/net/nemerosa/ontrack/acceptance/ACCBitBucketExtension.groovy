@@ -43,6 +43,36 @@ class ACCBitBucketExtension extends AbstractACCDSL {
     }
 
     /**
+     * Make sure that deleting a Bitbucket configuration does not remove other SCM configurations with the same name.
+     */
+    @Test
+    void 'Deleting a Bitbucket configuration keeps the GitHub configuration of a project even when having the same name'() {
+        // Unique configuration name
+        String confName = uid("B")
+        // BB configuration
+        ontrack.config.stash confName, url: "https://bitbucket.org"
+        // GH configuration
+        ontrack.config.gitHub confName, oauth2Token: 'ABCDEF'
+        // Configures a project with both configurations
+        String projectName = uid("P")
+        ontrack.project(projectName) {
+            config {
+                stash confName, "PRJ", "ontrack"
+                gitHub confName, repository: 'nemerosa/ontrack'
+            }
+        }
+        // Deletes the BB configuration
+        ontrack.delete("extension/stash/configurations/${confName}")
+        // Checks the project still has a GH configuration
+        def ghProperty = ontrack.project(projectName).config.gitHub
+        assert ghProperty != null: "GitHub property has been kept"
+        assert ghProperty.configuration.name == confName
+        // Checks the project BB configuration is gone
+        def bbProperty = ontrack.project(projectName).config.stash
+        assert bbProperty == null: "Bitbucket property is gone"
+    }
+
+    /**
      * Regression test for #395
      */
     @Test
