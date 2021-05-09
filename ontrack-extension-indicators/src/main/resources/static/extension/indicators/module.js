@@ -135,19 +135,10 @@ angular.module('ontrack.extension.indicators', [
                   id
                   name
                   deprecated
-                  source {
-                    provider {
-                        id
-                        name
-                    }
-                    name
-                  }
-                  links {
-                    _update
-                    _delete
-                  }
                   types {
                     id
+                    name
+                    deprecated
                   }
                 }
                 links {
@@ -161,13 +152,21 @@ angular.module('ontrack.extension.indicators', [
             $scope.loadingViews = true;
             otGraphqlService.pageGraphQLCall(query).then(data => {
                 $scope.views = data.indicatorViewList;
-                $scope.categories = data.indicatorCategories;
+                $scope.categories = data.indicatorCategories.categories;
             }).finally(() => {
                 $scope.loadingViews = false;
             });
         };
 
         loadViews();
+
+        $scope.unfold = (category) => {
+            category.unfolded = true;
+        };
+
+        $scope.fold = (category) => {
+            category.unfolded = false;
+        };
 
     })
     .config(function ($stateProvider) {
