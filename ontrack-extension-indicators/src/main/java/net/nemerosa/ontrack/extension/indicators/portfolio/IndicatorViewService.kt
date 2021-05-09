@@ -19,13 +19,18 @@ interface IndicatorViewService {
     fun saveIndicatorView(view: IndicatorView): IndicatorView
 
     /**
+     * Gets a view using its ID
+     */
+    fun findIndicatorViewById(id: String): IndicatorView?
+
+    /**
      * Gets a view using its name
      */
     fun findIndicatorViewByName(name: String): IndicatorView?
 
     /**
-     * Deletes an indicator view
+     * Deletes an indicator view using its ID.
      */
-    fun deleteIndicatorView(name: String)
+    fun deleteIndicatorView(id: String)
 
 }

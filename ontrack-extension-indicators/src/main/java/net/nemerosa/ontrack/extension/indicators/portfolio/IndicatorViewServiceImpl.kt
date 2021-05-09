@@ -48,7 +48,7 @@ class IndicatorViewServiceImpl(
             categories = view.categories
         )
         storageService.store(STORE_INDICATOR_VIEWS, uuid, record)
-        return view
+        return record
     }
 
     private fun updateIndicatorView(view: IndicatorView): IndicatorView {
@@ -60,15 +60,15 @@ class IndicatorViewServiceImpl(
         return view
     }
 
-    private fun findIndicatorViewById(id: String): IndicatorView? =
+    override fun findIndicatorViewById(id: String): IndicatorView? =
         storageService.retrieve(STORE_INDICATOR_VIEWS, id, IndicatorView::class.java).getOrNull()
 
     override fun findIndicatorViewByName(name: String): IndicatorView? =
         getIndicatorViews().findLast { it.name == name }
 
-    override fun deleteIndicatorView(name: String) {
+    override fun deleteIndicatorView(id: String) {
         securityService.checkGlobalFunction(IndicatorViewManagement::class.java)
-        storageService.store(STORE_INDICATOR_VIEWS, name, null)
+        storageService.store(STORE_INDICATOR_VIEWS, id, null)
     }
 
     companion object {
