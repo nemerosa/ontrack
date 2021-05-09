@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.indicators.portfolio
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorViewManagement
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
@@ -66,9 +67,10 @@ class IndicatorViewServiceImpl(
     override fun findIndicatorViewByName(name: String): IndicatorView? =
         getIndicatorViews().findLast { it.name == name }
 
-    override fun deleteIndicatorView(id: String) {
+    override fun deleteIndicatorView(id: String): Ack {
         securityService.checkGlobalFunction(IndicatorViewManagement::class.java)
         storageService.store(STORE_INDICATOR_VIEWS, id, null)
+        return Ack.OK
     }
 
     companion object {

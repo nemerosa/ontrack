@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.indicators.portfolio
 
+import net.nemerosa.ontrack.model.Ack
+
 /**
  * Management of [IndicatorView]s.
  */
@@ -31,6 +33,6 @@ interface IndicatorViewService {
     /**
      * Deletes an indicator view using its ID.
      */
-    fun deleteIndicatorView(id: String)
+    fun deleteIndicatorView(id: String): Ack
 
 }
