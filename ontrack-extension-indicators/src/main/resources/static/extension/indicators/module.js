@@ -93,6 +93,84 @@ angular.module('ontrack.extension.indicators', [
 
     })
     .config(function ($stateProvider) {
+        $stateProvider.state('indicator-views', {
+            url: '/extension/indicators/views',
+            templateUrl: 'extension/indicators/views.tpl.html',
+            controller: 'IndicatorViewsCtrl'
+        });
+    })
+    .controller('IndicatorViewsCtrl', function ($scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
+        $scope.loadingViews = false;
+
+        const view = ot.view();
+        view.title = "Indicator views";
+
+        const query = `
+            {
+              indicatorViewList {
+                views {
+                  name
+                  categories {
+                    id
+                    name
+                    deprecated
+                    types {
+                      id
+                      name
+                      deprecated
+                      link
+                    }
+                  }
+                  links {
+                    _update
+                    _delete
+                  }
+                }
+                links {
+                  _create
+                }
+              }
+              indicatorCategories {
+                categories {
+                  id
+                  name
+                  deprecated
+                  source {
+                    provider {
+                        id
+                        name
+                    }
+                    name
+                  }
+                  links {
+                    _update
+                    _delete
+                  }
+                  types {
+                    id
+                  }
+                }
+                links {
+                  _create
+                }
+              }
+            }
+        `;
+
+        const loadViews = () => {
+            $scope.loadingViews = true;
+            otGraphqlService.pageGraphQLCall(query).then(data => {
+                $scope.views = data.indicatorViewList;
+                $scope.categories = data.indicatorCategories;
+            }).finally(() => {
+                $scope.loadingViews = false;
+            });
+        };
+
+        loadViews();
+
+    })
+    .config(function ($stateProvider) {
         $stateProvider.state('indicator-types', {
             url: '/extension/indicators/types',
             templateUrl: 'extension/indicators/types.tpl.html',
