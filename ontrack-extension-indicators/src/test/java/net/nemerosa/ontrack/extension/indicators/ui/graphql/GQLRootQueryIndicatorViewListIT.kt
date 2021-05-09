@@ -17,7 +17,7 @@ class GQLRootQueryIndicatorViewListIT : AbstractIndicatorsTestSupport() {
         val category2 = category(id = "cat-2")
         // Indicator views
         val name = uid("V")
-        asAdmin {
+        val id = asAdmin {
             indicatorViewService.saveIndicatorView(
                 IndicatorView(
                     id = "",
@@ -27,7 +27,7 @@ class GQLRootQueryIndicatorViewListIT : AbstractIndicatorsTestSupport() {
                         category2.id
                     )
                 )
-            )
+            ).id
         }
         // Gets the views
         asAdmin {
@@ -35,6 +35,7 @@ class GQLRootQueryIndicatorViewListIT : AbstractIndicatorsTestSupport() {
                 """{
                     indicatorViewList {
                         views {
+                            id
                             name
                             categories {
                                 id
@@ -46,6 +47,7 @@ class GQLRootQueryIndicatorViewListIT : AbstractIndicatorsTestSupport() {
             ).let { data ->
                 val view = data.path("indicatorViewList").path("views").find { it.path("name").asText() == name }
                 assertNotNull(view) {
+                    assertEquals(id, it.path("id").asText())
                     assertEquals(
                         listOf(
                             mapOf(

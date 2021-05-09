@@ -19,6 +19,8 @@ class GQLTypeIndicatorView(
         GraphQLObjectType.newObject()
             .name(typeName)
             .description("List of categories to display for a portfolio or a list of portfolios.")
+            // ID
+            .stringField(IndicatorView::id, "Unique ID for this view")
             // Name
             .stringField(IndicatorView::name, "Name of the view")
             // Categories
