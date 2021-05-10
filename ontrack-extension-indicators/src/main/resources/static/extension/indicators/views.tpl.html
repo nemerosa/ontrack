@@ -36,6 +36,11 @@
                             <span ng-click="selectView(view)" class="ot-action">
                                 {{ view.name }}
                             </span>
+                            <!-- Updating -->
+                            <span class="ot-command-update ot-command"
+                                  title="Updating the name of this view"
+                                  ng-if="view.links._update"
+                                  ng-click="updateViewName(view)"></span>
                             <!-- Deletion -->
                             <span class="ot-command-delete ot-command"
                                   title="Delete this view"

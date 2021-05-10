@@ -202,6 +202,25 @@ angular.module('ontrack.extension.indicators', [
             });
         };
 
+        $scope.updateViewName = (view) => {
+            if (view.links._update) {
+                const formConfig = {
+                    uri: view.links._update,
+                    title: "Updating view name",
+                    submit: function (data) {
+                        return ot.pageCall($http.put(view.links._update, {
+                            name: data.name,
+                            categories: $scope.categories.filter(category => category.selected).map(category => category.id)
+                        }));
+                    }
+                };
+                otFormService.display(formConfig).then(data => {
+                    view.name = data.data.name;
+                    $scope.selectView(view);
+                });
+            }
+        };
+
         $scope.updateCategories = () => {
             if ($scope.currentView && $scope.currentView.links._update) {
                 $scope.updatingCategories = true;
