@@ -659,7 +659,7 @@ angular.module('ontrack.extension.indicators', [
         view.breadcrumbs = ot.homeBreadcrumbs();
 
         const query = `
-            query LoadPortfolioOfPortfolios($trendDuration: Int) {
+            query LoadPortfolioOfPortfolios($viewId: String, $trendDuration: Int) {
               indicatorViewList {
                 links {
                   _create
@@ -684,7 +684,7 @@ angular.module('ontrack.extension.indicators', [
                     color
                     description
                   }
-                  globalStats(duration: $trendDuration) {
+                  viewStats(id: $viewId, duration: $trendDuration) {
                     category {
                       id
                       name
@@ -721,7 +721,8 @@ angular.module('ontrack.extension.indicators', [
         `;
 
         const queryVariables = {
-            trendDuration: undefined
+            trendDuration: undefined,
+            viewId: null
         };
 
         $scope.pageModel = {
@@ -745,13 +746,6 @@ angular.module('ontrack.extension.indicators', [
                             name: "Create a portfolio",
                             cls: 'ot-command-new',
                             action: $scope.createPortfolio
-                        },
-                        {
-                            condition: () => $scope.portfolioOfPortolios.links._globalIndicators,
-                            id: 'portfolio-global-indicators',
-                            name: "Global indicators",
-                            cls: "ot-command-update",
-                            link: "/extension/indicators/portfolios/global-indicators"
                         },
                         ot.viewCloseCommand('/home')
                     ];
@@ -790,7 +784,12 @@ angular.module('ontrack.extension.indicators', [
 
         $scope.selectView = (view) => {
             $scope.currentView = view;
-            // TODO Reloads the stats
+            if (view) {
+                queryVariables.viewId = view.id;
+            } else {
+                queryVariables.viewId = null;
+            }
+            loadPortfolios();
         };
 
     })

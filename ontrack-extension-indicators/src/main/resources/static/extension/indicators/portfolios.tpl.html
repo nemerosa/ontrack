@@ -27,14 +27,6 @@
         <div class="col-md-12">
             <form class="form-inline">
                 <div class="form-group">
-                    <!--suppress XmlInvalidId -->
-                    <label for="trend-selection"><span class="fa fa-line-chart"></span> Trend period</label>
-                    <ot-extension-indicators-trend-selection
-                            select-id="trend-selection"
-                            model="pageModel.trendDuration"
-                    ></ot-extension-indicators-trend-selection>
-                </div>
-                <div class="form-group">
                     <label for="view-selection"><span class="fa fa-filter"></span> View</label>
                     <div class="btn-group">
                         <button id="view-selection" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -67,6 +59,14 @@
                         </ul>
                     </div>
                 </div>
+                <div class="form-group">
+                    <!--suppress XmlInvalidId -->
+                    <label for="trend-selection"><span class="fa fa-line-chart"></span> Trend period</label>
+                    <ot-extension-indicators-trend-selection
+                            select-id="trend-selection"
+                            model="pageModel.trendDuration"
+                    ></ot-extension-indicators-trend-selection>
+                </div>
             </form>
         </div>
     </div>
@@ -91,8 +91,15 @@
             </h4>
         </div>
         <div class="col-md-12">
-            <div class="row">
-                <div class="col-md-2" ng-repeat="categoryStats in portfolio.globalStats">
+            <div class="row" ng-if="!portfolio.viewStats || portfolio.viewStats.length == 0">
+                <div class="col-md-12">
+                    <div class="alert alert-warning">
+                        No indicator view is selected or the selected indicator view does not have any category.
+                    </div>
+                </div>
+            </div>
+            <div class="row" ng-if="portfolio.viewStats && portfolio.viewStats.length > 0">
+                <div class="col-md-2" ng-repeat="categoryStats in portfolio.viewStats">
                     <div class="row">
                         <div class="col-md-3">
                             <span ng-if="categoryStats.stats.count == 0" title="Not enough data.">

@@ -95,20 +95,22 @@ class GQLTypeIndicatorPortfolio(
                     .field {
                         it.name("viewStats")
                             .description("Indicators stats for a given view for this portfolio")
+                            .durationArgument()
                             .argument { arg ->
-                                arg.name("name")
-                                    .description("Name of the indicator view")
+                                arg.name("id")
+                                    .description("ID of the indicator view")
                                     .type(GraphQLString)
                             }
                             .type(GraphQLList(GraphQLNonNull(indicatorCategoryStats.typeRef)))
                             .dataFetcher { env ->
                                 val portfolio: IndicatorPortfolio = env.getSource()
-                                val name: String? = env.getArgument<String?>("name")?.takeIf { it.isNotBlank() }
-                                val view = name?.run {
-                                    indicatorViewService.findIndicatorViewByName(this)
+                                val duration = env.getDurationArgument()
+                                val id: String? = env.getArgument<String?>("id")?.takeIf { it.isNotBlank() }
+                                val view = id?.run {
+                                    indicatorViewService.findIndicatorViewById(this)
                                 }
                                 view?.run {
-                                    indicatorStatsService.getPortfolioViewStats(portfolio, this)
+                                    indicatorStatsService.getPortfolioViewStats(portfolio, this, duration)
                                 }
                             }
                     }
