@@ -179,8 +179,15 @@ angular.module('ontrack.extension.indicators', [
             });
         };
 
+        const selectCategories = (view) => {
+            $scope.categories.forEach(category => {
+                category.selected = view && view.categories.some(it => it.id === category.id);
+            });
+        };
+
         $scope.selectView = (view) => {
             $scope.currentView = view;
+            selectCategories(view);
         };
 
         $scope.deleteView = (view) => {
@@ -193,6 +200,23 @@ angular.module('ontrack.extension.indicators', [
                 $scope.selectView(undefined);
                 loadViews();
             });
+        };
+
+        $scope.updateCategories = () => {
+            if ($scope.currentView && $scope.currentView.links._update) {
+                $scope.updatingCategories = true;
+                const categoryIds = $scope.categories.filter(category => category.selected).map(category => category.id);
+                ot.pageCall($http.put($scope.currentView.links._update, {
+                    name: $scope.currentView.name,
+                    categories: categoryIds
+                })).finally(() => {
+                    $scope.currentView.categories = categoryIds.map(id => {
+                        return {id: id};
+                    });
+                    selectCategories($scope.currentView);
+                    $scope.updatingCategories = false;
+                });
+            }
         };
 
         $scope.unfold = (category) => {

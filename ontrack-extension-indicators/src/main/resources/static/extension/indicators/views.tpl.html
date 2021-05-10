@@ -55,8 +55,12 @@
     <table class="table table-hover table-bordered" ng-if="categories">
         <tbody ng-repeat="category in categories">
         <tr class="info">
-            <td style="width: 30px;">
-                <input type="checkbox" ng-model="category.selected" ng-change="updateCategories()">
+            <td style="width: 30px;" ng-if="currentView.links._update">
+                <input type="checkbox" ng-disabled="updatingCategories" ng-hide="updatingCategories" ng-model="category.selected" ng-change="updateCategories()">
+                <span class="ot-loading-indicator" ng-show="updatingCategories"></span>
+            </td>
+            <td style="width: 30px;" ng-if="!currentView.links._update">
+                <input type="checkbox" disabled ng-model="category.selected">
             </td>
             <td>
                 {{category.name}}
