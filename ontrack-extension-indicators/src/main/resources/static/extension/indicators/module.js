@@ -660,6 +660,15 @@ angular.module('ontrack.extension.indicators', [
 
         const query = `
             query LoadPortfolioOfPortfolios($trendDuration: Int) {
+              indicatorViewList {
+                links {
+                  _create
+                }
+                views {
+                  id
+                  name
+                }
+              }
               indicatorPortfolioOfPortfolios {
                 links {
                   _create
@@ -726,6 +735,7 @@ angular.module('ontrack.extension.indicators', [
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.portfolioOfPortolios = data.indicatorPortfolioOfPortfolios;
                 $scope.portfolios = data.indicatorPortfolioOfPortfolios.portfolios;
+                $scope.indicatorViewList = data.indicatorViewList;
 
                 if (!viewInitialized) {
                     view.commands = [
@@ -777,6 +787,11 @@ angular.module('ontrack.extension.indicators', [
                 loadPortfolios();
             }
         });
+
+        $scope.selectView = (view) => {
+            $scope.currentView = view;
+            // TODO Reloads the stats
+        };
 
     })
     .config(function ($stateProvider) {
