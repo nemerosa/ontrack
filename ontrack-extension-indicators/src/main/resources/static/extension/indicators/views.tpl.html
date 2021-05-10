@@ -2,7 +2,7 @@
 
     <ot-extension-indicators-message></ot-extension-indicators-message>
 
-    <div class="row" ng-show="loadingViews">
+    <div class="row" ng-show="loadingAll">
         <div class="col-md-12">
             <div class="alert alert-info">
                 <span class="ot-loading-indicator"></span>
@@ -11,21 +11,27 @@
         </div>
     </div>
 
-    {{ views }}
-    {{ currentView }}
-
     <div class="row">
         <div class="col-md-12">
             <div class="btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                    TODO Selected view
-                    <span class="caret"></span>
+                    <span ng-show="views.views.length > 0">
+                        <span ng-show="currentView">
+                            <span class="fa fa-check"></span>
+                            {{ currentView.name }}
+                        </span>
+                        <span ng-hide="currentView" class="ot-description">Select a view</span>
+                        <span class="caret"></span>
+                    </span>
+                    <span ng-show="views.views.length == 0" class="ot-description">
+                        Click "+" to create a view
+                    </span>
                 </button>
                 <ul class="dropdown-menu" role="menu">
                     <li ng-repeat="view in views.views">
                         <a>
                             <!-- View selection -->
-                            <span class="fa fa-check" ng-if="currentView.id == view.id"></span>
+                            <span class="fa fa-check" ng-if="currentView && currentView.id == view.id"></span>
                             <!-- View name -->
                             <span ng-click="selectView(view)" class="ot-action">
                                 {{ view.name }}
@@ -37,10 +43,12 @@
                                   ng-click="deleteView(view)"></span>
                         </a>
                     </li>
+                </ul>
             </div>
             <button type="button" class="btn btn-link" title="Create a new indicator view" ng-click="createView()">
                 <span class="fa fa-plus"></span>
             </button>
+            <span class="ot-loading-indicator" title="Loading views" ng-show="loadingViews"></span>
         </div>
     </div>
 

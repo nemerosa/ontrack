@@ -109,17 +109,10 @@ angular.module('ontrack.extension.indicators', [
             {
               indicatorViewList {
                 views {
+                  id
                   name
                   categories {
                     id
-                    name
-                    deprecated
-                    types {
-                      id
-                      name
-                      deprecated
-                      link
-                    }
                   }
                   links {
                     _update
@@ -176,7 +169,14 @@ angular.module('ontrack.extension.indicators', [
         loadAll();
 
         $scope.createView = () => {
-            otFormService.create($scope.views.links._create, "New indicator view").then(loadViews);
+            let viewId = '';
+            otFormService.create($scope.views.links._create, "New indicator view").then((data) => {
+                viewId = data.data.id;
+                return loadViews();
+            }).then(() => {
+                const view = $scope.views.views.find(item => item.id === viewId);
+                $scope.selectView(view);
+            });
         };
 
         $scope.selectView = (view) => {
