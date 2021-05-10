@@ -82,7 +82,7 @@ class GQLTypeIndicatorPortfolio(
                     .field {
                         it.name("globalStats")
                                 .description("Global indicator stats")
-                                .deprecate("Use indicator views")
+                                .deprecate("Use indicator views. This field will be removed in V4.")
                                 .type(stdList(indicatorCategoryStats.typeRef))
                                 .durationArgument()
                                 .dataFetcher { env ->

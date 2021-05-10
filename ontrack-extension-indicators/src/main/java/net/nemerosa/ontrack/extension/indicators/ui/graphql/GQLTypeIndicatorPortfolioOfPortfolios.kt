@@ -12,7 +12,6 @@ import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import org.springframework.stereotype.Component
 
 @Component
-@Deprecated("Use indicator views")
 class GQLTypeIndicatorPortfolioOfPortfolios(
         private val indicatorPortfolioService: IndicatorPortfolioService,
         private val indicatorPortfolio: GQLTypeIndicatorPortfolio,
@@ -29,6 +28,7 @@ class GQLTypeIndicatorPortfolioOfPortfolios(
                     .field {
                         it.name(IndicatorPortfolioOfPortfolios::categories.name)
                                 .description("Global indicator categories")
+                                .deprecate("Use indicator views")
                                 .type(stdList(indicatorCategory.typeRef))
                                 .dataFetcher { env ->
                                     val pp = env.getSource<IndicatorPortfolioOfPortfolios>()

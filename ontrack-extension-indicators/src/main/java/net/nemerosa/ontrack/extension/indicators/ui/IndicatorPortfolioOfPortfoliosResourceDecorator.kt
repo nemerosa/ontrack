@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @Component
-@Deprecated("Use indicator views")
 class IndicatorPortfolioOfPortfoliosResourceDecorator : AbstractLinkResourceDecorator<IndicatorPortfolioOfPortfolios>(IndicatorPortfolioOfPortfolios::class.java) {
 
     @Suppress("RedundantLambdaArrow")
