@@ -11,6 +11,9 @@
         </div>
     </div>
 
+    {{ views }}
+    {{ currentView }}
+
     <div class="row">
         <div class="col-md-12">
             <div class="btn-group">
@@ -20,11 +23,11 @@
                 </button>
                 <ul class="dropdown-menu" role="menu">
                     <li ng-repeat="view in views.views">
-                        <a class="ot-action">
+                        <a>
                             <!-- View selection -->
-                            <span class="fa fa-check" ng-show="currentView.id == view.id"></span>
+                            <span class="fa fa-check" ng-if="currentView.id == view.id"></span>
                             <!-- View name -->
-                            <span ng-click="selectView(view)">
+                            <span ng-click="selectView(view)" class="ot-action">
                                 {{ view.name }}
                             </span>
                             <!-- Deletion -->

@@ -157,6 +157,7 @@ angular.module('ontrack.extension.indicators', [
             $scope.loadingViews = true;
             return otGraphqlService.pageGraphQLCall(queryViews).then(data => {
                 $scope.views = data.indicatorViewList;
+                $scope.currentView = undefined;
             }).finally(() => {
                 $scope.loadingViews = false;
             });
@@ -176,6 +177,22 @@ angular.module('ontrack.extension.indicators', [
 
         $scope.createView = () => {
             otFormService.create($scope.views.links._create, "New indicator view").then(loadViews);
+        };
+
+        $scope.selectView = (view) => {
+            $scope.currentView = view;
+        };
+
+        $scope.deleteView = (view) => {
+            otAlertService.confirm({
+                title: "Delete view",
+                message: `Do you want to delete the "${view.name}" view?`
+            }).then(() => {
+                return ot.pageCall($http.delete(view.links._delete));
+            }).then(() => {
+                $scope.selectView(undefined);
+                loadViews();
+            });
         };
 
         $scope.unfold = (category) => {
