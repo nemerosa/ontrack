@@ -725,6 +725,8 @@ angular.module('ontrack.extension.indicators', [
             viewId: null
         };
 
+        queryVariables.viewId = localStorage.getItem('portfoliosView');
+
         $scope.pageModel = {
             trendDuration: undefined
         };
@@ -737,6 +739,8 @@ angular.module('ontrack.extension.indicators', [
                 $scope.portfolioOfPortolios = data.indicatorPortfolioOfPortfolios;
                 $scope.portfolios = data.indicatorPortfolioOfPortfolios.portfolios;
                 $scope.indicatorViewList = data.indicatorViewList;
+
+                $scope.currentView = $scope.indicatorViewList.views.find(view => view.id === queryVariables.viewId);
 
                 if (!viewInitialized) {
                     view.commands = [
@@ -786,8 +790,10 @@ angular.module('ontrack.extension.indicators', [
             $scope.currentView = view;
             if (view) {
                 queryVariables.viewId = view.id;
+                localStorage.setItem('portfoliosView', view.id);
             } else {
                 queryVariables.viewId = null;
+                localStorage.removeItem('portfoliosView');
             }
             loadPortfolios();
         };
