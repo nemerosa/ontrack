@@ -105,7 +105,7 @@ angular.module('ontrack.extension.indicators', [
         const view = ot.view();
         view.title = "Indicator views";
 
-        const query = `
+        const queryViews = `
             {
               indicatorViewList {
                 views {
@@ -130,6 +130,11 @@ angular.module('ontrack.extension.indicators', [
                   _create
                 }
               }
+            }
+        `;
+
+        const queryCategories = `
+            {
               indicatorCategories {
                 categories {
                   id
@@ -150,15 +155,28 @@ angular.module('ontrack.extension.indicators', [
 
         const loadViews = () => {
             $scope.loadingViews = true;
-            otGraphqlService.pageGraphQLCall(query).then(data => {
+            return otGraphqlService.pageGraphQLCall(queryViews).then(data => {
                 $scope.views = data.indicatorViewList;
-                $scope.categories = data.indicatorCategories.categories;
             }).finally(() => {
                 $scope.loadingViews = false;
             });
         };
 
-        loadViews();
+        const loadAll = () => {
+            $scope.loadingAll = true;
+            otGraphqlService.pageGraphQLCall(queryCategories).then(data => {
+                $scope.categories = data.indicatorCategories.categories;
+                return loadViews();
+            }).finally(() => {
+                $scope.loadingAll = false;
+            });
+        };
+
+        loadAll();
+
+        $scope.createView = () => {
+            otFormService.create($scope.views.links._create, "New indicator view").then(loadViews);
+        };
 
         $scope.unfold = (category) => {
             category.unfolded = true;
