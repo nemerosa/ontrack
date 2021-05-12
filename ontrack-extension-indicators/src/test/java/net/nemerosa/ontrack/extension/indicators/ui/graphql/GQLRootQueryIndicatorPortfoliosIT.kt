@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorView
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
+import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -63,17 +64,16 @@ class GQLRootQueryIndicatorPortfoliosIT : AbstractIndicatorsTestSupport() {
 
         val category = category()
         val type = category.booleanType()
-        val viewName = uid("V")
-        asAdmin {
+        val viewId = asAdmin {
             indicatorViewService.saveIndicatorView(
                 IndicatorView(
                     id = "",
-                    name = viewName,
+                    name = uid("V"),
                     categories = listOf(
                         category.id
                     )
                 )
-            )
+            ).id
         }
 
         val label = label()
@@ -89,12 +89,12 @@ class GQLRootQueryIndicatorPortfoliosIT : AbstractIndicatorsTestSupport() {
         asAdmin {
             run(
                 """query IndicatorPortfolios(
-                ${'$'}viewName: String
+                ${'$'}viewId: String
             ) {
-                indicatorPortfolios {
+                indicatorPortfolios(id: "${portfolio.id}") {
                     id
                     name
-                    viewStats(name: ${'$'}viewName) {
+                    viewStats(id: ${'$'}viewId) {
                         category {
                           id
                         }
@@ -105,7 +105,7 @@ class GQLRootQueryIndicatorPortfoliosIT : AbstractIndicatorsTestSupport() {
                         }
                     }
                 }
-            }""", mapOf("viewName" to viewName)
+            }""", mapOf("viewId" to viewId)
             ).let { data ->
                 assertEquals(
                     mapOf(
@@ -154,12 +154,12 @@ class GQLRootQueryIndicatorPortfoliosIT : AbstractIndicatorsTestSupport() {
         asAdmin {
             run(
                 """query IndicatorPortfolios(
-                ${'$'}viewName: String
+                ${'$'}viewId: String
             ) {
                 indicatorPortfolios {
                     id
                     name
-                    viewStats(name: ${'$'}viewName) {
+                    viewStats(id: ${'$'}viewId) {
                         category {
                           id
                         }
@@ -170,7 +170,7 @@ class GQLRootQueryIndicatorPortfoliosIT : AbstractIndicatorsTestSupport() {
                         }
                     }
                 }
-            }""", mapOf("viewName" to null)
+            }""", mapOf("viewId" to null)
             ).let { data ->
                 assertEquals(
                     mapOf(
@@ -207,12 +207,12 @@ class GQLRootQueryIndicatorPortfoliosIT : AbstractIndicatorsTestSupport() {
         asAdmin {
             run(
                 """query IndicatorPortfolios(
-                ${'$'}viewName: String
+                ${'$'}viewId: String
             ) {
                 indicatorPortfolios {
                     id
                     name
-                    viewStats(name: ${'$'}viewName) {
+                    viewStats(id: ${'$'}viewId) {
                         category {
                           id
                         }
@@ -223,7 +223,7 @@ class GQLRootQueryIndicatorPortfoliosIT : AbstractIndicatorsTestSupport() {
                         }
                     }
                 }
-            }""", mapOf("viewName" to uid("V"))
+            }""", mapOf("viewId" to UUID.randomUUID().toString())
             ).let { data ->
                 assertEquals(
                     mapOf(
