@@ -4,12 +4,54 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import graphql.language.*
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class GQLScalarJSONTest {
+
+    @Test
+    fun `Parse string value`() {
+        val json = GQLScalarJSON.INSTANCE.coercing.parseValue("""{"passed":15}""")
+        assertEquals(
+            mapOf(
+                "passed" to 15
+            ).asJson(),
+            json
+        )
+    }
+
+    @Test
+    fun `Parse JSON value`() {
+        val json = GQLScalarJSON.INSTANCE.coercing.parseValue(
+            mapOf(
+                "passed" to 15
+            ).asJson()
+        )
+        assertEquals(
+            mapOf(
+                "passed" to 15
+            ).asJson(),
+            json
+        )
+    }
+
+    @Test
+    fun `Parse map value`() {
+        val json = GQLScalarJSON.INSTANCE.coercing.parseValue(
+            mapOf(
+                "passed" to 15
+            )
+        )
+        assertEquals(
+            mapOf(
+                "passed" to 15
+            ).asJson(),
+            json
+        )
+    }
 
     @Test
     fun `Parse literal object`() {
