@@ -73,10 +73,8 @@ pipeline {
                     def props = readProperties(file: 'build/version.properties')
                     env.VERSION = props.VERSION_DISPLAY
                     env.GIT_COMMIT = props.VERSION_COMMIT
-                    // If not a PR, create a build
-                    if (!(BRANCH_NAME ==~ /PR-.*/)) {
-                        ontrackBuild(project: ONTRACK_PROJECT_NAME, branch: ONTRACK_BRANCH_NAME, build: VERSION, gitCommit: GIT_COMMIT)
-                    }
+                    // Creates a build
+                    ontrackCliBuild(name: VERSION)
                 }
                 echo "Version = ${VERSION}"
                 sh '''
