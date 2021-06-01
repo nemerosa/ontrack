@@ -72,9 +72,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                         tags = eq(mapOf(
                                 "project" to build.project.name,
                                 "branch" to build.branch.name,
-                                "build" to build.name,
                                 "status" to "PASSED",
-                                "version" to "1.0.0",
                                 "measure" to name
                         )),
                         fields = eq(mapOf(
