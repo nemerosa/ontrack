@@ -182,9 +182,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
                         tags = mapOf(
                                 "project" to build.project.name,
                                 "branch" to build.branch.name,
-                                "build" to build.name,
                                 "status" to status,
-                                "version" to version,
                                 "measure" to name
                         ),
                         fields = mapOf(
