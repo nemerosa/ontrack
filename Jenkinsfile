@@ -36,10 +36,7 @@ pipeline {
         stage('Setup') {
             when {
                 not {
-                    anyOf {
-                        branch 'master'
-                        changeRequest()
-                    }
+                    branch 'master'
                 }
             }
             steps {
