@@ -102,19 +102,11 @@ pipeline {
             post {
                 always {
                     recordIssues(tools: [kotlin(), javaDoc(), java()])
-                    script {
-                        def results = junit '**/build/test-results/**/*.xml'
-                        // If not a PR, create a build validation stamp
-                        if (!(BRANCH_NAME ==~ /PR-.*/)) {
-                            ontrackValidate(
-                                    project: ONTRACK_PROJECT_NAME,
-                                    branch: ONTRACK_BRANCH_NAME,
-                                    build: VERSION,
-                                    validationStamp: 'BUILD',
-                                    testResults: results,
-                            )
-                        }
-                    }
+                    // Build validation stamp
+                    ontrackCliValidateTests(
+                        stamp: 'BUILD',
+                        pattern: '**/build/test-results/**/*.xml',
+                    )
                 }
             }
         }
@@ -184,18 +176,10 @@ pipeline {
                         mkdir -p build
                         cp -r ontrack-acceptance/src/main/compose/build build/acceptance
                         '''
-                    script {
-                        def results = junit('build/acceptance/*.xml')
-                        if (!(BRANCH_NAME ==~ /PR-.*/)) {
-                            ontrackValidate(
-                                    project: ONTRACK_PROJECT_NAME,
-                                    branch: ONTRACK_BRANCH_NAME,
-                                    build: VERSION,
-                                    validationStamp: 'ACCEPTANCE',
-                                    testResults: results,
-                            )
-                        }
-                    }
+                    ontrackCliValidateTests(
+                        stamp: 'ACCEPTANCE',
+                        pattern: 'build/acceptance/*.xml',
+                    )
                 }
                 cleanup {
                     sh '''
