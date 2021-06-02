@@ -47,6 +47,7 @@ pipeline {
                 }
             }
             steps {
+                sh 'ls -l $ONTRACK_CLI_DIR'
                 ontrackCliSetup(logging: true, tracing: true)
             }
         }
