@@ -47,7 +47,7 @@ pipeline {
                 }
             }
             steps {
-                ontrackCliSetup(logging: true)
+                ontrackCliSetup(logging: true, tracing: true)
             }
         }
 
