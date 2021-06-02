@@ -216,6 +216,7 @@ pipeline {
                             logs ontrack > docker-compose-acceptance-ontrack.log
                     '''
                     archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance.log", allowEmptyArchive: true)
+                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/build/**", allowEmptyArchive: true)
                     sh '''
                         rm -rf build/acceptance
                         mkdir -p build
