@@ -12,7 +12,13 @@ pipeline {
         AGENT_OPTIONS = "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
     }
 
-    agent any
+    agent {
+        docker {
+            image AGENT_IMAGE
+            reuseNode true
+            args AGENT_OPTIONS
+        }
+    }
 
     options {
         // General Jenkins job properties
@@ -30,15 +36,7 @@ pipeline {
     stages {
 
         stage('Setup') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             when {
-                beforeAgent true
                 not {
                     anyOf {
                         branch 'master'
@@ -47,21 +45,12 @@ pipeline {
                 }
             }
             steps {
-                sh 'ls -l $ONTRACK_CLI_DIR'
                 ontrackCliSetup(logging: true, tracing: true)
             }
         }
 
         stage('Build') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             when {
-                beforeAgent true
                 not {
                     branch 'master'
                 }
@@ -138,15 +127,7 @@ pipeline {
         }
 
         stage('Local acceptance tests') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             when {
-                beforeAgent true
                 not {
                     branch 'master'
                 }
@@ -237,15 +218,7 @@ pipeline {
         }
 
         stage('Local extension tests') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             when {
-                beforeAgent true
                 not {
                     anyOf {
                         branch "master"
@@ -318,15 +291,7 @@ pipeline {
         }
 
         stage('Local Vault tests') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             when {
-                beforeAgent true
                 not {
                     anyOf {
                         branch "master"
@@ -400,7 +365,6 @@ pipeline {
 
         stage('Codecov upload') {
             when {
-                beforeAgent true
                 not {
                     anyOf {
                         branch "master"
@@ -427,20 +391,12 @@ pipeline {
 
         stage('Platform tests') {
             when {
-                beforeAgent true
                 anyOf {
                     branch 'release/*'
                 }
             }
             stages {
                 stage('CentOS7') {
-                    agent {
-                        docker {
-                            image AGENT_IMAGE
-                            reuseNode true
-                            args AGENT_OPTIONS
-                        }
-                    }
                     steps {
                         timeout(time: 25, unit: 'MINUTES') {
                             sh '''
@@ -490,13 +446,6 @@ pipeline {
                 }
                 // Debian
                 stage('Debian') {
-                    agent {
-                        docker {
-                            image AGENT_IMAGE
-                            reuseNode true
-                            args AGENT_OPTIONS
-                        }
-                    }
                     steps {
                         timeout(time: 25, unit: 'MINUTES') {
                             sh '''
@@ -550,15 +499,7 @@ pipeline {
         // Publication
 
         stage('Publication') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             when {
-                beforeAgent true
                 anyOf {
                     branch 'release/*'
                     branch 'feature/*publication'
@@ -625,13 +566,6 @@ pipeline {
         // Release
 
         stage('Release') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             environment {
                 GITHUB_TOKEN = credentials("JENKINS_GITHUB_TOKEN")
                 GITTER_TOKEN = credentials("GITTER_TOKEN")
@@ -682,13 +616,6 @@ pipeline {
         // Documentation
 
         stage('Documentation') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             environment {
                 AMS3_DELIVERY = credentials("AMS3_DELIVERY")
             }
@@ -747,7 +674,6 @@ pipeline {
 
         stage('Merge to master') {
             when {
-                beforeAgent true
                 allOf {
                     branch "release/4.*"
                     expression {
@@ -784,7 +710,6 @@ pipeline {
 
         stage('Master setup') {
             when {
-                beforeAgent true
                 branch 'master'
             }
             steps {
@@ -827,15 +752,7 @@ pipeline {
         // Latest documentation
 
         stage('Latest documentation') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             when {
-                beforeAgent true
                 branch 'master'
             }
             environment {
@@ -870,15 +787,7 @@ pipeline {
         // Docker latest images
 
         stage('Docker Latest') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             when {
-                beforeAgent true
                 branch "master"
             }
             environment {
@@ -918,20 +827,12 @@ pipeline {
         // Site generation
 
         stage('Site generation') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             environment {
                 // GitHub OAuth token
                 GRGIT_USER = credentials("JENKINS_GITHUB_TOKEN")
                 GITHUB_URI = 'https://github.com/nemerosa/ontrack.git'
             }
             when {
-                beforeAgent true
                 branch 'master'
             }
             steps {
