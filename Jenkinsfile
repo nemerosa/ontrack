@@ -50,7 +50,6 @@ pipeline {
                 }
             }
             steps {
-                sh ''' git checkout -B ${BRANCH_NAME} && git clean -xfd '''
                 sh ''' ./gradlew clean versionDisplay versionFile'''
                 script {
                     // Reads version information
