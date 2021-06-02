@@ -23,6 +23,8 @@ class ACCBrowserValidationBulkUpdateLink extends AcceptanceTestClient {
 
     @Before
     void prepare() {
+        // Makes sure we can access projects on the home page
+        deleteAllProjects()
         // Validation stamp to bulk update
         def projectName = uid('P')
         ontrack.project(projectName) {
