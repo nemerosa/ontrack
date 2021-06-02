@@ -39,7 +39,7 @@ pipeline {
                 }
             }
             steps {
-                ontrackCliSetup(logging: true, tracing: true)
+                ontrackCliSetup(autoValidationStamps: true)
             }
         }
 
