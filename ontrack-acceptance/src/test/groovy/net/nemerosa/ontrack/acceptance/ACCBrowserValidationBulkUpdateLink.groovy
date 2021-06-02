@@ -43,10 +43,13 @@ class ACCBrowserValidationBulkUpdateLink extends AcceptanceTestClient {
     @Test
     void 'Validation bulk update accessible to global validation manager'() {
         browser { browser ->
+            browser.screenshot 'validation-bulk-global-manager-1-before-login'
             // Logs in
             login(browser, username, password, username)
+            browser.screenshot 'validation-bulk-global-manager-2-after-login'
             // Goes to the validation stamp page
             ValidationStampPage vsPage = goTo(ValidationStampPage, [id: vs.id])
+            browser.screenshot 'validation-bulk-global-manager-2-after-vs-page'
             // Checks the "Bulk update" command
             def bulkUpdate = vsPage.bulkUpdateCommand
             assert bulkUpdate != null && bulkUpdate.isDisplayed(): "Bulk update command is present"
