@@ -15,7 +15,7 @@ services:
       environment:
          - "discovery.type=single-node"
    influxdb:
-    image: influxdb:1.5.2
+    image: influxdb:1.8.6
    ontrack:
       image: "nemerosa/ontrack:${VERSION:-latest}"
       depends_on:
@@ -38,7 +38,7 @@ services:
          ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
          SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
    selenium:
-      image: "selenium/standalone-chrome:3.11.0"
+      image: "selenium/standalone-chrome:91.0"
       environment:
          JAVA_OPTS: "-Xmx3072m -Xms3072m"
    ontrack_acceptance:
