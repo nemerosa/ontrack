@@ -38,9 +38,10 @@ services:
          ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
          SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
    selenium:
-      image: "selenium/standalone-chrome:91.0"
+      image: "selenium/standalone-firefox:88.0"
       environment:
          JAVA_OPTS: "-Xmx3072m -Xms3072m"
+         SE_OPTS: "--log-level FINE"
    ontrack_acceptance:
       image: "nemerosa/ontrack-acceptance:${VERSION:-latest}"
       depends_on:
