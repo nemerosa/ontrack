@@ -38,7 +38,16 @@ pipeline {
                 }
             }
             steps {
-                ontrackCliSetup(autoValidationStamps: true)
+                ontrackCliSetup(
+                    autoValidationStamps: true,
+                    promotions: [
+                        RELEASE: [
+                            validations: [
+                                'GITHUB.RELEASE',
+                            ]
+                        ]
+                    ]
+                )
             }
         }
 
@@ -534,14 +543,6 @@ pipeline {
                 always {
                     ontrackCliValidate(
                             stamp: 'GITHUB.RELEASE',
-                    )
-                }
-                success {
-                    ontrackPromote(
-                            project: ONTRACK_PROJECT_NAME,
-                            branch: ONTRACK_BRANCH_NAME,
-                            build: VERSION,
-                            promotionLevel: 'RELEASE',
                     )
                 }
             }
