@@ -197,10 +197,7 @@ pipeline {
         stage('Local extension tests') {
             when {
                 not {
-                    anyOf {
-                        branch "master"
-                        changeRequest()
-                    }
+                    branch "master"
                 }
             }
             steps {
@@ -243,16 +240,10 @@ pipeline {
                         rm -rf build/extension
                         cp -r ontrack-acceptance/src/main/compose/build build/extension
                     '''
-                    script {
-                        def results = junit 'build/extension/*.xml'
-                        ontrackValidate(
-                                project: ONTRACK_PROJECT_NAME,
-                                branch: ONTRACK_BRANCH_NAME,
-                                build: VERSION,
-                                validationStamp: 'EXTENSIONS',
-                                testResults: results,
-                        )
-                    }
+                    ontrackCliValidateTests(
+                            stamp: 'EXTENSIONS',
+                            pattern: 'build/extension/*.xml',
+                    )
                 }
                 cleanup {
                     sh '''
@@ -270,10 +261,7 @@ pipeline {
         stage('Local Vault tests') {
             when {
                 not {
-                    anyOf {
-                        branch "master"
-                        changeRequest()
-                    }
+                    branch "master"
                 }
             }
             steps {
@@ -316,16 +304,10 @@ pipeline {
                         rm -rf build/vault
                         cp -r ontrack-acceptance/src/main/compose/build build/vault
                     '''
-                    script {
-                        def results = junit 'build/vault/*.xml'
-                        ontrackValidate(
-                                project: ONTRACK_PROJECT_NAME,
-                                branch: ONTRACK_BRANCH_NAME,
-                                build: VERSION,
-                                validationStamp: 'VAULT',
-                                testResults: results,
-                        )
-                    }
+                    ontrackCliValidateTests(
+                            stamp: 'VAULT',
+                            pattern: 'build/vault/*.xml',
+                    )
                 }
                 cleanup {
                     sh '''
@@ -343,10 +325,7 @@ pipeline {
         stage('Codecov upload') {
             when {
                 not {
-                    anyOf {
-                        branch "master"
-                        changeRequest()
-                    }
+                    branch "master"
                 }
             }
             steps {
@@ -402,16 +381,10 @@ pipeline {
                                 mkdir -p build
                                 cp -r ontrack-acceptance/src/main/compose/build build/centos
                                 '''
-                            script {
-                                def results = junit 'build/centos/*.xml'
-                                ontrackValidate(
-                                        project: ONTRACK_PROJECT_NAME,
-                                        branch: ONTRACK_BRANCH_NAME,
-                                        build: VERSION,
-                                        validationStamp: 'ACCEPTANCE.CENTOS.7',
-                                        testResults: results,
-                                )
-                            }
+                            ontrackCliValidateTests(
+                                    stamp: 'ACCEPTANCE.CENTOS.7',
+                                    pattern: 'build/centos/*.xml',
+                            )
                         }
                         cleanup {
                             sh '''
@@ -451,22 +424,16 @@ pipeline {
                                 mkdir -p build/debian
                                 cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
                                 '''
-                            script {
-                                def results = junit 'build/debian/*.xml'
-                                ontrackValidate(
-                                        project: ONTRACK_PROJECT_NAME,
-                                        branch: ONTRACK_BRANCH_NAME,
-                                        build: VERSION,
-                                        validationStamp: 'ACCEPTANCE.DEBIAN',
-                                        testResults: results,
-                                )
-                            }
+                            ontrackCliValidateTests(
+                                    stamp: 'ACCEPTANCE.DEBIAN',
+                                    pattern: 'build/debian/*.xml',
+                            )
                         }
                         cleanup {
                             sh '''
                                 cd ontrack-acceptance/src/main/compose
                                 docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
-                                '''
+                            '''
                         }
                     }
                 }
@@ -496,11 +463,8 @@ pipeline {
                     }
                     post {
                         always {
-                            ontrackValidate(
-                                    project: ONTRACK_PROJECT_NAME,
-                                    branch: ONTRACK_BRANCH_NAME,
-                                    build: VERSION,
-                                    validationStamp: 'DOCKER.HUB'
+                            ontrackCliValidate(
+                                    stamp: 'DOCKER.HUB'
                             )
                         }
                     }
@@ -528,11 +492,8 @@ pipeline {
                     }
                     post {
                         always {
-                            ontrackValidate(
-                                    project: ONTRACK_PROJECT_NAME,
-                                    branch: ONTRACK_BRANCH_NAME,
-                                    build: VERSION,
-                                    validationStamp: 'MAVEN.CENTRAL'
+                            ontrackCliValidate(
+                                    stamp: 'MAVEN.CENTRAL'
                             )
                         }
                     }
@@ -572,11 +533,8 @@ pipeline {
             }
             post {
                 always {
-                    ontrackValidate(
-                            project: ONTRACK_PROJECT_NAME,
-                            branch: ONTRACK_BRANCH_NAME,
-                            build: VERSION,
-                            validationStamp: 'GITHUB.RELEASE',
+                    ontrackCliValidate(
+                            stamp: 'GITHUB.RELEASE',
                     )
                 }
                 success {
@@ -637,11 +595,8 @@ pipeline {
             }
             post {
                 always {
-                    ontrackValidate(
-                            project: ONTRACK_PROJECT_NAME,
-                            branch: ONTRACK_BRANCH_NAME,
-                            build: VERSION,
-                            validationStamp: 'DOCUMENTATION',
+                    ontrackCliValidate(
+                            stamp: 'DOCUMENTATION',
                     )
                 }
             }
@@ -654,6 +609,7 @@ pipeline {
                 allOf {
                     branch "release/4.*"
                     expression {
+                        // TODO Use the Jenkins pipeline library
                         ontrackGetLastBranch(project: ONTRACK_PROJECT_NAME, pattern: 'release-4\\..*') == ONTRACK_BRANCH_NAME
                     }
                 }
@@ -673,6 +629,7 @@ pipeline {
             }
             post {
                 always {
+                    // TODO Adapt call for Jenkins pipeline library
                     ontrackValidate(
                             project: ONTRACK_PROJECT_NAME,
                             branch: ONTRACK_BRANCH_NAME,
@@ -751,6 +708,7 @@ pipeline {
             }
             post {
                 always {
+                    // TODO Adapt call for Jenkins pipeline library
                     ontrackValidate(
                             project: ONTRACK_PROJECT_NAME,
                             branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
@@ -791,6 +749,7 @@ pipeline {
             }
             post {
                 always {
+                    // TODO Adapt call for Jenkins pipeline library
                     ontrackValidate(
                             project: ONTRACK_PROJECT_NAME,
                             branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
@@ -827,6 +786,7 @@ pipeline {
             }
             post {
                 always {
+                    // TODO Adapt call for Jenkins pipeline library
                     ontrackValidate(
                             project: ONTRACK_PROJECT_NAME,
                             branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
