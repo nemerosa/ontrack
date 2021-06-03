@@ -1,4 +1,3 @@
-@Library("ontrack-jenkins-library@1.0.0")
 @Library("ontrack-jenkins-cli-pipeline@main") _
 
 pipeline {
@@ -609,8 +608,7 @@ pipeline {
                 allOf {
                     branch "release/4.*"
                     expression {
-                        // TODO Use the Jenkins pipeline library
-                        ontrackGetLastBranch(project: ONTRACK_PROJECT_NAME, pattern: 'release-4\\..*') == ONTRACK_BRANCH_NAME
+                        ontrackCliLastBranch(pattern: 'release-4\\..*') == ONTRACK_BRANCH_NAME
                     }
                 }
             }
@@ -629,13 +627,7 @@ pipeline {
             }
             post {
                 always {
-                    // TODO Adapt call for Jenkins pipeline library
-                    ontrackValidate(
-                            project: ONTRACK_PROJECT_NAME,
-                            branch: ONTRACK_BRANCH_NAME,
-                            build: VERSION,
-                            validationStamp: 'MERGE',
-                    )
+                    ontrackCliValidate(stamp: 'MERGE')
                 }
             }
         }
@@ -647,6 +639,7 @@ pipeline {
                 branch 'master'
             }
             steps {
+                ontrackCliSetup(setup: false)
                 script {
                     // Gets the latest tag
                     env.ONTRACK_VERSION = sh(
@@ -661,8 +654,8 @@ pipeline {
                     echo "ONTRACK_VERSION_MAJOR_MINOR=${env.ONTRACK_VERSION_MAJOR_MINOR}"
                     echo "ONTRACK_VERSION_MAJOR=${env.ONTRACK_VERSION_MAJOR}"
                     // Gets the corresponding branch
-                    def result = ontrackGraphQL(
-                            script: '''
+                    def result = ontrackCliGraphQL(
+                            query: '''
                                 query BranchLookup($project: String!, $build: String!) {
                                   builds(project: $project, buildProjectFilter: {buildExactMatch: true, buildName: $build}) {
                                     branch {
@@ -671,9 +664,9 @@ pipeline {
                                   }
                                 }
                             ''',
-                            bindings: [
-                                    'project': ONTRACK_PROJECT_NAME,
-                                    'build'  : env.ONTRACK_VERSION as String
+                            variables: [
+                                project: env.ONTRACK_PROJECT_NAME as String,
+                                build  : env.ONTRACK_VERSION as String,
                             ],
                     )
                     env.ONTRACK_TARGET_BRANCH_NAME = result.data.builds.first().branch.name as String
@@ -708,12 +701,10 @@ pipeline {
             }
             post {
                 always {
-                    // TODO Adapt call for Jenkins pipeline library
-                    ontrackValidate(
-                            project: ONTRACK_PROJECT_NAME,
+                    ontrackCliValidate(
                             branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
-                            validationStamp: 'DOCUMENTATION.LATEST',
+                            stamp: 'DOCUMENTATION.LATEST',
                     )
                 }
             }
@@ -749,12 +740,10 @@ pipeline {
             }
             post {
                 always {
-                    // TODO Adapt call for Jenkins pipeline library
                     ontrackValidate(
-                            project: ONTRACK_PROJECT_NAME,
                             branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
-                            validationStamp: 'DOCKER.LATEST',
+                            stamp: 'DOCKER.LATEST',
                     )
                 }
             }
@@ -786,12 +775,10 @@ pipeline {
             }
             post {
                 always {
-                    // TODO Adapt call for Jenkins pipeline library
-                    ontrackValidate(
-                            project: ONTRACK_PROJECT_NAME,
+                    ontrackCliValidate(
                             branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
-                            validationStamp: 'SITE',
+                            stamp: 'SITE',
                     )
                 }
             }
