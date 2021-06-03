@@ -1,19 +1,20 @@
-@Library("ontrack-jenkins-library@1.0.0") _
+@Library("ontrack-jenkins-cli-pipeline@main") _
 
 pipeline {
 
     environment {
-        ONTRACK_PROJECT_NAME = "ontrack"
-        ONTRACK_BRANCH_NAME = ontrackBranchName(BRANCH_NAME)
         DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
         CODECOV_TOKEN = credentials("CODECOV_TOKEN")
         GPG_KEY = credentials("GPG_KEY")
         GPG_KEY_RING = credentials("GPG_KEY_RING")
-        AGENT_IMAGE = "nemerosa/ontrack-build:3.0.0"
-        AGENT_OPTIONS = "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
     }
 
-    agent any
+    agent {
+        docker {
+            image "nemerosa/ontrack-build:3.0.0"
+            args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
+        }
+    }
 
     options {
         // General Jenkins job properties
@@ -31,62 +32,40 @@ pipeline {
     stages {
 
         stage('Setup') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             when {
-                beforeAgent true
-                not {
-                    anyOf {
-                        branch 'master'
-                        changeRequest()
-                    }
-                }
-            }
-            steps {
-                echo "Ontrack setup for ${ONTRACK_BRANCH_NAME}"
-                ontrackBranchSetup(project: ONTRACK_PROJECT_NAME, branch: ONTRACK_BRANCH_NAME, script: """
-                            branch.config {
-                                gitBranch '${BRANCH_NAME}', [
-                                    buildCommitLink: [
-                                        id: 'git-commit-property'
-                                    ]
-                                ]
-                            }
-                        """)
-            }
-        }
-
-        stage('Build') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
-            when {
-                beforeAgent true
                 not {
                     branch 'master'
                 }
             }
             steps {
-                sh ''' git checkout -B ${BRANCH_NAME} && git clean -xfd '''
+                ontrackCliSetup(
+                    autoValidationStamps: true,
+                    promotions: [
+                        RELEASE: [
+                            validations: [
+                                'GITHUB.RELEASE',
+                            ]
+                        ]
+                    ]
+                )
+            }
+        }
+
+        stage('Build') {
+            when {
+                not {
+                    branch 'master'
+                }
+            }
+            steps {
                 sh ''' ./gradlew clean versionDisplay versionFile'''
                 script {
                     // Reads version information
                     def props = readProperties(file: 'build/version.properties')
                     env.VERSION = props.VERSION_DISPLAY
                     env.GIT_COMMIT = props.VERSION_COMMIT
-                    // If not a PR, create a build
-                    if (!(BRANCH_NAME ==~ /PR-.*/)) {
-                        ontrackBuild(project: ONTRACK_PROJECT_NAME, branch: ONTRACK_BRANCH_NAME, build: VERSION, gitCommit: GIT_COMMIT)
-                    }
+                    // Creates a build
+                    ontrackCliBuild(name: VERSION)
                 }
                 echo "Version = ${VERSION}"
                 sh '''
@@ -131,33 +110,17 @@ pipeline {
             post {
                 always {
                     recordIssues(tools: [kotlin(), javaDoc(), java()])
-                    script {
-                        def results = junit '**/build/test-results/**/*.xml'
-                        // If not a PR, create a build validation stamp
-                        if (!(BRANCH_NAME ==~ /PR-.*/)) {
-                            ontrackValidate(
-                                    project: ONTRACK_PROJECT_NAME,
-                                    branch: ONTRACK_BRANCH_NAME,
-                                    build: VERSION,
-                                    validationStamp: 'BUILD',
-                                    testResults: results,
-                            )
-                        }
-                    }
+                    // Build validation stamp
+                    ontrackCliValidateTests(
+                        stamp: 'BUILD',
+                        pattern: '**/build/test-results/**/*.xml',
+                    )
                 }
             }
         }
 
         stage('Local acceptance tests') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             when {
-                beforeAgent true
                 not {
                     branch 'master'
                 }
@@ -221,18 +184,10 @@ pipeline {
                         mkdir -p build
                         cp -r ontrack-acceptance/src/main/compose/build build/acceptance
                         '''
-                    script {
-                        def results = junit('build/acceptance/*.xml')
-                        if (!(BRANCH_NAME ==~ /PR-.*/)) {
-                            ontrackValidate(
-                                    project: ONTRACK_PROJECT_NAME,
-                                    branch: ONTRACK_BRANCH_NAME,
-                                    build: VERSION,
-                                    validationStamp: 'ACCEPTANCE',
-                                    testResults: results,
-                            )
-                        }
-                    }
+                    ontrackCliValidateTests(
+                        stamp: 'ACCEPTANCE',
+                        pattern: 'build/acceptance/*.xml',
+                    )
                 }
                 cleanup {
                     sh '''
@@ -248,20 +203,9 @@ pipeline {
         }
 
         stage('Local extension tests') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             when {
-                beforeAgent true
                 not {
-                    anyOf {
-                        branch "master"
-                        changeRequest()
-                    }
+                    branch "master"
                 }
             }
             steps {
@@ -304,16 +248,10 @@ pipeline {
                         rm -rf build/extension
                         cp -r ontrack-acceptance/src/main/compose/build build/extension
                     '''
-                    script {
-                        def results = junit 'build/extension/*.xml'
-                        ontrackValidate(
-                                project: ONTRACK_PROJECT_NAME,
-                                branch: ONTRACK_BRANCH_NAME,
-                                build: VERSION,
-                                validationStamp: 'EXTENSIONS',
-                                testResults: results,
-                        )
-                    }
+                    ontrackCliValidateTests(
+                            stamp: 'EXTENSIONS',
+                            pattern: 'build/extension/*.xml',
+                    )
                 }
                 cleanup {
                     sh '''
@@ -329,20 +267,9 @@ pipeline {
         }
 
         stage('Local Vault tests') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             when {
-                beforeAgent true
                 not {
-                    anyOf {
-                        branch "master"
-                        changeRequest()
-                    }
+                    branch "master"
                 }
             }
             steps {
@@ -385,16 +312,10 @@ pipeline {
                         rm -rf build/vault
                         cp -r ontrack-acceptance/src/main/compose/build build/vault
                     '''
-                    script {
-                        def results = junit 'build/vault/*.xml'
-                        ontrackValidate(
-                                project: ONTRACK_PROJECT_NAME,
-                                branch: ONTRACK_BRANCH_NAME,
-                                build: VERSION,
-                                validationStamp: 'VAULT',
-                                testResults: results,
-                        )
-                    }
+                    ontrackCliValidateTests(
+                            stamp: 'VAULT',
+                            pattern: 'build/vault/*.xml',
+                    )
                 }
                 cleanup {
                     sh '''
@@ -411,12 +332,8 @@ pipeline {
 
         stage('Codecov upload') {
             when {
-                beforeAgent true
                 not {
-                    anyOf {
-                        branch "master"
-                        changeRequest()
-                    }
+                    branch "master"
                 }
             }
             steps {
@@ -438,20 +355,12 @@ pipeline {
 
         stage('Platform tests') {
             when {
-                beforeAgent true
                 anyOf {
                     branch 'release/*'
                 }
             }
             stages {
                 stage('CentOS7') {
-                    agent {
-                        docker {
-                            image AGENT_IMAGE
-                            reuseNode true
-                            args AGENT_OPTIONS
-                        }
-                    }
                     steps {
                         timeout(time: 25, unit: 'MINUTES') {
                             sh '''
@@ -480,16 +389,10 @@ pipeline {
                                 mkdir -p build
                                 cp -r ontrack-acceptance/src/main/compose/build build/centos
                                 '''
-                            script {
-                                def results = junit 'build/centos/*.xml'
-                                ontrackValidate(
-                                        project: ONTRACK_PROJECT_NAME,
-                                        branch: ONTRACK_BRANCH_NAME,
-                                        build: VERSION,
-                                        validationStamp: 'ACCEPTANCE.CENTOS.7',
-                                        testResults: results,
-                                )
-                            }
+                            ontrackCliValidateTests(
+                                    stamp: 'ACCEPTANCE.CENTOS.7',
+                                    pattern: 'build/centos/*.xml',
+                            )
                         }
                         cleanup {
                             sh '''
@@ -501,13 +404,6 @@ pipeline {
                 }
                 // Debian
                 stage('Debian') {
-                    agent {
-                        docker {
-                            image AGENT_IMAGE
-                            reuseNode true
-                            args AGENT_OPTIONS
-                        }
-                    }
                     steps {
                         timeout(time: 25, unit: 'MINUTES') {
                             sh '''
@@ -536,22 +432,16 @@ pipeline {
                                 mkdir -p build/debian
                                 cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
                                 '''
-                            script {
-                                def results = junit 'build/debian/*.xml'
-                                ontrackValidate(
-                                        project: ONTRACK_PROJECT_NAME,
-                                        branch: ONTRACK_BRANCH_NAME,
-                                        build: VERSION,
-                                        validationStamp: 'ACCEPTANCE.DEBIAN',
-                                        testResults: results,
-                                )
-                            }
+                            ontrackCliValidateTests(
+                                    stamp: 'ACCEPTANCE.DEBIAN',
+                                    pattern: 'build/debian/*.xml',
+                            )
                         }
                         cleanup {
                             sh '''
                                 cd ontrack-acceptance/src/main/compose
                                 docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
-                                '''
+                            '''
                         }
                     }
                 }
@@ -561,15 +451,7 @@ pipeline {
         // Publication
 
         stage('Publication') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             when {
-                beforeAgent true
                 anyOf {
                     branch 'release/*'
                     branch 'feature/*publication'
@@ -589,11 +471,8 @@ pipeline {
                     }
                     post {
                         always {
-                            ontrackValidate(
-                                    project: ONTRACK_PROJECT_NAME,
-                                    branch: ONTRACK_BRANCH_NAME,
-                                    build: VERSION,
-                                    validationStamp: 'DOCKER.HUB'
+                            ontrackCliValidate(
+                                    stamp: 'DOCKER.HUB'
                             )
                         }
                     }
@@ -621,11 +500,8 @@ pipeline {
                     }
                     post {
                         always {
-                            ontrackValidate(
-                                    project: ONTRACK_PROJECT_NAME,
-                                    branch: ONTRACK_BRANCH_NAME,
-                                    build: VERSION,
-                                    validationStamp: 'MAVEN.CENTRAL'
+                            ontrackCliValidate(
+                                    stamp: 'MAVEN.CENTRAL'
                             )
                         }
                     }
@@ -636,13 +512,6 @@ pipeline {
         // Release
 
         stage('Release') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             environment {
                 GITHUB_TOKEN = credentials("JENKINS_GITHUB_TOKEN")
                 GITTER_TOKEN = credentials("GITTER_TOKEN")
@@ -672,19 +541,8 @@ pipeline {
             }
             post {
                 always {
-                    ontrackValidate(
-                            project: ONTRACK_PROJECT_NAME,
-                            branch: ONTRACK_BRANCH_NAME,
-                            build: VERSION,
-                            validationStamp: 'GITHUB.RELEASE',
-                    )
-                }
-                success {
-                    ontrackPromote(
-                            project: ONTRACK_PROJECT_NAME,
-                            branch: ONTRACK_BRANCH_NAME,
-                            build: VERSION,
-                            promotionLevel: 'RELEASE',
+                    ontrackCliValidate(
+                            stamp: 'GITHUB.RELEASE',
                     )
                 }
             }
@@ -693,13 +551,6 @@ pipeline {
         // Documentation
 
         stage('Documentation') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             environment {
                 AMS3_DELIVERY = credentials("AMS3_DELIVERY")
             }
@@ -744,11 +595,8 @@ pipeline {
             }
             post {
                 always {
-                    ontrackValidate(
-                            project: ONTRACK_PROJECT_NAME,
-                            branch: ONTRACK_BRANCH_NAME,
-                            build: VERSION,
-                            validationStamp: 'DOCUMENTATION',
+                    ontrackCliValidate(
+                            stamp: 'DOCUMENTATION',
                     )
                 }
             }
@@ -758,11 +606,10 @@ pipeline {
 
         stage('Merge to master') {
             when {
-                beforeAgent true
                 allOf {
                     branch "release/4.*"
                     expression {
-                        ontrackGetLastBranch(project: ONTRACK_PROJECT_NAME, pattern: 'release-4\\..*') == ONTRACK_BRANCH_NAME
+                        ontrackCliLastBranch(pattern: 'release-4\\..*') == ONTRACK_BRANCH_NAME
                     }
                 }
             }
@@ -781,12 +628,7 @@ pipeline {
             }
             post {
                 always {
-                    ontrackValidate(
-                            project: ONTRACK_PROJECT_NAME,
-                            branch: ONTRACK_BRANCH_NAME,
-                            build: VERSION,
-                            validationStamp: 'MERGE',
-                    )
+                    ontrackCliValidate(stamp: 'MERGE')
                 }
             }
         }
@@ -795,10 +637,10 @@ pipeline {
 
         stage('Master setup') {
             when {
-                beforeAgent true
                 branch 'master'
             }
             steps {
+                ontrackCliSetup(setup: false)
                 script {
                     // Gets the latest tag
                     env.ONTRACK_VERSION = sh(
@@ -813,8 +655,8 @@ pipeline {
                     echo "ONTRACK_VERSION_MAJOR_MINOR=${env.ONTRACK_VERSION_MAJOR_MINOR}"
                     echo "ONTRACK_VERSION_MAJOR=${env.ONTRACK_VERSION_MAJOR}"
                     // Gets the corresponding branch
-                    def result = ontrackGraphQL(
-                            script: '''
+                    def result = ontrackCliGraphQL(
+                            query: '''
                                 query BranchLookup($project: String!, $build: String!) {
                                   builds(project: $project, buildProjectFilter: {buildExactMatch: true, buildName: $build}) {
                                     branch {
@@ -823,9 +665,9 @@ pipeline {
                                   }
                                 }
                             ''',
-                            bindings: [
-                                    'project': ONTRACK_PROJECT_NAME,
-                                    'build'  : env.ONTRACK_VERSION as String
+                            variables: [
+                                project: env.ONTRACK_PROJECT_NAME as String,
+                                build  : env.ONTRACK_VERSION as String,
                             ],
                     )
                     env.ONTRACK_TARGET_BRANCH_NAME = result.data.builds.first().branch.name as String
@@ -838,15 +680,7 @@ pipeline {
         // Latest documentation
 
         stage('Latest documentation') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             when {
-                beforeAgent true
                 branch 'master'
             }
             environment {
@@ -868,11 +702,10 @@ pipeline {
             }
             post {
                 always {
-                    ontrackValidate(
-                            project: ONTRACK_PROJECT_NAME,
+                    ontrackCliValidate(
                             branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
-                            validationStamp: 'DOCUMENTATION.LATEST',
+                            stamp: 'DOCUMENTATION.LATEST',
                     )
                 }
             }
@@ -881,15 +714,7 @@ pipeline {
         // Docker latest images
 
         stage('Docker Latest') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             when {
-                beforeAgent true
                 branch "master"
             }
             environment {
@@ -916,11 +741,10 @@ pipeline {
             }
             post {
                 always {
-                    ontrackValidate(
-                            project: ONTRACK_PROJECT_NAME,
+                    ontrackCliValidate(
                             branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
-                            validationStamp: 'DOCKER.LATEST',
+                            stamp: 'DOCKER.LATEST',
                     )
                 }
             }
@@ -929,20 +753,12 @@ pipeline {
         // Site generation
 
         stage('Site generation') {
-            agent {
-                docker {
-                    image AGENT_IMAGE
-                    reuseNode true
-                    args AGENT_OPTIONS
-                }
-            }
             environment {
                 // GitHub OAuth token
                 GRGIT_USER = credentials("JENKINS_GITHUB_TOKEN")
                 GITHUB_URI = 'https://github.com/nemerosa/ontrack.git'
             }
             when {
-                beforeAgent true
                 branch 'master'
             }
             steps {
@@ -960,11 +776,10 @@ pipeline {
             }
             post {
                 always {
-                    ontrackValidate(
-                            project: ONTRACK_PROJECT_NAME,
+                    ontrackCliValidate(
                             branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
-                            validationStamp: 'SITE',
+                            stamp: 'SITE',
                     )
                 }
             }
