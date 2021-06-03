@@ -740,7 +740,7 @@ pipeline {
             }
             post {
                 always {
-                    ontrackValidate(
+                    ontrackCliValidate(
                             branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
                             stamp: 'DOCKER.LATEST',
