@@ -215,7 +215,16 @@ pipeline {
                             --file docker-compose-jacoco.yml \\
                             logs ontrack > docker-compose-acceptance-ontrack.log
                     '''
+                    sh '''
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose  \\
+                            --project-name local \\
+                            --file docker-compose.yml \\
+                            --file docker-compose-jacoco.yml \\
+                            logs selenium > docker-compose-acceptance-selenium.log
+                    '''
                     archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance-ontrack.log", allowEmptyArchive: true)
+                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance-selenium.log", allowEmptyArchive: true)
                     archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/build/**", allowEmptyArchive: true)
                     sh '''
                         rm -rf build/acceptance
