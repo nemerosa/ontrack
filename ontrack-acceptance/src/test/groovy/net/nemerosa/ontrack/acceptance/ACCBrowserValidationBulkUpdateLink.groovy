@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.ValidationStamp
 import org.junit.Before
 import org.junit.Test
+import org.junit.Ignore
 
 import static net.nemerosa.ontrack.acceptance.steps.BasicSteps.login
 import static net.nemerosa.ontrack.acceptance.steps.BasicSteps.loginAsAdmin
@@ -14,6 +15,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
  * Regression test for #678
  */
 @AcceptanceTestSuite
+@Ignore
 class ACCBrowserValidationBulkUpdateLink extends AcceptanceTestClient {
 
     private final String groupName = "ValidationManagers"
