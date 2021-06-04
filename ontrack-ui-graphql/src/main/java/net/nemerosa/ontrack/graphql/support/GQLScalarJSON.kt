@@ -23,7 +23,7 @@ class GQLScalarJSON private constructor() : GraphQLScalarType(
         override fun serialize(dataFetcherResult: Any): JsonNode {
             val json = when (dataFetcherResult) {
                 is JsonNode -> dataFetcherResult
-                else -> mapper.valueToTree<JsonNode>(dataFetcherResult)
+                else -> mapper.valueToTree(dataFetcherResult)
             }
             return json.obfuscate()
         }
@@ -32,7 +32,7 @@ class GQLScalarJSON private constructor() : GraphQLScalarType(
             when (input) {
                 is String -> mapper.readTree(input)
                 is JsonNode -> input
-                else -> throw CoercingParseValueException("Cannot parse value for ${input::class}")
+                else -> input.asJson()
             }
 
         override fun parseLiteral(input: Any): JsonNode? =
