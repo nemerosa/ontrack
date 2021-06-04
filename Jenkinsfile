@@ -1,8 +1,9 @@
-@Library("ontrack-jenkins-cli-pipeline@main") _
+@Library("ontrack-jenkins-cli-pipeline@1.0.1") _
 
 pipeline {
 
     environment {
+        ONTRACK = credentials("ONTRACK_SERVICE_ACCOUNT")
         DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
         CODECOV_TOKEN = credentials("CODECOV_TOKEN")
         GPG_KEY = credentials("GPG_KEY")
@@ -11,7 +12,7 @@ pipeline {
 
     agent {
         docker {
-            image "nemerosa/ontrack-build:3.0.0"
+            image "nemerosa/ontrack-build:3.1.0"
             args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
         }
     }
@@ -368,16 +369,16 @@ pipeline {
                                 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
                                 rm -f ${DOCKER_DIR}/*.rpm
                                 cp build/distributions/*rpm ${DOCKER_DIR}/ontrack.rpm
-                                
+
                                 echo "Launching test environment..."
                                 cd ontrack-acceptance/src/main/compose
                                 docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
-                                
+
                                 echo "Launching Ontrack in CentOS environment..."
                                 CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
                                 echo "... for container ${CONTAINER}"
                                 docker container exec ${CONTAINER} /etc/init.d/ontrack start
-                                
+
                                 echo "Launching tests..."
                                 docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
                             '''
@@ -411,16 +412,16 @@ pipeline {
                                 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
                                 rm -f ${DOCKER_DIR}/*.deb
                                 cp build/distributions/*.deb ${DOCKER_DIR}/ontrack.deb
-                                
+
                                 echo "Launching test environment..."
                                 cd ontrack-acceptance/src/main/compose
                                 docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
-                                
+
                                 echo "Launching Ontrack in Debian environment..."
                                 CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
                                 echo "... for container ${CONTAINER}"
                                 docker container exec ${CONTAINER} /etc/init.d/ontrack start
-                                
+
                                 echo "Launching tests..."
                                 docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
                                 '''
@@ -515,7 +516,6 @@ pipeline {
             environment {
                 GITHUB_TOKEN = credentials("JENKINS_GITHUB_TOKEN")
                 GITTER_TOKEN = credentials("GITTER_TOKEN")
-                ONTRACK = credentials("ONTRACK_SERVICE_ACCOUNT")
             }
             when {
                 beforeAgent true
@@ -769,6 +769,8 @@ pipeline {
                         --profile \\
                         --console plain \\
                         --stacktrace \\
+                        -PontrackUser=${ONTRACK_USR} \\
+                        -PontrackPassword=${ONTRACK_PSW} \\
                         -PontrackVersion=${ONTRACK_VERSION} \\
                         -PontrackGitHubUri=${GITHUB_URI} \\
                         site
