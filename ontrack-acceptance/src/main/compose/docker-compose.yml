@@ -41,7 +41,7 @@ services:
       image: "selenium/standalone-firefox:88.0"
       environment:
          JAVA_OPTS: "-Xmx3072m -Xms3072m"
-         SE_OPTS: "--log-level FINE"
+         SE_OPTS: "--log-level INFO"
    ontrack_acceptance:
       image: "nemerosa/ontrack-acceptance:${VERSION:-latest}"
       depends_on:
