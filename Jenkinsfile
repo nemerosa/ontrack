@@ -12,7 +12,7 @@ pipeline {
 
     agent {
         docker {
-            image "nemerosa/ontrack-build:3.0.0"
+            image "nemerosa/ontrack-build:3.1.0"
             args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
         }
     }
