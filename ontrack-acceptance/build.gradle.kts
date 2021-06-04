@@ -106,30 +106,6 @@ tasks.named<Test>("test") {
 
 val publishedTasks = mutableListOf<Jar>(bootJar)
 
-if (hasProperty("documentation")) {
-
-    val groovydoc = tasks.named<Groovydoc>("groovydoc") {
-        source = project.the<SourceSetContainer>()["test"].allSource
-    }
-
-    val javadoc = tasks.named<Javadoc>("javadoc") {
-        source = project.the<SourceSetContainer>()["test"].allJava
-    }
-
-    val javadocJar = tasks.getByName<Jar>("javadocJar") {
-        from(javadoc)
-        from(groovydoc)
-    }
-
-    val sourcesJar = tasks.getByName<Jar>("sourcesJar") {
-        from(project.the<SourceSetContainer>()["test"].allSource)
-    }
-
-    publishedTasks.add(javadocJar)
-    publishedTasks.add(sourcesJar)
-
-}
-
 // Publications
 
 configure<PublishingExtension> {
