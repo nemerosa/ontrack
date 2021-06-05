@@ -7,6 +7,7 @@ import org.openqa.selenium.*
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxOptions
 import org.openqa.selenium.firefox.FirefoxProfile
+import org.openqa.selenium.logging.LogType
 import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.support.ui.FluentWait
@@ -18,6 +19,7 @@ import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 import java.util.function.Consumer
+import java.util.logging.Level
 
 class Configuration {
 
@@ -29,6 +31,7 @@ class Configuration {
     private final String baseUrl
     private final int implicitWait
     private final File screenshotDir
+    private final File consoleDir
 
     private final AtomicLong screenshotIndex = new AtomicLong()
 
@@ -38,7 +41,9 @@ class Configuration {
         baseUrl = config.seleniumTargetUrl ?: config.url
         implicitWait = config.implicitWait
         screenshotDir = new File(config.outputDir, "screenshots").getAbsoluteFile()
+        consoleDir = new File(config.outputDir, "console").getAbsoluteFile()
         FileUtils.forceMkdir(screenshotDir)
+        FileUtils.forceMkdir(consoleDir)
         // Logging
         logger.info("Browser base URL: ${}", baseUrl)
         // Web driver class
@@ -108,6 +113,24 @@ class Configuration {
             screenshot("timeout")
             // The error is still there
             throw new TimeoutException("Could not get ${message} in less than ${seconds} seconds", ex)
+        }
+    }
+
+    void saveBrowserLogs() {
+        // Log file name
+        String fileName = String.format(
+                "browser-%s.log",
+                new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())
+        )
+        // Target file
+        File logFile = new File(consoleDir, fileName)
+        logger.info("[gui] Browser logs at {}", logFile.getAbsolutePath())
+        // Gets the log entries >= FINE and writes them into the log file
+        logFile.withWriter {writer ->
+            def logEntries = driver.manage().logs().get(LogType.BROWSER)
+            logEntries.filter(Level.FINE).each { entry ->
+                writer.println(entry.toString())
+            }
         }
     }
 
