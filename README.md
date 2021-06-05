@@ -45,16 +45,17 @@ And if this is not enough, you can add your own
 You can feed information into Ontrack using:
 
 * a REST / GraphQL API
-* a Groovy based DSL
-* a [Jenkins plugin](https://plugins.jenkins.io/ontrack/)
+* a [CLI](https://github.com/nemerosa/ontrack-cli)
+* a [Jenkins pipeline library](https://github.com/nemerosa/ontrack-jenkins-cli-pipeline/)
+* a [GitHub action](https://github.com/nemerosa/ontrack-github-actions-cli-setup)
 
 ## Quick start
 
 The fastest way to start Ontrack is to use Docker Compose:
 
 ```bash
-curl -fsSLO https://github.com/nemerosa/ontrack/blob/master/compose/docker-compose.yml
-docker-compose up -d
+curl -fsSLO https://raw.githubusercontent.com/nemerosa/ontrack/master/compose/docker-compose.yml
+docker compose up -d
 ```
 
 This sets up:
