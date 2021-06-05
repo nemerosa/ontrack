@@ -122,6 +122,11 @@ class Configuration {
                 "browser-%s.log",
                 new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())
         )
+        // Test context is available
+        AcceptanceRunContext context = AcceptanceRunContext.instance.get()
+        if (context != null) {
+            fileName = context.testDescription + "-" + fileName
+        }
         // Target file
         File logFile = new File(consoleDir, fileName)
         logger.info("[gui] Browser logs at {}", logFile.getAbsolutePath())
