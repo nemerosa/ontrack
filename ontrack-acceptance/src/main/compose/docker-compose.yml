@@ -39,8 +39,8 @@ services:
          SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
    selenium:
       image: "selenium/standalone-chrome:91.0"
+      shm_size: 2g
       environment:
-         JAVA_OPTS: "-Xmx4096m -Xms4096m"
          SE_OPTS: "--log-level INFO"
    ontrack_acceptance:
       image: "nemerosa/ontrack-acceptance:${VERSION:-latest}"
