@@ -131,11 +131,15 @@ class Configuration {
         File logFile = new File(consoleDir, fileName)
         logger.info("[gui] Browser logs at {}", logFile.getAbsolutePath())
         // Gets the log entries >= FINE and writes them into the log file
-        logFile.withWriter {writer ->
+        try {
             def logEntries = driver.manage().logs().get(LogType.BROWSER)
-            logEntries.filter(Level.FINE).each { entry ->
-                writer.println(entry.toString())
+            logFile.withWriter { writer ->
+                logEntries.filter(Level.FINE).each { entry ->
+                    writer.println(entry.toString())
+                }
             }
+        } catch (UnsupportedCommandException ignored) {
+            logger.warn("[gui] Getting the browser logs is not support for this driver.")
         }
     }
 
