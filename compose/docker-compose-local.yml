@@ -3,7 +3,7 @@ version: "2.1"
 services:
   # InfluxDB container
   influxdb:
-    image: influxdb:1.1-alpine
+    image: influxdb:1.8.6
     environment:
       PRE_CREATE_DB: "ontrack"
     # Makes all ports accessible on the host for testing
@@ -11,19 +11,36 @@ services:
       - "8083"
       - "8086"
 
-  # Grafana container
-  grafana:
-    image: grafana/grafana:4.1.1
+  # Elastic search
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
     ports:
-      - "3000"
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - "discovery.type=single-node"
 
   # Ontrack container
   ontrack:
     image: nemerosa/ontrack:latest
+    depends_on:
+      postgresql:
+        condition: service_started
+      influxdb:
+        condition: service_started
+      elasticsearch:
+        condition: service_started
     environment:
       JAVA_OPTIONS: "${JAVA_OPTIONS}"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://postgresql/ontrack"
       PROFILE: acceptance
+      # InfluxDB being enabled
+      ONTRACK_INFLUXDB_ENABLED: "true"
+      ONTRACK_INFLUXDB_URI: "http://influxdb:8086"
+      # Elastic search
+      ONTRACK_CONFIG_SEARCH_ENGINE: "elasticsearch"
+      ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
+      SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
     volumes:
       - "./ci/ontrack:/var/ontrack/conf"
       # Better startup performances in CI and DO, do not use in Prod

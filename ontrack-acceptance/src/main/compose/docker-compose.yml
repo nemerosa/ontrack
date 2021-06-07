@@ -15,7 +15,7 @@ services:
       environment:
          - "discovery.type=single-node"
    influxdb:
-    image: influxdb:1.5.2
+    image: influxdb:1.8.6
    ontrack:
       image: "nemerosa/ontrack:${VERSION:-latest}"
       depends_on:
@@ -38,9 +38,10 @@ services:
          ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
          SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
    selenium:
-      image: "selenium/standalone-chrome:3.11.0"
+      image: "selenium/standalone-chrome:91.0"
+      shm_size: 2g
       environment:
-         JAVA_OPTS: "-Xmx3072m -Xms3072m"
+         SE_OPTS: "--log-level INFO"
    ontrack_acceptance:
       image: "nemerosa/ontrack-acceptance:${VERSION:-latest}"
       depends_on:
@@ -52,9 +53,9 @@ services:
          ONTRACK_ACCEPTANCE_SELENIUM_GRID_URL: http://selenium:4444/wd/hub
          ONTRACK_ACCEPTANCE_SELENIUM_BROWSER_NAME: chrome
          ONTRACK_ACCEPTANCE_SELENIUM_TARGET_URL: http://ontrack:8080
-         ONTRACK_ACCEPTANCE_IMPLICIT_WAIT: 30
+         ONTRACK_ACCEPTANCE_IMPLICIT_WAIT: 60
          ONTRACK_ACCEPTANCE_TARGET_URL: http://ontrack:8080
          ONTRACK_ACCEPTANCE_INFLUXDB_URI: http://influxdb:8086
-         JAVA_OPTIONS: "-Xmx2048m -Xms2048m"
+         JAVA_OPTIONS: "-Xmx3072m -Xms3072m"
       volumes:
          - "./build:/ontrack/acceptance/output:rw"

@@ -9,7 +9,7 @@ plugins {
 apply(plugin = "org.springframework.boot")
 apply(plugin = "com.bmuschko.docker-remote-api")
 
-val seleniumVersion = "3.11.0"
+val seleniumVersion = "3.141.59"
 
 dependencies {
     implementation("org.codehaus.groovy:groovy")
@@ -105,30 +105,6 @@ tasks.named<Test>("test") {
 // Javadoc and sources for the tests
 
 val publishedTasks = mutableListOf<Jar>(bootJar)
-
-if (hasProperty("documentation")) {
-
-    val groovydoc = tasks.named<Groovydoc>("groovydoc") {
-        source = project.the<SourceSetContainer>()["test"].allSource
-    }
-
-    val javadoc = tasks.named<Javadoc>("javadoc") {
-        source = project.the<SourceSetContainer>()["test"].allJava
-    }
-
-    val javadocJar = tasks.getByName<Jar>("javadocJar") {
-        from(javadoc)
-        from(groovydoc)
-    }
-
-    val sourcesJar = tasks.getByName<Jar>("sourcesJar") {
-        from(project.the<SourceSetContainer>()["test"].allSource)
-    }
-
-    publishedTasks.add(javadocJar)
-    publishedTasks.add(sourcesJar)
-
-}
 
 // Publications
 

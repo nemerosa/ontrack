@@ -50,12 +50,18 @@ angular.module('ot.service.user', [
          * Login
          */
         self.login = function () {
+
+            const encodeUnicode = (str) => {
+                const bytes = utf8.encode(str);
+                return base64.encode(bytes);
+            };
+
             return otFormService.display({
                 uri: $rootScope.user.login,
                 title: "Sign in",
                 submit: function (data) {
                     var credentials = data.name + ':' + data.password;
-                    var encodedCredentials = Unibabel.arrToBase64(Unibabel.strToUtf8Arr(credentials));
+                    var encodedCredentials = encodeUnicode(credentials);
                     var d = $q.defer();
                     $http.post(
                         $rootScope.user.login + "?remember-me=" + (data.rememberMe === true),
@@ -93,6 +99,10 @@ angular.module('ot.service.user', [
                 location.reload();
             });
         };
+
+        /**
+         * OK
+         */
 
         return self;
     })

@@ -9,7 +9,7 @@ pipeline {
         CODECOV_TOKEN = credentials("CODECOV_TOKEN")
         GPG_KEY = credentials("GPG_KEY")
         GPG_KEY_RING = credentials("GPG_KEY_RING")
-        AGENT_IMAGE = "nemerosa/ontrack-build:1.0.2"
+        AGENT_IMAGE = "nemerosa/ontrack-build:2.0.0"
         AGENT_OPTIONS = "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
     }
 
@@ -41,10 +41,7 @@ pipeline {
             when {
                 beforeAgent true
                 not {
-                    anyOf {
-                        branch 'master'
-                        changeRequest()
-                    }
+                  branch 'master'
                 }
             }
             steps {
@@ -77,16 +74,14 @@ pipeline {
             }
             steps {
                 sh ''' git checkout -B ${BRANCH_NAME} && git clean -xfd '''
-                sh ''' ./gradlew clean versionDisplay versionFile'''
+                sh ''' ./gradlew clean versionDisplay versionFile --no-daemon'''
                 script {
                     // Reads version information
                     def props = readProperties(file: 'build/version.properties')
                     env.VERSION = props.VERSION_DISPLAY
                     env.GIT_COMMIT = props.VERSION_COMMIT
                     // If not a PR, create a build
-                    if (!(BRANCH_NAME ==~ /PR-.*/)) {
-                        ontrackBuild(project: ONTRACK_PROJECT_NAME, branch: ONTRACK_BRANCH_NAME, build: VERSION, gitCommit: GIT_COMMIT)
-                    }
+                    ontrackBuild(project: ONTRACK_PROJECT_NAME, branch: ONTRACK_BRANCH_NAME, build: VERSION, gitCommit: GIT_COMMIT)
                 }
                 echo "Version = ${VERSION}"
                 sh '''
@@ -103,9 +98,10 @@ pipeline {
                         -Psigning.keyId=${GPG_KEY_USR} \\
                         -Psigning.password=${GPG_KEY_PSW} \\
                         -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
-                        -Dorg.gradle.jvmargs=-Xmx4096m \\
+                        -Dorg.gradle.jvmargs=-Xmx6144m \\
                         --stacktrace \\
                         --parallel \\
+                        --no-daemon \\
                         --console plain
                 '''
                 sh ''' curl -s https://codecov.io/bash | bash -s -- -c -F build'''
@@ -132,16 +128,13 @@ pipeline {
                 always {
                     script {
                         def results = junit '**/build/test-results/**/*.xml'
-                        // If not a PR, create a build validation stamp
-                        if (!(BRANCH_NAME ==~ /PR-.*/)) {
-                            ontrackValidate(
-                                    project: ONTRACK_PROJECT_NAME,
-                                    branch: ONTRACK_BRANCH_NAME,
-                                    build: VERSION,
-                                    validationStamp: 'BUILD',
-                                    testResults: results,
-                            )
-                        }
+                        ontrackValidate(
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: ONTRACK_BRANCH_NAME,
+                            build: VERSION,
+                            validationStamp: 'BUILD',
+                            testResults: results,
+                        )
                     }
                 }
             }
@@ -215,7 +208,17 @@ pipeline {
                             --file docker-compose-jacoco.yml \\
                             logs ontrack > docker-compose-acceptance-ontrack.log
                     '''
-                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance.log", allowEmptyArchive: true)
+                    sh '''
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose  \\
+                            --project-name local \\
+                            --file docker-compose.yml \\
+                            --file docker-compose-jacoco.yml \\
+                            logs selenium > docker-compose-acceptance-selenium.log
+                    '''
+                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance-ontrack.log", allowEmptyArchive: true)
+                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance-selenium.log", allowEmptyArchive: true)
+                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/build/**", allowEmptyArchive: true)
                     sh '''
                         rm -rf build/acceptance
                         mkdir -p build
@@ -223,15 +226,13 @@ pipeline {
                         '''
                     script {
                         def results = junit('build/acceptance/*.xml')
-                        if (!(BRANCH_NAME ==~ /PR-.*/)) {
-                            ontrackValidate(
-                                    project: ONTRACK_PROJECT_NAME,
-                                    branch: ONTRACK_BRANCH_NAME,
-                                    build: VERSION,
-                                    validationStamp: 'ACCEPTANCE',
-                                    testResults: results,
-                            )
-                        }
+                        ontrackValidate(
+                                project: ONTRACK_PROJECT_NAME,
+                                branch: ONTRACK_BRANCH_NAME,
+                                build: VERSION,
+                                validationStamp: 'ACCEPTANCE',
+                                testResults: results,
+                        )
                     }
                 }
                 cleanup {
@@ -434,16 +435,16 @@ pipeline {
                                 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
                                 rm -f ${DOCKER_DIR}/*.rpm
                                 cp build/distributions/*rpm ${DOCKER_DIR}/ontrack.rpm
-                                
+
                                 echo "Launching test environment..."
                                 cd ontrack-acceptance/src/main/compose
                                 docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
-                                
+
                                 echo "Launching Ontrack in CentOS environment..."
                                 CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
                                 echo "... for container ${CONTAINER}"
                                 docker container exec ${CONTAINER} /etc/init.d/ontrack start
-                                
+
                                 echo "Launching tests..."
                                 docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
                             '''
@@ -490,16 +491,16 @@ pipeline {
                                 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
                                 rm -f ${DOCKER_DIR}/*.deb
                                 cp build/distributions/*.deb ${DOCKER_DIR}/ontrack.deb
-                                
+
                                 echo "Launching test environment..."
                                 cd ontrack-acceptance/src/main/compose
                                 docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
-                                
+
                                 echo "Launching Ontrack in Debian environment..."
                                 CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
                                 echo "... for container ${CONTAINER}"
                                 docker container exec ${CONTAINER} /etc/init.d/ontrack start
-                                
+
                                 echo "Launching tests..."
                                 docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
                                 '''
