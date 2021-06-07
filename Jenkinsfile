@@ -77,7 +77,7 @@ pipeline {
             }
             steps {
                 sh ''' git checkout -B ${BRANCH_NAME} && git clean -xfd '''
-                sh ''' ./gradlew clean versionDisplay versionFile'''
+                sh ''' ./gradlew clean versionDisplay versionFile --no-daemon'''
                 script {
                     // Reads version information
                     def props = readProperties(file: 'build/version.properties')
@@ -106,6 +106,7 @@ pipeline {
                         -Dorg.gradle.jvmargs=-Xmx6144m \\
                         --stacktrace \\
                         --parallel \\
+                        --no-daemon \\
                         --console plain
                 '''
                 sh ''' curl -s https://codecov.io/bash | bash -s -- -c -F build'''
