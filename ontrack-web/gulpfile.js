@@ -76,7 +76,6 @@ var vendorJsResources = [
     'angular-bootstrap/ui-bootstrap-tpls.js',
     'moment/min/moment.min.js',
     'oclazyload/dist/ocLazyLoad.min.js',
-    'unibabel/index.js',
     'echarts/dist/echarts.js'
 ].map(function (rel) {
     return vendor + '/' + rel;
