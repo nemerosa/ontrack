@@ -84,9 +84,7 @@ pipeline {
                     env.VERSION = props.VERSION_DISPLAY
                     env.GIT_COMMIT = props.VERSION_COMMIT
                     // If not a PR, create a build
-                    if (!(BRANCH_NAME ==~ /PR-.*/)) {
-                        ontrackBuild(project: ONTRACK_PROJECT_NAME, branch: ONTRACK_BRANCH_NAME, build: VERSION, gitCommit: GIT_COMMIT)
-                    }
+                    ontrackBuild(project: ONTRACK_PROJECT_NAME, branch: ONTRACK_BRANCH_NAME, build: VERSION, gitCommit: GIT_COMMIT)
                 }
                 echo "Version = ${VERSION}"
                 sh '''
@@ -133,16 +131,13 @@ pipeline {
                 always {
                     script {
                         def results = junit '**/build/test-results/**/*.xml'
-                        // If not a PR, create a build validation stamp
-                        if (!(BRANCH_NAME ==~ /PR-.*/)) {
-                            ontrackValidate(
-                                    project: ONTRACK_PROJECT_NAME,
-                                    branch: ONTRACK_BRANCH_NAME,
-                                    build: VERSION,
-                                    validationStamp: 'BUILD',
-                                    testResults: results,
-                            )
-                        }
+                        ontrackValidate(
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: ONTRACK_BRANCH_NAME,
+                            build: VERSION,
+                            validationStamp: 'BUILD',
+                            testResults: results,
+                        )
                     }
                 }
             }
@@ -234,15 +229,13 @@ pipeline {
                         '''
                     script {
                         def results = junit('build/acceptance/*.xml')
-                        if (!(BRANCH_NAME ==~ /PR-.*/)) {
-                            ontrackValidate(
-                                    project: ONTRACK_PROJECT_NAME,
-                                    branch: ONTRACK_BRANCH_NAME,
-                                    build: VERSION,
-                                    validationStamp: 'ACCEPTANCE',
-                                    testResults: results,
-                            )
-                        }
+                        ontrackValidate(
+                                project: ONTRACK_PROJECT_NAME,
+                                branch: ONTRACK_BRANCH_NAME,
+                                build: VERSION,
+                                validationStamp: 'ACCEPTANCE',
+                                testResults: results,
+                        )
                     }
                 }
                 cleanup {
