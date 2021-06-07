@@ -41,10 +41,7 @@ pipeline {
             when {
                 beforeAgent true
                 not {
-                    anyOf {
-                        branch 'master'
-                        changeRequest()
-                    }
+                  branch 'master'
                 }
             }
             steps {
