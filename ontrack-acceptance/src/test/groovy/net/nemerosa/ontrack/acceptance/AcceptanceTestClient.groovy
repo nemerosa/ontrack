@@ -95,7 +95,7 @@ class AcceptanceTestClient extends AcceptanceSupport {
         def project = admin().get("rest/structure/entity/project/$name").get()
         def link = project._delete.asText()
         logger.debug "Deleting project at ${link}"
-        admin().delete(link).get()
+        admin().delete(link as String).get()
     }
 
     JsonNode doCreateBranch() {
@@ -193,7 +193,11 @@ class AcceptanceTestClient extends AcceptanceSupport {
         Configuration.driver(configRule.config) { config ->
             Browser browser = new Browser(config)
             closure.delegate = browser
-            closure(browser)
+            try {
+                closure(browser)
+            } finally {
+                browser.saveBrowserLogs()
+            }
         }
     }
 }

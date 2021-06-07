@@ -3,7 +3,7 @@ version: "2.1"
 services:
   # InfluxDB container
   influxdb:
-    image: influxdb:1.1-alpine
+    image: influxdb:1.8.6
     environment:
       PRE_CREATE_DB: "ontrack"
     # Makes all ports accessible on the host for testing
@@ -14,6 +14,13 @@ services:
   # Ontrack container
   ontrack:
     image: nemerosa/ontrack:latest
+    depends_on:
+      postgresql:
+        condition: service_started
+      influxdb:
+        condition: service_started
+      elasticsearch:
+        condition: service_started
     environment:
       JAVA_OPTIONS: "${JAVA_OPTIONS}"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://postgresql/ontrack"
@@ -23,13 +30,6 @@ services:
       # Elastic search
       SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
       PROFILE: acceptance
-    depends_on:
-      postgresql:
-        condition: service_started
-      influxdb:
-        condition: service_started
-      elasticsearch:
-        condition: service_started
     volumes:
       - "./ci/ontrack:/var/ontrack/conf"
       # Better startup performances in CI and DO, do not use in Prod

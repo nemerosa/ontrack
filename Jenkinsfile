@@ -59,7 +59,7 @@ pipeline {
                 }
             }
             steps {
-                sh ''' ./gradlew clean versionDisplay versionFile'''
+                sh ''' ./gradlew clean versionDisplay versionFile --no-daemon'''
                 script {
                     // Reads version information
                     def props = readProperties(file: 'build/version.properties')
@@ -83,9 +83,10 @@ pipeline {
                         -Psigning.keyId=${GPG_KEY_USR} \\
                         -Psigning.password=${GPG_KEY_PSW} \\
                         -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
-                        -Dorg.gradle.jvmargs=-Xmx8192m \\
+                        -Dorg.gradle.jvmargs=-Xmx6144m \\
                         --stacktrace \\
                         --parallel \\
+                        --no-daemon \\
                         --console plain
                 '''
                 // Jacoco report available at build/reports/jacoco/build.xml
@@ -179,7 +180,17 @@ pipeline {
                             --file docker-compose-jacoco.yml \\
                             logs ontrack > docker-compose-acceptance-ontrack.log
                     '''
-                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance.log", allowEmptyArchive: true)
+                    sh '''
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose  \\
+                            --project-name local \\
+                            --file docker-compose.yml \\
+                            --file docker-compose-jacoco.yml \\
+                            logs selenium > docker-compose-acceptance-selenium.log
+                    '''
+                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance-ontrack.log", allowEmptyArchive: true)
+                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance-selenium.log", allowEmptyArchive: true)
+                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/build/**", allowEmptyArchive: true)
                     sh '''
                         rm -rf build/acceptance
                         mkdir -p build
