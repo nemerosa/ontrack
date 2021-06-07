@@ -50,12 +50,24 @@ angular.module('ot.service.user', [
          * Login
          */
         self.login = function () {
+
+            const encodeUnicode = (str) => {
+                // source: https://attacomsian.com/blog/javascript-base64-encode-decode
+                // first we use encodeURIComponent to get percent-encoded UTF-8,
+                // then we convert the percent encodings into raw bytes which
+                // can be fed into btoa.
+                return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+                    function toSolidBytes(match, p1) {
+                        return String.fromCharCode('0x' + p1);
+                    }));
+            };
+
             return otFormService.display({
                 uri: $rootScope.user.login,
                 title: "Sign in",
                 submit: function (data) {
                     var credentials = data.name + ':' + data.password;
-                    var encodedCredentials = Unibabel.arrToBase64(Unibabel.strToUtf8Arr(credentials));
+                    var encodedCredentials = encodeUnicode(credentials);
                     var d = $q.defer();
                     $http.post(
                         $rootScope.user.login + "?remember-me=" + (data.rememberMe === true),
@@ -93,6 +105,10 @@ angular.module('ot.service.user', [
                 location.reload();
             });
         };
+
+        /**
+         * OK
+         */
 
         return self;
     })
