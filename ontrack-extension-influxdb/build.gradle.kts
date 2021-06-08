@@ -16,6 +16,7 @@ dependencies {
     testImplementation(project(":ontrack-it-utils"))
     testImplementation("org.codehaus.groovy:groovy")
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
+    testImplementation("org.testcontainers:testcontainers:1.15.3")
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))

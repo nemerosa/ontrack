@@ -69,9 +69,16 @@ class DefaultInfluxDBConnection(
         renew()
     }
 
-    private fun check(connection: InfluxDB): Boolean =
-        if (lastCheck == null || Duration.between(lastCheck, Time.now()) > influxDBExtensionProperties.validity) {
-            val pong = connection.ping()
+    private fun check(connection: InfluxDB): Boolean {
+        return if (
+            lastCheck == null ||
+            Duration.between(lastCheck, Time.now()) > influxDBExtensionProperties.validity
+        ) {
+            val pong = try {
+                connection.ping()
+            } catch (_: Exception) {
+                return false
+            }
             val connectionOK = pong?.isGood ?: false
             if (!connectionOK) {
                 false
@@ -82,6 +89,7 @@ class DefaultInfluxDBConnection(
         } else {
             true
         }
+    }
 
     private fun renew(): InfluxDB? = create()
 
