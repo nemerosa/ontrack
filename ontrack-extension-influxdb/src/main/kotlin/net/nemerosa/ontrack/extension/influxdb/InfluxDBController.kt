@@ -30,7 +30,7 @@ class InfluxDBController(
         return InfluxDBStatus(
             url = influxDBExtensionProperties.uri,
             db = influxDBExtensionProperties.db,
-            status = influxDBConnection.isValid
+            status = influxDBConnection.isValid(immediate = true)
         )
     }
 

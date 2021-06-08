@@ -43,7 +43,7 @@ class InfluxDBConnectionIT {
             assertNotNull(connection.current) { db ->
                 assertConnectionOK(db)
             }
-            assertTrue(connection.isValid, "Connection is OK")
+            assertTrue(connection.isValid(), "Connection is OK")
         }
     }
 
@@ -53,13 +53,13 @@ class InfluxDBConnectionIT {
             val connection = influxDBConnection(influxDBContainer)
             // Testing the connection is no longer valid
             waitUntil("Connection is valid first", interval = 1.seconds, timeout = 6.seconds) {
-                connection.isValid
+                connection.isValid()
             }
             // Stopping the container
             influxDBContainer.stop()
             // Testing the connection is no longer valid
             waitUntil("Connection is no longer valid", interval = 1.seconds, timeout = 15.seconds) {
-                !connection.isValid
+                !connection.isValid()
             }
         }
     }
@@ -70,20 +70,20 @@ class InfluxDBConnectionIT {
             val connection = influxDBConnection(influxDBContainer)
             // Testing the connection is no longer valid
             waitUntil("Connection is valid first", interval = 1.seconds, timeout = 6.seconds) {
-                connection.isValid
+                connection.isValid()
             }
             // Stopping the container
             influxDBContainer.stop()
             // Testing the connection is no longer valid
             waitUntil("Connection is no longer valid", interval = 1.seconds, timeout = 15.seconds) {
-                !connection.isValid
+                !connection.isValid()
             }
             // Starting the container again
             influxDBContainer.start()
             influxDBExtensionProperties.uri = influxDBUri(influxDBContainer)
             // Testing the connection is restored
             waitUntil("Connection is restored", interval = 1.seconds, timeout = 15.seconds) {
-                !connection.isValid
+                !connection.isValid()
             }
         }
     }

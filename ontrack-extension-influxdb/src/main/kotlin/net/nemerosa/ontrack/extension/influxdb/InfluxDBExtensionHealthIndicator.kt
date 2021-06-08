@@ -9,7 +9,7 @@ class InfluxDBExtensionHealthIndicator(
 
     override fun health(): Health {
         val ok: Boolean = try {
-            influxDBConnection.isValid
+            influxDBConnection.isValid(true)
         } catch (ex: Exception) {
             false
         }

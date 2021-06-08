@@ -27,8 +27,10 @@ interface InfluxDBConnection {
 
     /**
      * Checks if the [current] connection to InfluxDB is a valid one.
+     *
+     * @param immediate If the connection must be tested immediately or can wait until next test window.
      */
-    val isValid: Boolean
+    fun isValid(immediate: Boolean = false): Boolean
 
     /**
      * Forces a reconnection at the next attempt

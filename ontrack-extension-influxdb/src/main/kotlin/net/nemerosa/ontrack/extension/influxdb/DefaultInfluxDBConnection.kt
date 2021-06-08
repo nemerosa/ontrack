@@ -32,7 +32,7 @@ class DefaultInfluxDBConnection(
     override fun startupOrder(): Int = StartupService.SYSTEM_REGISTRATION
 
     override fun start() {
-        if (current != null && isValid) {
+        if (current != null && isValid(true)) {
             logger.info("InfluxDB connection to ${influxDBExtensionProperties.uri} is OK")
         } else {
             logger.error("InfluxDB connection to ${influxDBExtensionProperties.uri} is not OK")
@@ -61,16 +61,17 @@ class DefaultInfluxDBConnection(
                 }
             } ?: create()
 
-    override val isValid: Boolean
-        get() = internalConnection?.run { check(this) } ?: false
+    override fun isValid(immediate: Boolean): Boolean =
+        internalConnection?.run { check(this, immediate = immediate) } ?: false
 
     override fun reset() {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
         renew()
     }
 
-    private fun check(connection: InfluxDB): Boolean {
+    private fun check(connection: InfluxDB, immediate: Boolean = false): Boolean {
         return if (
+            immediate ||
             lastCheck == null ||
             Duration.between(lastCheck, Time.now()) > influxDBExtensionProperties.validity
         ) {
