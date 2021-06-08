@@ -88,6 +88,27 @@ builds which are branch which comply with the project branch model.
 The _Branch model_ and _Branch pattern_ can be combined together.
 ====
 
+[[integration-sonarqube-search]]
+==== Identifying measures in SonarQube
+
+Ontrack looks for the measures in SonarQube using the following approach.
+
+It looks first for analyses in SonarQube for the corresponding:
+
+* _project_ as defined in the SonarQube property of the Ontrack project, typically `group:artifact`
+* _branch_ - either the Git branch associated with the Ontrack branch if any or the Ontrack branch name
+
+[NOTE]
+====
+This implies that your SonarQube analysis parameters must include the corresponding branch name. If you use the Git branch name for your SonarQube analysis, make sure that the same Git branch is associated with your Ontrack branch.
+====
+
+Once the analyses have been collected, the specific analysis for the Ontrack build will be looked for based on the:
+
+* _version_ - set to either the release label associated to the Ontrack build if any or the Ontrack build name
+
+Once the analysis for the Ontrack build has been found, its measures are collected and filtered based on the _measures_ property.
+
 [[integration-sonarqube-build-measures]]
 ==== Build measures
 
