@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.read
 import kotlin.concurrent.write
 
 class DefaultInfluxDBConnection(
@@ -51,46 +50,45 @@ class DefaultInfluxDBConnection(
     }
 
     override val current: InfluxDB?
-        get() = checkAndGet()
+        get() =
+            internalConnection?.let { connection ->
+                val ok = check(connection)
+                if (ok) {
+                    connection
+                } else {
+                    logger.info("Connection to InfluxDB is not valid any longer, attempting to renew it.")
+                    renew()
+                }
+            } ?: create()
 
     override val isValid: Boolean
-        get() = internalConnection?.check() ?: false
+        get() = internalConnection?.run { check(this) } ?: false
 
     override fun reset() {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
         renew()
     }
 
-    private fun checkAndGet(): InfluxDB? {
-        val influxDB = getOrCreate()
-        if (influxDB != null) {
-            if (lastCheck == null || Duration.between(lastCheck, Time.now()) > influxDBExtensionProperties.validity) {
-                if (!influxDB.check()) {
-                    logger.info("Connection to InfluxDB is not valid any longer, attempting to renew it.")
-                    return renew()
-                } else {
-                    lastCheck = Time.now()
-                }
+    private fun check(connection: InfluxDB): Boolean =
+        if (lastCheck == null || Duration.between(lastCheck, Time.now()) > influxDBExtensionProperties.validity) {
+            val pong = connection.ping()
+            val connectionOK = pong?.isGood ?: false
+            if (!connectionOK) {
+                false
+            } else {
+                lastCheck = Time.now()
+                true
             }
+        } else {
+            true
         }
-        return influxDB
-    }
-
-    private fun InfluxDB.check(): Boolean {
-        val pong = ping()
-        return pong?.isGood ?: false
-    }
-
-    private fun getOrCreate(): InfluxDB? = internalConnectionLock.read {
-        internalConnection ?: create()
-    }
 
     private fun renew(): InfluxDB? = create()
 
     private fun create(): InfluxDB? {
         return internalConnectionLock.write {
             doCreate()?.apply {
-                if (!check()) {
+                if (!check(this)) {
                     logger.warn("InfluxDB connection was created/renewed but is not valid. Recreation will be attempted in ${influxDBExtensionProperties.validity}.")
                 }
                 lastCheck = Time.now()
