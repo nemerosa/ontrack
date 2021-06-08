@@ -25,9 +25,15 @@ class InfluxDBConnectionIT {
 
     private lateinit var securityService: SecurityService
 
+    private lateinit var influxDBExtensionProperties: InfluxDBExtensionProperties
+
     @Before
     fun before() {
         securityService = mock(SecurityService::class.java)
+        influxDBExtensionProperties = InfluxDBExtensionProperties().apply {
+            enabled = true
+            validity = Duration.ofSeconds(5)
+        }
     }
 
     @Test
@@ -52,7 +58,31 @@ class InfluxDBConnectionIT {
             // Stopping the container
             influxDBContainer.stop()
             // Testing the connection is no longer valid
-            waitUntil("Connection is no longer valid", interval = 1.seconds, timeout = 3600.seconds) {
+            waitUntil("Connection is no longer valid", interval = 1.seconds, timeout = 15.seconds) {
+                !connection.isValid
+            }
+        }
+    }
+
+    @Test
+    fun `A connection will be restored automatically after some time`() {
+        withContainer { influxDBContainer ->
+            val connection = influxDBConnection(influxDBContainer)
+            // Testing the connection is no longer valid
+            waitUntil("Connection is valid first", interval = 1.seconds, timeout = 6.seconds) {
+                connection.isValid
+            }
+            // Stopping the container
+            influxDBContainer.stop()
+            // Testing the connection is no longer valid
+            waitUntil("Connection is no longer valid", interval = 1.seconds, timeout = 15.seconds) {
+                !connection.isValid
+            }
+            // Starting the container again
+            influxDBContainer.start()
+            influxDBExtensionProperties.uri = influxDBUri(influxDBContainer)
+            // Testing the connection is restored
+            waitUntil("Connection is restored", interval = 1.seconds, timeout = 15.seconds) {
                 !connection.isValid
             }
         }
@@ -74,17 +104,17 @@ class InfluxDBConnectionIT {
     private fun influxDBConnection(
         influxDBContainer: KGenericContainer
     ): InfluxDBConnection {
+        influxDBExtensionProperties.uri = influxDBUri(influxDBContainer)
         return DefaultInfluxDBConnection(
-            influxDBExtensionProperties = InfluxDBExtensionProperties().apply {
-                enabled = true
-                uri = "http://localhost:${influxDBContainer.getMappedPort(8086)}"
-                validity = Duration.ofSeconds(5)
-            },
+            influxDBExtensionProperties = influxDBExtensionProperties,
             securityService = securityService
         ).apply {
             start()
         }
     }
+
+    private fun influxDBUri(influxDBContainer: KGenericContainer) =
+        "http://localhost:${influxDBContainer.getMappedPort(8086)}"
 
     private fun assertConnectionOK(connection: InfluxDB) {
         val pong = connection.ping()
