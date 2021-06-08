@@ -20,12 +20,10 @@ services:
     environment:
       - "discovery.type=single-node"
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.5.2
+  influxdb:
+    image: influxdb:1.8.6
     ports:
-    - "5601:5601"
-    environment:
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      - "8086:8086"
 
   # Vault
   # Non production setup
