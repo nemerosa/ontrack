@@ -44,6 +44,42 @@ class GitLabProjectConfigurationPropertyMutationProviderIT : AbstractGitLabTestS
     }
 
     @Test
+    fun `Setting a GitLab configuration on a project identified by name without any issue service`() {
+        asAdmin {
+            project {
+                val cfg = gitLabConfig()
+                run(
+                    """
+                    mutation {
+                        setProjectGitLabConfigurationProperty(input: {
+                            project: "$name",
+                            configuration: "${cfg.name}",
+                            repository: "nemerosa/test"
+                        }) {
+                            project {
+                                id
+                            }
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                """
+                ).let { data ->
+                    val node = assertNoUserError(data, "setProjectGitLabConfigurationProperty")
+                    assertEquals(id(), node.path("project").path("id").asInt())
+                    assertNotNull(getProperty(this, GitLabProjectConfigurationPropertyType::class.java)) { property ->
+                        assertEquals(cfg.name, property.configuration.name)
+                        assertEquals("nemerosa/test", property.repository)
+                        assertEquals(0, property.indexationInterval)
+                        assertEquals(null, property.issueServiceConfigurationIdentifier)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Setting a GitLab configuration on a project identified by ID with indexation`() {
         asAdmin {
             project {

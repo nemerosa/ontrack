@@ -20,8 +20,8 @@ class BitbucketProjectConfigurationPropertyMutationProvider(
 
     override val inputFields: List<GraphQLInputObjectField> = listOf(
         requiredStringInputField("configuration", "Name of the Bitbucket configuration to use"),
-        requiredStringInputField("project", "Key of the Bitbucket project to use"),
-        requiredStringInputField("repository", "Name of the Bitbucket repository to use"),
+        requiredStringInputField("bitbucketProject", "Key of the Bitbucket project to use"),
+        requiredStringInputField("bitbucketRepository", "Name of the Bitbucket repository to use"),
         optionalIntInputField(
             "indexationInterval",
             "Interval (in minutes) between each indexation of the repository by Ontrack"
@@ -34,8 +34,8 @@ class BitbucketProjectConfigurationPropertyMutationProvider(
 
     override fun readInput(entity: ProjectEntity, input: MutationInput) = StashProjectConfigurationProperty(
         configuration = stashConfigurationService.getConfiguration(input.getRequiredInput("configuration")),
-        project = input.getRequiredInput("project"),
-        repository = input.getRequiredInput("repository"),
+        project = input.getRequiredInput("bitbucketProject"),
+        repository = input.getRequiredInput("bitbucketRepository"),
         indexationInterval = input.getInput<Int>("indexationInterval") ?: 0,
         issueServiceConfigurationIdentifier = input.getInput("issueServiceConfigurationIdentifier"),
     )

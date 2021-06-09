@@ -18,8 +18,8 @@ class BitbucketProjectConfigurationPropertyMutationProviderIT : AbstractBitbucke
                         setProjectBitbucketConfigurationPropertyById(input: {
                             id: $id,
                             configuration: "${cfg.name}",
-                            project: "NEM",
-                            repository: "test"
+                            bitbucketProject: "NEM",
+                            bitbucketRepository: "test"
                         }) {
                             project {
                                 id
@@ -46,6 +46,44 @@ class BitbucketProjectConfigurationPropertyMutationProviderIT : AbstractBitbucke
     }
 
     @Test
+    fun `Setting a Bitbucket configuration on a project identified by name without any issue service`() {
+        asAdmin {
+            project {
+                val cfg = bitbucketConfig()
+                run(
+                    """
+                    mutation {
+                        setProjectBitbucketConfigurationProperty(input: {
+                            project: "$name",
+                            configuration: "${cfg.name}",
+                            bitbucketProject: "NEM",
+                            bitbucketRepository: "test"
+                        }) {
+                            project {
+                                id
+                            }
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                """
+                ).let { data ->
+                    val node = assertNoUserError(data, "setProjectBitbucketConfigurationProperty")
+                    assertEquals(id(), node.path("project").path("id").asInt())
+                    assertNotNull(getProperty(this, StashProjectConfigurationPropertyType::class.java)) { property ->
+                        assertEquals(cfg.name, property.configuration.name)
+                        assertEquals("NEM", property.project)
+                        assertEquals("test", property.repository)
+                        assertEquals(0, property.indexationInterval)
+                        assertEquals(null, property.issueServiceConfigurationIdentifier)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Setting a Bitbucket configuration on a project identified by ID with indexation`() {
         asAdmin {
             project {
@@ -56,8 +94,8 @@ class BitbucketProjectConfigurationPropertyMutationProviderIT : AbstractBitbucke
                         setProjectBitbucketConfigurationPropertyById(input: {
                             id: $id,
                             configuration: "${cfg.name}",
-                            project: "NEM",
-                            repository: "test",
+                            bitbucketProject: "NEM",
+                            bitbucketRepository: "test",
                             indexationInterval: 30
                         }) {
                             project {
@@ -95,8 +133,8 @@ class BitbucketProjectConfigurationPropertyMutationProviderIT : AbstractBitbucke
                         setProjectBitbucketConfigurationPropertyById(input: {
                             id: $id,
                             configuration: "${cfg.name}",
-                            project: "NEM",
-                            repository: "test",
+                            bitbucketProject: "NEM",
+                            bitbucketRepository: "test",
                             issueServiceConfigurationIdentifier: "jira//Name"
                         }) {
                             project {
