@@ -21,7 +21,7 @@ class GitHubProjectConfigurationPropertyMutationProvider(
     override val inputFields: List<GraphQLInputObjectField> = listOf(
         requiredStringInputField("configuration", "Name of the GitHub configuration to use"),
         requiredStringInputField("repository", "GitHub repository to use, in the form of `organization/name`"),
-        optionalIntInputField("indexationInterval", "GitHub repository interval to use"),
+        optionalIntInputField("indexationInterval", "Interval (in minutes) between each indexation of the repository by Ontrack"),
         optionalStringInputField("issueServiceConfigurationIdentifier",
             "Issue identifier to use, for example jira//name where name is the name of the JIRA configuration in Ontrack.")
     )
