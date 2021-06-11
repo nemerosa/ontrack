@@ -13,7 +13,7 @@ abstract class AbstractBitbucketCloudTestSupport : AbstractDSLTestSupport() {
     @Autowired
     protected lateinit var bitbucketCloudConfigurationService: BitbucketCloudConfigurationService
 
-    fun Project.setBitbucketCloudProperty(
+    protected fun Project.setBitbucketCloudProperty(
         config: BitbucketCloudConfiguration,
         repository: String,
         indexationInterval: Int = 0,
@@ -29,6 +29,20 @@ abstract class AbstractBitbucketCloudTestSupport : AbstractDSLTestSupport() {
                 issueServiceConfigurationIdentifier = issueServiceConfigurationIdentifier,
             )
         )
+    }
+
+    protected fun Project.withBitbucketCloudProperty(
+        repository: String = "my-repository"
+    ): BitbucketCloudConfiguration {
+        val config = bitbucketCloudTestConfigMock()
+        bitbucketCloudConfigurationService.newConfiguration(config)
+        setBitbucketCloudProperty(
+            config,
+            repository = repository,
+            indexationInterval = 30,
+            issueServiceConfigurationIdentifier = "jira//my-jira",
+        )
+        return config
     }
 
 }
