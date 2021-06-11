@@ -58,6 +58,12 @@ pipeline {
                     branch 'master'
                 }
             }
+            environment {
+                ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_WORKSPACE = credentials('ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_WORKSPACE')
+                ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_USER = credentials('ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_USER')
+                ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_TOKEN = credentials('ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_TOKEN')
+                ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_EXPECTED_PROJECT = 'ONTRACK'
+            }
             steps {
                 sh ''' ./gradlew clean versionDisplay versionFile --no-daemon'''
                 script {
