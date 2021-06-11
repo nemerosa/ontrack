@@ -29,4 +29,16 @@ class DefaultBitbucketCloudClientIT {
         )
     }
 
+    @Test
+    fun `Getting the list of repositories`() {
+        val repositories = client.repositories
+        val expectedRepository = bitbucketCloudTestEnv.expectedRepository
+        val repository = repositories.find {
+            it.slug == expectedRepository
+        }
+        assertNotNull(repository, "Expected repository has been found") {
+            assertNotNull(client.getRepositoryLastModified(it), "Last modified date is set")
+        }
+    }
+
 }

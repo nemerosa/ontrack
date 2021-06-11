@@ -12,6 +12,7 @@ class BitbucketCloudTestEnv(
     val user: String,
     val token: String,
     val expectedProject: String,
+    val expectedRepository: String,
 )
 
 val bitbucketCloudExtensionFeature: BitbucketCloudExtensionFeature by lazy {
@@ -24,6 +25,7 @@ val bitbucketCloudTestEnv: BitbucketCloudTestEnv by lazy {
         user = getEnv("ontrack.test.extension.bitbucket.cloud.user"),
         token = getEnv("ontrack.test.extension.bitbucket.cloud.token"),
         expectedProject = getEnv("ontrack.test.extension.bitbucket.cloud.expected.project"),
+        expectedRepository = getEnv("ontrack.test.extension.bitbucket.cloud.expected.repository"),
     )
 }
 
