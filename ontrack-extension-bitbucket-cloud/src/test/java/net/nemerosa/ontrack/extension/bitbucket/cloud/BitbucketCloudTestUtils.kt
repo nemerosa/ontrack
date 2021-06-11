@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud
 
 import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketCloudConfiguration
+import net.nemerosa.ontrack.extension.git.GitExtensionFeature
+import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
+import net.nemerosa.ontrack.extension.stale.StaleExtensionFeature
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.getEnv
 
@@ -10,6 +13,10 @@ class BitbucketCloudTestEnv(
     val token: String,
     val expectedProject: String,
 )
+
+val bitbucketCloudExtensionFeature: BitbucketCloudExtensionFeature by lazy {
+    BitbucketCloudExtensionFeature(GitExtensionFeature(SCMExtensionFeature(), StaleExtensionFeature()))
+}
 
 val bitbucketCloudTestEnv: BitbucketCloudTestEnv by lazy {
     BitbucketCloudTestEnv(
@@ -33,11 +40,13 @@ fun bitbucketCloudTestConfigReal(name: String = uid("C")) = bitbucketCloudTestEn
 }
 
 
-fun bitbucketCloudTestConfigMock(name: String = uid("C")) =
+fun bitbucketCloudTestConfigMock(
+    name: String = uid("C"),
+    workspace: String = "my-workspace",
+) =
     BitbucketCloudConfiguration(
         name = name,
-        workspace = "my-workspace",
+        workspace = workspace,
         user = "user",
         password = "token",
     )
-

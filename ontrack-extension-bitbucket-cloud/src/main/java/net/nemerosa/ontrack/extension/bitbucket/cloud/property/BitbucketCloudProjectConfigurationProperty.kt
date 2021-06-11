@@ -21,4 +21,9 @@ class BitbucketCloudProjectConfigurationProperty(
 
     override fun getConfiguration(): BitbucketCloudConfiguration = configuration
 
+    /**
+     * Gets the URL to the repository
+     */
+    val repositoryUrl: String get() = "https://bitbucket.org/${configuration.workspace}/$repository"
+
 }
