@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.configuration
 
+import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfig
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.model.support.ConnectionResult
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -97,6 +99,15 @@ class BitbucketCloudConfigurationServiceIT : AbstractDSLTestSupport() {
                     "Deleted configuration cannot be found any longer"
                 )
             }
+        }
+    }
+
+    @Test
+    fun `Testing a configuration`() {
+        asAdmin {
+            val config = bitbucketCloudTestConfig()
+            val result = bitbucketCloudConfigurationService.test(config)
+            assertEquals(ConnectionResult.ConnectionResultType.OK, result.type)
         }
     }
 

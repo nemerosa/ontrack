@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.client
 
-import net.nemerosa.ontrack.test.getEnv
+import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestEnv
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertNotNull
@@ -11,16 +11,17 @@ class DefaultBitbucketCloudClientIT {
 
     @Before
     fun init() {
+        val env = bitbucketCloudTestEnv
         client = DefaultBitbucketCloudClient(
-            workspace = getEnv("ontrack.test.extension.bitbucket.cloud.workspace"),
-            user = getEnv("ontrack.test.extension.bitbucket.cloud.user"),
-            token = getEnv("ontrack.test.extension.bitbucket.cloud.token"),
+            workspace = env.workspace,
+            user = env.user,
+            token = env.token,
         )
     }
 
     @Test
     fun `Getting the list of projects`() {
-        val expectedProject = getEnv("ontrack.test.extension.bitbucket.cloud.expected.project")
+        val expectedProject = bitbucketCloudTestEnv.expectedProject
         val projects = client.projects
         assertNotNull(
             projects.find { it.key == expectedProject },
