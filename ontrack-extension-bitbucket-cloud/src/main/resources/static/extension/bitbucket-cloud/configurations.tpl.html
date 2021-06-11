@@ -3,13 +3,13 @@
         <div class="col-md-12">
             <ot-section-title>List of configurations</ot-section-title>
             <ot-noentry list="configurations.resources">
-                No Bitbucket Server configuration has been created yet.
+                No Bitbucket Cloud configuration has been created yet.
             </ot-noentry>
             <table class="table table-hover" ng-show="configurations.resources">
                 <thead>
                 <tr>
                     <th>Name</th>
-                    <th>URL</th>
+                    <th>Workspace</th>
                     <th>User</th>
                     <th>&nbsp;</th>
                 </tr>
@@ -20,15 +20,10 @@
                         <code>{{configuration.name}}</code>
                     </td>
                     <td>
-                        <a href="{{configuration.url}}">{{configuration.url}}</a>
+                        <code>{{configuration.workspace}}</code>
                     </td>
                     <td>
-                        <span ng-if="configuration.user">
-                            {{configuration.user}}
-                        </span>
-                        <span ng-if="!configuration.user" class="ot-description">
-                            No user
-                        </span>
+                        {{configuration.user}}
                     </td>
                     <td>
                         <span class="ot-command" ng-click="updateConfiguration(configuration)">
