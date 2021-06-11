@@ -8,6 +8,11 @@ import net.nemerosa.ontrack.extension.bitbucket.cloud.model.BitbucketCloudProjec
 interface BitbucketCloudClient {
 
     /**
+     * Associated workspace slug
+     */
+    val workspace: String
+
+    /**
      * Gets the list of projects for this client
      *
      * @return List of projects

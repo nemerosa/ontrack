@@ -11,7 +11,7 @@ public class StashExtensionFeature extends AbstractExtensionFeature {
 
     @Autowired
     public StashExtensionFeature(GitExtensionFeature gitExtensionFeature) {
-        super("stash", "Bitbucket", "Support for Atlassian Bitbucket (Cloud & Server)",
+        super("stash", "Bitbucket Server", "Support for Atlassian Bitbucket Server",
                 ExtensionFeatureOptions.DEFAULT
                         .withGui(true)
                         .withDependency(gitExtensionFeature)

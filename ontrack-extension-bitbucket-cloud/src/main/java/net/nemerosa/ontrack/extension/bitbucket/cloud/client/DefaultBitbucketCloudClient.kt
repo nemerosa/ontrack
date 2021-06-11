@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate
 import kotlin.reflect.KClass
 
 class DefaultBitbucketCloudClient(
-    private val workspace: String,
+    override val workspace: String,
     private val user: String,
     private val token: String,
 ) : BitbucketCloudClient {
