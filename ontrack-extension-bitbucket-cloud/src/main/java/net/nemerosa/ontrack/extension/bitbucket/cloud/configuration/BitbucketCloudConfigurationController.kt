@@ -117,6 +117,7 @@ class BitbucketCloudConfigurationController(
                     .label("Name")
                     .help("Name of the configuration")
                     .value(config?.name)
+                    .readOnly(config != null)
             )
             .with(
                 Text.of(BitbucketCloudConfiguration::workspace.name)
@@ -134,6 +135,7 @@ class BitbucketCloudConfigurationController(
                 Password.of("password")
                     .label("App password")
                     .help("App password to use to connect to Bitbucket Cloud")
+                    .optional()
             )
 
 }

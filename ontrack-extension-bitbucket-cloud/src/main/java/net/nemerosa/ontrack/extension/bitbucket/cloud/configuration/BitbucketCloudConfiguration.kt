@@ -17,7 +17,7 @@ open class BitbucketCloudConfiguration(
     private val name: String,
     val workspace: String,
     private val user: String,
-    private val password: String
+    private val password: String?
 ) : UserPasswordConfiguration<BitbucketCloudConfiguration> {
 
     override fun getName(): String = name

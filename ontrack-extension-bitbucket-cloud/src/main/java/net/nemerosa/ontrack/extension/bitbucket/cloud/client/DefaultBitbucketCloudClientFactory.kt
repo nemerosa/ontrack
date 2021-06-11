@@ -7,6 +7,10 @@ import org.springframework.stereotype.Component
 class DefaultBitbucketCloudClientFactory : BitbucketCloudClientFactory {
 
     override fun getBitbucketCloudClient(config: BitbucketCloudConfiguration): BitbucketCloudClient =
-        DefaultBitbucketCloudClient(config.workspace, config.user!!, config.password!!)
+        if (config.user != null && config.password != null) {
+            DefaultBitbucketCloudClient(config.workspace, config.user!!, config.password!!)
+        } else {
+            throw IllegalStateException("Bitbucket Cloud user name and app password are required.")
+        }
 
 }
