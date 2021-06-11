@@ -20,7 +20,10 @@ val bitbucketCloudTestEnv: BitbucketCloudTestEnv by lazy {
     )
 }
 
-fun bitbucketCloudTestConfig(name: String = uid("C")) = bitbucketCloudTestEnv.run {
+/**
+ * Creates a real configuration for Bitbucket Cloud, suitable for system tests.
+ */
+fun bitbucketCloudTestConfigReal(name: String = uid("C")) = bitbucketCloudTestEnv.run {
     BitbucketCloudConfiguration(
         name = name,
         workspace = workspace,
@@ -28,3 +31,13 @@ fun bitbucketCloudTestConfig(name: String = uid("C")) = bitbucketCloudTestEnv.ru
         password = token,
     )
 }
+
+
+fun bitbucketCloudTestConfigMock(name: String = uid("C")) =
+    BitbucketCloudConfiguration(
+        name = name,
+        workspace = "my-workspace",
+        user = "user",
+        password = "token",
+    )
+

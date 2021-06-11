@@ -42,12 +42,12 @@ public class StashProjectConfigurationPropertyType extends AbstractGitProjectCon
 
     @Override
     public String getName() {
-        return "Bitbucket configuration";
+        return "Bitbucket Server configuration";
     }
 
     @Override
     public String getDescription() {
-        return "Associates the project with a Bitbucket repository";
+        return "Associates the project with a Bitbucket Server repository";
     }
 
     @Override

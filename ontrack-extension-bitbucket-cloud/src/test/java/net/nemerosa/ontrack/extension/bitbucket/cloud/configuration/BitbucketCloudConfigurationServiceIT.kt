@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.configuration
 
-import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfig
+import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigReal
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.support.ConnectionResult
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -105,7 +105,7 @@ class BitbucketCloudConfigurationServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Testing a configuration`() {
         asAdmin {
-            val config = bitbucketCloudTestConfig()
+            val config = bitbucketCloudTestConfigReal()
             val result = bitbucketCloudConfigurationService.test(config)
             assertEquals(ConnectionResult.ConnectionResultType.OK, result.type)
         }
