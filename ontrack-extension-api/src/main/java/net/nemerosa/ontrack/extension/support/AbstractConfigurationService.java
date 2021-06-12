@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.support;
 
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
+import net.nemerosa.ontrack.model.security.EncryptionException;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -190,11 +191,15 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     }
 
     protected T decrypt(T config) {
-        return config.withPassword(
-                encryptionService.decrypt(
-                        config.getPassword()
-                )
-        );
+        try {
+            return config.withPassword(
+                    encryptionService.decrypt(
+                            config.getPassword()
+                    )
+            );
+        } catch (EncryptionException ex) {
+            return config.withPassword("");
+        }
     }
 
 }
