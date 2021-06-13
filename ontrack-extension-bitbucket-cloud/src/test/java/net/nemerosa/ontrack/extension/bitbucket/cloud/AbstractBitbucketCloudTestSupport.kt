@@ -13,6 +13,15 @@ abstract class AbstractBitbucketCloudTestSupport : AbstractDSLTestSupport() {
     @Autowired
     protected lateinit var bitbucketCloudConfigurationService: BitbucketCloudConfigurationService
 
+    protected fun deleteAllConfigs() {
+        asAdmin {
+            val names = bitbucketCloudConfigurationService.configurations.map { it.name }
+            names.forEach { name ->
+                bitbucketCloudConfigurationService.deleteConfiguration(name)
+            }
+        }
+    }
+
     protected fun Project.setBitbucketCloudProperty(
         config: BitbucketCloudConfiguration,
         repository: String,
