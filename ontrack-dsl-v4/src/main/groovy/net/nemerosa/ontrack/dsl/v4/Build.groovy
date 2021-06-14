@@ -286,7 +286,7 @@ class Build extends AbstractProjectResource {
     @DSLMethod
     def buildLink(String project, String build) {
         ontrack.put(
-                link('buildLinksForm'),
+                "rest/structure/builds/${id}/links/edit" as String,
                 [
                         addOnly: true,
                         links  : [[
