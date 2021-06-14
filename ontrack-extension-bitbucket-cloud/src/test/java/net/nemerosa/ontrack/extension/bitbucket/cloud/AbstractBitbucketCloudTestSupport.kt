@@ -4,11 +4,12 @@ import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketClo
 import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketCloudConfigurationService
 import net.nemerosa.ontrack.extension.bitbucket.cloud.property.BitbucketCloudProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.bitbucket.cloud.property.BitbucketCloudProjectConfigurationPropertyType
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.structure.Project
 import org.springframework.beans.factory.annotation.Autowired
 
-abstract class AbstractBitbucketCloudTestSupport : AbstractDSLTestSupport() {
+abstract class AbstractBitbucketCloudTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
     protected lateinit var bitbucketCloudConfigurationService: BitbucketCloudConfigurationService
