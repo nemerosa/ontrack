@@ -70,7 +70,7 @@ class BitbucketCloudConfigurationCascContextIT : AbstractCascTestSupport() {
             )
             asAdmin {
                 val savedConfig = bitbucketCloudConfigurationService.getConfiguration(config.name)
-                assertEquals(config.workspace, newWorkspace)
+                assertEquals(newWorkspace, savedConfig.workspace)
                 assertEquals(config.user, savedConfig.user)
                 assertEquals(config.password, savedConfig.password)
             }
