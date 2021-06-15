@@ -150,9 +150,9 @@ class PropertyServiceImpl(
         return Ack.OK
     }
 
-    protected fun <T> getProperty(type: PropertyType<T>?, entity: ProjectEntity): Property<T> {
+    protected fun <T> getProperty(type: PropertyType<T>, entity: ProjectEntity): Property<T> {
         val value = getPropertyValue(type, entity)
-        return if (value != null) Property.of(type, value) else Property.empty(type)
+        return if (value != null) Property.of(type, value, type.getPropertyDecorations(value)) else Property.empty(type)
     }
 
     protected fun <T> getPropertyValue(type: PropertyType<T>?, entity: ProjectEntity): T? {
@@ -192,9 +192,10 @@ class PropertyServiceImpl(
         // Search
         return propertyRepository.searchByProperty(
                 propertyTypeName,
-                entityLoader,
-                Predicate { t: TProperty -> predicate.test(propertyType.fromStorage(t.json)) }
-        )
+                entityLoader
+        ) { t: TProperty ->
+            predicate.test(propertyType.fromStorage(t.json))
+        }
     }
 
     override fun <T> forEachEntityWithProperty(propertyTypeClass: KClass<out PropertyType<T>>, consumer: (ProjectEntityID, T) -> Unit) {

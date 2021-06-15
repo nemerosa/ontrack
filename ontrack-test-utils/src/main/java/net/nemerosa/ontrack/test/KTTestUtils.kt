@@ -42,3 +42,21 @@ fun assertJsonNotNull(
         node.code()
     }
 }
+
+/**
+ * Gets a value from the system properties or from the environment.
+ */
+fun getEnv(property: String): String {
+    val sysValue = System.getProperty(property)
+    return if (sysValue.isNullOrBlank()) {
+        val envName = property.toUpperCase().replace('.', '_')
+        val envValue = System.getenv(envName)
+        if (envValue.isNullOrBlank()) {
+            throw IllegalStateException("Cannot find $property system property or $envName environment variable.")
+        } else {
+            envValue
+        }
+    } else {
+        sysValue
+    }
+}

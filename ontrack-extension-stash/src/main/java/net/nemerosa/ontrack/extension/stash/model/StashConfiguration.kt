@@ -36,6 +36,7 @@ open class StashConfiguration(
     /**
      * Checks if this configuration denotes any Bitbucket Cloud instance
      */
+    @Deprecated("Specific Bitbucket Cloud configuration must be used. Will be removed in V5.")
     val isCloud: Boolean
         @JsonIgnore
         get() = StringUtils.contains(url, "bitbucket.org")
