@@ -8,7 +8,10 @@ apply<OntrackExtensionPlugin>()
 
 dependencies {
     api(project(":ontrack-extension-git"))
-    
+
+    // Used for the migration of Stash configurations which are actually Bitbucket Cloud configurations
+    implementation(project(":ontrack-extension-stash"))
+
     implementation("org.apache.commons:commons-lang3")
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-extension-casc"))
