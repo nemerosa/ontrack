@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.bitbucket.cloud.client
 import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestEnv
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class DefaultBitbucketCloudClientIT {
@@ -32,12 +33,14 @@ class DefaultBitbucketCloudClientIT {
     @Test
     fun `Getting the list of repositories`() {
         val repositories = client.repositories
+        val expectedProject = bitbucketCloudTestEnv.expectedProject
         val expectedRepository = bitbucketCloudTestEnv.expectedRepository
         val repository = repositories.find {
             it.slug == expectedRepository
         }
         assertNotNull(repository, "Expected repository has been found") {
             assertNotNull(client.getRepositoryLastModified(it), "Last modified date is set")
+            assertEquals(expectedProject, it.project.key, "Project is read")
         }
     }
 
