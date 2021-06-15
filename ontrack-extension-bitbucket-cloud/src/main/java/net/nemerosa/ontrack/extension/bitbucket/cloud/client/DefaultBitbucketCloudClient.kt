@@ -24,6 +24,9 @@ class DefaultBitbucketCloudClient(
     override fun getRepositoryLastModified(repository: BitbucketCloudRepository): LocalDateTime? =
         LocalDateTime.parse(repository.updated_on, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 
+    override fun getRepository(repository: String): BitbucketCloudRepository =
+        get("/2.0/repositories/$workspace/$repository")
+
     private inline fun <reified T, reified P : BitbucketCloudPaginatedList<T>> paginate(
         noinline path: (Int) -> String,
     ): List<T> = paginate(P::class, path)

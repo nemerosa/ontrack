@@ -2,6 +2,9 @@ package net.nemerosa.ontrack.extension.bitbucket.cloud.property
 
 import net.nemerosa.ontrack.extension.bitbucket.cloud.AbstractBitbucketCloudTestSupport
 import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigMock
+import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigReal
+import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestEnv
+import net.nemerosa.ontrack.test.assertIs
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -52,6 +55,31 @@ class BitbucketCloudProjectConfigurationPropertyTypeIT : AbstractBitbucketCloudT
                     bitbucketCloudConfigurationService.deleteConfiguration(config.name)
                     // Checks the property's gone
                     assertFalse(propertyService.hasProperty(this, BitbucketCloudProjectConfigurationPropertyType::class.java), "Property is unset")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Project information in the property decorations`() {
+        val expectedRepository = bitbucketCloudTestEnv.expectedRepository
+        val expectedProject = bitbucketCloudTestEnv.expectedProject
+        asAdmin {
+            project {
+                val config = bitbucketCloudTestConfigReal()
+                bitbucketCloudConfigurationService.newConfiguration(config)
+                setBitbucketCloudProperty(config, expectedRepository, 0, null)
+                // Gets the property
+                assertNotNull(propertyService.getProperty(this, BitbucketCloudProjectConfigurationPropertyType::class.java).value) {
+                    // Gets its decorations
+                    val decorations = bitbucketCloudProjectConfigurationPropertyType.getPropertyDecorations(it)
+                    // Checks that they contain the project information
+                    assertNotNull(decorations["projectInfo"]) { node ->
+                        assertIs<BitbucketCloudProjectConfigurationPropertyType.BitbucketCloudProjectProperty>(node) { info ->
+                            assertEquals(expectedProject, info.project.key)
+                            assertEquals("https://bitbucket.org/${config.workspace}/workspace/projects/$expectedProject", info.url)
+                        }
+                    }
                 }
             }
         }

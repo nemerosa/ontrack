@@ -14,6 +14,9 @@ abstract class AbstractBitbucketCloudTestSupport : AbstractQLKTITSupport() {
     @Autowired
     protected lateinit var bitbucketCloudConfigurationService: BitbucketCloudConfigurationService
 
+    @Autowired
+    protected lateinit var bitbucketCloudProjectConfigurationPropertyType: BitbucketCloudProjectConfigurationPropertyType
+
     protected fun deleteAllConfigs() {
         asAdmin {
             val names = bitbucketCloudConfigurationService.configurations.map { it.name }

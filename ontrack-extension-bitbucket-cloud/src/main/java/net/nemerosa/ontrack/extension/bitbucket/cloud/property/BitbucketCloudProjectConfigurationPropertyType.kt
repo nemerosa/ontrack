@@ -3,8 +3,10 @@ package net.nemerosa.ontrack.extension.bitbucket.cloud.property
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.MapBuilder
 import net.nemerosa.ontrack.extension.bitbucket.cloud.BitbucketCloudExtensionFeature
+import net.nemerosa.ontrack.extension.bitbucket.cloud.client.BitbucketCloudClientFactory
 import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketCloudConfiguration
 import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketCloudConfigurationService
+import net.nemerosa.ontrack.extension.bitbucket.cloud.model.BitbucketCloudProject
 import net.nemerosa.ontrack.extension.git.property.AbstractGitProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.json.JsonUtils
@@ -26,7 +28,8 @@ import java.util.function.Function
 class BitbucketCloudProjectConfigurationPropertyType(
     extensionFeature: BitbucketCloudExtensionFeature,
     private val configurationService: BitbucketCloudConfigurationService,
-    private val issueServiceRegistry: IssueServiceRegistry
+    private val issueServiceRegistry: IssueServiceRegistry,
+    private val bitbucketCloudClientFactory: BitbucketCloudClientFactory,
 ) : AbstractGitProjectConfigurationPropertyType<BitbucketCloudProjectConfigurationProperty>(extensionFeature),
     ConfigurationPropertyType<BitbucketCloudConfiguration, BitbucketCloudProjectConfigurationProperty> {
 
@@ -111,4 +114,28 @@ class BitbucketCloudProjectConfigurationPropertyType(
         value.issueServiceConfigurationIdentifier
     )
 
+    override fun getPropertyDecorations(value: BitbucketCloudProjectConfigurationProperty): Map<String, *> =
+        getBitbucketCloudProject(value)?.run {
+            mapOf(
+                "projectInfo" to this
+            )
+        } ?: emptyMap<String,Any>()
+
+    private fun getBitbucketCloudProject(property: BitbucketCloudProjectConfigurationProperty): BitbucketCloudProjectProperty? {
+        return try {
+            val client = bitbucketCloudClientFactory.getBitbucketCloudClient(property.configuration)
+            val repository = client.getRepository(property.repository)
+            BitbucketCloudProjectProperty(
+                project = repository.project,
+                url = "https://bitbucket.org/${property.configuration.workspace}/workspace/projects/${repository.project.key}"
+            )
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    class BitbucketCloudProjectProperty(
+        val project: BitbucketCloudProject,
+        val url: String,
+    )
 }

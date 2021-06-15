@@ -34,4 +34,12 @@ interface BitbucketCloudClient {
      */
     fun getRepositoryLastModified(repository: BitbucketCloudRepository): LocalDateTime?
 
+    /**
+     * Gets the repository information.
+     *
+     * @param repository Repository slug
+     * @return Repository information
+     */
+    fun getRepository(repository: String): BitbucketCloudRepository
+
 }

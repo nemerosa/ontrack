@@ -5,8 +5,11 @@ import net.nemerosa.ontrack.model.extension.Extension;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -165,5 +168,15 @@ public interface PropertyType<T> extends Extension {
     @Nullable
     default PropertySearchArguments getSearchArguments(String token) {
         return null;
+    }
+
+    /**
+     * Additional decorations for a property, which will be available as additional information
+     * for display or through the API.
+     * @param value Property value
+     * @return Additional decorations if any.
+     */
+    default @NotNull Map<String,?> getPropertyDecorations(@SuppressWarnings("unused") @NotNull T value) {
+        return Collections.emptyMap();
     }
 }
