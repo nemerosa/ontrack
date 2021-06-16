@@ -12,15 +12,12 @@ interface GraphQLService {
      * @param query GraphQL query
      * @param variables List of variables to associate with the query
      * @param operationName Optional name of the operation
-     * @param reportErrors If `true`, converts the execution result errors into an exception
      * @return Execution result
-     * @throws GraphQLServiceException If `reportErrors` is `true` and if there are some errors
      */
     @Throws(GraphQLServiceException::class)
     fun execute(
-            query: String,
-            variables: Map<String, Any> = mapOf(),
-            operationName: String? = null,
-            reportErrors: Boolean = false
+        query: String,
+        variables: Map<String, Any> = mapOf(),
+        operationName: String? = null,
     ): ExecutionResult
 }

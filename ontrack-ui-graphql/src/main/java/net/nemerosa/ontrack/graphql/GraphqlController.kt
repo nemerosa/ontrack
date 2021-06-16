@@ -81,10 +81,9 @@ class GraphqlController(
      */
     fun request(request: Request): ExecutionResult {
         return graphQLService.execute(
-                request.query,
-                request.variables ?: emptyMap(),
-                request.operationName,
-                true
+            query = request.query,
+            variables = request.variables ?: emptyMap(),
+            operationName = request.operationName,
         )
     }
 
