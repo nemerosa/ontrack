@@ -45,7 +45,7 @@ plugins {
     id("nebula.deb") version "8.1.0"
     id("nebula.rpm") version "8.1.0"
     id("org.sonarqube") version "2.5"
-    id("com.avast.gradle.docker-compose") version "0.10.10"
+    id("com.avast.gradle.docker-compose") version "0.14.3"
     id("com.bmuschko.docker-remote-api") version "6.4.0"
     id("org.springframework.boot") version Versions.springBootVersion apply false
     id("io.freefair.aggregate-javadoc") version "4.1.2"
@@ -662,6 +662,9 @@ val prepareGitHubRelease by tasks.registering(Copy::class) {
         include("ontrack*.rpm")
         rename { "ontrack.rpm" }
     }
+    from("ontrack-ui/build") {
+        include("graphql.json")
+    }
     into("build/release")
 }
 
@@ -687,7 +690,8 @@ githubRelease {
             "build/release/ontrack-postgresql-migration.jar",
             "build/release/ontrack.pdf",
             "build/release/ontrack.deb",
-            "build/release/ontrack.rpm"
+            "build/release/ontrack.rpm",
+            "build/release/graphql.json"
     )
     body {
         githubReleaseChangeLog.get().changeLog

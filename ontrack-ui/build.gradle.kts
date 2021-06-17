@@ -163,11 +163,18 @@ val bootJar = tasks.getByName<BootJar>("bootJar") {
     }
 }
 
+/**
+ * Publication of artifacts
+ */
+
 publishing {
     publications {
         named<MavenPublication>("mavenCustom") {
             artifact(bootJar) {
                 classifier = "app"
+            }
+            artifact("build/graphql.json") {
+                classifier = "graphql.json"
             }
         }
     }
