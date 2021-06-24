@@ -60,10 +60,14 @@ class DefaultOntrackGitHubClient(
                 query OrgRepositories(${'$'}login: String!, ${'$'}after: String) {
                   organization(login: ${'$'}login) {
                     repositories(first: 100, after: ${'$'}after) {
+                      pageInfo {
+                        hasNextPage
+                        endCursor
+                      }
                       nodes {
                         name
                         description
-                        pushedAt
+                        updatedAt
                       }
                     }
                   }
@@ -76,7 +80,7 @@ class DefaultOntrackGitHubClient(
             GitHubRepository(
                 name = node.path("name").asText(),
                 description = node.path("description").asText(),
-                lastUpdate = node.path("pushedAt")?.asText()
+                lastUpdate = node.path("updatedAt")?.asText()
                     ?.takeIf { it.isNotBlank() }
                     ?.let { LocalDateTime.parse(it, DateTimeFormatter.ISO_DATE_TIME) }
             )
