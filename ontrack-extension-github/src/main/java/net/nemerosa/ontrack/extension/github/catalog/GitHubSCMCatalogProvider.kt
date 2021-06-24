@@ -59,14 +59,13 @@ class GitHubSCMCatalogProvider(
                 }
             }
             client.findRepositoriesByOrganization(org.login)
-                .map { name -> "${org.login}/$name" }
                 .map { repo ->
                     SCMCatalogSource(
                         config = config.name,
-                        repository = repo,
-                        repositoryPage = "${config.url}/$repo",
-                        lastActivity = client.getRepositoryLastModified(repo),
-                        teams = repositoryTeamIndex[repo]?.toList()
+                        repository = "${org.login}/${repo.name}",
+                        repositoryPage = "${config.url}/${repo.name}",
+                        lastActivity = repo.lastUpdate,
+                        teams = repositoryTeamIndex[repo.name]?.toList()
                     )
                 }
 

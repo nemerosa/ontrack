@@ -26,6 +26,7 @@ import org.springframework.web.client.RestTemplate
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class DefaultOntrackGitHubClient(
@@ -68,7 +69,7 @@ class DefaultOntrackGitHubClient(
             }
         }
 
-    override fun findRepositoriesByOrganization(organization: String): List<String> =
+    override fun findRepositoriesByOrganization(organization: String): List<GitHubRepository> =
         paginateGraphQL(
             message = "Getting repositories for organization $organization",
             query = """
@@ -77,6 +78,8 @@ class DefaultOntrackGitHubClient(
                     repositories(first: 100, after: ${'$'}after) {
                       nodes {
                         name
+                        description
+                        pushedAt
                       }
                     }
                   }
@@ -86,23 +89,14 @@ class DefaultOntrackGitHubClient(
             collectionAt = listOf("organization", "repositories"),
             nodes = true
         ) { node ->
-            node.path("name").asText()
+            GitHubRepository(
+                name = node.path("name").asText(),
+                description = node.path("description").asText(),
+                lastUpdate = node.path("pushedAt")?.asText()
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let { LocalDateTime.parse(it, DateTimeFormatter.ISO_DATE_TIME) }
+            )
         } ?: throw GitHubNoGraphQLResponseException("Getting repositories for organization $organization")
-
-    override fun getRepositoryLastModified(repo: String): LocalDateTime? {
-        // Logging
-        logger.debug("[github] Getting repository last modification {}", repo)
-        // Getting a client
-        val client = createGitHubClient()
-        // Service
-        val repositoryService = RepositoryService(client)
-        // Gets the repository
-        val owner = repo.substringBefore("/")
-        val name = repo.substringAfter("/")
-        val repository = repositoryService.getRepository(owner, name)
-        // Last modification date
-        return repository.pushedAt?.let { Time.from(it, null) }
-    }
 
     override fun getRepositoryTeams(repo: String): List<GitHubTeam>? {
         // Getting a client
@@ -159,7 +153,7 @@ class DefaultOntrackGitHubClient(
             query = """
                query OrgTeams(${'$'}login: String!, ${'$'}after: String) {
                   organization(login: ${'$'}login) {
-                    teams(first: 20, after: ${'$'}after) {
+                    teams(first: 100, after: ${'$'}after) {
                       pageInfo {
                         hasNextPage
                         endCursor
@@ -195,7 +189,7 @@ class DefaultOntrackGitHubClient(
                 query TeamRepositories(${'$'}login: String!, ${'$'}team: String!, ${'$'}after: String) {
                   organization(login: ${'$'}login) {
                     team(slug: ${'$'}team) {
-                      repositories(first: 50, after: ${'$'}after) {
+                      repositories(first: 100, after: ${'$'}after) {
                         pageInfo {
                           hasNextPage
                           endCursor
