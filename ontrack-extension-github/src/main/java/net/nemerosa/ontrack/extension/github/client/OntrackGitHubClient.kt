@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.client
 
 import net.nemerosa.ontrack.extension.github.model.GitHubIssue
 import net.nemerosa.ontrack.extension.github.model.GitHubTeam
+import net.nemerosa.ontrack.extension.github.model.GitHubTeamRepository
 import net.nemerosa.ontrack.extension.github.model.GitHubUser
 import org.eclipse.egit.github.core.client.GitHubClient
 import org.springframework.web.client.RestTemplate
@@ -63,4 +64,25 @@ interface OntrackGitHubClient {
      * @return List of teams or `null` if the teams cannot be accessed
      */
     fun getRepositoryTeams(repo: String): List<GitHubTeam>?
+
+    /**
+     * Gets the list of teams for this organization.
+     *
+     * The `read:org` permission is required (it not granted, `null` will be returned).
+     *
+     * @param login Login for the organization.
+     * @return List of teams or null if the teams cannot be accessed.
+     */
+    fun getOrganizationTeams(login: String): List<GitHubTeam>?
+
+    /**
+     * Returns the list of repositories associated to a team.
+     *
+     * The `read:org` permission is required (it not granted, `null` will be returned).
+     *
+     * @param login Login for the organization.
+     * @param teamSlug Slug of the team
+     * @return List of repositories with their permissions or null if the permissions cannot be accessed.
+     */
+    fun getTeamRepositories(login: String, teamSlug: String): List<GitHubTeamRepository>?
 }

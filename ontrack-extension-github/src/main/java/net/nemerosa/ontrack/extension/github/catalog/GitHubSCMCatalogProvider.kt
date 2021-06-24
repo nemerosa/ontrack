@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.github.catalog
 
-import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
@@ -38,33 +37,41 @@ class GitHubSCMCatalogProvider(
         config: GitHubEngineConfiguration
     ): Iterable<SCMCatalogSource> {
         val client = gitHubClientFactory.create(config)
-        return client.organizations.filter { it.login in settings.orgs }.flatMap {
-            client.findRepositoriesByOrganization(it.login).map { name -> "${it.login}/$name" }
-        }.map { repo ->
-            SCMCatalogSource(
-                config = config.name,
-                repository = repo,
-                repositoryPage = "${config.url}/$repo",
-                lastActivity = client.getRepositoryLastModified(repo),
-                teams = getTeams(client, repo)
-            )
+        return client.organizations.filter { it.login in settings.orgs }.flatMap { org ->
+            // Gets the list of teams for this organization
+            val teams = client.getOrganizationTeams(org.login)
+            // Indexing the repositories per team (repository name --> list of team slugs)
+            val repositoryTeamIndex = mutableMapOf<String, MutableSet<SCMCatalogTeam>>()
+            teams?.forEach { team ->
+                val repositoryPermissions = client.getTeamRepositories(org.login, team.slug)
+                repositoryPermissions?.forEach { (repository, permission) ->
+                    repositoryTeamIndex.getOrPut(repository) { mutableSetOf() }.apply {
+                        add(
+                            SCMCatalogTeam(
+                                id = team.slug,
+                                name = team.name,
+                                description = team.description,
+                                url = team.html_url,
+                                role = permission.name
+                            )
+                        )
+                    }
+                }
+            }
+            client.findRepositoriesByOrganization(org.login)
+                .map { name -> "${org.login}/$name" }
+                .map { repo ->
+                    SCMCatalogSource(
+                        config = config.name,
+                        repository = repo,
+                        repositoryPage = "${config.url}/$repo",
+                        lastActivity = client.getRepositoryLastModified(repo),
+                        teams = repositoryTeamIndex[repo]?.toList()
+                    )
+                }
+
         }
     }
-
-    private fun getTeams(client: OntrackGitHubClient, repo: String): List<SCMCatalogTeam>? =
-        try {
-            client.getRepositoryTeams(repo)?.map {
-                SCMCatalogTeam(
-                    id = it.slug,
-                    name = it.name,
-                    description = it.description,
-                    url = it.html_url,
-                    role = it.permission
-                )
-            }
-        } catch (_: Exception) {
-            null
-        }
 
     override fun matches(entry: SCMCatalogEntry, project: Project): Boolean {
         val property: GitHubProjectConfigurationProperty? =

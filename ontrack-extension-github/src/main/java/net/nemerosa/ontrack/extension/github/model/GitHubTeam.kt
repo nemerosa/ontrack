@@ -7,6 +7,5 @@ data class GitHubTeam(
     val slug: String,
     val name: String,
     val description: String?,
-    val html_url: String,
-    val permission: String
+    val html_url: String
 )
