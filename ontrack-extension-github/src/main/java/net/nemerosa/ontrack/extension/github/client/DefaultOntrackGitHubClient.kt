@@ -17,7 +17,6 @@ import org.eclipse.egit.github.core.client.GitHubClient
 import org.eclipse.egit.github.core.client.RequestException
 import org.eclipse.egit.github.core.service.IssueService
 import org.eclipse.egit.github.core.service.OrganizationService
-import org.eclipse.egit.github.core.service.RepositoryService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.MediaType
@@ -34,21 +33,6 @@ class DefaultOntrackGitHubClient(
 ) : OntrackGitHubClient {
 
     private val logger = LoggerFactory.getLogger(OntrackGitHubClient::class.java)
-
-    override val repositories: List<String>
-        get() {
-            logger.debug("[github] Getting repository list")
-            // Getting a client
-            val client = createGitHubClient()
-            // Service
-            val repositoryService = RepositoryService(client)
-            // Gets the repository names
-            return try {
-                repositoryService.repositories.map { it.name }
-            } catch (e: IOException) {
-                throw OntrackGitHubClientException(e)
-            }
-        }
 
     override val organizations: List<GitHubUser>
         get() {

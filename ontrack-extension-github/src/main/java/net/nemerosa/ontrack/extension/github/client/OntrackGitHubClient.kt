@@ -19,11 +19,6 @@ interface OntrackGitHubClient {
     fun getIssue(repository: String, id: Int): GitHubIssue?
 
     /**
-     * Gets the list of repositories available using this client.
-     */
-    val repositories: List<String>
-
-    /**
      * Gets the list of organizations available from this client.
      */
     val organizations: List<GitHubUser>
