@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.github.model.GitHubTeam
 import net.nemerosa.ontrack.extension.github.model.GitHubUser
 import org.eclipse.egit.github.core.client.GitHubClient
 import org.springframework.web.client.RestTemplate
-import java.time.LocalDateTime
 
 
 /**
@@ -24,11 +23,6 @@ interface OntrackGitHubClient {
     fun getIssue(repository: String, id: Int): GitHubIssue?
 
     /**
-     * Gets the list of repositories available using this client.
-     */
-    val repositories: List<String>
-
-    /**
      * Gets the list of organizations available from this client.
      */
     val organizations: List<GitHubUser>
@@ -37,9 +31,9 @@ interface OntrackGitHubClient {
      * Gets the list of repositories for an organization
      *
      * @param organization Organization name
-     * @return List of repository names in this [organization]
+     * @return List of repository in this [organization]
      */
-    fun findRepositoriesByOrganization(organization: String): List<String>
+    fun findRepositoriesByOrganization(organization: String): List<GitHubRepository>
 
     /**
      * Gets the underlying / native GitHub client so that extensions
@@ -63,15 +57,31 @@ interface OntrackGitHubClient {
     fun getPullRequest(repository: String, id: Int): GitPullRequest?
 
     /**
-     * Gets the last modified date for a given [repository][repo].
-     */
-    fun getRepositoryLastModified(repo: String): LocalDateTime?
-
-    /**
      * Gets the list of teams for a repository
      *
      * @param repo Repository (org/name)
      * @return List of teams or `null` if the teams cannot be accessed
      */
     fun getRepositoryTeams(repo: String): List<GitHubTeam>?
+
+    /**
+     * Gets the list of teams for this organization.
+     *
+     * The `read:org` permission is required (it not granted, `null` will be returned).
+     *
+     * @param login Login for the organization.
+     * @return List of teams or null if the teams cannot be accessed.
+     */
+    fun getOrganizationTeams(login: String): List<GitHubTeam>?
+
+    /**
+     * Returns the list of repositories associated to a team.
+     *
+     * The `read:org` permission is required (it not granted, `null` will be returned).
+     *
+     * @param login Login for the organization.
+     * @param teamSlug Slug of the team
+     * @return List of repositories with their permissions or null if the permissions cannot be accessed.
+     */
+    fun getTeamRepositories(login: String, teamSlug: String): List<GitHubTeamRepository>?
 }

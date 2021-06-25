@@ -25,6 +25,7 @@ import org.springframework.web.client.RestTemplate
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -33,21 +34,6 @@ class DefaultOntrackGitHubClient(
 ) : OntrackGitHubClient {
 
     private val logger = LoggerFactory.getLogger(OntrackGitHubClient::class.java)
-
-    override val repositories: List<String>
-        get() {
-            logger.debug("[github] Getting repository list")
-            // Getting a client
-            val client = createGitHubClient()
-            // Service
-            val repositoryService = RepositoryService(client)
-            // Gets the repository names
-            return try {
-                repositoryService.repositories.map { it.name }
-            } catch (e: IOException) {
-                throw OntrackGitHubClientException(e)
-            }
-        }
 
     override val organizations: List<GitHubUser>
         get() {
@@ -68,33 +54,38 @@ class DefaultOntrackGitHubClient(
             }
         }
 
-    override fun findRepositoriesByOrganization(organization: String): List<String> {
-        // Getting a client
-        val client = createGitHubClient()
-        // Service
-        val repositoryService = RepositoryService(client)
-        // Gets the repository names
-        return try {
-            repositoryService.getOrgRepositories(organization).map { it.name }
-        } catch (e: IOException) {
-            throw OntrackGitHubClientException(e)
-        }
-    }
-
-    override fun getRepositoryLastModified(repo: String): LocalDateTime? {
-        // Logging
-        logger.debug("[github] Getting repository last modification {}", repo)
-        // Getting a client
-        val client = createGitHubClient()
-        // Service
-        val repositoryService = RepositoryService(client)
-        // Gets the repository
-        val owner = repo.substringBefore("/")
-        val name = repo.substringAfter("/")
-        val repository = repositoryService.getRepository(owner, name)
-        // Last modification date
-        return repository.pushedAt?.let { Time.from(it, null) }
-    }
+    override fun findRepositoriesByOrganization(organization: String): List<GitHubRepository> =
+        paginateGraphQL(
+            message = "Getting repositories for organization $organization",
+            query = """
+                query OrgRepositories(${'$'}login: String!, ${'$'}after: String) {
+                  organization(login: ${'$'}login) {
+                    repositories(first: 100, after: ${'$'}after) {
+                      pageInfo {
+                        hasNextPage
+                        endCursor
+                      }
+                      nodes {
+                        name
+                        description
+                        updatedAt
+                      }
+                    }
+                  }
+                }
+            """,
+            variables = mapOf("login" to organization),
+            collectionAt = listOf("organization", "repositories"),
+            nodes = true
+        ) { node ->
+            GitHubRepository(
+                name = node.path("name").asText(),
+                description = node.path("description").asText(),
+                lastUpdate = node.path("updatedAt")?.asText()
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let { LocalDateTime.parse(it, DateTimeFormatter.ISO_DATE_TIME) }
+            )
+        } ?: throw GitHubNoGraphQLResponseException("Getting repositories for organization $organization")
 
     override fun getRepositoryTeams(repo: String): List<GitHubTeam>? {
         // Getting a client
@@ -143,6 +134,153 @@ class DefaultOntrackGitHubClient(
             toDateTime(issue.updatedAt) ?: toDateTime(issue.createdAt)!!,
             toDateTime(issue.closedAt)
         )
+    }
+
+    override fun getOrganizationTeams(login: String): List<GitHubTeam>? =
+        paginateGraphQL(
+            message = "Getting teams for $login organization",
+            query = """
+               query OrgTeams(${'$'}login: String!, ${'$'}after: String) {
+                  organization(login: ${'$'}login) {
+                    teams(first: 100, after: ${'$'}after) {
+                      pageInfo {
+                        hasNextPage
+                        endCursor
+                      }
+                      nodes {
+                        slug
+                        name
+                        description
+                        url
+                      }
+                    }
+                  }
+                } 
+            """,
+            variables = mapOf(
+                "login" to login
+            ),
+            collectionAt = listOf("organization", "teams"),
+            nodes = true
+        ) { teamNode ->
+            GitHubTeam(
+                slug = teamNode.path("slug").asText(),
+                name = teamNode.path("name").asText(),
+                description = teamNode.path("description").asText(),
+                html_url = teamNode.path("url").asText()
+            )
+        }
+
+    override fun getTeamRepositories(login: String, teamSlug: String): List<GitHubTeamRepository>? =
+        paginateGraphQL(
+            message = "Getting repositories for team $teamSlug in organization $login",
+            query = """
+                query TeamRepositories(${'$'}login: String!, ${'$'}team: String!, ${'$'}after: String) {
+                  organization(login: ${'$'}login) {
+                    team(slug: ${'$'}team) {
+                      repositories(first: 100, after: ${'$'}after) {
+                        pageInfo {
+                          hasNextPage
+                          endCursor
+                        }
+                        edges {
+                          permission
+                          node {
+                            name
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+            """,
+            variables = mapOf(
+                "login" to login,
+                "team" to teamSlug
+            ),
+            collectionAt = listOf("organization", "team", "repositories"),
+            nodes = false
+        ) { edge ->
+            GitHubTeamRepository(
+                repository = edge.path("node").path("name").asText(),
+                permission = edge.path("permission").asText().let { GitHubRepositoryPermission.valueOf(it) }
+            )
+        }
+
+    private fun <T> paginateGraphQL(
+        message: String,
+        query: String,
+        variables: Map<String, *> = emptyMap<String, Any>(),
+        collectionAt: List<String>,
+        nodes: Boolean = false,
+        code: (node: JsonNode) -> T
+    ): List<T>? {
+        val results = mutableListOf<T>()
+        var hasNext = true
+        var after: String? = null
+        while (hasNext) {
+            val actualVariables = variables + ("after" to after)
+            try {
+                graphQL(message, query, actualVariables) { data ->
+                    var page = data
+                    collectionAt.forEach { childName ->
+                        page = page.path(childName)
+                    }
+                    // List of results
+                    val list = if (nodes) {
+                        page.path("nodes")
+                    } else {
+                        page.path("edges")
+                    }
+                    // Conversion
+                    list.forEach { item ->
+                        results += code(item)
+                    }
+                    // Pagination
+                    val pageInfo = page.path("pageInfo")
+                    hasNext = pageInfo.path("hasNextPage").asBoolean()
+                    if (hasNext) {
+                        after = pageInfo.path("endCursor").asText()
+                    }
+                }
+            } catch (_: GitHubNoGraphQLResponseException) {
+                return null
+            }
+        }
+        return results
+    }
+
+    private fun graphQL(
+        message: String,
+        query: String,
+        variables: Map<String, *> = emptyMap<String, Any>(),
+        code: (data: JsonNode) -> Unit
+    ) {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // GraphQL call
+        client(message) {
+            val response = postForObject(
+                "/graphql",
+                mapOf(
+                    "query" to query,
+                    "variables" to variables
+                ),
+                JsonNode::class.java
+            )
+            if (response != null) {
+                val errors = response.path("errors")
+                if (errors != null && errors.isArray && errors.size() > 0) {
+                    val messages: List<String> = errors.map { it.path("message").asText() }
+                    throw GitHubNoGraphQLErrorsException(message, messages)
+                } else {
+                    val data = response.path("data")
+                    code(data)
+                }
+            } else {
+                throw GitHubNoGraphQLResponseException(message)
+            }
+        }
     }
 
     private operator fun <T> RestTemplate.invoke(
@@ -275,6 +413,25 @@ class DefaultOntrackGitHubClient(
             } else {
                 "${url.trimEnd('/')}/api/v3"
             }
+    }
+
+    private class GitHubNoGraphQLResponseException(message: String) : BaseException(
+        """
+            $message
+            
+            No GraphQL response was returned.
+        """.trimIndent()
+    )
+
+    private class GitHubNoGraphQLErrorsException(message: String, messages: List<String>) : BaseException(
+        format(message, messages)
+    ) {
+        companion object {
+            fun format(message: String, messages: List<String>): String {
+                val list = messages.joinToString("\n") { " - $it" }
+                return "$message\n\n$list"
+            }
+        }
     }
 
     private class GitHubErrorsException(
