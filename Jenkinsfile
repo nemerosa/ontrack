@@ -59,11 +59,19 @@ pipeline {
                 }
             }
             environment {
+                // Bitbucket Cloud system tests
                 ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_WORKSPACE = credentials('ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_WORKSPACE')
                 ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_USER = credentials('ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_USER')
                 ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_TOKEN = credentials('ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_TOKEN')
                 ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_EXPECTED_PROJECT = 'ONTRACK'
                 ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_EXPECTED_REPOSITORY = 'ontrack-pipeline-bitbucket-cloud'
+                // GitHub system tests
+                ONTRACK_TEST_EXTENSION_GITHUB_USER = credentials('ONTRACK_TEST_EXTENSION_GITHUB_USER')
+                ONTRACK_TEST_EXTENSION_GITHUB_TOKEN = credentials('ONTRACK_TEST_EXTENSION_GITHUB_TOKEN')
+                ONTRACK_TEST_EXTENSION_GITHUB_ORGANIZATION = 'nemerosa'
+                ONTRACK_TEST_EXTENSION_GITHUB_REPOSITORY = 'ontrack'
+                ONTRACK_TEST_EXTENSION_GITHUB_ISSUE = '880'
+                ONTRACK_TEST_EXTENSION_GITHUB_TEAM = 'ontrack-integration-tests'
             }
             steps {
                 sh ''' ./gradlew clean versionDisplay versionFile --no-daemon'''
