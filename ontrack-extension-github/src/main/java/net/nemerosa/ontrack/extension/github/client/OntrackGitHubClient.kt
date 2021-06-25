@@ -55,14 +55,6 @@ interface OntrackGitHubClient {
     fun getPullRequest(repository: String, id: Int): GitPullRequest?
 
     /**
-     * Gets the list of teams for a repository
-     *
-     * @param repo Repository (org/name)
-     * @return List of teams or `null` if the teams cannot be accessed
-     */
-    fun getRepositoryTeams(repo: String): List<GitHubTeam>?
-
-    /**
      * Gets the list of teams for this organization.
      *
      * The `read:org` permission is required (it not granted, `null` will be returned).

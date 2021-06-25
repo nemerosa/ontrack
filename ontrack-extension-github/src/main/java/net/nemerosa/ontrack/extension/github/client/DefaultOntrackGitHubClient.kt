@@ -86,17 +86,6 @@ class DefaultOntrackGitHubClient(
             )
         } ?: throw GitHubNoGraphQLResponseException("Getting repositories for organization $organization")
 
-    override fun getRepositoryTeams(repo: String): List<GitHubTeam>? {
-        // Getting a client
-        val client = createGitHubRestTemplate()
-        // Calling
-        return client("Getting teams for $repo") {
-            getForObject("/repos/$repo/teams", JsonNode::class.java)?.map {
-                it.parse<GitHubTeam>()
-            }
-        }
-    }
-
     override fun getIssue(repository: String, id: Int): GitHubIssue? {
         // Logging
         logger.debug("[github] Getting issue {}/{}", repository, id)
