@@ -93,6 +93,7 @@ pipeline {
                         publishToMavenLocal \\
                         osPackages \\
                         dockerBuild \\
+                        javadocPackage \\
                         -Pdocumentation \\
                         -PbowerOptions='--allow-root' \\
                         -Psigning.keyId=${GPG_KEY_USR} \\
