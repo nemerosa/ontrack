@@ -16,7 +16,6 @@ import org.eclipse.egit.github.core.client.RequestException
 import org.eclipse.egit.github.core.service.IssueService
 import org.eclipse.egit.github.core.service.OrganizationService
 import org.eclipse.egit.github.core.service.PullRequestService
-import org.eclipse.egit.github.core.service.RepositoryService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.MediaType
@@ -362,13 +361,13 @@ class DefaultOntrackGitHubClient(
         }
         // Conversion
         return GitPullRequest(
-                id = id,
-                key = "#$id",
-                source = pr.head.ref,
-                target = pr.base.ref,
-                title = pr.title,
-                status = pr.state,
-                url = pr.htmlUrl
+            id = id,
+            key = "#$id",
+            source = pr.head.ref,
+            target = pr.base.ref,
+            title = pr.title,
+            status = pr.state,
+            url = pr.htmlUrl
         )
     }
 
