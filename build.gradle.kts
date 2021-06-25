@@ -429,7 +429,9 @@ if (project.hasProperty("documentation")) {
         archiveClassifier.set("javadoc")
         archiveFileName.set("ontrack-javadoc.zip")
         dependsOn("aggregateJavadoc")
-        from(rootProject.file("$rootProject.buildDir/docs/javadoc"))
+        from(rootProject.file("${rootProject.buildDir}/docs/javadoc")) {
+            include("**")
+        }
     }
 }
 
@@ -588,9 +590,11 @@ if (hasProperty("documentation")) {
     }
 
     val releaseDocCopyJavadoc by tasks.registering(Copy::class) {
-        dependsOn("aggregateJavadoc")
-        from("build/docs/javadoc")
-        into("build/site/release/javadoc/")
+        dependsOn("javadocPackage")
+        from("build/distributions") {
+            include("ontrack-javadoc.zip")
+        }
+        into("build/site/release/")
     }
 
     val releaseDocPrepare by tasks.registering {
