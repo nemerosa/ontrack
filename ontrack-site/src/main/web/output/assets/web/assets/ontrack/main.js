@@ -23,7 +23,7 @@ $.each(releases, function (index, release) {
         <td>
             <a href="${prefix}/${release}/docs/doc/index.html">HTML</a>
              | <a href="${prefix}/${release}/docs/index.pdf">PDF</a>
-             | <a href="${prefix}/${release}/docs/javadoc/index.html">Javadoc</a>
+             | <a href="${prefix}/${release}/docs/ontrack-javadoc.zip">Javadoc ZIP</a>
         </td>
       </tr>`;
 });
