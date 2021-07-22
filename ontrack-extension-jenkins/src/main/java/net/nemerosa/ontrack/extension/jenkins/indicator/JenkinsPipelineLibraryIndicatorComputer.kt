@@ -6,7 +6,9 @@ import net.nemerosa.ontrack.extension.scm.indicator.AbstractSCMIndicatorComputer
 import net.nemerosa.ontrack.extension.scm.service.SCMService
 import net.nemerosa.ontrack.extension.scm.service.SCMServiceDetector
 import net.nemerosa.ontrack.model.structure.Project
+import org.springframework.stereotype.Component
 
+@Component
 class JenkinsPipelineLibraryIndicatorComputer(
     extension: JenkinsExtensionFeature,
     scmServiceDetector: SCMServiceDetector,
@@ -49,7 +51,7 @@ class JenkinsPipelineLibraryIndicatorComputer(
             valueType = jenkinsPipelineLibraryIndicatorValueType,
             valueConfig = JenkinsPipelineLibraryIndicatorValueTypeConfig(
                 // TODO Makes the configuration configurable per library (settings)
-                versionRequired = true,
+                versionRequired = false,
                 versionMinimum = null,
             ),
         )
