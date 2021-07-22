@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.common.FutureUtils
 import net.nemerosa.ontrack.common.asOptional
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequestDifferenceProjectException
 import net.nemerosa.ontrack.extension.git.CACHE_GIT_PULL_REQUEST
@@ -403,6 +404,17 @@ class GitServiceImpl(
             )
             client.download(branchConfiguration.branch, path).asOptional()
         }
+    }
+
+    override fun download(project: Project, scmBranch: String, path: String): String? {
+        securityService.checkProjectFunction(project, ProjectConfig::class.java)
+        return transactionService.doInTransaction {
+            val projectConfiguration = getRequiredProjectConfiguration(project)
+            val client = gitRepositoryClientFactory.getClient(
+                projectConfiguration.gitRepository
+            )
+            client.download(scmBranch, path).asOptional()
+        }.getOrNull()
     }
 
     override fun projectSync(project: Project, request: GitSynchronisationRequest): Ack {
@@ -992,6 +1004,12 @@ class GitServiceImpl(
             }
         }
     }
+
+    override fun getSCMDefaultBranch(project: Project): String? =
+        getProjectConfiguration(project)?.let { conf ->
+            val client = gitRepositoryClientFactory.getClient(conf.gitRepository)
+            client.defaultBranch
+        }
 
     private fun collectIndexableGitCommitForBuild(
             build: Build,

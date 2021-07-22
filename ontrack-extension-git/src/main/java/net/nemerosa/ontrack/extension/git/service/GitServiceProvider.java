@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.git.service;
 
+import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.scm.service.SCMService;
 import net.nemerosa.ontrack.extension.scm.service.SCMServiceProvider;
 import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +22,16 @@ public class GitServiceProvider implements SCMServiceProvider {
 
     @Override
     public Optional<SCMService> getScmService(Branch branch) {
-        return Optional.ofNullable(gitService.getBranchConfiguration(branch))
-                .map(conf -> gitService);
+        return getScmService(branch.getProject());
+    }
+
+    @Override
+    public Optional<SCMService> getScmService(Project project) {
+        GitConfiguration projectConfiguration = gitService.getProjectConfiguration(project);
+        if (projectConfiguration != null) {
+            return Optional.of(gitService);
+        } else {
+            return Optional.empty();
+        }
     }
 }

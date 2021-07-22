@@ -2,7 +2,9 @@ package net.nemerosa.ontrack.extension.jenkins.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.extension.indicators.IndicatorsExtensionFeature;
 import net.nemerosa.ontrack.extension.jenkins.*;
+import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature;
 import net.nemerosa.ontrack.model.form.Field;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
@@ -30,7 +32,10 @@ public class JenkinsJobPropertyTypeTest {
         securityService = mock(SecurityService.class);
         configurationService = mock(JenkinsConfigurationService.class);
         type = new JenkinsJobPropertyType(
-                new JenkinsExtensionFeature(),
+                new JenkinsExtensionFeature(
+                        new IndicatorsExtensionFeature(),
+                        new SCMExtensionFeature()
+                ),
                 configurationService
         );
     }
