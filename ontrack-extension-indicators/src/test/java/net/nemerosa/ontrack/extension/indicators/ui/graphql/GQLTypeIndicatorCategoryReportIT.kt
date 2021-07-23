@@ -73,9 +73,9 @@ class GQLTypeIndicatorCategoryReportIT : AbstractIndicatorsTestSupport() {
             projects.forEach { project ->
                 val projectReport = projectReports[project.name]
                 assertNotNull(projectReport) {
-                    val indicators = it.path("indicators").associate { indicator ->
+                    val indicators = it.associate { indicator ->
                         indicator.path("type").path("id").asText() to
-                                indicator.path("value")
+                                indicator.path("value").path("value")
                     }
                     types.forEach { type ->
                         val value = indicators[type.id]
@@ -90,14 +90,14 @@ class GQLTypeIndicatorCategoryReportIT : AbstractIndicatorsTestSupport() {
             unsetProjects.forEach { project ->
                 val projectReport = projectReports[project.name]
                 assertNotNull(projectReport) {
-                    val indicators = it.path("indicators").associate { indicator ->
+                    val indicators = it.associate { indicator ->
                         indicator.path("type").path("id").asText() to
-                                indicator.path("value")
+                                indicator.path("value").path("value")
                     }
                     types.forEach { type ->
                         val value = indicators[type.id]
                         assertNotNull(value) { actualValue ->
-                            assertTrue(actualValue.isNull)
+                            assertTrue(actualValue.isNull || actualValue.isMissingNode)
                         }
                     }
                 }
@@ -115,9 +115,9 @@ class GQLTypeIndicatorCategoryReportIT : AbstractIndicatorsTestSupport() {
             types.forEach { type ->
                 val typeReport = typeReports[type.id]
                 assertNotNull(typeReport) { actualTypeReport ->
-                    val projectIndicators = actualTypeReport.path("projectIndicators").associate { projectIndicator ->
+                    val projectIndicators = actualTypeReport.associate { projectIndicator ->
                         projectIndicator.path("project").path("name").asText() to
-                                projectIndicator.path("indicator").path("value")
+                                projectIndicator.path("indicator").path("value").path("value")
                     }
                     // Projects with values
                     projects.forEach { project ->
@@ -131,7 +131,7 @@ class GQLTypeIndicatorCategoryReportIT : AbstractIndicatorsTestSupport() {
                     unsetProjects.forEach { project ->
                         val projectIndicator = projectIndicators[project.name]
                         assertNotNull(projectIndicator) { actualValue ->
-                            assertTrue(actualValue.isNull)
+                            assertTrue(actualValue.isNull || actualValue.isMissingNode)
                         }
                     }
                 }
@@ -204,9 +204,9 @@ class GQLTypeIndicatorCategoryReportIT : AbstractIndicatorsTestSupport() {
             projects.forEach { project ->
                 val projectReport = projectReports[project.name]
                 assertNotNull(projectReport) {
-                    val indicators = it.path("indicators").associate { indicator ->
+                    val indicators = it.associate { indicator ->
                         indicator.path("type").path("id").asText() to
-                                indicator.path("value")
+                                indicator.path("value").path("value")
                     }
                     types.forEach { type ->
                         val value = indicators[type.id]
@@ -235,9 +235,9 @@ class GQLTypeIndicatorCategoryReportIT : AbstractIndicatorsTestSupport() {
             types.forEach { type ->
                 val typeReport = typeReports[type.id]
                 assertNotNull(typeReport) { actualTypeReport ->
-                    val projectIndicators = actualTypeReport.path("projectIndicators").associate { projectIndicator ->
+                    val projectIndicators = actualTypeReport.associate { projectIndicator ->
                         projectIndicator.path("project").path("name").asText() to
-                                projectIndicator.path("indicator").path("value")
+                                projectIndicator.path("indicator").path("value").path("value")
                     }
                     // Projects with values
                     projects.forEach { project ->
@@ -323,9 +323,9 @@ class GQLTypeIndicatorCategoryReportIT : AbstractIndicatorsTestSupport() {
                 val projectReport = projectReports[project.name]
                 if (project.name == projects[0].name) {
                     assertNotNull(projectReport) {
-                        val indicators = it.path("indicators").associate { indicator ->
+                        val indicators = it.associate { indicator ->
                             indicator.path("type").path("id").asText() to
-                                    indicator.path("value")
+                                    indicator.path("value").path("value")
                         }
                         types.forEach { type ->
                             val value = indicators[type.id]
@@ -357,9 +357,9 @@ class GQLTypeIndicatorCategoryReportIT : AbstractIndicatorsTestSupport() {
             types.forEach { type ->
                 val typeReport = typeReports[type.id]
                 assertNotNull(typeReport) { actualTypeReport ->
-                    val projectIndicators = actualTypeReport.path("projectIndicators").associate { projectIndicator ->
+                    val projectIndicators = actualTypeReport.associate { projectIndicator ->
                         projectIndicator.path("project").path("name").asText() to
-                                projectIndicator.path("indicator").path("value")
+                                projectIndicator.path("indicator").path("value").path("value")
                     }
                     // Projects with values
                     projects.forEach { project ->
@@ -403,7 +403,7 @@ class GQLTypeIndicatorCategoryReportIT : AbstractIndicatorsTestSupport() {
             {
                 indicatorCategories {
                     categories(id: "${category.id}") {
-                        report(projectId: "${projects[0].id}") {
+                        report(projectId: ${projects[0].id}) {
                             projectReport {
                                 project {
                                     name
@@ -449,9 +449,9 @@ class GQLTypeIndicatorCategoryReportIT : AbstractIndicatorsTestSupport() {
                 val projectReport = projectReports[project.name]
                 if (project.name == projects[0].name) {
                     assertNotNull(projectReport) {
-                        val indicators = it.path("indicators").associate { indicator ->
+                        val indicators = it.associate { indicator ->
                             indicator.path("type").path("id").asText() to
-                                    indicator.path("value")
+                                    indicator.path("value").path("value")
                         }
                         types.forEach { type ->
                             val value = indicators[type.id]
@@ -483,9 +483,9 @@ class GQLTypeIndicatorCategoryReportIT : AbstractIndicatorsTestSupport() {
             types.forEach { type ->
                 val typeReport = typeReports[type.id]
                 assertNotNull(typeReport) { actualTypeReport ->
-                    val projectIndicators = actualTypeReport.path("projectIndicators").associate { projectIndicator ->
+                    val projectIndicators = actualTypeReport.associate { projectIndicator ->
                         projectIndicator.path("project").path("name").asText() to
-                                projectIndicator.path("indicator").path("value")
+                                projectIndicator.path("indicator").path("value").path("value")
                     }
                     // Projects with values
                     projects.forEach { project ->
@@ -579,9 +579,9 @@ class GQLTypeIndicatorCategoryReportIT : AbstractIndicatorsTestSupport() {
                 val projectReport = projectReports[project.name]
                 if (project.name == projects[0].name) {
                     assertNotNull(projectReport) {
-                        val indicators = it.path("indicators").associate { indicator ->
+                        val indicators = it.associate { indicator ->
                             indicator.path("type").path("id").asText() to
-                                    indicator.path("value")
+                                    indicator.path("value").path("value")
                         }
                         types.forEach { type ->
                             val value = indicators[type.id]
@@ -613,9 +613,9 @@ class GQLTypeIndicatorCategoryReportIT : AbstractIndicatorsTestSupport() {
             types.forEach { type ->
                 val typeReport = typeReports[type.id]
                 assertNotNull(typeReport) { actualTypeReport ->
-                    val projectIndicators = actualTypeReport.path("projectIndicators").associate { projectIndicator ->
+                    val projectIndicators = actualTypeReport.associate { projectIndicator ->
                         projectIndicator.path("project").path("name").asText() to
-                                projectIndicator.path("indicator").path("value")
+                                projectIndicator.path("indicator").path("value").path("value")
                     }
                     // Projects with values
                     projects.forEach { project ->
@@ -708,9 +708,9 @@ class GQLTypeIndicatorCategoryReportIT : AbstractIndicatorsTestSupport() {
                 val projectReport = projectReports[project.name]
                 if (project.name == projects[0].name) {
                     assertNotNull(projectReport) {
-                        val indicators = it.path("indicators").associate { indicator ->
+                        val indicators = it.associate { indicator ->
                             indicator.path("type").path("id").asText() to
-                                    indicator.path("value")
+                                    indicator.path("value").path("value")
                         }
                         types.forEach { type ->
                             val value = indicators[type.id]
@@ -742,9 +742,9 @@ class GQLTypeIndicatorCategoryReportIT : AbstractIndicatorsTestSupport() {
             types.forEach { type ->
                 val typeReport = typeReports[type.id]
                 assertNotNull(typeReport) { actualTypeReport ->
-                    val projectIndicators = actualTypeReport.path("projectIndicators").associate { projectIndicator ->
+                    val projectIndicators = actualTypeReport.associate { projectIndicator ->
                         projectIndicator.path("project").path("name").asText() to
-                                projectIndicator.path("indicator").path("value")
+                                projectIndicator.path("indicator").path("value").path("value")
                     }
                     // Projects with values
                     projects.forEach { project ->

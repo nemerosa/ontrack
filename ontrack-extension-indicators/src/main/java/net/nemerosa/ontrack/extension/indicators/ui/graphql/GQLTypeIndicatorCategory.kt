@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
 import graphql.Scalars.*
+import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategory
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
@@ -51,7 +52,7 @@ class GQLTypeIndicatorCategory(
         .field {
             it.name("report")
                 .description("Reporting the indicators for the types in this category")
-                .type(listType(indicatorCategoryReportType.typeRef))
+                .type(GraphQLNonNull(indicatorCategoryReportType.typeRef))
                 .argument {
                     it.name(GQLTypeIndicatorCategoryReport.ARG_FILLED_ONLY)
                         .description("Reports only projects where the indicator is filled in")

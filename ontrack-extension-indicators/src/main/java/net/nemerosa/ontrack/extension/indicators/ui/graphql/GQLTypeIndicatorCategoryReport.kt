@@ -3,15 +3,24 @@ package net.nemerosa.ontrack.extension.indicators.ui.graphql
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategory
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorService
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorType
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
+import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicator
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.GQLTypeProject
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.nullableType
+import net.nemerosa.ontrack.model.labels.LabelManagementService
+import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
+import net.nemerosa.ontrack.model.labels.findLabelByDisplay
+import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 
 /**
@@ -20,7 +29,13 @@ import org.springframework.stereotype.Component
 @Component
 class GQLTypeIndicatorCategoryReport(
     private val indicatorCategoryReportProject: GQLTypeIndicatorCategoryReportProject,
-    private val indicatorCategoryReportType: GQLTypeIndicatorCategoryReportType
+    private val indicatorCategoryReportType: GQLTypeIndicatorCategoryReportType,
+    private val structureService: StructureService,
+    private val labelManagementService: LabelManagementService,
+    private val projectLabelManagementService: ProjectLabelManagementService,
+    private val portfolioService: IndicatorPortfolioService,
+    private val indicatorTypeService: IndicatorTypeService,
+    private val indicatorService: IndicatorService,
 ) : GQLType {
 
     override fun getTypeName(): String = INDICATOR_CATEGORY_REPORT
@@ -59,16 +74,90 @@ class GQLTypeIndicatorCategoryReport(
 
     inner class IndicatorCategoryReport(
         private val category: IndicatorCategory,
-        private val reportEnv: DataFetchingEnvironment
+        private val reportEnv: DataFetchingEnvironment,
     ) {
 
-        val projectReport: List<GQLTypeIndicatorCategoryReportProject.IndicatorCategoryReportProject> = TODO()
+        val projectReport: List<GQLTypeIndicatorCategoryReportProject.IndicatorCategoryReportProject> by lazy {
+            projects.map { project ->
+                GQLTypeIndicatorCategoryReportProject.IndicatorCategoryReportProject(
+                    project = project,
+                    indicators = types.map { type ->
+                        indicatorService.getProjectIndicator(project, type).run {
+                            ProjectIndicator(project, this)
+                        }
+                    }
+                )
+            }
+        }
 
-        val typeReport: List<IndicatorCategoryReportType> = TODO()
+        val typeReport: List<GQLTypeIndicatorCategoryReportType.IndicatorCategoryReportType> by lazy {
+            types.map { type ->
+                GQLTypeIndicatorCategoryReportType.IndicatorCategoryReportType(
+                    type = type,
+                    projectIndicators = projects.map { project ->
+                        GQLTypeIndicatorCategoryReportTypeEntry.IndicatorCategoryReportTypeEntry(
+                            project = project,
+                            indicator = ProjectIndicator(
+                                project,
+                                indicatorService.getProjectIndicator(project, type)
+                            )
+                        )
+                    }
+                )
+            }
+        }
+
+        private val types: List<IndicatorType<*, *>> by lazy {
+            indicatorTypeService.findByCategory(category)
+        }
+
+        private val projects: List<Project> by lazy {
+            val filledOnly: Boolean? = reportEnv.getArgument(ARG_FILLED_ONLY)
+            val projectId: Int? = reportEnv.getArgument(ARG_PROJECT_ID)
+            val projectName: String? = reportEnv.getArgument(ARG_PROJECT_NAME)
+            val portfolio: String? = reportEnv.getArgument(ARG_PORTFOLIO)
+            val label: String? = reportEnv.getArgument(ARG_LABEL)
+
+            val list = when {
+                projectId != null -> listOf(
+                    structureService.getProject(ID.of(projectId))
+                )
+                projectName != null -> listOfNotNull(
+                    structureService.findProjectByName(projectName).getOrNull()
+                )
+                label != null -> {
+                    val actualLabel = labelManagementService.findLabelByDisplay(label)
+                    if (actualLabel != null) {
+                        projectLabelManagementService.getProjectsForLabel(actualLabel).map { id ->
+                            structureService.getProject(id)
+                        }
+                    } else {
+                        emptyList()
+                    }
+                }
+                portfolio != null -> {
+                    val actualPortfolio = portfolioService.findPortfolioById(portfolio)
+                    if (actualPortfolio != null) {
+                        portfolioService.getPortfolioProjects(actualPortfolio)
+                    } else {
+                        emptyList()
+                    }
+                }
+                else -> structureService.projectList
+            }
+
+            if (filledOnly != null && filledOnly) {
+                list.filter { project ->
+                    types.any { type ->
+                        indicatorService.getProjectIndicator(project, type).value != null
+                    }
+                }
+            } else {
+                list
+            }
+        }
 
     }
-
-    class IndicatorCategoryReportType {}
 
 }
 
@@ -112,7 +201,7 @@ class GQLTypeIndicatorCategoryReportType(
 ) : GQLType {
 
     class IndicatorCategoryReportType(
-        val indicatorType: IndicatorType<*, *>,
+        val type: IndicatorType<*, *>,
         val projectIndicators: List<GQLTypeIndicatorCategoryReportTypeEntry.IndicatorCategoryReportTypeEntry>
     )
 
