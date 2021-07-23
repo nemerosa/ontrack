@@ -44,9 +44,9 @@ class JenkinsPipelineLibraryIndicatorComputer(
 
     private fun getIndicatorType(library: JenkinsPipelineLibrary) =
         IndicatorComputedType(
-            category = getIndicatorCategory(library),
+            category = indicatorCategory,
             id = library.name,
-            name = library.name,
+            name = "Using the ${library.name} Jenkins pipeline library",
             link = null,
             valueType = jenkinsPipelineLibraryIndicatorValueType,
             valueConfig = JenkinsPipelineLibraryIndicatorValueTypeConfig(
@@ -56,8 +56,9 @@ class JenkinsPipelineLibraryIndicatorComputer(
             ),
         )
 
-    private fun getIndicatorCategory(library: JenkinsPipelineLibrary) = IndicatorComputedCategory(
+    private val indicatorCategory = IndicatorComputedCategory(
         id = "jenkins-pipeline-library",
         name = "Jenkins pipeline libraries"
     )
+
 }
