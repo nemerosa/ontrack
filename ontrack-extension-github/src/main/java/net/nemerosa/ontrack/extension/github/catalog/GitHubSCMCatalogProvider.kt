@@ -32,7 +32,7 @@ class GitHubSCMCatalogProvider(
             }
         }
 
-    private fun getConfigEntries(
+    internal fun getConfigEntries(
         settings: GitHubSCMCatalogSettings,
         config: GitHubEngineConfiguration
     ): Iterable<SCMCatalogSource> {
