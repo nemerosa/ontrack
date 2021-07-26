@@ -32,7 +32,7 @@ class GitHubSCMCatalogProvider(
             }
         }
 
-    private fun getConfigEntries(
+    internal fun getConfigEntries(
         settings: GitHubSCMCatalogSettings,
         config: GitHubEngineConfiguration
     ): Iterable<SCMCatalogSource> {
@@ -63,7 +63,7 @@ class GitHubSCMCatalogProvider(
                     SCMCatalogSource(
                         config = config.name,
                         repository = "${org.login}/${repo.name}",
-                        repositoryPage = "${config.url}/${repo.name}",
+                        repositoryPage = "${config.url}/${org.login}/${repo.name}",
                         lastActivity = repo.lastUpdate,
                         teams = repositoryTeamIndex[repo.name]?.toList()
                     )
