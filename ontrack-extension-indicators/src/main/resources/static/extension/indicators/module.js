@@ -93,6 +93,85 @@ angular.module('ontrack.extension.indicators', [
 
     })
     .config(function ($stateProvider) {
+        $stateProvider.state('indicator-category-report', {
+            url: '/extension/indicators/categories/{id}/report',
+            templateUrl: 'extension/indicators/category-report.tpl.html',
+            controller: 'IndicatorCategoryReportCtrl'
+        });
+    })
+    .controller('IndicatorCategoryReportCtrl', function ($scope, $stateParams, $http, ot, otGraphqlService) {
+        $scope.loadingReport = false;
+        const categoryId = $stateParams.id;
+
+        const view = ot.view();
+        view.title = "Indicator category report";
+
+        const query = `
+            query IndicatorCategoryReport($id: String!) {
+              indicatorCategories {
+                categories(id: $id) {
+                  id
+                  name
+                  report {
+                    projectReport {
+                        project {
+                            name
+                        }
+                        indicators {
+                            type {
+                                id
+                                valueType {
+                                  id
+                                  feature {
+                                    id
+                                  }
+                                }
+                            }
+                            value
+                            compliance
+                            rating
+                            comment
+                            annotatedComment
+                            signature {
+                              user
+                              time
+                            }
+                        }
+                    }
+                    typeReport {
+                        type {
+                            id
+                            name
+                            link
+                        }
+                    }
+                  }
+                }
+              }
+            }
+        `;
+
+        let viewInitialized = false;
+
+        const loadReport = () => {
+            $scope.loadingReport = true;
+            otGraphqlService.pageGraphQLCall(query, {id: categoryId}).then((data) => {
+                $scope.category = data.indicatorCategories.categories[0];
+                $scope.report = $scope.category.report;
+
+                if (!viewInitialized) {
+                    view.title = `Indicator report for category ${$scope.category.name}`;
+                    viewInitialized = true;
+                }
+
+            }).finally(() => {
+                $scope.loadingReport = false;
+            });
+        };
+
+        loadReport();
+    })
+    .config(function ($stateProvider) {
         $stateProvider.state('indicator-types', {
             url: '/extension/indicators/types',
             templateUrl: 'extension/indicators/types.tpl.html',

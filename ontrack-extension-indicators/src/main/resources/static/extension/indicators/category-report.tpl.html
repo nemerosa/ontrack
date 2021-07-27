@@ -1,0 +1,19 @@
+<ot-view>
+
+    <ot-extension-indicators-message></ot-extension-indicators-message>
+
+    <div class="row" ng-show="loadingReport">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading indicator report...
+            </div>
+        </div>
+    </div>
+
+    {{report}}
+
+    <table class="table table-hover table-bordered" ng-if="report">
+    </table>
+
+</ot-view>
