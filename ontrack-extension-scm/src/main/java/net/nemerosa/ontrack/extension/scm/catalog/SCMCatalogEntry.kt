@@ -12,6 +12,7 @@ import java.time.LocalDateTime
  * @param repository Name of the SCM repository (for example: "nemerosa/ontrack")
  * @param repositoryPage URL to the web repository page (a GitHub repository page for example)
  * @param lastActivity Timestamp for the last activity on this repository
+ * @param createdAt Timestamp for the creation of this repository
  * @param timestamp Timestamp for the collection of the information
  * @param teams List of teams assigned to this entry
  */
@@ -22,6 +23,7 @@ data class SCMCatalogEntry(
         val repository: String,
         val repositoryPage: String?,
         val lastActivity: LocalDateTime?,
+        val createdAt: LocalDateTime?,
         val timestamp: LocalDateTime,
         val teams: List<SCMCatalogTeam>?
 ) : Comparable<SCMCatalogEntry> {

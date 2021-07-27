@@ -68,6 +68,7 @@ class DefaultOntrackGitHubClient(
                         name
                         description
                         updatedAt
+                        createdAt
                       }
                     }
                   }
@@ -81,6 +82,9 @@ class DefaultOntrackGitHubClient(
                 name = node.path("name").asText(),
                 description = node.path("description").asText(),
                 lastUpdate = node.path("updatedAt")?.asText()
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let { LocalDateTime.parse(it, DateTimeFormatter.ISO_DATE_TIME) },
+                createdAt = node.path("createdAt")?.asText()
                     ?.takeIf { it.isNotBlank() }
                     ?.let { LocalDateTime.parse(it, DateTimeFormatter.ISO_DATE_TIME) }
             )

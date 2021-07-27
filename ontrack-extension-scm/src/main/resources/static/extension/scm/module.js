@@ -515,6 +515,8 @@ angular.module('ontrack.extension.scm', [
             link: "ENTRY",
             beforeLastActivity: null,
             afterLastActivity: null,
+            beforeCreatedAt: null,
+            afterCreatedAt: null,
             team: null,
             sortOn: null,
             sortAscending: true
@@ -529,8 +531,8 @@ angular.module('ontrack.extension.scm', [
         };
 
         const query = `
-            query CatalogInfo($offset: Int!, $size: Int!, $scm: String, $config: String, $repository: String, $link: String, $project: String, $sortOn: String, $sortAscending: Boolean, $beforeLastActivity: String, $afterLastActivity: String, $team: String) {
-                scmCatalog(offset: $offset, size: $size, scm: $scm, config: $config, repository: $repository, link: $link, project: $project, sortOn: $sortOn, sortAscending: $sortAscending, beforeLastActivity: $beforeLastActivity, afterLastActivity: $afterLastActivity, team: $team) {
+            query CatalogInfo($offset: Int!, $size: Int!, $scm: String, $config: String, $repository: String, $link: String, $project: String, $sortOn: String, $sortAscending: Boolean, $beforeLastActivity: String, $afterLastActivity: String, $beforeCreatedAt: String, $afterCreatedAt: String, $team: String) {
+                scmCatalog(offset: $offset, size: $size, scm: $scm, config: $config, repository: $repository, link: $link, project: $project, sortOn: $sortOn, sortAscending: $sortAscending, beforeLastActivity: $beforeLastActivity, afterLastActivity: $afterLastActivity, beforeCreatedAt: $beforeCreatedAt, afterCreatedAt: $afterCreatedAt, team: $team) {
                     pageInfo {
                       totalSize
                       currentOffset
@@ -553,6 +555,7 @@ angular.module('ontrack.extension.scm', [
                         repository
                         repositoryPage
                         lastActivity
+                        createdAt
                         timestamp
                         teams {
                           id

@@ -50,6 +50,11 @@ class GQLTypeSCMCatalogEntry(
                                 .type(GQLScalarLocalDateTime.INSTANCE)
                     }
                     .field {
+                        it.name("createdAt")
+                                .description("Creation timestamp")
+                                .type(GQLScalarLocalDateTime.INSTANCE)
+                    }
+                    .field {
                         it.name("timestamp")
                                 .description("Collection timestamp")
                                 .type(GQLScalarLocalDateTime.INSTANCE)

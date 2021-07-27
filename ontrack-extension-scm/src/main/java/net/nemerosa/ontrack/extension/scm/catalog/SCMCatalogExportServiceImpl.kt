@@ -20,6 +20,7 @@ class SCMCatalogExportServiceImpl : SCMCatalogExportService {
                 "config",
                 "repository",
                 "lastActivity",
+                "createdAt",
                 "timestamp",
                 "teams"
             )
@@ -31,6 +32,7 @@ class SCMCatalogExportServiceImpl : SCMCatalogExportService {
                     entry.config,
                     entry.repository,
                     formatDateTime(entry.lastActivity),
+                    formatDateTime(entry.createdAt),
                     formatDateTime(entry.timestamp),
                     formatTeams(entry.teams)
                 )
