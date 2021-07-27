@@ -6,6 +6,8 @@ enum class SCMCatalogProjectFilterSort(
 
     REPOSITORY({ it.entry?.repository }),
 
-    LAST_ACTIVITY({ it.entry?.lastActivity })
+    LAST_ACTIVITY({ it.entry?.lastActivity }),
+
+    CREATED_AT({ it.entry?.createdAt })
 
 }

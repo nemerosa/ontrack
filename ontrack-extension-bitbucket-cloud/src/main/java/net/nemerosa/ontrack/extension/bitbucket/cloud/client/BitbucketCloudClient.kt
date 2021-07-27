@@ -35,6 +35,14 @@ interface BitbucketCloudClient {
     fun getRepositoryLastModified(repository: BitbucketCloudRepository): LocalDateTime?
 
     /**
+     * Given a [repository], returns its creation date (if any).
+     *
+     * @param repository Repository to get the date from
+     * @return The creation date or `null` if not available
+     */
+    fun getRepositoryCreationDate(repository: BitbucketCloudRepository): LocalDateTime?
+
+    /**
      * Gets the repository information.
      *
      * @param repository Repository slug

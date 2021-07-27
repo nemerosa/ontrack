@@ -64,6 +64,14 @@ class GQLRootQuerySCMCatalog(
                                     .description("Selects entries whose last activity is after this date.")
                                     .type(GraphQLString)
                                     .build(),
+                            GraphQLArgument.newArgument().name(ARG_BEFORE_CREATED_AT)
+                                    .description("Selects entries whose creation date is before this date.")
+                                    .type(GraphQLString)
+                                    .build(),
+                            GraphQLArgument.newArgument().name(ARG_AFTER_CREATED_AT)
+                                    .description("Selects entries whose creation date is after this date.")
+                                    .type(GraphQLString)
+                                    .build(),
                             GraphQLArgument.newArgument().name(ARG_TEAM)
                                     .description("ID of the SCM team. Empty string to select entries without a team.")
                                     .type(GraphQLString)
@@ -81,6 +89,8 @@ class GQLRootQuerySCMCatalog(
         val project: String? = env.getArgument<String>(ARG_PROJECT)
         val beforeLastActivity: LocalDate? = env.getArgument<String?>(ARG_BEFORE_LAST_ACTIVITY)?.run { JDKLocalDateDeserializer.parse(this) }
         val afterLastActivity: LocalDate? = env.getArgument<String?>(ARG_AFTER_LAST_ACTIVITY)?.run { JDKLocalDateDeserializer.parse(this) }
+        val beforeCreatedAt: LocalDate? = env.getArgument<String?>(ARG_BEFORE_CREATED_AT)?.run { JDKLocalDateDeserializer.parse(this) }
+        val afterCreatedAt: LocalDate? = env.getArgument<String?>(ARG_AFTER_CREATED_AT)?.run { JDKLocalDateDeserializer.parse(this) }
         val team: String? = env.getArgument(ARG_TEAM)
         val sortOn: SCMCatalogProjectFilterSort? = env.getArgument<String?>(ARG_SORT_ON)?.run { SCMCatalogProjectFilterSort.valueOf(this) }
         val sortAscending: Boolean = env.getArgument(ARG_SORT_ASCENDING) ?: true
@@ -94,6 +104,8 @@ class GQLRootQuerySCMCatalog(
                 project = project,
                 beforeLastActivity = beforeLastActivity,
                 afterLastActivity = afterLastActivity,
+                beforeCreatedAt = beforeCreatedAt,
+                afterCreatedAt = afterCreatedAt,
                 team = team,
                 sortOn = sortOn,
                 sortAscending = sortAscending
@@ -111,6 +123,8 @@ class GQLRootQuerySCMCatalog(
         private const val ARG_SORT_ASCENDING = "sortAscending"
         private const val ARG_BEFORE_LAST_ACTIVITY = "beforeLastActivity"
         private const val ARG_AFTER_LAST_ACTIVITY = "afterLastActivity"
+        private const val ARG_BEFORE_CREATED_AT = "beforeCreatedAt"
+        private const val ARG_AFTER_CREATED_AT = "afterCreatedAt"
         private const val ARG_TEAM = "team"
     }
 

@@ -9,8 +9,6 @@ import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogProvider
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogSource
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
@@ -20,8 +18,6 @@ class BitbucketCloudSCMCatalogProvider(
     private val propertyService: PropertyService
 ) : SCMCatalogProvider {
 
-    private val logger: Logger = LoggerFactory.getLogger(BitbucketCloudSCMCatalogProvider::class.java)
-
     override val id: String = "bitbucket"
 
     override val entries: List<SCMCatalogSource>
@@ -30,12 +26,8 @@ class BitbucketCloudSCMCatalogProvider(
             .flatMap { config ->
                 val client = bitbucketCloudClientFactory.getBitbucketCloudClient(config)
                 client.repositories.mapNotNull { repo ->
-                    val lastModified = try {
-                        client.getRepositoryLastModified(repo)
-                    } catch (ex: Exception) {
-                        logger.debug("Cannot get last modified date on Bitbucket Cloud repository at ${config.workspace}/$repo")
-                        null
-                    }
+                    val lastModified = client.getRepositoryLastModified(repo)
+                    val creationDate = client.getRepositoryCreationDate(repo)
                     lastModified?.let {
                         SCMCatalogSource(
                             config = config.name,
@@ -46,7 +38,8 @@ class BitbucketCloudSCMCatalogProvider(
                                 0,
                                 null
                             ).repositoryUrl,
-                            lastActivity = it
+                            lastActivity = it,
+                            createdAt = creationDate,
                         )
                     }
                 }

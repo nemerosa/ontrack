@@ -159,15 +159,17 @@ class SCMCatalogImplTest {
         repository = name,
         repositoryPage = "https://scm/$name",
         lastActivity = Time.now(),
+        createdAt = Time.now(),
         timestamp = Time.now(),
         teams = null
     )
 
     private fun source(name: String) = SCMCatalogSource(
-            "config",
-            name,
-            "https://scm/$name",
-            Time.now()
+        config = "config",
+        repository = name,
+        repositoryPage = "https://scm/$name",
+        lastActivity = Time.now(),
+        createdAt = Time.now()
     )
 
 }

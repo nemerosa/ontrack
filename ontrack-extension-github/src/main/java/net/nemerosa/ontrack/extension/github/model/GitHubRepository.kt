@@ -8,5 +8,6 @@ import java.time.LocalDateTime
 class GitHubRepository(
     val name: String,
     val description: String?,
-    val lastUpdate: LocalDateTime?
+    val lastUpdate: LocalDateTime?,
+    val createdAt: LocalDateTime?
 )

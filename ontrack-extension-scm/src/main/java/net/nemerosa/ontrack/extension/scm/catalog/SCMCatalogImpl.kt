@@ -45,6 +45,7 @@ class SCMCatalogImpl(
                         repository = source.repository,
                         repositoryPage = source.repositoryPage,
                         lastActivity = source.lastActivity,
+                        createdAt = source.createdAt,
                         timestamp = Time.now(),
                         teams = source.teams
                 )

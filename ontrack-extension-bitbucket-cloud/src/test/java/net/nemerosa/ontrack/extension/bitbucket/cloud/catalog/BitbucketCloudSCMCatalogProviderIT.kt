@@ -88,6 +88,7 @@ class BitbucketCloudSCMCatalogProviderIT : AbstractBitbucketCloudTestSupport() {
             repository = "${config.workspace}/my-repository",
             repositoryPage = "",
             lastActivity = null,
+            createdAt = null,
             timestamp = Time.now(),
             teams = null,
         )
