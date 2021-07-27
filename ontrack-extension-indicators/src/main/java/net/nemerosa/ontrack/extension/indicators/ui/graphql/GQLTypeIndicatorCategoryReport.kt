@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.indicators.ui.graphql
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategory
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorService
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorType
@@ -17,8 +16,6 @@ import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.nullableType
 import net.nemerosa.ontrack.model.labels.LabelManagementService
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
-import net.nemerosa.ontrack.model.labels.findLabelByDisplay
-import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
@@ -30,6 +27,7 @@ import org.springframework.stereotype.Component
 class GQLTypeIndicatorCategoryReport(
     private val indicatorCategoryReportProject: GQLTypeIndicatorCategoryReportProject,
     private val indicatorCategoryReportType: GQLTypeIndicatorCategoryReportType,
+    private val indicatorReportingService: IndicatorReportingService,
     private val structureService: StructureService,
     private val labelManagementService: LabelManagementService,
     private val projectLabelManagementService: ProjectLabelManagementService,
@@ -112,49 +110,7 @@ class GQLTypeIndicatorCategoryReport(
         }
 
         private val projects: List<Project> by lazy {
-            val filledOnly: Boolean? = reportEnv.getArgument(ARG_FILLED_ONLY)
-            val projectId: Int? = reportEnv.getArgument(ARG_PROJECT_ID)
-            val projectName: String? = reportEnv.getArgument(ARG_PROJECT_NAME)
-            val portfolio: String? = reportEnv.getArgument(ARG_PORTFOLIO)
-            val label: String? = reportEnv.getArgument(ARG_LABEL)
-
-            val list = when {
-                projectId != null -> listOf(
-                    structureService.getProject(ID.of(projectId))
-                )
-                projectName != null -> listOfNotNull(
-                    structureService.findProjectByName(projectName).getOrNull()
-                )
-                label != null -> {
-                    val actualLabel = labelManagementService.findLabelByDisplay(label)
-                    if (actualLabel != null) {
-                        projectLabelManagementService.getProjectsForLabel(actualLabel).map { id ->
-                            structureService.getProject(id)
-                        }
-                    } else {
-                        emptyList()
-                    }
-                }
-                portfolio != null -> {
-                    val actualPortfolio = portfolioService.findPortfolioById(portfolio)
-                    if (actualPortfolio != null) {
-                        portfolioService.getPortfolioProjects(actualPortfolio)
-                    } else {
-                        emptyList()
-                    }
-                }
-                else -> structureService.projectList
-            }
-
-            if (filledOnly != null && filledOnly) {
-                list.filter { project ->
-                    types.any { type ->
-                        indicatorService.getProjectIndicator(project, type).value != null
-                    }
-                }
-            } else {
-                list
-            }
+            indicatorReportingService.findProjects(reportEnv, types)
         }
 
     }

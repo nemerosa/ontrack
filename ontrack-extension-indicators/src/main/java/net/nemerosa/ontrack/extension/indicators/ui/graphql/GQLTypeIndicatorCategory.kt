@@ -20,6 +20,7 @@ class GQLTypeIndicatorCategory(
     private val indicatorSource: GQLTypeIndicatorSource,
     private val indicatorTypeService: IndicatorTypeService,
     private val indicatorCategoryReportType: GQLTypeIndicatorCategoryReport,
+    private val indicatorReportingService: IndicatorReportingService,
     private val fieldContributors: List<GQLFieldContributor>
 ) : GQLType {
 
@@ -53,6 +54,7 @@ class GQLTypeIndicatorCategory(
             it.name("report")
                 .description("Reporting the indicators for the types in this category")
                 .type(GraphQLNonNull(indicatorCategoryReportType.typeRef))
+                .arguments(indicatorReportingService.arguments)
                 .argument {
                     it.name(GQLTypeIndicatorCategoryReport.ARG_FILLED_ONLY)
                         .description("Reports only projects where the indicator is filled in")
