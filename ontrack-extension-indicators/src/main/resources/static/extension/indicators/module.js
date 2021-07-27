@@ -116,6 +116,9 @@ angular.module('ontrack.extension.indicators', [
                     projectReport {
                         project {
                             name
+                            links {
+                                _page
+                            }
                         }
                         indicators {
                             type {
@@ -161,6 +164,9 @@ angular.module('ontrack.extension.indicators', [
 
                 if (!viewInitialized) {
                     view.title = `Indicator report for category ${$scope.category.name}`;
+                    view.commands = [
+                        ot.viewCloseCommand('/extension/indicators/categories')
+                    ];
                     viewInitialized = true;
                 }
 
