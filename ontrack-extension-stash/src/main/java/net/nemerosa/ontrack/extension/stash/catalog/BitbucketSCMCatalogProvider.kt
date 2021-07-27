@@ -43,6 +43,7 @@ class BitbucketSCMCatalogProvider(
                                     config = config.name,
                                     repository = "${repo.project}/${repo.repository}",
                                     repositoryPage = StashProjectConfigurationProperty(config, repo.project, repo.repository, 0, null).repositoryUrl,
+                                    createdAt = null, // Cannot find a REST API end point to get the creation date
                                     lastActivity = it
                             )
                         }

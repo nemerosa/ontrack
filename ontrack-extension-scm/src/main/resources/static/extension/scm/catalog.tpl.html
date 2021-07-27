@@ -62,7 +62,7 @@
                     </div>
                     <!-- After last activity filter -->
                     <div class="form-group">
-                        <label for="catalog-filter-after-last-activity">After</label>
+                        <label for="catalog-filter-after-last-activity">After last activity</label>
                         <input ng-model="queryVariables.afterLastActivity" id="catalog-filter-after-last-activity" type="text" class="form-control"
                                datepicker-popup="EEE dd MMM yyyy"
                                is-open="catalog-filter-before-last-activity-opened"
@@ -70,10 +70,26 @@
                     </div>
                     <!-- Before last activity filter -->
                     <div class="form-group">
-                        <label for="catalog-filter-before-last-activity">Before</label>
+                        <label for="catalog-filter-before-last-activity">Before last activity</label>
                         <input ng-model="queryVariables.beforeLastActivity" id="catalog-filter-before-last-activity" type="text" class="form-control"
                                datepicker-popup="EEE dd MMM yyyy"
                                is-open="catalog-filter-before-last-activity-opened"
+                        />
+                    </div>
+                    <!-- After creation date filter -->
+                    <div class="form-group">
+                        <label for="catalog-filter-after-creation-date">After creation date</label>
+                        <input ng-model="queryVariables.afterCreatedAt" id="catalog-filter-after-creation-date" type="text" class="form-control"
+                               datepicker-popup="EEE dd MMM yyyy"
+                               is-open="catalog-filter-before-creation-date-opened"
+                        />
+                    </div>
+                    <!-- Before creation date filter -->
+                    <div class="form-group">
+                        <label for="catalog-filter-before-creation-date">Before creation date</label>
+                        <input ng-model="queryVariables.beforeCreatedAt" id="catalog-filter-before-creation-date" type="text" class="form-control"
+                               datepicker-popup="EEE dd MMM yyyy"
+                               is-open="catalog-filter-before-creation-date-opened"
                         />
                     </div>
                     <!-- Team filter -->
@@ -137,6 +153,12 @@
                 <span class="fa fa-sort-desc" ng-if="catalogSortOn == 'LAST_ACTIVITY' && !catalogSortAscending"></span>
                 <span class="fa fa-sort text-muted" ng-if="catalogSortOn != 'LAST_ACTIVITY'"></span>
             </th>
+            <th ng-click="changeCatalogSorting('CREATED_AT')" class="ot-action">
+                Created at
+                <span class="fa fa-sort-asc" ng-if="catalogSortOn == 'CREATED_AT' && catalogSortAscending"></span>
+                <span class="fa fa-sort-desc" ng-if="catalogSortOn == 'CREATED_AT' && !catalogSortAscending"></span>
+                <span class="fa fa-sort text-muted" ng-if="catalogSortOn != 'CREATED_AT'"></span>
+            </th>
             <th>Team(s)</th>
             <th>Collection time</th>
         </tr>
@@ -154,6 +176,11 @@
             <td title="Last activity">
                 <span ng-if="item.entry.lastActivity">
                 {{item.entry.lastActivity | date:'mediumDate'}}
+                </span>
+            </td>
+            <td title="Created at">
+                <span ng-if="item.entry.createdAt">
+                {{item.entry.createdAt | date:'mediumDate'}}
                 </span>
             </td>
             <td>

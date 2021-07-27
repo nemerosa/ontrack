@@ -44,7 +44,8 @@ class MockSCMCatalogProvider : SCMCatalogProvider {
                 config = entry.config,
                 repository = entry.repository,
                 repositoryPage = entry.repositoryPage,
-                lastActivity = entry.lastActivity
+                lastActivity = entry.lastActivity,
+                createdAt = entry.createdAt
         )
     }
 

@@ -65,6 +65,7 @@ class GitHubSCMCatalogProvider(
                         repository = "${org.login}/${repo.name}",
                         repositoryPage = "${config.url}/${org.login}/${repo.name}",
                         lastActivity = repo.lastUpdate,
+                        createdAt = repo.createdAt,
                         teams = repositoryTeamIndex[repo.name]?.toList()
                     )
                 }

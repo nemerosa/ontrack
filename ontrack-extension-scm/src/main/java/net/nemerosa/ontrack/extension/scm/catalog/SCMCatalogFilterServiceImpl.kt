@@ -68,6 +68,12 @@ class SCMCatalogFilterServiceImpl(
         val entryAfterLastActivityFilter: (SCMCatalogEntry) -> Boolean = filter.afterLastActivity?.let {
             { entry: SCMCatalogEntry -> entry.lastActivity != null && entry.lastActivity.toLocalDate() >= it }
         } ?: { true }
+        val entryBeforeCreatedAtFilter: (SCMCatalogEntry) -> Boolean = filter.beforeCreatedAt?.let {
+            { entry: SCMCatalogEntry -> entry.createdAt != null && entry.createdAt.toLocalDate() <= it }
+        } ?: { true }
+        val entryAfterCreatedAtFilter: (SCMCatalogEntry) -> Boolean = filter.afterCreatedAt?.let {
+            { entry: SCMCatalogEntry -> entry.createdAt != null && entry.createdAt.toLocalDate() >= it }
+        } ?: { true }
 
         val entryTeamFilter: (SCMCatalogEntry) -> Boolean = { entry: SCMCatalogEntry ->
             when {
@@ -87,6 +93,8 @@ class SCMCatalogFilterServiceImpl(
                 entryLinkFilter and
                 entryBeforeLastActivityFilter and
                 entryAfterLastActivityFilter and
+                entryBeforeCreatedAtFilter and
+                entryAfterCreatedAtFilter and
                 entryTeamFilter
 
         val entries: () -> Sequence<SCMCatalogEntryOrProject> = {

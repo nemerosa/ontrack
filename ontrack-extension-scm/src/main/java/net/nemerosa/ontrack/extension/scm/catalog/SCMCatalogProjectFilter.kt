@@ -15,6 +15,8 @@ data class SCMCatalogProjectFilter(
         val link: SCMCatalogProjectFilterLink = SCMCatalogProjectFilterLink.ALL,
         val beforeLastActivity: LocalDate? = null,
         val afterLastActivity: LocalDate? = null,
+        val beforeCreatedAt: LocalDate? = null,
+        val afterCreatedAt: LocalDate? = null,
         val team: String? = null,
         val sortOn: SCMCatalogProjectFilterSort? = null,
         val sortAscending: Boolean = true
