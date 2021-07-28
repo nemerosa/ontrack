@@ -191,6 +191,93 @@ angular.module('ontrack.extension.indicators', [
         $scope.loadReport();
     })
     .config(function ($stateProvider) {
+        $stateProvider.state('indicator-type-report', {
+            url: '/extension/indicators/types/{id}/report',
+            templateUrl: 'extension/indicators/type-report.tpl.html',
+            controller: 'IndicatorTypeReportCtrl'
+        });
+    })
+    .controller('IndicatorTypeReportCtrl', function ($scope, $stateParams, $http, ot, otGraphqlService) {
+        $scope.loadingReport = false;
+        const typeId = $stateParams.id;
+
+        const view = ot.view();
+        view.title = "Indicator type report";
+
+        const query = `
+            query IndicatorTypeReport($id: String!, $filledOnly: Boolean!) {
+              indicatorTypes {
+                types(id: $id) {
+                  id
+                  name
+                  link
+                  indicators(filledOnly: $filledOnly) {
+                    project {
+                        name
+                        links {
+                            _page
+                        }
+                    }
+                    type {
+                        id
+                        valueType {
+                          id
+                          feature {
+                            id
+                          }
+                        }
+                    }
+                    value
+                    compliance
+                    rating
+                    comment
+                    annotatedComment
+                    signature {
+                      user
+                      time
+                    }
+                  }
+                }
+              }
+            }
+        `;
+
+        $scope.filter = {
+            filledOnly: true
+        };
+
+        let viewInitialized = false;
+
+        $scope.loadReport = () => {
+            $scope.loadingReport = true;
+            otGraphqlService.pageGraphQLCall(query, {
+                id: typeId,
+                filledOnly: $scope.filter.filledOnly
+            }).then((data) => {
+                $scope.type = data.indicatorTypes.types[0];
+
+                if (!viewInitialized) {
+                    view.title = `Indicator report for type ${$scope.type.name}`;
+                    view.commands = [
+                        {
+                            id: 'indicator-type-report-export',
+                            name: "CSV Export",
+                            cls: 'ot-command-download',
+                            absoluteLink: `extension/indicators/types/${typeId}/report/export?filledOnly=${$scope.filter.filledOnly}`
+                        },
+                        ot.viewCloseCommand('/extension/indicators/types')
+                    ];
+                    viewInitialized = true;
+                }
+
+            }).finally(() => {
+                $scope.loadingReport = false;
+            });
+        };
+
+        $scope.loadReport();
+    })
+    .config(function ($stateProvider) {
         $stateProvider.state('indicator-types', {
             url: '/extension/indicators/types',
             templateUrl: 'extension/indicators/types.tpl.html',

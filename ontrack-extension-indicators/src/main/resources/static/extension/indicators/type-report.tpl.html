@@ -24,23 +24,22 @@
         </div>
     </div>
 
-    <table class="table table-hover table-bordered" ng-if="report">
+    <table class="table table-hover table-bordered" ng-if="type">
         <thead>
         <tr>
             <th>Project</th>
-            <th ng-repeat="typeReport in report.typeReport">
-                <ot-extension-indicators-type-name type="typeReport.type"></ot-extension-indicators-type-name>
-                <a href="#/extension/indicators/types/{{ typeReport.type.id }}/report"><span class="fa fa-eye ot-command"></span></a>
+            <th>
+                <ot-extension-indicators-type-name type="type"></ot-extension-indicators-type-name>
             </th>
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="projectReport in report.projectReport">
+        <tr ng-repeat="indicator in type.indicators">
             <td>
-                <a href="{{ projectReport.project.links._page }}">{{ projectReport.project.name }}</a>
-                <a href="#/extension/indicators/project-indicators/{{projectReport.project.name}}"><span class="fa fa-eye ot-command" title="List of all indicators for this project"></span></a>
+                <a href="{{ indicator.project.links._page }}">{{ indicator.project.name }}</a>
+                <a href="#/extension/indicators/project-indicators/{{indicator.project.name}}"><span class="fa fa-eye ot-command" title="List of all indicators for this project"></span></a>
             </td>
-            <td ng-repeat="indicator in projectReport.indicators">
+            <td>
                 <ot-extension-indicators-status status="indicator" size="sm"></ot-extension-indicators-status>
                 <span ng-if="indicator.value">
                     <ot-include value="indicator.value" template="extension/{{indicator.type.valueType.feature.id}}/indicators/{{indicator.type.valueType.id}}.tpl.html"></ot-include>
