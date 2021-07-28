@@ -89,7 +89,7 @@ class JenkinsPipelineLibraryIndicatorComputerIT : AbstractGitTestSupport() {
                                     "Jenkins pipeline libraries"
                                 ),
                                 id = "pipeline-general",
-                                name = "pipeline-general",
+                                name = "Using the pipeline-general Jenkins pipeline library",
                                 link = null,
                                 valueType = valueType,
                                 valueConfig = JenkinsPipelineLibraryIndicatorValueTypeConfig(false, null),
@@ -127,7 +127,7 @@ class JenkinsPipelineLibraryIndicatorComputerIT : AbstractGitTestSupport() {
                                     "Jenkins pipeline libraries"
                                 ),
                                 id = "pipeline-general",
-                                name = "pipeline-general",
+                                name = "Using the pipeline-general Jenkins pipeline library",
                                 link = null,
                                 valueType = valueType,
                                 valueConfig = JenkinsPipelineLibraryIndicatorValueTypeConfig(false, null),
@@ -142,7 +142,7 @@ class JenkinsPipelineLibraryIndicatorComputerIT : AbstractGitTestSupport() {
                                     "Jenkins pipeline libraries"
                                 ),
                                 id = "pipeline-common",
-                                name = "pipeline-common",
+                                name = "Using the pipeline-common Jenkins pipeline library",
                                 link = null,
                                 valueType = valueType,
                                 valueConfig = JenkinsPipelineLibraryIndicatorValueTypeConfig(false, null),
