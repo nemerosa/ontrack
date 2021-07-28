@@ -9,6 +9,8 @@ apply<OntrackExtensionPlugin>()
 
 dependencies {
     api(project(":ontrack-extension-issues"))
+    api(project(":ontrack-extension-indicators"))
+
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.apache.commons:commons-lang3")
     implementation(project(":ontrack-repository-support"))

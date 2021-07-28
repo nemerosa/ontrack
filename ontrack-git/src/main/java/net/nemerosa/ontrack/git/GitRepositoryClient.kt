@@ -33,6 +33,11 @@ interface GitRepositoryClient {
     val branches: GitBranchesInfo
 
     /**
+     * Gets the default branch for this repository, if any.
+     */
+    val defaultBranch: String?
+
+    /**
      * Gets the list of branches for a given commit.
      *
      * @param commit Commit hash

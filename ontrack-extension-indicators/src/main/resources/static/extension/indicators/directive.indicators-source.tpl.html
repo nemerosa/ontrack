@@ -1,5 +1,5 @@
 <span ng-if="source">
-    {{source.provider.name}}: <i>{{source.name}}</i>
+    {{source.provider.name}}<span ng-if="source.name">: <i>{{source.name}}</i></span>
 </span>
 <span ng-if="!source">
     <i title="This item has been provisioned manually">Manual</i>
