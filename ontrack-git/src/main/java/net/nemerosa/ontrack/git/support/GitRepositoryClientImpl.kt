@@ -73,9 +73,7 @@ class GitRepositoryClientImpl(
             else -> GitSynchronisationStatus.NONE
         }
 
-    override
-
-    val branches: GitBranchesInfo
+    override val branches: GitBranchesInfo
         get() = if (!isClonedOrCloning) {
             GitBranchesInfo.empty()
         } else if (sync.tryLock()) {
@@ -105,6 +103,24 @@ class GitRepositoryClientImpl(
             }
         } else {
             GitBranchesInfo.empty()
+        }
+
+    override val defaultBranch: String?
+        get() = if (!isClonedOrCloning) {
+            null
+        } else if (sync.tryLock()) {
+            try {
+                val repo = git.repository
+                repo.branch
+            } catch (e: GitAPIException) {
+                throw GitRepositoryAPIException(repository.remote, e)
+            } catch (e: IOException) {
+                throw GitRepositoryIOException(repository.remote, e)
+            } finally {
+                sync.unlock()
+            }
+        } else {
+            null
         }
 
     override fun getBranchesForCommit(commit: String): List<String> {

@@ -28,7 +28,7 @@ fun <T> assertNotPresent(o: Optional<T>, message: String = "Optional is not pres
 }
 
 fun assertJsonNull(node: JsonNode?, message: String = "Node is expected to be null") {
-    assertTrue(node == null || node.isNull, message)
+    assertTrue(node == null || node.isNull || node.isMissingNode, message)
 }
 
 fun assertJsonNotNull(

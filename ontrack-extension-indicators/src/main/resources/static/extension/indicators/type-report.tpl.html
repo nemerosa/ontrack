@@ -1,0 +1,52 @@
+<ot-view>
+
+    <ot-extension-indicators-message></ot-extension-indicators-message>
+
+    <div class="row" ng-show="loadingReport">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading indicator report...
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-hide="loadingReport">
+        <div class="col-md-12">
+            <form class="form-inline">
+                <div class="checkbox">
+                    <label>
+                        <input id="filter-filled-only" ng-model="filter.filledOnly" type="checkbox" ng-change="loadReport()">
+                        Only projects with values
+                    </label>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <table class="table table-hover table-bordered" ng-if="type">
+        <thead>
+        <tr>
+            <th>Project</th>
+            <th>
+                <ot-extension-indicators-type-name type="type"></ot-extension-indicators-type-name>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="indicator in type.indicators">
+            <td>
+                <a href="{{ indicator.project.links._page }}">{{ indicator.project.name }}</a>
+                <a href="#/extension/indicators/project-indicators/{{indicator.project.name}}"><span class="fa fa-eye ot-command" title="List of all indicators for this project"></span></a>
+            </td>
+            <td>
+                <ot-extension-indicators-status status="indicator" size="sm"></ot-extension-indicators-status>
+                <span ng-if="indicator.value">
+                    <ot-include value="indicator.value" template="extension/{{indicator.type.valueType.feature.id}}/indicators/{{indicator.type.valueType.id}}.tpl.html"></ot-include>
+                </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</ot-view>

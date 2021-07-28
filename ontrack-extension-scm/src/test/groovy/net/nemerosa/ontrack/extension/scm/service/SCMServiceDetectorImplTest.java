@@ -35,7 +35,7 @@ public class SCMServiceDetectorImplTest {
         Branch branch = Branch.of(Project.of(NameDescription.nd("P", "")), NameDescription.nd("B", ""));
         SCMService service = mock(SCMService.class);
         SCMServiceProvider provider = mock(SCMServiceProvider.class);
-        when(provider.getScmService(branch)).thenReturn(Optional.of(service));
+        when(provider.getScmService(branch.getProject())).thenReturn(Optional.of(service));
         SCMServiceDetectorImpl detector = new SCMServiceDetectorImpl(Collections.singletonList(provider));
         Optional<SCMService> scmService = detector.getScmService(branch);
         assertNotNull(scmService);

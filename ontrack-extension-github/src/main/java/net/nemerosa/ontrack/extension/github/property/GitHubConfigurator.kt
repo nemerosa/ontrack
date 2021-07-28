@@ -35,8 +35,9 @@ class GitHubConfigurator(
             if (configuration is GitHubGitConfiguration) {
                 val client = ontrackGitHubClientFactory.create(configuration.property.configuration)
                 client.getPullRequest(
-                        configuration.property.repository,
-                        id
+                    repository = configuration.property.repository,
+                    id = id,
+                    ignoreError = true,
                 )
             } else {
                 null

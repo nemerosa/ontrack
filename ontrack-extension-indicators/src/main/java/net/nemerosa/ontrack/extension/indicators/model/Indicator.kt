@@ -15,6 +15,8 @@ data class Indicator<T>(
 ) {
     fun toClientJson(): JsonNode = value?.let { type.toClientJson(it) } ?: NullNode.instance
 
+    fun toClientString(): String = value?.let { type.toClientString(it)} ?: ""
+
     fun getUpdateForm(): Form = type.getUpdateForm(value)
             .with(
                     Memo.of("comment")

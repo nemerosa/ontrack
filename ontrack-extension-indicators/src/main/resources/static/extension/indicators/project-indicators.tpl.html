@@ -85,7 +85,7 @@
                 <a class="fa fa-history ot-command" title="History for this indicator" href="#/extension/indicators/project-indicators/{{project.id}}/{{indicator.type.id}}/history"></a>
                 <span ng-if="indicator.links._update" class="fa fa-pencil ot-command" title="Edit value" ng-click="editIndicator(indicator)"></span>
                 <span ng-if="indicator.links._delete" class="fa fa-trash ot-command" title="Remove value" ng-click="deleteIndicator(indicator)"></span>
-                <span ng-if="indicator.type.computed" class="text-muted" title="This indicator is computed and cannot be edited."><span class="fa fa-cog"></span>&nbsp;<i>Computed</i></span>
+                <span ng-if="indicator.type.computed" class="text-muted" title="This indicator is computed and cannot be edited."><span class="fa fa-cog"></span></span>
             </td>
             <td>
                 <ot-extension-indicators-status status="indicator" size="sm"></ot-extension-indicators-status>
