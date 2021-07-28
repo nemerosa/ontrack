@@ -50,9 +50,10 @@ interface OntrackGitHubClient {
      *
      * @param repository Repository name, like `nemerosa/ontrack`
      * @param id         ID of the pull request
+     * @param ignoreError If `true` in case of error, this method returns `null`
      * @return Details of the pull request or `null` if it does not exist
      */
-    fun getPullRequest(repository: String, id: Int): GitPullRequest?
+    fun getPullRequest(repository: String, id: Int, ignoreError: Boolean = false): GitPullRequest?
 
     /**
      * Gets the list of teams for this organization.

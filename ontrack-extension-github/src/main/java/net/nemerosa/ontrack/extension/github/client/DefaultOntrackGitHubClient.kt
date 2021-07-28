@@ -334,17 +334,16 @@ class DefaultOntrackGitHubClient(
         return client
     }
 
-    override fun getPullRequest(repository: String, id: Int): GitPullRequest? {
+    override fun getPullRequest(repository: String, id: Int, ignoreError: Boolean): GitPullRequest? {
         // Getting a client
         val client = createGitHubClient()
         // PR service using this client
         val service = PullRequestService(client)
         // Getting the PR
-        val pr: PullRequest
-        pr = try {
+        val pr: PullRequest = try {
             service.getPullRequest(RepositoryId.createFromId(repository), id)
         } catch (ex: RequestException) {
-            return if (ex.status == 404) {
+            return if (ex.status == 404 || ignoreError) {
                 null
             } else {
                 throw OntrackGitHubClientException(ex)
