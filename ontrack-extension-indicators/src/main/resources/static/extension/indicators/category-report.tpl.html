@@ -11,6 +11,22 @@
         </div>
     </div>
 
+    <div class="row" ng-hide="loadingReport">
+        <div class="col-md-12">
+            <form class="form-inline">
+                <div class="checkbox">
+                    <label>
+                        <input id="filter-filled-only" ng-model="filter.filledOnly" type="checkbox" ng-change="loadReport()">
+                        Only projects with values
+                    </label>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TODO Filter on projects having a value -->
+    <!-- TODO Link to type indicators report -->
+
     <table class="table table-hover table-bordered" ng-if="report">
         <thead>
         <tr>

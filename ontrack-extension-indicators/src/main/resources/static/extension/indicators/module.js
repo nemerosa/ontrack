@@ -107,12 +107,12 @@ angular.module('ontrack.extension.indicators', [
         view.title = "Indicator category report";
 
         const query = `
-            query IndicatorCategoryReport($id: String!) {
+            query IndicatorCategoryReport($id: String!, $filledOnly: Boolean!) {
               indicatorCategories {
                 categories(id: $id) {
                   id
                   name
-                  report {
+                  report(filledOnly: $filledOnly) {
                     projectReport {
                         project {
                             name
@@ -154,11 +154,18 @@ angular.module('ontrack.extension.indicators', [
             }
         `;
 
+        $scope.filter = {
+            filledOnly: true
+        };
+
         let viewInitialized = false;
 
-        const loadReport = () => {
+        $scope.loadReport = () => {
             $scope.loadingReport = true;
-            otGraphqlService.pageGraphQLCall(query, {id: categoryId}).then((data) => {
+            otGraphqlService.pageGraphQLCall(query, {
+                id: categoryId,
+                filledOnly: $scope.filter.filledOnly
+            }).then((data) => {
                 $scope.category = data.indicatorCategories.categories[0];
                 $scope.report = $scope.category.report;
 
@@ -175,7 +182,7 @@ angular.module('ontrack.extension.indicators', [
             });
         };
 
-        loadReport();
+        $scope.loadReport();
     })
     .config(function ($stateProvider) {
         $stateProvider.state('indicator-types', {
