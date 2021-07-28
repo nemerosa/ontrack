@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicatorService
 import net.nemerosa.ontrack.graphql.schema.*
 import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
+import net.nemerosa.ontrack.graphql.support.toTypeRef
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
@@ -33,6 +34,11 @@ class GQLTypeProjectIndicator(
     override fun createType(cache: GQLTypeCache): GraphQLObjectType = GraphQLObjectType.newObject()
             .name(typeName)
             .description("Project indicator")
+            .field {
+                it.name(ProjectIndicator::project.name)
+                    .description("Associated project")
+                    .type(Project::class.toTypeRef())
+            }
             .field {
                 it.name(ProjectIndicator::type.name)
                         .description("Type of indicator")

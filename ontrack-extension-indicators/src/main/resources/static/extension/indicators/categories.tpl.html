@@ -46,6 +46,9 @@
                 {{category.types.length}}
             </td>
             <td>
+                <a href="#/extension/indicators/categories/{{category.id}}/report"
+                   title="Report of all indicators for this category"
+                   ><span class="fa fa-eye ot-command"></span></a>
                 <a ng-if="category.links._update"
                    ng-click="editCategory(category)"
                    title="Edit this category"

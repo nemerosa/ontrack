@@ -30,6 +30,11 @@ data class IndicatorType<T, C>(
     fun toClientJson(value: T) = valueType.toClientJson(valueConfig, value)
     fun fromClientJson(value: JsonNode): T? = valueType.fromClientJson(valueConfig, value)
 
+    /**
+     * Gets a string representation for the value
+     */
+    fun toClientString(value: T): String = valueType.toClientString(valueConfig, value)
+
     fun fromStoredJson(value: JsonNode): T? = valueType.fromStoredJson(valueConfig, value)
     fun toStoredJson(value: T) = valueType.toStoredJson(valueConfig, value)
 
