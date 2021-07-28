@@ -7,17 +7,13 @@ import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategory
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorService
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorType
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
-import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicator
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.GQLTypeProject
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.nullableType
-import net.nemerosa.ontrack.model.labels.LabelManagementService
-import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
 import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 
 /**
@@ -27,11 +23,7 @@ import org.springframework.stereotype.Component
 class GQLTypeIndicatorCategoryReport(
     private val indicatorCategoryReportProject: GQLTypeIndicatorCategoryReportProject,
     private val indicatorCategoryReportType: GQLTypeIndicatorCategoryReportType,
-    private val indicatorReportingService: IndicatorReportingService,
-    private val structureService: StructureService,
-    private val labelManagementService: LabelManagementService,
-    private val projectLabelManagementService: ProjectLabelManagementService,
-    private val portfolioService: IndicatorPortfolioService,
+    private val indicatorReportingService: GQLIndicatorReportingService,
     private val indicatorTypeService: IndicatorTypeService,
     private val indicatorService: IndicatorService,
 ) : GQLType {

@@ -20,7 +20,7 @@ class GQLTypeIndicatorCategory(
     private val indicatorSource: GQLTypeIndicatorSource,
     private val indicatorTypeService: IndicatorTypeService,
     private val indicatorCategoryReportType: GQLTypeIndicatorCategoryReport,
-    private val indicatorReportingService: IndicatorReportingService,
+    private val indicatorReportingService: GQLIndicatorReportingService,
     private val fieldContributors: List<GQLFieldContributor>
 ) : GQLType {
 

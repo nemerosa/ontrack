@@ -5,7 +5,7 @@ import graphql.schema.GraphQLArgument
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorType
 import net.nemerosa.ontrack.model.structure.Project
 
-interface IndicatorReportingService {
+interface GQLIndicatorReportingService {
     val arguments: List<GraphQLArgument>
 
     fun findProjects(env: DataFetchingEnvironment, types: List<IndicatorType<*, *>>): List<Project>

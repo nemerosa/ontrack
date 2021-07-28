@@ -172,6 +172,12 @@ angular.module('ontrack.extension.indicators', [
                 if (!viewInitialized) {
                     view.title = `Indicator report for category ${$scope.category.name}`;
                     view.commands = [
+                        {
+                            id: 'indicator-category-report-export',
+                            name: "CSV Export",
+                            cls: 'ot-command-download',
+                            absoluteLink: `extension/indicators/categories/${categoryId}/report/export?filledOnly=${$scope.filter.filledOnly}`
+                        },
                         ot.viewCloseCommand('/extension/indicators/categories')
                     ];
                     viewInitialized = true;

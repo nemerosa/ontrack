@@ -18,6 +18,11 @@ interface IndicatorValueType<T, C> : Extension {
     fun toClientJson(config: C, value: T): JsonNode
     fun fromClientJson(config: C, value: JsonNode): T?
 
+    /**
+     * Gets a string representation for the value
+     */
+    fun toClientString(config: C, value: T): String = value.toString()
+
     fun fromStoredJson(valueConfig: C, value: JsonNode): T?
     fun toStoredJson(config: C, value: T): JsonNode
 

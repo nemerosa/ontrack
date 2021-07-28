@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component
 class GQLTypeProjectIndicatorType(
     private val indicatorTypeService: IndicatorTypeService,
     private val indicatorValueType: GQLTypeIndicatorValueType,
-    private val indicatorReportingService: IndicatorReportingService,
+    private val indicatorReportingService: GQLIndicatorReportingService,
     private val indicatorService: IndicatorService,
     private val indicatorSource: GQLTypeIndicatorSource,
     private val fieldContributors: List<GQLFieldContributor>
