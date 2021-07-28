@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.indicators.ui
 
-import com.opencsv.CSVWriter
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
 import net.nemerosa.ontrack.extension.indicators.model.*
@@ -16,7 +15,6 @@ import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
-import java.io.StringWriter
 import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
 
@@ -28,7 +26,7 @@ import javax.validation.Valid
 class IndicatorCategoryController(
     private val indicatorCategoryService: IndicatorCategoryService,
     private val indicatorTypeService: IndicatorTypeService,
-    private val indicatorReportingService: IndicatorReportingService,
+    private val indicatorExportService: IndicatorExportService,
     private val securityService: SecurityService
 ) : AbstractResourceController() {
 
@@ -99,38 +97,13 @@ class IndicatorCategoryController(
         val types = indicatorTypeService.findByCategory(category)
         // Filter on the projects
         val filter = IndicatorReportingFilter(filledOnly = filledOnly)
-        // Report
-        val report = indicatorReportingService.report(filter, types)
-        // Converts to CSV
-        val csv = export(report, types)
+        // Export
+        val csv = indicatorExportService.exportCSV(filter, types)
         // Attachment
         response.addHeader("Content-Disposition", "attachment; filename=ontrack-indicator-category-$id.csv")
         // Export as CSV
         return csv
     }
-
-    private fun export(report: IndicatorProjectReport, types: List<IndicatorType<*, *>>): Document {
-        // Output
-        val output = StringWriter()
-        val csvWriter = CSVWriter(output)
-        // Headers
-        val titles = listOf("project") + types.map { it.id }
-        csvWriter.writeNext(titles.toTypedArray())
-        // Lines
-        for (item in report.items) {
-            val row = mutableListOf<String>()
-            row += item.project.name
-            for (indicator in item.indicators) {
-                val representation = indicator.toClientString()
-                row += representation
-            }
-            csvWriter.writeNext(row.toTypedArray())
-        }
-        csvWriter.close()
-        // As document
-        return Document("text/plain", output.toString().toByteArray())
-    }
-
 
     private fun getCategoryForm(category: IndicatorCategory? = null): Form {
         return Form.create()
