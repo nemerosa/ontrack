@@ -415,46 +415,48 @@ class IndicatorStatsServiceIT : AbstractIndicatorsTestSupport() {
         project {
             labels = listOf(label)
             // Past
-            indicator(type11, null, pastTime)
-            indicator(type12, null, pastTime)
-            indicator(type21, false, pastTime)
-            indicator(type22, false, pastTime)
+            indicator(type11, null, pastTime) // null
+            indicator(type12, null, pastTime) // null
+            indicator(type21, false, pastTime) // 0
+            indicator(type22, false, pastTime) // 0
             // Current
-            indicator(type11, false, lastTime)
-            indicator(type12, false, lastTime)
-            indicator(type21, false, lastTime)
-            indicator(type22, true, lastTime)
+            indicator(type11, false, lastTime) // 0
+            indicator(type12, false, lastTime) // 0
+            indicator(type21, false, lastTime) // 0
+            indicator(type22, true, lastTime) // 100
         }
         project {
             labels = listOf(label)
             // Past
-            indicator(type11, false, pastTime)
-            indicator(type12, false, pastTime)
-            indicator(type21, false, pastTime)
-            indicator(type22, false, pastTime)
+            indicator(type11, false, pastTime) // 0
+            indicator(type12, false, pastTime) // 0
+            indicator(type21, false, pastTime) // 0
+            indicator(type22, false, pastTime) // 0
             // Current
-            indicator(type11, true, lastTime)
-            indicator(type12, true, lastTime)
-            indicator(type21, false, lastTime)
-            indicator(type22, true, lastTime)
+            indicator(type11, true, lastTime) // 100
+            indicator(type12, true, lastTime) // 100
+            indicator(type21, false, lastTime) // 0
+            indicator(type22, true, lastTime) // 100
         }
         project {
             labels = listOf(label)
             // Partial indicators only
             // Past
-            indicator(type11, true, pastTime)
-            indicator(type21, false, pastTime)
+            indicator(type11, true, pastTime) // 100
+            indicator(type21, false, pastTime) // 0
             // Current
-            indicator(type11, true, lastTime)
-            indicator(type21, false, lastTime)
+            indicator(type11, true, lastTime) // 100
+            indicator(type21, false, lastTime) // 0
         }
         // Gets the stats for this portfolio and period
-        val categoryStats = indicatorStatsService.getPortfolioViewStats(portfolio, indicatorView, duration)
+        val categoryStats = asAdmin {
+            indicatorStatsService.getPortfolioViewStats(portfolio, indicatorView, duration)
+        }
         assertEquals(2, categoryStats.size)
         // First category
         categoryStats[0].apply {
             assertEquals(category1, category)
-            assertEquals(60, stats.avg?.value)
+            assertEquals(60, stats.avg?.value) // ((0 + 0) + (100 + 100) + (100)) / 5
             assertNotNull(previousStats) {
                 assertEquals(33, it.stats.avg?.value)
                 assertEquals(IndicatorTrend.GROWTH, it.avgTrend)

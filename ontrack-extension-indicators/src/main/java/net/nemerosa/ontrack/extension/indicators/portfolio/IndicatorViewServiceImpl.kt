@@ -69,7 +69,7 @@ class IndicatorViewServiceImpl(
 
     override fun deleteIndicatorView(id: String): Ack {
         securityService.checkGlobalFunction(IndicatorViewManagement::class.java)
-        storageService.store(STORE_INDICATOR_VIEWS, id, null)
+        storageService.delete(STORE_INDICATOR_VIEWS, id)
         return Ack.OK
     }
 
