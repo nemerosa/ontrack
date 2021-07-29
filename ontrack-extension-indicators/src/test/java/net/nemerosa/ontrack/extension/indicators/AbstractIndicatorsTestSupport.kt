@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.indicators
 import net.nemerosa.ontrack.extension.indicators.model.*
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolio
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
+import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorViewService
 import net.nemerosa.ontrack.extension.indicators.portfolio.PortfolioUpdateForm
 import net.nemerosa.ontrack.extension.indicators.support.IntegerThresholds
 import net.nemerosa.ontrack.extension.indicators.support.Percentage
@@ -44,6 +45,9 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
     protected lateinit var indicatorPortfolioService: IndicatorPortfolioService
+
+    @Autowired
+    protected lateinit var indicatorViewService: IndicatorViewService
 
     protected fun clearIndicators() {
         asAdmin {

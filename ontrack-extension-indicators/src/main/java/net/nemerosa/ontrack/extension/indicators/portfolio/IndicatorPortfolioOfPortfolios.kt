@@ -1,10 +1,11 @@
 package net.nemerosa.ontrack.extension.indicators.portfolio
 
 /**
- * Aggregation of all portfolios
+ * Aggregation of all portfolios.
  *
  * @property categories List of indicator categories to show for all portfolios
  */
 class IndicatorPortfolioOfPortfolios(
+        @Deprecated("Use indicator view instead. Will be removed in V4.")
         val categories: List<String>
 )

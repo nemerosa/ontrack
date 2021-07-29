@@ -93,6 +93,161 @@ angular.module('ontrack.extension.indicators', [
 
     })
     .config(function ($stateProvider) {
+        $stateProvider.state('indicator-views', {
+            url: '/extension/indicators/views',
+            templateUrl: 'extension/indicators/views.tpl.html',
+            controller: 'IndicatorViewsCtrl'
+        });
+    })
+    .controller('IndicatorViewsCtrl', function ($scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
+        $scope.loadingViews = false;
+
+        const view = ot.view();
+        view.title = "Indicator views";
+
+        const queryViews = `
+            {
+              indicatorViewList {
+                views {
+                  id
+                  name
+                  categories {
+                    id
+                  }
+                  links {
+                    _update
+                    _delete
+                  }
+                }
+                links {
+                  _create
+                }
+              }
+            }
+        `;
+
+        const queryCategories = `
+            {
+              indicatorCategories {
+                categories {
+                  id
+                  name
+                  deprecated
+                  types {
+                    id
+                    name
+                    deprecated
+                  }
+                }
+                links {
+                  _create
+                }
+              }
+            }
+        `;
+
+        const loadViews = () => {
+            $scope.loadingViews = true;
+            return otGraphqlService.pageGraphQLCall(queryViews).then(data => {
+                $scope.views = data.indicatorViewList;
+                $scope.currentView = undefined;
+            }).finally(() => {
+                $scope.loadingViews = false;
+            });
+        };
+
+        const loadAll = () => {
+            $scope.loadingAll = true;
+            otGraphqlService.pageGraphQLCall(queryCategories).then(data => {
+                $scope.categories = data.indicatorCategories.categories;
+                return loadViews();
+            }).finally(() => {
+                $scope.loadingAll = false;
+            });
+        };
+
+        loadAll();
+
+        $scope.createView = () => {
+            let viewId = '';
+            otFormService.create($scope.views.links._create, "New indicator view").then((data) => {
+                viewId = data.data.id;
+                return loadViews();
+            }).then(() => {
+                const view = $scope.views.views.find(item => item.id === viewId);
+                $scope.selectView(view);
+            });
+        };
+
+        const selectCategories = (view) => {
+            $scope.categories.forEach(category => {
+                category.selected = view && view.categories.some(it => it.id === category.id);
+            });
+        };
+
+        $scope.selectView = (view) => {
+            $scope.currentView = view;
+            selectCategories(view);
+        };
+
+        $scope.deleteView = (view) => {
+            otAlertService.confirm({
+                title: "Delete view",
+                message: `Do you want to delete the "${view.name}" view?`
+            }).then(() => {
+                return ot.pageCall($http.delete(view.links._delete));
+            }).then(() => {
+                $scope.selectView(undefined);
+                loadViews();
+            });
+        };
+
+        $scope.updateViewName = (view) => {
+            if (view.links._update) {
+                const formConfig = {
+                    uri: view.links._update,
+                    title: "Updating view name",
+                    submit: function (data) {
+                        return ot.pageCall($http.put(view.links._update, {
+                            name: data.name,
+                            categories: $scope.categories.filter(category => category.selected).map(category => category.id)
+                        }));
+                    }
+                };
+                otFormService.display(formConfig).then(data => {
+                    view.name = data.data.name;
+                    $scope.selectView(view);
+                });
+            }
+        };
+
+        $scope.updateCategories = () => {
+            if ($scope.currentView && $scope.currentView.links._update) {
+                $scope.updatingCategories = true;
+                const categoryIds = $scope.categories.filter(category => category.selected).map(category => category.id);
+                ot.pageCall($http.put($scope.currentView.links._update, {
+                    name: $scope.currentView.name,
+                    categories: categoryIds
+                })).finally(() => {
+                    $scope.currentView.categories = categoryIds.map(id => {
+                        return {id: id};
+                    });
+                    selectCategories($scope.currentView);
+                    $scope.updatingCategories = false;
+                });
+            }
+        };
+
+        $scope.unfold = (category) => {
+            category.unfolded = true;
+        };
+
+        $scope.fold = (category) => {
+            category.unfolded = false;
+        };
+
+    })
+    .config(function ($stateProvider) {
         $stateProvider.state('indicator-category-report', {
             url: '/extension/indicators/categories/{id}/report',
             templateUrl: 'extension/indicators/category-report.tpl.html',
@@ -689,7 +844,16 @@ angular.module('ontrack.extension.indicators', [
         view.breadcrumbs = ot.homeBreadcrumbs();
 
         const query = `
-            query LoadPortfolioOfPortfolios($trendDuration: Int) {
+            query LoadPortfolioOfPortfolios($viewId: String, $trendDuration: Int) {
+              indicatorViewList {
+                links {
+                  _create
+                }
+                views {
+                  id
+                  name
+                }
+              }
               indicatorPortfolioOfPortfolios {
                 links {
                   _create
@@ -705,7 +869,7 @@ angular.module('ontrack.extension.indicators', [
                     color
                     description
                   }
-                  globalStats(duration: $trendDuration) {
+                  viewStats(id: $viewId, duration: $trendDuration) {
                     category {
                       id
                       name
@@ -742,8 +906,11 @@ angular.module('ontrack.extension.indicators', [
         `;
 
         const queryVariables = {
-            trendDuration: undefined
+            trendDuration: undefined,
+            viewId: null
         };
+
+        queryVariables.viewId = localStorage.getItem('portfoliosView');
 
         $scope.pageModel = {
             trendDuration: undefined
@@ -756,6 +923,9 @@ angular.module('ontrack.extension.indicators', [
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.portfolioOfPortolios = data.indicatorPortfolioOfPortfolios;
                 $scope.portfolios = data.indicatorPortfolioOfPortfolios.portfolios;
+                $scope.indicatorViewList = data.indicatorViewList;
+
+                $scope.currentView = $scope.indicatorViewList.views.find(view => view.id === queryVariables.viewId);
 
                 if (!viewInitialized) {
                     view.commands = [
@@ -765,13 +935,6 @@ angular.module('ontrack.extension.indicators', [
                             name: "Create a portfolio",
                             cls: 'ot-command-new',
                             action: $scope.createPortfolio
-                        },
-                        {
-                            condition: () => $scope.portfolioOfPortolios.links._globalIndicators,
-                            id: 'portfolio-global-indicators',
-                            name: "Global indicators",
-                            cls: "ot-command-update",
-                            link: "/extension/indicators/portfolios/global-indicators"
                         },
                         ot.viewCloseCommand('/home')
                     ];
@@ -808,6 +971,18 @@ angular.module('ontrack.extension.indicators', [
             }
         });
 
+        $scope.selectView = (view) => {
+            $scope.currentView = view;
+            if (view) {
+                queryVariables.viewId = view.id;
+                localStorage.setItem('portfoliosView', view.id);
+            } else {
+                queryVariables.viewId = null;
+                localStorage.removeItem('portfoliosView');
+            }
+            loadPortfolios();
+        };
+
     })
     .config(function ($stateProvider) {
         $stateProvider.state('portfolio-global-indicators', {
@@ -816,6 +991,7 @@ angular.module('ontrack.extension.indicators', [
             controller: 'PortfolioGlobalIndicatorsCtrl'
         });
     })
+    // TODO V4 Remove this view
     .controller('PortfolioGlobalIndicatorsCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService) {
         $scope.loadingPortfolioGlobalIndicators = true;
 
