@@ -12,20 +12,20 @@ interface IndicatorStatsService {
     /**
      * Gets global stats for a portfolio
      */
-    @Deprecated("Use indicator views")
+    @Deprecated("Use indicator views. This method will be removed in V5.")
     fun getGlobalStats(portfolio: IndicatorPortfolio, previous: Duration? = null): List<IndicatorCategoryStats>
 
     /**
      * Gets the portfolio stats for a given indicator view.
      *
      * @param portfolio Portfolio to get starts about
-     * @param indicatorView View used to collect stats
+     * @param indicatorView View used to collect stats (if null, the default view associated with the portfolio will be used)
      * @param previous Optional duration to compute a trend
      * @return List of stats for this portfolio and view, with optional trend indicator
      */
     fun getPortfolioViewStats(
         portfolio: IndicatorPortfolio,
-        indicatorView: IndicatorView,
+        indicatorView: IndicatorView?,
         previous: Duration? = null
     ): List<IndicatorCategoryStats>
 

@@ -70,6 +70,7 @@ class GQLTypeIndicatorPortfolio(
                         it.name("categoryStats")
                                 .description("Stats per category")
                                 .type(stdList(indicatorCategoryStats.typeRef))
+                                .deprecate("Use viewStats with viewId = null. This field will be removed in V5.")
                                 .durationArgument()
                                 .dataFetcher { env ->
                                     val duration = env.getDurationArgument()
@@ -82,7 +83,7 @@ class GQLTypeIndicatorPortfolio(
                     .field {
                         it.name("globalStats")
                                 .description("Global indicator stats")
-                                .deprecate("Use indicator views. This field will be removed in V4.")
+                                .deprecate("Use indicator views. This field will be removed in V5.")
                                 .type(stdList(indicatorCategoryStats.typeRef))
                                 .durationArgument()
                                 .dataFetcher { env ->
@@ -98,7 +99,7 @@ class GQLTypeIndicatorPortfolio(
                             .durationArgument()
                             .argument { arg ->
                                 arg.name("id")
-                                    .description("ID of the indicator view")
+                                    .description("ID of the indicator view, set to null to use the portfolio default configuration")
                                     .type(GraphQLString)
                             }
                             .type(GraphQLList(GraphQLNonNull(indicatorCategoryStats.typeRef)))
@@ -109,9 +110,7 @@ class GQLTypeIndicatorPortfolio(
                                 val view = id?.run {
                                     indicatorViewService.findIndicatorViewById(this)
                                 }
-                                view?.run {
-                                    indicatorStatsService.getPortfolioViewStats(portfolio, this, duration)
-                                }
+                                indicatorStatsService.getPortfolioViewStats(portfolio, view, duration)
                             }
                     }
                     // Links

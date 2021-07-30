@@ -53,12 +53,46 @@
         </div>
     </div>
 
-    <table ng-if="portfolio && portfolio.projects.length > 0 && portfolio.categoryStats.length > 0"
+    <table ng-if="portfolio && portfolio.projects.length > 0 && portfolio.viewStats.length > 0"
            ng-show="activeTab == 'portfolio'" class="table table-striped">
         <thead>
         <tr>
             <td>
                 <form class="form-inline">
+                    <div class="form-group">
+                        <label for="view-selection"><span class="fa fa-filter"></span> View</label>
+                        <div class="btn-group">
+                            <button id="view-selection" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            <span ng-if="currentView">
+                                <span class="fa fa-check"></span>
+                                {{ currentView.name }}
+                            </span>
+                            <span ng-if="!currentView">
+                                <span class="fa fa-check"></span>
+                                Portfolio view
+                            </span>
+                            <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a>
+                                        <span class="fa fa-check" ng-if="!currentView"></span>
+                                        <span ng-click="selectView()" class="ot-action">Portfolio view</span>
+                                    </a>
+                                </li>
+                                <li ng-repeat="view in indicatorViewList.views">
+                                    <a>
+                                        <!-- View selection -->
+                                        <span class="fa fa-check" ng-if="currentView && currentView.id == view.id"></span>
+                                        <!-- View name -->
+                                        <span ng-click="selectView(view)" class="ot-action">
+                                            {{ view.name }}
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <!--suppress XmlInvalidId -->
                         <label for="trend-selection"><span class="fa fa-line-chart"></span> Trend period</label>
@@ -69,7 +103,7 @@
                     </div>
                 </form>
             </td>
-            <td ng-repeat-start="categoryStats in portfolio.categoryStats" style="width: 36px;">
+            <td ng-repeat-start="categoryStats in portfolio.viewStats" style="width: 36px;">
                 <ot-extension-indicators-status status="categoryStats" size="md"></ot-extension-indicators-status>
             </td>
             <td ng-repeat-end>

@@ -1450,10 +1450,11 @@ angular.module('ontrack.extension.indicators', [
         view.breadcrumbs = ot.homeBreadcrumbs();
 
         const query = `
-            query LoadPortfolio($id: String!, $duration: Int) {
-              indicatorPortfolioOfPortfolios {
-                categories {
+            query LoadPortfolio($id: String!, $viewId: String, $duration: Int) {
+              indicatorViewList {
+                views {
                   id
+                  name
                 }
               }
               indicatorPortfolios(id: $id) {
@@ -1463,7 +1464,7 @@ angular.module('ontrack.extension.indicators', [
                   _update
                   _delete
                 }
-                categoryStats(duration: $duration) {
+                viewStats(id: $viewId, duration: $duration) {
                   category {
                     id
                     name
@@ -1526,7 +1527,8 @@ angular.module('ontrack.extension.indicators', [
 
         const queryVariables = {
             id: portfolioId,
-            duration: undefined
+            viewId: null,
+            duration: null
         };
 
         // Same than in view.home.js for the project favourites
@@ -1546,7 +1548,6 @@ angular.module('ontrack.extension.indicators', [
                         branches(useModel: true) {
                           id
                           name
-                          type
                           disabled
                           decorations {
                             ...decorationContent
@@ -1597,6 +1598,10 @@ angular.module('ontrack.extension.indicators', [
             $scope.loadingPortfolioProjects = true;
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.portfolio = data.indicatorPortfolios[0];
+                $scope.indicatorViewList = data.indicatorViewList;
+
+                $scope.currentView = $scope.indicatorViewList.views.find(view => view.id === queryVariables.viewId);
+
                 view.title = `Portfolio: ${$scope.portfolio.name}`;
 
                 view.commands = [
@@ -1617,10 +1622,10 @@ angular.module('ontrack.extension.indicators', [
                     ot.viewCloseCommand('/extension/indicators/portfolios')
                 ];
 
-                // Filtering projecct categories out
+                // Filtering project categories out
                 $scope.portfolio.projects.forEach((project) => {
                     project.projectIndicators.categories.forEach((projectCategory) => {
-                        let portfolioCategory = $scope.portfolio.categoryStats.find((stats) => stats.category.id === projectCategory.categoryStats.category.id);
+                        let portfolioCategory = $scope.portfolio.viewStats.find((stats) => stats.category.id === projectCategory.categoryStats.category.id);
                         projectCategory.enabled = !!portfolioCategory;
                         if (projectCategory.categoryStats.stats.avg === undefined) {
                             projectCategory.stats = {
@@ -1638,7 +1643,7 @@ angular.module('ontrack.extension.indicators', [
                 });
 
                 // Filling portfolio stats when not available
-                $scope.portfolio.categoryStats.forEach((categoryStats) => {
+                $scope.portfolio.viewStats.forEach((categoryStats) => {
                     if (categoryStats.stats.avg === undefined) {
                         categoryStats.compliance = 0;
                         categoryStats.rating = '-';
@@ -1679,6 +1684,18 @@ angular.module('ontrack.extension.indicators', [
                 queryVariables.duration = Number($scope.pageModel.duration);
             } else {
                 queryVariables.duration = undefined;
+            }
+            loadPortfolio();
+        };
+
+        $scope.selectView = (view) => {
+            $scope.currentView = view;
+            if (view) {
+                queryVariables.viewId = view.id;
+                localStorage.setItem('portfoliosView', view.id);
+            } else {
+                queryVariables.viewId = null;
+                localStorage.removeItem('portfoliosView');
             }
             loadPortfolio();
         };
