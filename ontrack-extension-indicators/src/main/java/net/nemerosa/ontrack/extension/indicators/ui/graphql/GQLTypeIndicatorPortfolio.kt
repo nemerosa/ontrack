@@ -107,8 +107,13 @@ class GQLTypeIndicatorPortfolio(
                                 val portfolio: IndicatorPortfolio = env.getSource()
                                 val duration = env.getDurationArgument()
                                 val id: String? = env.getArgument<String?>("id")?.takeIf { it.isNotBlank() }
-                                val view = id?.run {
-                                    indicatorViewService.findIndicatorViewById(this)
+                                val view = if (id != null) {
+                                    indicatorViewService.findIndicatorViewById(id)
+                                        // Not returning any stat if no view
+                                        ?: return@dataFetcher null
+                                } else {
+                                    // The portfolio categories will be used
+                                    null
                                 }
                                 indicatorStatsService.getPortfolioViewStats(portfolio, view, duration)
                             }

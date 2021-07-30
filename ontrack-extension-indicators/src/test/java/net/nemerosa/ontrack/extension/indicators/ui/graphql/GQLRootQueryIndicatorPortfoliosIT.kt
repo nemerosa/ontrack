@@ -135,7 +135,7 @@ class GQLRootQueryIndicatorPortfoliosIT : AbstractIndicatorsTestSupport() {
     }
 
     @Test
-    fun `Getting portfolio stats without a view`() {
+    fun `Getting portfolio stats without a view returns the categories of the portfolio`() {
         clearPortfolios()
 
         val category = category()
@@ -148,7 +148,8 @@ class GQLRootQueryIndicatorPortfoliosIT : AbstractIndicatorsTestSupport() {
         }
 
         val portfolio = portfolio(
-            label = label
+            label = label,
+            categories = listOf(category)
         )
 
         asAdmin {
@@ -178,7 +179,20 @@ class GQLRootQueryIndicatorPortfoliosIT : AbstractIndicatorsTestSupport() {
                             mapOf(
                                 "id" to portfolio.id,
                                 "name" to portfolio.name,
-                                "viewStats" to null                            )
+                                "viewStats" to listOf(
+                                    mapOf(
+                                        "category" to mapOf(
+                                            "id" to category.id
+                                        ),
+                                        "stats" to mapOf(
+                                            "count" to 1,
+                                            "avg" to 0,
+                                            "avgRating" to "F"
+                                        )
+                                    )
+                                )
+
+                            )
                         )
                     ).asJson(),
                     data
@@ -231,7 +245,8 @@ class GQLRootQueryIndicatorPortfoliosIT : AbstractIndicatorsTestSupport() {
                             mapOf(
                                 "id" to portfolio.id,
                                 "name" to portfolio.name,
-                                "viewStats" to null                            )
+                                "viewStats" to null
+                            )
                         )
                     ).asJson(),
                     data
