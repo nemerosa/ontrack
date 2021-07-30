@@ -24,6 +24,7 @@ class IndicatorRoleContributor : RoleContributor {
         /**
          * Indicator portfolio at global level
          */
+        @Deprecated("Use indicator views. This role will be removed in V4.")
         const val GLOBAL_INDICATOR_PORTFOLIO_MANAGER = "GLOBAL_INDICATOR_PORTFOLIO_MANAGER"
     }
 
@@ -59,14 +60,16 @@ class IndicatorRoleContributor : RoleContributor {
                 IndicatorPortfolioIndicatorManagement::class.java,
                 IndicatorPortfolioManagement::class.java,
                 IndicatorPortfolioAccess::class.java,
-                IndicatorTypeManagement::class.java
+                IndicatorTypeManagement::class.java,
+                IndicatorViewManagement::class.java
         ))
 
         map[GLOBAL_INDICATOR_MANAGER] = mutableListOf(
                 IndicatorPortfolioIndicatorManagement::class.java,
                 IndicatorPortfolioManagement::class.java,
                 IndicatorPortfolioAccess::class.java,
-                IndicatorTypeManagement::class.java
+                IndicatorTypeManagement::class.java,
+                IndicatorViewManagement::class.java
         )
 
         map[GLOBAL_INDICATOR_PORTFOLIO_MANAGER] = mutableListOf(

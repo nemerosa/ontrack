@@ -46,11 +46,13 @@ interface IndicatorPortfolioService {
     /**
      * Gets the portfolio of portfolios
      */
+    @Deprecated("Use IndicatorView(s) instead")
     fun getPortfolioOfPortfolios(): IndicatorPortfolioOfPortfolios
 
     /**
      * Saves the portfolio of portfolios
      */
+    @Deprecated("Use IndicatorView(s) instead")
     fun savePortfolioOfPortfolios(input: PortfolioGlobalIndicators): IndicatorPortfolioOfPortfolios
 
     /**

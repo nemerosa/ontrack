@@ -27,6 +27,39 @@
         <div class="col-md-12">
             <form class="form-inline">
                 <div class="form-group">
+                    <label for="view-selection"><span class="fa fa-filter"></span> View</label>
+                    <div class="btn-group">
+                        <button id="view-selection" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            <span ng-if="currentView">
+                                <span class="fa fa-check"></span>
+                                {{ currentView.name }}
+                            </span>
+                            <span ng-if="!currentView" class="ot-description">Select a view</span>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li ng-repeat="view in indicatorViewList.views">
+                                <a>
+                                    <!-- View selection -->
+                                    <span class="fa fa-check" ng-if="currentView && currentView.id == view.id"></span>
+                                    <!-- View name -->
+                                    <span ng-click="selectView(view)" class="ot-action">
+                                        {{ view.name }}
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="divider" ng-if="indicatorViewList.links._create"></li>
+                            <li ng-if="indicatorViewList.links._create">
+                                <a href="/#/extension/indicators/views">
+                                    <span class="fa fa-filter"></span>
+                                    Management of views
+                                    <span class="fa fa-external-link" title="Goes to the management page for the indicator views."></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="form-group">
                     <!--suppress XmlInvalidId -->
                     <label for="trend-selection"><span class="fa fa-line-chart"></span> Trend period</label>
                     <ot-extension-indicators-trend-selection
@@ -58,8 +91,15 @@
             </h4>
         </div>
         <div class="col-md-12">
-            <div class="row">
-                <div class="col-md-2" ng-repeat="categoryStats in portfolio.globalStats">
+            <div class="row" ng-if="!portfolio.viewStats || portfolio.viewStats.length == 0">
+                <div class="col-md-12">
+                    <div class="alert alert-warning">
+                        No indicator view is selected or the selected indicator view does not have any category.
+                    </div>
+                </div>
+            </div>
+            <div class="row" ng-if="portfolio.viewStats && portfolio.viewStats.length > 0">
+                <div class="col-md-2" ng-repeat="categoryStats in portfolio.viewStats">
                     <div class="row">
                         <div class="col-md-3">
                             <span ng-if="categoryStats.stats.count == 0" title="Not enough data.">

@@ -1,10 +1,14 @@
 package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
+import graphql.Scalars.GraphQLString
+import graphql.schema.GraphQLList
+import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategoryService
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolio
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
+import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorViewService
 import net.nemerosa.ontrack.extension.indicators.stats.IndicatorStatsService
 import net.nemerosa.ontrack.graphql.schema.*
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
@@ -19,6 +23,7 @@ class GQLTypeIndicatorPortfolio(
         private val indicatorCategoryService: IndicatorCategoryService,
         private val indicatorCategoryStats: GQLTypeIndicatorCategoryStats,
         private val indicatorStatsService: IndicatorStatsService,
+        private val indicatorViewService: IndicatorViewService,
         private val fieldContributors: List<GQLFieldContributor>
 ) : GQLType {
 
@@ -65,6 +70,7 @@ class GQLTypeIndicatorPortfolio(
                         it.name("categoryStats")
                                 .description("Stats per category")
                                 .type(stdList(indicatorCategoryStats.typeRef))
+                                .deprecate("Use viewStats with viewId = null. This field will be removed in V5.")
                                 .durationArgument()
                                 .dataFetcher { env ->
                                     val duration = env.getDurationArgument()
@@ -72,10 +78,12 @@ class GQLTypeIndicatorPortfolio(
                                     indicatorStatsService.getStatsPortfolio(portfolio, duration)
                                 }
                     }
+                    // TODO V5 Removal
                     // Stats
                     .field {
                         it.name("globalStats")
                                 .description("Global indicator stats")
+                                .deprecate("Use indicator views. This field will be removed in V5.")
                                 .type(stdList(indicatorCategoryStats.typeRef))
                                 .durationArgument()
                                 .dataFetcher { env ->
@@ -83,6 +91,32 @@ class GQLTypeIndicatorPortfolio(
                                     val portfolio: IndicatorPortfolio = env.getSource()
                                     indicatorStatsService.getGlobalStats(portfolio, duration)
                                 }
+                    }
+                    // Stats for a view
+                    .field {
+                        it.name("viewStats")
+                            .description("Indicators stats for a given view for this portfolio")
+                            .durationArgument()
+                            .argument { arg ->
+                                arg.name("id")
+                                    .description("ID of the indicator view, set to null to use the portfolio default configuration")
+                                    .type(GraphQLString)
+                            }
+                            .type(GraphQLList(GraphQLNonNull(indicatorCategoryStats.typeRef)))
+                            .dataFetcher { env ->
+                                val portfolio: IndicatorPortfolio = env.getSource()
+                                val duration = env.getDurationArgument()
+                                val id: String? = env.getArgument<String?>("id")?.takeIf { it.isNotBlank() }
+                                val view = if (id != null) {
+                                    indicatorViewService.findIndicatorViewById(id)
+                                        // Not returning any stat if no view
+                                        ?: return@dataFetcher null
+                                } else {
+                                    // The portfolio categories will be used
+                                    null
+                                }
+                                indicatorStatsService.getPortfolioViewStats(portfolio, view, duration)
+                            }
                     }
                     // Links
                     .fields(IndicatorPortfolio::class.java.graphQLFieldContributions(fieldContributors))

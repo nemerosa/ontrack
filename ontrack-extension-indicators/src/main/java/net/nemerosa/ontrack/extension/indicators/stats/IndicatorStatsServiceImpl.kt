@@ -4,19 +4,24 @@ import net.nemerosa.ontrack.extension.indicators.model.*
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorCategoryStats
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolio
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
+import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorView
 import net.nemerosa.ontrack.model.structure.Project
 import org.springframework.stereotype.Service
 import java.time.Duration
 
 @Service
 class IndicatorStatsServiceImpl(
-        private val indicatorPortfolioService: IndicatorPortfolioService,
-        private val indicatorCategoryService: IndicatorCategoryService,
-        private val indicatorTypeService: IndicatorTypeService,
-        private val indicatorService: IndicatorService
+    private val indicatorPortfolioService: IndicatorPortfolioService,
+    private val indicatorCategoryService: IndicatorCategoryService,
+    private val indicatorTypeService: IndicatorTypeService,
+    private val indicatorService: IndicatorService
 ) : IndicatorStatsService {
 
-    override fun getStatsForCategoryAndProject(category: IndicatorCategory, project: Project, previous: Duration?): IndicatorCategoryStats {
+    override fun getStatsForCategoryAndProject(
+        category: IndicatorCategory,
+        project: Project,
+        previous: Duration?
+    ): IndicatorCategoryStats {
         return indicatorCategoryStats(category, listOf(project), previous)
     }
 
@@ -46,7 +51,32 @@ class IndicatorStatsServiceImpl(
         }
     }
 
-    private fun indicatorCategoryStats(category: IndicatorCategory, projects: List<Project>, previous: Duration?): IndicatorCategoryStats {
+    override fun getPortfolioViewStats(
+        portfolio: IndicatorPortfolio,
+        indicatorView: IndicatorView?,
+        previous: Duration?
+    ): List<IndicatorCategoryStats> {
+        // Gets the view categories
+        val categories = indicatorView
+            ?.categories?.mapNotNull {
+                indicatorCategoryService.findCategoryById(it)
+            }
+            ?: portfolio.categories.mapNotNull { categoryId ->
+                indicatorCategoryService.findCategoryById(categoryId)
+            }
+        // Gets the projects for this portfolio
+        val projects = indicatorPortfolioService.getPortfolioProjects(portfolio)
+        // For each category in the view
+        return categories.map { category ->
+            indicatorCategoryStats(category, projects, previous)
+        }
+    }
+
+    private fun indicatorCategoryStats(
+        category: IndicatorCategory,
+        projects: List<Project>,
+        previous: Duration?
+    ): IndicatorCategoryStats {
         // Gets all types for this category
         val types = indicatorTypeService.findByCategory(category)
         // Gets all the indicators for all projects and types
@@ -57,13 +87,17 @@ class IndicatorStatsServiceImpl(
         }
         // Computation
         return IndicatorCategoryStats(
-                category = category,
-                stats = currentStats,
-                previousStats = previousStats
+            category = category,
+            stats = currentStats,
+            previousStats = previousStats
         )
     }
 
-    private fun getStats(types: List<IndicatorType<*, *>>, projects: List<Project>, previous: Duration?): IndicatorStats {
+    private fun getStats(
+        types: List<IndicatorType<*, *>>,
+        projects: List<Project>,
+        previous: Duration?
+    ): IndicatorStats {
         val compliances = types.flatMap { type ->
             projects.map { project ->
                 indicatorService.getProjectIndicator(project, type, previous).compliance
@@ -72,7 +106,12 @@ class IndicatorStatsServiceImpl(
         return IndicatorStats.compute(compliances)
     }
 
-    private fun getPreviousStats(types: List<IndicatorType<*, *>>, projects: List<Project>, currentStats: IndicatorStats, previous: Duration): IndicatorPreviousStats {
+    private fun getPreviousStats(
+        types: List<IndicatorType<*, *>>,
+        projects: List<Project>,
+        currentStats: IndicatorStats,
+        previous: Duration
+    ): IndicatorPreviousStats {
         // Previous stats
         val previousStats = getStats(types, projects, previous)
         // Trend computation
@@ -81,11 +120,11 @@ class IndicatorStatsServiceImpl(
         val maxTrend = trendBetween(previousStats.max, currentStats.max)
         // Finally...
         return IndicatorPreviousStats(
-                previousStats,
-                previous,
-                minTrend,
-                avgTrend,
-                maxTrend
+            previousStats,
+            previous,
+            minTrend,
+            avgTrend,
+            maxTrend
         )
     }
 }

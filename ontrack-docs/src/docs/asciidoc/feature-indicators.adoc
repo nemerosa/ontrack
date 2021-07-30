@@ -29,6 +29,8 @@ However, managing indicators, types & portfolios is granted according to the fol
 
 | Type and category management (1) | Yes | Yes | No | No | No |
 
+| <<feature-indicators-view,View management>> | Yes | Yes | No | No | No |
+
 | Portfolio management | Yes | Yes | Yes | No | No |
 
 | Indicator edition (2) | Yes | Yes | No | Yes | Yes |
@@ -154,7 +156,7 @@ image::images/extension-indicators-project-portfolios.png[Project portfolios,300
 
 Portfolios are available in the _Indicator portfolios_ user menu and the associated page displays the list of already created portfolios.
 
-Each portfolio is associated with a list of selected _global categories_ and each of those categories is associated with the average rating for all the projects and all the types of this category.
+In this list, each portfolio is associated with the list of categories for the current <<feature-indicators-view,view>> and each of these categories is associated with the average rating for all the projects and all the types of this category.
 
 image::images/extension-indicators-portfolio-overview.png[Portfolio overview]
 
@@ -163,19 +165,6 @@ NOTE: Only indicators having an actual value are used to compute the average rat
 NOTE: The minimum ratings are also mentioned if they diverge from the average.
 
 The trend period allows to display the average value from the past, and to compare it with the current value.
-
-[[feature-indicators-portfolios-global-indicators]]
-===== Global indicators
-
-<<feature-indicators-acl,Authorized users>> can edit the list of categories which are displayed on the portfolio overview by clicking on the _Global indicators_ command:
-
-image::images/extension-indicators-global-indicators-command.png[Global indicators command,300]
-
-On the associated page, the user can select / unselect the categories which must be displayed for _all portfolios_:
-
-image::images/extension-indicators-global-indicators-page.png[Global indicators,300]
-
-Closing this page goes back to the portfolio overview.
 
 [[feature-indicators-portfolios-management]]
 ===== Management of portfolios
@@ -196,14 +185,14 @@ The portfolio creation dialog requires:
 
 image::images/extension-indicators-portfolio-create-dialog.png[Create portfolio dialog,400]
 
-Once created, the portfolio appears on the portfolio overview and can edited or deleted using the appropriate icons:
+Once created, the portfolio appears on the portfolio overview and can be edited or deleted using the appropriate icons:
 
 image::images/extension-indicators-portfolio-commands.png[Portfolio commands]
 
-* the portfolio name is actually a link going tothe detailed <<feature-indicators-portfolios-view,portfolio view>>
-* the arrow icon goes to the home page and displays only the projectsassociated to this portfolio
+* the portfolio name is actually a link going to the detailed <<feature-indicators-portfolios-view,portfolio view>>
+* the arrow icon goes to the home page and displays only the projects associated to this portfolio
 * the edition icon goes to the <<feature-indicators-portfolios-edition,portfolio edition page>>
-* the deletion icon displays a warning and allows the user to delete theportfolio.
+* the deletion icon displays a warning and allows the user to delete the portfolio.
 
 NOTE: The deletion of a portfolio _does not_ delete any indicator in any project.
 
@@ -219,6 +208,8 @@ By clicking on the portfolio name in the portfolio overview, you get to a page d
 image::images/extension-indicators-portfolio-view.png[Portfolio view]
 
 NOTE: As for the portfolio overview, the average rating is computed only using the indicators which are actually set, and the ratio filled vs. total is displayed.
+
+NOTE: You can also select a <<feature-indicators-view,view>> to change the selected categories.
 
 The trend period selector allows you to check the past average values and the associated trends.
 
@@ -251,6 +242,23 @@ The label allows a portfolio to be associated to all projects which have this la
 ====
 <<feature-indicators-acl,"Global indicator portfolio managers">> and<<feature-indicators-acl,"Global indicator managers">> can associate existing labels to projects but cannot create new labels.
 ====
+
+[[feature-indicators-view]]
+==== Indicator views
+
+Indicator views group categories together under a common name. These views can be used in the following pages to restrict the categories which are shown:
+
+* overview of all portfolios
+* portfolio page
+* project indicators
+
+The list of views can be <<feature-indicators-acl,edited>> by administrators and global indicator managers, using the _Indicator views_ item in the user menu.
+
+In the view management page, the user can:
+
+* create new views
+* edit the list of categories for an existing view
+* delete existing views
 
 [[feature-indicators-import]]
 ==== Importing categories and types
