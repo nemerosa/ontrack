@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 /**
  * Migration of the global indicators into a 'Migrated' indicator view.
  */
-@Deprecated("Used for the transition period in V4. This class will be removed in V4.")
+@Deprecated("Used for the transition period in V4. This class will be removed in V5.")
 @Component
 class PortfolioGlobalIndicatorsMigration(
     private val indicatorPortfolioService: IndicatorPortfolioService,

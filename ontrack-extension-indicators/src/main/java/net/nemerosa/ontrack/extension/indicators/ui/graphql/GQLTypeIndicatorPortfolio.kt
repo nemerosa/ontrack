@@ -78,7 +78,7 @@ class GQLTypeIndicatorPortfolio(
                                     indicatorStatsService.getStatsPortfolio(portfolio, duration)
                                 }
                     }
-                    // TODO V4 Removal
+                    // TODO V5 Removal
                     // Stats
                     .field {
                         it.name("globalStats")

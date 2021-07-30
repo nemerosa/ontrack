@@ -19,7 +19,7 @@ class IndicatorPortfolioOfPortfoliosResourceDecorator :
             on(IndicatorPortfolioController::class.java).getPortfolioCreationForm()
         } linkIfGlobal IndicatorPortfolioManagement::class,
 
-        // TODO V4 Remove this link
+        // TODO V5 Remove this link
         "_globalIndicators" linkTo { _: IndicatorPortfolioOfPortfolios ->
             on(IndicatorPortfolioController::class.java).updatePortfolioGlobalIndicators(
                 PortfolioGlobalIndicators(
