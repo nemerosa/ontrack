@@ -567,6 +567,15 @@ angular.module('ontrack.extension.indicators', [
 
         const query = `
             query Indicators($project: Int!) {
+              indicatorViewList {
+                views {
+                  id
+                  name
+                  categories {
+                    id
+                  }
+                }
+              }
               projects(id: $project) {
                 id
                 name
@@ -640,13 +649,16 @@ angular.module('ontrack.extension.indicators', [
         let viewInitialized = false;
 
         $scope.filtering = {
-            showAllCategories: false
+            showAllCategories: false,
+            useView: false,
+            view: null
         };
 
         const loadIndicators = () => {
             $scope.loadingIndicators = true;
             otGraphqlService.pageGraphQLCall(query, queryVars).then((data) => {
 
+                $scope.indicatorViewList = data.indicatorViewList;
                 $scope.project = data.projects[0];
                 $scope.portfolios = $scope.project.indicatorPortfolios;
                 $scope.projectIndicators = $scope.project.projectIndicators;
@@ -691,7 +703,9 @@ angular.module('ontrack.extension.indicators', [
         loadIndicators();
 
         $scope.isCategoryIndicatorsSelected = (categoryIndicators) =>
-            $scope.filtering.showAllCategories || categoryIndicators.portfolios.some((portfolio) => portfolio.selected);
+            $scope.filtering.showAllCategories ||
+                categoryIndicators.portfolios.some((portfolio) => portfolio.selected) ||
+                ($scope.filtering.useView && $scope.filtering.view && $scope.filtering.view.categories.some((viewCategory) => viewCategory.id === categoryIndicators.category.id));
 
         $scope.editIndicator = (indicator) => {
             otExtensionIndicatorsService.editIndicator(indicator).then(loadIndicators);

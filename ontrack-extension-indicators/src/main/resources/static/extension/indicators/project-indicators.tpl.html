@@ -42,6 +42,17 @@
                     <span>Show all categories</span>
                     <span class="fa fa-info-circle" title="Shows all categories, independently of the portfolios."></span>
                 </label>
+                <label>
+                    <input id="view-selection" type="checkbox" ng-model="filtering.useView"/>
+                    <span>Use view</span>
+                    <span class="fa fa-info-circle" title="Use a view to show the categories."></span>
+                </label>
+                <label>
+                    <select id="views"
+                       ng-disabled="!filtering.useView"
+                       ng-model="filtering.view"
+                       ng-options="view as view.name for view in indicatorViewList.views"></select>
+                </label>
             </td>
         </tr>
         </thead>
