@@ -103,10 +103,10 @@
                     </div>
                 </form>
             </td>
-            <td ng-repeat-start="categoryStats in portfolio.viewStats" style="width: 36px;">
+            <td ng-repeat-start="categoryStats in portfolio.viewStats" style="width: 36px;" class="info">
                 <ot-extension-indicators-status status="categoryStats" size="md"></ot-extension-indicators-status>
             </td>
-            <td ng-repeat-end>
+            <td ng-repeat-end class="info">
                 <p><b><a
                         href="#/extension/indicators/portfolios/{{portfolio.id}}/category/{{categoryStats.category.id}}">{{categoryStats.category.name}}</a></b>
                     <ot-extension-indicators-deprecation-icon deprecated="categoryStats.category.deprecated"></ot-extension-indicators-deprecation-icon>
