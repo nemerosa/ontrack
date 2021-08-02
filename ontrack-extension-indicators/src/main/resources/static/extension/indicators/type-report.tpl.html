@@ -37,7 +37,7 @@
         <tr ng-repeat="indicator in type.indicators">
             <td>
                 <a href="{{ indicator.project.links._page }}">{{ indicator.project.name }}</a>
-                <a href="#/extension/indicators/project-indicators/{{indicator.project.name}}"><span class="fa fa-eye ot-command" title="List of all indicators for this project"></span></a>
+                <a href="#/extension/indicators/project-indicators/{{indicator.project.id}}"><span class="fa fa-eye ot-command" title="List of all indicators for this project"></span></a>
             </td>
             <td>
                 <ot-extension-indicators-status status="indicator" size="sm"></ot-extension-indicators-status>

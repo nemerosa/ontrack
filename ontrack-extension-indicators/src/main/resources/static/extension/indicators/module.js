@@ -270,6 +270,7 @@ angular.module('ontrack.extension.indicators', [
                   report(filledOnly: $filledOnly) {
                     projectReport {
                         project {
+                            id
                             name
                             links {
                                 _page
@@ -368,6 +369,7 @@ angular.module('ontrack.extension.indicators', [
                   link
                   indicators(filledOnly: $filledOnly) {
                     project {
+                        id
                         name
                         links {
                             _page
