@@ -339,9 +339,9 @@ class IndicatorComputingIT : AbstractIndicatorsTestSupport() {
         }
 
         fun <T : Any> assertIndicatorValueIs(
-                project: Project,
-                computerType: IndicatorComputedType<T, *>,
-                expectedValue: T?
+            project: Project,
+            computerType: IndicatorComputedType<T, *>,
+            expectedValue: T?
         ) {
             @Suppress("UNCHECKED_CAST")
             val type = indicatorTypeService.getTypeById(computerType.id) as IndicatorType<T, *>

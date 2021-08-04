@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.extension.jenkins.indicator
 
+import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputedCategory
+import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputedType
+import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputedValue
 import net.nemerosa.ontrack.extension.indicators.model.*
 import net.nemerosa.ontrack.extension.jenkins.JenkinsExtensionFeature
 import net.nemerosa.ontrack.extension.scm.indicator.AbstractSCMIndicatorComputer

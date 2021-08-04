@@ -3,8 +3,6 @@ package net.nemerosa.ontrack.extension.indicators.computing
 import com.nhaarman.mockitokotlin2.*
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorComputer
-import net.nemerosa.ontrack.extension.indicators.model.id
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd

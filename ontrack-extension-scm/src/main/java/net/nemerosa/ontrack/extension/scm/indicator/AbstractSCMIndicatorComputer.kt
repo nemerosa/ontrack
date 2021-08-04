@@ -1,13 +1,12 @@
 package net.nemerosa.ontrack.extension.scm.indicator
 
 import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorComputedValue
+import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputedValue
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorComputer
 import net.nemerosa.ontrack.extension.scm.service.SCMService
 import net.nemerosa.ontrack.extension.scm.service.SCMServiceDetector
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.extension.ExtensionFeature
-import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
 
 /**

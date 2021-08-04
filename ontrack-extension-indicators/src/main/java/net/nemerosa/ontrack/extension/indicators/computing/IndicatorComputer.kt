@@ -1,5 +1,6 @@
-package net.nemerosa.ontrack.extension.indicators.model
+package net.nemerosa.ontrack.extension.indicators.computing
 
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorSource
 import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.model.extension.Extension
 import net.nemerosa.ontrack.model.structure.Project
@@ -56,31 +57,3 @@ interface IndicatorComputer : Extension {
  */
 val IndicatorComputer.id: String get() = this::class.java.name
 
-/**
- * Category provided by an [IndicatorComputer].
- */
-data class IndicatorComputedCategory(
-        val id: String,
-        val name: String
-)
-
-/**
- * Type provided by an [IndicatorComputer].
- */
-data class IndicatorComputedType<T, C>(
-        val category: IndicatorComputedCategory,
-        val id: String,
-        val name: String,
-        val link: String?,
-        val valueType: IndicatorValueType<T, C>,
-        val valueConfig: C
-)
-
-/**
- * Value provided by an [IndicatorComputer] for a given [type] and project.
- */
-data class IndicatorComputedValue<T, C>(
-        val type: IndicatorComputedType<T, C>,
-        val value: T?,
-        val comment: String?
-)

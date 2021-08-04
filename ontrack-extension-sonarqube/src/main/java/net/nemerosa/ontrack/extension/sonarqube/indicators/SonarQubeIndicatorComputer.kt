@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.sonarqube.indicators
 
 import net.nemerosa.ontrack.extension.indicators.computing.AbstractBranchIndicatorComputer
+import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputedCategory
+import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputedType
+import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputedValue
 import net.nemerosa.ontrack.extension.indicators.model.*
 import net.nemerosa.ontrack.extension.indicators.support.IntegerThresholds
 import net.nemerosa.ontrack.extension.indicators.support.PercentageThreshold
@@ -101,8 +104,8 @@ class SonarQubeIndicatorComputer(
     }
 
     class SonarQubeIndicatorType<T>(
-            val measure: String,
-            val type: IndicatorComputedType<T, *>,
-            val toValueConverter: (Double) -> T
+        val measure: String,
+        val type: IndicatorComputedType<T, *>,
+        val toValueConverter: (Double) -> T
     )
 }
