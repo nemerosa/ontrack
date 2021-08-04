@@ -50,6 +50,11 @@ interface IndicatorComputer : Extension {
      */
     fun isProjectEligible(project: Project): Boolean
 
+    /**
+     * List of configurable indicators for this computer.
+     */
+    val configurableIndicators: List<ConfigurableIndicatorType> get() = emptyList()
+
 }
 
 /**
