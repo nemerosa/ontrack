@@ -53,7 +53,7 @@ interface IndicatorComputer : Extension {
     /**
      * List of configurable indicators for this computer.
      */
-    val configurableIndicators: List<ConfigurableIndicatorType> get() = emptyList()
+    val configurableIndicators: List<ConfigurableIndicatorType<*,*>> get() = emptyList()
 
 }
 

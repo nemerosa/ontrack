@@ -75,4 +75,21 @@ interface OntrackGitHubClient {
      * @return List of repositories with their permissions or null if the permissions cannot be accessed.
      */
     fun getTeamRepositories(login: String, teamSlug: String): List<GitHubTeamRepository>?
+
+    /**
+     * Returns the default branch for a repository.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @return Name of the branch (like `main`) or null if not found
+     */
+    fun getDefaultBranch(repository: String): String?
+
+    /**
+     * Returns the description for a repository.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @return Description or null if not found
+     */
+    fun getRepositoryDescription(repository: String): String?
+
 }

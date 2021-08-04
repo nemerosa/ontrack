@@ -90,6 +90,12 @@ class DefaultOntrackGitHubClient(
             )
         } ?: throw GitHubNoGraphQLResponseException("Getting repositories for organization $organization")
 
+    private fun getRepositoryParts(repository: String): Pair<String, String> {
+        val login = repository.substringBefore("/")
+        val name = repository.substringAfter("/")
+        return login to name
+    }
+
     override fun getIssue(repository: String, id: Int): GitHubIssue? {
         // Logging
         logger.debug("[github] Getting issue {}/{}", repository, id)
@@ -98,8 +104,7 @@ class DefaultOntrackGitHubClient(
         // Issue service using this client
         val service = IssueService(client)
         // Gets the repository for this project
-        val owner = repository.substringBefore("/")
-        val name = repository.substringAfter("/")
+        val (owner, name) = getRepositoryParts(repository)
         val issue: Issue = try {
             service.getIssue(owner, name, id)
         } catch (ex: RequestException) {
@@ -242,16 +247,16 @@ class DefaultOntrackGitHubClient(
         return results
     }
 
-    private fun graphQL(
+    private fun <T> graphQL(
         message: String,
         query: String,
         variables: Map<String, *> = emptyMap<String, Any>(),
-        code: (data: JsonNode) -> Unit
-    ) {
+        code: (data: JsonNode) -> T
+    ): T {
         // Getting a client
         val client = createGitHubRestTemplate()
         // GraphQL call
-        client(message) {
+        return client(message) {
             val response = postForObject(
                 "/graphql",
                 mapOf(
@@ -361,6 +366,55 @@ class DefaultOntrackGitHubClient(
             status = pr.state,
             url = pr.htmlUrl
         )
+    }
+
+    override fun getDefaultBranch(repository: String): String? {
+        val (login, name) = getRepositoryParts(repository)
+        return graphQL(
+            message = "Get default branch for $repository",
+            query = """
+                query DefaultBranch(${'$'}login: String!, ${'$'}name: String!) {
+                  organization(login: ${'$'}login) {
+                    repository(name: ${'$'}name) {
+                      defaultBranchRef {
+                        name
+                      }
+                    }
+                  }
+                }
+            """,
+            variables = mapOf("login" to login, "name" to name)
+        ) { data ->
+            data.path("organization")
+                .path("repository")
+                .path("defaultBranchRef")
+                .path("name")
+                .asText()
+                ?.takeIf { it.isNotBlank() }
+        }
+    }
+
+    override fun getRepositoryDescription(repository: String): String? {
+        val (login, name) = getRepositoryParts(repository)
+        return graphQL(
+            message = "Get description for $repository",
+            query = """
+                query Description(${'$'}login: String!, ${'$'}name: String!) {
+                  organization(login: ${'$'}login) {
+                    repository(name: ${'$'}name) {
+                        description
+                    }
+                  }
+                }
+            """,
+            variables = mapOf("login" to login, "name" to name)
+        ) { data ->
+            data.path("organization")
+                .path("repository")
+                .path("description")
+                .asText()
+                ?.takeIf { it.isNotBlank() }
+        }
     }
 
     private fun toDateTime(date: Date?): LocalDateTime? = Time.from(date, null)

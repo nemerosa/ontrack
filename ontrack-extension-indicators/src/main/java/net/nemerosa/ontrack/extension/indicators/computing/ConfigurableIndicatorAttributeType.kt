@@ -12,6 +12,11 @@ enum class ConfigurableIndicatorAttributeType(
     /**
      * Integer type
      */
-    INT(displayName = "Integer")
+    INT(displayName = "Integer"),
+
+    /**
+     * Regular expression type
+     */
+    REGEX(displayName = "Regular expression"),
 
 }
