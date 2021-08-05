@@ -9,4 +9,12 @@ interface ConfigurableIndicatorService {
      * @return State for this configurable state or null if none has been stored
      */
     fun getConfigurableIndicatorState(type: ConfigurableIndicatorType<*, *>): ConfigurableIndicatorState?
+
+    /**
+     * Saves the state for a given configurable indicator type
+     *
+     * @param type Type to save the state for
+     * @param state State to save (null to remove)
+     */
+    fun saveConfigurableIndicator(type: ConfigurableIndicatorType<*, *>, state: ConfigurableIndicatorState?)
 }

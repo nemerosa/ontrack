@@ -17,4 +17,17 @@ class ConfigurableIndicatorState(
      */
     fun getAttribute(key: String): String? =
         values.find { it.attribute.key == key }?.value
+
+    companion object {
+        fun toAttributeList(
+            type: ConfigurableIndicatorType<*, *>,
+            values: Map<String, String?>
+        ): List<ConfigurableIndicatorAttributeValue> =
+            type.attributes.map { attribute ->
+                ConfigurableIndicatorAttributeValue(
+                    attribute = attribute,
+                    value = values[attribute.key]
+                )
+            }
+    }
 }

@@ -1,8 +1,6 @@
-package net.nemerosa.ontrack.extension.github.indicators
+package net.nemerosa.ontrack.extension.github.indicators.compliance
 
 import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
-import net.nemerosa.ontrack.extension.github.indicators.compliance.GitHubComplianceCheck
-import net.nemerosa.ontrack.extension.github.indicators.compliance.toConfigurableIndicatorType
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.indicators.computing.AbstractConfigurableIndicatorComputer
 import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicatorService

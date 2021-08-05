@@ -24,7 +24,7 @@ class RepositoryDefaultBranchShouldBeMain(
 ) {
 
     override val category: IndicatorComputedCategory = GitHubComplianceCategories.settings
-    override val id: String = "github-compliance-repository-default-branch-should-be-main"
+    override val id: String = ID
     override val name: String = "A repository default branch SHOULD be main"
     override val attributes: List<ConfigurableIndicatorAttribute> = emptyList()
 
@@ -38,5 +38,9 @@ class RepositoryDefaultBranchShouldBeMain(
     ): Boolean? {
         val defaultBranch = client.getDefaultBranch(config.repository)
         return defaultBranch?.let { it == "main" }
+    }
+
+    companion object {
+        const val ID = "github-compliance-repository-default-branch-should-be-main"
     }
 }
