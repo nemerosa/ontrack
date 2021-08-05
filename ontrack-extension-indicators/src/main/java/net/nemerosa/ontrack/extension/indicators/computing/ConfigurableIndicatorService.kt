@@ -22,4 +22,9 @@ interface ConfigurableIndicatorService {
      * List of all configurable indicators and their states.
      */
     fun getConfigurableIndicatorStates(): List<ConfigurableIndicatorTypeState<*,*>>
+
+    /**
+     * Gets a configurable indicator using its ID
+     */
+    fun getConfigurableIndicatorType(id: String): ConfigurableIndicatorType<*, *>
 }

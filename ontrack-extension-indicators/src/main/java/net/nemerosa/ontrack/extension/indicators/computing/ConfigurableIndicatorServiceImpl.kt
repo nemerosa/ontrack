@@ -13,6 +13,12 @@ class ConfigurableIndicatorServiceImpl(
     private val extensionManager: ExtensionManager,
 ) : ConfigurableIndicatorService {
 
+    override fun getConfigurableIndicatorType(id: String): ConfigurableIndicatorType<*, *> =
+        extensionManager.getExtensions(IndicatorComputer::class.java)
+            .flatMap { it.configurableIndicators }
+            .find { it.id == id }
+            ?: throw ConfigurableIndicatorTypeIdNotFoundException(id)
+
     override fun getConfigurableIndicatorStates(): List<ConfigurableIndicatorTypeState<*, *>> {
         // Gets the list of all indicators from all the computers
         val indicators = extensionManager.getExtensions(IndicatorComputer::class.java)

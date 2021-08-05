@@ -3,8 +3,10 @@ package net.nemerosa.ontrack.extension.indicators.ui.graphql
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicatorTypeState
+import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
+import net.nemerosa.ontrack.graphql.schema.graphQLFieldContributions
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.toNotNull
 import org.springframework.stereotype.Component
@@ -17,6 +19,7 @@ class GQLTypeConfigurableIndicatorTypeState(
     private val gqlIndicatorComputedCategory: GQLTypeIndicatorComputedCategory,
     private val gqlConfigurableIndicatorAttribute: GQLTypeConfigurableIndicatorAttribute,
     private val gqlConfigurableIndicatorState: GQLTypeConfigurableIndicatorState,
+    private val fieldContributors: List<GQLFieldContributor>,
 ) : GQLType {
 
     override fun getTypeName(): String = ConfigurableIndicatorTypeState::class.java.simpleName
@@ -71,6 +74,8 @@ class GQLTypeConfigurableIndicatorTypeState(
                     .description("Saved stated for this configurable indicator")
                     .type(gqlConfigurableIndicatorState.typeRef)
             }
+            // Links
+            .fields(ConfigurableIndicatorTypeState::class.java.graphQLFieldContributions(fieldContributors))
             // OK
             .build()
 }
