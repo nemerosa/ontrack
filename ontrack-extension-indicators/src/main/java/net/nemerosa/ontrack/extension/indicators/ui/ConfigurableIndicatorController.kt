@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicator
 import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicatorService
 import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicatorState
 import net.nemerosa.ontrack.graphql.support.getDescription
+import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Int
 import net.nemerosa.ontrack.model.form.Text
@@ -44,6 +45,7 @@ class ConfigurableIndicatorController(
                 Text.of(ConfigurableIndicatorState::link.name)
                     .label("Link")
                     .help(getDescription(ConfigurableIndicatorState::link))
+                    .optional()
                     .value(configurableIndicatorState?.link)
             )
         // Fields for the attributes
@@ -70,12 +72,12 @@ class ConfigurableIndicatorController(
      *
      * @param id ID of the configurable indicator
      */
-    @PostMapping("{id}/edit")
+    @PutMapping("{id}/edit")
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun save(@PathVariable id: String, @RequestBody data: JsonNode) {
         // Gets the basic data
         val enabled = data.path(ConfigurableIndicatorState::enabled.name).asBoolean()
-        val link = data.path(ConfigurableIndicatorState::link.name).asText().takeIf { it.isNotBlank() }
+        val link = data.getTextField(ConfigurableIndicatorState::link.name)?.takeIf { it.isNotBlank() }
         // Extracts the attributes into a map
         val values = mutableMapOf<String, String?>()
         val configurableIndicatorType = configurableIndicatorService.getConfigurableIndicatorType(id)

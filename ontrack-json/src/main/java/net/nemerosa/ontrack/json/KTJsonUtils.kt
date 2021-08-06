@@ -102,7 +102,7 @@ fun JsonNode?.isNullOrNullNode() = this == null || this.isNull
  * Gets a string field
  */
 fun JsonNode.getTextField(field: String): String? = if (has(field)) {
-    get(field).asText()
+    get(field).takeIf { !it.isNull }?.asText()
 } else {
     null
 }
