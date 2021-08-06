@@ -39,6 +39,12 @@ class GitHubComplianceIndicatorsIT : AbstractGitHubTestSupport() {
     private lateinit var repositoryMustHaveMaintainingTeam: RepositoryMustHaveMaintainingTeam
 
     @Autowired
+    private lateinit var repositoryMustNotHaveAnyAdmin: RepositoryMustNotHaveAnyAdmin
+
+    @Autowired
+    private lateinit var repositoryMustHaveAReadme: RepositoryMustHaveAReadme
+
+    @Autowired
     private lateinit var scmCatalog: SCMCatalog
 
     @Autowired
@@ -66,6 +72,8 @@ class GitHubComplianceIndicatorsIT : AbstractGitHubTestSupport() {
         repositoryMustHaveDescription.save(enabled = true)
         repositoryMustHaveMaintainingTeam.save(enabled = true)
         repositoryTeamMustHaveDescription.save(enabled = true)
+        repositoryMustNotHaveAnyAdmin.save(enabled = true)
+        repositoryMustHaveAReadme.save(enabled = true)
         withSettings(GitHubSCMCatalogSettings::class) {
             try {
                 // Project setup
@@ -92,11 +100,15 @@ class GitHubComplianceIndicatorsIT : AbstractGitHubTestSupport() {
                     assertEquals(false, values[RepositoryMustHaveMaintainingTeam.ID])
                     assertEquals(false, values[RepositoryTeamMustHaveDescription.ID])
                     assertEquals(true, values[RepositoryMustHaveDescription.ID])
+                    assertEquals(false, values[RepositoryMustNotHaveAnyAdmin.ID])
+                    assertEquals(true, values[RepositoryMustHaveAReadme.ID])
                     // Checks some compliance
                     assertEquals(50, compliances[RepositoryDefaultBranchShouldBeMain.ID])
                     assertEquals(0, compliances[RepositoryMustHaveMaintainingTeam.ID])
                     assertEquals(0, compliances[RepositoryTeamMustHaveDescription.ID])
                     assertEquals(100, compliances[RepositoryMustHaveDescription.ID])
+                    assertEquals(0, compliances[RepositoryMustNotHaveAnyAdmin.ID])
+                    assertEquals(100, compliances[RepositoryMustHaveAReadme.ID])
                 }
             } finally {
                 listOf(
@@ -104,6 +116,8 @@ class GitHubComplianceIndicatorsIT : AbstractGitHubTestSupport() {
                     repositoryMustHaveDescription,
                     repositoryMustHaveMaintainingTeam,
                     repositoryTeamMustHaveDescription,
+                    repositoryMustNotHaveAnyAdmin,
+                    repositoryMustHaveAReadme,
                 ).forEach { it.delete() }
             }
         }
