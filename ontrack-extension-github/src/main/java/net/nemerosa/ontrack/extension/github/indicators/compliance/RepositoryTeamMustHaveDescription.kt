@@ -63,7 +63,7 @@ class RepositoryTeamMustHaveDescription(
         val regex = regexExpression.toRegex()
         // Matching the regular expression against all the descriptions
         return descriptions.all { description ->
-            description != null && regex.matches(description)
+            description != null && regex.containsMatchIn(description)
         }
     }
 }
