@@ -33,6 +33,4 @@ public class CustomConfidentialStore extends AbstractConfidentialStore {
 }
 ----
 
-Note the use of the `ConditionalOnProperty`, which allows to select
-this store when the `ontrack.config.key-store`
-<<configuration-properties,property>> is set to `custom`.
+Note the use of the `ConditionalOnProperty`, which allows to select this store when the `ontrack.config.key-store`<<configuration-properties,property>> is set to `custom`.
