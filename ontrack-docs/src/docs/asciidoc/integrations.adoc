@@ -17,6 +17,6 @@ include::integration-metrics.adoc[]
 
 // TODO include::integration-graphql.adoc[]
 
-// TODO include::integration-encryption.adoc[]
+include::integration-encryption.adoc[]
 
 // TODO include::integration-run-info.adoc[]

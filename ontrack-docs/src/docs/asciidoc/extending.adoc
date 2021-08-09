@@ -1,5 +1,5 @@
 [[extending]]
-=== Extending Ontrack
+== Extending Ontrack
 
 Ontrack allows extensions to contribute to the application, and actually, most
 of the core features, like <<changelogs, Git change logs>>,
@@ -15,7 +15,7 @@ versions. In particular, the extension mechanism does not provide classpath
 isolation between the "plugins".
 
 [[extending-preparing]]
-==== Preparing an extension
+=== Preparing an extension
 
 In order to create an extension, you have to create a Java project.
 
@@ -63,7 +63,7 @@ of your extension
 (see later)
 
 [[extending-id]]
-==== Extension ID
+=== Extension ID
 
 Your extension must be associated with an identifier, which will be used
 throughout all the extension mechanism of Ontrack.
@@ -91,7 +91,7 @@ ontrack {
 ----
 
 [[extending-coding]]
-==== Coding an extension
+=== Coding an extension
 
 All your code must belong to a package starting with `net.nemerosa.ontrack` in
 order to be visible by the Ontrack application.
@@ -136,7 +136,7 @@ The arguments for the extension feature constructor are:
 * the extension options (see below)
 
 [[extending-options]]
-==== Extension options
+=== Extension options
 
 If your extension has some web components (templates, pages, etc.), it must
 declare this fact:
@@ -182,7 +182,7 @@ public class MyExtensionFeature extends AbstractExtensionFeature {
 ----
 
 [[extending-testing]]
-==== Writing tests for your extension
+=== Writing tests for your extension
 
 Additionally to creating unit tests for your extension, you can also write
 integration tests, which will run with the Ontrack runtime enabled.
@@ -216,7 +216,7 @@ public MyTest extends AbstractServiceTestSupport {
 ----
 
 [[extending-extensions]]
-==== List of extension points
+=== List of extension points
 
 Ontrack provides the following extension points:
 
@@ -245,7 +245,7 @@ Other topics:
 See <<reference-services>> for a list of the core Ontrack services.
 
 [[extending-running]]
-==== Running an extension
+=== Running an extension
 
 [NOTE]
 ====
@@ -256,7 +256,7 @@ See the <<development-postgres,development section>> to see how quickly set it u
 ====
 
 [[extending-running-gradle]]
-===== Using Gradle
+==== Using Gradle
 
 To run your extension using Gradle:
 
@@ -275,7 +275,7 @@ want your changes available in the browser, just rebuild your project
 (`Ctrl F9` in Intellij) and refresh your browser.
 
 [[extending-packaging]]
-==== Packaging an extension
+=== Packaging an extension
 
 Just run:
 
@@ -288,7 +288,7 @@ The extension is available as a JAR (together with its transitive dependencies,
 see below) in `build/dist`.
 
 [[extending-dependencies]]
-==== Extension dependencies
+=== Extension dependencies
 
 If your extension depends on dependencies which are not brought by Ontrack,
 you have to collect them explicitly and put them in the same directory
@@ -300,10 +300,10 @@ all dependencies (transitively) and the main JAR in the `build/dist` directory.
 This task is called by the main `build` task.
 
 [[extending-deploying]]
-==== Deploying an extension
+=== Deploying an extension
 
 [[extending-deploying-docker]]
-===== Using the Docker image
+==== Using the Docker image
 
 The <<installation-docker, Ontrack Docker image>> uses the
 `/var/ontrack/extensions` volume to load extensions from. Bind this volume to
@@ -343,7 +343,7 @@ NOTE: When using a _child_ `Dockerfile`, the extension directory has to be
 customized because we cannot use the `VOLUME` in this case.
 
 [[extending-deploying-os]]
-===== Using the CentOS or Debian/Ubuntu package
+==== Using the CentOS or Debian/Ubuntu package
 
 The <<installation-rpm, RPM>> and <<installation-debian, Debian>> packages both
 use the `/usr/lib/ontrack/extensions` directory for the location of the
@@ -361,7 +361,7 @@ Your package must:
 * have a dependency on the `ontrack` package
 
 [[extending-deploying-sa]]
-===== In standalone mode
+==== In standalone mode
 
 When running <<installation-sa, Ontrack directly>>, you have to set the
 `loader.path` to a directory containing the extensions JAR files:

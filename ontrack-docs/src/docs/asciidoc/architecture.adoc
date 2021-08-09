@@ -1,8 +1,8 @@
 [[architecture]]
-=== Architecture
+== Architecture
 
 [[architecture-modules]]
-==== Modules
+=== Modules
 
 [plantuml,"modules",png]
 ----
@@ -33,10 +33,10 @@ The main core module is the `model` one, which defines both the API of the
 Ontrack services and the domain model.
 
 [[architecture-ui]]
-==== UI
+=== UI
 
 [[architecture-ui-resources]]
-===== Resources
+==== Resources
 
 The UI is realized by REST controllers. They manipulate the _model_ and get
 access to it through _services_.
@@ -54,22 +54,22 @@ do not want each project to bring along its own copy of the project object.
 This is achieved using the _model filtering_ technics.
 
 [[architecture-ui-decorators]]
-===== Resource decorators
+==== Resource decorators
 
 TODO
 
 [[architecture-ui-forms]]
-==== Forms
+=== Forms
 
 include::architecture-ui-forms.adoc[]
 
 [[architecture-model]]
-==== Model
+=== Model
 
 include::concepts.adoc[]
 
 [[architecture-model-filtering]]
-==== Model filtering
+=== Model filtering
 
 TODO
 
@@ -78,13 +78,13 @@ include::architecture-jobs.adoc[]
 include::architecture-encryption.adoc[]
 
 [[architecture-build-filters]]
-==== Build filters
+=== Build filters
 
 The _build filters_ are responsible for the filtering of _builds_ when listing
 them for a _branch_.
 
 [[architecture-build-filters-usage]]
-===== Usage
+==== Usage
 
 By default, only the last 10 builds are shown for a branch, but a user can
 choose to create filters for a branch, and to select them.
@@ -98,7 +98,7 @@ filters for a branch is composed of those stored locally and of those returned
 by the server. The later ones have priority when there is a name conflict.
 
 [[architecture-build-filters-implementation]]
-===== Implementation
+==== Implementation
 
 The `BuildFilter` interface defines how to use a filter. This filter takes as
 parameters:
@@ -123,10 +123,10 @@ injected `BuildFilterProvider`s to get an actual instance.
 include::reference-services.adoc[]
 
 [[artifacture-technology]]
-==== Technology
+=== Technology
 
 [[artifacture-technology-client]]
-===== Client side
+==== Client side
 
 One page only, pure AJAX communication between the client and the server.
 
@@ -137,7 +137,7 @@ One page only, pure AJAX communication between the client and the server.
 * Less
 
 [[artifacture-technology-server]]
-===== Server side
+==== Server side
 
 * Spring Boot for the packaging & deployment
 * Spring MVC for the REST API
@@ -147,7 +147,7 @@ One page only, pure AJAX communication between the client and the server.
 * H2 in MySQL mode for the database engine
 
 [[artifacture-technology-layers]]
-===== Layers
+==== Layers
 
 [plantuml,"layers",png]
 ----
