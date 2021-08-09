@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.model.*
 import net.nemerosa.ontrack.json.JsonParseException
+import net.nemerosa.ontrack.json.getBooleanField
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
 import org.apache.commons.lang3.StringUtils
@@ -368,33 +369,7 @@ class DefaultOntrackGitHubClient(
         )
     }
 
-    override fun getDefaultBranch(repository: String): String? {
-        val (login, name) = getRepositoryParts(repository)
-        return graphQL(
-            message = "Get default branch for $repository",
-            query = """
-                query DefaultBranch(${'$'}login: String!, ${'$'}name: String!) {
-                  organization(login: ${'$'}login) {
-                    repository(name: ${'$'}name) {
-                      defaultBranchRef {
-                        name
-                      }
-                    }
-                  }
-                }
-            """,
-            variables = mapOf("login" to login, "name" to name)
-        ) { data ->
-            data.path("organization")
-                .path("repository")
-                .path("defaultBranchRef")
-                .path("name")
-                .asText()
-                ?.takeIf { it.isNotBlank() }
-        }
-    }
-
-    override fun getRepositoryDescription(repository: String): String? {
+    override fun getRepositorySettings(repository: String, askVisibility: Boolean): GitHubRepositorySettings {
         val (login, name) = getRepositoryParts(repository)
         return graphQL(
             message = "Get description for $repository",
@@ -409,11 +384,37 @@ class DefaultOntrackGitHubClient(
             """,
             variables = mapOf("login" to login, "name" to name)
         ) { data ->
-            data.path("organization")
-                .path("repository")
-                .path("description")
+            val repo = data.path("organization").path("repository")
+            val description = repo.path("description")
                 .asText()
                 ?.takeIf { it.isNotBlank() }
+            val branch = repo.path("defaultBranchRef")
+                .path("name")
+                .asText()
+                ?.takeIf { it.isNotBlank() }
+            val hasWikiEnabled = repo.getBooleanField("hasWikiEnabled") ?: false
+            val hasIssuesEnabled = repo.getBooleanField("hasIssuesEnabled") ?: false
+            val hasProjectsEnabled = repo.getBooleanField("hasProjectsEnabled") ?: false
+            // Visibility
+            var visibility: GitHubRepositoryVisibility? = null
+            if (askVisibility) {
+                // Unfortunately, as of now, the visibility flag is not available through the GraphQL API
+                // and a REST call is therefore needed to get this information
+                val rest = createGitHubRestTemplate()
+                visibility = rest.getForObject("/repos/${login}/${name}", GitHubRepositoryWithVisibility::class.java)
+                    ?.visibility
+                    ?.toUpperCase()
+                    ?.let { GitHubRepositoryVisibility.valueOf(it) }
+            }
+            // OK
+            GitHubRepositorySettings(
+                description = description,
+                defaultBranch = branch,
+                hasWikiEnabled = hasWikiEnabled,
+                hasIssuesEnabled = hasIssuesEnabled,
+                hasProjectsEnabled = hasProjectsEnabled,
+                visibility = visibility,
+            )
         }
     }
 

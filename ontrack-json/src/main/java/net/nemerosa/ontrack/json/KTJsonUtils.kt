@@ -115,6 +115,15 @@ fun JsonNode.getRequiredTextField(field: String): String =
         ?: throw JsonParseException("Missing field $field")
 
 /**
+ * Gets a boolean field
+ */
+fun JsonNode.getBooleanField(field: String): Boolean? = if (has(field)) {
+    get(field).takeIf { !it.isNull }?.asBoolean()
+} else {
+    null
+}
+
+/**
  * Merging two JSON nodes
  *
  * @receiver Left component

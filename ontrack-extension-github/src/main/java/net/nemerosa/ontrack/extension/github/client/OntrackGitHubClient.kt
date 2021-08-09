@@ -77,19 +77,12 @@ interface OntrackGitHubClient {
     fun getTeamRepositories(login: String, teamSlug: String): List<GitHubTeamRepository>?
 
     /**
-     * Returns the default branch for a repository.
+     * Returns the settings for a repository.
      *
      * @param repository Repository name, like `nemerosa/ontrack`
-     * @return Name of the branch (like `main`) or null if not found
+     * @param askVisibility True to ask the visibility (extra performance cost)
+     * @return Settings
      */
-    fun getDefaultBranch(repository: String): String?
-
-    /**
-     * Returns the description for a repository.
-     *
-     * @param repository Repository name, like `nemerosa/ontrack`
-     * @return Description or null if not found
-     */
-    fun getRepositoryDescription(repository: String): String?
+    fun getRepositorySettings(repository: String, askVisibility: Boolean = false): GitHubRepositorySettings
 
 }

@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.model.structure.PropertyService
 import org.springframework.stereotype.Component
 
 @Component
-class RepositoryMustHaveDescription(
+class RepositoryMustNotHaveTheIssuesFeature(
     propertyService: PropertyService,
     clientFactory: OntrackGitHubClientFactory,
     valueType: BooleanIndicatorValueType,
@@ -20,14 +20,15 @@ class RepositoryMustHaveDescription(
 ) {
 
     companion object {
-        const val ID = "github-compliance-repository-must-have-description"
+        const val ID = "github-compliance-repository-must-not-the-issues-feature"
     }
 
     override val id: String = ID
-    override val name: String = "A repository MUST have a description"
+    override val name: String = "A repository MUST NOT have the issues feature"
+
     override val valueConfig = BooleanIndicatorValueTypeConfig(required = true)
 
     override fun checkSettings(project: Project, settings: GitHubRepositorySettings): Boolean? =
-        settings.description != null && settings.description.isNotBlank()
-
+        settings.hasIssuesEnabled
+    
 }
