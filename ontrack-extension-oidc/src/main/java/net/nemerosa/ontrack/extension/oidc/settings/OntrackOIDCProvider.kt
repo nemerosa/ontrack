@@ -14,6 +14,7 @@ import javax.validation.constraints.Pattern
  * @property clientId OIDC client ID
  * @property clientSecret OIDC client secret
  * @property groupFilter Regular expression used to filter groups associated with the OIDC user
+ * @property forceHttps Check to force the protocol to HTTPS for the Redirect URI
  */
 data class OntrackOIDCProvider(
         @get:NotNull(message = "The account name is required.")
@@ -31,14 +32,16 @@ data class OntrackOIDCProvider(
         @APIDescription("OIDC client secret")
         val clientSecret: String,
         @APIDescription("Regular expression used to filter groups associated with the OIDC user")
-        val groupFilter: String?
+        val groupFilter: String?,
+        @APIDescription("Check to force the protocol to HTTPS for the Redirect URI")
+        val forceHttps: Boolean,
 ) {
 
     /**
      * Erases the [clientSecret].
      */
     fun obfuscate() = OntrackOIDCProvider(
-            id, name, description, issuerId, clientId, "", groupFilter
+            id, name, description, issuerId, clientId, "", groupFilter, forceHttps
     )
 
 }

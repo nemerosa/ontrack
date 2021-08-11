@@ -118,7 +118,8 @@ class OntrackClientRegistrationRepositoryIT : AbstractDSLTestSupport() {
             issuerId = issuer,
             clientId = "xxx",
             clientSecret = "",
-            groupFilter = null
+            groupFilter = null,
+            forceHttps = false,
     )
 
     companion object {

@@ -56,6 +56,10 @@ final class OntrackClientRegistrationRepository(
                 clientSecret = settings.clientSecret
                 // See https://github.com/spring-projects/spring-security/issues/8514
                 scope = setOf("openid", "profile", "email")
+                // Forcing HTTPS
+                if (settings.forceHttps) {
+                    redirectUri = "https://{baseHost}{basePort}{basePath}"
+                }
             }
         }
         return OAuth2ClientPropertiesRegistrationAdapter.getClientRegistrations(properties)

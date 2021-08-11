@@ -141,5 +141,11 @@ class OIDCSettingsController(
                             .help("Regular expression used to filter groups associated with the OIDC user.")
                             .value(provider?.groupFilter)
             )
+            .with(
+                    Text.of(OntrackOIDCProvider::forceHttps.name)
+                        .label("Force HTTPS")
+                        .help("Check to force the protocol to HTTPS for the Redirect URI")
+                        .value(provider?.forceHttps ?: false)
+            )
 
 }

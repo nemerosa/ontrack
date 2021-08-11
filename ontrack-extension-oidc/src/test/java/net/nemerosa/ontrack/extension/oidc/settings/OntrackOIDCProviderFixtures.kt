@@ -15,7 +15,8 @@ object OntrackOIDCProviderFixtures {
             issuerId = "",
             clientId = "",
             clientSecret = "",
-            groupFilter = null
+            groupFilter = null,
+            forceHttps = false,
     )
 
     fun image() = Document(
