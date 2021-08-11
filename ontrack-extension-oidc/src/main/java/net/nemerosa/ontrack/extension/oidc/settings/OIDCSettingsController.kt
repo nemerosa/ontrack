@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.extension.oidc.settings
 
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Password
-import net.nemerosa.ontrack.model.form.Text
-import net.nemerosa.ontrack.model.form.Url
+import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.Resources
@@ -142,7 +139,7 @@ class OIDCSettingsController(
                             .value(provider?.groupFilter)
             )
             .with(
-                    Text.of(OntrackOIDCProvider::forceHttps.name)
+                    YesNo.of(OntrackOIDCProvider::forceHttps.name)
                         .label("Force HTTPS")
                         .help("Check to force the protocol to HTTPS for the Redirect URI")
                         .value(provider?.forceHttps ?: false)

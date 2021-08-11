@@ -20,6 +20,7 @@
             <th>Client ID</th>
             <th>Client Secret</th>
             <th>Group filter</th>
+            <th>Force HTTPS</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
@@ -42,6 +43,10 @@
             <td>****</td>
             <td>
                 <code>{{provider.groupFilter}}</code>
+            </td>
+            <td>
+                <span ng-if="provider.forceHttps">Yes</span>
+                <span ng-if="!provider.forceHttps">No</span>
             </td>
             <td>
                 <span
