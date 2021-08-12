@@ -44,6 +44,9 @@ class GitHubComplianceIndicatorsIT : AbstractGitHubTestSupport() {
     @Autowired
     private lateinit var repositoryMustHaveAReadme: RepositoryMustHaveAReadme
 
+    // @Autowired
+    // TODO private lateinit var repositoryShouldBeInternalOrPrivate: RepositoryShouldBeInternalOrPrivate
+
     @Autowired
     private lateinit var scmCatalog: SCMCatalog
 
@@ -74,6 +77,7 @@ class GitHubComplianceIndicatorsIT : AbstractGitHubTestSupport() {
         repositoryTeamMustHaveDescription.save(enabled = true)
         repositoryMustNotHaveAnyAdmin.save(enabled = true)
         repositoryMustHaveAReadme.save(enabled = true)
+        // TODO repositoryShouldBeInternalOrPrivate.save(enabled = true)
         withSettings(GitHubSCMCatalogSettings::class) {
             try {
                 // Project setup
@@ -102,6 +106,7 @@ class GitHubComplianceIndicatorsIT : AbstractGitHubTestSupport() {
                     assertEquals(true, values[RepositoryMustHaveDescription.ID])
                     assertEquals(false, values[RepositoryMustNotHaveAnyAdmin.ID])
                     assertEquals(true, values[RepositoryMustHaveAReadme.ID])
+                    // TODO assertEquals(false, values[RepositoryShouldBeInternalOrPrivate.ID])
                     // Checks some compliance
                     assertEquals(50, compliances[RepositoryDefaultBranchShouldBeMain.ID])
                     assertEquals(0, compliances[RepositoryMustHaveMaintainingTeam.ID])
@@ -109,6 +114,7 @@ class GitHubComplianceIndicatorsIT : AbstractGitHubTestSupport() {
                     assertEquals(100, compliances[RepositoryMustHaveDescription.ID])
                     assertEquals(0, compliances[RepositoryMustNotHaveAnyAdmin.ID])
                     assertEquals(100, compliances[RepositoryMustHaveAReadme.ID])
+                    // TODO assertEquals(50, compliances[RepositoryShouldBeInternalOrPrivate.ID])
                 }
             } finally {
                 listOf(
@@ -118,6 +124,7 @@ class GitHubComplianceIndicatorsIT : AbstractGitHubTestSupport() {
                     repositoryTeamMustHaveDescription,
                     repositoryMustNotHaveAnyAdmin,
                     repositoryMustHaveAReadme,
+                    // TODO repositoryShouldBeInternalOrPrivate,
                 ).forEach { it.delete() }
             }
         }

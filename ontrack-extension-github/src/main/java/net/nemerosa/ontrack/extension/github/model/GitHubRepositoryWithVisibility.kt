@@ -7,5 +7,5 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 class GitHubRepositoryWithVisibility(
-    val visibility: String,
+    val visibility: String?,
 )

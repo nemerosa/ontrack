@@ -378,6 +378,12 @@ class DefaultOntrackGitHubClient(
                   organization(login: ${'$'}login) {
                     repository(name: ${'$'}name) {
                         description
+                        defaultBranchRef {
+                            name
+                        }
+                        hasWikiEnabled
+                        hasIssuesEnabled
+                        hasProjectsEnabled
                     }
                   }
                 }

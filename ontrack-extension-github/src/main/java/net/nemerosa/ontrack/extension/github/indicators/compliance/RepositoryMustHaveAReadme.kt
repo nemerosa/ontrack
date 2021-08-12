@@ -43,7 +43,7 @@ class RepositoryMustHaveAReadme(
         client: OntrackGitHubClient,
     ): Boolean? {
         // Gets the default branch
-        val branch = client.getDefaultBranch(config.repository) ?: return false
+        val branch = client.getRepositorySettings(config.repository).defaultBranch ?: return false
         // Gets the SCM service for this
         val scmService = scmServiceDetector.getScmService(project).getOrNull() ?: return false
         // Gets the README file
