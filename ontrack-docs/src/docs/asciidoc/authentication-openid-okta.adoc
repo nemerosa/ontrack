@@ -43,6 +43,8 @@ On the Ontrack side, as an administrator:
 ** Client secret of the application in Okta
 ** Group filter: regular expression to filter the group list sent by Okta in the `groups` claim
 
+NOTE: If Ontrack runs behind a SSL termination proxy and if the HTTP headers are not all forwarded, the "Force HTTPS" option can be set to `true` in order to force the redirect URI to use HTTPS.
+
 In the OIDC provider list, you can optionally set a picture for this configuration. This picture will be used on the login page. For example:
 
 image::images/authentication-okta-login.png[Okta login,30%]
