@@ -18,6 +18,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
+import kotlin.test.assertTrue
 import kotlin.test.fail
 
 class OntrackClientRegistrationRepositoryIT : AbstractDSLTestSupport() {
@@ -46,19 +47,19 @@ class OntrackClientRegistrationRepositoryIT : AbstractDSLTestSupport() {
 
         val dispatcher: Dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest): MockResponse =
-                    when (request.path) {
-                        "/.well-known/openid-configuration/" ->
-                            buildSuccessMockResponse(responseBody)
-                        else -> MockResponse().setResponseCode(404)
-                    }
+                when (request.path) {
+                    "/.well-known/openid-configuration/" ->
+                        buildSuccessMockResponse(responseBody)
+                    else -> MockResponse().setResponseCode(404)
+                }
         }
         server.dispatcher = dispatcher
     }
 
     private fun buildSuccessMockResponse(body: String): MockResponse =
-            MockResponse().setResponseCode(200)
-                    .setBody(body)
-                    .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        MockResponse().setResponseCode(200)
+            .setBody(body)
+            .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 
     @After
     fun cleanup() {
@@ -81,14 +82,36 @@ class OntrackClientRegistrationRepositoryIT : AbstractDSLTestSupport() {
     fun `Custom URI when forcing HTTPS`() {
         val id = providers(provider(forceHttps = true)).first()
         val registration = repository.registrations[id] ?: fail("Provider $id not found")
-        assertEquals("https://{baseHost}{basePort}{basePath}/{action}/oauth2/code/{registrationId}", registration.redirectUri)
+        assertEquals(
+            "https://{baseHost}{basePort}{basePath}/{action}/oauth2/code/{registrationId}",
+            registration.redirectUri
+        )
+    }
+
+    @Test
+    fun `List of registrations before and after disabling a provider`() {
+        val id = providers(provider()).first()
+        // Gets the registrations
+        val registrations = repository.registrations
+        assertEquals(setOf(id), registrations.values.map { it.registrationId }.toSet())
+        // Disables the provider
+        asAdmin {
+            val provider = oidcSettingsService.getProviderById(id) ?: fail("Provider $id not found")
+            oidcSettingsService.updateProvider(
+                provider.disable()
+            )
+        }
+        // Gets the registrations back
+        val newRegistrations = repository.registrations
+        // Checks that the disabled registration is gone
+        assertTrue(newRegistrations.isEmpty(), "Disabled registration is gone")
     }
 
     @Test
     fun `List of registrations cached`() {
         val ids = providers(
-                provider(),
-                provider()
+            provider(),
+            provider()
         )
         // Gets the registrations
         val registrations = repository.registrations
@@ -101,15 +124,15 @@ class OntrackClientRegistrationRepositoryIT : AbstractDSLTestSupport() {
     @Test
     fun `List of registrations updated automatically`() {
         val ids = providers(
-                provider(),
-                provider()
+            provider(),
+            provider()
         )
         // Gets the registrations
         var registrations = repository.registrations
         assertEquals(ids.toSet(), registrations.values.map { it.registrationId }.toSet())
         // Adds a provider
         val additionalIds = providers(
-                provider()
+            provider()
         )
         registrations = repository.registrations
         assertEquals((ids + additionalIds).toSet(), registrations.values.map { it.registrationId }.toSet())
@@ -125,17 +148,19 @@ class OntrackClientRegistrationRepositoryIT : AbstractDSLTestSupport() {
     }
 
     private fun provider(
-            id: String = uid("P"),
-            forceHttps: Boolean = false,
+        id: String = uid("P"),
+        forceHttps: Boolean = false,
+        disabled: Boolean = false,
     ) = OntrackOIDCProvider(
-            id = id,
-            name = "$id name",
-            description = "",
-            issuerId = issuer,
-            clientId = "xxx",
-            clientSecret = "",
-            groupFilter = null,
-            forceHttps = forceHttps,
+        id = id,
+        name = "$id name",
+        description = "",
+        issuerId = issuer,
+        clientId = "xxx",
+        clientSecret = "",
+        groupFilter = null,
+        forceHttps = forceHttps,
+        disabled = disabled,
     )
 
     companion object {

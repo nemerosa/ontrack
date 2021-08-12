@@ -17,31 +17,56 @@ import javax.validation.constraints.Pattern
  * @property forceHttps Check to force the protocol to HTTPS for the Redirect URI
  */
 data class OntrackOIDCProvider(
-        @get:NotNull(message = "The account name is required.")
-        @get:Pattern(regexp = "[a-zA-Z0-9_-]+", message = "The ID must contain only letters, digits, underscores and dashes.")
-        @APIDescription("Unique ID for this provider")
-        val id: String,
-        @APIDescription("Display name for this provider")
-        val name: String,
-        @APIDescription("Tooltip for this provider")
-        val description: String,
-        @APIDescription("OIDC issueId URL")
-        val issuerId: String,
-        @APIDescription("OIDC client ID")
-        val clientId: String,
-        @APIDescription("OIDC client secret")
-        val clientSecret: String,
-        @APIDescription("Regular expression used to filter groups associated with the OIDC user")
-        val groupFilter: String?,
-        @APIDescription("Check to force the protocol to HTTPS for the Redirect URI")
-        val forceHttps: Boolean,
+    @get:NotNull(message = "The account name is required.")
+    @get:Pattern(
+        regexp = "[a-zA-Z0-9_-]+",
+        message = "The ID must contain only letters, digits, underscores and dashes."
+    )
+    @APIDescription("Unique ID for this provider")
+    val id: String,
+    @APIDescription("Display name for this provider")
+    val name: String,
+    @APIDescription("Tooltip for this provider")
+    val description: String,
+    @APIDescription("OIDC issueId URL")
+    val issuerId: String,
+    @APIDescription("OIDC client ID")
+    val clientId: String,
+    @APIDescription("OIDC client secret")
+    val clientSecret: String,
+    @APIDescription("Regular expression used to filter groups associated with the OIDC user")
+    val groupFilter: String?,
+    @APIDescription("Check to force the protocol to HTTPS for the Redirect URI")
+    val forceHttps: Boolean,
+    @APIDescription("If true, this provider is disabled and won't be active")
+    val disabled: Boolean,
 ) {
 
     /**
      * Erases the [clientSecret].
      */
     fun obfuscate() = OntrackOIDCProvider(
-            id, name, description, issuerId, clientId, "", groupFilter, forceHttps
+        id, name, description, issuerId, clientId, "", groupFilter, forceHttps, disabled
+    )
+
+    /**
+     * Disables this provider
+     */
+    fun disable() = withDisabled(true)
+
+    /**
+     * Disables flag for this provider
+     */
+    fun withDisabled(disabled: Boolean) = OntrackOIDCProvider(
+        id = id,
+        name = name,
+        description = description,
+        issuerId = issuerId,
+        clientId = clientId,
+        clientSecret = clientSecret,
+        groupFilter = groupFilter,
+        forceHttps = forceHttps,
+        disabled = disabled,
     )
 
 }

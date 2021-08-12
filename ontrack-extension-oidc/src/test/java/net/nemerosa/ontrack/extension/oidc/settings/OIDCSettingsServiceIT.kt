@@ -46,7 +46,7 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
     fun `Client secret must be decrypted`() {
         val id = uid("I")
         asAdmin {
-            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "", "xxxx", null, false))
+            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "", "xxxx", null, false, false))
             val provider = service.providers.find { it.id == id }
             assertNotNull(provider) {
                 assertEquals("xxxx", it.clientSecret)
@@ -89,7 +89,7 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
         val id = uid("I")
         asAdmin {
             service.createProvider(testProvider(id))
-            service.updateProvider(OntrackOIDCProvider(id, "Test 2", "", "", "xxxx", "yyyy", null, false))
+            service.updateProvider(OntrackOIDCProvider(id, "Test 2", "", "", "xxxx", "yyyy", null, false, false))
             val provider = service.getProviderById(id) ?: error("Cannot find provider")
             assertEquals("Test 2", provider.name)
             assertEquals("xxxx", provider.clientId)
@@ -101,8 +101,8 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
     fun `Updating a provider does not update its secret if left blank in input`() {
         val id = uid("I")
         asAdmin {
-            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "xxxx", "yyyy", null, false))
-            service.updateProvider(OntrackOIDCProvider(id, "Test 2", "", "", "xxxx", "", null, false))
+            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "xxxx", "yyyy", null, false, false))
+            service.updateProvider(OntrackOIDCProvider(id, "Test 2", "", "", "xxxx", "", null, false, false))
             val provider = service.getProviderById(id) ?: error("Cannot find provider")
             assertEquals("Test 2", provider.name)
             assertEquals("xxxx", provider.clientId)
@@ -116,7 +116,7 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
         asAdmin {
             service.createProvider(testProvider(id))
             assertFailsWith<OntrackOIDCProviderIDAlreadyExistsException> {
-                service.createProvider(OntrackOIDCProvider(id, "Test 2", "", "", "", "", null, false))
+                service.createProvider(OntrackOIDCProvider(id, "Test 2", "", "", "", "", null, false, false))
             }
         }
     }

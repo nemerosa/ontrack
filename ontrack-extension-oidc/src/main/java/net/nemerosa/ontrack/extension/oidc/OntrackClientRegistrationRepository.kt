@@ -45,7 +45,7 @@ final class OntrackClientRegistrationRepository(
 
     private fun toRegistrations(providers: List<OntrackOIDCProvider>): Map<String, ClientRegistration> {
         val properties = OAuth2ClientProperties()
-        providers.forEach { settings ->
+        providers.filter { !it.disabled }.forEach { settings ->
             properties.provider[settings.id] = OAuth2ClientProperties.Provider().apply {
                 issuerUri = settings.issuerId
             }

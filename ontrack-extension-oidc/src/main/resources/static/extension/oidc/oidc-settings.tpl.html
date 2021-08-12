@@ -21,12 +21,13 @@
             <th>Client Secret</th>
             <th>Group filter</th>
             <th>Force HTTPS</th>
+            <th>State</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
         <tbody>
         <tr ng-if="resources.resources.length == 0" class="info">
-            <td colspan="9">
+            <td colspan="11">
                 No OIDC provider has been registered yet.
                 Click <a class="ot-action" ng-click="createProvider()">here</a> to create one.
             </td>
@@ -47,6 +48,10 @@
             <td>
                 <span ng-if="provider.forceHttps">Yes</span>
                 <span ng-if="!provider.forceHttps">No</span>
+            </td>
+            <td>
+                <span ng-if="provider.disabled" class="text-muted"><span class="fa fa-square-o"></span>&nbsp;Disabled</span>
+                <span ng-if="!provider.disabled" class="text-success"><span class="fa fa-square"></span>&nbsp;Enabled</span>
             </td>
             <td>
                 <span

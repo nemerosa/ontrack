@@ -270,6 +270,7 @@ class OntrackOidcUserServiceIT : AbstractDSLTestSupport() {
                                 clientSecret = "",
                                 groupFilter = groupFilter,
                                 forceHttps = false,
+                                disabled = false,
                         )
                 )
             } else {
@@ -283,6 +284,7 @@ class OntrackOidcUserServiceIT : AbstractDSLTestSupport() {
                                 clientSecret = "",
                                 groupFilter = null,
                                 forceHttps = false,
+                                disabled = false,
                         )
                 )
             }

@@ -144,5 +144,11 @@ class OIDCSettingsController(
                         .help("Check to force the protocol to HTTPS for the Redirect URI")
                         .value(provider?.forceHttps ?: false)
             )
+            .with(
+                    YesNo.of(OntrackOIDCProvider::disabled.name)
+                        .label("Disabled")
+                        .help("Check to disable this provider while keeping its configuration")
+                        .value(provider?.disabled ?: false)
+            )
 
 }

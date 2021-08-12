@@ -16,15 +16,17 @@ class OIDCUILoginExtension(
 
     override val contributions: List<UILogin>
         get() = securityService.asAdmin {
-            oidcSettingsService.providers.map { provider ->
-                UILogin(
+            oidcSettingsService.providers
+                .filter { !it.disabled }
+                .map { provider ->
+                    UILogin(
                         id = provider.id,
                         link = "/oauth2/authorization/${provider.id}",
                         name = provider.name,
                         description = provider.description,
                         image = oidcSettingsService.hasProviderImage(provider.id),
                         imageLoader = { oidcSettingsService.getProviderImage(provider.id) }
-                )
-            }
+                    )
+                }
         }
 }

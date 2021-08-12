@@ -114,6 +114,7 @@ class OIDCSettingsServiceImpl(
                 },
                 groupFilter = input.groupFilter,
                 forceHttps = input.forceHttps,
+                disabled = input.disabled,
         )
         storageService.store(OIDC_PROVIDERS_STORE, input.id, encrypt(record))
         clearCache()
@@ -193,7 +194,8 @@ class OIDCSettingsServiceImpl(
             val clientId: String,
             val clientEncryptedSecret: String,
             val groupFilter: String?,
-            val forceHttps: Boolean
+            val forceHttps: Boolean,
+            val disabled: Boolean,
     )
 
     private fun decrypt(stored: StoredOntrackOIDCProvider) = OntrackOIDCProvider(
@@ -205,6 +207,7 @@ class OIDCSettingsServiceImpl(
             clientSecret = encryptionService.decrypt(stored.clientEncryptedSecret) ?: "",
             groupFilter = stored.groupFilter,
             forceHttps = stored.forceHttps,
+            disabled = stored.disabled,
     )
 
     private fun encrypt(input: OntrackOIDCProvider) = StoredOntrackOIDCProvider(
@@ -217,5 +220,6 @@ class OIDCSettingsServiceImpl(
                     ?: throw OntrackOIDCProviderCannotEncryptSecretException()),
             groupFilter = input.groupFilter,
             forceHttps = input.forceHttps,
+            disabled = input.disabled,
     )
 }

@@ -21,4 +21,20 @@ class OntrackOIDCProviderTest {
         assertEquals(false, provider.forceHttps)
     }
 
+    @Test
+    fun `Introduction of the disabled flag`() {
+        val provider = mapOf(
+            "id" to "test",
+            "name" to "Name",
+            "description" to "My provider",
+            "issuerId" to "issuer",
+            "clientId" to "client_id",
+            "clientSecret" to "client_secret",
+            "groupFilter" to "ontrack.*",
+            "forceHttps" to false,
+        ).asJson().parse<OntrackOIDCProvider>()
+        assertEquals(false, provider.forceHttps)
+        assertEquals(false, provider.disabled)
+    }
+
 }
