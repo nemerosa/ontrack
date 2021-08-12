@@ -124,6 +124,13 @@ fun JsonNode.getBooleanField(field: String): Boolean? = if (has(field)) {
 }
 
 /**
+ * Gets a required boolean field
+ */
+fun JsonNode.getRequiredBooleanField(field: String): Boolean =
+    getBooleanField(field)
+        ?: throw JsonParseException("Missing field $field")
+
+/**
  * Merging two JSON nodes
  *
  * @receiver Left component

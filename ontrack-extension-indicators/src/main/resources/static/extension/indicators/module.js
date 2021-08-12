@@ -21,14 +21,12 @@ angular.module('ontrack.extension.indicators', [
 
         const query = `
             {
-              indicatorManagement {
-                links {
-                  _indicatorsPortfolios
-                  _indicatorsConfiguration
-                  _indicatorsCategories
-                  _indicatorsTypes
-                  _indicatorsViews
-                }
+              indicatorsManagement {
+                portfolios
+                configuration
+                categories
+                types
+                views
               }
             }
         `;
