@@ -6,13 +6,13 @@ import net.nemerosa.ontrack.model.support.ActionType
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class IndicatorPortfolioUserMenuExtensionTest {
+class IndicatorsManagementUserMenuExtensionTest {
 
     @Test
     fun check() {
-        val extension = IndicatorPortfolioUserMenuExtension(IndicatorsTestFixtures.indicatorsExtensionFeature())
+        val extension = IndicatorsManagementUserMenuExtension(IndicatorsTestFixtures.indicatorsExtensionFeature())
         assertEquals(IndicatorPortfolioAccess::class.java, extension.globalFunction)
-        assertEquals("portfolios", extension.action.uri)
+        assertEquals("indicators-management", extension.action.uri)
         assertEquals(ActionType.LINK, extension.action.type)
     }
 

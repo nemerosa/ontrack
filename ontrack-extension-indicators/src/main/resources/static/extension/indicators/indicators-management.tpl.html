@@ -1,0 +1,59 @@
+<ot-view>
+
+    <ot-extension-indicators-message></ot-extension-indicators-message>
+
+    <div class="row" ng-show="loadingIndicatorsManagement">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading indicator menu...
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-if="indicatorsManagement.links._indicatorsPortfolios">
+        <div class="col-md-3">
+            <a href="#/extension/indicators/portfolios" class="btn btn-primary">Portfolios</a>
+        </div>
+        <div class="col-md-9 ot-description">
+            Access to the indicator portfolios.
+        </div>
+    </div>
+
+    <div class="row" ng-if="indicatorsManagement.links._indicatorsConfiguration">
+        <div class="col-md-3">
+            <a href="#/extension/indicators/configurable-indicator" class="btn btn-primary">Configuration</a>
+        </div>
+        <div class="col-md-9 ot-description">
+            Management of the configurable indicators.
+        </div>
+    </div>
+
+    <div class="row" ng-if="indicatorsManagement.links._indicatorsCategories">
+        <div class="col-md-3">
+            <a href="#/extension/indicators/categories" class="btn btn-primary">Categories</a>
+        </div>
+        <div class="col-md-9 ot-description">
+            Management of the indicator categories.
+        </div>
+    </div>
+
+    <div class="row" ng-if="indicatorsManagement.links._indicatorsTypes">
+        <div class="col-md-3">
+            <a href="#/extension/indicators/types" class="btn btn-primary">Types</a>
+        </div>
+        <div class="col-md-9 ot-description">
+            Management of the indicator types.
+        </div>
+    </div>
+
+    <div class="row" ng-if="indicatorsManagement.links._indicatorsViews">
+        <div class="col-md-3">
+            <a href="#/extension/indicators/views" class="btn btn-primary">Views</a>
+        </div>
+        <div class="col-md-9 ot-description">
+            Management of the indicator views.
+        </div>
+    </div>
+
+</ot-view>
