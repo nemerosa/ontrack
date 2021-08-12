@@ -18,6 +18,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
+import kotlin.test.fail
 
 class OntrackClientRegistrationRepositoryIT : AbstractDSLTestSupport() {
 
@@ -70,6 +71,20 @@ class OntrackClientRegistrationRepositoryIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Default URI when no forcing HTTPS`() {
+        val id = providers(provider()).first()
+        val registration = repository.registrations[id] ?: fail("Provider $id not found")
+        assertEquals("{baseUrl}/{action}/oauth2/code/{registrationId}", registration.redirectUri)
+    }
+
+    @Test
+    fun `Custom URI when forcing HTTPS`() {
+        val id = providers(provider(forceHttps = true)).first()
+        val registration = repository.registrations[id] ?: fail("Provider $id not found")
+        assertEquals("https://{baseHost}{basePort}{basePath}/{action}/oauth2/code/{registrationId}", registration.redirectUri)
+    }
+
+    @Test
     fun `List of registrations cached`() {
         val ids = providers(
                 provider(),
@@ -110,7 +125,8 @@ class OntrackClientRegistrationRepositoryIT : AbstractDSLTestSupport() {
     }
 
     private fun provider(
-            id: String = uid("P")
+            id: String = uid("P"),
+            forceHttps: Boolean = false,
     ) = OntrackOIDCProvider(
             id = id,
             name = "$id name",
@@ -119,7 +135,7 @@ class OntrackClientRegistrationRepositoryIT : AbstractDSLTestSupport() {
             clientId = "xxx",
             clientSecret = "",
             groupFilter = null,
-            forceHttps = false,
+            forceHttps = forceHttps,
     )
 
     companion object {

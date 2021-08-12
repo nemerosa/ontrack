@@ -58,7 +58,7 @@ final class OntrackClientRegistrationRepository(
                 scope = setOf("openid", "profile", "email")
                 // Forcing HTTPS
                 if (settings.forceHttps) {
-                    redirectUri = "https://{baseHost}{basePort}{basePath}"
+                    redirectUri = "https://{baseHost}{basePort}{basePath}/{action}/oauth2/code/{registrationId}"
                 }
             }
         }
