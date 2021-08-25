@@ -113,18 +113,18 @@ class DefaultOntrackGitHubClient(
         }
         // Conversion
         return GitHubIssue(
-            id,
-            issue.htmlUrl,
-            issue.title,
-            issue.bodyText,
-            issue.bodyHtml,
-            toUser(issue.assignee),
-            toLabels(issue.labels),
-            toState(issue.state),
-            toMilestone(repository, issue.milestone),
-            toDateTime(issue.createdAt)!!,
-            toDateTime(issue.updatedAt) ?: toDateTime(issue.createdAt)!!,
-            toDateTime(issue.closedAt)
+            id = id,
+            url = issue.htmlUrl,
+            summary = issue.title,
+            body = issue.bodyText ?: "",
+            bodyHtml = issue.bodyHtml ?: "",
+            assignee = toUser(issue.assignee),
+            labels = toLabels(issue.labels),
+            state = toState(issue.state),
+            milestone = toMilestone(repository, issue.milestone),
+            createdAt = toDateTime(issue.createdAt)!!,
+            updateTime = toDateTime(issue.updatedAt) ?: toDateTime(issue.createdAt)!!,
+            closedAt = toDateTime(issue.closedAt)
         )
     }
 
