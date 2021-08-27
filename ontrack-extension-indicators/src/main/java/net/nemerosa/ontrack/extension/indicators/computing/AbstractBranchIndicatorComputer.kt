@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.computing
 
 import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorComputedValue
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorComputer
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.extension.ExtensionFeature
 import net.nemerosa.ontrack.model.structure.Branch

@@ -2,8 +2,6 @@ package net.nemerosa.ontrack.extension.indicators.computing
 
 import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputingMetrics.METRIC_ONTRACK_INDICATORS_COMPUTING_MS
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorComputer
-import net.nemerosa.ontrack.extension.indicators.model.id
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
 import net.nemerosa.ontrack.model.structure.Project

@@ -4,6 +4,120 @@ angular.module('ontrack.extension.indicators', [
     'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
+        $stateProvider.state('indicators-management', {
+            url: '/extension/indicators/indicators-management',
+            templateUrl: 'extension/indicators/indicators-management.tpl.html',
+            controller: 'IndicatorsManagementCtrl'
+        });
+    })
+    .controller('IndicatorsManagementCtrl', function ($scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
+        $scope.loadingIndicatorsManagement = false;
+
+        const view = ot.view();
+        view.title = "Indicators";
+        view.commands = [
+            ot.viewCloseCommand('/home')
+        ];
+
+        const query = `
+            {
+              indicatorsManagement {
+                portfolios
+                configuration
+                categories
+                types
+                views
+              }
+            }
+        `;
+
+        const loadIndicatorsManagement = () => {
+            $scope.loadingIndicatorsManagement = true;
+            otGraphqlService.pageGraphQLCall(query).then((data) => {
+                $scope.indicatorsManagement = data.indicatorsManagement;
+            }).finally(() => {
+                $scope.loadingIndicatorsManagement = false;
+            });
+        };
+
+        loadIndicatorsManagement();
+    })
+    .config(function ($stateProvider) {
+        $stateProvider.state('configurable-indicators', {
+            url: '/extension/indicators/configurable-indicators',
+            templateUrl: 'extension/indicators/configurable-indicators.tpl.html',
+            controller: 'ConfigurableIndicatorsCtrl'
+        });
+    })
+    .controller('ConfigurableIndicatorsCtrl', function ($scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
+        $scope.loadingIndicators = false;
+
+        const view = ot.view();
+        view.title = "Configurable indicators";
+        view.commands = [
+            ot.viewCloseCommand('/home')
+        ];
+
+        const query = `
+            {
+              configurableIndicators {
+                category {
+                  id
+                  name
+                }
+                id
+                name
+                attributes {
+                  key
+                  name
+                  type
+                  required
+                }
+                state {
+                  enabled
+                  link
+                  values {
+                    key
+                    value
+                  }
+                }
+                links {
+                  _update
+                }
+              }
+            }
+        `;
+
+        const loadIndicators = () => {
+            $scope.loadingIndicators = true;
+            otGraphqlService.pageGraphQLCall(query).then((data) => {
+                // Grouping per category
+                const categoryGroups = {};
+                data.configurableIndicators.forEach((configurableIndicator) => {
+                    const category = configurableIndicator.category;
+                    let categoryGroup = categoryGroups[category.id];
+                    if (!categoryGroup) {
+                        categoryGroup = {
+                            category,
+                            indicators: []
+                        };
+                        categoryGroups[category.id] = categoryGroup;
+                    }
+                    categoryGroup.indicators.push(configurableIndicator);
+                });
+                $scope.categoryGroups = Object.values(categoryGroups);
+            }).finally(() => {
+                $scope.loadingIndicators = false;
+            });
+        };
+
+        loadIndicators();
+
+        $scope.configureIndicator = (configurableIndicator) => {
+            otFormService.update(configurableIndicator.links._update, `Configure ${configurableIndicator.name}`).then(loadIndicators);
+        };
+    })
+    .config(function ($stateProvider) {
         $stateProvider.state('indicator-categories', {
             url: '/extension/indicators/categories',
             templateUrl: 'extension/indicators/categories.tpl.html',
@@ -706,8 +820,8 @@ angular.module('ontrack.extension.indicators', [
 
         $scope.isCategoryIndicatorsSelected = (categoryIndicators) =>
             $scope.filtering.showAllCategories ||
-                categoryIndicators.portfolios.some((portfolio) => portfolio.selected) ||
-                ($scope.filtering.useView && $scope.filtering.view && $scope.filtering.view.categories.some((viewCategory) => viewCategory.id === categoryIndicators.category.id));
+            categoryIndicators.portfolios.some((portfolio) => portfolio.selected) ||
+            ($scope.filtering.useView && $scope.filtering.view && $scope.filtering.view.categories.some((viewCategory) => viewCategory.id === categoryIndicators.category.id));
 
         $scope.editIndicator = (indicator) => {
             otExtensionIndicatorsService.editIndicator(indicator).then(loadIndicators);
@@ -1742,8 +1856,7 @@ angular.module('ontrack.extension.indicators', [
         return {
             restrict: 'E',
             templateUrl: 'extension/indicators/directive.indicators-message.tpl.html',
-            scope: {
-            }
+            scope: {}
         };
     })
     .directive('otExtensionIndicatorsDeprecationIcon', function () {

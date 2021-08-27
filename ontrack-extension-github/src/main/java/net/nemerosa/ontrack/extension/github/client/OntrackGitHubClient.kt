@@ -75,4 +75,14 @@ interface OntrackGitHubClient {
      * @return List of repositories with their permissions or null if the permissions cannot be accessed.
      */
     fun getTeamRepositories(login: String, teamSlug: String): List<GitHubTeamRepository>?
+
+    /**
+     * Returns the settings for a repository.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param askVisibility True to ask the visibility (extra performance cost)
+     * @return Settings
+     */
+    fun getRepositorySettings(repository: String, askVisibility: Boolean = false): GitHubRepositorySettings
+
 }

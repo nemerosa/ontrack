@@ -102,7 +102,7 @@ fun JsonNode?.isNullOrNullNode() = this == null || this.isNull
  * Gets a string field
  */
 fun JsonNode.getTextField(field: String): String? = if (has(field)) {
-    get(field).asText()
+    get(field).takeIf { !it.isNull }?.asText()
 } else {
     null
 }
@@ -112,6 +112,22 @@ fun JsonNode.getTextField(field: String): String? = if (has(field)) {
  */
 fun JsonNode.getRequiredTextField(field: String): String =
     getTextField(field)
+        ?: throw JsonParseException("Missing field $field")
+
+/**
+ * Gets a boolean field
+ */
+fun JsonNode.getBooleanField(field: String): Boolean? = if (has(field)) {
+    get(field).takeIf { !it.isNull }?.asBoolean()
+} else {
+    null
+}
+
+/**
+ * Gets a required boolean field
+ */
+fun JsonNode.getRequiredBooleanField(field: String): Boolean =
+    getBooleanField(field)
         ?: throw JsonParseException("Missing field $field")
 
 /**

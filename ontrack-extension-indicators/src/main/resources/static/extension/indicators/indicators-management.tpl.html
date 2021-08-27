@@ -1,0 +1,49 @@
+<ot-view>
+
+    <ot-extension-indicators-message></ot-extension-indicators-message>
+
+    <div class="row" ng-show="loadingIndicatorsManagement">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading indicator menu...
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-if="indicatorsManagement.portfolios">
+        <div class="col-md-6">
+            <a href="#/extension/indicators/portfolios">Portfolios</a>
+            <span class="ot-description">Access to the indicator portfolios.</span>
+        </div>
+    </div>
+
+    <div class="row" ng-if="indicatorsManagement.configuration">
+        <div class="col-md-6">
+            <a href="#/extension/indicators/configurable-indicators">Configuration</a>
+            <span class="ot-description">Management of the configurable indicators.</span>
+        </div>
+    </div>
+
+    <div class="row" ng-if="indicatorsManagement.categories">
+        <div class="col-md-6">
+            <a href="#/extension/indicators/categories">Categories</a>
+            <span class="ot-description">Management of the indicator categories.</span>
+        </div>
+    </div>
+
+    <div class="row" ng-if="indicatorsManagement.types">
+        <div class="col-md-6">
+            <a href="#/extension/indicators/types">Types</a>
+            <span class="ot-description">Management of the indicator types.</span>
+        </div>
+    </div>
+
+    <div class="row" ng-if="indicatorsManagement.views">
+        <div class="col-md-6">
+            <a href="#/extension/indicators/views">Views</a>
+            <span class="ot-description">Management of the indicator views.</span>
+        </div>
+    </div>
+
+</ot-view>

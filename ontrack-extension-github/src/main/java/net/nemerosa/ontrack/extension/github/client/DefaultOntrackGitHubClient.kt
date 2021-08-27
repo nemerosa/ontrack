@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.model.*
 import net.nemerosa.ontrack.json.JsonParseException
+import net.nemerosa.ontrack.json.getBooleanField
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
 import org.apache.commons.lang3.StringUtils
@@ -90,6 +91,12 @@ class DefaultOntrackGitHubClient(
             )
         } ?: throw GitHubNoGraphQLResponseException("Getting repositories for organization $organization")
 
+    private fun getRepositoryParts(repository: String): Pair<String, String> {
+        val login = repository.substringBefore("/")
+        val name = repository.substringAfter("/")
+        return login to name
+    }
+
     override fun getIssue(repository: String, id: Int): GitHubIssue? {
         // Logging
         logger.debug("[github] Getting issue {}/{}", repository, id)
@@ -98,8 +105,7 @@ class DefaultOntrackGitHubClient(
         // Issue service using this client
         val service = IssueService(client)
         // Gets the repository for this project
-        val owner = repository.substringBefore("/")
-        val name = repository.substringAfter("/")
+        val (owner, name) = getRepositoryParts(repository)
         val issue: Issue = try {
             service.getIssue(owner, name, id)
         } catch (ex: RequestException) {
@@ -242,16 +248,16 @@ class DefaultOntrackGitHubClient(
         return results
     }
 
-    private fun graphQL(
+    private fun <T> graphQL(
         message: String,
         query: String,
         variables: Map<String, *> = emptyMap<String, Any>(),
-        code: (data: JsonNode) -> Unit
-    ) {
+        code: (data: JsonNode) -> T
+    ): T {
         // Getting a client
         val client = createGitHubRestTemplate()
         // GraphQL call
-        client(message) {
+        return client(message) {
             val response = postForObject(
                 "/graphql",
                 mapOf(
@@ -361,6 +367,61 @@ class DefaultOntrackGitHubClient(
             status = pr.state,
             url = pr.htmlUrl
         )
+    }
+
+    override fun getRepositorySettings(repository: String, askVisibility: Boolean): GitHubRepositorySettings {
+        val (login, name) = getRepositoryParts(repository)
+        return graphQL(
+            message = "Get description for $repository",
+            query = """
+                query Description(${'$'}login: String!, ${'$'}name: String!) {
+                  organization(login: ${'$'}login) {
+                    repository(name: ${'$'}name) {
+                        description
+                        defaultBranchRef {
+                            name
+                        }
+                        hasWikiEnabled
+                        hasIssuesEnabled
+                        hasProjectsEnabled
+                    }
+                  }
+                }
+            """,
+            variables = mapOf("login" to login, "name" to name)
+        ) { data ->
+            val repo = data.path("organization").path("repository")
+            val description = repo.path("description")
+                .asText()
+                ?.takeIf { it.isNotBlank() }
+            val branch = repo.path("defaultBranchRef")
+                .path("name")
+                .asText()
+                ?.takeIf { it.isNotBlank() }
+            val hasWikiEnabled = repo.getBooleanField("hasWikiEnabled") ?: false
+            val hasIssuesEnabled = repo.getBooleanField("hasIssuesEnabled") ?: false
+            val hasProjectsEnabled = repo.getBooleanField("hasProjectsEnabled") ?: false
+            // Visibility
+            var visibility: GitHubRepositoryVisibility? = null
+            if (askVisibility) {
+                // Unfortunately, as of now, the visibility flag is not available through the GraphQL API
+                // and a REST call is therefore needed to get this information
+                val rest = createGitHubRestTemplate()
+                visibility = rest.getForObject("/repos/${login}/${name}", GitHubRepositoryWithVisibility::class.java)
+                    ?.visibility
+                    ?.toUpperCase()
+                    ?.let { GitHubRepositoryVisibility.valueOf(it) }
+            }
+            // OK
+            GitHubRepositorySettings(
+                description = description,
+                defaultBranch = branch,
+                hasWikiEnabled = hasWikiEnabled,
+                hasIssuesEnabled = hasIssuesEnabled,
+                hasProjectsEnabled = hasProjectsEnabled,
+                visibility = visibility,
+            )
+        }
     }
 
     private fun toDateTime(date: Date?): LocalDateTime? = Time.from(date, null)

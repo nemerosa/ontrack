@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.jenkins.indicator
 
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorComputedCategory
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorComputedType
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorComputedValue
+import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputedCategory
+import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputedType
+import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputedValue
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals

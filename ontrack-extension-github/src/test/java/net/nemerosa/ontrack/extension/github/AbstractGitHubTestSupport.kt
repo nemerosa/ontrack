@@ -5,15 +5,11 @@ import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
-import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
-import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
@@ -61,6 +57,25 @@ abstract class AbstractGitHubTestSupport : AbstractQLKTITSupport() {
             property
         )
         return property
+    }
+
+    protected fun Project.gitHubRealConfig() {
+        // Create a Git configuration
+        val gitConfiguration = githubTestConfigReal()
+        asUser().with(GlobalSettings::class.java).call {
+            gitConfigurationService.newConfiguration(gitConfiguration)
+        }
+        // Project property
+        setProperty(
+            this,
+            GitHubProjectConfigurationPropertyType::class.java,
+            GitHubProjectConfigurationProperty(
+                gitConfiguration,
+                githubTestEnv.fullRepository,
+                0,
+                null
+            )
+        )
     }
 
     protected fun Project.expects(transformation: Pair<String, String>) {
