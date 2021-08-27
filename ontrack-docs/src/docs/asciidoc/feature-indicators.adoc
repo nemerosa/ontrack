@@ -15,6 +15,11 @@ Projects can be grouped together in _portfolios_ which are also associated with 
 
 Finally, the history of indicators is retained by Ontrack and can be used to compute trends at the different levels (at project level, at portfolio level or globally).
 
+Indicators functions can be accessed either by:
+
+* the _Indicators_ menu for the <<feature-indicators-acl,managers>>, leading to a page listing all the different options
+* the _Indicator portfolios_ menu for the non managers, leading the list of existing <<feature-indicators-portfolios,portfolios>>
+
 [[feature-indicators-acl]]
 ==== Indicators authorization model
 
@@ -42,10 +47,10 @@ However, managing indicators, types & portfolios is granted according to the fol
 [[feature-indicators-types]]
 ==== Indicator types management
 
-Categories & types can be managed manually by an authorized used using the following user menus:
+Categories & types can be managed manually by an authorized using the following user menus:
 
-* _Indicator categories_
-* _Indicator types_
+* _Indicators > Categories_
+* _Indicators > Types_
 
 A _category_ must have the following attributes:
 
@@ -154,7 +159,7 @@ image::images/extension-indicators-project-portfolios.png[Project portfolios,300
 [[feature-indicators-portfolios]]
 ==== Indicator portfolios
 
-Portfolios are available in the _Indicator portfolios_ user menu and the associated page displays the list of already created portfolios.
+Portfolios are available in the _Indicator portfolios_ user menu (or _Indicators > Portfolios_ for the managers) and the associated page displays the list of already created portfolios.
 
 In this list, each portfolio is associated with the list of categories for the current <<feature-indicators-view,view>> and each of these categories is associated with the average rating for all the projects and all the types of this category.
 
@@ -252,7 +257,7 @@ Indicator views group categories together under a common name. These views can b
 * portfolio page
 * project indicators
 
-The list of views can be <<feature-indicators-acl,edited>> by administrators and global indicator managers, using the _Indicator views_ item in the user menu.
+The list of views can be <<feature-indicators-acl,edited>> by administrators and global indicator managers, using the _Indicators > Views_ menu.
 
 In the view management page, the user can:
 
@@ -358,3 +363,33 @@ See the documentation of those two types for more information.
 The `SonarQubeIndicatorComputer` extension is an example of such an implementation.
 
 NOTE: Computed categories & types cannot be edited, and their values cannot be edited manually.
+
+
+[[feature-indicators-configurable]]
+==== Configurable indicators
+
+Some indicators, provided by Ontrack, are configurable:
+
+* they are disabled by default, and an <<feature-indicators-acl,administrator>> must enable them
+* optionally, these indicators take some parameters
+
+Once enabled, these configurable behave like any other computed indicator:
+
+* they are computed in the background
+* they cannot be edited
+
+As an administrator, you can access the list of configurable indicators through _Indicators > Configuration_:
+
+image::images/feature-indicators-configurable-menu.png[Configuration of the indicators]
+
+In the following page, the list of configurable indicators is shown, with their current status (enabled / disabled), their parameters, etc.
+
+image::images/feature-indicators-configurable-list.png[List of the configurable indicators]
+
+The administrator can use the edit button (pencil icon) to edit a given indicator and fill:
+
+* its status: enabled or disabled
+* an optional link (to some additional and specific documentation for example)
+* some parameters specific to this indicator
+
+image::images/feature-indicators-configurable-edit.png[Edition of a configurable indicator,400px]
