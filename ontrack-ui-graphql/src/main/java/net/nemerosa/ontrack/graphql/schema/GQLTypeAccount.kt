@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.graphql.schema
 
+import graphql.Scalars.GraphQLString
 import graphql.schema.DataFetcher
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.schema.security.GQLTypeAuthenticationSource
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.booleanField
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.stereotype.Component
@@ -19,7 +21,9 @@ class GQLTypeAccount(
         private val authorizedProject: GQLTypeAuthorizedProject,
         private val token: GQLTypeToken,
         private val fieldContributors: List<GQLFieldContributor>,
-        private val authenticationSource: GQLTypeAuthenticationSource
+        private val authenticationSource: GQLTypeAuthenticationSource,
+        private val accountGroupContributors: List<AccountGroupContributor>,
+        private val providedGroupsService: ProvidedGroupsService,
 ) : GQLType {
 
     override fun getTypeName(): String = ACCOUNT
@@ -68,6 +72,30 @@ class GQLTypeAccount(
                 }
                 .booleanField(Account::disabled, "Is this account disabled?")
                 .booleanField(Account::locked, "Is this account locked (meaning that no change can be performed)?")
+                // Contributed groups
+                .field {
+                    it.name("contributedGroups")
+                        .description("List of groups contributed to this account. Some groups are available only after the user has logged in.")
+                        .type(listType(GraphQLTypeReference(GQLTypeAccountGroup.ACCOUNT_GROUP)))
+                        .dataFetcher { env ->
+                            val account: Account = env.getSource()
+                            securityService.asAdmin {
+                                accountGroupContributors.flatMap { contributor -> contributor.collectGroups(account) }
+                            }
+                        }
+                }
+                // Provided groups
+                .field {
+                    it.name("providedGroups")
+                        .description("List of groups provided to this account. Some groups are available only after the user has logged in.")
+                        .type(listType(GraphQLString))
+                        .dataFetcher { env ->
+                            val account: Account = env.getSource()
+                            securityService.asAdmin {
+                                providedGroupsService.getProvidedGroups(account.id(), account.authenticationSource).toList().sorted()
+                            }
+                        }
+                }
                 // Links
                 .fields(Account::class.java.graphQLFieldContributions(fieldContributors))
                 // OK

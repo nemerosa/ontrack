@@ -18,6 +18,9 @@ class AdminQLIT : AbstractQLKTITSupport() {
     @Autowired
     private lateinit var tokensService: TokensService
 
+    @Autowired
+    private lateinit var providedGroupsService: ProvidedGroupsService
+
     private val JsonNode.name: String? get() = get("name").asText()
     private val JsonNode.id: Int get() = get("id").asInt()
 
@@ -658,6 +661,30 @@ class AdminQLIT : AbstractQLKTITSupport() {
                 }""")
                 val token = data["accounts"][0]["token"]
                 assertTrue(token["valid"].booleanValue())
+            }
+        }
+    }
+
+    @Test
+    fun `List of contributed and provided groups for an account`() {
+        asUser {
+            val account = securityService.currentAccount?.account ?: fail("No current account")
+            // Registers some provided accounts
+            providedGroupsService.saveProvidedGroups(account.id(), account.authenticationSource, setOf("provided-admin", "provided-user"))
+            // Queries them
+            run("""
+                {
+                    accounts(id: ${account.id}) {
+                        contributedGroups {
+                            name
+                        }
+                        providedGroups
+                    }
+                }
+            """).let { data ->
+                val accountNode = data.path("accounts").first()
+                val expectedGroupNames = setOf("provided-admin", "provided-user")
+                assertEq
             }
         }
     }
