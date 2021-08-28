@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.ldap.LDAPAuthenticationSourceProvider
+import net.nemerosa.ontrack.it.support.TestAuthenticationSourceProvider
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.TokensService
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -667,24 +668,44 @@ class AdminQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `List of contributed and provided groups for an account`() {
-        asUser {
+        asUserWithAuthenticationSource(TestAuthenticationSourceProvider.SOURCE).call {
             val account = securityService.currentAccount?.account ?: fail("No current account")
             // Registers some provided accounts
-            providedGroupsService.saveProvidedGroups(account.id(), account.authenticationSource, setOf("provided-admin", "provided-user"))
-            // Queries them
-            run("""
-                {
-                    accounts(id: ${account.id}) {
-                        contributedGroups {
-                            name
+            val providedGroupNames = setOf("provided-admin", "provided-user")
+            asAdmin {
+                // Provided groups for this account
+                providedGroupsService.saveProvidedGroups(account.id(), account.authenticationSource, providedGroupNames)
+                // Creates a group and a mapping
+                val adminGroup = doCreateAccountGroupWithGlobalRole(Roles.GLOBAL_ADMINISTRATOR)
+                mappingService.newMapping(account.authenticationSource, AccountGroupMappingInput(
+                    "provided-admin",
+                    adminGroup.id
+                ))
+                // Queries them
+                run(
+                    """
+                        {
+                            accounts(id: ${account.id}) {
+                                contributedGroups {
+                                    name
+                                }
+                                providedGroups
+                            }
                         }
-                        providedGroups
-                    }
+                    """
+                ).let { data ->
+                    val accountNode = data.path("accounts").first()
+                    assertEquals(
+                        setOf(adminGroup.name),
+                        accountNode.path("contributedGroups").map { it.path("name").asText() }.toSet(),
+                        "Expected contributed groups"
+                    )
+                    assertEquals(
+                        providedGroupNames,
+                        accountNode.path("providedGroups").map { it.asText() }.toSet(),
+                        "Expected provided groups"
+                    )
                 }
-            """).let { data ->
-                val accountNode = data.path("accounts").first()
-                val expectedGroupNames = setOf("provided-admin", "provided-user")
-                assertEq
             }
         }
     }
