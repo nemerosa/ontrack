@@ -16,7 +16,7 @@ angular.module('ot.view.promotionLevel', [
         // PromotionLevel's id
         const promotionLevelId = $stateParams.promotionLevelId;
         // GraphQL query
-        const query = `query PromotionLevel($id: Int!, $offset: Int!, $size: Int!) {
+        const query = `query PromotionLevel($id: Int!, $offset: Int!, $size: Int!, $name: String, $version: String) {
             promotionLevel(id: $id) {
                 id
                 name
@@ -24,7 +24,7 @@ angular.module('ot.view.promotionLevel', [
                 annotatedDescription
                 image
                 _image
-                promotionRuns: promotionRunsPaginated(offset: $offset, size: $size) {
+                promotionRuns: promotionRunsPaginated(offset: $offset, size: $size, name: $name, version: $version) {
                     pageInfo {
                         totalSize
                         currentOffset
@@ -96,7 +96,15 @@ angular.module('ot.view.promotionLevel', [
         const queryVariables = {
             id: promotionLevelId,
             offset: 0,
-            size: pageSize
+            size: pageSize,
+            name: null,
+            version: null,
+        };
+
+        // Filter
+        $scope.filter = {
+            name: '',
+            version: ''
         };
 
         $scope.loadingPromotionLevel = true;
@@ -105,6 +113,19 @@ angular.module('ot.view.promotionLevel', [
         // Loading the promotion level
         function loadPromotionLevel() {
             $scope.loadingPromotionLevel = true;
+
+            if ($scope.filter.name) {
+                queryVariables.name = $scope.filter.name;
+            } else {
+                queryVariables.name = null;
+            }
+
+            if ($scope.filter.version) {
+                queryVariables.version = $scope.filter.version;
+            } else {
+                queryVariables.version = null;
+            }
+
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 let promotionLevel = data.promotionLevel;
                 $scope.promotionLevel = promotionLevel;
@@ -182,6 +203,22 @@ angular.module('ot.view.promotionLevel', [
 
         // Initialisation
         loadPromotionLevel();
+
+        // Clears the filter
+        $scope.onClearFilter = () => {
+            $scope.filter.name = '';
+            $scope.filter.version = '';
+            queryVariables.offset = 0;
+            queryVariables.size = pageSize;
+            loadPromotionLevel();
+        };
+
+        // Applies the filter
+        $scope.onApplyFilter = () => {
+            queryVariables.offset = 0;
+            queryVariables.size = pageSize;
+            loadPromotionLevel();
+        };
 
         // Changing the image
         function changeImage() {

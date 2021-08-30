@@ -28,6 +28,22 @@
                 </th>
                 <th colspan="2">Promotion</th>
             </tr>
+            <tr>
+                <td colspan="3">
+                    <form class="form-inline" ng-submit="onApplyFilter()">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="filter_build_name" placeholder="Name" ng-model="filter.name"/>
+                            <span class="fa fa-info-circle text-info" title="Build name regular expression"></span>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="filter_build_version" placeholder="Version" ng-model="filter.version"/>
+                            <span class="fa fa-info-circle text-info" title="Build version regular expression"></span>
+                        </div>
+                        <button type="submit" class="btn btn-info" title="Apply filter"><span class="fa fa-search"></span></button>
+                        <button type="button" class="btn btn-default" title="Clear filter" ng-click="onClearFilter()"><span class="fa fa-ban"></span></button>
+                    </form>
+                </td>
+            </tr>
         </thead>
         <tbody>
         <tr ng-repeat="promotionRun in promotionLevel.promotionRuns.pageItems">
