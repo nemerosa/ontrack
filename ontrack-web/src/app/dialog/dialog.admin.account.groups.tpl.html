@@ -1,0 +1,60 @@
+<div class="modal-header">
+    <h3 ng-click="cancel()">
+        {{ account.name }} groups
+    </h3>
+</div>
+<div class="modal-body">
+    <div class="panel panel-default" ng-show="loadingAccountGroups">
+        <div class="alert alert-info">
+            <span class="ot-loading-indicator"></span>
+            Loading the groups...
+        </div>
+    </div>
+    <div class="panel panel-default"
+         ng-hide="loadingAccountGroups">
+        <div class="panel-heading">
+            Authentication source
+        </div>
+        <div class="panel-body">
+            {{ account.authenticationSource.provider }}
+            <span ng-if="account.authenticationSource.key"> / {{ account.authenticationSource.name }}</span>
+        </div>
+        <div class="panel-heading">
+            Assigned groups
+        </div>
+        <div class="panel-body">
+            <span ng-if="account.groups.length == 0"><i>None</i></span>
+            <ul>
+                <li ng-repeat="group in account.groups">{{ group.name }}</li>
+            </ul>
+        </div>
+        <div class="panel-heading">
+            Contributed groups
+        </div>
+        <div class="panel-body">
+            <span ng-if="account.contributedGroups.length == 0"><i>None</i></span>
+            <ul>
+                <li ng-repeat="group in account.contributedGroups">
+                    {{ group.name }}
+                    <ul ng-if="group.mappings.length > 0">
+                        <li ng-repeat="mapping in group.mappings">from {{ mapping.authenticationSource.provider }}<span ng-if="account.authenticationSource.key"> / {{ account.authenticationSource.name }}</span> <code>{{ mapping.name }}</code></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="panel-heading">
+            Provided groups
+        </div>
+        <div class="panel-body">
+            <span ng-if="account.providedGroups.length == 0"><i>None</i></span>
+            <ul>
+                <li ng-repeat="group in account.providedGroups">
+                    {{ group }}
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="submit" ng-click="cancel()">OK</button>
+</div>

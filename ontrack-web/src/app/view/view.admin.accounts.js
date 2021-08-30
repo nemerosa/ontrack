@@ -1,7 +1,8 @@
 angular.module('ot.view.admin.accounts', [
     'ui.router',
     'ot.service.core',
-    'ot.service.graphql'
+    'ot.service.graphql',
+    'ot.dialog.admin.account.groups'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('admin-accounts', {
@@ -11,7 +12,7 @@ angular.module('ot.view.admin.accounts', [
         });
     })
 
-    .controller('AdminAccountsCtrl', function ($scope, $http, ot, otFormService, otAlertService, otGraphqlService) {
+    .controller('AdminAccountsCtrl', function ($scope, $http, $modal, ot, otFormService, otAlertService, otGraphqlService) {
         var view = ot.view();
         view.title = "Account management";
 
@@ -127,6 +128,21 @@ angular.module('ot.view.admin.accounts', [
                 ot.call($http.delete(account.links._delete)).then(load);
             });
 
+        };
+
+        // Displays the groups of an account
+        $scope.displayGroups = function (account) {
+            $modal.open({
+                templateUrl: 'app/dialog/dialog.admin.account.groups.tpl.html',
+                controller: 'otDialogAdminAccountGroups',
+                resolve: {
+                    config: function () {
+                        return {
+                            account: account
+                        };
+                    }
+                }
+            });
         };
 
         // Creating a group

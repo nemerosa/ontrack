@@ -103,6 +103,10 @@
                           ></span>
                 </td>
                 <td>
+                <span class="ot-command fa fa-users"
+                      title="Displays the assigned, contributed and provided groups for this account."
+                      ng-if="account.links._update"
+                      ng-click="displayGroups(account)"></span>
                 <span class="ot-command ot-command-update"
                       title="Update account {{account.name}}"
                       ng-if="account.links._update"
