@@ -18,7 +18,7 @@ class GQLScalarLocalDateTime private constructor() : GraphQLScalarType(
 
         override fun serialize(dataFetcherResult: Any): String? =
             if (dataFetcherResult is LocalDateTime) {
-                DateTimeFormatter.ISO_INSTANT.format(dataFetcherResult)
+                dataFetcherResult.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
             } else {
                 throw CoercingSerializeException("Cannot serialize ${dataFetcherResult::class.java} into a string")
             }
