@@ -765,7 +765,6 @@ angular.module('ontrack.extension.indicators', [
         let viewInitialized = false;
 
         $scope.filtering = {
-            showAllCategories: false,
             useView: false,
             view: null
         };
@@ -783,11 +782,6 @@ angular.module('ontrack.extension.indicators', [
                 $scope.portfolios.forEach(portfolio => {
                     portfolio.selected = true;
                 });
-
-                // If no portfolio, show all categories by default
-                if ($scope.portfolios.length === 0) {
-                    $scope.filtering.showAllCategories = true;
-                }
 
                 // Getting the list of portfolios per categories
                 $scope.projectIndicators.categories.forEach((categoryIndicators) => {
@@ -818,10 +812,12 @@ angular.module('ontrack.extension.indicators', [
 
         loadIndicators();
 
-        $scope.isCategoryIndicatorsSelected = (categoryIndicators) =>
-            $scope.filtering.showAllCategories ||
-            categoryIndicators.portfolios.some((portfolio) => portfolio.selected) ||
-            ($scope.filtering.useView && $scope.filtering.view && $scope.filtering.view.categories.some((viewCategory) => viewCategory.id === categoryIndicators.category.id));
+        $scope.isCategoryIndicatorsSelected = (categoryIndicators) => {
+            const portfolioSelected = categoryIndicators.portfolios.some((portfolio) => portfolio.selected);
+            return (!portfolioSelected && !$scope.filtering.useView) ||
+                portfolioSelected ||
+                ($scope.filtering.useView && $scope.filtering.view && $scope.filtering.view.categories.some((viewCategory) => viewCategory.id === categoryIndicators.category.id));
+        };
 
         $scope.editIndicator = (indicator) => {
             otExtensionIndicatorsService.editIndicator(indicator).then(loadIndicators);
