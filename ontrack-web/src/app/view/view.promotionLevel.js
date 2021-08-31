@@ -16,7 +16,7 @@ angular.module('ot.view.promotionLevel', [
         // PromotionLevel's id
         const promotionLevelId = $stateParams.promotionLevelId;
         // GraphQL query
-        const query = `query PromotionLevel($id: Int!, $offset: Int!, $size: Int!, $name: String, $version: String) {
+        const query = `query PromotionLevel($id: Int!, $offset: Int!, $size: Int!, $name: String, $version: String, $afterDate: LocalDateTime, $beforeDate: LocalDateTime) {
             promotionLevel(id: $id) {
                 id
                 name
@@ -24,7 +24,7 @@ angular.module('ot.view.promotionLevel', [
                 annotatedDescription
                 image
                 _image
-                promotionRuns: promotionRunsPaginated(offset: $offset, size: $size, name: $name, version: $version) {
+                promotionRuns: promotionRunsPaginated(offset: $offset, size: $size, name: $name, version: $version, afterDate: $afterDate, beforeDate: $beforeDate) {
                     pageInfo {
                         totalSize
                         currentOffset
@@ -99,12 +99,16 @@ angular.module('ot.view.promotionLevel', [
             size: pageSize,
             name: null,
             version: null,
+            afterDate: null,
+            beforeDate: null
         };
 
         // Filter
         $scope.filter = {
             name: '',
-            version: ''
+            version: '',
+            afterDate: null,
+            beforeDate: null
         };
 
         $scope.loadingPromotionLevel = true;
@@ -125,6 +129,9 @@ angular.module('ot.view.promotionLevel', [
             } else {
                 queryVariables.version = null;
             }
+
+            queryVariables.afterDate = $scope.filter.afterDate;
+            queryVariables.beforeDate = $scope.filter.beforeDate;
 
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 let promotionLevel = data.promotionLevel;
@@ -208,6 +215,8 @@ angular.module('ot.view.promotionLevel', [
         $scope.onClearFilter = () => {
             $scope.filter.name = '';
             $scope.filter.version = '';
+            $scope.filter.afterDate = null;
+            $scope.filter.beforeDate = null;
             queryVariables.offset = 0;
             queryVariables.size = pageSize;
             loadPromotionLevel();
