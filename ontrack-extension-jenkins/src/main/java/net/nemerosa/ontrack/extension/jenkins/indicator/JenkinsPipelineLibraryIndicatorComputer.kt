@@ -19,6 +19,11 @@ class JenkinsPipelineLibraryIndicatorComputer(
     private val jenkinsPipelineLibraryIndicatorValueType: JenkinsPipelineLibraryIndicatorValueType,
 ) : AbstractSCMIndicatorComputer(extension, scmServiceDetector) {
 
+    /**
+     * Parallelisation of the computation is not necessary for this indicator.
+     */
+    override val perProject: Boolean = false
+
     override val name: String = "Jenkins pipeline libraries"
 
     override val source: IndicatorSource = jenkinsPipelineLibraryIndicatorSourceProvider.createSource("")
