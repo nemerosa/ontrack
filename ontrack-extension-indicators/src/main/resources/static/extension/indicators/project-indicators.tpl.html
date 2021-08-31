@@ -37,6 +37,7 @@
                     <select id="views"
                        ng-disabled="!filtering.useView"
                        ng-model="filtering.view"
+                       ng-change="onFilterViewSelected()"
                        ng-options="view as view.name for view in indicatorViewList.views"></select>
                 </label>
             </td>

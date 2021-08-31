@@ -802,6 +802,16 @@ angular.module('ontrack.extension.indicators', [
                     view.commands = [
                         ot.viewCloseCommand('/project/' + $scope.project.id)
                     ];
+                    // Selection of the initial view
+                    const localViewId = localStorage.getItem('portfoliosView');
+                    if (localViewId) {
+                        $scope.filtering.view = $scope.indicatorViewList.views.find((view) => view.id === localViewId);
+                        if ($scope.filtering.view) {
+                            $scope.filtering.useView = true;
+                        } else {
+                            $scope.filtering.useView = false;
+                        }
+                    }
                     // OK
                     viewInitialized = true;
                 }
@@ -833,6 +843,15 @@ angular.module('ontrack.extension.indicators', [
 
         $scope.fold = (categoryIndicators) => {
             categoryIndicators.unfolded = false;
+        };
+
+        $scope.onFilterViewSelected = () => {
+            const view = $scope.filtering.view;
+            if (view) {
+                localStorage.setItem('portfoliosView', view.id);
+            } else {
+                localStorage.removeItem('portfoliosView');
+            }
         };
 
     })
