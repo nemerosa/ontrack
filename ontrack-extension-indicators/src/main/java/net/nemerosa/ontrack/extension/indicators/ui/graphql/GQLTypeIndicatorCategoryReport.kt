@@ -53,12 +53,6 @@ class GQLTypeIndicatorCategoryReport(
         IndicatorCategoryReport(category, env)
 
     companion object {
-        const val ARG_FILLED_ONLY = "filledOnly"
-        const val ARG_PROJECT_ID = "projectId"
-        const val ARG_PROJECT_NAME = "projectName"
-        const val ARG_PORTFOLIO = "portfolio"
-        const val ARG_LABEL = "label"
-
         const val INDICATOR_CATEGORY_REPORT: String = "IndicatorCategoryReport"
     }
 

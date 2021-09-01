@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.extension.indicators
 
 import net.nemerosa.ontrack.extension.indicators.model.*
-import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolio
-import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
-import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorViewService
-import net.nemerosa.ontrack.extension.indicators.portfolio.PortfolioUpdateForm
+import net.nemerosa.ontrack.extension.indicators.portfolio.*
 import net.nemerosa.ontrack.extension.indicators.support.IntegerThresholds
 import net.nemerosa.ontrack.extension.indicators.support.Percentage
 import net.nemerosa.ontrack.extension.indicators.support.PercentageThreshold
@@ -78,6 +75,19 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
                         deprecated = deprecated
                 ),
                 source = source
+        )
+    }
+
+    protected fun indicatorView(
+        name: String = uid("V"),
+        categories: List<IndicatorCategory>,
+    ) = asAdmin {
+        indicatorViewService.saveIndicatorView(
+            IndicatorView(
+                id = "",
+                name = name,
+                categories = categories.map { it.id }
+            )
         )
     }
 

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
+import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorViewManagement
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorView
@@ -10,6 +11,7 @@ import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.graphQLFieldContributions
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.ui.resource.AbstractLinkResourceDecorator
 import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.linkIfGlobal
@@ -34,9 +36,31 @@ class GQLTypeIndicatorViewList(
             .field {
                 it.name("views")
                     .description("List of indicator views")
-                    .type(stdList(gqlTypeIndicatorView.typeRef))
-                    .dataFetcher {
-                        indicatorViewService.getIndicatorViews()
+                    .type(listType(gqlTypeIndicatorView.typeRef))
+                    .argument { a ->
+                        a.name(ARG_ID)
+                            .description("ID of the view to put in the list")
+                            .type(GraphQLString)
+                    }
+                    .argument { a ->
+                        a.name(ARG_NAME)
+                            .description("Name of the view to put in the list")
+                            .type(GraphQLString)
+                    }
+                    .dataFetcher { env ->
+                        val id: String? = env.getArgument(ARG_ID)
+                        val name: String? = env.getArgument(ARG_NAME)
+                        if (id != null) {
+                            listOfNotNull(
+                                indicatorViewService.findIndicatorViewById(id)
+                            )
+                        } else if (name != null) {
+                            listOfNotNull(
+                                indicatorViewService.findIndicatorViewByName(name)
+                            )
+                        } else {
+                            indicatorViewService.getIndicatorViews()
+                        }
                     }
             }
             // Links
@@ -45,6 +69,11 @@ class GQLTypeIndicatorViewList(
             .build()
 
     override fun getTypeName(): String = IndicatorViewList::class.java.simpleName
+
+    companion object {
+        const val ARG_ID = "id"
+        const val ARG_NAME = "name"
+    }
 }
 
 class IndicatorViewList private constructor() {
