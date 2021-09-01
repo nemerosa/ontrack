@@ -16,7 +16,6 @@ interface IndicatorReportingService {
      * this list of types to assert if the project has some indicator value
      * @return Matching projects
      */
-    @Deprecated("Use the report method directly")
     fun findProjects(filter: IndicatorReportingFilter, types: List<IndicatorType<*, *>>): List<Project>
 
     /**

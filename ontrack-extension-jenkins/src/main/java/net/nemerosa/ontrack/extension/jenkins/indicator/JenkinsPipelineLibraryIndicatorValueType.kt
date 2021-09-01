@@ -43,6 +43,11 @@ class JenkinsPipelineLibraryIndicatorValueType(
             else -> IndicatorCompliance.HIGHEST
         }
 
+    override fun toClientString(
+        config: JenkinsPipelineLibraryIndicatorValueTypeConfig,
+        value: JenkinsPipelineLibraryVersion?
+    ): String = value?.value ?: ""
+
     override fun toClientJson(
         config: JenkinsPipelineLibraryIndicatorValueTypeConfig,
         value: JenkinsPipelineLibraryVersion?

@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
-import graphql.Scalars.*
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategory
@@ -55,31 +54,6 @@ class GQLTypeIndicatorCategory(
                 .description("Reporting the indicators for the types in this category")
                 .type(GraphQLNonNull(indicatorCategoryReportType.typeRef))
                 .arguments(indicatorReportingService.arguments)
-                .argument {
-                    it.name(GQLTypeIndicatorCategoryReport.ARG_FILLED_ONLY)
-                        .description("Reports only projects where the indicator is filled in")
-                        .type(GraphQLBoolean)
-                }
-                .argument {
-                    it.name(GQLTypeIndicatorCategoryReport.ARG_PROJECT_ID)
-                        .description("Reports on the project matching this ID")
-                        .type(GraphQLInt)
-                }
-                .argument {
-                    it.name(GQLTypeIndicatorCategoryReport.ARG_PROJECT_NAME)
-                        .description("Reports on the project matching this name")
-                        .type(GraphQLString)
-                }
-                .argument {
-                    it.name(GQLTypeIndicatorCategoryReport.ARG_PORTFOLIO)
-                        .description("Reports on the projects belonging to this portfolio")
-                        .type(GraphQLString)
-                }
-                .argument {
-                    it.name(GQLTypeIndicatorCategoryReport.ARG_LABEL)
-                        .description("Reports on the projects matching this label")
-                        .type(GraphQLString)
-                }
                 .dataFetcher { env ->
                     val category = env.getSource<IndicatorCategory>()
                     indicatorCategoryReportType.report(category, env)
