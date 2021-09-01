@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.job.orchestrator
 
+import io.mockk.mockk
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.job.support.AbstractJobTest
 import net.nemerosa.ontrack.job.support.ConfigurableJob
 import net.nemerosa.ontrack.test.assertNotPresent
 import net.nemerosa.ontrack.test.assertPresent
 import org.junit.Test
+import org.springframework.transaction.PlatformTransactionManager
 import java.util.stream.Stream
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -127,7 +129,8 @@ class JobOrchestratorIntegrationTest : AbstractJobTest() {
         private val orchestrator: JobOrchestrator = JobOrchestrator(
                 scheduler,
                 "Test",
-                listOf(supplier)
+                listOf(supplier),
+                mockk(relaxed = true)
         )
 
         fun orchestration(code: OrchestrationContext.() -> Unit) {

@@ -8,6 +8,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation(project(":ontrack-common"))
     implementation("org.springframework:spring-context")
+    implementation("org.springframework:spring-tx")
     implementation("org.slf4j:slf4j-api")
     implementation("io.micrometer:micrometer-core")
 
