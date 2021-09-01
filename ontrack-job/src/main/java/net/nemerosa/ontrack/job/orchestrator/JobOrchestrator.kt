@@ -3,14 +3,18 @@ package net.nemerosa.ontrack.job.orchestrator
 import net.nemerosa.ontrack.job.*
 import java.util.*
 import kotlin.streams.toList
+import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.support.TransactionTemplate
 
 class JobOrchestrator(
         private val jobScheduler: JobScheduler,
         private val name: String,
-        private val jobOrchestratorSuppliers: Collection<JobOrchestratorSupplier>
+        private val jobOrchestratorSuppliers: Collection<JobOrchestratorSupplier>,
+        transactionManager: PlatformTransactionManager,
 ) : Job {
 
     private val cache = HashSet<JobKey>()
+    private val transactionTemplate = TransactionTemplate(transactionManager)
 
     override fun getKey(): JobKey {
         return JobCategory.CORE.getType("orchestrator").withName("Orchestrator").getKey(name)
@@ -23,8 +27,9 @@ class JobOrchestrator(
     @Synchronized
     fun orchestrate(runListener: JobRunListener) {
         // Complete list of registrations
-        val registrations = jobOrchestratorSuppliers
-                .flatMap { it.collectJobRegistrations().toList() }
+        val registrations = transactionTemplate.execute {
+            jobOrchestratorSuppliers.flatMap { it.collectJobRegistrations().toList() }
+        } ?: return
         // List of registration keys
         val keys = registrations
                 .map { registration -> registration.job.key }
