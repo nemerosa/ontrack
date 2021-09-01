@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.job.support
 
+import io.mockk.mockk
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
@@ -425,7 +426,8 @@ class JobSchedulingTest : AbstractJobTest() {
                                 ).stream()
                             }
 
-                    )
+                    ),
+                    mockk(relaxed = true)
             )
             // Registers the orchestrator
             schedule(jobOrchestrator, Schedule.EVERY_SECOND)
