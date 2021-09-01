@@ -36,6 +36,8 @@
                             <span ng-click="selectView(view)" class="ot-action">
                                 {{ view.name }}
                             </span>
+                            <!-- Report for this view -->
+                            <span class="fa fa-eye ot-command" title="Report of all indicators for this view" ng-click="reportView(view)"></span>
                             <!-- Updating -->
                             <span class="ot-command-update ot-command"
                                   title="Updating the name of this view"

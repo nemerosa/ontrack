@@ -213,7 +213,7 @@ angular.module('ontrack.extension.indicators', [
             controller: 'IndicatorViewsCtrl'
         });
     })
-    .controller('IndicatorViewsCtrl', function ($scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
+    .controller('IndicatorViewsCtrl', function ($scope, $http, $location, ot, otGraphqlService, otFormService, otAlertService) {
         $scope.loadingViews = false;
 
         const view = ot.view();
@@ -316,6 +316,10 @@ angular.module('ontrack.extension.indicators', [
             });
         };
 
+        $scope.reportView = (view) => {
+            $location.path(`/extension/indicators/views/${view.id}/report`);
+        };
+
         $scope.updateViewName = (view) => {
             if (view.links._update) {
                 const formConfig = {
@@ -359,6 +363,128 @@ angular.module('ontrack.extension.indicators', [
         $scope.fold = (category) => {
             category.unfolded = false;
         };
+
+    })
+    .config(function ($stateProvider) {
+        $stateProvider.state('indicator-view-report', {
+            url: '/extension/indicators/views/{id}/report',
+            templateUrl: 'extension/indicators/view-report.tpl.html',
+            controller: 'IndicatorViewReportCtrl'
+        });
+    })
+    .controller('IndicatorViewReportCtrl', function ($scope, $stateParams, $http, ot, otGraphqlService) {
+        $scope.loadingReport = false;
+        const viewId = $stateParams.id;
+
+        const view = ot.view();
+        view.title = "Indicator view report";
+
+        const query = `
+            query IndicatorViewReport($id: String!, $filledOnly: Boolean!, $duration: Int) {
+              indicatorViewList {
+                views(id: $id) {
+                  id
+                  name
+                  categories {
+                    id
+                    name
+                  }
+                  reports(filledOnly: $filledOnly, duration: $duration) {
+                    project {
+                      id
+                      name
+                      links {
+                        _page
+                      }
+                    }
+                    viewStats {
+                      category {
+                        id
+                      }
+                      stats {
+                        total
+                        count
+                        min
+                        minCount
+                        minRating
+                        avg
+                        avgRating
+                        max
+                        maxCount
+                        maxRating
+                      }
+                      previousStats {
+                        stats {
+                          avg
+                          avgRating
+                        }
+                        avgTrend
+                        durationSeconds
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        `;
+
+        $scope.filter = {
+            filledOnly: true,
+            duration: '',
+        };
+
+        const queryVariables = {
+            id: viewId
+        };
+
+        let viewInitialized = false;
+
+        $scope.loadReport = () => {
+            $scope.loadingReport = true;
+            queryVariables.filledOnly = $scope.filter.filledOnly;
+            if ($scope.filter.duration) {
+                queryVariables.duration = Number($scope.filter.duration);
+            } else {
+                queryVariables.duration = null;
+            }
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
+                $scope.view = data.indicatorViewList.views[0];
+                $scope.reports = $scope.view.reports;
+
+                // Indexation of stats per category for each project line
+                $scope.reports.forEach(report => {
+                    report.indexedViewStats = {};
+                     report.viewStats.forEach(viewStat => {
+                         report.indexedViewStats[viewStat.category.id] = viewStat;
+                     });
+                });
+
+                if (!viewInitialized) {
+                    view.title = `Indicator report for view ${$scope.view.name}`;
+                    view.commands = [
+                        {
+                            id: 'indicator-view-report-export',
+                            name: "CSV Export",
+                            cls: 'ot-command-download',
+                            absoluteLink: `extension/indicators/view/${viewId}/report/export?filledOnly=${$scope.filter.filledOnly}`
+                        },
+                        ot.viewCloseCommand('/extension/indicators/views')
+                    ];
+                    viewInitialized = true;
+                }
+
+            }).finally(() => {
+                $scope.loadingReport = false;
+            });
+        };
+
+        $scope.loadReport();
+
+        $scope.$watch('filter.duration', (newValue, oldValue) => {
+            if (newValue !== oldValue) {
+                $scope.loadReport();
+            }
+        });
 
     })
     .config(function ($stateProvider) {

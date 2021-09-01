@@ -1,0 +1,67 @@
+<ot-view>
+
+    <ot-extension-indicators-message></ot-extension-indicators-message>
+
+    <div class="row" ng-show="loadingReport">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading indicator report...
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-hide="loadingReport">
+        <div class="col-md-12">
+            <form class="form-inline">
+                <div class="checkbox">
+                    <label>
+                        <input id="filter-filled-only" ng-model="filter.filledOnly" type="checkbox" ng-change="loadReport()">
+                        Only projects with values
+                    </label>
+                </div>
+                <div class="form-group">
+                    <!--suppress XmlInvalidId -->
+                    <label for="trend-selection"><span class="fa fa-line-chart"></span> Trend period</label>
+                    <ot-extension-indicators-trend-selection
+                            select-id="trend-selection"
+                            model="filter.duration"
+                    ></ot-extension-indicators-trend-selection>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <table class="table table-hover table-bordered" ng-if="reports">
+        <thead>
+        <tr>
+            <th>Projects</th>
+            <th ng-repeat="category in view.categories" colspan="2">
+                <a href="#/extension/indicators/categories/{{ category.id }}/report">{{ category.name }}</a>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="report in reports">
+            <td>
+                <a href="{{ report.project.links._page }}">{{ report.project.name }}</a>
+                <a href="#/extension/indicators/project-indicators/{{ report.project.id }}"><span class="fa fa-eye ot-command" title="Indicators for project {{ report.project.name }}"></span></a>
+            </td>
+            <td ng-repeat-start="category in view.categories" style="width: 36px;">
+                <span ng-if="report.indexedViewStats[category.id] && report.indexedViewStats[category.id].stats.count > 0">
+                    <ot-extension-indicators-status
+                            status="{compliance: report.indexedViewStats[category.id].stats.avg, rating: report.indexedViewStats[category.id].stats.avgRating }"
+                            size="md"
+                    ></ot-extension-indicators-status>
+                </span>
+            </td>
+            <td ng-repeat-end>
+                <span ng-if="report.indexedViewStats[category.id] && report.indexedViewStats[category.id].stats.count > 0">
+                    <ot-extension-indicators-stats-summary stats="report.indexedViewStats[category.id].stats" previous-stats="report.indexedViewStats[category.id].previousStats" item="category and project"></ot-extension-indicators-stats-summary>
+                </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</ot-view>
