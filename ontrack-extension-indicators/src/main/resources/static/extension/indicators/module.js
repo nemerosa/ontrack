@@ -466,7 +466,7 @@ angular.module('ontrack.extension.indicators', [
                             id: 'indicator-view-report-export',
                             name: "CSV Export",
                             cls: 'ot-command-download',
-                            absoluteLink: `extension/indicators/view/${viewId}/report/export?filledOnly=${$scope.filter.filledOnly}`
+                            absoluteLink: `extension/indicators/views/${viewId}/report/export?filledOnly=${$scope.filter.filledOnly}`
                         },
                         ot.viewCloseCommand('/extension/indicators/views')
                     ];

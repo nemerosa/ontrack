@@ -1,6 +1,10 @@
 package net.nemerosa.ontrack.extension.indicators.ui
 
+import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorViewManagement
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategoryService
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorReportingFilter
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorView
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorViewIDNotFoundException
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorViewService
@@ -15,6 +19,7 @@ import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
+import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
 
 /**
@@ -24,6 +29,9 @@ import javax.validation.Valid
 @RequestMapping("/extension/indicators/views")
 class IndicatorViewController(
     private val indicatorViewService: IndicatorViewService,
+    private val indicatorCategoryService: IndicatorCategoryService,
+    private val indicatorTypeService: IndicatorTypeService,
+    private val indicatorExportService: IndicatorExportService,
     private val securityService: SecurityService
 ) : AbstractResourceController() {
 
@@ -92,6 +100,30 @@ class IndicatorViewController(
     fun delete(@PathVariable id: String): ResponseEntity<Ack> =
         ResponseEntity.ok(indicatorViewService.deleteIndicatorView(id))
 
+    /**
+     * Download the category report as CSV
+     */
+    @GetMapping("{id}/report/export")
+    fun reportExport(
+        @PathVariable id: String,
+        @RequestParam(value = "filledOnly", defaultValue = "true") filledOnly: Boolean,
+        response: HttpServletResponse
+    ): Document {
+        // Gets the view
+        val view = indicatorViewService.findIndicatorViewById(id) ?: throw IndicatorViewIDNotFoundException(id)
+        // Gets all the types for this view
+        val types = view.categories
+            .mapNotNull(indicatorCategoryService::findCategoryById)
+            .flatMap(indicatorTypeService::findByCategory)
+        // Filter on the projects
+        val filter = IndicatorReportingFilter(filledOnly = filledOnly)
+        // Export
+        val csv = indicatorExportService.exportCSV(filter, types)
+        // Attachment
+        response.addHeader("Content-Disposition", "attachment; filename=ontrack-indicator-view-$id.csv")
+        // Export as CSV
+        return csv
+    }
 
     private fun getViewForm(view: IndicatorView? = null): Form {
         return Form.create()
