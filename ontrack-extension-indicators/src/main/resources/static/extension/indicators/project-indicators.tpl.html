@@ -11,24 +11,15 @@
         </div>
     </div>
 
-    <div class="row" ng-show="!loadingIndicators && portfolios.length == 0">
-        <div class="col-md-12">
-            <div class="alert alert-info">
-                This project is not associated with any portfolio. All indicator types
-                will be displayed.
-            </div>
-        </div>
-    </div>
-
     <table class="table table-bordered table-hover">
-        <thead ng-if="portfolios.length > 0">
+        <thead>
         <tr>
             <td colspan="6" class="">
                 Filter:
-                <span ng-repeat="portfolio in portfolios">
+                <span ng-repeat="portfolio in portfolios" ng-if="portfolios.length > 0">
                     <label title="Select categories which match the '{{portfolio.name}}' portfolio."
                         ng-class="{
-                            'text-muted': filtering.showAllCategories || !portfolio.selected
+                            'text-muted': !portfolio.selected
                         }">
                         <input id="{{portfolio.id}}-selection" type="checkbox" ng-model="portfolio.selected"/>
                         <span>{{portfolio.name}}</span>
@@ -38,11 +29,6 @@
                     </label>
                 </span>
                 <label>
-                    <input id="all-types-selection" type="checkbox" ng-model="filtering.showAllCategories"/>
-                    <span>Show all categories</span>
-                    <span class="fa fa-info-circle" title="Shows all categories, independently of the portfolios."></span>
-                </label>
-                <label>
                     <input id="view-selection" type="checkbox" ng-model="filtering.useView"/>
                     <span>Use view</span>
                     <span class="fa fa-info-circle" title="Use a view to show the categories."></span>
@@ -51,6 +37,7 @@
                     <select id="views"
                        ng-disabled="!filtering.useView"
                        ng-model="filtering.view"
+                       ng-change="onFilterViewSelected()"
                        ng-options="view as view.name for view in indicatorViewList.views"></select>
                 </label>
             </td>

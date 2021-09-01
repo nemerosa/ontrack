@@ -765,7 +765,6 @@ angular.module('ontrack.extension.indicators', [
         let viewInitialized = false;
 
         $scope.filtering = {
-            showAllCategories: false,
             useView: false,
             view: null
         };
@@ -783,11 +782,6 @@ angular.module('ontrack.extension.indicators', [
                 $scope.portfolios.forEach(portfolio => {
                     portfolio.selected = true;
                 });
-
-                // If no portfolio, show all categories by default
-                if ($scope.portfolios.length === 0) {
-                    $scope.filtering.showAllCategories = true;
-                }
 
                 // Getting the list of portfolios per categories
                 $scope.projectIndicators.categories.forEach((categoryIndicators) => {
@@ -808,6 +802,16 @@ angular.module('ontrack.extension.indicators', [
                     view.commands = [
                         ot.viewCloseCommand('/project/' + $scope.project.id)
                     ];
+                    // Selection of the initial view
+                    const localViewId = localStorage.getItem('portfoliosView');
+                    if (localViewId) {
+                        $scope.filtering.view = $scope.indicatorViewList.views.find((view) => view.id === localViewId);
+                        if ($scope.filtering.view) {
+                            $scope.filtering.useView = true;
+                        } else {
+                            $scope.filtering.useView = false;
+                        }
+                    }
                     // OK
                     viewInitialized = true;
                 }
@@ -818,10 +822,12 @@ angular.module('ontrack.extension.indicators', [
 
         loadIndicators();
 
-        $scope.isCategoryIndicatorsSelected = (categoryIndicators) =>
-            $scope.filtering.showAllCategories ||
-            categoryIndicators.portfolios.some((portfolio) => portfolio.selected) ||
-            ($scope.filtering.useView && $scope.filtering.view && $scope.filtering.view.categories.some((viewCategory) => viewCategory.id === categoryIndicators.category.id));
+        $scope.isCategoryIndicatorsSelected = (categoryIndicators) => {
+            const portfolioSelected = categoryIndicators.portfolios.some((portfolio) => portfolio.selected);
+            return (!portfolioSelected && !$scope.filtering.useView) ||
+                portfolioSelected ||
+                ($scope.filtering.useView && $scope.filtering.view && $scope.filtering.view.categories.some((viewCategory) => viewCategory.id === categoryIndicators.category.id));
+        };
 
         $scope.editIndicator = (indicator) => {
             otExtensionIndicatorsService.editIndicator(indicator).then(loadIndicators);
@@ -837,6 +843,15 @@ angular.module('ontrack.extension.indicators', [
 
         $scope.fold = (categoryIndicators) => {
             categoryIndicators.unfolded = false;
+        };
+
+        $scope.onFilterViewSelected = () => {
+            const view = $scope.filtering.view;
+            if (view) {
+                localStorage.setItem('portfoliosView', view.id);
+            } else {
+                localStorage.removeItem('portfoliosView');
+            }
         };
 
     })
