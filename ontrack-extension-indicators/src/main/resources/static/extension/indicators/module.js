@@ -448,8 +448,8 @@ angular.module('ontrack.extension.indicators', [
                 queryVariables.duration = null;
             }
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
-                $scope.view = data.indicatorViewList.views[0];
-                $scope.reports = $scope.view.reports;
+                $scope.theView = data.indicatorViewList.views[0];
+                $scope.reports = $scope.theView.reports;
 
                 // Indexation of stats per category for each project line
                 $scope.reports.forEach(report => {
@@ -460,7 +460,7 @@ angular.module('ontrack.extension.indicators', [
                 });
 
                 if (!viewInitialized) {
-                    view.title = `Indicator report for view ${$scope.view.name}`;
+                    view.title = `Indicator report for view ${$scope.theView.name}`;
                     view.commands = [
                         {
                             id: 'indicator-view-report-export',

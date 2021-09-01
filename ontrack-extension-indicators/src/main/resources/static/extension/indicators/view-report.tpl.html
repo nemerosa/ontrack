@@ -36,7 +36,7 @@
         <thead>
         <tr>
             <th>Projects</th>
-            <th ng-repeat="category in view.categories" colspan="2">
+            <th ng-repeat="category in theView.categories" colspan="2">
                 <a href="#/extension/indicators/categories/{{ category.id }}/report">{{ category.name }}</a>
             </th>
         </tr>
@@ -47,7 +47,7 @@
                 <a href="{{ report.project.links._page }}">{{ report.project.name }}</a>
                 <a href="#/extension/indicators/project-indicators/{{ report.project.id }}"><span class="fa fa-eye ot-command" title="Indicators for project {{ report.project.name }}"></span></a>
             </td>
-            <td ng-repeat-start="category in view.categories" style="width: 36px;">
+            <td ng-repeat-start="category in theView.categories" style="width: 36px;">
                 <span ng-if="report.indexedViewStats[category.id] && report.indexedViewStats[category.id].stats.count > 0">
                     <ot-extension-indicators-status
                             status="{compliance: report.indexedViewStats[category.id].stats.avg, rating: report.indexedViewStats[category.id].stats.avgRating }"
