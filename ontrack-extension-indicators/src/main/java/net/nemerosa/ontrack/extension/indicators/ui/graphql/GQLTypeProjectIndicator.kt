@@ -135,7 +135,7 @@ class GQLTypeProjectIndicator(
                             fieldName = "history",
                             fieldDescription = "History of this indicator",
                             itemType = projectIndicatorHistoryItem,
-                            itemPaginatedListProvider = { env, source, offset, size ->
+                            itemPaginatedListProvider = { _, source, offset, size ->
                                 history(source, offset, size)
                             }
                     )

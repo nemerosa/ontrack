@@ -11,7 +11,7 @@ import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioSer
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorViewService
 import net.nemerosa.ontrack.extension.indicators.stats.IndicatorStatsService
 import net.nemerosa.ontrack.graphql.schema.*
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.stereotype.Component
 
@@ -47,7 +47,7 @@ class GQLTypeIndicatorPortfolio(
                     .field {
                         it.name(IndicatorPortfolio::categories.name)
                                 .description("Indicator categories being shown for this portfolio")
-                                .type(stdList(indicatorCategory.typeRef))
+                                .type(listType(indicatorCategory.typeRef))
                                 .dataFetcher { env ->
                                     val portfolio: IndicatorPortfolio = env.getSource()
                                     portfolio.categories.mapNotNull { id ->
@@ -59,7 +59,7 @@ class GQLTypeIndicatorPortfolio(
                     .field {
                         it.name("projects")
                                 .description("List of projects associated with this portfolio")
-                                .type(stdList(GraphQLTypeReference(GQLTypeProject.PROJECT)))
+                                .type(listType(GraphQLTypeReference(GQLTypeProject.PROJECT)))
                                 .dataFetcher { env ->
                                     val portfolio: IndicatorPortfolio = env.getSource()
                                     indicatorPortfolioService.getPortfolioProjects(portfolio)
@@ -69,7 +69,7 @@ class GQLTypeIndicatorPortfolio(
                     .field {
                         it.name("categoryStats")
                                 .description("Stats per category")
-                                .type(stdList(indicatorCategoryStats.typeRef))
+                                .type(listType(indicatorCategoryStats.typeRef))
                                 .deprecate("Use viewStats with viewId = null. This field will be removed in V5.")
                                 .durationArgument()
                                 .dataFetcher { env ->
@@ -84,7 +84,7 @@ class GQLTypeIndicatorPortfolio(
                         it.name("globalStats")
                                 .description("Global indicator stats")
                                 .deprecate("Use indicator views. This field will be removed in V5.")
-                                .type(stdList(indicatorCategoryStats.typeRef))
+                                .type(listType(indicatorCategoryStats.typeRef))
                                 .durationArgument()
                                 .dataFetcher { env ->
                                     val duration = env.getDurationArgument()

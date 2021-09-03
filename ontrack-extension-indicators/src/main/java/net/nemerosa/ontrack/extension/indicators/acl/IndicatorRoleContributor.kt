@@ -24,7 +24,7 @@ class IndicatorRoleContributor : RoleContributor {
         /**
          * Indicator portfolio at global level
          */
-        @Deprecated("Use indicator views. This role will be removed in V4.")
+        @Deprecated("Use indicator views. This role will be removed in V5.")
         const val GLOBAL_INDICATOR_PORTFOLIO_MANAGER = "GLOBAL_INDICATOR_PORTFOLIO_MANAGER"
     }
 

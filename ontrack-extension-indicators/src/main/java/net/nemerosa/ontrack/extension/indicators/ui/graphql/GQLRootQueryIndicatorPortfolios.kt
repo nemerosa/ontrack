@@ -5,7 +5,7 @@ import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioNotFoundException
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import org.springframework.stereotype.Component
 
 @Component
@@ -17,7 +17,7 @@ class GQLRootQueryIndicatorPortfolios(
             GraphQLFieldDefinition.newFieldDefinition()
                     .name("indicatorPortfolios")
                     .description("List of indicator portfolios")
-                    .type(stdList(indicatorPortfolio.typeRef))
+                    .type(listType(indicatorPortfolio.typeRef))
                     .argument {
                         it.name(ARG_ID)
                                 .description("ID of the indicator portfolio")

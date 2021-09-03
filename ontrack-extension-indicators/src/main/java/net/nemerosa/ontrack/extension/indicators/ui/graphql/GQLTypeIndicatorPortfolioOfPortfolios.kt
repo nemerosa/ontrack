@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.graphQLFieldContributions
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import org.springframework.stereotype.Component
 
 @Component
@@ -29,7 +29,7 @@ class GQLTypeIndicatorPortfolioOfPortfolios(
                         it.name(IndicatorPortfolioOfPortfolios::categories.name)
                                 .description("Global indicator categories")
                                 .deprecate("Use indicator views")
-                                .type(stdList(indicatorCategory.typeRef))
+                                .type(listType(indicatorCategory.typeRef))
                                 .dataFetcher { env ->
                                     val pp = env.getSource<IndicatorPortfolioOfPortfolios>()
                                     pp.categories.mapNotNull { id ->
@@ -41,7 +41,7 @@ class GQLTypeIndicatorPortfolioOfPortfolios(
                     .field {
                         it.name("portfolios")
                                 .description("List of portfolios")
-                                .type(stdList(indicatorPortfolio.typeRef))
+                                .type(listType(indicatorPortfolio.typeRef))
                                 .dataFetcher {
                                     indicatorPortfolioService.findAll()
                                 }

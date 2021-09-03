@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicators
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.GQLTypeProject
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import org.springframework.stereotype.Component
 
 @Component
@@ -29,7 +29,7 @@ class GQLTypeProjectIndicators(
             .field {
                 it.name("indicators")
                         .description("List of indicators")
-                        .type(stdList(projectIndicator.typeRef))
+                        .type(listType(projectIndicator.typeRef))
                         .argument { arg ->
                             arg.name(ARG_CATEGORY)
                                     .description("Restriction on the indicator category")
@@ -59,7 +59,7 @@ class GQLTypeProjectIndicators(
             .field {
                 it.name("categories")
                         .description("List of indicator categories")
-                        .type(stdList(projectCategoryIndicators.typeRef))
+                        .type(listType(projectCategoryIndicators.typeRef))
                         .dataFetcher { env ->
                             val project = env.getSource<ProjectIndicators>().project
                             projectIndicatorService.getProjectCategoryIndicators(project.id, true)

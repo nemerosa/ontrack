@@ -5,7 +5,7 @@ import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.git.model.BranchInfos
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import org.springframework.stereotype.Component
 
 /**
@@ -32,7 +32,7 @@ class BranchInfosGQLType(
                     .field {
                         it.name("branchInfoList")
                                 .description("List of branches and their associated information")
-                                .type(stdList(branchInfoGQLType.typeRef))
+                                .type(listType(branchInfoGQLType.typeRef))
                     }
                     // OK
                     .build()

@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.common.BaseException
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.api.model.FileDiffChangeLogRequest
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
@@ -357,7 +356,9 @@ class GitController(
      */
     @GetMapping("download/{branchId}")
     fun download(@PathVariable branchId: ID, path: String): ResponseEntity<String> {
-        return gitService.download(structureService.getBranch(branchId), path).getOrNull()
+        val branch = structureService.getBranch(branchId)
+        val config = gitService.getBranchConfiguration(branch) ?: throw GitBranchNotConfiguredException(branchId)
+        return gitService.download(branch.project, config.branch, path)
                 ?.let { ResponseEntity.ok(it) }
                 ?: throw SCMDocumentNotFoundException(path)
     }

@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.graphQLFieldContributions
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.ui.resource.*
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
@@ -31,9 +31,9 @@ class GQLTypeIndicatorCategories(
                     .field {
                         it.name("categories")
                                 .description("List of indicator categories")
-                                .type(stdList(indicatorCategory.typeRef))
-                                .argument {
-                                    it.name(ARG_ID)
+                                .type(listType(indicatorCategory.typeRef))
+                                .argument { a ->
+                                    a.name(ARG_ID)
                                             .description("ID of the indicator category")
                                             .type(Scalars.GraphQLString)
                                 }

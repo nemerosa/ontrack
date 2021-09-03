@@ -409,7 +409,7 @@ class DefaultOntrackGitHubClient(
                 val rest = createGitHubRestTemplate()
                 visibility = rest.getForObject("/repos/${login}/${name}", GitHubRepositoryWithVisibility::class.java)
                     ?.visibility
-                    ?.toUpperCase()
+                    ?.uppercase()
                     ?.let { GitHubRepositoryVisibility.valueOf(it) }
             }
             // OK

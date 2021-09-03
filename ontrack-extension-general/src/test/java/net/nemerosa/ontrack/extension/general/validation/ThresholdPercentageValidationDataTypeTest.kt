@@ -10,7 +10,7 @@ class ThresholdPercentageValidationDataTypeTest {
     private val dataType = ThresholdPercentageValidationDataType(GeneralExtensionFeature())
 
     @Test
-    fun `Threshold of 0% with success being 0%`() {
+    fun `Threshold of 0 percent with success being 0 percent`() {
         val config = ThresholdConfig(0, 50, false)
         assertEquals(ValidationRunStatusID.STATUS_PASSED.id, dataType.computeStatus(config, 0)?.id)
         assertEquals(ValidationRunStatusID.STATUS_WARNING.id, dataType.computeStatus(config, 1)?.id)

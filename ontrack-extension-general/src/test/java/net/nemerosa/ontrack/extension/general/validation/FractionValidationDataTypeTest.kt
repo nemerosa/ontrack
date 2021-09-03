@@ -96,7 +96,7 @@ class FractionValidationDataTypeTest {
     }
 
     @Test
-    fun `Status with threshold at 100%`() {
+    fun `Status with threshold at 100 percents`() {
         val config = ThresholdConfig(100, 80, true)
         assertEquals(ValidationRunStatusID.STATUS_PASSED.id, dataType.computeStatus(config, FractionValidationData(10000, 10000))?.id)
         assertEquals(ValidationRunStatusID.STATUS_WARNING.id, dataType.computeStatus(config, FractionValidationData(9999, 10000))?.id)

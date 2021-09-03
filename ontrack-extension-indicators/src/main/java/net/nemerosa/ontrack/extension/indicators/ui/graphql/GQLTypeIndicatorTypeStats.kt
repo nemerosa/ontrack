@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorTypeStats
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicatorType
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import org.springframework.stereotype.Component
 
 @Component

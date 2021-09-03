@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.graphQLFieldContributions
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.stereotype.Component
@@ -37,7 +36,7 @@ class GQLTypeIndicatorView(
             .field {
                 it.name(IndicatorView::categories.name)
                     .description("Selected categories for this view")
-                    .type(stdList(indicatorCategory.typeRef))
+                    .type(listType(indicatorCategory.typeRef))
                     .dataFetcher { env ->
                         val view: IndicatorView = env.getSource()
                         view.categories.mapNotNull { id ->

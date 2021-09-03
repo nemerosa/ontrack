@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.indicators.stats.IndicatorStatsService
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectCategoryIndicators
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import org.springframework.stereotype.Component
 
 @Component
@@ -42,7 +42,7 @@ class GQLTypeProjectCategoryIndicators(
             .field {
                 it.name(ProjectCategoryIndicators::indicators.name)
                         .description("List of indicators")
-                        .type(stdList(projectIndicator.typeRef))
+                        .type(listType(projectIndicator.typeRef))
             }
             .build()
 

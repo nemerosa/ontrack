@@ -4,7 +4,7 @@ import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.git.model.BranchInfo
 import net.nemerosa.ontrack.graphql.schema.*
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import org.springframework.stereotype.Component
 
 /**
@@ -35,7 +35,7 @@ class BranchInfoGQLType : GQLType {
                     .field {
                         it.name("promotions")
                                 .description("First promotion for every promotion level")
-                                .type(stdList(GraphQLTypeReference(GQLTypePromotionRun.PROMOTION_RUN)))
+                                .type(listType(GraphQLTypeReference(GQLTypePromotionRun.PROMOTION_RUN)))
                     }
                     // OK
                     .build()

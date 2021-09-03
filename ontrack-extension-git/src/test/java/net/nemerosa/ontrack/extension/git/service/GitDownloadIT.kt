@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.model.security.ProjectConfig
-import net.nemerosa.ontrack.test.assertPresent
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -36,9 +35,7 @@ class GitDownloadIT : AbstractGitTestSupport() {
                     }
                     // Downloads the files for this branch
                     asUser().with(project, ProjectConfig::class.java).call {
-                        assertPresent(gitService.download(this, "folder/file1")) {
-                            assertEquals("Content1", it)
-                        }
+                        assertEquals("Content1", gitService.download(project, "branch1", "folder/file1"))
                     }
                 }
                 branch("master") {
@@ -47,9 +44,7 @@ class GitDownloadIT : AbstractGitTestSupport() {
                     }
                     // Downloads the files for this branch
                     asUser().with(project, ProjectConfig::class.java).call {
-                        assertPresent(gitService.download(this, "folder/file1")) {
-                            assertEquals("Content2", it)
-                        }
+                        assertEquals("Content2", gitService.download(project, "master", "folder/file1"))
                     }
                 }
             }

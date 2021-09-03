@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.indicators.ui.graphql
 import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
 import net.nemerosa.ontrack.graphql.schema.GQLProjectEntityFieldContributor
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
@@ -24,7 +24,7 @@ class ProjectIndicatorPortfoliosGraphQLFieldContributor(
                     GraphQLFieldDefinition.newFieldDefinition()
                             .name("indicatorPortfolios")
                             .description("List of indicator portfolios associated with this project, through its labels.")
-                            .type(stdList(indicatorPortfolio.typeRef))
+                            .type(listType(indicatorPortfolio.typeRef))
                             .dataFetcher { env ->
                                 val project: Project = env.getSource()
                                 indicatorPortfolioService.findPortfolioByProject(project)
