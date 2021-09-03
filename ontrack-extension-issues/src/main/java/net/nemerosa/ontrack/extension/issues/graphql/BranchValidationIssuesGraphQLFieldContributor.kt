@@ -5,7 +5,7 @@ import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLList
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtensionService
 import net.nemerosa.ontrack.graphql.schema.GQLProjectEntityFieldContributor
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.exceptions.InputException
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.tx.TransactionService
@@ -51,7 +51,7 @@ class BranchValidationIssuesGraphQLFieldContributor(
                         GraphQLFieldDefinition.newFieldDefinition()
                                 .name("validationIssues")
                                 .description("List of issues reported into the validation run statuses")
-                                .type(stdList(validationIssue.typeRef))
+                                .type(listType(validationIssue.typeRef))
                                 .argument {
                                     it.name("passed")
                                             .description("Filters the validation runs according to their status")

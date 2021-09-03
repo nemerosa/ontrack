@@ -17,7 +17,7 @@ class InfluxDBRunInfoListener(
         if (runTime != null) {
             influxDBConnection.safe {
                 write(
-                    Point.measurement("ontrack_value_run_info_${runnableEntity.runnableEntityType.name.toLowerCase()}_time_seconds")
+                    Point.measurement("ontrack_value_run_info_${runnableEntity.runnableEntityType.name.lowercase()}_time_seconds")
                         .tag(runnableEntity.runMetricTags)
                         .addField("value", runTime)
                         .addField("name", runnableEntity.runMetricName)

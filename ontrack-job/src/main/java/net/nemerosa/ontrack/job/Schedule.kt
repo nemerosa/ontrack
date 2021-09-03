@@ -11,8 +11,8 @@ data class Schedule(
     val periodText: String
         get() = when {
             period <= 0 -> "Manually"
-            period == 1L -> "Every " + StringUtils.substringBeforeLast(unit.name.toLowerCase(), "s")
-            else -> "Every " + period + " " + unit.name.toLowerCase()
+            period == 1L -> "Every " + StringUtils.substringBeforeLast(unit.name.lowercase(), "s")
+            else -> "Every " + period + " " + unit.name.lowercase()
         }
 
     fun toMiliseconds(): Long = TimeUnit.MILLISECONDS.convert(period, unit)
@@ -22,18 +22,6 @@ data class Schedule(
                 initial.toLong(),
                 period,
                 unit
-        )
-    }
-
-    fun sameDelayThan(schedule: Schedule): Boolean {
-        return this.period == schedule.period && this.unit == schedule.unit
-    }
-
-    fun convertTo(target: TimeUnit): Schedule {
-        return Schedule(
-                target.convert(initialPeriod, unit),
-                target.convert(period, unit),
-                target
         )
     }
 
@@ -55,6 +43,7 @@ data class Schedule(
         val EVERY_SECOND = everySeconds(1)
         @JvmField
         val EVERY_MINUTE = everyMinutes(1)
+        @Suppress("unused")
         @JvmField
         val EVERY_HOUR = Schedule(0, 1, TimeUnit.HOURS)
         @JvmField

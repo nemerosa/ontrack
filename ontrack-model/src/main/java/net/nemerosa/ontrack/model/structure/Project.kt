@@ -27,7 +27,7 @@ data class Project(
 
         @JvmStatic
         fun of(nameDescription: NameDescriptionState) =
-                Project(ID.NONE, nameDescription.name, nameDescription.description, nameDescription.isDisabled ?: false, Signature.anonymous())
+                Project(ID.NONE, nameDescription.name, nameDescription.description, nameDescription.isDisabled, Signature.anonymous())
 
         @JvmStatic
         fun of(nameDescription: NameDescription) =
@@ -41,7 +41,7 @@ data class Project(
                         )
     }
 
-    override val project: Project = this
+    override val project: Project get() = this
 
     override val entityDisplayName: String get() = "Project $name"
 
@@ -49,7 +49,7 @@ data class Project(
 
 
     fun update(form: NameDescriptionState): Project =
-            of(form).withId(id).withDisabled(form.isDisabled ?: false)
+            of(form).withId(id).withDisabled(form.isDisabled)
 
     fun asForm(): Form =
             form().name(name).description(description).fill("disabled", isDisabled)

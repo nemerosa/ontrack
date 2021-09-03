@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.influxdb.validation.data
 
+import net.nemerosa.ontrack.common.seconds
 import net.nemerosa.ontrack.extension.influxdb.DefaultInfluxDBConnection
 import net.nemerosa.ontrack.extension.influxdb.InfluxDBConnection
 import net.nemerosa.ontrack.extension.influxdb.InfluxDBExtensionProperties
@@ -14,7 +15,6 @@ import java.time.Duration
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 
 /**

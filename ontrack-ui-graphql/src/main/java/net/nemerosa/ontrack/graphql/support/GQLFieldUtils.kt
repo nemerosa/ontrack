@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.graphql.support
 
+import graphql.Scalars
 import graphql.schema.*
+import net.nemerosa.ontrack.model.structure.Entity
 import kotlin.reflect.KClass
 
 // ============================================================================
@@ -85,6 +87,37 @@ fun <T> listField(
     .description(description)
     .type(listType(type, nullable))
     .dataFetcher(fetcher)
+    .build()
+
+// ============================================================================
+// Common fields
+// ============================================================================
+
+
+@Suppress("DEPRECATION")
+fun idField(): GraphQLFieldDefinition =
+    GraphQLFieldDefinition.newFieldDefinition()
+        .name("id")
+        .type(Scalars.GraphQLInt.toNotNull())
+        .dataFetcher { environment: DataFetchingEnvironment ->
+            val source = environment.getSource<Any>()
+            if (source is Entity) {
+                return@dataFetcher source.id
+            } else {
+                return@dataFetcher null
+            }
+        }
+        .build()
+
+fun nameField(description: String = ""): GraphQLFieldDefinition = GraphQLFieldDefinition.newFieldDefinition()
+    .name("name")
+    .description(description)
+    .type(Scalars.GraphQLString)
+    .build()
+
+fun descriptionField(): GraphQLFieldDefinition = GraphQLFieldDefinition.newFieldDefinition()
+    .name("description")
+    .type(Scalars.GraphQLString)
     .build()
 
 // ============================================================================

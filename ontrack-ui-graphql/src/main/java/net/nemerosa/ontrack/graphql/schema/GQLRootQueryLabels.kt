@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLFieldDefinition
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.labels.LabelManagementService
 import org.springframework.stereotype.Component
 
@@ -18,7 +18,7 @@ class GQLRootQueryLabels(
             GraphQLFieldDefinition.newFieldDefinition()
                     .name("labels")
                     .description("List of all labels")
-                    .type(stdList(label.typeRef))
+                    .type(listType(label.typeRef))
                     .argument {
                         it.name("category")
                                 .description("Category to look for")

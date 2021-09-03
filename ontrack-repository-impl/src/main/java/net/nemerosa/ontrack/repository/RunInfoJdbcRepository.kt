@@ -18,7 +18,7 @@ class RunInfoJdbcRepository(
 ) : AbstractJdbcRepository(dataSource), RunInfoRepository {
     override fun getRunInfo(runnableEntityType: RunnableEntityType, id: Int): RunInfo? {
         return getFirstItem(
-                "SELECT * FROM RUN_INFO WHERE ${runnableEntityType.name.toUpperCase()} = :entityId",
+                "SELECT * FROM RUN_INFO WHERE ${runnableEntityType.name.uppercase()} = :entityId",
                 params("entityId", id)
         ) { rs, _ ->
             toRunInfo(rs)
@@ -38,7 +38,7 @@ class RunInfoJdbcRepository(
     override fun deleteRunInfo(runnableEntityType: RunnableEntityType, id: Int): Ack {
         val runInfo = getRunInfo(runnableEntityType, id)
         namedParameterJdbcTemplate!!.update(
-                "DELETE FROM RUN_INFO WHERE ${runnableEntityType.name.toUpperCase()} = :entityId",
+                "DELETE FROM RUN_INFO WHERE ${runnableEntityType.name.uppercase()} = :entityId",
                 params("entityId", id)
         )
         return Ack.validate(runInfo != null)
@@ -78,7 +78,7 @@ class RunInfoJdbcRepository(
         // Else, creates it
         else {
             namedParameterJdbcTemplate!!.update(
-                    "INSERT INTO RUN_INFO(${runnableEntityType.name.toUpperCase()}, SOURCE_TYPE, SOURCE_URI, TRIGGER_TYPE, TRIGGER_DATA, RUN_TIME, CREATION, CREATOR) " +
+                    "INSERT INTO RUN_INFO(${runnableEntityType.name.uppercase()}, SOURCE_TYPE, SOURCE_URI, TRIGGER_TYPE, TRIGGER_DATA, RUN_TIME, CREATION, CREATOR) " +
                             "VALUES (:entityId, :sourceType, :sourceUri, :triggerType, :triggerData, :runTime, :creation, :creator)",
                     params.addValue("entityId", id)
             )
@@ -92,13 +92,13 @@ class RunInfoJdbcRepository(
                     """
                 SELECT COUNT(ID)
                 FROM RUN_INFO
-                WHERE ${type.name.toUpperCase()} IS NOT NULL
+                WHERE ${type.name.uppercase()} IS NOT NULL
             """,
                     Int::class.java
             ) ?: 0
 
     override fun forEachRunnableEntityType(runnableEntityType: RunnableEntityType, code: (id: Int, runInfo: RunInfo) -> Unit) {
-        val entityColumn = runnableEntityType.name.toUpperCase()
+        val entityColumn = runnableEntityType.name.uppercase()
         namedParameterJdbcTemplate!!.query(
                 """
                     SELECT *

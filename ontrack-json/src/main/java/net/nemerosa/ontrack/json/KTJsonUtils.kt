@@ -46,13 +46,13 @@ inline fun <reified T> JsonNode.parse(): T =
 /**
  * Parses any node into an object.
  */
-inline fun <T : Any> JsonNode.parseInto(type: KClass<T>): T =
+fun <T : Any> JsonNode.parseInto(type: KClass<T>): T =
     JsonUtils.parse(this, type.java)
 
 /**
  * Formatting a JSON node as a string
  */
-fun JsonNode.format() = JsonUtils.toJSONString(this)
+fun JsonNode.format(): String = JsonUtils.toJSONString(this)
 
 /**
  * Parses any node into an object or returns `null` if parsing fails

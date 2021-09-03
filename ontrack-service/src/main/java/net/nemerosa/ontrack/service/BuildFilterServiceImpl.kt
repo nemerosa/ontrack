@@ -194,13 +194,13 @@ class BuildFilterServiceImpl(
             parameters: JsonNode
     ): String? {
         // Parsing
-        val data: T = try {
+        val data: T? = try {
             buildFilterProvider.parse(parameters).orElse(null)
         } catch (ex: Exception) {
             return "Cannot parse build filter data: ${ex.message}"
         }
         // Validation
-        return buildFilterProvider.validateData(branch, data)
+        return data?.run { buildFilterProvider.validateData(branch, this) }
     }
 
     protected fun <T> getBuildFilterProviderData(provider: BuildFilterProvider<T>, parameters: JsonNode): BuildFilterProviderData<T> {
@@ -313,7 +313,7 @@ class BuildFilterServiceImpl(
 
     private fun <T> getBuildFilterProviderByType(type: String): BuildFilterProvider<T>? {
         @Suppress("UNCHECKED_CAST")
-        return buildFilterProviders[type] as BuildFilterProvider<T>
+        return buildFilterProviders[type] as BuildFilterProvider<T>?
     }
 
     private fun <T> loadBuildFilterResource(branch: Branch, t: TBuildFilter): BuildFilterResource<T>? {
@@ -326,16 +326,17 @@ class BuildFilterServiceImpl(
 
     private fun <T> loadBuildFilterResource(provider: BuildFilterProvider<T>, branch: Branch, shared: Boolean, name: String, data: JsonNode): BuildFilterResource<T>? {
         return provider.parse(data)
-                .map { parsedData ->
-                    BuildFilterResource(
-                            branch,
-                            shared,
-                            name,
-                            provider.type,
-                            parsedData,
-                            provider.validateData(branch, parsedData)
-                    )
-                }.orElse(null)
+            .getOrNull()
+            ?.run {
+                BuildFilterResource(
+                    branch,
+                    shared,
+                    name,
+                    provider.type,
+                    this,
+                    provider.validateData(branch, this)
+                )
+            }
     }
 
 }
