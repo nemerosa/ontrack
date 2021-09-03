@@ -102,7 +102,7 @@ fun idField(): GraphQLFieldDefinition =
         .dataFetcher { environment: DataFetchingEnvironment ->
             val source = environment.getSource<Any>()
             if (source is Entity) {
-                return@dataFetcher source.id
+                return@dataFetcher source.id.value
             } else {
                 return@dataFetcher null
             }

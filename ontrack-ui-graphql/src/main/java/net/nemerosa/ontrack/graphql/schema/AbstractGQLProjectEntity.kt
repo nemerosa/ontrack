@@ -20,7 +20,7 @@ abstract class AbstractGQLProjectEntity<T : ProjectEntity>(
 ) : GQLType {
 
     protected fun projectEntityInterfaceFields(): List<GraphQLFieldDefinition> {
-        val definitions = baseProjectEntityInterfaceFields()
+        val definitions = baseProjectEntityInterfaceFields().toMutableList()
         // For all contributors
         definitions.addAll(
             projectEntityFieldContributors
@@ -36,8 +36,7 @@ abstract class AbstractGQLProjectEntity<T : ProjectEntity>(
         return definitions
     }
 
-    private fun baseProjectEntityInterfaceFields(): MutableList<GraphQLFieldDefinition> {
-        return ArrayList(
+    private fun baseProjectEntityInterfaceFields(): List<GraphQLFieldDefinition> =
             listOf(
                 idField(),
                 nameField(),
@@ -69,8 +68,6 @@ abstract class AbstractGQLProjectEntity<T : ProjectEntity>(
                     }
                     .build()
             )
-        )
-    }
 
     protected abstract fun getSignature(entity: T): Signature?
 
