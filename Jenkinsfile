@@ -210,6 +210,7 @@ pipeline {
                         docker-compose \\
                             --project-name ext \\
                             --file docker-compose-ext.yml \\
+                            up \\
                             --exit-code-from ontrack_acceptance
                     '''
                 }
@@ -254,6 +255,7 @@ pipeline {
                         docker-compose \\
                             --project-name vault \\
                             --file docker-compose-vault.yml \\
+                            up \\
                             --exit-code-from ontrack_acceptance
                     '''
                 }
