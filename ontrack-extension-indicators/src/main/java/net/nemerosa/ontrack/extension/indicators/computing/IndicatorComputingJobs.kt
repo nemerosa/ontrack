@@ -4,18 +4,22 @@ import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputingMetrics.METRIC_ONTRACK_INDICATORS_COMPUTING_MS
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
+import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.support.ApplicationLogEntry
+import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.model.support.time
 import org.springframework.stereotype.Component
 import java.util.stream.Stream
 
 @Component
 class IndicatorComputingJobs(
-        private val structureService: StructureService,
-        private val computers: List<IndicatorComputer>,
-        private val indicatorComputingService: IndicatorComputingService,
-        private val meterRegistry: MeterRegistry
+    private val structureService: StructureService,
+    private val computers: List<IndicatorComputer>,
+    private val indicatorComputingService: IndicatorComputingService,
+    private val meterRegistry: MeterRegistry,
+    private val applicationLogService: ApplicationLogService,
 ) : JobOrchestratorSupplier {
 
     override fun collectJobRegistrations(): Stream<JobRegistration> {
@@ -57,7 +61,7 @@ class IndicatorComputingJobs(
                 "Computing indicator values by ${computer.name} for project ${project.name}"
 
         override fun getTask() = JobRun {
-            compute(computer, project)
+            compute(computer, project, allowFailure = true)
         }
     }
 
@@ -76,18 +80,37 @@ class IndicatorComputingJobs(
                         !it.isDisabled && computer.isProjectEligible(it)
                     }
                     .forEach { project ->
-                        compute(computer, project)
+                        compute(computer, project, allowFailure = false)
                     }
         }
     }
 
-    private fun compute(computer: IndicatorComputer, project: Project) {
+    private fun compute(computer: IndicatorComputer, project: Project, allowFailure: Boolean) {
         meterRegistry.time(
                 METRIC_ONTRACK_INDICATORS_COMPUTING_MS,
                 "computer" to computer.id,
                 "project" to project.name
         ) {
-            indicatorComputingService.compute(computer, project)
+            try {
+                indicatorComputingService.compute(computer, project)
+            } catch (any: Exception) {
+                if (allowFailure) {
+                    throw any
+                } else {
+                    // Does not stop the job
+                    // Just logs the error
+                    applicationLogService.log(
+                        ApplicationLogEntry.error(
+                            any,
+                            NameDescription.nd("indicator-computing-error", "Indicator computation error"),
+                            "Error while computing ${computer.name} for project ${project.name}"
+                        )
+                            .withDetail("computer", computer.id)
+                            .withDetail("project", project.name)
+                    )
+                    // Going on...
+                }
+            }
         }
     }
 
