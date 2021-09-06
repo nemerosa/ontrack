@@ -72,9 +72,7 @@ class GQLInputMetricsEntry : GQLInputType<MetricsEntryInput> {
         )
         .build()
 
-    override fun convert(argument: Any): MetricsEntryInput {
-        return argument.asJson().parse()
-    }
+    override fun convert(argument: Any?): MetricsEntryInput? = argument?.asJson()?.parse()
 
     override fun getTypeRef() = GraphQLTypeReference(
         MetricsEntryInput::class.java.simpleName
