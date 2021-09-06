@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -41,7 +42,7 @@ public class StorageJdbcRepository extends AbstractJdbcRepository implements Sto
     }
 
     @Override
-    public void storeJson(String store, String key, JsonNode node) {
+    public void storeJson(String store, String key, @NotNull JsonNode node) {
         MapSqlParameterSource params = params("store", store)
                 .addValue("key", key)
                 .addValue("data", writeJson(node));

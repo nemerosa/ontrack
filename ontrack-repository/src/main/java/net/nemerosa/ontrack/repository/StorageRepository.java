@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -16,9 +17,9 @@ public interface StorageRepository {
      *
      * @param store Store (typically an extension class name)
      * @param key   Identifier of data
-     * @param node  Data to store (null to delete)
+     * @param node  Data to store
      */
-    void storeJson(String store, String key, JsonNode node);
+    void storeJson(String store, String key, @NotNull JsonNode node);
 
     /**
      * Retrieves some JSON using a key

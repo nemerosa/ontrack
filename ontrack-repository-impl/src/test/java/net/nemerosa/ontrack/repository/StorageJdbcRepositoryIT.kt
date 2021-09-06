@@ -1,86 +1,73 @@
-package net.nemerosa.ontrack.repository;
+package net.nemerosa.ontrack.repository
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import net.nemerosa.ontrack.json.JsonUtils;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
-
-import static net.nemerosa.ontrack.test.TestUtils.assertJsonEquals;
-import static net.nemerosa.ontrack.test.TestUtils.uid;
-import static org.junit.Assert.*;
+import com.fasterxml.jackson.core.JsonProcessingException
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.assertNotPresent
+import net.nemerosa.ontrack.test.assertPresent
+import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.transaction.annotation.Transactional
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 
 @Transactional
-public class StorageJdbcRepositoryIT extends AbstractRepositoryTestSupport {
+class StorageJdbcRepositoryIT : AbstractRepositoryTestSupport() {
 
     @Autowired
-    private StorageRepository repository;
+    private lateinit var repository: StorageRepository
 
     @Test
-    public void no_data_returns_empty() {
-        Optional<JsonNode> o = repository.retrieveJson(uid("C"), "1");
-        assertNotNull(o);
-        assertFalse(o.isPresent());
+    fun no_data_returns_empty() {
+        val o = repository.retrieveJson(uid("C"), "1")
+        assertNotNull(o)
+        assertFalse(o.isPresent)
     }
 
     @Test
-    public void store_and_retrieve() throws JsonProcessingException {
-        ObjectNode json = JsonUtils.object().with("name", "My name").end();
-
-        String store = uid("C");
-
-        repository.storeJson(store, "1", json);
-
-        Optional<JsonNode> o = repository.retrieveJson(store, "1");
-        assertNotNull(o);
-        assertTrue(o.isPresent());
-        assertJsonEquals(json, o.get());
+    fun store_and_retrieve() {
+        val json = mapOf("name" to "My name").asJson()
+        val store = uid("C")
+        repository.storeJson(store, "1", json)
+        val o = repository.retrieveJson(store, "1")
+        assertPresent(o) {
+            assertEquals(json, it)
+        }
     }
 
     @Test
-    public void store_and_delete() throws JsonProcessingException {
-        ObjectNode json = JsonUtils.object().with("name", "My name").end();
-
-        String store = uid("C");
-        repository.storeJson(store, "1", json);
-        repository.storeJson(store, "1", null);
-
-        Optional<JsonNode> o = repository.retrieveJson(store, "1");
-        assertNotNull(o);
-        assertFalse(o.isPresent());
+    fun store_and_delete() {
+        val json = mapOf("name" to "My name").asJson()
+        val store = uid("C")
+        repository.storeJson(store, "1", json)
+        repository.delete(store, "1")
+        val o = repository.retrieveJson(store, "1")
+        assertNotPresent(o)
     }
 
     @Test
-    public void get_keys() {
-        String store = uid("C");
-        repository.storeJson(store, "1", JsonUtils.object().with("name", "1").end());
-        repository.storeJson(store, "2", JsonUtils.object().with("name", "2").end());
+    fun get_keys() {
+        val store = uid("C")
+        repository.storeJson(store, "1", mapOf("name" to "1").asJson())
+        repository.storeJson(store, "2", mapOf("name" to "2").asJson())
         assertEquals(
-                Arrays.asList("1", "2"),
-                repository.getKeys(store)
-        );
+            listOf("1", "2"),
+            repository.getKeys(store)
+        )
     }
 
     @Test
-    public void get_data() throws JsonProcessingException {
-        String store = uid("C");
-        ObjectNode data1 = JsonUtils.object().with("name", "1").end();
-        ObjectNode data2 = JsonUtils.object().with("name", "2").end();
-
-        repository.storeJson(store, "1", data1);
-        repository.storeJson(store, "2", data2);
-
-        Map<String, JsonNode> data = repository.getData(store);
-
-        assertEquals(2, data.size());
-        assertJsonEquals(data1, data.get("1"));
-        assertJsonEquals(data2, data.get("2"));
+    @Throws(JsonProcessingException::class)
+    fun get_data() {
+        val store = uid("C")
+        val data1 = mapOf("name" to "1").asJson()
+        val data2 = mapOf("name" to "2").asJson()
+        repository.storeJson(store, "1", data1)
+        repository.storeJson(store, "2", data2)
+        val data = repository.getData(store)
+        assertEquals(2, data.size)
+        assertEquals(data1, data["1"])
+        assertEquals(data2, data["2"])
     }
-
 }
