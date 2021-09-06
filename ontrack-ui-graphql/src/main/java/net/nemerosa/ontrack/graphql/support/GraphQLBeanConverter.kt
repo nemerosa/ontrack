@@ -23,7 +23,7 @@ import kotlin.reflect.jvm.javaType
 object GraphQLBeanConverter {
 
     private val DEFAULT_EXCLUSIONS = setOf(
-            "class"
+        "class"
     )
 
     fun asInputFields(type: KClass<*>): List<GraphQLInputObjectField> {
@@ -40,10 +40,10 @@ object GraphQLBeanConverter {
                     GraphQLNonNull(scalarType)
                 }
                 fields += GraphQLInputObjectField.newInputObjectField()
-                        .name(name)
-                        .description(description)
-                        .type(actualType)
-                        .build()
+                    .name(name)
+                    .description(description)
+                    .type(actualType)
+                    .build()
             } else {
                 val typeRef = property.findAnnotation<TypeRef>()
                 if (typeRef != null) {
@@ -72,42 +72,17 @@ object GraphQLBeanConverter {
         return fields
     }
 
-    @Deprecated("Use method with KClass")
-    fun asInputFields(type: Class<*>): List<GraphQLInputObjectField> {
-        val fields = mutableListOf<GraphQLInputObjectField>()
-        // Gets the properties for the type
-        for (descriptor in BeanUtils.getPropertyDescriptors(type)) {
-            if (descriptor.readMethod != null) {
-                val name = descriptor.name
-                val description = getDescription(type, descriptor)
-                val scalarType = getScalarType(descriptor.propertyType)
-                if (scalarType != null) {
-                    fields += GraphQLInputObjectField.newInputObjectField()
-                            .name(name)
-                            .description(description)
-                            .type(scalarType)
-                            .build()
-                }
-            }
-        }
-        // OK
-        return fields
-    }
-
-    @Deprecated("No replacement yet, but Java class must be avoided")
-    fun asInputType(type: Class<*>): GraphQLInputType {
-        return GraphQLInputObjectType.newInputObject()
-                .name(type.simpleName)
-                .fields(asInputFields(type))
-                .build()
-    }
+    fun asInputType(type: KClass<*>): GraphQLInputType = GraphQLInputObjectType.newInputObject()
+        .name(type.simpleName)
+        .fields(asInputFields(type))
+        .build()
 
     fun asObjectType(type: KClass<*>, cache: GQLTypeCache): GraphQLObjectType {
         return GraphQLObjectType.newObject()
-                .name(type.java.simpleName)
-                .description(getTypeDescription(type))
-                .fields(asObjectFields(type, cache))
-                .build()
+            .name(type.java.simpleName)
+            .description(getTypeDescription(type))
+            .fields(asObjectFields(type, cache))
+            .build()
     }
 
     fun asObjectFields(type: KClass<*>, cache: GQLTypeCache): List<GraphQLFieldDefinition> {
@@ -118,8 +93,8 @@ object GraphQLBeanConverter {
             val nullable = property.returnType.isMarkedNullable
             // Field builder
             val field = GraphQLFieldDefinition.newFieldDefinition()
-                    .name(name)
-                    .description(description)
+                .name(name)
+                .description(description)
             // Deprecation
             property.findAnnotation<Deprecated>()?.let {
                 field.deprecate(it.message)
@@ -139,7 +114,7 @@ object GraphQLBeanConverter {
                     val propertyKClass = Reflection.createKotlinClass(propertyType)
                     // Tries to convert to an object type
                     cache.getOrCreate(
-                            propertyType.simpleName
+                        propertyType.simpleName
                     ) { asObjectType(propertyKClass, cache) }
                 }
                 // Assignment
@@ -158,7 +133,7 @@ object GraphQLBeanConverter {
     @Deprecated("Use Kotlin equivalent")
     fun asObjectTypeBuilder(type: Class<*>, cache: GQLTypeCache, exclusions: Set<String>?): GraphQLObjectType.Builder {
         var builder: GraphQLObjectType.Builder = GraphQLObjectType.newObject()
-                .name(type.simpleName)
+            .name(type.simpleName)
         // Actual exclusions
         val actualExclusions = HashSet(DEFAULT_EXCLUSIONS)
         if (exclusions != null) {
@@ -176,29 +151,29 @@ object GraphQLBeanConverter {
                     if (scalarType != null) {
                         builder = builder.field { field ->
                             field
-                                    .name(name)
-                                    .description(description)
-                                    .type(scalarType)
+                                .name(name)
+                                .description(description)
+                                .type(scalarType)
                         }
                     } else if (propertyType is Map<*, *> || propertyType is Collection<*>) {
                         throw IllegalArgumentException(
-                                String.format(
-                                        "Maps and collections are not supported yet: %s in %s",
-                                        name,
-                                        type.name
-                                )
+                            String.format(
+                                "Maps and collections are not supported yet: %s in %s",
+                                name,
+                                type.name
+                            )
                         )
                     } else {
                         // Tries to convert to an object type
                         // Note: caching might be needed here...
                         val propertyObjectType = cache.getOrCreate(
-                                propertyType.simpleName
+                            propertyType.simpleName
                         ) { asObjectType(propertyType, cache) }
                         builder = builder.field { field ->
                             field
-                                    .name(name)
-                                    .description(description)
-                                    .type(propertyObjectType)
+                                .name(name)
+                                .description(description)
+                                .type(propertyObjectType)
                         }
                     }// Maps & collections not supported yet
                 }

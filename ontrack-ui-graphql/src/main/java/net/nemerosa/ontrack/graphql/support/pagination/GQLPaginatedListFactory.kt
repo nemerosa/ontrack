@@ -7,7 +7,7 @@ import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.pagination.PageRequest
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import org.springframework.stereotype.Component
@@ -128,7 +128,7 @@ class GQLPaginatedListFactory(
                                 .type(GraphQLInt)
                                 .defaultValue(PageRequest.DEFAULT_PAGE_SIZE)
                     }
-                    .argument(arguments)
+                    .arguments(arguments)
                     .type(createPaginatedList(cache, itemType))
 
     /**
@@ -155,7 +155,7 @@ class GQLPaginatedListFactory(
                     .field {
                         it.name("pageItems")
                                 .description("Items in the current page")
-                                .type(stdList(itemType.typeRef))
+                                .type(listType(itemType.typeRef))
                     }
                     .build()
         }

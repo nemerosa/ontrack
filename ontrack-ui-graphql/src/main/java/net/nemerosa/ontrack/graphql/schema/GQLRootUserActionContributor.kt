@@ -17,7 +17,13 @@ class URIDefinition(
  *
  * @see GQLRootQueryUserRootActions
  */
-@Deprecated("Security grants are given through GraphQL mutations")
+@Deprecated("""
+    Security grants are given through GraphQL mutations.
+    
+    See UIActionsProvider.
+        
+    The GQLRootUserActionContributor mechanism will be removed in V5.
+""")
 interface GQLRootUserActionContributor {
 
     /**
