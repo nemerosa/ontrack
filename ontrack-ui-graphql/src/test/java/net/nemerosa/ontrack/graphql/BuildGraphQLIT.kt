@@ -1,20 +1,326 @@
 package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.isNullOrNullNode
-import net.nemerosa.ontrack.json.toJsonMap
+import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
+import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
+import net.nemerosa.ontrack.json.*
+import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
+import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
+import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.RunInfoInput
+import net.nemerosa.ontrack.model.structure.Signature
+import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.Test
+import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.test.fail
 
 /**
  * Integration tests around the `builds` root query.
  */
 class BuildGraphQLIT : AbstractQLKTITSupport() {
+
+    @Test
+    fun `Build creation`() {
+        val branch = doCreateBranch()
+        val build = asUser().with(branch, BuildCreate::class.java).call {
+            structureService.newBuild(
+                Build.of(
+                    branch,
+                    nd("1", ""),
+                    Signature.of(
+                        LocalDateTime.of(2016, 11, 25, 14, 43),
+                        "test"
+                    )
+                )
+            )
+        }
+
+        run("""{builds (id: ${build.id}) { creation { user time } } }""") { data ->
+            val creation = data.path("builds").first().path("creation")
+            assertEquals("test", creation.getRequiredTextField("user"))
+            assertEquals("2016-11-25T14:43:00", creation.getRequiredTextField("time"))
+        }
+    }
+
+    @Test
+    fun `Build property by name`() {
+        val build = doCreateBuild()
+        setProperty(build, TestSimplePropertyType::class.java, TestSimpleProperty("value 1"))
+        run("""{
+            builds(id: ${build.id}) {
+                testSimpleProperty { 
+                    type { 
+                        typeName 
+                        name
+                        description
+                    }
+                    value
+                    editable
+                }
+            }
+        }""") { data ->
+            val p = data.path("builds").first().path("testSimpleProperty")
+            assertEquals("net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType", p.path("type").path("typeName").asText())
+            assertEquals("Simple value", p.path("type").path("name").asText())
+            assertEquals("Value.", p.path("type").path("description").asText())
+            assertEquals("value 1", p.path("value").path("value").asText())
+            assertEquals(false, p.path("editable").asBoolean())
+        }
+    }
+
+    @Test
+    fun `Build property by list`() {
+        val build = doCreateBuild()
+        setProperty(build, TestSimplePropertyType::class.java, TestSimpleProperty("value 2"))
+        run("""{
+            builds(id: ${build.id}) {
+                properties { 
+                    type { 
+                        typeName 
+                        name
+                        description
+                    }
+                    value
+                    editable
+                }
+            }
+        }""") { data ->
+            var p = data.path("builds").first().path("properties").find {
+                it.path("type").path("name").asText() == "Simple value"
+            } ?: fail("Cannot find property")
+            assertEquals("net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType", p.path("type").path("typeName").asText())
+            assertEquals("Simple value", p.path("type").path("name").asText())
+            assertEquals("Value.", p.path("type").path("description").asText())
+            assertEquals("value 2", p.path("value").path("value").asText())
+            assertEquals(false, p.path("editable").asBoolean())
+
+            p = data.path("builds").first().path("properties").find {
+                it.path("type").path("name").asText() == "Configuration value"
+            } ?: fail("Cannot find property")
+            assertEquals("net.nemerosa.ontrack.extension.api.support.TestPropertyType", p.path("type").path("typeName").asText())
+            assertEquals("Configuration value", p.path("type").path("name").asText())
+            assertEquals("Value.", p.path("type").path("description").asText())
+            assertJsonNull(p.path("type").path("value"))
+            assertEquals(false, p.path("editable").asBoolean())
+        }
+    }
+
+    @Test
+    fun `Build property filtered by type`() {
+        val build = doCreateBuild()
+        setProperty(build, TestSimplePropertyType::class.java, TestSimpleProperty("value 2"))
+        run("""{
+            builds(id: ${build.id}) {
+                properties(type: "net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType") { 
+                    type { 
+                        typeName 
+                        name
+                        description
+                    }
+                    value
+                    editable
+                }
+            }
+        }""") { data ->
+            val properties = data.path("builds").first().path("properties")
+            assertEquals(1, properties.size())
+            val p = properties.first()
+            assertEquals("net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType", p.path("type").path("typeName").asText())
+            assertEquals("Simple value", p.path("type").path("name").asText())
+            assertEquals("Value.", p.path("type").path("description").asText())
+            assertEquals("value 2", p.path("value").path("value").asText())
+            assertEquals(false, p.path("editable").asBoolean())
+        }
+    }
+
+    @Test
+    fun `Build property filtered by value`() {
+        val build = doCreateBuild()
+        setProperty(build, TestSimplePropertyType::class.java, TestSimpleProperty("value 2"))
+        run("""{
+            builds(id: ${build.id}) {
+                properties(hasValue: true) { 
+                    type { 
+                        typeName 
+                        name
+                        description
+                    }
+                    value
+                    editable
+                }
+            }
+        }""") { data ->
+            val properties = data.path("builds").first().path("properties")
+            assertEquals(1, properties.size())
+            val p = properties.first()
+            assertEquals("net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType", p.path("type").path("typeName").asText())
+            assertEquals("Simple value", p.path("type").path("name").asText())
+            assertEquals("Value.", p.path("type").path("description").asText())
+            assertEquals("value 2", p.path("value").path("value").asText())
+            assertEquals(false, p.path("editable").asBoolean())
+        }
+    }
+
+    @Test(expected = BranchNotFoundException::class)
+    fun `By branch not found`() {
+        project {
+            val name = uid("B")
+            run("""{
+                builds(project: "${project.name}", branch: "$name") {
+                    name
+                }
+            }""")
+        }
+    }
+
+    @Test
+    fun `By branch`() {
+        val build = doCreateBuild()
+
+        run("""{
+            builds(project: "${build.project.name}", branch: "${build.branch.name}") {
+                id
+            }
+        }""") { data ->
+            assertEquals(build.id(), data.path("builds").first().getInt("id"))
+        }
+    }
+
+    @Test(expected = ProjectNotFoundException::class)
+    fun `By project not found`() {
+        val name = uid("P")
+        run("""{
+            builds(project: "$name") {
+                name
+            }
+        }""")
+    }
+
+    @Test
+    fun `By project`() {
+        val build = doCreateBuild()
+
+        run("""{
+            builds(project: "${build.project.name}") {
+                id
+            }
+        }""") { data ->
+            assertEquals(build.id(), data.path("builds").first().getInt("id"))
+        }
+    }
+
+    @Test
+    fun `No argument means no result`() {
+        doCreateBuild()
+        run("""{
+            builds {
+                id
+            }
+        }""") { data ->
+            assertTrue(data.path("builds").isEmpty)
+        }
+    }
+
+    @Test
+    fun `Branch filter`() {
+        // Builds
+        val branch = doCreateBranch()
+        val build1 = doCreateBuild(branch, nd("1", ""))
+        doCreateBuild(branch, nd("2", ""))
+        val pl = doCreatePromotionLevel(branch, nd("PL", ""))
+        doPromote(build1, pl, "")
+        // Query
+        run("""{
+            builds(
+                    project: "${branch.project.name}", 
+                    branch: "${branch.name}", 
+                    buildBranchFilter: {withPromotionLevel: "PL"}) {
+                id
+            }
+        }""") { data ->
+            val builds = data.path("builds")
+            assertEquals(1, builds.size())
+            assertEquals(build1.id(), builds.first().getInt("id"))
+        }
+    }
+
+    @Test
+    fun `Build filter with promotion since promotion when no promotion is available`() {
+        // Branch
+        val branch = doCreateBranch()
+        // A few builds without promotions
+        (1..4).forEach {
+            doCreateBuild(branch, nd(it.toString(), ""))
+        }
+        // Query
+        run(""" {
+          builds(project: "${branch.project.name}", branch: "${branch.name}", buildBranchFilter: {count: 100, withPromotionLevel: "BRONZE", sincePromotionLevel: "SILVER"}) {
+            id
+          }
+        }""") { data ->
+            // We should not have any build
+            assertEquals(0, data.path("builds").size())
+        }
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `Branch filter requires a branch`() {
+        // Builds
+        val branch = doCreateBranch()
+        val build1 = doCreateBuild(branch, nd("1", ""))
+        doCreateBuild(branch, nd("2", ""))
+        val pl = doCreatePromotionLevel(branch, nd("PL", ""))
+        doPromote(build1, pl, "")
+        // Query
+        run("""{
+            builds( 
+                    buildBranchFilter: {withPromotionLevel: "PL"}) {
+                id
+            }
+        }""")
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `Project filter requires a project`() {
+        // Builds
+        doCreateBuild()
+        // Query
+        run("""{
+            builds( 
+                    buildProjectFilter: {promotionName: "PL"}) {
+                id
+            }
+        }""")
+    }
+
+    @Test
+    fun `Project filter`() {
+        // Builds
+        val project = doCreateProject()
+        val branch1 = doCreateBranch(project, nd("1.0", ""))
+        doCreateBuild(branch1, nd("1.0.0", ""))
+        val branch2 = doCreateBranch(project, nd("2.0", ""))
+        doCreateBuild(branch2, nd("2.0.0", ""))
+        doCreateBuild(branch2, nd("2.0.1", ""))
+        // Query
+        run("""{
+            builds( 
+                    project: "${project.name}",
+                    buildProjectFilter: {branchName: "2.0"}) {
+                name
+            }
+        }""") { data ->
+            assertEquals(2, data.path("builds").size())
+            assertEquals("2.0.1", data.path("builds").get(0).getTextField("name"))
+            assertEquals("2.0.0", data.path("builds").get(1).getTextField("name"))
+        }
+    }
 
     @Test
     fun `Creating a build from a branch ID`() {
@@ -56,8 +362,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 branch branch@{
                     val runInfo = RunInfoInput(runTime = 27)
                     val data = run("""
-                        mutation CreateBuild(${'$'}runInfo: RunInfoInput) {
-                            createBuild(input: {branchId: ${this@branch.id}, name: "1", runInfo: ${'$'}runInfo}) {
+                        mutation CreateBuild(${"$"}runInfo: RunInfoInput) {
+                            createBuild(input: {branchId: ${this@branch.id}, name: "1", runInfo: ${"$"}runInfo}) {
                                 build {
                                     id
                                     name

@@ -30,6 +30,12 @@ abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
         }
     }
 
+    fun run(query: String, variables: Map<String, *> = emptyMap<String, Any>(), code: (data: JsonNode) -> Unit) {
+        run(query, variables).let { data ->
+            code(data)
+        }
+    }
+
     private fun internalRun(query: String, variables: Map<String, *> = emptyMap<String, Any>()): JsonNode {
         val result = GraphQL
             .newGraphQL(schemaService.schema)
