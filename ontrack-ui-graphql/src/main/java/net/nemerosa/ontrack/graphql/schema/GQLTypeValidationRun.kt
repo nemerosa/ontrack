@@ -5,7 +5,7 @@ import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import graphql.schema.GraphQLTypeReference
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.RunInfoService
 import net.nemerosa.ontrack.model.structure.Signature
@@ -64,7 +64,7 @@ class GQLTypeValidationRun(
                         it
                                 .name("validationRunStatuses")
                                 .description("List of validation statuses")
-                                .type(stdList(validationRunStatus.typeRef))
+                                .type(listType(validationRunStatus.typeRef))
                                 .dataFetcher { environment ->
                                     val validationRun = environment.getSource<ValidationRun>()
                                     validationRun.validationRunStatuses.map { status ->

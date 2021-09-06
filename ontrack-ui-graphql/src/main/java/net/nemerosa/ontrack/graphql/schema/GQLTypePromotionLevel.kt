@@ -6,10 +6,8 @@ import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.common.and
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils
-import net.nemerosa.ontrack.graphql.support.dateTimeArgument
+import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
-import net.nemerosa.ontrack.graphql.support.stringArgument
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
@@ -57,8 +55,8 @@ class GQLTypePromotionLevel(
                 it.name("promotionRuns")
                         .deprecate("Use the paginated promotion runs with the `promotionRunsPaginated` field.")
                         .description("List of runs for this promotion")
-                        .type(GraphqlUtils.stdList(promotionRun.typeRef))
-                        .argument(GraphqlUtils.stdListArguments())
+                        .type(listType(promotionRun.typeRef))
+                        .arguments(listArguments())
                         .dataFetcher(promotionLevelPromotionRunsFetcher())
             }
             // Paginated promotion runs
@@ -121,7 +119,7 @@ class GQLTypePromotionLevel(
                 // Gets all the promotion runs
                 val promotionRuns = structureService.getPromotionRunsForPromotionLevel(promotionLevel.id)
                 // Filters according to the arguments
-                GraphqlUtils.stdListArgumentsFilter(promotionRuns, environment)
+                stdListArgumentsFilter(promotionRuns, environment)
             }
 
     override fun getSignature(entity: PromotionLevel): Signature? {

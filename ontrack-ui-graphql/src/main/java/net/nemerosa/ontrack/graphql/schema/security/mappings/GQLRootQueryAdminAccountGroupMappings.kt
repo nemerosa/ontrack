@@ -3,12 +3,11 @@ package net.nemerosa.ontrack.graphql.schema.security.mappings
 import graphql.Scalars.GraphQLString
 import graphql.schema.DataFetcher
 import graphql.schema.DataFetchingEnvironment
-import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.common.and
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
 import net.nemerosa.ontrack.graphql.schema.GQLTypeAccountGroupMapping
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.security.AccountGroupMapping
 import net.nemerosa.ontrack.model.security.AccountGroupMappingService
 import org.springframework.stereotype.Component
@@ -22,23 +21,23 @@ class GQLRootQueryAdminAccountGroupMappings(
     override fun getFieldDefinition(): GraphQLFieldDefinition {
         return GraphQLFieldDefinition.newFieldDefinition()
                 .name("accountGroupMappings")
-                .type(GraphqlUtils.stdList(accountGroupMapping.typeRef))
-                .argument { a: GraphQLArgument.Builder ->
+                .type(listType(accountGroupMapping.typeRef))
+                .argument { a ->
                     a.name(ARG_PROVIDER)
                             .description("Authentication source provider")
                             .type(GraphQLString)
                 }
-                .argument { a: GraphQLArgument.Builder ->
+                .argument { a ->
                     a.name(ARG_SOURCE)
                             .description("Authentication source name")
                             .type(GraphQLString)
                 }
-                .argument { a: GraphQLArgument.Builder ->
+                .argument { a ->
                     a.name(ARG_NAME)
                             .description("Mapping name")
                             .type(GraphQLString)
                 }
-                .argument { a: GraphQLArgument.Builder ->
+                .argument { a ->
                     a.name(ARG_GROUP)
                             .description("Group name")
                             .type(GraphQLString)

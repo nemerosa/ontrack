@@ -77,13 +77,14 @@ object GraphQLBeanConverter {
         .fields(asInputFields(type))
         .build()
 
-    fun asObjectType(type: KClass<*>, cache: GQLTypeCache): GraphQLObjectType {
-        return GraphQLObjectType.newObject()
+    fun asObjectType(type: KClass<*>, cache: GQLTypeCache): GraphQLObjectType =
+        asObjectTypeBuilder(type, cache).build()
+
+    fun asObjectTypeBuilder(type: KClass<*>, cache: GQLTypeCache): GraphQLObjectType.Builder =
+        GraphQLObjectType.newObject()
             .name(type.java.simpleName)
             .description(getTypeDescription(type))
             .fields(asObjectFields(type, cache))
-            .build()
-    }
 
     fun asObjectFields(type: KClass<*>, cache: GQLTypeCache): List<GraphQLFieldDefinition> {
         val fields = mutableListOf<GraphQLFieldDefinition>()
