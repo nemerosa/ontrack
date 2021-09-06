@@ -98,6 +98,9 @@ fun optionalStringListInputField(
 fun stringInputField(property: KProperty<String?>, description: String? = null, nullable: Boolean? = null) : GraphQLInputObjectField =
     inputField(property, GraphQLString, description, nullable)
 
+fun booleanInputField(property: KProperty<Boolean?>, description: String? = null, nullable: Boolean? = null) : GraphQLInputObjectField =
+    inputField(property, GraphQLBoolean, description, nullable)
+
 fun intInputField(property: KProperty<Int?>, description: String? = null, nullable: Boolean? = null) : GraphQLInputObjectField =
     inputField(property, GraphQLInt, description, nullable)
 

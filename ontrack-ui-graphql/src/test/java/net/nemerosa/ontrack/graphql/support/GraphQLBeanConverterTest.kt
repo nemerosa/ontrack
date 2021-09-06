@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.graphql.support
 
 import graphql.schema.GraphQLFieldDefinition
-import graphql.schema.GraphQLNamedType
-import graphql.schema.GraphQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.UpdateProjectInput
 import net.nemerosa.ontrack.model.structure.NameDescriptionState
@@ -148,12 +146,6 @@ class GraphQLBeanConverterTest {
     }
 
     companion object {
-
-        fun typeName(type: GraphQLType): String = if (type is GraphQLNamedType) {
-            type.name
-        } else {
-            type.toString()
-        }
 
         fun fieldToTypeNames(fields: List<GraphQLFieldDefinition>): Map<String, String> =
             fields.associate {
