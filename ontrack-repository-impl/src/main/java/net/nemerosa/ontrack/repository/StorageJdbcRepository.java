@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -41,20 +42,17 @@ public class StorageJdbcRepository extends AbstractJdbcRepository implements Sto
     }
 
     @Override
-    public void storeJson(String store, String key, JsonNode node) {
-        MapSqlParameterSource params = params("store", store).addValue("key", key);
-        // Deleting first
+    public void storeJson(String store, String key, @NotNull JsonNode node) {
+        MapSqlParameterSource params = params("store", store)
+                .addValue("key", key)
+                .addValue("data", writeJson(node));
         getNamedParameterJdbcTemplate().update(
-                "DELETE FROM STORAGE WHERE STORE = :store AND NAME = :key",
+                "INSERT INTO STORAGE (STORE, NAME, DATA)" +
+                        " VALUES(:store, :key, CAST(:data AS JSONB)) " +
+                        " ON CONFLICT (STORE, NAME) " +
+                        " DO UPDATE SET DATA = EXCLUDED.DATA",
                 params
         );
-        // Inserting if not null
-        if (node != null) {
-            getNamedParameterJdbcTemplate().update(
-                    "INSERT INTO STORAGE(STORE, NAME, DATA) VALUES (:store, :key, CAST(:data AS JSONB))",
-                    params.addValue("data", writeJson(node))
-            );
-        }
     }
 
     @Override
