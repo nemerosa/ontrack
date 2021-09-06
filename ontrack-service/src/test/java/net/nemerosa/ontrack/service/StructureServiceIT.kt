@@ -185,7 +185,7 @@ class StructureServiceIT : AbstractDSLTestSupport() {
         assertEquals(listOf(build.id), builds.map { it.id })
         // Incorrect pattern (unmatched parenthesis)
         builds = asUser().withView(build).call {
-            structureService.buildSearch(build.project.id, BuildSearchForm(branchName = ".*1"))
+            structureService.buildSearch(build.project.id, BuildSearchForm(branchName = ".*1)"))
         }
         assertTrue(builds.isEmpty(), "No match, but no failure")
     }
@@ -201,7 +201,7 @@ class StructureServiceIT : AbstractDSLTestSupport() {
         assertEquals(listOf(build.id), builds.map { it.id })
         // Incorrect pattern (unmatched parenthesis)
         builds = asUser().withView(build).call {
-            structureService.buildSearch(build.project.id, BuildSearchForm(buildName = ".*1"))
+            structureService.buildSearch(build.project.id, BuildSearchForm(buildName = ".*1)"))
         }
         assertTrue(builds.isEmpty(), "No match, but no failure")
     }
