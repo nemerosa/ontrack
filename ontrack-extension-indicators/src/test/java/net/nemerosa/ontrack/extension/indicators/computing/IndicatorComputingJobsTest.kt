@@ -32,10 +32,11 @@ class IndicatorComputingJobsTest {
         meterRegistry = SimpleMeterRegistry()
 
         computingJobs = IndicatorComputingJobs(
-                structureService,
-                listOf(indicatorComputer),
-                indicatorComputingService,
-                meterRegistry
+            structureService = structureService,
+            computers = listOf(indicatorComputer),
+            indicatorComputingService = indicatorComputingService,
+            meterRegistry = meterRegistry,
+            applicationLogService = mock()
         )
     }
 
