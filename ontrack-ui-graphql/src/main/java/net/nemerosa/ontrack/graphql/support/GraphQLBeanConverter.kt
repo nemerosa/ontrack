@@ -128,6 +128,7 @@ object GraphQLBeanConverter {
     @JvmOverloads
     @Deprecated("Use Kotlin equivalent")
     fun asObjectType(type: Class<*>, cache: GQLTypeCache, exclusions: Set<String>? = null): GraphQLObjectType {
+        @Suppress("DEPRECATION")
         return asObjectTypeBuilder(type, cache, exclusions).build()
     }
 
@@ -167,6 +168,7 @@ object GraphQLBeanConverter {
                     } else {
                         // Tries to convert to an object type
                         // Note: caching might be needed here...
+                        @Suppress("DEPRECATION")
                         val propertyObjectType = cache.getOrCreate(
                             propertyType.simpleName
                         ) { asObjectType(propertyType, cache) }

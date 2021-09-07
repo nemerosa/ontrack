@@ -7,7 +7,7 @@ import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLList
 import net.nemerosa.ontrack.common.and
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.checkArgList
+import net.nemerosa.ontrack.graphql.support.checkArgList
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
 import net.nemerosa.ontrack.model.structure.ID

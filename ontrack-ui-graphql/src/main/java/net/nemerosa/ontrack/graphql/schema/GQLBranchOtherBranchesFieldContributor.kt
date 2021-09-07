@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLTypeReference
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ProjectEntity

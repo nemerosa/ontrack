@@ -7,7 +7,7 @@ import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import net.nemerosa.ontrack.common.and
 import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.checkArgList
+import net.nemerosa.ontrack.graphql.support.checkArgList
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
