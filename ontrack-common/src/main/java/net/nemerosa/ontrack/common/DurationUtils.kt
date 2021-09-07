@@ -3,6 +3,9 @@ package net.nemerosa.ontrack.common
 import org.apache.commons.lang3.time.DurationFormatUtils
 import java.time.Duration
 import java.time.temporal.ChronoUnit
+import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.toDuration
 
 /**
  * Formats a duration into a human readable string and truncates to the highest unit.
@@ -36,3 +39,9 @@ fun truncateDuration(duration: Duration): Duration {
         }
     }
 }
+
+/**
+ * Replaces the Kotlin deprecated functions.
+ */
+@ExperimentalTime
+val Int.seconds get() = toDuration(DurationUnit.SECONDS)

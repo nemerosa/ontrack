@@ -7,15 +7,12 @@ import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
-import net.nemerosa.ontrack.common.getOrNull
 import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
 import net.nemerosa.ontrack.graphql.schema.actions.actions
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.fetcher
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
-import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.pagination.PageRequest
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
@@ -72,7 +69,7 @@ class GQLTypeBuild(
                                                 .type(GraphQLBoolean)
                                                 .build()
                                 )
-                                .type(stdList(GraphQLTypeReference(GQLTypePromotionRun.PROMOTION_RUN)))
+                                .type(listType(GraphQLTypeReference(GQLTypePromotionRun.PROMOTION_RUN)))
                                 .dataFetcher(buildPromotionRunsFetcher())
                                 .build()
                 )
@@ -96,7 +93,7 @@ class GQLTypeBuild(
                                                 .defaultValue(50)
                                                 .build()
                                 )
-                                .type(stdList(GraphQLTypeReference(GQLTypeValidationRun.VALIDATION_RUN)))
+                                .type(listType(GraphQLTypeReference(GQLTypeValidationRun.VALIDATION_RUN)))
                                 .dataFetcher(buildValidationRunsFetcher())
                                 .build()
                 )
@@ -145,7 +142,7 @@ class GQLTypeBuild(
                                         .type(GraphQLInt)
                                         .defaultValue(PageRequest.DEFAULT_PAGE_SIZE)
                             }
-                            .type(stdList(validation.typeRef))
+                            .type(listType(validation.typeRef))
                             .dataFetcher(buildValidationsFetcher())
                 }
                 // Build links - "using" direction, with pagination
@@ -222,56 +219,53 @@ class GQLTypeBuild(
     private fun getFilter(environment: DataFetchingEnvironment): (Build) -> Boolean {
         val projectName: String? = environment.getArgument("project")
         val branchName: String? = environment.getArgument("branch")
-        val filter: (Build) -> Boolean
-        if (branchName != null) {
+        val filter: (Build) -> Boolean = if (branchName != null) {
             if (projectName == null) {
                 throw IllegalArgumentException("`project` is required")
             } else {
-                filter = {
+                {
                     it.branch.project.name == projectName && it.branch.name == branchName
                 }
             }
         } else if (projectName != null) {
-            filter = {
+            {
                 it.branch.project.name == projectName
             }
         } else {
-            filter = { true }
+            { true }
         }
         return filter
     }
 
-    private fun buildValidationsFetcher(): DataFetcher<List<GQLTypeValidation.GQLTypeValidationData>> {
-        return fetcher(
-                Build::class.java
-        ) { environment: DataFetchingEnvironment, build: Build ->
+    private fun buildValidationsFetcher(): DataFetcher<List<GQLTypeValidation.GQLTypeValidationData>> =
+        DataFetcher { environment ->
+            val build: Build = environment.getSource()
             // Filter on validation stamp
-            val validationStampName = GraphqlUtils.getStringArgument(environment, ARG_VALIDATION_STAMP)
+            val validationStampName: String? = environment.getArgument(ARG_VALIDATION_STAMP)
             val offset = environment.getArgument<Int>(GQLPaginatedListFactory.ARG_OFFSET) ?: 0
             val size = environment.getArgument<Int>(GQLPaginatedListFactory.ARG_SIZE) ?: 10
-            if (validationStampName.isPresent) {
+            if (validationStampName != null) {
                 val validationStamp: ValidationStamp? =
                         structureService.findValidationStampByName(
                                 build.project.name,
                                 build.branch.name,
-                                validationStampName.get()
+                                validationStampName
                         ).orElse(null)
                 if (validationStamp != null) {
-                    return@fetcher listOf(
+                    listOf(
                             buildValidation(
                                     validationStamp, build, offset, size
                             )
                     )
                 } else {
-                    return@fetcher listOf<GQLTypeValidation.GQLTypeValidationData>()
+                    emptyList()
                 }
             } else {
                 // Gets the validation runs for the build
-                return@fetcher structureService.getValidationStampListForBranch(build.branch.id)
+                structureService.getValidationStampListForBranch(build.branch.id)
                         .map { validationStamp -> buildValidation(validationStamp, build, offset, size) }
             }
         }
-    }
 
     private fun buildValidation(
             validationStamp: ValidationStamp,
@@ -291,11 +285,11 @@ class GQLTypeBuild(
     }
 
     private fun buildValidationRunsFetcher() =
-            DataFetcher<List<ValidationRun>> { environment ->
+            DataFetcher { environment ->
                 val build: Build = environment.getSource()
                 // Filter
-                val count = GraphqlUtils.getIntArgument(environment, ARG_COUNT).orElse(50)
-                val validation = GraphqlUtils.getStringArgument(environment, ARG_VALIDATION_STAMP).orElse(null)
+                val count: Int = environment.getArgument(ARG_COUNT) ?: 50
+                val validation: String? = environment.getArgument(ARG_VALIDATION_STAMP)
                 if (validation != null) {
                     // Gets one validation stamp by name
                     val validationStamp = structureService.findValidationStampByName(
@@ -338,9 +332,9 @@ class GQLTypeBuild(
             DataFetcher<List<PromotionRun>> { environment ->
                 val build: Build = environment.getSource()
                 // Last per promotion filter?
-                val lastPerLevel = GraphqlUtils.getBooleanArgument(environment, ARG_LAST_PER_LEVEL, false)
+                val lastPerLevel: Boolean = environment.getArgument(ARG_LAST_PER_LEVEL) ?: false
                 // Promotion filter
-                val promotion = GraphqlUtils.getStringArgument(environment, ARG_PROMOTION).orElse(null)
+                val promotion: String? = environment.getArgument(ARG_PROMOTION)
                 val promotionLevel: PromotionLevel? = if (promotion != null) {
                     // Gets the promotion level
                     structureService.findPromotionLevelByName(

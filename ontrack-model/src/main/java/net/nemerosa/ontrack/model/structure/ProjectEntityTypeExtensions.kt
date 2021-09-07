@@ -5,7 +5,7 @@ package net.nemerosa.ontrack.model.structure
  * Name suitable for generating a code variable.
  */
 val ProjectEntityType.varName: String
-    get() = name.toLowerCase().split("_").joinToString("") { it.capitalize() }.decapitalize()
+    get() = name.lowercase().split("_").joinToString("") { it.capitalize() }.decapitalize()
 
 /**
  * Name suitable for generating a code type.

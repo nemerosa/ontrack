@@ -5,7 +5,6 @@ import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLNonNull
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -34,8 +33,7 @@ class GQLRootQueryValidationStamp(
                 )
                 .dataFetcher { environment ->
                     // Gets the ID
-                    val id = GraphqlUtils.getIntArgument(environment, "id")
-                            .orElseThrow { IllegalStateException("`id` argument is required") }
+                    val id: Int = environment.getArgument("id")
                     // Gets the validation stamp
                     try {
                         structureService.getValidationStamp(ID.of(id))

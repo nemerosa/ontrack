@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.extension.issues.support.MockIssue
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceExtension
@@ -178,7 +177,6 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
         )
 
         val input = if (format != null || grouping != null || altGroup != null || exclude != null) {
-            var s = "(request: {"
             val args = mutableListOf<String>()
             format?.let {
                 args += """format: "$it""""

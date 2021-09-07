@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.Scalars.*
 import graphql.schema.DataFetcher
 import graphql.schema.DataFetchingEnvironment
-import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType
@@ -11,8 +10,8 @@ import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.common.and
 import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
 import net.nemerosa.ontrack.graphql.schema.actions.actions
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.disabledField
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
 import net.nemerosa.ontrack.model.pagination.PaginatedList
@@ -55,7 +54,7 @@ class GQLTypeProject(
                 .name(PROJECT)
                 .withInterface(projectEntityInterface.typeRef)
                 .fields(projectEntityInterfaceFields())
-                .field(GraphqlUtils.disabledField())
+                .field(disabledField())
                 // Actions
                 .actions(uiActionsGraphQLService, Project::class)
                 // Is this project a favourite?
@@ -72,7 +71,7 @@ class GQLTypeProject(
                 .field(
                         newFieldDefinition()
                                 .name("branches")
-                                .type(stdList(branch.typeRef))
+                                .type(listType(branch.typeRef))
                                 .argument(
                                         newArgument()
                                                 .name("name")
@@ -102,7 +101,7 @@ class GQLTypeProject(
                 .field {
                     it.name("labels")
                             .description("Labels for this project")
-                            .type(stdList(label.typeRef))
+                            .type(listType(label.typeRef))
                             .dataFetcher { environment ->
                                 val project: Project = environment.getSource()
                                 projectLabelManagementService.getLabelsForProject(project)
@@ -119,17 +118,17 @@ class GQLTypeProject(
                                     findValidationsRuns(environment, project, offset, size)
                                 },
                                 arguments = listOf(
-                                        GraphQLArgument.newArgument()
+                                        newArgument()
                                                 .name("branch")
                                                 .description("Branch where to look for validation runs (regular expression, defaults to all)")
                                                 .type(GraphQLString)
                                                 .build(),
-                                        GraphQLArgument.newArgument()
+                                        newArgument()
                                                 .name("validationStamp")
                                                 .description("Validation stamp where to look for validation runs (regular expression, defaults to all)")
                                                 .type(GraphQLString)
                                                 .build(),
-                                        GraphQLArgument.newArgument()
+                                        newArgument()
                                                 .name("statuses")
                                                 .description("Validation status to look for (regular expression, defaults to all)")
                                                 .type(GraphQLString)

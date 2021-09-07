@@ -3,7 +3,11 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils
+import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.graphql.support.descriptionField
+import net.nemerosa.ontrack.graphql.support.idField
+import net.nemerosa.ontrack.graphql.support.listType
+import net.nemerosa.ontrack.graphql.support.nameField
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountGroup
 import net.nemerosa.ontrack.model.security.AccountGroupMappingService
@@ -27,37 +31,45 @@ class GQLTypeAccountGroup(private val accountService: AccountService,
     override fun createType(cache: GQLTypeCache): GraphQLObjectType {
         return GraphQLObjectType.newObject()
                 .name(ACCOUNT_GROUP)
-                .field(GraphqlUtils.idField())
-                .field(GraphqlUtils.nameField())
-                .field(GraphqlUtils.descriptionField())
+                .field(idField())
+                .field(nameField())
+                .field(descriptionField())
                 // Associated accounts
-                .field { field: GraphQLFieldDefinition.Builder ->
+                .field { field ->
                     field.name(ACCOUNTS_FIELD)
                             .description("List of associated accounts")
-                            .type(GraphqlUtils.stdList(GraphQLTypeReference(GQLTypeAccount.ACCOUNT)))
-                            .dataFetcher(GraphqlUtils.fetcher(AccountGroup::class.java) { accountGroup: AccountGroup -> getAccountsForGroup(accountGroup) })
+                            .type(listType(GraphQLTypeReference(GQLTypeAccount.ACCOUNT)))
+                            .dataFetcher { env ->
+                                    val accountGroup: AccountGroup = env.getSource()
+                                    getAccountsForGroup(accountGroup)
+                            }
                 } // Global role
-                .field { field: GraphQLFieldDefinition.Builder ->
+                .field { field ->
                     field.name("globalRole")
                             .description("Global role for the account group")
                             .type(globalRole.typeRef)
-                            .dataFetcher(GraphqlUtils.fetcher(
-                                    AccountGroup::class.java
-                            ) { group: AccountGroup? -> accountService.getGlobalRoleForAccountGroup(group).orElse(null) })
+                            .dataFetcher { env ->
+                                val accountGroup: AccountGroup = env.getSource()
+                                accountService.getGlobalRoleForAccountGroup(accountGroup).getOrNull()
+                            }
                 } // Authorised projects
-                .field { field: GraphQLFieldDefinition.Builder ->
+                .field { field ->
                     field.name("authorizedProjects")
                             .description("List of authorized projects")
-                            .type(GraphqlUtils.stdList(authorizedProject.typeRef))
-                            .dataFetcher(GraphqlUtils.fetcher(
-                                    AccountGroup::class.java) { group: AccountGroup? -> accountService.getProjectPermissionsForAccountGroup(group) })
+                            .type(listType(authorizedProject.typeRef))
+                            .dataFetcher { env ->
+                                val accountGroup: AccountGroup = env.getSource()
+                                accountService.getProjectPermissionsForAccountGroup(accountGroup)
+                            }
                 } // Mappings
                 .field { field: GraphQLFieldDefinition.Builder ->
                     field.name("mappings")
                             .description("Mappings for this group")
-                            .type(GraphqlUtils.stdList(accountGroupMapping.typeRef))
-                            .dataFetcher(GraphqlUtils.fetcher(
-                                    AccountGroup::class.java) { group: AccountGroup? -> accountGroupMappingService.getMappingsForGroup(group!!) })
+                            .type(listType(accountGroupMapping.typeRef))
+                            .dataFetcher { env ->
+                                val accountGroup: AccountGroup = env.getSource()
+                                accountGroupMappingService.getMappingsForGroup(accountGroup)
+                            }
                 }
                 // Links
                 .fields(AccountGroup::class.java.graphQLFieldContributions(fieldContributors))

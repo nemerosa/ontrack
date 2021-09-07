@@ -12,11 +12,11 @@ class GQLRootQueryIndicatorTypesIT : AbstractIndicatorsTestSupport() {
         clearIndicators()
         val source = source()
         val category1 = category(id = "cat-1", source = source)
-        val type11 = category1.booleanType(id = "type-11", source = source)
-        val type12 = category1.booleanType(id = "type-12", source = source)
+        @Suppress("UNUSED_VARIABLE") val type11 = category1.booleanType(id = "type-11", source = source)
+        @Suppress("UNUSED_VARIABLE") val type12 = category1.booleanType(id = "type-12", source = source)
         val category2 = category(id = "cat-2")
-        val type21 = category2.booleanType(id = "type-21")
-        val type22 = category2.booleanType(id = "type-22")
+        @Suppress("UNUSED_VARIABLE") val type21 = category2.booleanType(id = "type-21")
+        @Suppress("UNUSED_VARIABLE") val type22 = category2.booleanType(id = "type-22")
 
         val data = asAdmin {
             run("""{
@@ -69,10 +69,10 @@ class GQLRootQueryIndicatorTypesIT : AbstractIndicatorsTestSupport() {
         val source = source()
         val category1 = category(id = "cat-1", source = source)
         val type11 = category1.booleanType(id = "type-11", source = source)
-        val type12 = category1.booleanType(id = "type-12", source = source)
+        @Suppress("UNUSED_VARIABLE") val type12 = category1.booleanType(id = "type-12", source = source)
         val category2 = category(id = "cat-2")
-        val type21 = category2.booleanType(id = "type-21")
-        val type22 = category2.booleanType(id = "type-22")
+        @Suppress("UNUSED_VARIABLE") val type21 = category2.booleanType(id = "type-21")
+        @Suppress("UNUSED_VARIABLE") val type22 = category2.booleanType(id = "type-22")
 
         val data = asAdmin {
             run("""{
@@ -124,11 +124,11 @@ class GQLRootQueryIndicatorTypesIT : AbstractIndicatorsTestSupport() {
         clearIndicators()
         val source = source()
         val category1 = category(id = "cat-1", source = source)
-        val type11 = category1.booleanType(id = "type-11", source = source)
-        val type12 = category1.booleanType(id = "type-12", source = source)
+        @Suppress("UNUSED_VARIABLE") val type11 = category1.booleanType(id = "type-11", source = source)
+        @Suppress("UNUSED_VARIABLE") val type12 = category1.booleanType(id = "type-12", source = source)
         val category2 = category(id = "cat-2")
-        val type21 = category2.booleanType(id = "type-21")
-        val type22 = category2.booleanType(id = "type-22")
+        @Suppress("UNUSED_VARIABLE") val type21 = category2.booleanType(id = "type-21")
+        @Suppress("UNUSED_VARIABLE") val type22 = category2.booleanType(id = "type-22")
 
         val data = asAdmin {
             run("""{

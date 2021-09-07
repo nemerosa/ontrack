@@ -4,7 +4,7 @@ import graphql.Scalars.GraphQLBoolean
 import graphql.schema.DataFetcher
 import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.security.AuthenticationSourceRepository
 import org.springframework.stereotype.Component
 
@@ -42,7 +42,7 @@ class GQLRootQueryAuthenticationSourceProviders(
                                 .description("Filters on authentication sources which allow the user's password to be changed")
                                 .type(GraphQLBoolean)
                     }
-                    .type(stdList(authenticationSource.typeRef))
+                    .type(listType(authenticationSource.typeRef))
                     .dataFetcher(authenticationSourcesDataFetcher())
                     .build()
 

@@ -180,12 +180,12 @@ class StructureServiceIT : AbstractDSLTestSupport() {
         val build = doCreateBuild(branch, nd("Build 1", ""))
         // Correct pattern
         var builds = asUser().withView(build).call {
-            structureService.buildSearch(build.project.id, BuildSearchForm().withBranchName(".*1$"))
+            structureService.buildSearch(build.project.id, BuildSearchForm(branchName = ".*1$"))
         }
         assertEquals(listOf(build.id), builds.map { it.id })
         // Incorrect pattern (unmatched parenthesis)
         builds = asUser().withView(build).call {
-            structureService.buildSearch(build.project.id, BuildSearchForm().withBranchName(".*1)"))
+            structureService.buildSearch(build.project.id, BuildSearchForm(branchName = ".*1)"))
         }
         assertTrue(builds.isEmpty(), "No match, but no failure")
     }
@@ -196,12 +196,12 @@ class StructureServiceIT : AbstractDSLTestSupport() {
         val build = doCreateBuild(branch, nd("Build 1", ""))
         // Correct pattern
         var builds = asUser().withView(build).call {
-            structureService.buildSearch(build.project.id, BuildSearchForm().withBuildName(".*1$"))
+            structureService.buildSearch(build.project.id, BuildSearchForm(buildName = ".*1$"))
         }
         assertEquals(listOf(build.id), builds.map { it.id })
         // Incorrect pattern (unmatched parenthesis)
         builds = asUser().withView(build).call {
-            structureService.buildSearch(build.project.id, BuildSearchForm().withBuildName(".*1)"))
+            structureService.buildSearch(build.project.id, BuildSearchForm(buildName = ".*1)"))
         }
         assertTrue(builds.isEmpty(), "No match, but no failure")
     }

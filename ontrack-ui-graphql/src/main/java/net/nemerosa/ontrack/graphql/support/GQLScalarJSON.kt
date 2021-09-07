@@ -77,8 +77,8 @@ class GQLScalarJSON private constructor() : GraphQLScalarType(
                                 when (value) {
                                     is TextNode ->
                                         when {
-                                            name.toLowerCase().contains("password") -> name to NullNode.instance
-                                            name.toLowerCase().contains("token") -> name to NullNode.instance
+                                            name.lowercase().contains("password") -> name to NullNode.instance
+                                            name.lowercase().contains("token") -> name to NullNode.instance
                                             else -> name to value
                                         }
                                     else ->

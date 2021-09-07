@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.GQLTypeValidationRun
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.structure.ValidationRun
 import org.springframework.stereotype.Component
 
@@ -31,7 +31,7 @@ class GQLTypeValidationIssue(
             .field {
                 it.name("validationRuns")
                         .description("List of validation runs where this issue was reported")
-                        .type(stdList(GraphQLTypeReference(GQLTypeValidationRun.VALIDATION_RUN)))
+                        .type(listType(GraphQLTypeReference(GQLTypeValidationRun.VALIDATION_RUN)))
             }
             .build()
 

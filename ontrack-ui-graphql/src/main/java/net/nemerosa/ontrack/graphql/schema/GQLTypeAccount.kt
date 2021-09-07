@@ -5,9 +5,7 @@ import graphql.schema.DataFetcher
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.schema.security.GQLTypeAuthenticationSource
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils
-import net.nemerosa.ontrack.graphql.support.booleanField
-import net.nemerosa.ontrack.graphql.support.listType
+import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.stereotype.Component
@@ -31,20 +29,20 @@ class GQLTypeAccount(
     override fun createType(cache: GQLTypeCache): GraphQLObjectType {
         return GraphQLObjectType.newObject()
                 .name(ACCOUNT)
-                .field(GraphqlUtils.idField())
-                .field(GraphqlUtils.nameField("Unique name for the account"))
-                .field(GraphqlUtils.stringField("fullName", "Full name of the account"))
-                .field(GraphqlUtils.stringField("email", "Email of the account"))
+                .field(idField())
+                .field(nameField("Unique name for the account"))
+                .stringField(Account::fullName, "Full name of the account")
+                .stringField(Account::email, "Email of the account")
                 .field {
                     it.name("authenticationSource")
                             .description("Source of authentication (builtin, ldap, etc.)")
                             .type(authenticationSource.typeRef)
                 }
-                .field(GraphqlUtils.stringField("role", "Security role (admin or none)"))
+                .stringField(Account::role.name, "Security role (admin or none)")
                 .field {
                     it.name("groups")
                             .description("List of groups the account belongs to")
-                            .type(GraphqlUtils.stdList(GraphQLTypeReference(GQLTypeAccountGroup.ACCOUNT_GROUP)))
+                            .type(listType(GraphQLTypeReference(GQLTypeAccountGroup.ACCOUNT_GROUP)))
                             .dataFetcher(accountAccountGroupsFetcher())
                 }
                 .field {
@@ -56,7 +54,7 @@ class GQLTypeAccount(
                 .field {
                     it.name("authorizedProjects")
                             .description("List of authorized projects")
-                            .type(GraphqlUtils.stdList(authorizedProject.typeRef))
+                            .type(listType(authorizedProject.typeRef))
                             .dataFetcher(accountAuthorizedProjectsFetcher())
                 }
                 .field {

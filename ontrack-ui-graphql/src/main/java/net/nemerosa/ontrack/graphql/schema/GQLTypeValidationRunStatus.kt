@@ -6,7 +6,7 @@ import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils
+import net.nemerosa.ontrack.graphql.support.descriptionField
 import net.nemerosa.ontrack.model.structure.ValidationRun
 import net.nemerosa.ontrack.model.structure.ValidationRunStatus
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
@@ -20,59 +20,58 @@ import org.springframework.stereotype.Component
 class GQLTypeValidationRunStatus
 @Autowired
 constructor(
-        private val fieldContributors: List<GQLFieldContributor>,
-        private val validationRunStatusID: GQLTypeValidationRunStatusID,
-        private val creation: GQLTypeCreation,
-        private val freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
+    private val fieldContributors: List<GQLFieldContributor>,
+    private val validationRunStatusID: GQLTypeValidationRunStatusID,
+    private val creation: GQLTypeCreation,
+    private val freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
 ) : GQLType {
 
     override fun getTypeName() = VALIDATION_RUN_STATUS
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType {
         return newObject()
-                .name(VALIDATION_RUN_STATUS)
-                // ID
-                .field {
-                    it.name("id")
-                            .type(GraphQLNonNull(GraphQLInt))
-                            .dataFetcher { environment ->
-                                val data = environment.getSource<Data>()
-                                data.delegate.id()
-                            }
-                }
-                // Creation
-                .field {
-                    it.name("creation")
-                            .type(creation.typeRef)
-                            .dataFetcher(GQLTypeCreation.dataFetcher<Data> { gqlTypeValidationRunStatusWrapper ->
-                                gqlTypeValidationRunStatusWrapper.delegate.signature
-                            })
-                }
-                // Status ID
-                .field(
-                        newFieldDefinition()
-                                .name("statusID")
-                                .description("Status ID")
-                                .type(validationRunStatusID.typeRef)
-                                .build()
-                )
-                // Description
-                .field(GraphqlUtils.descriptionField())
-                // Annotated description
-                .field {
-                    it.name("annotatedDescription")
-                            .type(Scalars.GraphQLString)
-                            .description("Description with links.")
-                            .dataFetcher(
-                                    GraphqlUtils.fetcher(Data::class.java) { wrapper ->
-                                        annotatedDescription(wrapper)
-                                    }
-                            )
-                }
-                // Links
-                .fields(ValidationRunStatus::class.java.graphQLFieldContributions(fieldContributors))
-                // OK
-                .build()
+            .name(VALIDATION_RUN_STATUS)
+            // ID
+            .field {
+                it.name("id")
+                    .type(GraphQLNonNull(GraphQLInt))
+                    .dataFetcher { environment ->
+                        val data = environment.getSource<Data>()
+                        data.delegate.id()
+                    }
+            }
+            // Creation
+            .field {
+                it.name("creation")
+                    .type(creation.typeRef)
+                    .dataFetcher(GQLTypeCreation.dataFetcher<Data> { gqlTypeValidationRunStatusWrapper ->
+                        gqlTypeValidationRunStatusWrapper.delegate.signature
+                    })
+            }
+            // Status ID
+            .field(
+                newFieldDefinition()
+                    .name("statusID")
+                    .description("Status ID")
+                    .type(validationRunStatusID.typeRef)
+                    .build()
+            )
+            // Description
+            .field(descriptionField())
+            // Annotated description
+            .field {
+                it.name("annotatedDescription")
+                    .type(Scalars.GraphQLString)
+                    .description("Description with links.")
+                    .dataFetcher { env ->
+                        val data: Data = env.getSource()
+                        annotatedDescription(data)
+                    }
+            }
+            // Links
+            .fields(ValidationRunStatus::class.java.graphQLFieldContributions(fieldContributors))
+            // OK
+            .build()
 
     }
 
@@ -94,8 +93,8 @@ constructor(
     }
 
     class Data(
-            val validationRun: ValidationRun,
-            val delegate: ValidationRunStatus
+        val validationRun: ValidationRun,
+        val delegate: ValidationRunStatus
     ) : ResourceDecoratorDelegate {
         val statusID: ValidationRunStatusID get() = delegate.statusID
         val description: String? get() = delegate.description

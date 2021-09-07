@@ -26,7 +26,7 @@ class GitSCMServiceDetectorIT : AbstractGitTestSupport() {
                     }
                     // Gets the SCM service for this branch
                     asUserWithView(this).execute {
-                        val oService = scmServiceDetector.getScmService(this)
+                        val oService = scmServiceDetector.getScmService(project)
                         assertPresent(oService) { service ->
                             val path = service.getSCMPathInfo(this)
                             assertPresent(path) {

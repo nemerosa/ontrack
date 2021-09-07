@@ -10,7 +10,6 @@ import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.graphQLFieldContributions
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.ui.resource.AbstractLinkResourceDecorator
 import net.nemerosa.ontrack.ui.resource.Link

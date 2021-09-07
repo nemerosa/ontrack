@@ -1,51 +1,30 @@
-package net.nemerosa.ontrack.model.structure;
+package net.nemerosa.ontrack.model.structure
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.experimental.Wither;
-import net.nemerosa.ontrack.model.annotations.API;
-import net.nemerosa.ontrack.model.annotations.APIDescription;
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import javax.validation.constraints.Min
+import javax.validation.constraints.Size
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
-
-@Data
-@AllArgsConstructor
-public class BuildSearchForm {
-
+data class BuildSearchForm(
     @Min(1)
-    @Wither
     @APIDescription("Maximum number of builds to return.")
-    private int maximumCount = 10;
-    @Wither
+    val maximumCount: Int = 10,
     @APIDescription("Regular expression to match against the branch name.")
-    private String branchName;
-    @Wither
+    val branchName: String? = null,
     @APIDescription("Regular expression to match against the build name, unless `buildExactMatch` is set to `true`.")
-    private String buildName;
-    @Wither
+    val buildName: String? = null,
     @APIDescription("Matches a build having at least this promotion.")
-    private String promotionName;
-    @Wither
+    val promotionName: String? = null,
     @APIDescription("Matches a build having at least this validation with PASSED as a status.")
-    private String validationStampName;
-    @Wither
+    val validationStampName: String? = null,
     @APIDescription("Matches a build having this property.")
-    private String property;
+    val property: String? = null,
     @Size(max = 200)
-    @Wither
     @APIDescription("When `property` is set, matches against the property value.")
-    private String propertyValue;
-    @Wither
+    val propertyValue: String? = null,
     @APIDescription("When `buildName` is set, considers an exact match on the build name.")
-    private boolean buildExactMatch;
-    @Wither
+    val buildExactMatch: Boolean = false,
     @APIDescription("`project:build` expression, matches against builds being linked from the build to match.")
-    private String linkedFrom;
-    @Wither
+    val linkedFrom: String? = null,
     @APIDescription("`project:build` expression, matches against builds being linked to the build to match.")
-    private String linkedTo;
-
-    public BuildSearchForm() {
-    }
-}
+    val linkedTo: String? = null,
+)

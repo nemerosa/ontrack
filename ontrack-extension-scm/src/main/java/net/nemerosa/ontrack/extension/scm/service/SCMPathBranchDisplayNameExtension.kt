@@ -13,7 +13,7 @@ class SCMPathBranchDisplayNameExtension(
         private val scmServiceDetector: SCMServiceDetector
 ) : AbstractExtension(extensionFeature), BranchDisplayNameExtension {
     override fun getBranchDisplayName(branch: Branch): String? =
-            scmServiceDetector.getScmService(branch).getOrNull()
+            scmServiceDetector.getScmService(branch.project).getOrNull()
                     ?.getSCMPathInfo(branch)?.getOrNull()
                     ?.branch
 }

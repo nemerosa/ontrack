@@ -302,7 +302,10 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     fun Build.linkTo(project: Project, buildName: String) {
         val build = structureService.buildSearch(
                 project.id,
-                BuildSearchForm().withBuildExactMatch(true).withBuildName(buildName)
+                BuildSearchForm(
+                    buildExactMatch = true,
+                    buildName = buildName,
+                )
         ).firstOrNull() ?: throw BuildNotFoundException(project.name, buildName)
         linkTo(build)
     }

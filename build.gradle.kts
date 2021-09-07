@@ -40,7 +40,6 @@ val ossrhPassword: String by project
 
 plugins {
     java
-    jacoco
     id("net.nemerosa.versioning") version "2.8.2" apply false
     id("nebula.deb") version "8.1.0"
     id("nebula.rpm") version "8.1.0"
@@ -314,7 +313,7 @@ configure(coreProjects) p@{
         "testImplementation"("junit:junit")
         "testImplementation"("org.mockito:mockito-core")
         "testImplementation"("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
-        "testImplementation"("io.mockk:mockk:1.10.3")
+        "testImplementation"("io.mockk:mockk:1.12.0")
         "testImplementation"("org.jetbrains.kotlin:kotlin-test")
     }
 
@@ -358,61 +357,6 @@ configure(coreProjects) p@{
         mustRunAfter(integrationTest)
     }
 
-}
-
-/**
- * Code coverage report
- */
-
-configure(coreProjects) {
-    apply(plugin = "jacoco")
-}
-
-val codeCoverageReport by tasks.registering(JacocoReport::class) {
-    executionData(fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec"))
-
-    javaProjects.forEach {
-        sourceSets(it.sourceSets["main"])
-    }
-
-    reports {
-        xml.isEnabled = true
-        xml.destination = file("${buildDir}/reports/jacoco/build.xml")
-        html.isEnabled = false
-        csv.isEnabled = false
-    }
-}
-
-configure(javaProjects) {
-    tasks.named("test") test@{
-        codeCoverageReport {
-            mustRunAfter(this@test)
-        }
-    }
-    val integrationTest = tasks.findByName("integrationTest")
-    if (integrationTest != null) {
-        codeCoverageReport {
-            mustRunAfter(integrationTest)
-        }
-    }
-}
-
-val jacocoExecFile: String by project
-val jacocoReportFile: String by project
-
-val codeDockerCoverageReport by tasks.registering(JacocoReport::class) {
-    executionData(fileTree(project.rootDir.absolutePath).include(jacocoExecFile))
-
-    javaProjects.forEach {
-        sourceSets(it.sourceSets["main"])
-    }
-
-    reports {
-        xml.isEnabled = true
-        xml.destination = file(jacocoReportFile)
-        html.isEnabled = false
-        csv.isEnabled = false
-    }
 }
 
 /**

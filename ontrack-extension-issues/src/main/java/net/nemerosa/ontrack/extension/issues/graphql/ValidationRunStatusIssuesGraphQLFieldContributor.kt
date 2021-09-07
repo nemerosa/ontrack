@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceExtensionService
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
 import net.nemerosa.ontrack.graphql.schema.GQLTypeValidationRunStatus
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.structure.ValidationRunStatus
 import org.springframework.stereotype.Component
@@ -24,7 +24,7 @@ class ValidationRunStatusIssuesGraphQLFieldContributor(
                         GraphQLFieldDefinition.newFieldDefinition()
                                 .name("issues")
                                 .description("List of issues attached to this status")
-                                .type(stdList(issue.typeRef))
+                                .type(listType(issue.typeRef))
                                 .argument {
                                     it.name("status")
                                             .description("Filtering the issues on their status")

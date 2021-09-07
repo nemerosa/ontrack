@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.graphql.support
 
-import graphql.Scalars
 import graphql.Scalars.*
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
@@ -10,13 +9,9 @@ import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
-import kotlin.reflect.KProperty1
 import kotlin.reflect.full.findAnnotation
 
 typealias TypeBuilder = GraphQLObjectType.Builder
-
-fun TypeBuilder.idField(): GraphQLObjectType.Builder =
-    fields(listOf(GraphqlUtils.idField()))
 
 fun TypeBuilder.booleanField(name: String, description: String): GraphQLObjectType.Builder =
     field { it.name(name).description(description).type(GraphQLBoolean) }
@@ -82,32 +77,12 @@ fun <E : Enum<E>> TypeBuilder.enumAsStringField(
             .type(GraphQLString)
     }
 
-fun <R, T> TypeBuilder.intField(
-    property: KProperty1<R, T?>,
-    description: String? = null,
-    converter: (T) -> Int,
-): GraphQLObjectType.Builder =
-    field {
-        it.name(property.name)
-            .description(getPropertyDescription(property, description))
-            .type(GraphQLInt)
-            .dataFetcher { env ->
-                val t = property.get(env.getSource<R>())
-                t?.let { converter(it) }
-            }
-    }
-
 fun TypeBuilder.stringField(property: KProperty<String?>, description: String? = null): GraphQLObjectType.Builder =
         field {
             it.name(property.name)
                 .description(getDescription(property, description))
                 .type(nullableOutputType(GraphQLString, property.returnType.isMarkedNullable))
         }
-
-fun TypeBuilder.creationField(name: String, description: String): GraphQLObjectType.Builder =
-    field {
-        it.name(name).description(description).type(GraphQLString)
-    }
 
 fun TypeBuilder.gqlTypeField(
     name: String,
@@ -119,12 +94,12 @@ fun TypeBuilder.gqlTypeField(
         it.name(name).description(description).type(nullableType(type.typeRef, nullable))
     }
 
-fun getDescription(type: KClass<*>, description: String? = null) =
+fun getDescription(type: KClass<*>, description: String? = null): String =
     description
         ?: type.findAnnotation<APIDescription>()?.value
         ?: type.java.simpleName
 
-fun getDescription(property: KProperty<*>, defaultDescription: String? = null): String? =
+fun getDescription(property: KProperty<*>, defaultDescription: String? = null): String =
         defaultDescription
                 ?: property.findAnnotation<APIDescription>()?.value
                 ?: "${property.name} property"

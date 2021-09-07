@@ -34,8 +34,8 @@ data class IndicatorStats(
             val actualStatuses = compliances.filterNotNull()
             val total = compliances.size
             val count = actualStatuses.size
-            val min = actualStatuses.minBy { it.value }
-            val max = actualStatuses.maxBy { it.value }
+            val min = actualStatuses.minByOrNull { it.value }
+            val max = actualStatuses.maxByOrNull { it.value }
             val avg = if (count > 0) {
                 actualStatuses.map { it.value }.average().toInt().let { IndicatorCompliance(it) }
             } else {

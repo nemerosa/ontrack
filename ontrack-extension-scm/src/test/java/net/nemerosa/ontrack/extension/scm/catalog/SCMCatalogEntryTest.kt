@@ -17,7 +17,7 @@ class SCMCatalogEntryTest {
                 "config" to "Test",
                 "repository" to "nemerosa/ontrack",
                 "repositoryPage" to "uri:web:github:nemerosa/ontrack",
-                "timestamp" to Time.forStorage(Time.now())
+                "timestamp" to Time.store(Time.now())
         ).asJson()
         val entry = json.parse<SCMCatalogEntry>()
         assertEquals("github", entry.scm)
@@ -35,8 +35,8 @@ class SCMCatalogEntryTest {
                 "config" to "Test",
                 "repository" to "nemerosa/ontrack",
                 "repositoryPage" to "uri:web:github:nemerosa/ontrack",
-                "lastActivity" to Time.forStorage(Time.now()),
-                "timestamp" to Time.forStorage(Time.now())
+                "lastActivity" to Time.store(Time.now()),
+                "timestamp" to Time.store(Time.now())
         ).asJson()
         val entry = json.parse<SCMCatalogEntry>()
         assertEquals("github", entry.scm)

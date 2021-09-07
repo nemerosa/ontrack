@@ -11,7 +11,7 @@ import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.graphQLFieldContributions
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.ui.resource.*
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
@@ -34,14 +34,14 @@ class GQLTypeIndicatorTypes(
                     .field {
                         it.name("types")
                                 .description("List of indicator types")
-                                .type(stdList(indicatorType.typeRef))
-                                .argument {
-                                    it.name(ARG_ID)
+                                .type(listType(indicatorType.typeRef))
+                                .argument { a ->
+                                    a.name(ARG_ID)
                                             .description("ID of the indicator type")
                                             .type(Scalars.GraphQLString)
                                 }
-                                .argument {
-                                    it.name(ARG_CATEGORY)
+                                .argument { a ->
+                                    a.name(ARG_CATEGORY)
                                             .description("ID of the indicator category")
                                             .type(Scalars.GraphQLString)
                                 }

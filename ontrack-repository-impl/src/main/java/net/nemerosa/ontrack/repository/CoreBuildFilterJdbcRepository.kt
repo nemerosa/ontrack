@@ -37,31 +37,33 @@ class CoreBuildFilterJdbcRepository(
         val params = MapSqlParameterSource("project", project.id())
 
         // branchName
-        if (!form.branchName.isNullOrBlank()) {
+        val branchName = form.branchName
+        if (!branchName.isNullOrBlank()) {
             try {
-                form.branchName.toRegex()
+                branchName.toRegex()
             } catch (_: Exception) {
                 // We ignore invalid regexes
                 return emptyList()
             }
             criteria.append(" AND BB.NAME ~ :branchName")
-            params.addValue("branchName", form.branchName)
+            params.addValue("branchName", branchName)
         }
 
         // buildName
-        if (!form.buildName.isNullOrBlank()) {
-            if (form.isBuildExactMatch) {
+        val buildName = form.buildName
+        if (!buildName.isNullOrBlank()) {
+            if (form.buildExactMatch) {
                 criteria.append(" AND B.NAME = :buildName")
             } else {
                 try {
-                    form.buildName.toRegex()
+                    buildName.toRegex()
                 } catch (_: Exception) {
                     // We ignore invalid regexes
                     return emptyList()
                 }
                 criteria.append(" AND B.NAME ~ :buildName")
             }
-            params.addValue("buildName", form.buildName)
+            params.addValue("buildName", buildName)
         }
 
         // promotionName
@@ -85,15 +87,16 @@ class CoreBuildFilterJdbcRepository(
         }
 
         // property
-        if (!form.property.isNullOrBlank()) {
+        val property = form.property
+        if (!property.isNullOrBlank()) {
             tables.append("""
                 INNER JOIN PROPERTIES PP ON PP.BUILD = B.ID 
             """)
             criteria.append(" AND PP.TYPE = :property")
-            params.addValue("property", form.property)
+            params.addValue("property", property)
             if (!form.propertyValue.isNullOrBlank()) {
                 // Gets the property type
-                val propertyType = propertyTypeAccessor(form.property)
+                val propertyType = propertyTypeAccessor(property)
                 // Gets the search arguments
                 val searchArguments = propertyType.getSearchArguments(form.propertyValue)
                 // If defined use them

@@ -7,9 +7,8 @@ import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLList
 import net.nemerosa.ontrack.common.and
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.checkArgList
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.checkArgList
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.Project
@@ -30,7 +29,7 @@ class GQLRootQueryProjects(
     override fun getFieldDefinition(): GraphQLFieldDefinition {
         return newFieldDefinition()
                 .name("projects")
-                .type(stdList(project.typeRef))
+                .type(listType(project.typeRef))
                 .argument(
                         newArgument()
                                 .name(ARG_ID)
@@ -72,7 +71,7 @@ class GQLRootQueryProjects(
             val id: Int? = environment.getArgument(ARG_ID)
             val name: String? = environment.getArgument(ARG_NAME)
             val namePattern: String? = environment.getArgument(ARG_NAME_PATTERN)
-            val favourites = GraphqlUtils.getBooleanArgument(environment, ARG_FAVOURITES, false)
+            val favourites = environment.getArgument<Boolean?>(ARG_FAVOURITES) ?: false
             val labels: List<String>? = environment.getArgument<List<String>>(ARG_LABELS)
             // Per ID
             when {
@@ -90,7 +89,7 @@ class GQLRootQueryProjects(
                     return@DataFetcher structureService
                             .findProjectByNameIfAuthorized(name)
                             ?.let { listOf(it) }
-                            ?: listOf<Project>()
+                            ?: emptyList()
                 }
                 favourites -> {
                     // No other argument is expected

@@ -1,14 +1,14 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.schema.GraphQLFieldDefinition
-import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLInterfaceType
 import graphql.schema.GraphQLTypeReference
 import graphql.schema.TypeResolverProxy
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils
+import net.nemerosa.ontrack.graphql.support.descriptionField
+import net.nemerosa.ontrack.graphql.support.idField
+import net.nemerosa.ontrack.graphql.support.nameField
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class GQLProjectEntityInterface @Autowired
@@ -27,23 +27,18 @@ constructor(private val creation: GQLTypeCreation) : GQLInterface {
                 .build()
     }
 
-    private fun baseProjectEntityInterfaceFields(): List<GraphQLFieldDefinition> {
-        return ArrayList(
-                Arrays.asList(
-                        GraphqlUtils.idField(),
-                        GraphqlUtils.nameField(),
-                        GraphqlUtils.descriptionField(),
-                        newFieldDefinition()
-                                .name("creation")
-                                .type(creation.typeRef)
-                                .build()
-                )
-        )
-    }
+    private fun baseProjectEntityInterfaceFields(): List<GraphQLFieldDefinition> = listOf(
+        idField(),
+        nameField(),
+        descriptionField(),
+        GraphQLFieldDefinition.newFieldDefinition()
+            .name("creation")
+            .type(creation.typeRef)
+            .build()
+    )
 
     companion object {
-        @JvmField
-        val PROJECT_ENTITY = "ProjectEntity"
+        const val PROJECT_ENTITY = "ProjectEntity"
     }
 
 }

@@ -8,8 +8,8 @@ class SyncPolicyTest {
 
     @Test
     fun `Copy sync`() {
-        val sources = listOf("a", "b", "c", "d", "e").associateWith { nd(it, it.toUpperCase()) }
-        val targets = listOf("b", "c", "d", "f").associateWith { nd(it, it.toLowerCase()) }.toMutableMap()
+        val sources = listOf("a", "b", "c", "d", "e").associateWith { nd(it, it.uppercase()) }
+        val targets = listOf("b", "c", "d", "f").associateWith { nd(it, it.lowercase()) }.toMutableMap()
 
         val result = SyncPolicy.COPY.sync(config(sources, targets))
         assertEquals(2, result.created)
@@ -33,8 +33,8 @@ class SyncPolicyTest {
 
     @Test
     fun sync() {
-        val sources = listOf("a", "b", "c", "d", "e").associateWith { nd(it, it.toUpperCase()) }
-        val targets = listOf("b", "c", "d", "f").associateWith { nd(it, it.toLowerCase()) }.toMutableMap()
+        val sources = listOf("a", "b", "c", "d", "e").associateWith { nd(it, it.uppercase()) }
+        val targets = listOf("b", "c", "d", "f").associateWith { nd(it, it.lowercase()) }.toMutableMap()
 
         val result = SyncPolicy.SYNC.sync(config(sources, targets))
         assertEquals(2, result.created)

@@ -12,7 +12,7 @@ class TestSummaryValidationConfigTest {
                 ValidationRunStatusID.FAILED,
                 TestSummaryValidationConfig(false).computeStatus(
                         TestSummaryValidationData(100, 100, 1)
-                )?.id
+                ).id
         )
     }
 
@@ -22,7 +22,7 @@ class TestSummaryValidationConfigTest {
                 ValidationRunStatusID.WARNING,
                 TestSummaryValidationConfig(true).computeStatus(
                         TestSummaryValidationData(100, 1, 0)
-                )?.id
+                ).id
         )
     }
 
@@ -32,7 +32,7 @@ class TestSummaryValidationConfigTest {
                 ValidationRunStatusID.PASSED,
                 TestSummaryValidationConfig(false).computeStatus(
                         TestSummaryValidationData(100, 1, 0)
-                )?.id
+                ).id
         )
     }
 
@@ -42,7 +42,7 @@ class TestSummaryValidationConfigTest {
                 ValidationRunStatusID.PASSED,
                 TestSummaryValidationConfig(true).computeStatus(
                         TestSummaryValidationData(100, 0, 0)
-                )?.id
+                ).id
         )
     }
 
@@ -52,7 +52,7 @@ class TestSummaryValidationConfigTest {
                 ValidationRunStatusID.PASSED,
                 TestSummaryValidationConfig(true).computeStatus(
                         TestSummaryValidationData(0, 0, 0)
-                )?.id
+                ).id
         )
     }
 

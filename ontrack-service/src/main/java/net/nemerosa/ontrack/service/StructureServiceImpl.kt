@@ -427,11 +427,11 @@ class StructureServiceImpl(
             val project = findProjectByName(item.project)
                     .orElseThrow { ProjectNotFoundException(item.project) }
             // Finds the build if possible (exact match - no regex)
-            val builds = buildSearch(project.id, BuildSearchForm()
-                    .withMaximumCount(1)
-                    .withBuildName(item.build)
-                    .withBuildExactMatch(true)
-            )
+            val builds = buildSearch(project.id, BuildSearchForm(
+                maximumCount = 1,
+                buildName = item.build,
+                buildExactMatch = true,
+            ))
             if (builds.isNotEmpty()) {
                 val target = builds[0]
                 // Adds the link

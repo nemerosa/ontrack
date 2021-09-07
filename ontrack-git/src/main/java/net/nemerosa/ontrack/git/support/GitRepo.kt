@@ -6,12 +6,13 @@ import net.nemerosa.ontrack.git.GitRepositoryClient
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.lang.Thread.sleep
+import java.nio.file.Files.createTempDirectory
 
 /**
  * Utility class to deal with a Git repository.
  */
 class GitRepo(val dir: File) : AutoCloseable {
-    constructor() : this(createTempDir("ontrack-git"))
+    constructor() : this(createTempDirectory("ontrack-git").toFile())
 
     companion object {
 
@@ -155,7 +156,7 @@ class GitRepo(val dir: File) : AutoCloseable {
          */
         infix fun withClone(clientAction: (client: GitRepositoryClient, clientRepo: GitRepo, origin: GitRepo) -> Unit) {
             repo.use {
-                val wd = createTempDir("ontrack-git", "")
+                val wd = createTempDirectory("ontrack-git").toFile()
                 try {
                     // Client
                     val client = cloneRepo(wd, it)

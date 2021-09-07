@@ -2,16 +2,19 @@ package net.nemerosa.ontrack.it
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import net.nemerosa.ontrack.common.seconds
 import org.slf4j.LoggerFactory
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 /**
  * Waits until a given condition is met.
  *
  * @param message Activity being waited for
- * @param timings Time to wait (initial timing, interval, max retries)
+ * @param initial Initial time to wait
+ * @param interval Interval to wait between two attemps
+ * @param timeout Total timeout for the operatiion to complete
+ * @param ignoreExceptions Set to `true` if exceptions do not abort the wait
  * @param check Must return `true` when the wait is over
  * @receiver Message to associate with the waiting (name of the task)
  */
@@ -41,17 +44,17 @@ class TimeTestUtils {
         check: () -> Boolean
     ) {
         runBlocking {
-            val timeout = timeout.toLongMilliseconds()
+            val timeoutMs = timeout.inWholeMilliseconds
             val start = System.currentTimeMillis()
             // Logging
             log(message, "Starting...")
             // Waiting some initial time
             if (initial != null) {
                 log(message, "Initial delay ($initial")
-                delay(initial.toLongMilliseconds())
+                delay(initial.inWholeMilliseconds)
             }
             // Checks
-            while ((System.currentTimeMillis() - start) < timeout) {
+            while ((System.currentTimeMillis() - start) < timeoutMs) {
                 // Check
                 log(message, "Checking...")
                 val ok = try {
@@ -69,7 +72,7 @@ class TimeTestUtils {
                     return@runBlocking
                 } else {
                     log(message, "Interval delay ($interval")
-                    delay(interval.toLongMilliseconds())
+                    delay(interval.inWholeMilliseconds)
                 }
             }
             // Timeout

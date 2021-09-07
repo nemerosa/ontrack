@@ -566,7 +566,7 @@ class BuildLinkIT : AbstractDSLTestSupport() {
         asUserWithView(source, target).call {
             val builds = structureService.buildSearch(
                     target.project.id,
-                    BuildSearchForm().withLinkedFrom(pattern)
+                    BuildSearchForm(linkedFrom = pattern)
             )
             assertEquals(
                     expected.map { it.id },
@@ -608,7 +608,7 @@ class BuildLinkIT : AbstractDSLTestSupport() {
         asUserWithView(source, target).call {
             val builds = structureService.buildSearch(
                     source.project.id,
-                    BuildSearchForm().withLinkedTo(pattern)
+                    BuildSearchForm(linkedTo = pattern)
             )
             assertEquals(
                     expected.map { it.id },

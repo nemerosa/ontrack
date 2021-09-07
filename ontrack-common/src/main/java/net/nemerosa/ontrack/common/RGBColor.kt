@@ -83,7 +83,7 @@ data class RGBColor(
         }
 
         private fun toHex(component: Int): String {
-            val h = component.toString(16).toUpperCase()
+            val h = component.toString(16).uppercase()
             return if (component < 16) {
                 "0$h"
             } else {

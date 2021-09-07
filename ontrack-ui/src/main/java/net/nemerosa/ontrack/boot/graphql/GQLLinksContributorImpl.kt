@@ -87,7 +87,7 @@ class GQLLinksContributorImpl(
             return CachedLink(link)
         }
 
-        private fun <T> computeLink(decorator: ResourceDecorator<T>, linkName: String): String? =
+        private fun <T: Any> computeLink(decorator: ResourceDecorator<T>, linkName: String): String? =
                 if (linkName in decorator.linkNames) {
                     @Suppress("UNCHECKED_CAST")
                     val t: T = if (source is ResourceDecoratorDelegate) {

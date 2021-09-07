@@ -1,13 +1,11 @@
 package net.nemerosa.ontrack.extension.git.graphql
 
 import graphql.schema.GraphQLObjectType
-import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.git.model.BranchInfos
 import net.nemerosa.ontrack.extension.git.model.OntrackGitCommitInfo
 import net.nemerosa.ontrack.graphql.schema.GQLType
-import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.listType
 import org.springframework.stereotype.Component
 
 /**
@@ -35,7 +33,7 @@ class OntrackGitCommitInfoGQLType(
                     .field {
                         it.name("branchInfosList")
                                 .description("Associated branch info per types of branches")
-                                .type(stdList(branchInfosGQLType.typeRef))
+                                .type(listType(branchInfosGQLType.typeRef))
                                 .dataFetcher { environment ->
                                     val gitCommitInfo = environment.getSource<OntrackGitCommitInfo>()
                                     BranchInfos.toList(gitCommitInfo.branchInfos)

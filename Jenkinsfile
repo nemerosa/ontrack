@@ -89,7 +89,6 @@ pipeline {
                         test \\
                         build \\
                         integrationTest \\
-                        codeCoverageReport \\
                         publishToMavenLocal \\
                         osPackages \\
                         dockerBuild \\
@@ -105,7 +104,6 @@ pipeline {
                         --no-daemon \\
                         --console plain
                 '''
-                // Jacoco report available at build/reports/jacoco/build.xml
                 sh '''
                     echo "(*) Building the test extension..."
                     cd ontrack-extension-test
@@ -150,50 +148,18 @@ pipeline {
                         docker-compose \\
                             --project-name local \\
                             --file docker-compose.yml \\
-                            --file docker-compose-jacoco.yml \\
                             up \\
                             --exit-code-from ontrack_acceptance
                         '''
                 }
             }
             post {
-                success {
-                    sh '''
-                        echo "Getting Jacoco coverage"
-                        mkdir -p build/jacoco/
-                        cp ontrack-acceptance/src/main/compose/jacoco/jacoco.exec build/jacoco/acceptance.exec
-                        cp ontrack-acceptance/src/main/compose/jacoco-dsl/jacoco.exec build/jacoco/dsl.exec
-                    '''
-                    // Collection of coverage in Docker
-                    sh '''
-                        ./gradlew \\
-                            codeDockerCoverageReport \\
-                            -x processResources \\
-                            -PjacocoExecFile=build/jacoco/acceptance.exec \\
-                            -PjacocoReportFile=build/reports/jacoco/acceptance.xml \\
-                            --parallel \\
-                            --stacktrace \\
-                            --console plain
-                    '''
-                    // Collection of coverage in DSL
-                    sh '''
-                        ./gradlew \\
-                            codeDockerCoverageReport \\
-                            -x processResources \\
-                            -PjacocoExecFile=build/jacoco/dsl.exec \\
-                            -PjacocoReportFile=build/reports/jacoco/dsl.xml \\
-                            --parallel \\
-                            --stacktrace \\
-                            --console plain
-                    '''
-                }
                 always {
                     sh '''
                         cd ontrack-acceptance/src/main/compose
                         docker-compose  \\
                             --project-name local \\
                             --file docker-compose.yml \\
-                            --file docker-compose-jacoco.yml \\
                             logs ontrack > docker-compose-acceptance-ontrack.log
                     '''
                     sh '''
@@ -201,7 +167,6 @@ pipeline {
                         docker-compose  \\
                             --project-name local \\
                             --file docker-compose.yml \\
-                            --file docker-compose-jacoco.yml \\
                             logs selenium > docker-compose-acceptance-selenium.log
                     '''
                     archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance-ontrack.log", allowEmptyArchive: true)
@@ -223,7 +188,6 @@ pipeline {
                         docker-compose \\
                             --project-name local \\
                             --file docker-compose.yml \\
-                            --file docker-compose-jacoco.yml \\
                             down --volumes
                     '''
                 }
@@ -246,30 +210,12 @@ pipeline {
                         docker-compose \\
                             --project-name ext \\
                             --file docker-compose-ext.yml \\
-                            --file docker-compose-jacoco.yml up \\
+                            up \\
                             --exit-code-from ontrack_acceptance
                     '''
                 }
             }
             post {
-                success {
-                    sh '''
-                        echo "Getting Jacoco coverage"
-                        mkdir -p build/jacoco/
-                        cp ontrack-acceptance/src/main/compose/jacoco/jacoco.exec build/jacoco/extension.exec
-                    '''
-                    // Collection of coverage in Docker
-                    sh '''
-                        ./gradlew \\
-                            codeDockerCoverageReport \\
-                            -x processResources \\
-                            -PjacocoExecFile=build/jacoco/extension.exec \\
-                            -PjacocoReportFile=build/reports/jacoco/extension.xml \\
-                            --parallel \\
-                            --stacktrace \\
-                            --console plain
-                    '''
-                }
                 always {
                     sh '''
                         mkdir -p build
@@ -287,7 +233,6 @@ pipeline {
                         docker-compose \\
                             --project-name ext \\
                             --file docker-compose-ext.yml \\
-                            --file docker-compose-jacoco.yml \\
                             down --volumes
                     '''
                 }
@@ -310,30 +255,12 @@ pipeline {
                         docker-compose \\
                             --project-name vault \\
                             --file docker-compose-vault.yml \\
-                            --file docker-compose-jacoco.yml up \\
+                            up \\
                             --exit-code-from ontrack_acceptance
                     '''
                 }
             }
             post {
-                success {
-                    sh '''
-                        echo "Getting Jacoco coverage"
-                        mkdir -p build/jacoco/
-                        cp ontrack-acceptance/src/main/compose/jacoco/jacoco.exec build/jacoco/vault.exec
-                    '''
-                    // Collection of coverage in Docker
-                    sh '''
-                        ./gradlew \\
-                            codeDockerCoverageReport \\
-                            -x processResources \\
-                            -PjacocoExecFile=build/jacoco/vault.exec \\
-                            -PjacocoReportFile=build/reports/jacoco/vault.xml \\
-                            --parallel \\
-                            --stacktrace \\
-                            --console plain
-                    '''
-                }
                 always {
                     sh '''
                         mkdir -p build
@@ -351,29 +278,9 @@ pipeline {
                         docker-compose \\
                             --project-name vault \\
                             --file docker-compose-vault.yml \\
-                            --file docker-compose-jacoco.yml \\
                             down --volumes
                     '''
                 }
-            }
-        }
-
-        stage('Codecov upload') {
-            when {
-                not {
-                    branch "master"
-                }
-            }
-            steps {
-                // Upload to Codecov
-                sh '''
-                    curl -s https://codecov.io/bash -o codecov.sh
-                    cat codecov.sh | bash -s -- -c -F build -f build/reports/jacoco/build.xml
-                    cat codecov.sh | bash -s -- -c -F acceptance -f build/reports/jacoco/acceptance.xml
-                    cat codecov.sh | bash -s -- -c -F dsl -f build/reports/jacoco/dsl.xml
-                    cat codecov.sh | bash -s -- -c -F extension -f build/reports/jacoco/extension.xml
-                    cat codecov.sh | bash -s -- -c -F vault -f build/reports/jacoco/vault.xml
-                    '''
             }
         }
 

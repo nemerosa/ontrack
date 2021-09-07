@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.graphql.support
 
+import graphql.Scalars.*
 import graphql.schema.*
+import net.nemerosa.ontrack.model.structure.Entity
 import kotlin.reflect.KClass
 
 // ============================================================================
@@ -87,10 +89,6 @@ fun <T> listField(
     .dataFetcher(fetcher)
     .build()
 
-// ============================================================================
-// General utilities
-// ============================================================================
-
 /**
  * List type
  */
@@ -99,6 +97,94 @@ fun listType(itemType: GraphQLOutputType, nullable: Boolean = false, nullableIte
         GraphQLList(nullableType(itemType, nullableItem)),
         nullable
     )
+
+/**
+ * Argument to get the first N elements in a list field
+ */
+const val STD_LIST_ARG_FIRST = "first"
+
+/**
+ * Argument to get the last N elements in a list field
+ */
+const val STD_LIST_ARG_LAST = "last"
+
+/**
+ * First & last arguments for a list
+ */
+fun listArguments() = listOf(
+    GraphQLArgument.newArgument()
+        .name(STD_LIST_ARG_FIRST)
+        .description("Number of items to return from the beginning of the list")
+        .type(GraphQLInt)
+        .build(),
+    GraphQLArgument.newArgument()
+        .name(STD_LIST_ARG_LAST)
+        .description("Number of items to return from the end of the list")
+        .type(GraphQLInt)
+        .build(),
+)
+
+/**
+ * Filtering a list based on first & last arguments
+ */
+fun <T> stdListArgumentsFilter(list: List<T>, environment: DataFetchingEnvironment): List<T> {
+    val first: Int? = environment.getArgument(STD_LIST_ARG_FIRST)
+    val last: Int? = environment.getArgument(STD_LIST_ARG_LAST)
+    return if (first != null) {
+        if (last != null) {
+            throw IllegalStateException("Only one of `${STD_LIST_ARG_FIRST}` or `${STD_LIST_ARG_LAST}` is expected as argument")
+        } else {
+            // First items...
+            list.take(first)
+        }
+    } else if (last != null) {
+        // Last items
+        list.takeLast(last)
+    } else {
+        // No range
+        list
+    }
+}
+
+// ============================================================================
+// Common fields
+// ============================================================================
+
+
+@Suppress("DEPRECATION")
+fun idField(): GraphQLFieldDefinition =
+    GraphQLFieldDefinition.newFieldDefinition()
+        .name("id")
+        .type(GraphQLInt.toNotNull())
+        .dataFetcher { environment: DataFetchingEnvironment ->
+            val source = environment.getSource<Any>()
+            if (source is Entity) {
+                return@dataFetcher source.id.value
+            } else {
+                return@dataFetcher null
+            }
+        }
+        .build()
+
+fun nameField(description: String = ""): GraphQLFieldDefinition = GraphQLFieldDefinition.newFieldDefinition()
+    .name("name")
+    .description(description)
+    .type(GraphQLString)
+    .build()
+
+fun descriptionField(): GraphQLFieldDefinition = GraphQLFieldDefinition.newFieldDefinition()
+    .name("description")
+    .type(GraphQLString)
+    .build()
+
+fun disabledField(): GraphQLFieldDefinition = GraphQLFieldDefinition.newFieldDefinition()
+    .name("disabled")
+    .type(GraphQLNonNull(GraphQLBoolean))
+    .build()
+
+// ============================================================================
+// General utilities
+// ============================================================================
 
 /**
  * Adjust a type so that it becomes nullable or not according to the value

@@ -56,9 +56,10 @@ class GitCommitPropertyTypeIT : AbstractGitTestSupport() {
                         }
                     }
                     // Looks for commit n°3 at project level
-                    val form = BuildSearchForm()
-                        .withProperty(GitCommitPropertyType::class.java.name)
-                        .withPropertyValue(commits.getValue(3))
+                    val form = BuildSearchForm(
+                        property = GitCommitPropertyType::class.java.name,
+                        propertyValue = commits.getValue(3),
+                    )
                     val builds = structureService.buildSearch(project.id, form)
                     assertEquals(
                         listOf("3"),
