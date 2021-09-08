@@ -91,6 +91,10 @@ fun optionalStringListInputField(
     .type(GraphQLList(GraphQLNonNull(GraphQLString)))
     .build()
 
+fun listInputType(
+    type: GraphQLInputType
+): GraphQLInputType = GraphQLNonNull(GraphQLList(GraphQLNonNull(type)))
+
 // ================================================================================================
 // Typed fields
 // ================================================================================================

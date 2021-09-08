@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.general
 import org.apache.commons.lang3.StringUtils
 import java.util.regex.Pattern
 
-class MetaInfoPropertyItem(
+data class MetaInfoPropertyItem(
         val name: String,
         val value: String?,
         val link: String?,
