@@ -51,7 +51,35 @@ class BuildMutations(
             "build", "Created or existing build", Build::class
         ) { input ->
             createBuildOrGet(input)
-        }
+        },
+        /**
+         * Creating a link between two builds using their names
+         */
+        simpleMutation(
+            "linkBuild", "Link two builds using their names", LinkBuildInput::class,
+            "build", "Build linked from", Build::class
+        ) { input ->
+            val from = structureService.findBuildByName(input.fromProject, input.fromBranch, input.fromBuild).getOrNull()
+            val to  = structureService.findBuildByName(input.toProject, input.toBranch, input.toBuild).getOrNull()
+            if (from != null && to != null) {
+                structureService.addBuildLink(from, to)
+            }
+            // Return the origin
+            from
+        },
+        /**
+         * Creating a link between two builds using their IDs
+         */
+        simpleMutation(
+            "linkBuildById", "Link two builds using their IDs", LinkBuildByIdInput::class,
+            "build", "Build linked from", Build::class
+        ) { input ->
+            val from = structureService.getBuild(ID.of(input.fromBuild))
+            val to = structureService.getBuild(ID.of(input.toBuild))
+            structureService.addBuildLink(from, to)
+            // Return the origin
+            from
+        },
     )
 
 
@@ -175,3 +203,25 @@ data class CreateBuildOrGetInput(
     @TypeRef
     val runInfo: RunInfoInput?,
 ) : BuildInput
+
+data class LinkBuildInput(
+    @APIDescription("Name of the project from which the link must be created")
+    val fromProject: String,
+    @APIDescription("Name of the branch from which the link must be created")
+    val fromBranch: String,
+    @APIDescription("Name of the build from which the link must be created")
+    val fromBuild: String,
+    @APIDescription("Name of the project to which the link must be created")
+    val toProject: String,
+    @APIDescription("Name of the branch to which the link must be created")
+    val toBranch: String,
+    @APIDescription("Name of the build to which the link must be created")
+    val toBuild: String,
+)
+
+data class LinkBuildByIdInput(
+    @APIDescription("ID of the build from which the link must be created")
+    val fromBuild: Int,
+    @APIDescription("ID of the build to which the link must be created")
+    val toBuild: Int,
+)

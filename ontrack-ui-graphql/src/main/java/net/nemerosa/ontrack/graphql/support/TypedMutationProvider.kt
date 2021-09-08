@@ -68,7 +68,7 @@ abstract class TypedMutationProvider protected constructor(
      * @param outputName Name of the output object (used as a field in the returned type)
      * @param outputDescription Description of the output field
      * @param outputType Type of the output (will be [mapped][toTypeRef] to an actual & existing GraphQL output type)
-     * @param fetcher Code whichs runs the actual mutation and returns the output object
+     * @param fetcher Code whichs runs the actual mutation and returns the output object. It can be null.
      */
     fun <I : Any, T : Any> simpleMutation(
             name: String,
@@ -77,7 +77,7 @@ abstract class TypedMutationProvider protected constructor(
             outputName: String,
             outputDescription: String,
             outputType: KClass<T>,
-            fetcher: (I) -> T
+            fetcher: (I) -> T?
     ): Mutation = SimpleTypedMutation(name, description, input, outputName, outputDescription, outputType, fetcher)
 
     inner class SimpleTypedMutation<I : Any, T : Any>(
@@ -87,7 +87,7 @@ abstract class TypedMutationProvider protected constructor(
             private val outputName: String,
             outputDescription: String,
             outputType: KClass<T>,
-            private val fetcher: (I) -> T
+            private val fetcher: (I) -> T?
     ) : Mutation {
 
         override val inputFields: List<GraphQLInputObjectField> = asInputFields(input)

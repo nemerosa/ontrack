@@ -99,12 +99,19 @@ abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
         }
     }
 
-    protected fun checkGraphQLUserErrors(data: JsonNode, field: String) {
-        val node = data.path(field).path("errors")
+    protected fun checkGraphQLUserErrors(data: JsonNode, field: String): JsonNode {
+        val payload = data.path(field)
+        val node = payload.path("errors")
         if (node != null && node.isArray && node.size() > 0) {
             val error = node.first().parse<UserError>()
             throw IllegalStateException(error.toString())
         }
+        return payload
+    }
+
+    protected fun checkGraphQLUserErrors(data: JsonNode, field: String, code: (payload: JsonNode) -> Unit) {
+        val payload = checkGraphQLUserErrors(data, field)
+        code(payload)
     }
 
 }
