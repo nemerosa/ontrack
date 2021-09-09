@@ -12,6 +12,12 @@ inline fun <reified T> SettingsRepository.getString(property: KProperty1<T, Stri
 /**
  * Type safe access to settings.
  */
+inline fun <reified T> SettingsRepository.getBoolean(property: KProperty1<T, Boolean?>, defaultValue: Boolean): Boolean =
+        getBoolean(T::class.java, property.name, defaultValue)
+
+/**
+ * Type safe access to settings.
+ */
 inline fun <reified T> SettingsRepository.getPassword(
         property: KProperty1<T, String?>,
         defaultValue: String,
