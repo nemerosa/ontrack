@@ -30,3 +30,10 @@ inline fun <reified T> SettingsRepository.getPassword(
 inline fun <reified T> SettingsRepository.setString(property: KProperty0<String?>) {
     setString(T::class.java, property.name, property.get())
 }
+
+/**
+ * Type safe setter of settings
+ */
+inline fun <reified T> SettingsRepository.setBoolean(property: KProperty0<Boolean>) {
+    setBoolean(T::class.java, property.name, property.get())
+}

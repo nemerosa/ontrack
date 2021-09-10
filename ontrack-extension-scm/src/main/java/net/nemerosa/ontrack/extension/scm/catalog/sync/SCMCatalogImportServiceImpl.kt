@@ -48,7 +48,7 @@ class SCMCatalogImportServiceImpl(
             val project = structureService.findProjectByName(name).getOrNull()
             if (project == null) {
                 val createdProject = structureService.newProject(Project.of(nd(name, "")))
-                logger("Created project $name from SCM catalog")
+                logger("Created project $name (id = ${createdProject.id}) from SCM catalog")
             }
         }
     }

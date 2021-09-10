@@ -44,16 +44,18 @@ class SCMCatalogImportServiceIT : AbstractDSLTestSupport() {
         doTest { _, _, entryUnlinked, entryUnlinkedOther ->
 
             // Disabling the sync
-            settingsManagerService.saveSettings(
-                SCMCatalogSyncSettings(syncEnabled = false)
-            )
+            asAdmin {
+                settingsManagerService.saveSettings(
+                    SCMCatalogSyncSettings(syncEnabled = false)
+                )
 
-            // Running the import
-            scmCatalogImportService.importCatalog(::println)
+                // Running the import
+                scmCatalogImportService.importCatalog(::println)
 
-            // Checks that no project has been created
-            assertNotPresent(structureService.findProjectByName(entryUnlinked.repository))
-            assertNotPresent(structureService.findProjectByName(entryUnlinkedOther.repository))
+                // Checks that no project has been created
+                assertNotPresent(structureService.findProjectByName(entryUnlinked.repository))
+                assertNotPresent(structureService.findProjectByName(entryUnlinkedOther.repository))
+            }
         }
     }
 
@@ -62,16 +64,23 @@ class SCMCatalogImportServiceIT : AbstractDSLTestSupport() {
         doTest { _, _, entryUnlinked, entryUnlinkedOther ->
 
             // Disabling the sync
-            settingsManagerService.saveSettings(
-                SCMCatalogSyncSettings(syncEnabled = true)
-            )
+            asAdmin {
+                settingsManagerService.saveSettings(
+                    SCMCatalogSyncSettings(syncEnabled = true)
+                )
+                // Running the import
+                scmCatalogImportService.importCatalog(::println)
 
-            // Running the import
-            scmCatalogImportService.importCatalog(::println)
-
-            // Checks that the unlinked projects have been created
-            assertPresent(structureService.findProjectByName(entryUnlinked.repository))
-            assertPresent(structureService.findProjectByName(entryUnlinkedOther.repository))
+                // Checks that the unlinked projects have been created
+                assertPresent(
+                    structureService.findProjectByName(entryUnlinked.repository),
+                    "${entryUnlinked.repository} project must be created"
+                )
+                assertPresent(
+                    structureService.findProjectByName(entryUnlinkedOther.repository),
+                    "${entryUnlinkedOther.repository} project must be created"
+                )
+            }
         }
     }
 
@@ -80,16 +89,18 @@ class SCMCatalogImportServiceIT : AbstractDSLTestSupport() {
         doTest { _, _, entryUnlinked, entryUnlinkedOther ->
 
             // Disabling the sync
-            settingsManagerService.saveSettings(
-                SCMCatalogSyncSettings(syncEnabled = true, repository = ".*other.*")
-            )
+            asAdmin {
+                settingsManagerService.saveSettings(
+                    SCMCatalogSyncSettings(syncEnabled = true, repository = ".*other.*")
+                )
 
-            // Running the import
-            scmCatalogImportService.importCatalog(::println)
+                // Running the import
+                scmCatalogImportService.importCatalog(::println)
 
-            // Checks that the unlinked projects have been created
-            assertNotPresent(structureService.findProjectByName(entryUnlinked.repository))
-            assertPresent(structureService.findProjectByName(entryUnlinkedOther.repository))
+                // Checks that the unlinked projects have been created
+                assertNotPresent(structureService.findProjectByName(entryUnlinked.repository))
+                assertPresent(structureService.findProjectByName(entryUnlinkedOther.repository))
+            }
         }
     }
 
@@ -128,11 +139,6 @@ class SCMCatalogImportServiceIT : AbstractDSLTestSupport() {
                 // Collection of catalog links
                 catalogLinkService.computeCatalogLinks()
             }
-
-            // Disabling the sync
-            settingsManagerService.saveSettings(
-                SCMCatalogSyncSettings(syncEnabled = false)
-            )
 
             // Running the test
             code(entryLinked, entryLinkedOther, entryUnlinked, entryUnlinkedOther)
