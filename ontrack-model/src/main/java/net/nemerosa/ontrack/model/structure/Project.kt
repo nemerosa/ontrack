@@ -21,6 +21,8 @@ data class Project(
 
     fun withSignature(signature: Signature) = Project(id, name, description, isDisabled, signature)
 
+    fun withDescription(description: String) = Project(id, name, description, isDisabled, signature)
+
     fun withId(id: ID) = Project(id, name, description, isDisabled, signature)
 
     companion object {

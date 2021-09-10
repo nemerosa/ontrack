@@ -13,6 +13,8 @@ import net.nemerosa.ontrack.test.assertPresent
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class SCMCatalogImportServiceIT : AbstractDSLTestSupport() {
 
@@ -34,7 +36,11 @@ class SCMCatalogImportServiceIT : AbstractDSLTestSupport() {
 
     @Before
     fun projects() {
-        projectLinked = project {}
+        projectLinked = project {
+            structureService.saveProject(
+                withDescription("Not to be overridden")
+            )
+        }
         projectLinkedOther = project {}
         projectOrphan = project {}
     }
@@ -99,13 +105,22 @@ class SCMCatalogImportServiceIT : AbstractDSLTestSupport() {
 
                 // Checks that the unlinked projects have been created
                 assertNotPresent(structureService.findProjectByName(entryUnlinked.repository))
-                assertPresent(structureService.findProjectByName(entryUnlinkedOther.repository))
+                assertPresent(structureService.findProjectByName(entryUnlinkedOther.repository)) { p ->
+                    // Checks that the SCM catalog entries are linked to the projects
+                    assertNotNull(catalogLinkService.getSCMCatalogEntry(p)) { entry ->
+                        assertEquals(entryUnlinkedOther.repository, entry.repository)
+                    }
+                }
 
-                // TODO Checks that the SCM property is set on the projects
-                // TODO Checks that the SCM catalog entries are linked to the projects
+                // Check that existing projects are not overridden
+                structureService.getProject(projectLinked.id).apply {
+                    assertEquals("Not to be overridden", description)
+                }
+
             }
         }
     }
+
 
     private fun doTest(
         code: (
