@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.stash.catalog
 
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogEntry
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogProvider
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogSource
@@ -55,5 +56,26 @@ class BitbucketSCMCatalogProvider(
         return property != null &&
                 property.configuration.name == entry.config &&
                 "${property.project}/${property.repository}" == entry.repository
+    }
+
+    override fun toProjectName(scmRepository: String): String =
+        scmRepository.substringAfter("/")
+
+    override fun linkProjectToSCM(project: Project, entry: SCMCatalogEntry): Boolean {
+        val config = stashConfigurationService.getOptionalConfiguration(entry.config).getOrNull() ?: return false
+        val projectName = entry.repository.substringBefore("/")
+        val repositoryName = entry.repository.substringAfter("/")
+        propertyService.editProperty(
+            project,
+            StashProjectConfigurationPropertyType::class.java,
+            StashProjectConfigurationProperty(
+                config,
+                projectName,
+                repositoryName,
+                0,
+                null
+            )
+        )
+        return true
     }
 }

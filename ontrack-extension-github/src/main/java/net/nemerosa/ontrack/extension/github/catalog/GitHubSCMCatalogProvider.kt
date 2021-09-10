@@ -84,4 +84,24 @@ class GitHubSCMCatalogProvider(
         }
     }
 
+    override fun toProjectName(scmRepository: String): String =
+        scmRepository.substringAfter("/")
+
+    override fun linkProjectToSCM(project: Project, entry: SCMCatalogEntry): Boolean {
+        // Gets the configuration
+        val config = gitHubConfigurationService.configurations.find { it.name == entry.config } ?: return false
+        // Setting the property
+        propertyService.editProperty(
+            entity = project,
+            propertyType = GitHubProjectConfigurationPropertyType::class.java,
+            data = GitHubProjectConfigurationProperty(
+                configuration = config,
+                repository = entry.repository,
+                indexationInterval = 0,
+                issueServiceConfigurationIdentifier = null,
+            )
+        )
+        // OK
+        return true
+    }
 }

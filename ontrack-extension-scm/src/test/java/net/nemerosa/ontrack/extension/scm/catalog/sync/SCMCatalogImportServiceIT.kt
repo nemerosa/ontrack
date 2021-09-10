@@ -100,6 +100,9 @@ class SCMCatalogImportServiceIT : AbstractDSLTestSupport() {
                 // Checks that the unlinked projects have been created
                 assertNotPresent(structureService.findProjectByName(entryUnlinked.repository))
                 assertPresent(structureService.findProjectByName(entryUnlinkedOther.repository))
+
+                // TODO Checks that the SCM property is set on the projects
+                // TODO Checks that the SCM catalog entries are linked to the projects
             }
         }
     }

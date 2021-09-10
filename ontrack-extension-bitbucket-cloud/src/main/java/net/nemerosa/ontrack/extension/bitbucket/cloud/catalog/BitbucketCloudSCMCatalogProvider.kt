@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.catalog
 
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.bitbucket.cloud.client.BitbucketCloudClientFactory
 import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketCloudConfigurationService
 import net.nemerosa.ontrack.extension.bitbucket.cloud.property.BitbucketCloudProjectConfigurationProperty
@@ -51,5 +52,23 @@ class BitbucketCloudSCMCatalogProvider(
         return property != null &&
                 property.configuration.name == entry.config &&
                 "${property.configuration.workspace}/${property.repository}" == entry.repository
+    }
+
+    override fun toProjectName(scmRepository: String): String =
+        scmRepository.substringAfter("/")
+
+    override fun linkProjectToSCM(project: Project, entry: SCMCatalogEntry): Boolean {
+        val config = bitbucketCloudConfigurationService.getOptionalConfiguration(entry.config).getOrNull() ?: return false
+        propertyService.editProperty(
+            project,
+            BitbucketCloudProjectConfigurationPropertyType::class.java,
+            BitbucketCloudProjectConfigurationProperty(
+                config,
+                entry.repository,
+                0,
+                null
+            )
+        )
+        return true
     }
 }

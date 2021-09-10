@@ -29,4 +29,9 @@ interface CatalogLinkService {
      */
     fun isOrphan(project: Project): Boolean
 
+    /**
+     * Stores a link between a project and a SCM catalog entry
+     */
+    fun storeLink(project: Project, entry: SCMCatalogEntry)
+
 }

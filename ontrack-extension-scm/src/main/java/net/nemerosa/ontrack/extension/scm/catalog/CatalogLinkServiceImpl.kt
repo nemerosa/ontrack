@@ -70,11 +70,7 @@ class CatalogLinkServiceImpl(
                 if (provider.matches(entry, project)) {
                     logger.debug("Catalog entry ${entry.key} --> ${project.name}")
                     // Stores the link
-                    entityDataService.store(
-                            project,
-                            CatalogLinkService::class.java.name,
-                            entry.key
-                    )
+                    storeLink(project, entry)
                     // OK
                     return true
                 }
@@ -82,6 +78,14 @@ class CatalogLinkServiceImpl(
         }
         // Not linked
         return false
+    }
+
+    override fun storeLink(project: Project, entry: SCMCatalogEntry) {
+        entityDataService.store(
+            project,
+            CatalogLinkService::class.java.name,
+            entry.key
+        )
     }
 
 }

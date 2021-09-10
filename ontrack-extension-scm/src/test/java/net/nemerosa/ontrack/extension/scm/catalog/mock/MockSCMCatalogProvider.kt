@@ -55,4 +55,11 @@ class MockSCMCatalogProvider : SCMCatalogProvider {
     fun linkEntry(entry: SCMCatalogEntry, project: Project) {
         mappings[entry.key] = project.id()
     }
+
+    override fun toProjectName(scmRepository: String): String = scmRepository
+
+    override fun linkProjectToSCM(project: Project, entry: SCMCatalogEntry): Boolean {
+        // Not doing anything
+        return false
+    }
 }
