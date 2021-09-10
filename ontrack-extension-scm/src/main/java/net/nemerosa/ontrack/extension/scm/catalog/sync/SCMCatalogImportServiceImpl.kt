@@ -56,7 +56,10 @@ class SCMCatalogImportServiceImpl(
                     if (name.length > Project.PROJECT_NAME_MAX_LENGTH) {
                         logger("Cannot import $name project because its length is > ${Project.PROJECT_NAME_MAX_LENGTH}")
                     } else {
-                        val createdProject = structureService.newProject(Project.of(nd(name, "")))
+                        // Description
+                        val description = "This project was automatically created from the SCM entry ${item.entry.scm}/${item.entry.config}/${item.entry.repository}"
+                        // Creating the project
+                        val createdProject = structureService.newProject(Project.of(nd(name, description)))
                         // Set the SCM property to link to the SCM entry
                         provider.linkProjectToSCM(createdProject, item.entry)
                         // Update the SCM catalog entry to link it to the created project
