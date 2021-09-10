@@ -25,6 +25,11 @@ data class Project(
 
     companion object {
 
+        /**
+         * Maximum length for the name of a project
+         */
+        const val PROJECT_NAME_MAX_LENGTH = 80
+
         @JvmStatic
         fun of(nameDescription: NameDescriptionState) =
                 Project(ID.NONE, nameDescription.name, nameDescription.description, nameDescription.isDisabled, Signature.anonymous())

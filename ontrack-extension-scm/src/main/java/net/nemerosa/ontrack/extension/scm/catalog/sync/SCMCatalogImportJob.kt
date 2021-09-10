@@ -28,7 +28,7 @@ class SCMCatalogImportJob(
     private fun createSCMCatalogImportJob() = object : Job {
 
         override fun isDisabled(): Boolean =
-            cachedSettingsService.getCachedSettings(SCMCatalogSyncSettings::class.java).syncEnabled
+            !cachedSettingsService.getCachedSettings(SCMCatalogSyncSettings::class.java).syncEnabled
 
         override fun getKey(): JobKey =
             SCMJobs.category

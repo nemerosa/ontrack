@@ -47,8 +47,12 @@ class SCMCatalogImportServiceImpl(
             val name = item.entry.repository
             val project = structureService.findProjectByName(name).getOrNull()
             if (project == null) {
-                val createdProject = structureService.newProject(Project.of(nd(name, "")))
-                logger("Created project $name (id = ${createdProject.id}) from SCM catalog")
+                if (name.length > Project.PROJECT_NAME_MAX_LENGTH) {
+                    logger("Cannot import $name project because its length is > ${Project.PROJECT_NAME_MAX_LENGTH}")
+                } else {
+                    val createdProject = structureService.newProject(Project.of(nd(name, "")))
+                    logger("Created project $name (id = ${createdProject.id}) from SCM catalog")
+                }
             }
         }
     }
