@@ -122,7 +122,7 @@ class ConfigurableIndicatorsIT : AbstractIndicatorsTestSupport() {
                 id = uid("cit"),
                 name = "TestConfigurableIndicator",
                 valueType = booleanIndicatorValueType,
-                valueConfig = BooleanIndicatorValueTypeConfig(required = false),
+                valueConfig = { _, _ -> BooleanIndicatorValueTypeConfig(required = false) },
                 attributes = listOf(
                     ConfigurableIndicatorAttribute(
                         key = "length",
