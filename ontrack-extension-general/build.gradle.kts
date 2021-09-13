@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":ontrack-ui-graphql"))
     implementation("org.apache.commons:commons-lang3")
     implementation(project(":ontrack-extension-casc"))
+    implementation(project(":ontrack-extension-indicators"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
