@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.extension.jenkins.indicator
 
 import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.extension.indicators.computing.AbstractConfigurableIndicatorComputer
-import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicatorService
-import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicatorType
-import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputedCategory
+import net.nemerosa.ontrack.extension.indicators.computing.*
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorSource
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorSourceProviderDescription
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueType
@@ -55,10 +52,12 @@ class JenkinsPipelineFileIndicatorComputer(
         ConfigurableIndicatorType(
             category = indicatorCategory,
             id = TYPE,
-            name = "The repository SHOULD have a Jenkinsfile",
+            name = "The repository {required} have a Jenkinsfile",
             valueType = booleanIndicatorValueType,
-            valueConfig = BooleanIndicatorValueTypeConfig(required = false),
-            attributes = emptyList(),
+            valueConfig = { _, state -> BooleanIndicatorValueTypeConfig(required = state.getRequiredAttribute()) },
+            attributes = listOf(
+                ConfigurableIndicatorAttribute.requiredFlag
+            ),
             computing = { project, _ ->
                 val scmService = scmServiceDetector.getScmService(project).getOrNull()
                 if (scmService != null) {

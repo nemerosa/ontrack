@@ -19,4 +19,13 @@ class ConfigurableIndicatorAttribute(
     val type: ConfigurableIndicatorAttributeType,
     @APIDescription("True is the attribute is required")
     val required: Boolean
-)
+) {
+    companion object {
+        val requiredFlag = ConfigurableIndicatorAttribute(
+            "required",
+            "Required",
+            ConfigurableIndicatorAttributeType.REQUIRED,
+            true,
+        )
+    }
+}

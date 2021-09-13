@@ -60,6 +60,10 @@ class ConfigurableIndicatorController(
                         .label(attribute.name)
                         .optional(!attribute.required)
                         .value(configurableIndicatorState?.getAttribute(attribute.key))
+                    ConfigurableIndicatorAttributeType.REQUIRED -> YesNo.of(attribute.key)
+                        .label(attribute.name)
+                        .optional(!attribute.required)
+                        .value(configurableIndicatorState?.getAttribute(attribute.key)?.toBoolean())
                 }
             )
         }

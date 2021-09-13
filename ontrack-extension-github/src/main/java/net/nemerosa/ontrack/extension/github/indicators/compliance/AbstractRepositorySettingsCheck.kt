@@ -23,7 +23,7 @@ abstract class AbstractRepositorySettingsCheck(
 ) {
 
     final override val category: IndicatorComputedCategory = GitHubComplianceCategories.settings
-    final override val attributes: List<ConfigurableIndicatorAttribute> = emptyList()
+    override val attributes: List<ConfigurableIndicatorAttribute> = emptyList()
 
     protected open val needsVisibility: Boolean = false
 

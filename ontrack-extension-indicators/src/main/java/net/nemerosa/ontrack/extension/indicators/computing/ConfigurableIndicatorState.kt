@@ -29,6 +29,12 @@ class ConfigurableIndicatorState(
     fun getIntAttribute(key: String): Int? =
         getAttribute(key)?.toInt()
 
+    /**
+     * Gets the value for an attribute of type [ConfigurableIndicatorAttributeType.REQUIRED]
+     */
+    fun getRequiredAttribute(): Boolean =
+        values.find { it.attribute.type == ConfigurableIndicatorAttributeType.REQUIRED}?.value?.toBooleanStrict() ?: error("Cannot find any REQUIRED attribute")
+
     companion object {
         fun toAttributeList(
             type: ConfigurableIndicatorType<*, *>,
