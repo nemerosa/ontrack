@@ -1,12 +1,15 @@
 package net.nemerosa.ontrack.extension.scm.catalog.api
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.extension.scm.catalog.CatalogFixtures
+import net.nemerosa.ontrack.extension.scm.catalog.CatalogFixtures.entry
+import net.nemerosa.ontrack.extension.scm.catalog.CatalogFixtures.team
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalog
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogAccessFunction
 import net.nemerosa.ontrack.extension.scm.catalog.mock.MockSCMCatalogProvider
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.security.Roles
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,17 +29,156 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
     private lateinit var scmCatalogProvider: MockSCMCatalogProvider
 
     @Test
+    fun `SCM catalog stats per team`() {
+        scmCatalogProvider.clear()
+        // Registration of mock entries with their teams
+        val entries = listOf(
+            entry(
+                scm = "mocking", repository = "project/repository-1", config = "my-config", teams = listOf(
+                    team("team-1")
+                )
+            ),
+            entry(
+                scm = "mocking", repository = "project/repository-2", config = "my-config", teams = listOf(
+                    team("team-1")
+                )
+            ),
+            entry(
+                scm = "mocking", repository = "project/repository-3", config = "my-config", teams = listOf(
+                    team("team-1")
+                )
+            ),
+            entry(
+                scm = "mocking", repository = "project/repository-4", config = "my-config", teams = listOf(
+                    team("team-2")
+                )
+            ),
+            entry(
+                scm = "mocking", repository = "project/repository-5", config = "my-config", teams = listOf(
+                    team("team-2")
+                )
+            ),
+            entry(
+                scm = "mocking", repository = "project/repository-6", config = "my-config", teams = listOf(
+                    team("team-3"),
+                )
+            ),
+            entry(
+                scm = "mocking", repository = "project/repository-7", config = "my-config", teams = listOf(
+                    team("team-4"),
+                    team("team-5"),
+                )
+            ),
+        )
+        entries.forEach { entry ->
+            scmCatalogProvider.storeEntry(entry)
+        }
+        // Collection of entries
+        scmCatalog.collectSCMCatalog { println(it) }
+        // Gets stats about teams
+        asAdmin {
+            run(
+                """{
+                scmCatalogTeams {
+                    id
+                    entryCount
+                    entries {
+                        repository
+                    }
+                }
+            }"""
+            ) { data ->
+                val scmCatalogTeams = data.path("scmCatalogTeams")
+                assertEquals(5, scmCatalogTeams.size())
+                assertEquals(
+                    mapOf(
+                        "id" to "team-1",
+                        "entryCount" to 3,
+                        "entries" to listOf(
+                            mapOf("repository" to "project/repository-1"),
+                            mapOf("repository" to "project/repository-2"),
+                            mapOf("repository" to "project/repository-3"),
+                        )
+                    ).asJson(),
+                    scmCatalogTeams.find { it.getTextField("id") == "team-1"}
+                )
+                assertEquals(
+                    mapOf(
+                        "id" to "team-2",
+                        "entryCount" to 2,
+                        "entries" to listOf(
+                            mapOf("repository" to "project/repository-4"),
+                            mapOf("repository" to "project/repository-5"),
+                        )
+                    ).asJson(),
+                    scmCatalogTeams.find { it.getTextField("id") == "team-2"}
+                )
+                assertEquals(
+                    mapOf(
+                        "id" to "team-3",
+                        "entryCount" to 1,
+                        "entries" to listOf(
+                            mapOf("repository" to "project/repository-6"),
+                        )
+                    ).asJson(),
+                    scmCatalogTeams.find { it.getTextField("id") == "team-3"}
+                )
+                assertEquals(
+                    mapOf(
+                        "id" to "team-4",
+                        "entryCount" to 1,
+                        "entries" to listOf(
+                            mapOf("repository" to "project/repository-7"),
+                        )
+                    ).asJson(),
+                    scmCatalogTeams.find { it.getTextField("id") == "team-4"}
+                )
+                assertEquals(
+                    mapOf(
+                        "id" to "team-5",
+                        "entryCount" to 1,
+                        "entries" to listOf(
+                            mapOf("repository" to "project/repository-7"),
+                        )
+                    ).asJson(),
+                    scmCatalogTeams.find { it.getTextField("id") == "team-5"}
+                )
+            }
+        }
+        // Gets stats about team count
+        asAdmin {
+            run(
+                """{
+                scmCatalogTeamStats {
+                    teamCount
+                    entryCount
+                }
+            }"""
+            ) { data ->
+                assertEquals(
+                    listOf(
+                        mapOf("teamCount" to 2, "entryCount" to 1),
+                        mapOf("teamCount" to 1, "entryCount" to 6),
+                    ).asJson(),
+                    data
+                )
+            }
+        }
+    }
+
+    @Test
     fun `Collection of entries and linking`() {
         scmCatalogProvider.clear()
         // Registration of mock entry
-        val entry = CatalogFixtures.entry(scm = "mocking", repository = "project/repository", config = "my-config")
+        val entry = entry(scm = "mocking", repository = "project/repository", config = "my-config")
         scmCatalogProvider.storeEntry(entry)
         // Collection of entries
         scmCatalog.collectSCMCatalog { println(it) }
         // Checks entry has been collected
         val collectionData = withGrantViewToAll {
             asUserWith<SCMCatalogAccessFunction, JsonNode> {
-                run("""{
+                run(
+                    """{
                     scmCatalog {
                         pageItems {
                             entry {
@@ -47,7 +189,8 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                }""")
+                }"""
+                )
             }
         }
         val item = collectionData["scmCatalog"]["pageItems"][0]
@@ -58,7 +201,8 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
         // Search on orphan entries
         val orphanData = withGrantViewToAll {
             asUserWith<SCMCatalogAccessFunction, JsonNode> {
-                run("""{
+                run(
+                    """{
                     scmCatalog(link: "UNLINKED") {
                         pageItems {
                             entry {
@@ -69,7 +213,8 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                }""")
+                }"""
+                )
             }
         }
         assertNotNull(orphanData) {
@@ -93,7 +238,8 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
             // Getting the SCM entry through GraphQL & project root
             val data = withGrantViewToAll {
                 asUserWith<SCMCatalogAccessFunction, JsonNode> {
-                    run("""
+                    run(
+                        """
                         query ProjectInfo {
                             projects(id: $id) {
                                 scmCatalogEntry {
@@ -104,7 +250,8 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                 }
             }
             // Checking data
@@ -118,7 +265,8 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
             // Getting the data through GraphQL & catalog entries
             val entryCollectionData = withGrantViewToAll {
                 asUserWith<SCMCatalogAccessFunction, JsonNode> {
-                    run("""{
+                    run(
+                        """{
                         scmCatalog {
                             pageItems {
                                 project {
@@ -126,7 +274,8 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    }""")
+                    }"""
+                    )
                 }
             }
             assertNotNull(entryCollectionData) {
@@ -137,7 +286,8 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
         // Search on linked entries
         val data = withGrantViewToAll {
             asUserWith<SCMCatalogAccessFunction, JsonNode> {
-                run("""{
+                run(
+                    """{
                     scmCatalog(link: "LINKED") {
                         pageItems {
                             project {
@@ -145,7 +295,8 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                }""")
+                }"""
+                )
             }
         }
         assertNotNull(data) {
@@ -183,7 +334,7 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
 
     private fun scmCatalogTest(setup: (code: () -> Unit) -> Unit) {
         // Collection of entries
-        val entry = CatalogFixtures.entry(scm = "mocking")
+        val entry = entry(scm = "mocking")
         scmCatalogProvider.clear()
         scmCatalogProvider.storeEntry(entry)
         scmCatalog.collectSCMCatalog { println(it) }
@@ -194,7 +345,8 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
         }
         // Checks rights
         setup {
-            val data = run("""{
+            val data = run(
+                """{
                     scmCatalog(link: "LINKED") {
                         pageItems {
                             project {
@@ -202,7 +354,8 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                }""")
+                }"""
+            )
             assertNotNull(data) {
                 val entryItem = it["scmCatalog"]["pageItems"][0]
                 assertEquals(project.name, entryItem["project"]["name"].asText())
