@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.extension.general.indicator
 
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
-import net.nemerosa.ontrack.extension.indicators.computing.AbstractConfigurableIndicatorComputer
-import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicatorService
-import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicatorType
-import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputedCategory
+import net.nemerosa.ontrack.extension.indicators.computing.*
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorSource
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorSourceProviderDescription
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueType
@@ -18,8 +15,8 @@ import org.springframework.stereotype.Component
 class OntrackPropertiesIndicatorComputer(
     extensionFeature: GeneralExtensionFeature,
     private val structureService: StructureService,
-    private val booleanIndicatorValueType: BooleanIndicatorValueType,
-    private val configurableIndicatorService: ConfigurableIndicatorService,
+    booleanIndicatorValueType: BooleanIndicatorValueType,
+    configurableIndicatorService: ConfigurableIndicatorService,
 ) : AbstractConfigurableIndicatorComputer(extensionFeature, configurableIndicatorService) {
 
     override val name: String = "Ontrack properties"
@@ -50,11 +47,11 @@ class OntrackPropertiesIndicatorComputer(
             id = "ontrack-builds-not-empty",
             name = "Ontrack projects {required} have at least one build",
             valueType = booleanIndicatorValueType,
-            valueConfig = BooleanIndicatorValueTypeConfig(required = false),
+            valueConfig = { _, state -> BooleanIndicatorValueTypeConfig(required = state.getRequiredAttribute()) },
             attributes = listOf(
-                TODO("Required flag")
+                ConfigurableIndicatorAttribute.requiredFlag
             ),
-            computing = { project, state ->
+            computing = { project, _ ->
                 val builds = structureService.buildSearch(project.id, BuildSearchForm(maximumCount = 1))
                 builds.isNotEmpty()
             }
