@@ -100,7 +100,7 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
                             mapOf("repository" to "project/repository-3"),
                         )
                     ).asJson(),
-                    scmCatalogTeams.find { it.getTextField("id") == "team-1"}
+                    scmCatalogTeams.find { it.getTextField("id") == "team-1" }
                 )
                 assertEquals(
                     mapOf(
@@ -111,7 +111,7 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
                             mapOf("repository" to "project/repository-5"),
                         )
                     ).asJson(),
-                    scmCatalogTeams.find { it.getTextField("id") == "team-2"}
+                    scmCatalogTeams.find { it.getTextField("id") == "team-2" }
                 )
                 assertEquals(
                     mapOf(
@@ -121,7 +121,7 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
                             mapOf("repository" to "project/repository-6"),
                         )
                     ).asJson(),
-                    scmCatalogTeams.find { it.getTextField("id") == "team-3"}
+                    scmCatalogTeams.find { it.getTextField("id") == "team-3" }
                 )
                 assertEquals(
                     mapOf(
@@ -131,7 +131,7 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
                             mapOf("repository" to "project/repository-7"),
                         )
                     ).asJson(),
-                    scmCatalogTeams.find { it.getTextField("id") == "team-4"}
+                    scmCatalogTeams.find { it.getTextField("id") == "team-4" }
                 )
                 assertEquals(
                     mapOf(
@@ -141,7 +141,7 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
                             mapOf("repository" to "project/repository-7"),
                         )
                     ).asJson(),
-                    scmCatalogTeams.find { it.getTextField("id") == "team-5"}
+                    scmCatalogTeams.find { it.getTextField("id") == "team-5" }
                 )
             }
         }
@@ -156,9 +156,11 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
             }"""
             ) { data ->
                 assertEquals(
-                    listOf(
-                        mapOf("teamCount" to 2, "entryCount" to 1),
-                        mapOf("teamCount" to 1, "entryCount" to 6),
+                    mapOf(
+                        "scmCatalogTeamStats" to listOf(
+                            mapOf("teamCount" to 2, "entryCount" to 1),
+                            mapOf("teamCount" to 1, "entryCount" to 6),
+                        )
                     ).asJson(),
                     data
                 )
