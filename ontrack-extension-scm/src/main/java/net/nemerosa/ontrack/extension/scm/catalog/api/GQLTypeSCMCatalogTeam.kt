@@ -33,7 +33,7 @@ class GQLTypeSCMCatalogTeam(
                     .dataFetcher { env ->
                         val team: SCMCatalogTeam = env.getSource()
                         scmCatalogFilterService.findCatalogProjectEntries(
-                            SCMCatalogProjectFilter(team = team.id)
+                            SCMCatalogProjectFilter(size = Int.MAX_VALUE, team = team.id)
                         ).mapNotNull(SCMCatalogEntryOrProject::entry)
                     }
             }
@@ -45,7 +45,7 @@ class GQLTypeSCMCatalogTeam(
                     .dataFetcher { env ->
                         val team: SCMCatalogTeam = env.getSource()
                         scmCatalogFilterService.findCatalogProjectEntries(
-                            SCMCatalogProjectFilter(team = team.id)
+                            SCMCatalogProjectFilter(size = Int.MAX_VALUE, team = team.id)
                         ).mapNotNull(SCMCatalogEntryOrProject::entry).size
                     }
             }
