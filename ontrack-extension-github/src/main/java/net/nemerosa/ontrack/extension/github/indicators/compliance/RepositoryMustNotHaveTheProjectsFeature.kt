@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.indicators.compliance
 
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.model.GitHubRepositorySettings
+import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicatorState
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueType
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTypeConfig
 import net.nemerosa.ontrack.model.structure.Project
@@ -26,7 +27,7 @@ class RepositoryMustNotHaveTheProjectsFeature(
     override val id: String = ID
     override val name: String = "A repository MUST NOT have the projects feature"
 
-    override val valueConfig = BooleanIndicatorValueTypeConfig(required = true)
+    override val valueConfig = { _: Project, _: ConfigurableIndicatorState -> BooleanIndicatorValueTypeConfig(required = true) }
 
     override fun checkSettings(project: Project, settings: GitHubRepositorySettings): Boolean? =
         settings.hasProjectsEnabled

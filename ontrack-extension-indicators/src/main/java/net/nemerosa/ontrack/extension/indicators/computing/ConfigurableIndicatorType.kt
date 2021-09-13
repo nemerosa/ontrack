@@ -9,10 +9,10 @@ import net.nemerosa.ontrack.model.structure.Project
  *
  * @property category Associated category
  * @property id Unique ID for this type
- * @property name Display name this type
- * @property attributes List of attributes for this type
+ * @property name Display name this type, including variables as defined for being used by [SimpleExpand].
  * @property valueType Type of value (see [IndicatorComputedType.valueType]
- * @property valueConfig Configuration of this type (see [IndicatorComputedType.valueConfig]
+ * @property valueConfig Configuration of this type (see [IndicatorComputedType.valueConfig], computed from the project and its stored state
+ * @property attributes List of attributes for this type
  * @property computing Function to compute the value for this indicator
  */
 class ConfigurableIndicatorType<T, C>(
@@ -20,14 +20,17 @@ class ConfigurableIndicatorType<T, C>(
     val id: String,
     val name: String,
     val valueType: IndicatorValueType<T, C>,
-    val valueConfig: C,
+    val valueConfig: (project: Project, state: ConfigurableIndicatorState) -> C,
     val attributes: List<ConfigurableIndicatorAttribute>,
     private val computing: (project: Project, state: ConfigurableIndicatorState) -> T?
 ) {
     fun computeValue(project: Project, state: ConfigurableIndicatorState) = computing(project, state)
 
-    fun expandName(state: ConfigurableIndicatorState): String =
-        SimpleExpand.expand(name, state.values.associate {
-            it.attribute.key to it.value
-        })
+    fun expandName(state: ConfigurableIndicatorState): String {
+        val valueMap = state.values.associate {
+            it.attribute.key to it.attribute.type.map(it.value)
+        }
+        // Expanding
+        return SimpleExpand.expand(name, valueMap)
+    }
 }

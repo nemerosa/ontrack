@@ -43,7 +43,7 @@ class RepositoryTeamMustHaveDescription(
         )
     )
 
-    override val valueConfig = BooleanIndicatorValueTypeConfig(required = true)
+    override val valueConfig = { _: Project, _: ConfigurableIndicatorState -> BooleanIndicatorValueTypeConfig(required = true) }
 
     override fun compute(
         project: Project,

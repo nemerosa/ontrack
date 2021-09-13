@@ -32,7 +32,7 @@ abstract class AbstractConfigurableIndicatorComputer(
             name = configurableIndicatorType.expandName(state),
             link = state.link,
             valueType = configurableIndicatorType.valueType,
-            valueConfig = configurableIndicatorType.valueConfig,
+            valueConfig = configurableIndicatorType.valueConfig(project, state),
         )
         // Computes the value
         val value = configurableIndicatorType.computeValue(project, state)
