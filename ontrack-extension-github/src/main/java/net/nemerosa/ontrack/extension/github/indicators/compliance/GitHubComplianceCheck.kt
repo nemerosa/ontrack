@@ -13,7 +13,7 @@ interface GitHubComplianceCheck<T, C> {
     val name: String
     val attributes: List<ConfigurableIndicatorAttribute>
     val valueType: IndicatorValueType<T, C>
-    val valueConfig: C
+    val valueConfig: (project: Project, state: ConfigurableIndicatorState) -> C
     val computing: (project: Project, state: ConfigurableIndicatorState) -> T?
 
 }

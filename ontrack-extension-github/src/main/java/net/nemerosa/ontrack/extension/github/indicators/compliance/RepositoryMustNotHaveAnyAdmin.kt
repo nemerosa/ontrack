@@ -29,7 +29,7 @@ class RepositoryMustNotHaveAnyAdmin(
     override val name: String = "A repository MUST NOT have any administrator"
     override val attributes: List<ConfigurableIndicatorAttribute> = emptyList()
 
-    override val valueConfig = BooleanIndicatorValueTypeConfig(required = true)
+    override val valueConfig = { _: Project, _: ConfigurableIndicatorState -> BooleanIndicatorValueTypeConfig(required = true) }
 
     override fun compute(
         project: Project,

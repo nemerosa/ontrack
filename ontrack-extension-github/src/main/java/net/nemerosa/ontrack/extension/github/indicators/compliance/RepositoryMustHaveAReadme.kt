@@ -34,7 +34,7 @@ class RepositoryMustHaveAReadme(
     override val id: String = ID
     override val name: String = "The repository MUST have a README file"
     override val attributes: List<ConfigurableIndicatorAttribute> = emptyList()
-    override val valueConfig = BooleanIndicatorValueTypeConfig(required = true)
+    override val valueConfig = { _: Project, _: ConfigurableIndicatorState -> BooleanIndicatorValueTypeConfig(required = true) }
 
     override fun compute(
         project: Project,
