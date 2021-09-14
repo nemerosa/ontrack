@@ -25,14 +25,10 @@ enum class ConfigurableIndicatorAttributeType(
      * Required flag
      */
     REQUIRED(displayName = "Required flag", mapping = {
-        if (it != null) {
-            if (it.toBooleanStrict()) {
-                "MUST"
-            } else {
-                "SHOULD"
-            }
+        if (it == "true") {
+            "MUST"
         } else {
-            ""
+            "SHOULD"
         }
     });
 
