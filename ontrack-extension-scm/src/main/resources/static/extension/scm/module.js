@@ -632,4 +632,38 @@ angular.module('ontrack.extension.scm', [
         };
 
     })
+    .config(function ($stateProvider) {
+        $stateProvider.state('scm-catalog-chart-teams', {
+            url: '/extension/scm/catalog/chart/teams',
+            templateUrl: 'extension/scm/catalog-chart-teams.tpl.html',
+            controller: 'CatalogChartTeamsCtrl'
+        });
+    })
+    .controller('CatalogChartTeamsCtrl', function ($scope, ot, otGraphqlService) {
+        $scope.loadingChart = true;
+
+        const view = ot.view();
+        view.title = "SCM Catalog Chart Teams";
+        view.breadcrumbs = ot.homeBreadcrumbs().concat([
+            ['SCM Catalog', '#/extension/scm/catalog']
+        ]);
+        view.commands = [
+            ot.viewCloseCommand('/extension/scm/catalog')
+        ];
+
+
+        const query = `{
+            scmCatalogTeams {
+                id
+                name
+                entryCount
+            }
+        }`;
+
+        otGraphqlService.pageGraphQLCall(query).then(data => {
+
+        }).finally(() => {
+            $scope.loadingChart = false;
+        });
+    })
 ;
