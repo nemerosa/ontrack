@@ -7,7 +7,9 @@ angular.module('ot.directive.chart', [
             scope: {
                 // Function which sets up the chart options
                 // It must returns a promise
-                options: '&'
+                options: '&',
+                // Height in CSS
+                height: '='
             },
             controller: ($scope) => {
                 // Chart context
