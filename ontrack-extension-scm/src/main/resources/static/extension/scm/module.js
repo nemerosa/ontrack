@@ -754,4 +754,84 @@ angular.module('ontrack.extension.scm', [
             }
         });
     })
+    .config(function ($stateProvider) {
+        $stateProvider.state('scm-catalog-chart-team-stats', {
+            url: '/extension/scm/catalog/chart/team-stats',
+            templateUrl: 'extension/scm/catalog-chart-team-stats.tpl.html',
+            controller: 'CatalogChartTeamStatsCtrl'
+        });
+    })
+    .controller('CatalogChartTeamStatsCtrl', function ($scope, ot, otGraphqlService) {
+        const view = ot.view();
+        view.title = "SCM Catalog Chart Team Stats";
+        view.breadcrumbs = ot.homeBreadcrumbs().concat([
+            ['SCM Catalog', '#/extension/scm/catalog']
+        ]);
+        view.commands = [
+            ot.viewCloseCommand('/extension/scm/catalog')
+        ];
+
+        // Initial chart options
+        const y = [];
+        const x = [];
+        const options = {
+            title: {
+                text: 'Number of repositories having a given count of teams'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'value',
+                boundaryGap: [0, 0.01]
+            },
+            yAxis: {
+                data: y
+            },
+            series: [
+                {
+                    type: 'bar',
+                    data: x,
+                    label: {
+                        show: true
+                    }
+                }
+            ]
+        };
+
+        const query = `{
+            scmCatalogTeamStats {
+                teamCount
+                entryCount
+            }
+        }`;
+
+        // Computing the options
+        $scope.options = () => {
+            return otGraphqlService.pageGraphQLCall(query).then(data => {
+                // Sorting the entries from the highest to the lowest count of teams
+                const entries = data.scmCatalogTeamStats.sort((entryA, entryB) => {
+                    return entryA.teamCount - entryB.teamCount;
+                });
+                // Y ==> team count
+                // X ==> entry count
+                entries.forEach(entry => {
+                    y.push(entry.teamCount);
+                    x.push(entry.entryCount);
+                });
+                // Returns the options
+                return options;
+            });
+        };
+
+    })
 ;
