@@ -660,10 +660,98 @@ angular.module('ontrack.extension.scm', [
             }
         }`;
 
-        otGraphqlService.pageGraphQLCall(query).then(data => {
+        // Chart context
+        const context = {
+            // the chart, not initialized at first
+            chart: undefined
+        };
+        $scope.context = context;
 
+        // Chart options
+        const yTeams = [];
+        const xTeams = [];
+        const options = {
+            title: {
+                text: 'Number of repositories per team'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            legend: {
+                data: ['Number of repositories']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'value',
+                boundaryGap: [0, 0.01]
+            },
+            yAxis: {
+                data: yTeams
+            },
+            series: [
+                {
+                    type: 'bar',
+                    data: xTeams,
+                    label: {
+                        show: true
+                    }
+                }
+            ]
+        };
+
+        // Gets the chart or creates it
+        const getOrCreateChart = () => {
+            if (context.chart) {
+                return context.chart;
+            }
+            context.chart = createChart();
+            return context.chart;
+        };
+
+        // Creates & inits the chart
+        const createChart = () => {
+            const graph = document.getElementById('graph');
+            // OK
+            return echarts.init(graph);
+        };
+
+        // Setting up the data
+        const setupData = (data) => {
+            // Sorting teams by descending entry count
+            const teams = data.scmCatalogTeams.sort((teamA, teamB) => {
+                return teamA.entryCount - teamB.entryCount;
+            });
+            // Y bars ==> IDs of the teams
+            // X bar values ==> entry count
+            teams.forEach(team => {
+                yTeams.push(team.id);
+                xTeams.push(team.entryCount);
+            });
+        };
+
+        otGraphqlService.pageGraphQLCall(query).then(data => {
+            if (context.chart) {
+                context.chart.showLoading();
+            }
+            // Graph setup
+            const chart = getOrCreateChart();
+            // Sets the data
+            setupData(data);
+            // Sets up the chart
+            chart.setOption(options);
         }).finally(() => {
             $scope.loadingChart = false;
+            if (context.chart) {
+                context.chart.hideLoading();
+            }
         });
     })
 ;
