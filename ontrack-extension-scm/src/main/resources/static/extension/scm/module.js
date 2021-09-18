@@ -640,8 +640,6 @@ angular.module('ontrack.extension.scm', [
         });
     })
     .controller('CatalogChartTeamsCtrl', function ($scope, ot, otGraphqlService) {
-        $scope.loadingChart = true;
-
         const view = ot.view();
         view.title = "SCM Catalog Chart Teams";
         view.breadcrumbs = ot.homeBreadcrumbs().concat([
@@ -659,13 +657,6 @@ angular.module('ontrack.extension.scm', [
                 entryCount
             }
         }`;
-
-        // Chart context
-        const context = {
-            // the chart, not initialized at first
-            chart: undefined
-        };
-        $scope.context = context;
 
         // Chart options
         const yTeams = [];
@@ -707,52 +698,23 @@ angular.module('ontrack.extension.scm', [
             ]
         };
 
-        // Gets the chart or creates it
-        const getOrCreateChart = () => {
-            if (context.chart) {
-                return context.chart;
-            }
-            context.chart = createChart();
-            return context.chart;
-        };
-
-        // Creates & inits the chart
-        const createChart = () => {
-            const graph = document.getElementById('graph');
-            // OK
-            return echarts.init(graph);
-        };
-
-        // Setting up the data
-        const setupData = (data) => {
-            // Sorting teams by descending entry count
-            const teams = data.scmCatalogTeams.sort((teamA, teamB) => {
-                return teamA.entryCount - teamB.entryCount;
-            });
-            // Y bars ==> IDs of the teams
-            // X bar values ==> entry count
-            teams.forEach(team => {
-                yTeams.push(team.id);
-                xTeams.push(team.entryCount);
+        // Computing the options
+        $scope.options = () => {
+            return otGraphqlService.pageGraphQLCall(query).then(data => {
+                // Sorting teams by descending entry count
+                const teams = data.scmCatalogTeams.sort((teamA, teamB) => {
+                    return teamA.entryCount - teamB.entryCount;
+                });
+                // Y bars ==> IDs of the teams
+                // X bar values ==> entry count
+                teams.forEach(team => {
+                    yTeams.push(team.id);
+                    xTeams.push(team.entryCount);
+                });
+                // Returns the options
+                return options;
             });
         };
-
-        otGraphqlService.pageGraphQLCall(query).then(data => {
-            if (context.chart) {
-                context.chart.showLoading();
-            }
-            // Graph setup
-            const chart = getOrCreateChart();
-            // Sets the data
-            setupData(data);
-            // Sets up the chart
-            chart.setOption(options);
-        }).finally(() => {
-            $scope.loadingChart = false;
-            if (context.chart) {
-                context.chart.hideLoading();
-            }
-        });
     })
     .config(function ($stateProvider) {
         $stateProvider.state('scm-catalog-chart-team-stats', {
