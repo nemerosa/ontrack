@@ -59,8 +59,8 @@ class BuildMutations(
             "linkBuild", "Link two builds using their names", LinkBuildInput::class,
             "build", "Build linked from", Build::class
         ) { input ->
-            val from = structureService.findBuildByName(input.fromProject, input.fromBranch, input.fromBuild).getOrNull()
-            val to  = structureService.findBuildByName(input.toProject, input.toBranch, input.toBuild).getOrNull()
+            val from = findBuildByProjectAndName(input.fromProject, input.fromBuild)
+            val to  = findBuildByProjectAndName(input.toProject, input.toBuild)
             if (from != null && to != null) {
                 structureService.addBuildLink(from, to)
             }
@@ -99,6 +99,12 @@ class BuildMutations(
         }
         // OK
         return build
+    }
+
+    private fun findBuildByProjectAndName(projectName: String, buildName: String): Build? {
+        val project = structureService.findProjectByName(projectName).getOrNull() ?: return null
+        val builds = structureService.buildSearch(project.id, BuildSearchForm(maximumCount = 1, buildName = buildName, buildExactMatch = true))
+        return builds.firstOrNull()
     }
 
     companion object {
@@ -207,14 +213,10 @@ data class CreateBuildOrGetInput(
 data class LinkBuildInput(
     @APIDescription("Name of the project from which the link must be created")
     val fromProject: String,
-    @APIDescription("Name of the branch from which the link must be created")
-    val fromBranch: String,
     @APIDescription("Name of the build from which the link must be created")
     val fromBuild: String,
     @APIDescription("Name of the project to which the link must be created")
     val toProject: String,
-    @APIDescription("Name of the branch to which the link must be created")
-    val toBranch: String,
     @APIDescription("Name of the build to which the link must be created")
     val toBuild: String,
 )

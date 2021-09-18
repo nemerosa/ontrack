@@ -19,10 +19,8 @@ class BuildLinksGraphQLIT : AbstractQLKTITSupport() {
                     mutation {
                         linkBuild(input: {
                             fromProject: "${build1.project.name}",
-                            fromBranch: "${build1.branch.name}",
                             fromBuild: "${build1.name}",
                             toProject: "${build2.project.name}",
-                            toBranch: "${build2.branch.name}",
                             toBuild: "${build2.name}",
                         }) {
                             build {
