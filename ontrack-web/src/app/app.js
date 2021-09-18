@@ -23,6 +23,7 @@ const ontrack = angular.module('ontrack', [
         'ot.directive.search-box',
         'ot.directive.range-selector',
         'ot.directive.yes-no',
+        'ot.directive.chart',
         // Dialogs
         'ot.dialog.applicationInfo',
         // Services
