@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import graphql.Scalars.*
 import graphql.schema.*
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
+import net.nemerosa.ontrack.graphql.schema.listInputType
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.apache.commons.lang3.reflect.FieldUtils
 import org.springframework.beans.BeanUtils
@@ -64,7 +65,27 @@ object GraphQLBeanConverter {
                         throw IllegalStateException("Unsupported type for input type: $property")
                     }
                 } else {
-                    throw IllegalStateException("Cannot create an input field out of $property since its type is not scalar and the property is not annotated with @TypeRef")
+                    val listRef = property.findAnnotation<ListRef>()
+                    if (listRef != null) {
+                        val listArguments = property.returnType.arguments
+                        if (listArguments.size == 1) {
+                            val elementType = listArguments.first().type?.javaType
+                            if (elementType is Class<*>) {
+                                val rootType = GraphQLTypeReference(elementType.simpleName)
+                                fields += GraphQLInputObjectField.newInputObjectField()
+                                    .name(name)
+                                    .description(description)
+                                    .type(listInputType(rootType))
+                                    .build()
+                            } else {
+                                throw IllegalStateException("Only list elements being Java classes are supported")
+                            }
+                        } else {
+                            throw IllegalStateException("List is supported only if it has a type")
+                        }
+                    } else {
+                        throw IllegalStateException("Cannot create an input field out of $property since its type is not scalar and the property is not annotated with @TypeRef")
+                    }
                 }
             }
         }

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypeRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
@@ -60,9 +61,28 @@ class BuildMutations(
             "build", "Build linked from", Build::class
         ) { input ->
             val from = findBuildByProjectAndName(input.fromProject, input.fromBuild)
-            val to  = findBuildByProjectAndName(input.toProject, input.toBuild)
+            val to = findBuildByProjectAndName(input.toProject, input.toBuild)
             if (from != null && to != null) {
                 structureService.addBuildLink(from, to)
+            }
+            // Return the origin
+            from
+        },
+        /**
+         * Creating a link between one build and several other ones using their names
+         */
+        simpleMutation(
+            "linksBuild", "Link build to other ones using their names", LinksBuildInput::class,
+            "build", "Build linked from", Build::class
+        ) { input ->
+            val from = findBuildByProjectAndName(input.fromProject, input.fromBuild)
+            if (from != null) {
+                input.links.forEach { link ->
+                    val to = findBuildByProjectAndName(link.project, link.build)
+                    if (to != null) {
+                        structureService.addBuildLink(from, to)
+                    }
+                }
             }
             // Return the origin
             from
@@ -103,7 +123,10 @@ class BuildMutations(
 
     private fun findBuildByProjectAndName(projectName: String, buildName: String): Build? {
         val project = structureService.findProjectByName(projectName).getOrNull() ?: return null
-        val builds = structureService.buildSearch(project.id, BuildSearchForm(maximumCount = 1, buildName = buildName, buildExactMatch = true))
+        val builds = structureService.buildSearch(
+            project.id,
+            BuildSearchForm(maximumCount = 1, buildName = buildName, buildExactMatch = true)
+        )
         return builds.firstOrNull()
     }
 
@@ -121,12 +144,16 @@ class BuildMutations(
         } else {
             checkInput(!input.branchName.isNullOrBlank(), "branchName is required if branchId is not provided")
             val project = if (input.projectId != null) {
-                checkInput(input.projectName.isNullOrBlank(),
-                    "Since projectId is provided, projectName is not required.")
+                checkInput(
+                    input.projectName.isNullOrBlank(),
+                    "Since projectId is provided, projectName is not required."
+                )
                 structureService.getProject(ID.of(input.projectId!!))
             } else {
-                checkInput(!input.projectName.isNullOrBlank(),
-                    "When using branchName, projectName is required if projectId is not provided")
+                checkInput(
+                    !input.projectName.isNullOrBlank(),
+                    "When using branchName, projectName is required if projectId is not provided"
+                )
                 structureService.findProjectByName(input.projectName!!).getOrNull()
                     ?: throw ProjectNotFoundException(input.projectName)
             }
@@ -227,3 +254,24 @@ data class LinkBuildByIdInput(
     @APIDescription("ID of the build to which the link must be created")
     val toBuild: Int,
 )
+
+
+data class LinksBuildInput(
+    @APIDescription("Name of the project from which the link must be created")
+    val fromProject: String,
+    @APIDescription("Name of the build from which the link must be created")
+    val fromBuild: String,
+    @APIDescription("List of links to add")
+    @ListRef
+    val links: List<LinksBuildInputItem>
+)
+
+data class LinksBuildInputItem(
+    @APIDescription("Name of the project to which the link must be created")
+    val project: String,
+    @APIDescription("Name of the build to which the link must be created")
+    val build: String,
+)
+
+@Component
+class GQLInputLinksBuildInputItem : SimpleGQLInputType<LinksBuildInputItem>(LinksBuildInputItem::class)

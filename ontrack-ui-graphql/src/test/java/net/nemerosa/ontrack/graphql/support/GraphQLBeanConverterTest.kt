@@ -1,13 +1,15 @@
 package net.nemerosa.ontrack.graphql.support
 
-import graphql.schema.GraphQLFieldDefinition
+import graphql.schema.*
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.UpdateProjectInput
 import net.nemerosa.ontrack.model.structure.NameDescriptionState
+import net.nemerosa.ontrack.test.assertIs
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.fail
 
 class GraphQLBeanConverterTest {
 
@@ -142,6 +144,21 @@ class GraphQLBeanConverterTest {
         assertNotNull(fields["disabled"]) {
             assertEquals("Boolean", typeName(it.type))
             assertEquals("Project state (leave null to not change)", it.description)
+        }
+    }
+
+    @Test
+    fun `Input list fields`() {
+        val type = GraphQLBeanConverter.asInputType(Group::class) as GraphQLInputObjectType
+        val accounts = type.getField("accounts") ?: fail("Cannot find account field")
+        assertIs<GraphQLNonNull>(accounts.type) { root ->
+            assertIs<GraphQLList>(root.wrappedType) { listType ->
+                assertIs<GraphQLNonNull>(listType.wrappedType) { elementType ->
+                    assertIs<GraphQLNamedInputType>(elementType.wrappedType) { namedType ->
+                        assertEquals("Account", namedType.name)
+                    }
+                }
+            }
         }
     }
 
