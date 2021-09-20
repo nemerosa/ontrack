@@ -24,7 +24,10 @@ class GitHubComplianceIndicators(
 
     override val name: String = "GitHub Compliance"
 
-    override val perProject: Boolean = true
+    /**
+     * Evaluates all projects in one unique job
+     */
+    override val perProject: Boolean = false
 
     override val source = IndicatorSource(
         IndicatorSourceProviderDescription("github", "GitHub"),
