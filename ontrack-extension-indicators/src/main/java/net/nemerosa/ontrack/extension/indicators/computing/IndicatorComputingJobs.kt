@@ -10,6 +10,8 @@ import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.model.support.time
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.util.stream.Stream
 
@@ -21,6 +23,8 @@ class IndicatorComputingJobs(
     private val meterRegistry: MeterRegistry,
     private val applicationLogService: ApplicationLogService,
 ) : JobOrchestratorSupplier {
+
+    private val logger: Logger = LoggerFactory.getLogger(IndicatorComputingJobs::class.java)
 
     override fun collectJobRegistrations(): Stream<JobRegistration> {
         // Gets the list of projects
@@ -92,7 +96,9 @@ class IndicatorComputingJobs(
                 "project" to project.name
         ) {
             try {
+                logger.info("[indicator-computing] computer=${computer.id},project=${project.name},start")
                 indicatorComputingService.compute(computer, project)
+                logger.info("[indicator-computing] computer=${computer.id},project=${project.name},end")
             } catch (any: Exception) {
                 if (allowFailure) {
                     throw any
