@@ -503,6 +503,18 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public int getBuildCountForProject(Project project) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT COUNT(B.ID) " +
+                    "FROM BUILDS B " +
+                    "INNER JOIN BRANCHES BR ON BR.ID = B.BRANCHID " +
+                    "WHERE BR.PROJECTID = :projectId",
+                params("projectId", project.id()),
+                Integer.class
+        );
+    }
+
+    @Override
     public Optional<Build> getPreviousBuild(Build build) {
         return getOptional(
                 "SELECT * FROM BUILDS WHERE BRANCHID = :branch AND ID < :id ORDER BY ID DESC LIMIT 1",

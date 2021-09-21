@@ -108,6 +108,14 @@ interface StructureService {
      */
     fun getBuildCount(branch: Branch): Int
 
+    /**
+     * Gets the number of builds for a project.
+     *
+     * @param project Project to get the build count for
+     * @return Number of builds in this project
+     */
+    fun getBuildCountForProject(project: Project): Int
+
     fun deleteBuild(buildId: ID): Ack
 
     // TODO Replace by Build?

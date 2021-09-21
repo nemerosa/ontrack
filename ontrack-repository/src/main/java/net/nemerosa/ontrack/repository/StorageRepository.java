@@ -57,4 +57,13 @@ public interface StorageRepository {
      * @return <code>true</code> if the entry exists
      */
     boolean exists(String store, String key);
+
+    /**
+     * Looking for stored entries using JSON queries
+     */
+    List<JsonNode> findByJson(
+            String store,
+            String query,
+            Map<String,?> variables
+    );
 }

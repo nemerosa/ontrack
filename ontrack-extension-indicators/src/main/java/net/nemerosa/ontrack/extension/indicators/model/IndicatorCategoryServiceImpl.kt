@@ -95,6 +95,18 @@ class IndicatorCategoryServiceImpl(
         }.sortedBy { it.name }
     }
 
+    override fun findBySource(source: IndicatorSource): List<IndicatorCategory> {
+        return storageService.findByJson(STORE, """
+            data->'source'->>'name' = :sourceName 
+            and data->'source'->'provider'->>'id' = :sourceProviderId
+        """, mapOf(
+            "sourceName" to source.name,
+            "sourceProviderId" to source.provider.id
+        ), StoredIndicatorCategory::class.java).map {
+            fromStorage(it)
+        }.sortedBy { it.name }
+    }
+
     private fun fromStorage(stored: StoredIndicatorCategory): IndicatorCategory =
         IndicatorCategory(
             id = stored.id,

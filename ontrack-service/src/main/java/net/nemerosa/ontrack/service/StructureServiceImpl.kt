@@ -254,6 +254,8 @@ class StructureServiceImpl(
         return structureRepository.getBuildCount(branch)
     }
 
+    override fun getBuildCountForProject(project: Project): Int = structureRepository.getBuildCountForProject(project)
+
     override fun deleteBuild(buildId: ID): Ack {
         Validate.isTrue(buildId.isSet, "Build ID must be set")
         val build = getBuild(buildId)

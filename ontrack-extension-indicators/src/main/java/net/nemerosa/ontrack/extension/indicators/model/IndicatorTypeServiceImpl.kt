@@ -68,6 +68,19 @@ class IndicatorTypeServiceImpl(
         )
     }
 
+    override fun findBySource(source: IndicatorSource): List<IndicatorType<*, *>> {
+        return storageService.findByJson(
+            STORE, """
+            data->'source'->>'name' = :sourceName 
+            and data->'source'->'provider'->>'id' = :sourceProviderId
+        """, mapOf(
+            "sourceName" to source.name,
+            "sourceProviderId" to source.provider.id
+        ), StoredIndicatorType::class.java).mapNotNull {
+            fromStorage<Any,Any>(it)
+        }
+    }
+
     private fun <T, C> fromStorage(stored: StoredIndicatorType): IndicatorType<T, C>? {
         val category = indicatorCategoryService.findCategoryById(stored.category)
         val valueType = indicatorValueTypeService.findValueTypeById<T, C>(stored.valueType)

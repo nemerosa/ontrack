@@ -19,6 +19,8 @@ interface IndicatorTypeService {
 
     fun findByCategory(category: IndicatorCategory): List<IndicatorType<*, *>>
 
+    fun findBySource(source: IndicatorSource): List<IndicatorType<*, *>>
+
     fun createType(input: CreateTypeForm): IndicatorType<*, *>
 
     fun <T, C> createType(

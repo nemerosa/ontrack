@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.support.StorageService;
 import net.nemerosa.ontrack.repository.StorageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -50,5 +52,12 @@ public class StorageServiceImpl implements StorageService {
     @Override
     public boolean exists(String store, String key) {
         return repository.exists(store, key);
+    }
+
+    @Override
+    public <T> List<T> findByJson(String store, String query, Map<String, ?> variables, Class<T> type) {
+        return repository.findByJson(store, query, variables).stream()
+                .map(json -> JsonUtils.parse(json, type))
+                .collect(Collectors.toList());
     }
 }

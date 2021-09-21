@@ -93,6 +93,14 @@ public interface StructureRepository {
 
     int getBuildCount(Branch branch);
 
+    /**
+     * Gets the number of builds for a project.
+     *
+     * @param project Project to get the build count for
+     * @return Number of builds in this project
+     */
+    int getBuildCountForProject(Project project);
+
     Optional<Build> getPreviousBuild(Build build);
 
     Optional<Build> getNextBuild(Build build);

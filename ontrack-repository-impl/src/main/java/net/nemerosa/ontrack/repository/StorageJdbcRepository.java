@@ -76,6 +76,17 @@ public class StorageJdbcRepository extends AbstractJdbcRepository implements Sto
     }
 
     @Override
+    public List<JsonNode> findByJson(String store, String query, Map<String, ?> variables) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT DATA FROM STORAGE WHERE STORE = :store AND " + query,
+                params("store", store).addValues(variables),
+                (rs, rowNum) -> {
+                    return readJson(rs, "DATA");
+                }
+        );
+    }
+
+    @Override
     public Map<String, JsonNode> getData(String store) {
         Map<String, JsonNode> results = new LinkedHashMap<>();
         //noinspection RedundantCast

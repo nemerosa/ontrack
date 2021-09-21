@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.indicators.model.IndicatorSource
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorSourceProviderDescription
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueType
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTypeConfig
-import net.nemerosa.ontrack.model.structure.BuildSearchForm
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
@@ -52,8 +51,8 @@ class OntrackPropertiesIndicatorComputer(
                 ConfigurableIndicatorAttribute.requiredFlag
             ),
             computing = { project, _ ->
-                val builds = structureService.buildSearch(project.id, BuildSearchForm(maximumCount = 1))
-                builds.isNotEmpty()
+                val count = structureService.getBuildCountForProject(project)
+                count > 0
             }
         )
     )

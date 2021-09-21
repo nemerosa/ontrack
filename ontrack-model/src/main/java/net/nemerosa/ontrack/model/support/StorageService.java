@@ -84,6 +84,16 @@ public interface StorageService {
     boolean exists(String store, String key);
 
     /**
+     * Looking for stored entries using JSON queries
+     */
+    <T> List<T> findByJson(
+            String store,
+            String query,
+            Map<String,?> variables,
+            Class<T> type
+    );
+
+    /**
      * Gets all the data for a store
      *
      * @param store Store (typically an extension class name)
