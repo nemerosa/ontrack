@@ -87,13 +87,12 @@ class IndicatorCategoryServiceImpl(
         return findCategoryById(id) ?: throw IndicatorCategoryNotFoundException(id)
     }
 
-    override fun findAll(): List<IndicatorCategory> {
-        return storageService.getKeys(STORE).mapNotNull { key ->
-            storageService.retrieve(STORE, key, StoredIndicatorCategory::class.java).getOrNull()
-        }.map {
-            fromStorage(it)
-        }.sortedBy { it.name }
-    }
+    override fun findAll(): List<IndicatorCategory> =
+        storageService.getData(STORE, StoredIndicatorCategory::class.java)
+            .values
+            .map {
+                fromStorage(it)
+            }.sortedBy { it.name }
 
     override fun findBySource(source: IndicatorSource): List<IndicatorCategory> {
         return storageService.findByJson(STORE, """

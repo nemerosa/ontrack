@@ -36,18 +36,17 @@ class IndicatorTypeServiceImpl(
         listeners += listener
     }
 
-    override fun findAll(): List<IndicatorType<*, *>> {
-        return storageService.getKeys(STORE).mapNotNull { key ->
-            storageService.retrieve(STORE, key, StoredIndicatorType::class.java).getOrNull()
-        }.mapNotNull {
-            fromStorage<Any, Any>(it)
-        }.sortedWith(
-            compareBy(
-                { it.category.name },
-                { it.name }
+    override fun findAll(): List<IndicatorType<*, *>> =
+        storageService.getData(STORE, StoredIndicatorType::class.java)
+            .values
+            .mapNotNull {
+                fromStorage<Any, Any>(it)
+            }.sortedWith(
+                compareBy(
+                    { it.category.name },
+                    { it.name }
+                )
             )
-        )
-    }
 
     override fun findTypeById(typeId: String): IndicatorType<*, *>? =
         storageService.retrieve(STORE, typeId, StoredIndicatorType::class.java)
@@ -58,8 +57,13 @@ class IndicatorTypeServiceImpl(
         findTypeById(typeId) ?: throw IndicatorTypeNotFoundException(typeId)
 
     override fun findByCategory(category: IndicatorCategory): List<IndicatorType<*, *>> {
-        return findAll().filter {
-            it.category.id == category.id
+        return storageService.findByJson(
+            STORE,
+            "data->>'category' = :category",
+            mapOf("category" to category.id),
+            StoredIndicatorType::class.java
+        ).mapNotNull {
+            fromStorage<Any, Any>(it)
         }.sortedWith(
             compareBy(
                 { it.category.name },

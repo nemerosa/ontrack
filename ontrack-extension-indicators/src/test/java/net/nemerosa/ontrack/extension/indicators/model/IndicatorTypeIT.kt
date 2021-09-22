@@ -197,4 +197,16 @@ class IndicatorTypeIT : AbstractIndicatorsTestSupport() {
         }
     }
 
+    @Test
+    fun `Finding types by category`() {
+        asAdmin {
+            val category = category()
+            val type = category.booleanType()
+            repeat(3) { category().booleanType() } // Creates additional types outside this category
+            // Looking for the type using its category
+            val types = indicatorTypeService.findByCategory(category)
+            assertEquals(listOf(type), types)
+        }
+    }
+
 }
