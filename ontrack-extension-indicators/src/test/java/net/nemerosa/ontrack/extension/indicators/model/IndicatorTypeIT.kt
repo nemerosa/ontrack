@@ -180,4 +180,21 @@ class IndicatorTypeIT : AbstractIndicatorsTestSupport() {
         }
     }
 
+    @Test
+    fun `Finding types by source`() {
+        asAdmin {
+            val source = IndicatorSource(
+                provider = IndicatorSourceProviderDescription(uid("i"), uid("I")),
+                name = uid("N")
+            )
+            val category = category(source = source)
+            val type = category.booleanType(source = source)
+            repeat(3) { category.booleanType() } // Creates additional types in this category
+            repeat(3) { category().booleanType() } // Creates additional types outside this category
+            // Looking for the type using its source
+            val types = indicatorTypeService.findBySource(source)
+            assertEquals(listOf(type), types)
+        }
+    }
+
 }

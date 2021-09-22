@@ -1,11 +1,9 @@
 package net.nemerosa.ontrack.extension.indicators.model
 
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class IndicatorCategoryServiceIT : AbstractIndicatorsTestSupport() {
 
@@ -42,6 +40,21 @@ class IndicatorCategoryServiceIT : AbstractIndicatorsTestSupport() {
             val category = category()
             assertTrue(indicatorCategoryService.deleteCategory(category.id).isSuccess, "Category was deleted")
             assertNull(indicatorCategoryService.findCategoryById(category.id), "Category has been deleted")
+        }
+    }
+
+    @Test
+    fun `Finding categories by source`() {
+        asAdmin {
+            val source = IndicatorSource(
+                provider = IndicatorSourceProviderDescription(uid("i"), uid("I")),
+                name = uid("N")
+            )
+            val category = category(source = source)
+            repeat(3) { category() } // Creates additional categories
+            // Looking for the category using its source
+            val categories = indicatorCategoryService.findBySource(source)
+            assertEquals(listOf(category), categories)
         }
     }
 
