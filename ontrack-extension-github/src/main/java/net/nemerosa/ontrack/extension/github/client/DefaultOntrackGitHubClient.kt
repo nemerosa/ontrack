@@ -307,6 +307,10 @@ class DefaultOntrackGitHubClient(
 
     override fun createGitHubRestTemplate(): RestTemplate = RestTemplateBuilder()
         .rootUri(getApiRoot(configuration.url))
+            // TODO #881
+//        .apply {
+//            configuration.authenticate(this)
+//        }
         .basicAuthentication(
             configuration.user,
             if (configuration.oauth2Token.isNullOrBlank()) {

@@ -2,13 +2,12 @@ package net.nemerosa.ontrack.extension.github.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
+import net.nemerosa.ontrack.model.form.Memo
 import net.nemerosa.ontrack.model.form.Password
 import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPassword
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
-import java.beans.ConstructorProperties
 import java.lang.String.format
 import java.util.*
 import java.util.function.Function
@@ -18,18 +17,18 @@ import java.util.function.Function
  *
  * @property name Name of this configuration
  * @property url End point
- * @property authenticationMode Authentication mode
  * @property user User name
  * @property password User password
  * @property oauth2Token OAuth2 token
  */
-open class GitHubEngineConfiguration(
+open class GitHubEngineConfiguration
+@JvmOverloads
+constructor(
     private val name: String,
     url: String?,
-    private val authenticationMode: GitHubAuthenticationMode,
-    private val user: String?,
-    private val password: String?,
-    val oauth2Token: String?,
+    private val user: String? = null,
+    private val password: String? = null,
+    val oauth2Token: String? = null,
     val appId: String? = null,
     val appPrivateKey: String? = null,
     val appInstallationAccountName: String? = null
@@ -48,21 +47,6 @@ open class GitHubEngineConfiguration(
 
     init {
         this.url = if (url.isNullOrBlank()) GITHUB_COM else url
-        // Checking the properties according the authentication mode
-        // TODO Moves this to the validation code
-//        when (authenticationMode) {
-//            GitHubAuthenticationMode.PASSWORD -> {
-//                check(user, "Username is required")
-//                check(password, "Password is required")
-//            }
-//            GitHubAuthenticationMode.TOKEN -> {
-//                check(oauth2Token, "Token is required")
-//            }
-//            GitHubAuthenticationMode.APP -> {
-//                check(appId, "App ID is required")
-//                check(appPrivateKey, "App private key is required")
-//            }
-//        }
     }
 
     @JsonIgnore
@@ -81,7 +65,6 @@ open class GitHubEngineConfiguration(
         return GitHubEngineConfiguration(
             name,
             url,
-            authenticationMode,
             user,
             password,
             "",
@@ -95,7 +78,6 @@ open class GitHubEngineConfiguration(
         return GitHubEngineConfiguration(
             name,
             url,
-            authenticationMode,
             user,
             password,
             oauth2Token,
@@ -109,7 +91,6 @@ open class GitHubEngineConfiguration(
         return GitHubEngineConfiguration(
             name,
             url,
-            authenticationMode,
             user,
             password,
             oauth2Token,
@@ -119,18 +100,7 @@ open class GitHubEngineConfiguration(
         )
     }
 
-    fun asForm(): Form {
-        return form()
-            .with(defaultNameField().readOnly().value(name))
-            .fill("url", url)
-            .fill(GitHubEngineConfiguration::authenticationMode.name, authenticationMode.name)
-            .fill("user", user)
-            .fill("password", "")
-            .fill("oauth2Token", oauth2Token)
-            .fill(GitHubEngineConfiguration::appId.name, appId)
-            .fill(GitHubEngineConfiguration::appPrivateKey.name, appPrivateKey)
-            .fill(GitHubEngineConfiguration::appInstallationAccountName.name, appInstallationAccountName)
-    }
+    fun asForm(): Form = form(this)
 
     override fun clone(
         targetConfigurationName: String,
@@ -139,7 +109,6 @@ open class GitHubEngineConfiguration(
         return GitHubEngineConfiguration(
             targetConfigurationName,
             replacementFunction.apply(url),
-            authenticationMode,
             user?.let { replacementFunction.apply(user) },
             password,
             oauth2Token,
@@ -175,7 +144,6 @@ open class GitHubEngineConfiguration(
         other as GitHubEngineConfiguration
 
         if (name != other.name) return false
-        if (authenticationMode != other.authenticationMode) return false
         if (user != other.user) return false
         if (password != other.password) return false
         if (oauth2Token != other.oauth2Token) return false
@@ -189,7 +157,6 @@ open class GitHubEngineConfiguration(
 
     override fun hashCode(): Int {
         var result = name.hashCode()
-        result = 31 * result + authenticationMode.hashCode()
         result = 31 * result + (user?.hashCode() ?: 0)
         result = 31 * result + (password?.hashCode() ?: 0)
         result = 31 * result + (oauth2Token?.hashCode() ?: 0)
@@ -200,6 +167,9 @@ open class GitHubEngineConfiguration(
         return result
     }
 
+    override fun toString(): String {
+        return "GitHubEngineConfiguration(name='$name', user=$user, password=$password, oauth2Token=$oauth2Token, appId=$appId, appPrivateKey=$appPrivateKey, appInstallationAccountName=$appInstallationAccountName, url='$url')"
+    }
 
     companion object {
 
@@ -208,51 +178,66 @@ open class GitHubEngineConfiguration(
          */
         const val GITHUB_COM = "https://github.com"
 
-        /**
-         * Checking an input
-         */
-        private fun check(value: String?, message: String) {
-            if (value.isNullOrBlank()) {
-                throw GitHubEngineConfigurationMissingFieldException(message)
-            }
-        }
-
         @JvmStatic
-        fun form(): Form {
+        fun form(configuration: GitHubEngineConfiguration?): Form {
             return Form.create()
-                .with(defaultNameField())
                 .with(
-                    Text.of("url")
+                    Text.of(GitHubEngineConfiguration::name.name)
+                        .label("Name")
+                        .length(40)
+                        .readOnly(configuration != null)
+                        .regex("[A-Za-z0-9_\\.\\-]+")
+                        .validation("Name is required and must contain only alpha-numeric characters, underscores, points or dashes.")
+                        .value(configuration?.name)
+                )
+                .with(
+                    Text.of(GitHubEngineConfiguration::url.name)
                         .label("URL")
                         .length(250)
                         .optional()
                         .help(format("URL of the GitHub engine. Defaults to %s if not defined.", GITHUB_COM))
+                        .value(configuration?.url)
                 )
-                    // TODO Authentication mode
                 .with(
-                    Text.of("user")
+                    Text.of(GitHubEngineConfiguration::user.name)
                         .label("User")
                         .length(16)
-                            // TODO Visible only if authentication mode = PASSWORD or TOKEN
                         .optional()
+                        .value(configuration?.user)
                 )
                 .with(
-                    Password.of("password")
+                    Password.of(GitHubEngineConfiguration::password.name)
                         .label("Password")
+                        .help("Deprecated. Prefer using tokens or GitHub Apps")
                         .length(40)
-                        // TODO Visible only if authentication mode = PASSWORD
                         .optional()
                 )
                 .with(
-                    Text.of("oauth2Token")
+                    Password.of(GitHubEngineConfiguration::oauth2Token.name)
                         .label("OAuth2 token")
                         .length(50)
-                        // TODO Visible only if authentication mode = PASSWORD
                         .optional()
                 )
-                // TODO App ID
-                // TODO App private key
-                // TODO App installation account name
+                .with(
+                    Text.of(GitHubEngineConfiguration::appId.name)
+                        .label("GitHub App ID")
+                        .help("ID of the GitHub App to use")
+                        .optional()
+                        .value(configuration?.appId)
+                )
+                .with(
+                    Memo.of(GitHubEngineConfiguration::appPrivateKey.name)
+                        .label("GitHub App PKey")
+                        .help("Private key for the GitHub App")
+                        .optional()
+                )
+                .with(
+                    Text.of(GitHubEngineConfiguration::appInstallationAccountName.name)
+                        .label("GitHub App Installation Account")
+                        .help("Optional. In case of several installations for this app, select the account where this app has been installed.")
+                        .optional()
+                        .value(configuration?.appInstallationAccountName)
+                )
         }
     }
 

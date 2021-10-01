@@ -85,7 +85,7 @@ public class GitHubController extends AbstractExtensionController<GitHubExtensio
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
     public Form getConfigurationForm() {
-        return GitHubEngineConfiguration.form();
+        return GitHubEngineConfiguration.form(null);
     }
 
     /**
