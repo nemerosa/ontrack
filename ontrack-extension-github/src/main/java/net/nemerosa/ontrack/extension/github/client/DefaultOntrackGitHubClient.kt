@@ -19,6 +19,7 @@ import org.eclipse.egit.github.core.service.OrganizationService
 import org.eclipse.egit.github.core.service.PullRequestService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestTemplate
@@ -307,18 +308,23 @@ class DefaultOntrackGitHubClient(
 
     override fun createGitHubRestTemplate(): RestTemplate = RestTemplateBuilder()
         .rootUri(getApiRoot(configuration.url))
-            // TODO #881
-//        .apply {
-//            configuration.authenticate(this)
-//        }
-        .basicAuthentication(
-            configuration.user,
-            if (configuration.oauth2Token.isNullOrBlank()) {
-                configuration.password
-            } else {
-                configuration.oauth2Token
+        .run {
+            when (configuration.authenticationType()) {
+                GitHubAuthenticationType.ANONYMOUS -> this // Nothing to be done
+                GitHubAuthenticationType.PASSWORD -> {
+                    basicAuthentication(configuration.user, configuration.password)
+                }
+                GitHubAuthenticationType.USER_TOKEN -> {
+                    basicAuthentication(configuration.user, configuration.oauth2Token)
+                }
+                GitHubAuthenticationType.TOKEN -> {
+                    defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${configuration.oauth2Token}")
+                }
+                GitHubAuthenticationType.APP -> {
+                    defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${configuration.getAppInstallationToken()}")
+                }
             }
-        )
+        }
         .build()
 
     override fun createGitHubClient(): GitHubClient {

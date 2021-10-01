@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPassword
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
-import java.beans.ConstructorProperties
 import java.lang.String.format
 import java.util.*
 import java.util.function.Function
