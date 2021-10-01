@@ -16,7 +16,7 @@ class GitHubEngineConfigurationTest {
             "secret",
             null
         )
-        assertEquals("", configuration.obfuscate().password)
+        assertEquals(null, configuration.obfuscate().password)
     }
 
     @Test
@@ -28,7 +28,7 @@ class GitHubEngineConfigurationTest {
             null,
             "1234567890abcdef"
         )
-        assertEquals("", configuration.obfuscate().oauth2Token)
+        assertEquals(null, configuration.obfuscate().oauth2Token)
     }
 
     @Test
@@ -39,7 +39,7 @@ class GitHubEngineConfigurationTest {
             appId = "123456",
             appPrivateKey = "xxxxxxx",
         )
-        assertEquals("", configuration.obfuscate().appPrivateKey)
+        assertEquals(null, configuration.obfuscate().appPrivateKey)
     }
 
     @Test
@@ -255,7 +255,8 @@ class GitHubEngineConfigurationTest {
 
     @Test
     fun `Password form does not contain any credentials`() {
-        GitHubEngineConfiguration("Test", null,
+        GitHubEngineConfiguration(
+            "Test", null,
             user = "user",
             password = "xxxx"
         ).asForm().apply {
@@ -269,7 +270,8 @@ class GitHubEngineConfigurationTest {
 
     @Test
     fun `Token form does not contain any credentials`() {
-        GitHubEngineConfiguration("Test", null,
+        GitHubEngineConfiguration(
+            "Test", null,
             oauth2Token = "token",
         ).asForm().apply {
             assertEquals(null, getField("user")?.value)
@@ -282,7 +284,8 @@ class GitHubEngineConfigurationTest {
 
     @Test
     fun `App form does not contain any credentials`() {
-        GitHubEngineConfiguration("Test", null,
+        GitHubEngineConfiguration(
+            "Test", null,
             appId = "123456",
             appPrivateKey = "xxxxxxx"
         ).asForm().apply {
@@ -292,5 +295,75 @@ class GitHubEngineConfigurationTest {
             assertEquals("123456", getField("appId")?.value)
             assertEquals(null, getField("appPrivateKey")?.value)
         }
+    }
+
+    @Test
+    fun `Anonymous mode`() {
+        assertEquals(
+            GitHubAuthenticationType.ANONYMOUS,
+            GitHubEngineConfiguration("Test", null).authenticationType()
+        )
+    }
+
+    @Test
+    fun `Password mode`() {
+        assertEquals(
+            GitHubAuthenticationType.PASSWORD,
+            GitHubEngineConfiguration(
+                "Test", null,
+                user = "user",
+                password = "xxx",
+            ).authenticationType()
+        )
+    }
+
+    @Test
+    fun `User token mode`() {
+        assertEquals(
+            GitHubAuthenticationType.USER_TOKEN,
+            GitHubEngineConfiguration(
+                "Test", null,
+                user = "user",
+                oauth2Token = "xxx",
+            ).authenticationType()
+        )
+    }
+
+    @Test
+    fun `Token mode`() {
+        assertEquals(
+            GitHubAuthenticationType.TOKEN,
+            GitHubEngineConfiguration(
+                "Test", null,
+                oauth2Token = "xxx",
+            ).authenticationType()
+        )
+    }
+
+    @Test
+    fun `App mode`() {
+        assertEquals(
+            GitHubAuthenticationType.APP,
+            GitHubEngineConfiguration(
+                "Test", null,
+                appId = "123456",
+                appPrivateKey = "xxx",
+            ).authenticationType()
+        )
+    }
+
+    @Test
+    fun `App mode takes precedence`() {
+        assertEquals(
+            GitHubAuthenticationType.APP,
+            GitHubEngineConfiguration(
+                "Test", null,
+                user = "user",
+                password = "xxx",
+                oauth2Token = "xxx",
+                appId = "123456",
+                appPrivateKey = "xxx",
+            ).authenticationType()
+        )
     }
 }

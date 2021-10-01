@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPassword
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
+import java.beans.ConstructorProperties
 import java.lang.String.format
 import java.util.*
 import java.util.function.Function
@@ -21,9 +22,7 @@ import java.util.function.Function
  * @property password User password
  * @property oauth2Token OAuth2 token
  */
-open class GitHubEngineConfiguration
-@JvmOverloads
-constructor(
+open class GitHubEngineConfiguration(
     private val name: String,
     url: String?,
     private val user: String? = null,
@@ -39,6 +38,20 @@ constructor(
     override fun getUser(): String? = user
 
     override fun getPassword(): String? = password
+
+    /**
+     * Authentication type
+     */
+    fun authenticationType(): GitHubAuthenticationType =
+        when {
+            !appId.isNullOrBlank() -> GitHubAuthenticationType.APP
+            !oauth2Token.isNullOrBlank() -> when {
+                user.isNullOrBlank() -> GitHubAuthenticationType.TOKEN
+                else -> GitHubAuthenticationType.USER_TOKEN
+            }
+            !password.isNullOrBlank() -> GitHubAuthenticationType.PASSWORD
+            else -> GitHubAuthenticationType.ANONYMOUS
+        }
 
     /**
      * End point
@@ -57,48 +70,29 @@ constructor(
         )
     }
 
-    override fun obfuscate(): GitHubEngineConfiguration {
-        return withPassword("").withNoOauth2Token().withAppPrivateKey("")
-    }
-
-    private fun withNoOauth2Token(): GitHubEngineConfiguration {
-        return GitHubEngineConfiguration(
-            name,
-            url,
-            user,
-            password,
-            "",
-            appId,
-            appPrivateKey,
-            appInstallationAccountName,
+    override fun obfuscate(): GitHubEngineConfiguration =
+        GitHubEngineConfiguration(
+            name = name,
+            url = url,
+            user = user,
+            password = null,
+            oauth2Token = null,
+            appId = appId,
+            appPrivateKey = null,
+            appInstallationAccountName = appInstallationAccountName,
         )
-    }
 
-    override fun withPassword(password: String?): GitHubEngineConfiguration {
-        return GitHubEngineConfiguration(
-            name,
-            url,
-            user,
-            password,
-            oauth2Token,
-            appId,
-            appPrivateKey,
-            appInstallationAccountName,
+    override fun withPassword(password: String?): GitHubEngineConfiguration =
+        GitHubEngineConfiguration(
+            name = name,
+            url = url,
+            user = user,
+            password = password,
+            oauth2Token = oauth2Token,
+            appId = appId,
+            appPrivateKey = appPrivateKey,
+            appInstallationAccountName = appInstallationAccountName,
         )
-    }
-
-    fun withAppPrivateKey(appPrivateKey: String?): GitHubEngineConfiguration {
-        return GitHubEngineConfiguration(
-            name,
-            url,
-            user,
-            password,
-            oauth2Token,
-            appId,
-            appPrivateKey,
-            appInstallationAccountName,
-        )
-    }
 
     fun asForm(): Form = form(this)
 
