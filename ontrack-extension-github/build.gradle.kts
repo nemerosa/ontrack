@@ -14,6 +14,10 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-extension-indicators"))
+    implementation("io.jsonwebtoken:jjwt-api")
+
+    runtimeOnly("io.jsonwebtoken:jjwt-impl")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson")
 
     testImplementation(project(":ontrack-test-utils"))
     testImplementation(project(":ontrack-it-utils"))

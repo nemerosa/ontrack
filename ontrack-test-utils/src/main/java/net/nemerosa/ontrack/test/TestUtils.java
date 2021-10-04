@@ -90,6 +90,11 @@ public final class TestUtils {
         return IOUtils.toByteArray(TestUtils.class.getResource(path));
     }
 
+    public static @NotNull
+    String resourceString(@NotNull String path) throws IOException {
+        return new String(resourceBytes(path), "UTF-8");
+    }
+
     public static JsonNode resourceJson(String path) throws IOException {
         return mapper.readTree(resourceBytes(path));
     }

@@ -1,11 +1,14 @@
 package net.nemerosa.ontrack.extension.github.client
 
+import net.nemerosa.ontrack.extension.github.app.client.GitHubAppClient
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import org.springframework.stereotype.Component
 
 @Component
-class DefaultGitHubClientFactoryImpl : OntrackGitHubClientFactory {
+class DefaultGitHubClientFactoryImpl(
+    private val gitHubAppClient: GitHubAppClient,
+) : OntrackGitHubClientFactory {
     override fun create(configuration: GitHubEngineConfiguration): OntrackGitHubClient {
-        return DefaultOntrackGitHubClient(configuration)
+        return DefaultOntrackGitHubClient(configuration, gitHubAppClient)
     }
 }

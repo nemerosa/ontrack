@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.github.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import net.nemerosa.ontrack.extension.github.app.GitHubApp
+import net.nemerosa.ontrack.extension.github.app.client.GitHubAppClient
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Memo
 import net.nemerosa.ontrack.model.form.Password
@@ -10,7 +12,10 @@ import net.nemerosa.ontrack.model.support.UserPassword
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 import java.lang.String.format
 import java.util.*
+import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.function.Function
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 
 /**
  * Configuration for accessing a GitHub engine, github.com or GitHub enterprise.
@@ -129,6 +134,46 @@ open class GitHubEngineConfiguration(
             else -> Optional.empty()
         }
     }
+
+    /**
+     * Gets the app token, renewing it if necessary.
+     *
+     * @param gitHubAppClient Client to use to connect to GitHub for the management of apps.
+     */
+    fun getAppInstallationToken(gitHubAppClient: GitHubAppClient): String =
+        appTokenLock.read {
+            appToken
+                ?.takeIf { it.isValid() } // If token is defined, checks its validity
+                ?.token // If token is valid, gets its current value
+                ?: renewToken(gitHubAppClient).token // If not defined or not valid, regenerate it
+        }
+
+    private fun renewToken(gitHubAppClient: GitHubAppClient): GHToken {
+        if (appId == null || appPrivateKey == null) {
+            error("App ID or App Private Key is not defined")
+        } else {
+            appTokenLock.write {
+                val appClient = GitHubApp(gitHubAppClient)
+                // Generate JWT token
+                val jwtToken = GitHubApp.generateJWT(appId, appPrivateKey)
+                // Getting the installation
+                val appInstallationId = appClient.getInstallation(jwtToken, appId, appInstallationAccountName)
+                TODO("Generating the token")
+                TODO("Storing the token")
+                TODO("Returning the generated token")
+            }
+        }
+    }
+
+    /**
+     * Internal app token
+     */
+    private var appToken: GHToken? = null
+
+    /**
+     * App token lock
+     */
+    private val appTokenLock = ReentrantReadWriteLock()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

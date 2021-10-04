@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.client
 
+import net.nemerosa.ontrack.extension.github.app.MockGitHubAppClient
 import net.nemerosa.ontrack.extension.github.githubTestConfigReal
 import net.nemerosa.ontrack.extension.github.githubTestEnv
 import net.nemerosa.ontrack.extension.github.model.GitHubRepositoryPermission
@@ -17,7 +18,8 @@ class DefaultOntrackGitHubClientIT {
     @Before
     fun init() {
         client = DefaultOntrackGitHubClient(
-            configuration = githubTestConfigReal()
+            configuration = githubTestConfigReal(),
+            gitHubAppClient = MockGitHubAppClient(),
         )
     }
 

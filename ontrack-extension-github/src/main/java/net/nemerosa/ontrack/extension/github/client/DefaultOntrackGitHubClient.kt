@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
+import net.nemerosa.ontrack.extension.github.app.client.GitHubAppClient
 import net.nemerosa.ontrack.extension.github.model.*
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.getBooleanField
@@ -31,7 +32,8 @@ import java.util.*
 
 
 class DefaultOntrackGitHubClient(
-    private val configuration: GitHubEngineConfiguration
+    private val configuration: GitHubEngineConfiguration,
+    private val gitHubAppClient: GitHubAppClient,
 ) : OntrackGitHubClient {
 
     private val logger = LoggerFactory.getLogger(OntrackGitHubClient::class.java)
@@ -321,7 +323,7 @@ class DefaultOntrackGitHubClient(
                     defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${configuration.oauth2Token}")
                 }
                 GitHubAuthenticationType.APP -> {
-                    defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${configuration.getAppInstallationToken()}")
+                    defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${configuration.getAppInstallationToken(gitHubAppClient)}")
                 }
             }
         }
