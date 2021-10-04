@@ -142,11 +142,15 @@ open class GitHubEngineConfiguration(
      * @param gitHubAppClient Client to use to connect to GitHub for the management of apps.
      */
     fun getAppInstallationToken(gitHubAppClient: GitHubAppClient): String =
-        appTokenLock.read {
-            appToken
-                ?.takeIf { it.isValid() } // If token is defined, checks its validity
-                ?.token // If token is valid, gets its current value
-                ?: renewToken(gitHubAppClient).token // If not defined or not valid, regenerate it
+        if (authenticationType() == GitHubAuthenticationType.APP) {
+            appTokenLock.read {
+                appToken
+                    ?.takeIf { it.isValid() } // If token is defined, checks its validity
+                    ?.token // If token is valid, gets its current value
+                    ?: renewToken(gitHubAppClient).token // If not defined or not valid, regenerate it
+            }
+        } else {
+            error("This configuration is not using a GitHub App.")
         }
 
     /**

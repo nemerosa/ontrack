@@ -318,7 +318,8 @@ configure(coreProjects) p@{
         "testImplementation"("junit:junit")
         "testImplementation"("org.mockito:mockito-core")
         "testImplementation"("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
-        "testImplementation"("io.mockk:mockk:1.12.0")
+        "testImplementation"("io.mockk:mockk:${Versions.mockkVersion}")
+        "testImplementation"("io.mockk:mockk-dsl-jvm:${Versions.mockkVersion}")
         "testImplementation"("org.jetbrains.kotlin:kotlin-test")
     }
 
