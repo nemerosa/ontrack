@@ -149,6 +149,13 @@ open class GitHubEngineConfiguration(
                 ?: renewToken(gitHubAppClient).token // If not defined or not valid, regenerate it
         }
 
+    /**
+     * Invalidates any existing token
+     */
+    fun invalidateAppInstallationToken() {
+        appToken?.invalidate()
+    }
+
     private fun renewToken(gitHubAppClient: GitHubAppClient): GitHubAppToken {
         if (appId == null || appPrivateKey == null) {
             error("App ID or App Private Key is not defined")

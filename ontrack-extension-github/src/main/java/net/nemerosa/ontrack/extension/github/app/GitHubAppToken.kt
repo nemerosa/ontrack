@@ -13,5 +13,12 @@ data class GitHubAppToken(
     val token: String,
     val validUntil: LocalDateTime,
 ) {
-    fun isValid() = (Time.now() <= validUntil)
+
+    private var invalid: Boolean = false
+
+    fun invalidate() {
+        invalid = true
+    }
+
+    fun isValid() = !invalid && (Time.now() <= validUntil)
 }
