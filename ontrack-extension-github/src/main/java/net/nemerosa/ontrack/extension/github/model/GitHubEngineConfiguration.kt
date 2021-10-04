@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.extension.github.app.GitHubApp
+import net.nemerosa.ontrack.extension.github.app.GitHubAppToken
 import net.nemerosa.ontrack.extension.github.app.client.GitHubAppClient
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Memo
@@ -148,19 +149,21 @@ open class GitHubEngineConfiguration(
                 ?: renewToken(gitHubAppClient).token // If not defined or not valid, regenerate it
         }
 
-    private fun renewToken(gitHubAppClient: GitHubAppClient): GHToken {
+    private fun renewToken(gitHubAppClient: GitHubAppClient): GitHubAppToken {
         if (appId == null || appPrivateKey == null) {
             error("App ID or App Private Key is not defined")
         } else {
             appTokenLock.write {
                 val appClient = GitHubApp(gitHubAppClient)
                 // Generate JWT token
-                val jwtToken = GitHubApp.generateJWT(appId, appPrivateKey)
+                val jwt = GitHubApp.generateJWT(appId, appPrivateKey)
                 // Getting the installation
-                val appInstallationId = appClient.getInstallation(jwtToken, appId, appInstallationAccountName)
-                TODO("Generating the token")
-                TODO("Storing the token")
-                TODO("Returning the generated token")
+                val appInstallationId = appClient.getInstallation(jwt, appId, appInstallationAccountName)
+                // Generating & storing the token
+                val generatedAppToken = appClient.generateInstallationToken(jwt, appInstallationId)
+                appToken = generatedAppToken
+                // Returning the generated token
+                return generatedAppToken
             }
         }
     }
@@ -168,7 +171,7 @@ open class GitHubEngineConfiguration(
     /**
      * Internal app token
      */
-    private var appToken: GHToken? = null
+    private var appToken: GitHubAppToken? = null
 
     /**
      * App token lock

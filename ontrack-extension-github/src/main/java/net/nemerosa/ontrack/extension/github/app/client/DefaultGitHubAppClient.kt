@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.github.app.client
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.parse
 import org.springframework.boot.web.client.RestTemplateBuilder
@@ -19,6 +18,14 @@ class DefaultGitHubAppClient : GitHubAppClient {
                 it.parse()
             }
             ?: emptyList()
+
+    override fun generateInstallationToken(jwt: String, appInstallationId: String): GitHubAppInstallationToken =
+        client(jwt).postForObject(
+            "/app/installations/$appInstallationId/access_tokens",
+            null,
+            GitHubAppInstallationToken::class.java
+        )
+            ?: throw GitHubAppClientCannotGetInstallationTokenException(appInstallationId)
 
     private fun client(jwt: String): RestTemplate = RestTemplateBuilder()
         .rootUri("https://api.github.com")

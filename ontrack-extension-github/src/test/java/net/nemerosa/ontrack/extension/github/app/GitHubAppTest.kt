@@ -80,6 +80,17 @@ class GitHubAppTest {
         assertEquals("234567890", installationId)
     }
 
+    @Test
+    fun `Installation token`() {
+        // JWT
+        val jwt = testJwt()
+        // Mocking
+        val client = MockGitHubAppClient()
+        // Installation token
+        val token = GitHubApp(client).generateInstallationToken(jwt, "1234567890")
+        assertEquals("12345678900000", token.token)
+    }
+
     private fun testJwt(): String {
         // Reading the private key
         val testAppPrivateKey = TestUtils.resourceString(testAppPrivateKeyResourcePath)
