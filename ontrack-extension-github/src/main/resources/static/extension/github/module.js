@@ -1,5 +1,6 @@
 angular.module('ontrack.extension.github', [
     'ot.service.core',
+    'ot.service.graphql',
     'ot.service.configuration',
     'ot.service.form'
 ])
@@ -11,16 +12,33 @@ angular.module('ontrack.extension.github', [
             controller: 'GitHubConfigurationsCtrl'
         });
     })
-    .controller('GitHubConfigurationsCtrl', function ($scope, $http, ot, otFormService, otAlertService, otConfigurationService) {
+    .controller('GitHubConfigurationsCtrl', function ($scope, $http, ot, otFormService, otAlertService, otConfigurationService, otGraphqlService) {
         var view = ot.view();
         view.title = 'GitHub configurations';
         view.description = 'Management of the GitHub configurations.';
         view.commands = [];
 
-        // Loading the Artifactory configurations
+        // Query to get the list of configurations
+        const query = `
+            {
+                gitHubConfigurations {
+                    name
+                    url
+                    user
+                    appId
+                    appInstallationAccountName
+                    links {
+                        _update
+                        _delete
+                    }
+                }
+            }
+        `;
+
+        // Loading the configurations
         function load() {
-            ot.call($http.get('extension/github/configurations')).then(function (configurations) {
-                $scope.configurations = configurations;
+            otGraphqlService.pageGraphQLCall(query).then((data) => {
+                $scope.configurations = data.gitHubConfigurations;
                 view.commands = [
                     {
                         id: 'github-configuration-create',
@@ -38,11 +56,11 @@ angular.module('ontrack.extension.github', [
         // Creating a configuration
         $scope.createConfiguration = function () {
             otFormService.display({
-                uri: $scope.configurations._create,
+                uri: '/extension/github/configurations/create',
                 title: "GitHub configuration",
-                buttons: [ otConfigurationService.testButton($scope.configurations._test) ],
+                buttons: [ otConfigurationService.testButton('/extension/github/configurations/test') ],
                 submit: function (data) {
-                    return ot.call($http.post($scope.configurations._create, data));
+                    return ot.call($http.post('/extension/github/configurations/create', data));
                 }
             }).then(load);
         };
@@ -54,7 +72,7 @@ angular.module('ontrack.extension.github', [
                 message: "Do you really want to delete this GitHub configuration? Some projects may still refer to it."
             }).then(
                 function success() {
-                    ot.call($http.delete(configuration._delete)).then(load);
+                    ot.call($http.delete(configuration.links._delete)).then(load);
                 }
             );
         };
@@ -62,11 +80,11 @@ angular.module('ontrack.extension.github', [
         // Updating a configuration
         $scope.updateConfiguration = function (configuration) {
             otFormService.display({
-                uri: configuration._update,
+                uri: configuration.links._update,
                 title: "GitHub configuration",
-                buttons: [ otConfigurationService.testButton($scope.configurations._test) ],
+                buttons: [ otConfigurationService.testButton('/extension/github/configurations/test') ],
                 submit: function (data) {
-                    return ot.call($http.put(configuration._update, data));
+                    return ot.call($http.put(configuration.links._update, data));
                 }
             }).then(load);
         };

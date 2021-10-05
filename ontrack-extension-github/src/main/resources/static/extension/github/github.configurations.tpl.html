@@ -2,20 +2,21 @@
     <div class="row">
         <div class="col-md-12">
             <ot-section-title>List of configurations</ot-section-title>
-            <ot-noentry list="configurations.resources">
+            <ot-noentry list="configurations">
                 No GitHub configuration has been created yet.
             </ot-noentry>
-            <table class="table table-hover" ng-show="configurations.resources">
+            <table class="table table-hover" ng-show="configurations">
                 <thead>
                 <tr>
                     <th>Name</th>
                     <th>URL</th>
                     <th>User</th>
+                    <th>GitHub App</th>
                     <th>&nbsp;</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="configuration in configurations.resources" name="{{configuration.name}}">
+                <tr ng-repeat="configuration in configurations">
                     <td>
                         <code>{{configuration.name}}</code>
                     </td>
@@ -26,8 +27,13 @@
                         <span ng-if="configuration.user">
                             {{configuration.user}}
                         </span>
-                        <span ng-if="!configuration.user" class="ot-description">
-                            No user
+                    </td>
+                    <td>
+                        <span ng-if="configuration.appId">
+                            {{ configuration.appId }}
+                            <span ng-if="configuration.appInstallationAccountName">
+                                (for <code>{{ configuration.appInstallationAccountName }}</code>)
+                            </span>
                         </span>
                     </td>
                     <td>
