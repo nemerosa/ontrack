@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
+import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.app.client.GitHubAppClient
 import net.nemerosa.ontrack.extension.github.model.*
 import net.nemerosa.ontrack.json.JsonParseException
@@ -29,11 +30,12 @@ import java.net.HttpURLConnection
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.concurrent.read
 
 
 class DefaultOntrackGitHubClient(
     private val configuration: GitHubEngineConfiguration,
-    private val gitHubAppClient: GitHubAppClient,
+    private val gitHubAppTokenService: GitHubAppTokenService,
 ) : OntrackGitHubClient {
 
     private val logger = LoggerFactory.getLogger(OntrackGitHubClient::class.java)
@@ -323,11 +325,18 @@ class DefaultOntrackGitHubClient(
                     defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${configuration.oauth2Token}")
                 }
                 GitHubAuthenticationType.APP -> {
-                    defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${configuration.getAppInstallationToken(gitHubAppClient)}")
+                    defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${gitHubAppTokenService.getAppInstallationToken(configuration)}")
                 }
             }
         }
         .build()
+
+    private fun GitHubAppTokenService.getAppInstallationToken(configuration: GitHubEngineConfiguration): String =
+        if (configuration.authenticationType() == GitHubAuthenticationType.APP) {
+            getAppInstallationToken(configuration.name, configuration.appId!!, configuration.appPrivateKey!!, configuration.appInstallationAccountName)
+        } else {
+            error("This configuration is not using a GitHub App.")
+        }
 
     override fun createGitHubClient(): GitHubClient {
         // GitHub client (non authentified)

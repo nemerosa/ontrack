@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.client
 
+import net.nemerosa.ontrack.extension.github.app.DefaultGitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.app.MockGitHubAppClient
 import net.nemerosa.ontrack.extension.github.githubTestConfigReal
 import net.nemerosa.ontrack.extension.github.githubTestEnv
@@ -19,7 +20,9 @@ class DefaultOntrackGitHubClientIT {
     fun init() {
         client = DefaultOntrackGitHubClient(
             configuration = githubTestConfigReal(),
-            gitHubAppClient = MockGitHubAppClient(),
+            gitHubAppTokenService = DefaultGitHubAppTokenService(
+                gitHubAppClient = MockGitHubAppClient()
+            ),
         )
     }
 

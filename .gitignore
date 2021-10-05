@@ -1,6 +1,7 @@
 target
 .idea
 *.iml
+.run
 .project
 .classpath
 .settings

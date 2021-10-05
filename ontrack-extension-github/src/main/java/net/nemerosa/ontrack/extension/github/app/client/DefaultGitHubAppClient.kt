@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.github.app.client
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.parse
 import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 
 /**
@@ -10,6 +11,7 @@ import org.springframework.web.client.RestTemplate
  *
  * See https://docs.github.com/en/rest/reference/apps
  */
+@Component
 class DefaultGitHubAppClient : GitHubAppClient {
 
     override fun getAppInstallations(jwt: String): List<GitHubAppInstallation> =

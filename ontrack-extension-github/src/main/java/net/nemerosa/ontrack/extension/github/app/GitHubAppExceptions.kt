@@ -13,3 +13,7 @@ class GitHubAppSeveralInstallationsException(appId: String): BaseException(
 class GitHubAppNoInstallationForAccountException(appId: String, appInstallationAccountName: String): BaseException(
     "GitHub App $appId is not installed for account $appInstallationAccountName."
 )
+
+class GitHubAppNoTokenException(appId: String): BaseException(
+    "Could not get any installation token for the GitHub App $appId"
+)
