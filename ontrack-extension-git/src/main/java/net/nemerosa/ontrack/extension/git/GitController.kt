@@ -176,10 +176,10 @@ class GitController(
         val projectConfiguration = gitService.getProjectConfiguration(project)
         if (projectConfiguration != null) {
             val configuredIssueService = projectConfiguration.configuredIssueService
-            if (configuredIssueService.isPresent) {
+            if (configuredIssueService != null) {
                 return Resources.of(
-                        configuredIssueService.get().issueServiceExtension.exportFormats(
-                                configuredIssueService.get().issueServiceConfiguration
+                        configuredIssueService.issueServiceExtension.exportFormats(
+                                configuredIssueService.issueServiceConfiguration
                         ),
                         uri(on(GitController::class.java).changeLogExportFormats(projectId))
                 )
@@ -204,15 +204,14 @@ class GitController(
         // Gets the configuration for the project
         val gitConfiguration = gitService.getProjectConfiguration(project)
                 ?: throw GitProjectNotConfiguredException(project.id)
-// Gets the issue service
-        val optConfiguredIssueService = gitConfiguration.configuredIssueService
-        if (!optConfiguredIssueService.isPresent) {
+        // Gets the issue service
+        val configuredIssueService = gitConfiguration.configuredIssueService
+        if (configuredIssueService == null) {
             return ResponseEntity(
                     "The branch is not configured for issues",
                     HttpStatus.NO_CONTENT
             )
         }
-        val configuredIssueService = optConfiguredIssueService.get()
         // Gets the issue change log
         val changeLogIssues = gitService.getChangeLogIssues(changeLog)
         // List of issues

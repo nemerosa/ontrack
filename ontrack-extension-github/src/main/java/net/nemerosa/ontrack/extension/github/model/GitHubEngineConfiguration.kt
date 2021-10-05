@@ -1,16 +1,13 @@
 package net.nemerosa.ontrack.extension.github.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Memo
 import net.nemerosa.ontrack.model.form.Password
 import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
-import net.nemerosa.ontrack.model.support.UserPassword
+import net.nemerosa.ontrack.model.support.CredentialsConfiguration
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 import java.lang.String.format
-import java.util.*
-import java.util.function.Function
 
 /**
  * Configuration for accessing a GitHub engine, github.com or GitHub enterprise.
@@ -22,21 +19,15 @@ import java.util.function.Function
  * @property oauth2Token OAuth2 token
  */
 open class GitHubEngineConfiguration(
-    private val name: String,
+    override val name: String,
     url: String?,
-    private val user: String? = null,
-    private val password: String? = null,
+    override val user: String? = null,
+    override val password: String? = null,
     val oauth2Token: String? = null,
     val appId: String? = null,
     val appPrivateKey: String? = null,
     val appInstallationAccountName: String? = null
-) : UserPasswordConfiguration<GitHubEngineConfiguration> {
-
-    override fun getName(): String = name
-
-    override fun getUser(): String? = user
-
-    override fun getPassword(): String? = password
+) : UserPasswordConfiguration<GitHubEngineConfiguration>, CredentialsConfiguration<GitHubEngineConfiguration> {
 
     /**
      * Authentication type
@@ -61,13 +52,11 @@ open class GitHubEngineConfiguration(
         this.url = if (url.isNullOrBlank()) GITHUB_COM else url
     }
 
-    @JsonIgnore
-    override fun getDescriptor(): ConfigurationDescriptor {
-        return ConfigurationDescriptor(
+    override val descriptor: ConfigurationDescriptor
+        get() = ConfigurationDescriptor(
             name,
-            format("%s (%s)", name, url)
+            "$name ($url)"
         )
-    }
 
     override fun obfuscate(): GitHubEngineConfiguration =
         GitHubEngineConfiguration(
@@ -94,41 +83,6 @@ open class GitHubEngineConfiguration(
         )
 
     fun asForm(): Form = form(this)
-
-    override fun clone(
-        targetConfigurationName: String,
-        replacementFunction: Function<String, String>
-    ): GitHubEngineConfiguration {
-        return GitHubEngineConfiguration(
-            targetConfigurationName,
-            replacementFunction.apply(url),
-            user?.let { replacementFunction.apply(user) },
-            password,
-            oauth2Token,
-            appId,
-            appPrivateKey,
-            appInstallationAccountName,
-        )
-    }
-
-    @JsonIgnore
-    override fun getCredentials(): Optional<UserPassword> {
-        return when {
-            !oauth2Token.isNullOrBlank() -> Optional.of(
-                UserPassword(
-                    oauth2Token,
-                    "x-oauth-basic"
-                )
-            )
-            !user.isNullOrBlank() && !password.isNullOrBlank() -> Optional.of(
-                UserPassword(
-                    user,
-                    password
-                )
-            )
-            else -> Optional.empty()
-        }
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

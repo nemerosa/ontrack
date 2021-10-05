@@ -3,8 +3,7 @@ package net.nemerosa.ontrack.extension.stash.property;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.model.support.UserPassword;
-
-import java.util.Optional;
+import org.jetbrains.annotations.Nullable;
 
 import static java.lang.String.format;
 
@@ -49,9 +48,13 @@ public class StashGitConfiguration implements GitConfiguration {
         );
     }
 
+    @Nullable
     @Override
-    public Optional<UserPassword> getCredentials() {
-        return property.getConfiguration().getCredentials();
+    public UserPassword getCredentials() {
+        return new UserPassword(
+                property.getConfiguration().getUser(),
+                property.getConfiguration().getPassword()
+        );
     }
 
     @Override
@@ -80,8 +83,8 @@ public class StashGitConfiguration implements GitConfiguration {
     }
 
     @Override
-    public Optional<ConfiguredIssueService> getConfiguredIssueService() {
-        return Optional.ofNullable(configuredIssueService);
+    public ConfiguredIssueService getConfiguredIssueService() {
+        return configuredIssueService;
     }
 
     protected String getFileAtCommitLinkFormat() {

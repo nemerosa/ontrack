@@ -3,29 +3,25 @@ package net.nemerosa.ontrack.extension.git.mocking
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.model.support.UserPassword
-import java.util.*
 
-class GitMockingConfiguration: GitConfiguration {
+class GitMockingConfiguration : GitConfiguration {
 
-    override fun getConfiguredIssueService(): Optional<ConfiguredIssueService> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override val configuredIssueService: ConfiguredIssueService? = null
 
-    override fun getRemote(): String = "uri:test:git"
+    override val remote: String = "uri:test:git"
 
-    override fun getName(): String = "Mocking"
+    override val name: String = "Mocking"
 
-    override fun getCredentials(): Optional<UserPassword> = Optional.empty()
+    override val credentials: UserPassword? = null
 
-    override fun getType(): String = "mocking"
+    override val type: String = "mocking"
 
-    override fun getFileAtCommitLink(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override val commitLink: String =
+        TODO("not implemented")
 
-    override fun getCommitLink(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override val fileAtCommitLink: String =
+        TODO("Not yet implemented")
 
-    override fun getIndexationInterval(): Int = 0
+    override val indexationInterval: Int =
+        TODO("Not yet implemented")
 }

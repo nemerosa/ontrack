@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.gitlab.property;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.model.support.UserPassword;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -43,9 +44,13 @@ public class GitLabGitConfiguration implements GitConfiguration {
         );
     }
 
+    @Nullable
     @Override
-    public Optional<UserPassword> getCredentials() {
-        return property.getConfiguration().getCredentials();
+    public UserPassword getCredentials() {
+        return new UserPassword(
+                property.getConfiguration().getUser(),
+                property.getConfiguration().getPassword()
+        );
     }
 
     @Override
@@ -71,8 +76,9 @@ public class GitLabGitConfiguration implements GitConfiguration {
         return property.getIndexationInterval();
     }
 
+    @Nullable
     @Override
-    public Optional<ConfiguredIssueService> getConfiguredIssueService() {
-        return Optional.ofNullable(configuredIssueService);
+    public ConfiguredIssueService getConfiguredIssueService() {
+        return configuredIssueService;
     }
 }

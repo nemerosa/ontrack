@@ -90,7 +90,7 @@ class GitIssueSearchExtension(
         // Getting the project configuration
         val projectConfig = project?.let { gitService.getProjectConfiguration(project) }
         // Getting the associated issue service
-        val issueConfig = projectConfig?.configuredIssueService?.getOrNull()
+        val issueConfig = projectConfig?.configuredIssueService
         // Note: for performances reasons, we don't control if the issue exists or not
         // OK
         return if (project != null && issueConfig != null) {

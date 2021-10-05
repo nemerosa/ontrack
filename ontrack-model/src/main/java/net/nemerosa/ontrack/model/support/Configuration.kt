@@ -1,21 +1,24 @@
-package net.nemerosa.ontrack.model.support;
+package net.nemerosa.ontrack.model.support
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore
 
-public interface Configuration<T extends Configuration<T>> {
+interface Configuration<T : Configuration<T>> {
 
-    String getName();
+    /**
+     * Name of this configuration
+     */
+    val name: String
 
     /**
      * Gets the descriptor for this configuration
      */
-    @JsonIgnore
-    ConfigurationDescriptor getDescriptor();
+    @get:JsonIgnore
+    val descriptor: ConfigurationDescriptor
 
     /**
      * Utility method that erases any sensitive data from this configuration
      * and returns new one.
      */
-    T obfuscate();
+    fun obfuscate(): T
 
 }

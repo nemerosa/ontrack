@@ -260,7 +260,7 @@ class GitServiceImpl(
             // Configuration
             val configuration = getRequiredProjectConfiguration(changeLog.project)
             // Issue service
-            val configuredIssueService = configuration.configuredIssueService.orElse(null)
+            val configuredIssueService = configuration.configuredIssueService
                     ?: throw IssueServiceNotConfiguredException()
             // Set of issues
             val issueKeys = TreeSet<String>()
@@ -284,7 +284,7 @@ class GitServiceImpl(
             // Configuration
             val configuration = getRequiredProjectConfiguration(changeLog.project)
             // Issue service
-            val configuredIssueService = configuration.configuredIssueService.orElse(null)
+            val configuredIssueService = configuration.configuredIssueService
                     ?: throw IssueServiceNotConfiguredException()
             // Index of issues, sorted by keys
             val issues = TreeMap<String, GitChangeLogIssue>()
@@ -472,7 +472,7 @@ class GitServiceImpl(
         // Gets the project configuration
         val projectConfiguration = getRequiredProjectConfiguration(project)
         // Issue service
-        val configuredIssueService: ConfiguredIssueService? = projectConfiguration.configuredIssueService.orElse(null)
+        val configuredIssueService: ConfiguredIssueService? = projectConfiguration.configuredIssueService
         // Gets the details about the issue
         val issue: Issue? = logTime("issue-object") {
             configuredIssueService?.getIssue(key)
@@ -636,7 +636,7 @@ class GitServiceImpl(
     }
 
     private fun getMessageAnnotators(gitConfiguration: GitConfiguration): List<MessageAnnotator> {
-        val configuredIssueService = gitConfiguration.configuredIssueService.orElse(null)
+        val configuredIssueService = gitConfiguration.configuredIssueService
         return if (configuredIssueService != null) {
             // Gets the message annotator
             val messageAnnotator = configuredIssueService.messageAnnotator

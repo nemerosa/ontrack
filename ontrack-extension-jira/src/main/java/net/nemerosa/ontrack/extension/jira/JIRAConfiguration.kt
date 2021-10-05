@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.jira
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
@@ -9,56 +8,44 @@ import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 import org.apache.commons.lang3.StringUtils
-import java.util.function.Function
 import java.util.regex.Pattern
 
 open class JIRAConfiguration(
-        private val name: String,
-        val url: String,
-        private val user: String?,
-        private val password: String?
+    override val name: String,
+    val url: String,
+    override val user: String?,
+    override val password: String?
 ) : UserPasswordConfiguration<JIRAConfiguration>, IssueServiceConfiguration {
-
-    override fun getName(): String = name
-
-    override fun getUser(): String? = user
-
-    override fun getPassword(): String? = password
 
     override fun obfuscate(): JIRAConfiguration {
         return JIRAConfiguration(
-                name,
-                url,
-                user,
-                ""
+            name,
+            url,
+            user,
+            ""
         )
     }
 
     fun asForm(): Form {
         return form()
-                .with(defaultNameField().readOnly().value(name))
-                .fill("url", url)
-                .fill("user", user)
-                .fill("password", "")
+            .with(defaultNameField().readOnly().value(name))
+            .fill("url", url)
+            .fill("user", user)
+            .fill("password", "")
     }
 
     override fun withPassword(password: String?): JIRAConfiguration {
         return JIRAConfiguration(
-                name,
-                url,
-                user,
-                password
+            name,
+            url,
+            user,
+            password
         )
     }
 
-    override fun getDescriptor(): ConfigurationDescriptor {
-        return ConfigurationDescriptor(name, name)
-    }
+    override val descriptor: ConfigurationDescriptor get() = ConfigurationDescriptor(name, name)
 
-    @JsonIgnore
-    override fun getServiceId(): String {
-        return JIRAServiceExtension.SERVICE
-    }
+    override val serviceId: String = JIRAServiceExtension.SERVICE
 
     fun isIssue(token: String): Boolean {
         return ISSUE_PATTERN.matcher(token).matches() && !isIssueExcluded(token)
@@ -75,15 +62,6 @@ open class JIRAConfiguration(
         } else {
             key
         }
-    }
-
-    override fun clone(targetConfigurationName: String, replacementFunction: Function<String, String>): JIRAConfiguration {
-        return JIRAConfiguration(
-                targetConfigurationName,
-                replacementFunction.apply(url),
-                user?.let { replacementFunction.apply(user) },
-                password
-        )
     }
 
     override fun equals(other: Any?): Boolean {
@@ -118,10 +96,10 @@ open class JIRAConfiguration(
         @JvmStatic
         fun form(): Form {
             return Form.create()
-                    .with(defaultNameField())
-                    .url()
-                    .with(Text.of("user").label("User").length(16).optional())
-                    .with(Password.of("password").label("Password").length(40).optional())
+                .with(defaultNameField())
+                .url()
+                .with(Text.of("user").label("User").length(16).optional())
+                .with(Password.of("password").label("Password").length(40).optional())
         }
     }
 }

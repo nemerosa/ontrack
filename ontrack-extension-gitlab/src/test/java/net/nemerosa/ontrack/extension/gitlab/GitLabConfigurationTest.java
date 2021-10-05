@@ -4,16 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabConfiguration;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
-import net.nemerosa.ontrack.model.support.UserPassword;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
-
-import java.util.Optional;
 
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonRead;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonWrite;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class GitLabConfigurationTest {
 
@@ -69,24 +66,6 @@ public class GitLabConfigurationTest {
         assertEquals(Boolean.FALSE, form.getField("ignoreSslCertificate").getValue());
         // Obfuscated token
         assertNull(form.getField("password").getValue());
-    }
-
-    @Test
-    public void cloneTest() {
-        GitLabConfiguration cloned = configurationFixture().clone("newConfig", s -> StringUtils.replace(s, "nemerosa", "other"));
-        assertEquals("newConfig", cloned.getName());
-        assertEquals("https://gitlab.other.net", cloned.getUrl());
-        assertEquals("test", cloned.getUser());
-        assertEquals("1234567890abcdef", cloned.getPassword());
-        assertFalse(cloned.isIgnoreSslCertificate());
-    }
-
-    @Test
-    public void credentials() {
-        Optional<UserPassword> o = configurationFixture().getCredentials();
-        assertTrue(o.isPresent());
-        assertEquals("test", o.get().getUser());
-        assertEquals("1234567890abcdef", o.get().getPassword());
     }
 
     @Test

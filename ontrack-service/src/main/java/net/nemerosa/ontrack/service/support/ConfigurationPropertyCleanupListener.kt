@@ -47,10 +47,10 @@ class ConfigurationPropertyCleanupListener(
     ) {
         propertyService.forEachEntityWithProperty(propertyType) { entityId, property ->
             if (property is ConfigurationProperty<*>) {
-                val configuration = property.getConfiguration()
-                if (configuration::class.java.name == configurationType && configuration.getName() == configurationName) {
+                val configuration = property.configuration
+                if (configuration::class.java.name == configurationType && configuration.name == configurationName) {
                     val entity = entityId.type.getEntityFn(structureService).apply(ID.of(entityId.id))
-                    propertyService.deleteProperty(entity, propertyType.getTypeName())
+                    propertyService.deleteProperty(entity, propertyType.typeName)
                 }
             }
         }

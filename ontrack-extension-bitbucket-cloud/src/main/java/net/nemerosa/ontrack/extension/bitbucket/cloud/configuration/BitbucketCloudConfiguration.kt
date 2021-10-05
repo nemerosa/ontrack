@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.bitbucket.cloud.configuration
 
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
-import java.util.function.Function
 
 /**
  * Connection configuration to Bitbucket Cloud, at workspace level.
@@ -14,19 +13,13 @@ import java.util.function.Function
  */
 // TODO #532 Workaround
 open class BitbucketCloudConfiguration(
-    private val name: String,
+    override val name: String,
     val workspace: String,
-    private val user: String,
-    private val password: String?
+    override val user: String,
+    override val password: String?
 ) : UserPasswordConfiguration<BitbucketCloudConfiguration> {
 
-    override fun getName(): String = name
-
-    override fun getUser(): String? = user
-
-    override fun getPassword(): String? = password
-
-    override fun getDescriptor() = ConfigurationDescriptor(name, "$name ($workspace)")
+    override val descriptor: ConfigurationDescriptor get() = ConfigurationDescriptor(name, "$name ($workspace)")
 
     override fun obfuscate() = BitbucketCloudConfiguration(
         name = name,
@@ -40,16 +33,6 @@ open class BitbucketCloudConfiguration(
         workspace = workspace,
         user = user,
         password = password ?: ""
-    )
-
-    override fun clone(
-        targetConfigurationName: String,
-        replacementFunction: Function<String, String>
-    ) = BitbucketCloudConfiguration(
-        name = targetConfigurationName,
-        replacementFunction.apply(workspace),
-        user,
-        password
     )
 
 }

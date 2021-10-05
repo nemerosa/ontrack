@@ -14,7 +14,7 @@ class GitFreeTextAnnotatorContributor(
         val projectConfiguration: GitConfiguration? = gitService.getProjectConfiguration(entity.project)
         return listOfNotNull(
                 projectConfiguration?.configuredIssueService
-                        ?.flatMap { it.messageAnnotator }
+                        ?.messageAnnotator
                         ?.orElse(null)
         )
     }

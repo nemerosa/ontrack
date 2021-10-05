@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.stash
 
 import net.nemerosa.ontrack.extension.git.model.GitFreeTextAnnotatorContributor
+import net.nemerosa.ontrack.extension.issues.model.toIdentifier
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
 import net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationProperty

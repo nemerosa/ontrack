@@ -54,7 +54,10 @@ public interface ConfigurationService<T extends UserPasswordConfiguration> {
      * a {@link ConfigurationNotFoundException}
      * exception is thrown.</li>
      * </ul>
+     *
+     * @deprecated Will be removed in V5.
      */
+    @Deprecated
     T replaceConfiguration(T configuration, Function<String, String> replacementFunction) throws ConfigurationNotFoundException;
 
     /**

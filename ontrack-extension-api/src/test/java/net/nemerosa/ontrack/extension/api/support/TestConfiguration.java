@@ -1,10 +1,8 @@
 package net.nemerosa.ontrack.extension.api.support;
 
 import lombok.Data;
-import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
-
-import java.util.function.Function;
+import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 
 @Data
 public class TestConfiguration implements UserPasswordConfiguration<TestConfiguration> {
@@ -17,15 +15,6 @@ public class TestConfiguration implements UserPasswordConfiguration<TestConfigur
     public TestConfiguration withPassword(String password) {
         return new TestConfiguration(
                 name,
-                user,
-                password
-        );
-    }
-
-    @Override
-    public TestConfiguration clone(String targetConfigurationName, Function<String, String> replacementFunction) {
-        return new TestConfiguration(
-                targetConfigurationName,
                 user,
                 password
         );

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.git.model;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.model.support.UserPassword;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -48,13 +49,14 @@ public class BasicGitActualConfiguration implements GitConfiguration {
         return configuration.getRemote();
     }
 
+    @Nullable
     @Override
-    public Optional<UserPassword> getCredentials() {
+    public UserPassword getCredentials() {
         String user = configuration.getUser();
         String password = configuration.getPassword();
         return StringUtils.isNotBlank(user) ?
-                Optional.of(new UserPassword(user, password)) :
-                Optional.empty();
+                new UserPassword(user, password) :
+                null;
     }
 
     @Override
@@ -72,8 +74,9 @@ public class BasicGitActualConfiguration implements GitConfiguration {
         return configuration.getIndexationInterval();
     }
 
+    @Nullable
     @Override
-    public Optional<ConfiguredIssueService> getConfiguredIssueService() {
-        return Optional.ofNullable(configuredIssueService);
+    public ConfiguredIssueService getConfiguredIssueService() {
+        return configuredIssueService;
     }
 }

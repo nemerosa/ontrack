@@ -33,7 +33,7 @@ public class GitChangeLogResourceDecorator extends AbstractResourceDecorator<Git
         boolean issues = false;
         GitConfiguration configuration = gitService.getProjectConfiguration(changeLog.getProject());
         if (configuration != null) {
-            issues = configuration.getConfiguredIssueService().isPresent();
+            issues = true;
         }
         // Links
         return resourceContext.links()

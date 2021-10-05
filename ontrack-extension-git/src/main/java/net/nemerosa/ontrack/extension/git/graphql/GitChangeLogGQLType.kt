@@ -74,11 +74,8 @@ class GitChangeLogGQLType(
                         val gitConfiguration = gitService.getProjectConfiguration(project)
                             ?: return@dataFetcher null
                         // Gets the issue service
-                        val optConfiguredIssueService = gitConfiguration.configuredIssueService
-                        if (!optConfiguredIssueService.isPresent) {
-                            return@dataFetcher null
-                        }
-                        val configuredIssueService = optConfiguredIssueService.get()
+                        val configuredIssueService = gitConfiguration.configuredIssueService
+                            ?: return@dataFetcher null
                         // Gets the issue change log
                         val changeLogIssues = gitService.getChangeLogIssues(gitChangeLog)
                         // List of issues

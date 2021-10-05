@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github
 
+import net.nemerosa.ontrack.extension.issues.model.toIdentifier
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import org.junit.Test
 

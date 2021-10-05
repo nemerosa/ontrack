@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.github.property
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
 import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension
 import net.nemerosa.ontrack.json.asJson
@@ -27,7 +26,7 @@ class GitHubProjectConfigurationPropertyTypeIT : AbstractGitHubTestSupport() {
                 ).asJson())
                 // Gets the issue service configuration
                 assertNotNull(gitHubConfigurator.getConfiguration(this)) { gitConfiguration ->
-                    assertNotNull(gitConfiguration.configuredIssueService.getOrNull()) { configuredIssueService ->
+                    assertNotNull(gitConfiguration.configuredIssueService) { configuredIssueService ->
                         assertIs<GitHubIssueServiceExtension>(configuredIssueService.issueServiceExtension)
                     }
                 }

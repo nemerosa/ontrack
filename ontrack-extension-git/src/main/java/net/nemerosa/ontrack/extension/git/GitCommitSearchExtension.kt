@@ -72,7 +72,7 @@ class GitCommitSearchExtension(
                 logger.isDebugEnabled
         gitService.forEachConfiguredProject(BiConsumer { project, gitConfiguration ->
             logger.info("[search][indexation][git-commits] project=${project.name}")
-            val issueConfig: ConfiguredIssueService? = gitConfiguration.configuredIssueService.orElse(null)
+            val issueConfig: ConfiguredIssueService? = gitConfiguration.configuredIssueService
             val projectIssueKeys = mutableSetOf<String>()
             if (gitService.isRepositorySynched(gitConfiguration)) {
                 logger.info("[search][indexation][git-commits] project=${project.name} Git repository is synched. Indexing all commits...")

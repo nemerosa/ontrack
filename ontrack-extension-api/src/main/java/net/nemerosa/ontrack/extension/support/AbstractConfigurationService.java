@@ -152,24 +152,12 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     protected abstract ConnectionResult validate(T configuration);
 
 
+    /**
+     * Returns itself, no replacement any longer.
+     */
     @Override
     public T replaceConfiguration(T configuration, Function<String, String> replacementFunction) throws ConfigurationNotFoundException {
-        // Tries to replace the configuration name
-        String sourceConfigurationName = configuration.getName();
-        String targetConfigurationName = replacementFunction.apply(sourceConfigurationName);
-        // If not different, we can use the same configuration
-        if (StringUtils.equals(sourceConfigurationName, targetConfigurationName)) {
-            return configuration;
-        }
-        // If different, we need to create a new configuration
-        else if (!securityService.isGlobalFunctionGranted(GlobalSettings.class)) {
-            throw new ConfigurationNotFoundException(targetConfigurationName);
-        } else {
-            // Clones the configuration
-            T targetConfiguration = configuration.clone(targetConfigurationName, replacementFunction);
-            // Saves the configuration
-            return newConfiguration(targetConfiguration);
-        }
+        return configuration;
     }
 
     @Override
