@@ -1,16 +1,16 @@
-package net.nemerosa.ontrack.model.support;
+package net.nemerosa.ontrack.model.support
 
 /**
- * Type of {@linkplain net.nemerosa.ontrack.model.structure.PropertyType property} which gives access to
- * a {@link Configuration configuration}.
+ * Type of [property][net.nemerosa.ontrack.model.structure.PropertyType] which gives access to
+ * a [configuration][Configuration].
  *
  * @param <T> Type of the configuration
  */
-public interface ConfigurationProperty<T extends Configuration<T>> {
+interface ConfigurationProperty<T : Configuration<T>> {
 
     /**
      * Access to the configuration.
      */
-    T getConfiguration();
+    val configuration: T
 
 }

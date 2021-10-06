@@ -1,80 +1,77 @@
-package net.nemerosa.ontrack.extension.api.support;
+package net.nemerosa.ontrack.extension.api.support
 
-import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Text;
-import net.nemerosa.ontrack.model.security.ProjectEdit;
-import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
-import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-import net.nemerosa.ontrack.model.support.ConfigurationPropertyType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.EnumSet;
-import java.util.Set;
-import java.util.function.Function;
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.support.AbstractPropertyType
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.getRequiredTextField
+import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.Form.Companion.create
+import net.nemerosa.ontrack.model.form.Text
+import net.nemerosa.ontrack.model.security.ProjectEdit
+import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.ProjectEntity
+import net.nemerosa.ontrack.model.structure.ProjectEntityType
+import net.nemerosa.ontrack.model.support.ConfigurationPropertyType
+import org.springframework.stereotype.Component
+import java.util.*
+import java.util.function.Function
 
 @Component
-public class TestPropertyType extends AbstractPropertyType<TestProperty> implements ConfigurationPropertyType<TestConfiguration, TestProperty> {
+class TestPropertyType(
+    extensionFeature: TestExtensionFeature
+) : AbstractPropertyType<TestProperty>(extensionFeature),
+    ConfigurationPropertyType<TestConfiguration, TestProperty> {
 
-    @Autowired
-    public TestPropertyType(TestExtensionFeature extensionFeature) {
-        super(extensionFeature);
+    override fun getName(): String {
+        return "Configuration value"
     }
 
-    @Override
-    public String getName() {
-        return "Configuration value";
+    override fun getDescription(): String {
+        return "Value."
     }
 
-    @Override
-    public String getDescription() {
-        return "Value.";
+    override fun getSupportedEntityTypes(): Set<ProjectEntityType> {
+        return EnumSet.allOf(ProjectEntityType::class.java)
     }
 
-    @Override
-    public Set<ProjectEntityType> getSupportedEntityTypes() {
-        return EnumSet.allOf(ProjectEntityType.class);
+    override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
+        return securityService.isProjectFunctionGranted(entity, ProjectEdit::class.java)
     }
 
-    @Override
-    public boolean canEdit(ProjectEntity entity, SecurityService securityService) {
-        return securityService.isProjectFunctionGranted(entity, ProjectEdit.class);
+    override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean {
+        return true
     }
 
-    @Override
-    public boolean canView(ProjectEntity entity, SecurityService securityService) {
-        return true;
+    override fun getEditionForm(entity: ProjectEntity, value: TestProperty): Form {
+        return create()
+            .with(
+                Text.of("value")
+                    .label("Value")
+                    .value(value.value)
+            )
     }
 
-    @Override
-    public Form getEditionForm(ProjectEntity entity, TestProperty value) {
-        return Form.create()
-                .with(
-                        Text.of("value")
-                                .label("Value")
-                                .value(value != null ? value.getValue() : "")
-                )
-                ;
+    override fun forStorage(value: TestProperty): JsonNode =
+        mapOf(
+            TestProperty::configuration.name to value.configuration.name,
+            TestProperty::value.name to value.value,
+        ).asJson()
+
+    override fun fromClient(node: JsonNode): TestProperty {
+        return fromStorage(node)
     }
 
-    @Override
-    public TestProperty fromClient(JsonNode node) {
-        return fromStorage(node);
+    override fun fromStorage(node: JsonNode): TestProperty {
+        return TestProperty(
+            TestConfiguration.config(node.getRequiredTextField(TestProperty::configuration.name)),
+            node.getRequiredTextField(TestProperty::value.name),
+        )
     }
 
-    @Override
-    public TestProperty fromStorage(JsonNode node) {
-        return parse(node, TestProperty.class);
-    }
-
-    @Override
-    public TestProperty replaceValue(TestProperty value, Function<String, String> replacementFunction) {
-        return new TestProperty(
-                value.getConfiguration(),
-                replacementFunction.apply(value.getValue())
-        );
+    override fun replaceValue(value: TestProperty, replacementFunction: Function<String, String>): TestProperty {
+        return TestProperty(
+            value.configuration,
+            replacementFunction.apply(value.value)
+        )
     }
 }
