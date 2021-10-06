@@ -37,7 +37,7 @@ open class GitHubEngineConfiguration(
         when {
             !appId.isNullOrBlank() -> GitHubAuthenticationType.APP
             !oauth2Token.isNullOrBlank() -> when {
-                !user.isNullOrBlank() -> GitHubAuthenticationType.TOKEN
+                user.isNullOrBlank() -> GitHubAuthenticationType.TOKEN
                 else -> GitHubAuthenticationType.USER_TOKEN
             }
             !password.isNullOrBlank() -> GitHubAuthenticationType.PASSWORD
