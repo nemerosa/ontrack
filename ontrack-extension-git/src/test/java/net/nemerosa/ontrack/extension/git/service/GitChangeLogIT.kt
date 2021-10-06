@@ -113,7 +113,7 @@ class GitChangeLogIT : AbstractGitTestSupport() {
     @Test
     fun `Change log for PR based on commits`() {
         createRepo {
-            // 5 commits on master branch
+            // 5 commits on main branch
             commits(5)
             // Creates a feature branch
             git("checkout", "-b", "feature/my-feature")

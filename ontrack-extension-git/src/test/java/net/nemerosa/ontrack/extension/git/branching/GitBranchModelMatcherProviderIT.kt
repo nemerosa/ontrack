@@ -22,7 +22,7 @@ class GitBranchModelMatcherProviderIT : AbstractGitTestSupport() {
         } and { repo, _ ->
             project {
                 gitProject(repo)
-                val master = branch("master") { gitBranch("master") }
+                val main = branch("main") { gitBranch("main") }
                 val develop = branch("develop") { gitBranch("develop") }
                 val release = branch("release-1.0") { gitBranch("release/1.0") }
                 val feature = branch("feature-123-my-feature") { gitBranch("feature/123-my-feature") }
@@ -30,7 +30,7 @@ class GitBranchModelMatcherProviderIT : AbstractGitTestSupport() {
                 val matcher = branchModelMatcherService.getBranchModelMatcher(this)
                 // Checks the branches
                 assertNotNull(matcher) {
-                    assertTrue(it.matches(master), "Master branch matching")
+                    assertTrue(it.matches(main), "main branch matching")
                     assertTrue(it.matches(develop), "Develop branch matching")
                     assertTrue(it.matches(release), "Release branch matching")
                     assertFalse(it.matches(feature), "Feature branch not matching")
@@ -48,12 +48,12 @@ class GitBranchModelMatcherProviderIT : AbstractGitTestSupport() {
                 gitProject(repo)
                 setProperty(this, BranchingModelPropertyType::class.java,
                         BranchingModelProperty(listOf(
-                                NameValue("Development", "master"),
+                                NameValue("Development", "main"),
                                 NameValue("Release", "release/.*")
                         )
                         )
                 )
-                val master = branch("master") { gitBranch("master") }
+                val main = branch("main") { gitBranch("main") }
                 val develop = branch("develop") { gitBranch("develop") }
                 val release = branch("release-1.0") { gitBranch("release/1.0") }
                 val feature = branch("feature-123-my-feature") { gitBranch("feature/123-my-feature") }
@@ -61,7 +61,7 @@ class GitBranchModelMatcherProviderIT : AbstractGitTestSupport() {
                 val matcher = branchModelMatcherService.getBranchModelMatcher(this)
                 // Checks the branches
                 assertNotNull(matcher) {
-                    assertTrue(it.matches(master), "Master branch matching")
+                    assertTrue(it.matches(main), "main branch matching")
                     assertFalse(it.matches(develop), "Develop branch not matching")
                     assertTrue(it.matches(release), "Release branch matching")
                     assertFalse(it.matches(feature), "Feature branch not matching")
@@ -80,13 +80,13 @@ class GitBranchModelMatcherProviderIT : AbstractGitTestSupport() {
                 setProperty(this, BranchingModelPropertyType::class.java,
                         BranchingModelProperty(
                                 patterns = listOf(
-                                        NameValue("Development", "master|gatekeeper"),
+                                        NameValue("Development", "main|gatekeeper"),
                                         NameValue("Maintenance", "maintenance/.*"),
                                         NameValue("Release", "release/.*")
                                 )
                         )
                 )
-                val master = branch("master") { gitBranch("master") }
+                val main = branch("main") { gitBranch("main") }
                 val gatekeeper = branch("gatekeeper") { gitBranch("gatekeeper") }
                 val release = branch("release-1.0.0") { gitBranch("release/1.0.0") }
                 val maintenance = branch("maintenance-1.0") { gitBranch("maintenance/1.0") }
@@ -95,7 +95,7 @@ class GitBranchModelMatcherProviderIT : AbstractGitTestSupport() {
                 val matcher = branchModelMatcherService.getBranchModelMatcher(this)
                 // Checks the branches
                 assertNotNull(matcher) {
-                    assertTrue(it.matches(master), "Master branch matching")
+                    assertTrue(it.matches(main), "main branch matching")
                     assertTrue(it.matches(gatekeeper), "Gatekeeper branch matching")
                     assertTrue(it.matches(maintenance), "Maintenance branch matching")
                     assertTrue(it.matches(release), "Release branch matching")

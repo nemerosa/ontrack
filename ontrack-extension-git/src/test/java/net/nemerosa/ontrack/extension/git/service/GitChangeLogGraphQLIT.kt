@@ -34,7 +34,7 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
             project {
                 gitProject(repo, sync = true)
                 branch {
-                    gitBranch("master") {
+                    gitBranch("main") {
                         commitAsProperty()
                     }
 
@@ -93,7 +93,7 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
             project {
                 gitProject(repo, sync = true)
                 branch {
-                    gitBranch("master") {
+                    gitBranch("main") {
                         commitAsProperty()
                     }
 
@@ -208,7 +208,7 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
             project {
                 gitProject(repo, sync = true)
                 branch {
-                    gitBranch("master") {
+                    gitBranch("main") {
                         commitAsProperty()
                     }
 

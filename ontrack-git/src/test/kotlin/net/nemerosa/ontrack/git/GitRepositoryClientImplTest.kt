@@ -12,7 +12,7 @@ class GitRepositoryClientImplTest {
 
     /**
      * ```
-     *     *   C5 (master)
+     *     *   C5 (main)
      *     | * C4 (2.1)
      *     |/
      *     * C3
@@ -29,7 +29,7 @@ class GitRepositoryClientImplTest {
             commit(3)
             git("checkout", "-b", "2.1")
             commit(4)
-            git("checkout", "master")
+            git("checkout", "main")
             commit(5)
 
             log()
@@ -67,12 +67,12 @@ class GitRepositoryClientImplTest {
             commit(2)
             git("checkout", "-b", "2.1")
             commit(3)
-            git("checkout", "master")
+            git("checkout", "main")
             commit(4)
             git("checkout", "2.1")
             commit(5)
             tag("v2.1")
-            git("checkout", "master")
+            git("checkout", "main")
             git("merge", "--no-ff", "2.1", "--message", "Merge 2.1") // M6
             commit(7)
             commit(8)
@@ -92,7 +92,7 @@ class GitRepositoryClientImplTest {
 
     /**
      * ```
-     *     *   C5 (master)
+     *     *   C5 (main)
      *     | * C4 (2.1)
      *     |/
      *     * C3
@@ -109,14 +109,14 @@ class GitRepositoryClientImplTest {
             commit(3)
             git("checkout", "-b", "2.1")
             commit(4)
-            git("checkout", "master")
+            git("checkout", "main")
             commit(5)
 
             log()
         } and { client, repo ->
             val c1 = repo.commitLookup("Commit 1")
             val messages = mutableListOf<String>()
-            client.forEachCommitFrom("master", c1) { r ->
+            client.forEachCommitFrom("main", c1) { r ->
                 messages.add(r.fullMessage.trim())
                 // Going on
                 null
@@ -135,7 +135,7 @@ class GitRepositoryClientImplTest {
 
     /**
      * ```
-     *     *   C5 (master)
+     *     *   C5 (main)
      *     | * C4 (2.1)
      *     |/
      *     * C3
@@ -152,14 +152,14 @@ class GitRepositoryClientImplTest {
             commit(3)
             git("checkout", "-b", "2.1")
             commit(4)
-            git("checkout", "master")
+            git("checkout", "main")
             commit(5)
 
             log()
         } and { client, repo ->
             val c1 = repo.commitLookup("Commit 1")
             val messages = mutableListOf<String>()
-            client.forEachCommitFrom("master", c1, include = false) { r ->
+            client.forEachCommitFrom("main", c1, include = false) { r ->
                 messages.add(r.fullMessage.trim())
                 // Going on
                 null
@@ -177,7 +177,7 @@ class GitRepositoryClientImplTest {
 
     /**
      * ```
-     *     *   C4 (master)
+     *     *   C4 (main)
      *     | * C3 (2.1)
      *     |/
      *     * C2 (2.0)
@@ -193,7 +193,7 @@ class GitRepositoryClientImplTest {
             commit(2)
             git("checkout", "-b", "2.1")
             commit(3)
-            git("checkout", "master")
+            git("checkout", "main")
             commit(4)
 
             log()
@@ -205,13 +205,13 @@ class GitRepositoryClientImplTest {
                     assertEquals(listOf("2.1"), this)
                 }
                 cloneClient.getBranchesForCommit(cloneRepo.commitLookup("Commit 4")).apply {
-                    assertEquals(listOf("master"), this)
+                    assertEquals(listOf("main"), this)
                 }
                 cloneClient.getBranchesForCommit(cloneRepo.commitLookup("Commit 2")).apply {
                     assertEquals(listOf("2.0", "2.1"), this)
                 }
                 cloneClient.getBranchesForCommit(cloneRepo.commitLookup("Commit 1")).apply {
-                    assertEquals(listOf("2.0", "2.1", "master"), this)
+                    assertEquals(listOf("2.0", "2.1", "main"), this)
                 }
             }
         }
@@ -219,7 +219,7 @@ class GitRepositoryClientImplTest {
 
     /**
      * <pre>
-     *     *   C4 (master)
+     *     *   C4 (main)
      *     | * C3 (2.1)
      *     |/
      *     * C2
@@ -234,7 +234,7 @@ class GitRepositoryClientImplTest {
             commit(2)
             git("checkout", "-b", "2.1")
             commit(3)
-            git("checkout", "master")
+            git("checkout", "main")
             commit(4)
 
             log()
@@ -248,7 +248,7 @@ class GitRepositoryClientImplTest {
                 assertEquals("2.1", branches.branches[0].name)
                 assertEquals("Commit 3", branches.branches[0].commit.shortMessage)
 
-                assertEquals("master", branches.branches[1].name)
+                assertEquals("main", branches.branches[1].name)
                 assertEquals("Commit 4", branches.branches[1].commit.shortMessage)
             }
         }
@@ -330,18 +330,18 @@ class GitRepositoryClientImplTest {
             commit(2)
             git("checkout", "-b", "2.1")
             commit(3)
-            git("checkout", "master")
+            git("checkout", "main")
             commit(4)
             git("checkout", "2.1")
             commit(5)
             tag("v2.1")
-            git("checkout", "master")
+            git("checkout", "main")
             git("merge", "--no-ff", "2.1", "--message", "Merge 2.1") // M6
             commit(7)
             git("checkout", "-b", "2.2")
             commit(8)
             commit(9)
-            git("checkout", "master")
+            git("checkout", "main")
             commit(10)
             git("checkout", "2.2")
             commit(11)
@@ -464,7 +464,7 @@ class GitRepositoryClientImplTest {
                 val branches = cloneClient.remoteBranches
                 // Checks the list
                 assertEquals(
-                        (1..4).map { "feature/$it" } + listOf("master"),
+                        (1..4).map { "feature/$it" } + listOf("main"),
                         branches.sorted()
                 )
             }
@@ -556,17 +556,17 @@ class GitRepositoryClientImplTest {
         commit(2)
         git("checkout", "-b", "2.1")
         commit(3)
-        git("checkout", "master")
+        git("checkout", "main")
         commit(4)
         git("checkout", "2.1")
         commit(5)
         commit(6)
-        git("checkout", "master")
+        git("checkout", "main")
         commit(7)
         commit(8)
         git("checkout", "2.1")
         commit(9)
-        git("checkout", "-b", "2.2", "master")
+        git("checkout", "-b", "2.2", "main")
         commit(10)
         commit(11)
         git("checkout", "2.1")
@@ -574,7 +574,7 @@ class GitRepositoryClientImplTest {
         tag("v2.1")
         git("checkout", "2.2")
         git("merge", "--no-ff", "2.1", "--message", "Merge 2.1->2.2")
-        git("checkout", "master")
+        git("checkout", "main")
         commit(13)
         git("checkout", "2.2")
         commit(14)

@@ -46,7 +46,7 @@ class GitBuildResourceDecorationContributorIT : AbstractGitTestSupport() {
             project {
                 gitProject(repo)
                 branch {
-                    gitBranch("master") {
+                    gitBranch("main") {
                         commitAsProperty()
                     }
                     build {

@@ -13,7 +13,7 @@ import kotlin.test.assertEquals
  * The integration test creates the following Git history for the tests:
  *
  * <pre>
- * * e7c13f8 (HEAD, master) Commit 13
+ * * e7c13f8 (HEAD, main) Commit 13
  * * e7c13f8 Commit 12
  * * e7c13f8 Commit 11
  * * e7c13f8 (tag: 1.0) Commit 10
@@ -61,8 +61,8 @@ class GitGetTagsWhichContainCommitTest {
                 commit(5)
                 git("tag", "1.0-beta-1")
 
-                // Going further with the master
-                git("checkout", "master")
+                // Going further with the main
+                git("checkout", "main")
 
                 // Commits and tags
                 commit(6)

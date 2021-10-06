@@ -83,7 +83,7 @@ class PullRequestStaleBranchCheckIT : AbstractGitTestSupport() {
             project {
                 prGitProject(repo)
                 branch {
-                    gitBranch("master")
+                    gitBranch("main")
                     assertFalse(check.isBranchEligible(this), "Branch is not eligible for PR branch check because not a PR")
                 }
             }

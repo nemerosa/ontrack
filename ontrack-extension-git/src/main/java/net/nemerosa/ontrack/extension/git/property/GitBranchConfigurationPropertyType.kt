@@ -48,7 +48,7 @@ class GitBranchConfigurationPropertyType(
                 .with(
                         Text.of("branch")
                                 .label("Git branch")
-                                .value(value?.branch ?: "master")
+                                .value(value?.branch ?: "main")
                 )
                 .with(
                         ServiceConfigurator.of("buildCommitLink")
@@ -107,7 +107,7 @@ class GitBranchConfigurationPropertyType(
         }
         val indexationAvailable = configuredBuildGitCommitLink != null && configuredBuildGitCommitLink.link is IndexableBuildGitCommitLink<*>
         return GitBranchConfigurationProperty(
-                JsonUtils.get(node, "branch", "master"),
+                JsonUtils.get(node, "branch", "main"),
                 configuredBuildGitCommitLink?.toServiceConfiguration(),
                 indexationAvailable && JsonUtils.getBoolean(node, "override", false),
                 if (indexationAvailable) JsonUtils.getInt(node, "buildTagInterval", 0) else 0

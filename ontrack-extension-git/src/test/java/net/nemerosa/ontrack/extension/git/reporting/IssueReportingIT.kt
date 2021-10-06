@@ -34,7 +34,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
             // Running the query to get the opened issues
             val data = run("""{
                 projects(id: ${project.id}) {
-                    branches(name: "master") {
+                    branches(name: "main") {
                         validationStamps {
                             name
                             validationRunsPaginated(size: 20, passed: false) {
@@ -94,7 +94,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
             // Running the query to get the opened issues
             val data = run("""{
                 projects(id: ${project.id}) {
-                    branches(name: "master") {
+                    branches(name: "main") {
                         validationIssues {
                             validationRuns {
                                 validationStamp {
@@ -145,7 +145,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
             // Running the query to get the opened issues
             val data = run("""{
                 projects(id: ${project.id}) {
-                    branches(name: "master") {
+                    branches(name: "main") {
                         validationIssues(stamp: "VS2") {
                             validationRuns {
                                 validationStamp {
@@ -192,7 +192,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
             // Running the query to get the opened issues
             val data = run("""{
                 projects(id: ${project.id}) {
-                    branches(name: "master") {
+                    branches(name: "main") {
                         validationIssues(passed: false) {
                             validationRuns {
                                 validationStamp {
@@ -243,7 +243,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
             // Running the query to get the opened issues
             val data = run("""{
                 projects(id: ${project.id}) {
-                    branches(name: "master") {
+                    branches(name: "main") {
                         validationIssues(passed: false, status: ["OPEN"]) {
                             validationRuns {
                                 validationStamp {
@@ -290,7 +290,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
             // Running the query to get the opened issues
             val data = run("""{
                 projects(id: ${project.id}) {
-                    branches(name: "master") {
+                    branches(name: "main") {
                         validationStamps {
                             name
                             validationRunsPaginated(size: 20, passed: false) {
@@ -363,7 +363,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
             // Project & branch
             val project = project {
                 gitProject(repo)
-                branch("master") {
+                branch("main") {
                     gitBranch {
                         commitAsProperty()
                     }

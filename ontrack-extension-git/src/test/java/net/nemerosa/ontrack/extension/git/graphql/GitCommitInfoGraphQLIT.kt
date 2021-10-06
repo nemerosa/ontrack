@@ -24,8 +24,8 @@ class GitCommitInfoGraphQLIT : AbstractGitSearchTestSupport() {
             project {
                 gitProject(repo)
                 // Setup
-                branch("master") {
-                    gitBranch("master") {
+                branch("main") {
+                    gitBranch("main") {
                         commitAsProperty()
                     }
                     // Creates some builds on this branch, for some commits only
@@ -74,7 +74,7 @@ class GitCommitInfoGraphQLIT : AbstractGitSearchTestSupport() {
                                                 "branchInfoList" to listOf(
                                                         mapOf(
                                                                 "branch" to mapOf(
-                                                                        "name" to "master"
+                                                                        "name" to "main"
                                                                 ),
                                                                 "firstBuild" to mapOf(
                                                                         "name" to "3"
@@ -97,18 +97,18 @@ class GitCommitInfoGraphQLIT : AbstractGitSearchTestSupport() {
                     (1..3),
                     "release/2.0",
                     4,
-                    "master",
+                    "main",
                     5,
                     "release/2.0",
                     (6..7),
-                    "master",
+                    "main",
                     (8..10)
             )
         } and { repo, commits: Map<Int, String> ->
             project {
                 gitProject(repo)
-                branch("master") {
-                    gitBranch("master") {
+                branch("main") {
+                    gitBranch("main") {
                         commitAsProperty()
                     }
                     // Validations
@@ -184,7 +184,7 @@ class GitCommitInfoGraphQLIT : AbstractGitSearchTestSupport() {
                                                 "branchInfoList" to listOf(
                                                         mapOf(
                                                                 "branch" to mapOf(
-                                                                        "name" to "master"
+                                                                        "name" to "main"
                                                                 ),
                                                                 "firstBuild" to mapOf(
                                                                         "name" to "3"

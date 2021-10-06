@@ -27,7 +27,7 @@ class BranchingModelServiceIT : AbstractGitTestSupport() {
         project {
             setProperty(this, BranchingModelPropertyType::class.java,
                     BranchingModelProperty(listOf(
-                            NameValue("Development", "master|gatekeeper"),
+                            NameValue("Development", "main|gatekeeper"),
                             NameValue("Maintenance", "maintenance/.*"),
                             NameValue("Release", "release/.*")
                     )
@@ -36,7 +36,7 @@ class BranchingModelServiceIT : AbstractGitTestSupport() {
             val model = branchingModelService.getBranchingModel(project)
             assertEquals(
                     mapOf(
-                            "Development" to "master|gatekeeper",
+                            "Development" to "main|gatekeeper",
                             "Maintenance" to "maintenance/.*",
                             "Release" to "release/.*"
                     ),

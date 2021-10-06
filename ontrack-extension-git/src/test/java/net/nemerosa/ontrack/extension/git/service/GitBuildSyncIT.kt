@@ -36,7 +36,7 @@ class GitBuildSyncIT : AbstractServiceTestSupport() {
     private lateinit var jobOrchestrator: JobOrchestrator
 
     @Test
-    fun `Master sync`() {
+    fun `main sync`() {
         // Git repo
         GitRepo.prepare {
 
@@ -84,7 +84,7 @@ class GitBuildSyncIT : AbstractServiceTestSupport() {
                         branch,
                         GitBranchConfigurationPropertyType::class.java,
                         GitBranchConfigurationProperty(
-                                "master",
+                                "main",
                                 ConfiguredBuildGitCommitLink(
                                         tagPatternBuildNameGitCommitLink,
                                         TagPattern("1.2.*")

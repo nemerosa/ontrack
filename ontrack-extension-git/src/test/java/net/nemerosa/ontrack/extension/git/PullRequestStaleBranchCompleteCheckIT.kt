@@ -394,7 +394,7 @@ class PullRequestStaleBranchCompleteCheckIT : AbstractGitTestSupport() {
 
     private fun notAPR() = BranchPRConfiguration("Branch which is not a PR") {
         gitMockingConfigurator.clearPullRequests()
-        it.gitBranch("master") {
+        it.gitBranch("main") {
             commitAsProperty()
         }
     }

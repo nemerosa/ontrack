@@ -14,7 +14,7 @@ class GitBranchModelMatcherProviderGraphQLIT : AbstractGitTestSupport() {
         } and { repo, _ ->
             project {
                 gitProject(repo)
-                branch("master") { gitBranch("master") }
+                branch("main") { gitBranch("main") }
                 branch("develop") { gitBranch("develop") }
                 branch("release-1.0") { gitBranch("release/1.0") }
                 branch("feature-123-my-feature") { gitBranch("feature/123-my-feature") }
@@ -34,7 +34,7 @@ class GitBranchModelMatcherProviderGraphQLIT : AbstractGitTestSupport() {
                 // Checks the branches
                 assertEquals(
                         setOf(
-                                "master",
+                                "main",
                                 "develop",
                                 "release-1.0"
                         ),
@@ -53,12 +53,12 @@ class GitBranchModelMatcherProviderGraphQLIT : AbstractGitTestSupport() {
                 gitProject(repo)
                 setProperty(this, BranchingModelPropertyType::class.java,
                         BranchingModelProperty(listOf(
-                                NameValue("Development", "master"),
+                                NameValue("Development", "main"),
                                 NameValue("Release", "release/.*")
                         )
                         )
                 )
-                branch("master") { gitBranch("master") }
+                branch("main") { gitBranch("main") }
                 branch("develop") { gitBranch("develop") }
                 branch("release-1.0") { gitBranch("release/1.0") }
                 branch("feature-123-my-feature") { gitBranch("feature/123-my-feature") }
@@ -78,7 +78,7 @@ class GitBranchModelMatcherProviderGraphQLIT : AbstractGitTestSupport() {
                 // Checks the branches
                 assertEquals(
                         setOf(
-                                "master",
+                                "main",
                                 "release-1.0"
                         ),
                         names.toSet()
@@ -90,7 +90,7 @@ class GitBranchModelMatcherProviderGraphQLIT : AbstractGitTestSupport() {
     @Test
     fun `List of project branches unrestricted for a non-Git project`() {
         project {
-            branch("master")
+            branch("main")
             branch("develop")
             branch("release-1.0")
             branch("feature-123-my-feature")
@@ -110,7 +110,7 @@ class GitBranchModelMatcherProviderGraphQLIT : AbstractGitTestSupport() {
             // Checks the branches
             assertEquals(
                     setOf(
-                            "master",
+                            "main",
                             "develop",
                             "release-1.0",
                             "feature-123-my-feature"

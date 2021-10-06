@@ -180,7 +180,7 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
      * @param commitLinkConfiguration Returns the build commit link, defaults to [buildNameAsCommit]
      */
     protected fun Branch.gitBranch(
-            branchName: String = "master",
+            branchName: String = "main",
             commitLinkConfiguration: () -> ConfiguredBuildGitCommitLink<*> = { buildNameAsCommit() }
     ) {
         asAdmin().execute {
@@ -275,7 +275,7 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
      */
     private fun GitRepo.runSequence(commands: List<*>, pauses: Boolean): Map<Int, String> {
         val index = mutableMapOf<Int, String>()
-        val branches = mutableSetOf("master")
+        val branches = mutableSetOf("main")
         commands.forEach { command ->
             when (command) {
                 // Branch

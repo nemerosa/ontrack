@@ -30,8 +30,8 @@ class GitIssueInfoGraphQLIT : AbstractGitSearchTestSupport() {
             project {
                 gitProject(repo)
                 // Setup
-                branch("master") {
-                    gitBranch("master") {
+                branch("main") {
+                    gitBranch("main") {
                         commitAsProperty()
                     }
                     // Creates some builds on this branch, for some commits only

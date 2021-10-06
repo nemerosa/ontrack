@@ -23,7 +23,7 @@ class BranchingModel(
          */
         val DEFAULT = BranchingModel(
                 mapOf(
-                        "Development" to "master|develop",
+                        "Development" to "main|master|develop",
                         "Releases" to "release/.*"
                 )
         )

@@ -12,8 +12,8 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
         } and { repo, commits ->
             project {
                 gitProject(repo)
-                branch("master") {
-                    gitBranch("master") {
+                branch("main") {
+                    gitBranch("main") {
                         commitAsProperty()
                     }
                     // Creates some builds on this branch
@@ -27,7 +27,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                     assertBranchInfos(
                             "Development" to listOf(
                                     BranchInfoTest(
-                                            branch = "master",
+                                            branch = "main",
                                             firstBuild = "3"
                                     )
                             )
@@ -44,18 +44,18 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                     (1..3),
                     "release/2.0",
                     4,
-                    "master",
+                    "main",
                     5,
                     "release/2.0",
                     (6..7),
-                    "master",
+                    "main",
                     (8..10)
             )
         } and { repo, commits: Map<Int, String> ->
             project {
                 gitProject(repo)
-                branch("master") {
-                    gitBranch("master") {
+                branch("main") {
+                    gitBranch("main") {
                         commitAsProperty()
                     }
                     // Validations
@@ -88,7 +88,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                     assertBranchInfos(
                             "Development" to listOf(
                                     BranchInfoTest(
-                                            branch = "master",
+                                            branch = "main",
                                             firstBuild = "3",
                                             promotions = listOf(
                                                     "SILVER" to "3"
@@ -118,18 +118,18 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                     (1..3),
                     "release/2.0",
                     4,
-                    "master",
+                    "main",
                     5,
                     "release/2.0",
                     (6..7),
-                    "master",
+                    "main",
                     (8..10)
             )
         } and { repo, commits: Map<Int, String> ->
             project {
                 gitProject(repo)
-                branch("master") {
-                    gitBranch("master") {
+                branch("main") {
+                    gitBranch("main") {
                         commitAsProperty()
                     }
                     // Validations
@@ -166,7 +166,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                     assertBranchInfos(
                             "Development" to listOf(
                                     BranchInfoTest(
-                                            branch = "master",
+                                            branch = "main",
                                             firstBuild = "3",
                                             promotions = listOf(
                                                     "SILVER" to "3"
@@ -196,8 +196,8 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
         } and { repo, commits: Map<Int, String> ->
             project {
                 gitProject(repo)
-                branch("master") {
-                    gitBranch("master") {
+                branch("main") {
+                    gitBranch("main") {
                         buildNameAsCommit(abbreviated = false)
                     }
                     // Creates some builds on this branch
@@ -210,7 +210,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 commitInfoTest(this, commits, 2) {
                     "Development" to listOf(
                             BranchInfoTest(
-                                    branch = "master",
+                                    branch = "main",
                                     firstBuild = "3"
                             )
                     )
@@ -226,8 +226,8 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
         } and { repo, commits: Map<Int, String> ->
             project {
                 gitProject(repo)
-                branch("master") {
-                    gitBranch("master") {
+                branch("main") {
+                    gitBranch("main") {
                         buildNameAsCommit(abbreviated = true)
                     }
                     // Creates some builds on this branch
@@ -240,7 +240,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 commitInfoTest(this, commits, 2) {
                     "Development" to listOf(
                             BranchInfoTest(
-                                    branch = "master",
+                                    branch = "main",
                                     firstBuild = "3"
                             )
                     )
@@ -264,8 +264,8 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
         } and { repo, commits ->
             project {
                 gitProject(repo)
-                branch("master") {
-                    gitBranch("master") {
+                branch("main") {
+                    gitBranch("main") {
                         tagBuildName()
                     }
                     // Creates some builds on this branch, using the tags above
@@ -277,7 +277,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 commitInfoTest(this, commits, 5) {
                     "Development" to listOf(
                             BranchInfoTest(
-                                    branch = "master",
+                                    branch = "main",
                                     firstBuild = "3"
                             )
                     )
@@ -301,8 +301,8 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
         } and { repo, commits ->
             project {
                 gitProject(repo)
-                branch("master") {
-                    gitBranch("master") {
+                branch("main") {
+                    gitBranch("main") {
                         tagPatternBuildName("1.0.*")
                     }
                     // Creates some builds on this branch, using the tags above
@@ -313,7 +313,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 commitInfoTest(this, commits, 5) {
                     "Development" to listOf(
                             BranchInfoTest(
-                                    branch = "master",
+                                    branch = "main",
                                     firstBuild = "3"
                             )
                     )

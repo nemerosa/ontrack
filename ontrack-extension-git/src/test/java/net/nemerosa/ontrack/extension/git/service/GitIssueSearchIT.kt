@@ -25,7 +25,7 @@ class GitIssueSearchIT : AbstractGitTestSupport() {
         } and { repo, _ ->
             project {
                 gitProject(repo)
-                branch("master") {
+                branch("main") {
                     gitBranch {
                         buildNameAsCommit(abbreviated = true)
                     }
@@ -46,7 +46,7 @@ class GitIssueSearchIT : AbstractGitTestSupport() {
                         gitCommitInfo.assertBranchInfos(
                                 "Development" to listOf(
                                         BranchInfoTest(
-                                                branch = "master",
+                                                branch = "main",
                                                 firstBuild = repo.commitLookup("#2 Third commit")
                                         )
                                 )
@@ -62,7 +62,7 @@ class GitIssueSearchIT : AbstractGitTestSupport() {
      *
      * ```
      *     |  |
-     *     *  | Commit #2 (master)
+     *     *  | Commit #2 (main)
      *     |  |
      *     |  * Commit #2 (release/1.0)
      *     |  |
@@ -71,7 +71,7 @@ class GitIssueSearchIT : AbstractGitTestSupport() {
      *     * Commit #2
      * ```
      *
-     * Last commit for issue #2 is located on branch `master` and therefore
+     * Last commit for issue #2 is located on branch `main` and therefore
      * does not have any branch info (because not on a release branch).
      */
     @Test
@@ -80,7 +80,7 @@ class GitIssueSearchIT : AbstractGitTestSupport() {
             val commit1 = commit(1, "Commit #2 one", pause = true)
             git("checkout", "-b", "1.0")
             val commit2 = commit(2, "Commit #2 two", pause = true)
-            git("checkout", "master")
+            git("checkout", "main")
             val commit3 = commit(3, "Commit #2 three", pause = true)
             // Commits index
             mapOf(
@@ -92,8 +92,8 @@ class GitIssueSearchIT : AbstractGitTestSupport() {
             // Creates a project and two branches<
             project {
                 gitProject(repo)
-                branch("master") {
-                    gitBranch("master") {
+                branch("main") {
+                    gitBranch("main") {
                         commitAsProperty()
                     }
                     build("1") {
@@ -127,7 +127,7 @@ class GitIssueSearchIT : AbstractGitTestSupport() {
                         gitCommitInfo.assertBranchInfos(
                                 "Development" to listOf(
                                         BranchInfoTest(
-                                                branch = "master",
+                                                branch = "main",
                                                 firstBuild = "3"
                                         )
                                 )

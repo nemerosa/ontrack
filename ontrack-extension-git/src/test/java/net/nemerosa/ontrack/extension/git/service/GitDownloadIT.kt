@@ -17,7 +17,7 @@ class GitDownloadIT : AbstractGitTestSupport() {
             file("folder/file1", "Content1")
             git("commit", "-m", "Commit 1")
             git("checkout", "-b", "branch1")
-            git("checkout", "master")
+            git("checkout", "main")
             file("folder/file1", "Content2")
             git("commit", "-m", "Commit 2")
             // Identifies the commits
@@ -38,13 +38,13 @@ class GitDownloadIT : AbstractGitTestSupport() {
                         assertEquals("Content1", gitService.download(project, "branch1", "folder/file1"))
                     }
                 }
-                branch("master") {
-                    gitBranch("master") {
+                branch("main") {
+                    gitBranch("main") {
                         buildNameAsCommit()
                     }
                     // Downloads the files for this branch
                     asUser().with(project, ProjectConfig::class.java).call {
-                        assertEquals("Content2", gitService.download(project, "master", "folder/file1"))
+                        assertEquals("Content2", gitService.download(project, "main", "folder/file1"))
                     }
                 }
             }

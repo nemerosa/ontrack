@@ -20,12 +20,12 @@ class GitRepositoryHelperIT : AbstractGitTestSupport() {
         project {
             // Branch for Git
             val configuredBranch = branch {
-                gitBranch("master")
+                gitBranch("main")
             }
             // Branch not configured for Git
             branch {}
-            // Looking for the "master" branch should return the configured branch
-            assertNotNull(gitRepositoryHelper.findBranchWithProjectAndGitBranch(this, "master")) {
+            // Looking for the "main" branch should return the configured branch
+            assertNotNull(gitRepositoryHelper.findBranchWithProjectAndGitBranch(this, "main")) {
                 assertEquals(configuredBranch.id(), it)
             }
             // Looking for any other branch should not return anything
