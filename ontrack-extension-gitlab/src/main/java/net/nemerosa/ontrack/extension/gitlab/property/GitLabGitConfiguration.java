@@ -2,10 +2,9 @@ package net.nemerosa.ontrack.extension.gitlab.property;
 
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
-import net.nemerosa.ontrack.model.support.UserPassword;
+import net.nemerosa.ontrack.git.GitRepositoryAuthenticator;
+import net.nemerosa.ontrack.git.UsernamePasswordGitRepositoryAuthenticator;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
 
 import static java.lang.String.format;
 
@@ -46,8 +45,8 @@ public class GitLabGitConfiguration implements GitConfiguration {
 
     @Nullable
     @Override
-    public UserPassword getCredentials() {
-        return new UserPassword(
+    public GitRepositoryAuthenticator getAuthenticator() {
+        return new UsernamePasswordGitRepositoryAuthenticator(
                 property.getConfiguration().getUser(),
                 property.getConfiguration().getPassword()
         );

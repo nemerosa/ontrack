@@ -39,7 +39,7 @@ class GitRepo(val dir: File) : AutoCloseable {
                     "file",
                     "test",
                     origin.dir.absolutePath,
-                    "", ""
+                    authenticator = null
             )
             // Creates the client
             return GitRepositoryClientImpl(
@@ -56,7 +56,7 @@ class GitRepo(val dir: File) : AutoCloseable {
     val client: GitRepositoryClient
         get() = GitRepositoryClientImpl(
                 dir,
-                GitRepository("test", "test", "", "", "")
+                GitRepository("test", "test", "", authenticator = null)
         )
 
     /**

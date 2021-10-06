@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.common.Utils
 import net.nemerosa.ontrack.git.GitRepository
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.exceptions.*
+import net.nemerosa.ontrack.git.getCredentialsProvider
 import net.nemerosa.ontrack.git.model.*
 import net.nemerosa.ontrack.git.model.plot.GitPlotRenderer
 import org.apache.commons.io.FileUtils
@@ -26,7 +27,6 @@ import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.revwalk.filter.MessageRevFilter
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.eclipse.jgit.transport.CredentialsProvider
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.eclipse.jgit.treewalk.AbstractTreeIterator
 import org.eclipse.jgit.treewalk.CanonicalTreeParser
 import org.slf4j.LoggerFactory
@@ -168,11 +168,7 @@ class GitRepositoryClientImpl(
         // Gets the Git
         git = Git(gitRepository)
         // Credentials
-        credentialsProvider = if (StringUtils.isNotBlank(repository.user)) {
-            UsernamePasswordCredentialsProvider(repository.user, repository.password)
-        } else {
-            null
-        }
+        credentialsProvider = repository.authenticator?.getCredentialsProvider()
     }
 
     /**
@@ -480,7 +476,7 @@ class GitRepositoryClientImpl(
 
     override fun download(branch: String, path: String): String? {
         // Sync first
-        sync(Consumer { logger.debug(it) })
+        sync { logger.debug(it) }
         // Git show
         return GitClientSupport.showPath(repositoryDir, getBranchRef(branch), path)
     }

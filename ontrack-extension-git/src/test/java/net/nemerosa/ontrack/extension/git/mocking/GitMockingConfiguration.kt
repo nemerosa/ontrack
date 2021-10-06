@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.git.mocking
 
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
-import net.nemerosa.ontrack.model.support.UserPassword
+import net.nemerosa.ontrack.git.GitRepositoryAuthenticator
 
 class GitMockingConfiguration : GitConfiguration {
 
@@ -12,7 +12,7 @@ class GitMockingConfiguration : GitConfiguration {
 
     override val name: String = "Mocking"
 
-    override val credentials: UserPassword? = null
+    override val authenticator: GitRepositoryAuthenticator? = null
 
     override val type: String = "mocking"
 

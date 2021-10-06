@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.git.model
 
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
-import net.nemerosa.ontrack.model.support.UserPassword
+import net.nemerosa.ontrack.git.GitRepositoryAuthenticator
 
 /**
  * Definition of a Git configuration.
@@ -24,10 +24,9 @@ interface GitConfiguration {
     val remote: String
 
     /**
-     * Credentials
+     * Authentication mode
      */
-    @Deprecated("One cannot use user/password in all cases. This method will be deleted in the context of issue #881.")
-    val credentials: UserPassword?
+    val authenticator: GitRepositoryAuthenticator?
 
     /**
      * Link to a commit, using {commit} as placeholder

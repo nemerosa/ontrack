@@ -2,7 +2,8 @@ package net.nemerosa.ontrack.extension.bitbucket.cloud.property
 
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
-import net.nemerosa.ontrack.model.support.UserPassword
+import net.nemerosa.ontrack.git.GitRepositoryAuthenticator
+import net.nemerosa.ontrack.git.UsernamePasswordGitRepositoryAuthenticator
 
 class BitbucketCloudGitConfiguration(
     val property: BitbucketCloudProjectConfigurationProperty,
@@ -16,9 +17,9 @@ class BitbucketCloudGitConfiguration(
     override val remote: String =
         "https://bitbucket.org/${property.configuration.workspace}/${property.repository}.git"
 
-    override val credentials: UserPassword =
-        property.configuration.run {
-            UserPassword(user ?: "", password ?: "")
+    override val authenticator: GitRepositoryAuthenticator?
+        get() = property.configuration.run {
+            UsernamePasswordGitRepositoryAuthenticator(user ?: "", password ?: "")
         }
 
     override val commitLink: String =

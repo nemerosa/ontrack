@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.git.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation
 import net.nemerosa.ontrack.git.GitRepository
+import net.nemerosa.ontrack.git.UsernamePasswordGitRepositoryAuthenticator
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
 import net.nemerosa.ontrack.model.form.Password
@@ -100,8 +101,9 @@ open class BasicGitConfiguration(
                 TYPE,
                 name,
                 remote,
-                user ?: "",
-                password ?: "",
+                user?.takeIf { it.isNotBlank() }?.let {
+                    UsernamePasswordGitRepositoryAuthenticator(it, password ?: "")
+                },
             )
         }
 

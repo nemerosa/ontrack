@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.git.model;
 
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
+import net.nemerosa.ontrack.git.GitRepositoryAuthenticator;
+import net.nemerosa.ontrack.git.UsernamePasswordGitRepositoryAuthenticator;
 import net.nemerosa.ontrack.model.support.UserPassword;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
 
 /**
  * Git configuration based on direct definition.
@@ -51,11 +51,11 @@ public class BasicGitActualConfiguration implements GitConfiguration {
 
     @Nullable
     @Override
-    public UserPassword getCredentials() {
+    public GitRepositoryAuthenticator getAuthenticator() {
         String user = configuration.getUser();
         String password = configuration.getPassword();
         return StringUtils.isNotBlank(user) ?
-                new UserPassword(user, password) :
+                new UsernamePasswordGitRepositoryAuthenticator(user, password == null ? "" : password) :
                 null;
     }
 

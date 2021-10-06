@@ -331,13 +331,6 @@ class DefaultOntrackGitHubClient(
         }
         .build()
 
-    private fun GitHubAppTokenService.getAppInstallationToken(configuration: GitHubEngineConfiguration): String =
-        if (configuration.authenticationType() == GitHubAuthenticationType.APP) {
-            getAppInstallationToken(configuration.name, configuration.appId!!, configuration.appPrivateKey!!, configuration.appInstallationAccountName)
-        } else {
-            error("This configuration is not using a GitHub App.")
-        }
-
     override fun createGitHubClient(): GitHubClient {
         // GitHub client (non authentified)
         val client: GitHubClient = object : GitHubClient() {
