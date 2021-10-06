@@ -196,7 +196,7 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalStateException.class)
     public void update_name_check() throws Exception {
         asUser().with(GlobalSettings.class).call(() -> {
             configurationService.updateConfiguration("test", config("testx"));

@@ -7,21 +7,16 @@ import net.nemerosa.ontrack.model.events.Event;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.EncryptionService;
-import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.support.ConfigurationNotFoundException;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 import static net.nemerosa.ontrack.extension.api.support.TestConfiguration.PLAIN_PASSWORD;
 import static net.nemerosa.ontrack.extension.api.support.TestConfiguration.config;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.*;
 
 public class ConfigurationServiceTest {
@@ -49,37 +44,6 @@ public class ConfigurationServiceTest {
                 eventFactory,
                 ontrackConfigProperties
         );
-    }
-
-    @Test
-    public void replace_configuration_same() {
-        TestConfiguration config = config("test");
-        TestConfiguration replacedConfig = configurationService.replaceConfiguration(
-                config,
-                Function.identity()
-        );
-        assertSame("Same config is returned", config, replacedConfig);
-    }
-
-    @Test(expected = ConfigurationNotFoundException.class)
-    public void replace_configuration_different_not_authorised() {
-        TestConfiguration config = config("test");
-        when(securityService.isGlobalFunctionGranted(GlobalSettings.class)).thenReturn(false);
-        configurationService.replaceConfiguration(
-                config,
-                s -> s.replaceAll("test", "new")
-        );
-    }
-
-    @Test
-    public void replace_configuration_different_authorised() {
-        TestConfiguration config = config("test");
-        when(securityService.isGlobalFunctionGranted(GlobalSettings.class)).thenReturn(true);
-        TestConfiguration replacedConfig = configurationService.replaceConfiguration(
-                config,
-                s -> s.replaceAll("test", "new")
-        );
-        assertEquals(config("new").withPassword(""), replacedConfig);
     }
 
     @Test
