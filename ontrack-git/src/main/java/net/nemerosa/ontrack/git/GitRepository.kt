@@ -9,10 +9,10 @@ package net.nemerosa.ontrack.git
  * @property authenticator Authentication mechanism to use for this repository
  */
 class GitRepository(
-        val type: String,
-        val name: String,
-        val remote: String,
-        val authenticator: GitRepositoryAuthenticator? = null,
+    val type: String,
+    val name: String,
+    val remote: String,
+    val authenticator: GitRepositoryAuthenticator? = null,
 ) {
     val id: String = (type + "_" + name + "_" + remote).replace("[:.\\\\/@]".toRegex(), "_")
 }

@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.common.Utils
 import net.nemerosa.ontrack.git.GitRepository
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.exceptions.*
-import net.nemerosa.ontrack.git.getCredentialsProvider
 import net.nemerosa.ontrack.git.model.*
 import net.nemerosa.ontrack.git.model.plot.GitPlotRenderer
 import org.apache.commons.io.FileUtils
@@ -41,8 +40,8 @@ import java.util.function.Predicate
 import java.util.stream.Stream
 
 class GitRepositoryClientImpl(
-        private val repositoryDir: File,
-        private val repository: GitRepository
+    private val repositoryDir: File,
+    private val repository: GitRepository
 ) : GitRepositoryClient {
 
     private val logger = LoggerFactory.getLogger(GitRepositoryClient::class.java)
@@ -59,7 +58,7 @@ class GitRepositoryClientImpl(
         get() {
             try {
                 return git.lsRemote().setHeads(true).call()
-                        .map { ref -> StringUtils.removeStart(ref.name, "refs/heads/") }
+                    .map { ref -> StringUtils.removeStart(ref.name, "refs/heads/") }
             } catch (e: GitAPIException) {
                 throw GitRepositoryAPIException(repository.remote, e)
             }
@@ -91,8 +90,8 @@ class GitRepositoryClientImpl(
                     }
                 }
                 GitBranchesInfo(
-                        index.entries
-                                .map { entry -> GitBranchInfo(entry.key, entry.value) }
+                    index.entries
+                        .map { entry -> GitBranchInfo(entry.key, entry.value) }
                 )
             } catch (e: GitAPIException) {
                 throw GitRepositoryAPIException(repository.remote, e)
@@ -126,9 +125,9 @@ class GitRepositoryClientImpl(
     override fun getBranchesForCommit(commit: String): List<String> {
         try {
             val list = git.branchList()
-                    .setContains(commit)
-                    .setListMode(ListBranchCommand.ListMode.REMOTE)
-                    .call()
+                .setContains(commit)
+                .setListMode(ListBranchCommand.ListMode.REMOTE)
+                .call()
             return list.asSequence().map {
                 StringUtils.removeStart(it.name, "refs/remotes/origin/")
             }.map {
@@ -147,7 +146,7 @@ class GitRepositoryClientImpl(
                 val repo = git.repository
                 val revWalk = RevWalk(repo)
                 return repo.refDatabase.getRefs(Constants.R_TAGS).values
-                        .map { ref -> getGitTagFromRef(revWalk, ref) }
+                    .map { ref -> getGitTagFromRef(revWalk, ref) }
             } catch (e: IOException) {
                 throw GitRepositoryIOException(repository.remote, e)
             }
@@ -158,9 +157,9 @@ class GitRepositoryClientImpl(
         val gitRepository: Repository
         try {
             gitRepository = FileRepositoryBuilder()
-                    .setWorkTree(repositoryDir)
-                    .findGitDir(repositoryDir)
-                    .build()
+                .setWorkTree(repositoryDir)
+                .findGitDir(repositoryDir)
+                .build()
         } catch (e: IOException) {
             throw GitRepositoryInitException(e)
         }
@@ -178,10 +177,13 @@ class GitRepositoryClientImpl(
         logger.debug(format("[git] Listing the remote heads in %s", repository.remote))
         try {
             git.lsRemote()
-                    .setRemote(repository.remote)
-                    .setHeads(true)
-                    .setCredentialsProvider(credentialsProvider)
-                    .call()
+                .setRemote(repository.remote)
+                .setHeads(true)
+                .setTransportConfigCallback { transport ->
+                    repository.authenticator?.configureTransport(transport)
+                }
+                .setCredentialsProvider(credentialsProvider)
+                .call()
         } catch (e: GitAPIException) {
             throw GitTestException(e.message)
         }
@@ -212,8 +214,8 @@ class GitRepositoryClientImpl(
         logger.accept(format("[git] Pulling %s", repository.remote))
         try {
             git.fetch()
-                    .setCredentialsProvider(credentialsProvider)
-                    .call()
+                .setCredentialsProvider(credentialsProvider)
+                .call()
         } catch (e: GitAPIException) {
             throw GitRepositoryAPIException(repository.remote, e)
         }
@@ -226,10 +228,10 @@ class GitRepositoryClientImpl(
         logger.accept(format("[git] Cloning %s", repository.remote))
         try {
             CloneCommand()
-                    .setCredentialsProvider(credentialsProvider)
-                    .setDirectory(repositoryDir)
-                    .setURI(repository.remote)
-                    .call()
+                .setCredentialsProvider(credentialsProvider)
+                .setDirectory(repositoryDir)
+                .setURI(repository.remote)
+                .call()
         } catch (e: GitAPIException) {
             throw GitRepositoryAPIException(repository.remote, e)
         }
@@ -247,10 +249,10 @@ class GitRepositoryClientImpl(
     }
 
     override fun <T> forEachCommitFrom(
-            branch: String,
-            commit: String,
-            include: Boolean,
-            code: (RevCommit) -> T?
+        branch: String,
+        commit: String,
+        include: Boolean,
+        code: (RevCommit) -> T?
     ): T? {
         try {
             val gitRepository = git.repository
@@ -266,8 +268,8 @@ class GitRepositoryClientImpl(
             }
 
             val oHead: ObjectId = gitRepository.resolve(getBranchRef(branch))
-                    ?: gitRepository.resolve("refs/heads/$branch")
-                    ?: throw IllegalStateException("Cannot resolve commit for branch $branch")
+                ?: gitRepository.resolve("refs/heads/$branch")
+                ?: throw IllegalStateException("Cannot resolve commit for branch $branch")
 
             val walk = RevWalk(gitRepository)
 
@@ -299,8 +301,8 @@ class GitRepositoryClientImpl(
     override fun forEachCommit(code: (GitCommit) -> Unit) {
         try {
             git.log().all().call()
-                    .map { toCommit(it) }
-                    .forEach(code)
+                .map { toCommit(it) }
+                .forEach(code)
         } catch (_: NoHeadException) {
             // Ignoring this error, nothing to scan
         } catch (e: GitAPIException) {
@@ -319,10 +321,10 @@ class GitRepositoryClientImpl(
                 emptyList<GitCommit>().stream()
             } else {
                 git.log()
-                        .addRange(oFrom, oTo)
-                        .call()
-                        .map { this.toCommit(it) }
-                        .stream()
+                    .addRange(oFrom, oTo)
+                    .call()
+                    .map { this.toCommit(it) }
+                    .stream()
             }
         } catch (_: NoHeadException) {
             // Ignoring this error, nothing to scan
@@ -355,8 +357,8 @@ class GitRepositoryClientImpl(
 
             // OK
             return GitLog(
-                    plot,
-                    commits
+                plot,
+                commits
             )
 
         } catch (e: IOException) {
@@ -370,9 +372,9 @@ class GitRepositoryClientImpl(
         // In the Git repo is wrongly configured, the token is considered at not found
         return try {
             val log = git.log()
-                    .all()
-                    .setRevFilter(MessageRevFilter.create(token))
-                    .setMaxCount(1)
+                .all()
+                .setRevFilter(MessageRevFilter.create(token))
+                .setMaxCount(1)
             val commits = log.call()
             commits.iterator().hasNext()
         } catch (e: GitAPIException) {
@@ -388,8 +390,8 @@ class GitRepositoryClientImpl(
             val resolvedBranch = git.repository.resolve(getBranchRef(branch))
             return if (resolvedBranch != null) {
                 val log = git.log()
-                        .setRevFilter(MessageRevFilter.create("($regex)"))
-                        .setMaxCount(1)
+                    .setRevFilter(MessageRevFilter.create("($regex)"))
+                    .setMaxCount(1)
                 val commits = log.call()
                 val i = commits.iterator()
                 if (i.hasNext()) {
@@ -411,9 +413,9 @@ class GitRepositoryClientImpl(
     override fun getLastCommitForExpression(regex: String): String? {
         return try {
             val log = git.log()
-                    .all()
-                    .setRevFilter(MessageRevFilter.create(regex))
-                    .setMaxCount(1)
+                .all()
+                .setRevFilter(MessageRevFilter.create(regex))
+                .setMaxCount(1)
             val commits = log.call()
             val i = commits.iterator()
             if (i.hasNext()) {
@@ -447,10 +449,10 @@ class GitRepositoryClientImpl(
 
             // Diff command
             var entries = git.diff()
-                    .setShowNameAndStatusOnly(true)
-                    .setOldTree(getTreeIterator(range.from.id))
-                    .setNewTree(getTreeIterator(range.to.id))
-                    .call()
+                .setShowNameAndStatusOnly(true)
+                .setOldTree(getTreeIterator(range.from.id))
+                .setNewTree(getTreeIterator(range.to.id))
+                .call()
 
             // Filtering the entries
             entries = entries.filter { entry -> pathFilter.test(entry.oldPath) || pathFilter.test(entry.newPath) }
@@ -505,22 +507,22 @@ class GitRepositoryClientImpl(
 
             // Diff command
             val entries = git.diff()
-                    .setShowNameAndStatusOnly(true)
-                    .setOldTree(getTreeIterator(range.from.id))
-                    .setNewTree(getTreeIterator(range.to.id))
-                    .call()
+                .setShowNameAndStatusOnly(true)
+                .setOldTree(getTreeIterator(range.from.id))
+                .setNewTree(getTreeIterator(range.to.id))
+                .call()
 
             // OK
             return GitDiff(
-                    range.from,
-                    range.to,
-                    entries.map { diff ->
-                        GitDiffEntry(
-                                toChangeType(diff.changeType),
-                                diff.oldPath,
-                                diff.newPath
-                        )
-                    }
+                range.from,
+                range.to,
+                entries.map { diff ->
+                    GitDiffEntry(
+                        toChangeType(diff.changeType),
+                        diff.oldPath,
+                        diff.newPath
+                    )
+                }
             )
 
         } catch (e: GitAPIException) {
@@ -548,16 +550,16 @@ class GitRepositoryClientImpl(
 
     private fun getGitTagFromRef(revWalk: RevWalk, ref: Ref): GitTag {
         val tagName = StringUtils.substringAfter(
-                ref.name,
-                Constants.R_TAGS
+            ref.name,
+            Constants.R_TAGS
         )
         try {
             val revCommit = revWalk.parseCommit(ref.objectId)
             val commitTime = revCommit.commitTime
             val tagTime = Time.from(commitTime * 1000L)
             return GitTag(
-                    tagName,
-                    tagTime
+                tagName,
+                tagTime
             )
         } catch (e: IOException) {
             throw GitRepositoryIOException(repository.remote, e)
@@ -594,20 +596,20 @@ class GitRepositoryClientImpl(
 
     override fun toCommit(revCommit: RevCommit): GitCommit {
         return GitCommit(
-                getId(revCommit),
-                getShortId(revCommit),
-                toPerson(revCommit.authorIdent),
-                toPerson(revCommit.committerIdent),
-                Time.from(1000L * revCommit.commitTime),
-                revCommit.fullMessage,
-                revCommit.shortMessage
+            getId(revCommit),
+            getShortId(revCommit),
+            toPerson(revCommit.authorIdent),
+            toPerson(revCommit.committerIdent),
+            Time.from(1000L * revCommit.commitTime),
+            revCommit.fullMessage,
+            revCommit.shortMessage
         )
     }
 
     private fun toPerson(ident: PersonIdent): GitPerson {
         return GitPerson(
-                ident.name,
-                ident.emailAddress
+            ident.name,
+            ident.emailAddress
         )
     }
 

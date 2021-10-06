@@ -5,7 +5,7 @@ plugins {
 description = "Git client for Ontrack."
 
 dependencies {
-    api("org.eclipse.jgit:org.eclipse.jgit:4.11.5.201810191925-r")
+    api("org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r")
 
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework:spring-context")
