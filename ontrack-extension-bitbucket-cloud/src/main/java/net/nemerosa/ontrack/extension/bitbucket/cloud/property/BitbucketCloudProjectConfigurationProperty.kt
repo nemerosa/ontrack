@@ -13,13 +13,11 @@ import net.nemerosa.ontrack.model.support.ConfigurationProperty
  * with this repository.
  */
 class BitbucketCloudProjectConfigurationProperty(
-    private val configuration: BitbucketCloudConfiguration,
+    override val configuration: BitbucketCloudConfiguration,
     val repository: String,
     val indexationInterval: Int,
     val issueServiceConfigurationIdentifier: String?
 ) : ConfigurationProperty<BitbucketCloudConfiguration> {
-
-    override fun getConfiguration(): BitbucketCloudConfiguration = configuration
 
     /**
      * Gets the URL to the repository

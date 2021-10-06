@@ -11,10 +11,8 @@ import net.nemerosa.ontrack.model.support.ConfigurationProperty
  * @property indexationInterval Indexation interval
  */
 class GitLabProjectConfigurationProperty(
-        private val configuration: GitLabConfiguration,
-        val issueServiceConfigurationIdentifier: String?,
-        val repository: String,
-        val indexationInterval: Int
-) : ConfigurationProperty<GitLabConfiguration> {
-    override fun getConfiguration(): GitLabConfiguration = configuration
-}
+    override val configuration: GitLabConfiguration,
+    val issueServiceConfigurationIdentifier: String?,
+    val repository: String,
+    val indexationInterval: Int
+) : ConfigurationProperty<GitLabConfiguration>

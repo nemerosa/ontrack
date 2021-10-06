@@ -12,14 +12,12 @@ import net.nemerosa.ontrack.model.support.ConfigurationProperty
  * with this repository.
  */
 class StashProjectConfigurationProperty(
-        private val configuration: StashConfiguration,
+        override val configuration: StashConfiguration,
         val project: String,
         val repository: String,
         val indexationInterval: Int,
         val issueServiceConfigurationIdentifier: String?
 ) : ConfigurationProperty<StashConfiguration> {
-
-    override fun getConfiguration(): StashConfiguration = configuration
 
     /**
      * Link to the repository

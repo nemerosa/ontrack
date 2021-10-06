@@ -11,10 +11,9 @@ import net.nemerosa.ontrack.model.support.ConfigurationProperty
  * with this repository.
  */
 class GitHubProjectConfigurationProperty(
-        private val configuration: GitHubEngineConfiguration,
-        val repository: String,
-        val indexationInterval: Int,
-        val issueServiceConfigurationIdentifier: String?
-) : ConfigurationProperty<GitHubEngineConfiguration> {
-    override fun getConfiguration(): GitHubEngineConfiguration = configuration
-}
+    override val configuration: GitHubEngineConfiguration,
+    val repository: String,
+    val indexationInterval: Int,
+    val issueServiceConfigurationIdentifier: String?
+) : ConfigurationProperty<GitHubEngineConfiguration>
+

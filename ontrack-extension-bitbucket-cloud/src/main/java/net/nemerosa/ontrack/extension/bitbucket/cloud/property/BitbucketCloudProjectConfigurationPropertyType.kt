@@ -108,7 +108,7 @@ class BitbucketCloudProjectConfigurationPropertyType(
         value: BitbucketCloudProjectConfigurationProperty,
         replacementFunction: Function<String, String>
     ): BitbucketCloudProjectConfigurationProperty = BitbucketCloudProjectConfigurationProperty(
-        configurationService.replaceConfiguration(value.getConfiguration(), replacementFunction),
+        value.configuration,
         replacementFunction.apply(value.repository),
         value.indexationInterval,
         value.issueServiceConfigurationIdentifier

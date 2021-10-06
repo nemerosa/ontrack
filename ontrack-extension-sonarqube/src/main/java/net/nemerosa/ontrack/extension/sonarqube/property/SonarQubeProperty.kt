@@ -6,15 +6,14 @@ import net.nemerosa.ontrack.model.support.ConfigurationProperty
 import java.net.URLEncoder
 
 class SonarQubeProperty(
-        private val configuration: SonarQubeConfiguration,
-        val key: String,
-        val validationStamp: String,
-        override val measures: List<String>,
-        val override: Boolean,
-        val branchModel: Boolean,
-        val branchPattern: String?
+    override val configuration: SonarQubeConfiguration,
+    val key: String,
+    val validationStamp: String,
+    override val measures: List<String>,
+    val override: Boolean,
+    val branchModel: Boolean,
+    val branchPattern: String?
 ) : ConfigurationProperty<SonarQubeConfiguration>, SonarQubeMeasuresList {
-    override fun getConfiguration(): SonarQubeConfiguration = configuration
 
     val projectUrl: String
         get() = "${configuration.url}/dashboard?id=${URLEncoder.encode(key, "UTF-8")}"
