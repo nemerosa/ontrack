@@ -1,40 +1,36 @@
-package net.nemerosa.ontrack.extension.api.support;
+package net.nemerosa.ontrack.extension.api.support
 
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
-import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
+import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
+import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 
-public class TestConfiguration extends UserPasswordConfiguration<TestConfiguration> {
+class TestConfiguration(
+    name: String, user: String, password: String?
+) : UserPasswordConfiguration<TestConfiguration>(
+    name, user, password
+) {
 
-    public TestConfiguration(String name, String user, String password) {
-        super(name, user, password);
+    override fun withPassword(password: String?): TestConfiguration {
+        return TestConfiguration(
+            name,
+            user ?: "",
+            password
+        )
     }
 
-    @Override
-    public TestConfiguration withPassword(String password) {
-        return new TestConfiguration(
-                getName(),
-                getUser(),
-                password
-        );
+    override val descriptor: ConfigurationDescriptor
+        get() = ConfigurationDescriptor("test", name)
+
+    override fun obfuscate(): TestConfiguration {
+        return TestConfiguration(
+            name,
+            user ?: "",
+            ""
+        )
     }
 
-    @Override
-    public ConfigurationDescriptor getDescriptor() {
-        return new ConfigurationDescriptor("test", getName());
-    }
-
-    @Override
-    public TestConfiguration obfuscate() {
-        return new TestConfiguration(
-                getName(),
-                getUser(),
-                ""
-        );
-    }
-
-    public static final String PLAIN_PASSWORD = "verysecret";
-
-    public static TestConfiguration config(String name) {
-        return new TestConfiguration(name, "user", PLAIN_PASSWORD);
+    companion object {
+        const val PLAIN_PASSWORD = "verysecret"
+        @JvmStatic
+        fun config(name: String) = TestConfiguration(name, "user", PLAIN_PASSWORD)
     }
 }

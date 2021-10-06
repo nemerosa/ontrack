@@ -22,7 +22,6 @@ import static org.mockito.Mockito.*;
 public class ConfigurationServiceTest {
 
     private TestConfigurationService configurationService;
-    private SecurityService securityService;
     private EventPostService eventPostService;
     private EventFactory eventFactory;
     private ConfigurationRepository configurationRepository;
@@ -31,7 +30,7 @@ public class ConfigurationServiceTest {
     @Before
     public void before() {
         configurationRepository = mock(ConfigurationRepository.class);
-        securityService = mock(SecurityService.class);
+        SecurityService securityService = mock(SecurityService.class);
         encryptionService = mock(EncryptionService.class);
         eventPostService = mock(EventPostService.class);
         eventFactory = mock(EventFactory.class);
