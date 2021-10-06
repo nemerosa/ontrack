@@ -13,13 +13,13 @@ import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
  * Configuration for accessing a GitLab application.
  */
 open class GitLabConfiguration(
-    override val name: String,
+    name: String,
     val url: String,
-    override val user: String?,
-    override val password: String?,
+    user: String?,
+    password: String?,
     @get:JsonProperty("ignoreSslCertificate")
     val isIgnoreSslCertificate: Boolean
-) : UserPasswordConfiguration<GitLabConfiguration> {
+) : UserPasswordConfiguration<GitLabConfiguration>(name, user, password) {
 
     override val descriptor = ConfigurationDescriptor(
         name,

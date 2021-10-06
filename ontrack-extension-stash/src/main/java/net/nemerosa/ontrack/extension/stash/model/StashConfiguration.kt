@@ -18,11 +18,11 @@ import java.lang.String.format
  */
 // TODO #532 Workaround
 open class StashConfiguration(
-    override val name: String,
+    name: String,
     val url: String,
-    override val user: String?,
-    override val password: String?
-) : UserPasswordConfiguration<StashConfiguration> {
+    user: String?,
+    password: String?
+) : UserPasswordConfiguration<StashConfiguration>(name, user, password) {
 
     /**
      * Checks if this configuration denotes any Bitbucket Cloud instance

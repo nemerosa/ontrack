@@ -8,11 +8,11 @@ import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 
 open class ArtifactoryConfiguration(
-    override val name: String,
+    name: String,
     val url: String,
-    override val user: String?,
-    override val password: String?
-) : UserPasswordConfiguration<ArtifactoryConfiguration> {
+    user: String?,
+    password: String?
+) : UserPasswordConfiguration<ArtifactoryConfiguration>(name, user, password) {
 
     override fun obfuscate(): ArtifactoryConfiguration {
         return ArtifactoryConfiguration(

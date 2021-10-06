@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-public interface ConfigurationService<T extends UserPasswordConfiguration> {
+public interface ConfigurationService<T extends Configuration<T>> {
 
     List<T> getConfigurations();
 

@@ -44,14 +44,6 @@ public class GitLabConfigurationServiceImpl extends AbstractConfigurationService
         this.applicationLogService = applicationLogService;
     }
 
-    /**
-     * No need to inject a password since this is not supported.
-     */
-    @Override
-    protected GitLabConfiguration injectCredentials(GitLabConfiguration configuration) {
-        return configuration;
-    }
-
     @Override
     protected ConnectionResult validate(GitLabConfiguration configuration) {
         try {
@@ -64,10 +56,10 @@ public class GitLabConfigurationServiceImpl extends AbstractConfigurationService
         } catch (Exception ex) {
             applicationLogService.log(
                     ApplicationLogEntry.error(
-                            ex,
-                            NameDescription.nd("gitlab", "GitLab connection issue"),
-                            configuration.getUrl()
-                    )
+                                    ex,
+                                    NameDescription.nd("gitlab", "GitLab connection issue"),
+                                    configuration.getUrl()
+                            )
                             .withDetail("gitlab-config-name", configuration.getName())
                             .withDetail("gitlab-config-url", configuration.getUrl())
             );

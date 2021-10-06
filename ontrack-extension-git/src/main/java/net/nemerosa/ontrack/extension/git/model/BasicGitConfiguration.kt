@@ -28,15 +28,15 @@ import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
  */
 // TODO #532 Workaround
 open class BasicGitConfiguration(
-    override val name: String,
+    name: String,
     val remote: String,
-    override val user: String?,
-    override val password: String?,
+    user: String?,
+    password: String?,
     val commitLink: String?,
     val fileAtCommitLink: String?,
     val indexationInterval: Int,
     val issueServiceConfigurationIdentifier: String?
-) : UserPasswordConfiguration<BasicGitConfiguration> {
+) : UserPasswordConfiguration<BasicGitConfiguration>(name, user, password) {
 
     fun withUser(user: String?) = BasicGitConfiguration(
         name,

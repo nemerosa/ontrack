@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.model.support;
 
-public interface ConfigurationServiceListener<T extends UserPasswordConfiguration> {
+public interface ConfigurationServiceListener<T extends Configuration<T>> {
 
     default void onNewConfiguration(T configuration) {
     }

@@ -12,5 +12,4 @@ class GitIssueServiceExtensionContributor(
     override fun getIssueServiceExtension(project: Project): ConfiguredIssueService? =
             gitService.getProjectConfiguration(project)
                     ?.configuredIssueService
-                    ?.orElse(null)
 }

@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.model.support.*
 /**
  * Computing connector statuses based on [configurations][UserPasswordConfiguration].
  */
-abstract class ConfigurationConnectorStatusIndicator<T : UserPasswordConfiguration<*>>(
+abstract class ConfigurationConnectorStatusIndicator<T : Configuration<T>>(
         private val configurationService: ConfigurationService<T>,
         private val securityService: SecurityService
 ) : ConnectorStatusIndicator {

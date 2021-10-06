@@ -13,25 +13,25 @@ import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
  */
 // TODO #532 Workaround
 open class BitbucketCloudConfiguration(
-    override val name: String,
+    name: String,
     val workspace: String,
-    override val user: String,
-    override val password: String?
-) : UserPasswordConfiguration<BitbucketCloudConfiguration> {
+    user: String,
+    password: String?
+) : UserPasswordConfiguration<BitbucketCloudConfiguration>(name, user, password) {
 
     override val descriptor: ConfigurationDescriptor get() = ConfigurationDescriptor(name, "$name ($workspace)")
 
     override fun obfuscate() = BitbucketCloudConfiguration(
         name = name,
         workspace = workspace,
-        user = user,
+        user = user ?: "",
         password = ""
     )
 
     override fun withPassword(password: String?) = BitbucketCloudConfiguration(
         name = name,
         workspace = workspace,
-        user = user,
+        user = user ?: "",
         password = password ?: ""
     )
 

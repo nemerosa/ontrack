@@ -6,8 +6,6 @@ import net.nemerosa.ontrack.model.form.Password
 import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.CredentialsConfiguration
-import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
-import java.lang.String.format
 
 /**
  * Configuration for accessing a GitHub engine, github.com or GitHub enterprise.
@@ -17,17 +15,20 @@ import java.lang.String.format
  * @property user User name
  * @property password User password
  * @property oauth2Token OAuth2 token
+ * @property appId ID of the GitHub App to use for authentication
+ * @property appPrivateKey GitHub App private key
+ * @property appInstallationAccountName Account name of the GitHub App installation (used when more than 1 installation for the app)
  */
 open class GitHubEngineConfiguration(
     override val name: String,
     url: String?,
-    override val user: String? = null,
-    override val password: String? = null,
+    val user: String? = null,
+    val password: String? = null,
     val oauth2Token: String? = null,
     val appId: String? = null,
     val appPrivateKey: String? = null,
     val appInstallationAccountName: String? = null
-) : UserPasswordConfiguration<GitHubEngineConfiguration>, CredentialsConfiguration<GitHubEngineConfiguration> {
+) : CredentialsConfiguration<GitHubEngineConfiguration> {
 
     /**
      * Authentication type
@@ -70,17 +71,50 @@ open class GitHubEngineConfiguration(
             appInstallationAccountName = appInstallationAccountName,
         )
 
-    override fun withPassword(password: String?): GitHubEngineConfiguration =
-        GitHubEngineConfiguration(
-            name = name,
-            url = url,
-            user = user,
-            password = password,
-            oauth2Token = oauth2Token,
-            appId = appId,
-            appPrivateKey = appPrivateKey,
-            appInstallationAccountName = appInstallationAccountName,
-        )
+    override fun injectCredentials(oldConfig: GitHubEngineConfiguration) = GitHubEngineConfiguration(
+        name = name,
+        url = url,
+        user = user,
+        password = if (user != null && oldConfig.user == user && password.isNullOrBlank()) {
+            oldConfig.password
+        } else {
+            password
+        },
+        oauth2Token = if (oauth2Token.isNullOrBlank()) {
+            oldConfig.oauth2Token
+        } else {
+            oauth2Token
+        },
+        appId = appId,
+        appPrivateKey = if (appPrivateKey.isNullOrBlank()) {
+            oldConfig.appPrivateKey
+        } else {
+            appPrivateKey
+        },
+        appInstallationAccountName = appInstallationAccountName,
+    )
+
+    override fun encrypt(crypting: (plain: String?) -> String?) = GitHubEngineConfiguration(
+        name = name,
+        url = url,
+        user = user,
+        password = crypting(password?.takeIf { it.isNotBlank() }),
+        oauth2Token = crypting(oauth2Token?.takeIf { it.isNotBlank() }),
+        appId = appId,
+        appPrivateKey = crypting(appPrivateKey?.takeIf { it.isNotBlank() }),
+        appInstallationAccountName = appInstallationAccountName,
+    )
+
+    override fun decrypt(decrypting: (encrypted: String?) -> String?)= GitHubEngineConfiguration(
+        name = name,
+        url = url,
+        user = user,
+        password = decrypting(password?.takeIf { it.isNotBlank() }),
+        oauth2Token = decrypting(oauth2Token?.takeIf { it.isNotBlank() }),
+        appId = appId,
+        appPrivateKey = decrypting(appPrivateKey?.takeIf { it.isNotBlank() }),
+        appInstallationAccountName = appInstallationAccountName,
+    )
 
     fun asForm(): Form = form(this)
 
@@ -142,7 +176,7 @@ open class GitHubEngineConfiguration(
                         .label("URL")
                         .length(250)
                         .optional()
-                        .help(format("URL of the GitHub engine. Defaults to %s if not defined.", GITHUB_COM))
+                        .help("URL of the GitHub engine. Defaults to $GITHUB_COM if not defined.")
                         .value(configuration?.url)
                 )
                 .with(

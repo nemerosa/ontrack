@@ -1,35 +1,33 @@
 package net.nemerosa.ontrack.extension.api.support;
 
-import lombok.Data;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 
-@Data
-public class TestConfiguration implements UserPasswordConfiguration<TestConfiguration> {
+public class TestConfiguration extends UserPasswordConfiguration<TestConfiguration> {
 
-    private final String name;
-    private final String user;
-    private final String password;
+    public TestConfiguration(String name, String user, String password) {
+        super(name, user, password);
+    }
 
     @Override
     public TestConfiguration withPassword(String password) {
         return new TestConfiguration(
-                name,
-                user,
+                getName(),
+                getUser(),
                 password
         );
     }
 
     @Override
     public ConfigurationDescriptor getDescriptor() {
-        return new ConfigurationDescriptor("test", name);
+        return new ConfigurationDescriptor("test", getName());
     }
 
     @Override
     public TestConfiguration obfuscate() {
         return new TestConfiguration(
-                name,
-                user,
+                getName(),
+                getUser(),
                 ""
         );
     }

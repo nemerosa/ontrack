@@ -11,11 +11,11 @@ import org.apache.commons.lang3.StringUtils
 import java.util.regex.Pattern
 
 open class JIRAConfiguration(
-    override val name: String,
+    name: String,
     val url: String,
-    override val user: String?,
-    override val password: String?
-) : UserPasswordConfiguration<JIRAConfiguration>, IssueServiceConfiguration {
+    user: String?,
+    password: String?
+) : UserPasswordConfiguration<JIRAConfiguration>(name, user, password), IssueServiceConfiguration {
 
     override fun obfuscate(): JIRAConfiguration {
         return JIRAConfiguration(

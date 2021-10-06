@@ -23,6 +23,12 @@ class CombinedIssueServiceConfiguration(
 
     override fun obfuscate(): CombinedIssueServiceConfiguration = this
 
+    override fun injectCredentials(oldConfig: CombinedIssueServiceConfiguration): CombinedIssueServiceConfiguration = this
+
+    override fun encrypt(crypting: (plain: String?) -> String?): CombinedIssueServiceConfiguration = this
+
+    override fun decrypt(decrypting: (encrypted: String?) -> String?): CombinedIssueServiceConfiguration = this
+
     fun asForm(availableIssueServiceConfigurations: List<IssueServiceConfigurationRepresentation>): Form {
         return Form.create()
             .with(defaultNameField().value(name))

@@ -8,11 +8,11 @@ import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 
 open class JenkinsConfiguration(
-    override val name: String,
+    name: String,
     val url: String,
-    override val user: String?,
-    override val password: String?
-) : UserPasswordConfiguration<JenkinsConfiguration> {
+    user: String?,
+    password: String?
+) : UserPasswordConfiguration<JenkinsConfiguration>(name, user, password) {
 
     override fun equals(other: Any?): Boolean =
         other is JenkinsConfiguration &&

@@ -18,7 +18,7 @@ class BitbucketCloudGitConfiguration(
 
     override val credentials: UserPassword =
         property.configuration.run {
-            UserPassword(user, password ?: "")
+            UserPassword(user ?: "", password ?: "")
         }
 
     override val commitLink: String =
