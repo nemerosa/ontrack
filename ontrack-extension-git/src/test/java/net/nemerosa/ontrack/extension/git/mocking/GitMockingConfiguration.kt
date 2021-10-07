@@ -16,12 +16,9 @@ class GitMockingConfiguration : GitConfiguration {
 
     override val type: String = "mocking"
 
-    override val commitLink: String =
-        TODO("not implemented")
+    override val commitLink: String = ""
 
-    override val fileAtCommitLink: String =
-        TODO("Not yet implemented")
+    override val fileAtCommitLink: String = ""
 
-    override val indexationInterval: Int =
-        TODO("Not yet implemented")
+    override val indexationInterval: Int = 0
 }
