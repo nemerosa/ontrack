@@ -29,4 +29,5 @@ RUN chmod +x /usr/bin/docker-compose
 
 # Git configuration
 RUN git config --global user.email "jenkins@nemerosa.net" \
-    && git config --global user.name "Jenkins"
+    && git config --global user.name "Jenkins" \
+    && git config --global init.defaultbranch main
