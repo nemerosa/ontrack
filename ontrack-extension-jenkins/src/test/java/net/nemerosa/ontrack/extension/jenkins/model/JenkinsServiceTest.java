@@ -40,7 +40,7 @@ public class JenkinsServiceTest {
                 mock(EventPostService.class), mock(EventFactory.class), jenkinsClientFactory, ontrackConfigProperties);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalStateException.class)
     public void update_name_check() {
         jenkinsService.updateConfiguration("test", new JenkinsConfiguration("Test", "http://host", "user", ""));
     }
