@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.github
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.getEnv
+import net.nemerosa.ontrack.test.getOptionalEnv
 
 class GitHubTestEnv(
     val user: String,
@@ -11,6 +12,9 @@ class GitHubTestEnv(
     val repository: String,
     val issue: Int,
     val team: String,
+    val appId: String,
+    val appPrivateKey: String,
+    val appInstallationAccountName: String?,
 ) {
     val fullRepository: String = "$organization/$repository"
 }
@@ -26,6 +30,9 @@ val githubTestEnv: GitHubTestEnv by lazy {
         repository = getEnv("ontrack.test.extension.github.repository"),
         issue = getEnv("ontrack.test.extension.github.issue").toInt(),
         team = getEnv("ontrack.test.extension.github.team"),
+        appId = getEnv("ontrack.test.extension.github.app.id"),
+        appPrivateKey = getEnv("ontrack.test.extension.github.app.pem"),
+        appInstallationAccountName = getOptionalEnv("ontrack.test.extension.github.app.installation"),
     )
 }
 

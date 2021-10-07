@@ -47,12 +47,20 @@ fun assertJsonNotNull(
  * Gets a value from the system properties or from the environment.
  */
 fun getEnv(property: String): String {
+    return getOptionalEnv(property)
+        ?: throw IllegalStateException("Cannot find $property system property or ${propertyToEnvName(property)} environment variable.")
+}
+
+/**
+ * Gets a value from the system properties or from the environment.
+ */
+fun getOptionalEnv(property: String): String? {
     val sysValue = System.getProperty(property)
     return if (sysValue.isNullOrBlank()) {
-        val envName = property.uppercase().replace('.', '_')
+        val envName = propertyToEnvName(property)
         val envValue = System.getenv(envName)
         if (envValue.isNullOrBlank()) {
-            throw IllegalStateException("Cannot find $property system property or $envName environment variable.")
+            null
         } else {
             envValue
         }
@@ -60,3 +68,6 @@ fun getEnv(property: String): String {
         sysValue
     }
 }
+
+private fun propertyToEnvName(property: String) = property.uppercase().replace('.', '_')
+
