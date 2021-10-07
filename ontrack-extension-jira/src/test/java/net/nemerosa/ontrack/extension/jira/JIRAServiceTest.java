@@ -40,7 +40,7 @@ public class JIRAServiceTest {
                 mock(EventPostService.class), mock(EventFactory.class), jiraSessionFactory, ontrackConfigProperties);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalStateException.class)
     public void update_name_check() {
         jiraService.updateConfiguration("test", new JIRAConfiguration("Test", "http://host", "user", ""));
     }
