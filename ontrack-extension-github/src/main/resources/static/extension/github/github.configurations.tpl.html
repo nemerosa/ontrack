@@ -16,7 +16,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="configuration in configurations">
+                <tr ng-repeat="configuration in configurations" name="{{ configuration.name }}"> <!-- @name used for acc tests -->
                     <td>
                         <code>{{configuration.name}}</code>
                     </td>
