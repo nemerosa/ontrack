@@ -61,6 +61,21 @@ class DefaultOntrackGitHubClientIT {
     }
 
     @Test
+    fun `Getting a PR`() {
+        val pr = client.getPullRequest(githubTestEnv.fullRepository, githubTestEnv.pr)
+        assertNotNull(pr, "PR ${githubTestEnv.fullRepository}#${githubTestEnv.pr} has been found") {
+            assertEquals("#${githubTestEnv.pr}", it.key)
+        }
+    }
+
+    @Test
+    fun `Getting an unknown PR`() {
+        val id = Int.MAX_VALUE / 2
+        val pr = client.getPullRequest(githubTestEnv.fullRepository, id)
+        assertNull(pr, "Issue ${githubTestEnv.fullRepository}#$id cannot be found found")
+    }
+
+    @Test
     fun `Getting the teams for an organization`() {
         val teams = client.getOrganizationTeams(githubTestEnv.organization)
         assertNotNull(teams, "Getting the teams") { list ->

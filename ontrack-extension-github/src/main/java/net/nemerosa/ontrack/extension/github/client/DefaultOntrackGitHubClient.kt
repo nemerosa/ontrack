@@ -320,17 +320,25 @@ class DefaultOntrackGitHubClient(
         // Gets the repository for this project
         val (owner, name) = getRepositoryParts(repository)
         // Getting the PR
-        return client("Get PR $repository#$id") {
-            getForObject<JsonNode?>("/repos/$owner/$name/pulls/$id")?.run {
-                GitPullRequest(
-                    id = id,
-                    key = "#$id",
-                    source = path("head").path("ref").asText(),
-                    target = path("base").path("ref").asText(),
-                    title = getRequiredTextField("title"),
-                    status = getRequiredTextField("state"),
-                    url = getRequiredTextField("html_url"),
-                )
+        return try {
+            client("Get PR $repository#$id") {
+                getForObject<JsonNode?>("/repos/$owner/$name/pulls/$id")?.run {
+                    GitPullRequest(
+                        id = id,
+                        key = "#$id",
+                        source = path("head").path("ref").asText(),
+                        target = path("base").path("ref").asText(),
+                        title = getRequiredTextField("title"),
+                        status = getRequiredTextField("state"),
+                        url = getRequiredTextField("html_url"),
+                    )
+                }
+            }
+        } catch (ex: GitHubErrorsException) {
+            if (ex.status == 404 || ignoreError) {
+                null
+            } else {
+                throw ex
             }
         }
     }
