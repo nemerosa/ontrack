@@ -71,7 +71,11 @@ pipeline {
                 ONTRACK_TEST_EXTENSION_GITHUB_ORGANIZATION = 'nemerosa'
                 ONTRACK_TEST_EXTENSION_GITHUB_REPOSITORY = 'ontrack'
                 ONTRACK_TEST_EXTENSION_GITHUB_ISSUE = '880'
+                ONTRACK_TEST_EXTENSION_GITHUB_PR = '869'
                 ONTRACK_TEST_EXTENSION_GITHUB_TEAM = 'ontrack-integration-tests'
+                ONTRACK_TEST_EXTENSION_GITHUB_APP_ID = '143291'
+                ONTRACK_TEST_EXTENSION_GITHUB_APP_PEM = credentials('ONTRACK_TEST_EXTENSION_GITHUB_APP_PEM')
+                ONTRACK_TEST_EXTENSION_GITHUB_APP_INSTALLATION = 'nemerosa'
             }
             steps {
                 sh ''' ./gradlew clean versionDisplay versionFile --no-daemon'''
