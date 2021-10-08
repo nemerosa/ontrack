@@ -12,6 +12,13 @@ class GitHubAppTest {
     private val testAppPrivateKeyResourcePath = "/test-app.pem"
 
     @Test
+    fun `Reading the private key`() {
+        val pem = TestUtils.resourceString(testAppPrivateKeyResourcePath)
+        val key = GitHubApp.readPrivateKey(pem)
+        assertEquals("RSA", key.algorithm)
+    }
+
+    @Test
     fun `Generating the key`() {
         val token = testJwt()
         // Simple check

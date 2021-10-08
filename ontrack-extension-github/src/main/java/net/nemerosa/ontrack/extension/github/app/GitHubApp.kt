@@ -1,14 +1,15 @@
 package net.nemerosa.ontrack.extension.github.app
 
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.security.Keys
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.github.app.client.GitHubAppClient
-import net.nemerosa.ontrack.extension.github.app.client.GitHubAppInstallationToken
+import java.security.KeyFactory
+import java.security.interfaces.RSAPrivateKey
+import java.security.spec.InvalidKeySpecException
+import java.security.spec.PKCS8EncodedKeySpec
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
-import javax.crypto.SecretKey
 
 
 class GitHubApp(
@@ -27,7 +28,7 @@ class GitHubApp(
             val expiresAt = Date.from(now.plusMinutes(10).atZone(ZoneId.systemDefault()).toInstant())
 
             // Encoding the key for JWT
-            val key: SecretKey = Keys.hmacShaKeyFor(appPrivateKey.toByteArray())
+            val key = readPrivateKey(appPrivateKey)
 
             // Encoding the JWT
             return Jwts.builder()
@@ -36,6 +37,20 @@ class GitHubApp(
                 .setExpiration(expiresAt)
                 .signWith(key)
                 .compact()
+        }
+
+        internal fun readPrivateKey(key: String): RSAPrivateKey {
+            if (" RSA " in key) {
+                throw InvalidKeySpecException("Private key must be a PKCS#8 formatted string, to convert it from PKCS#1 use: openssl pkcs8 -topk8 -inform PEM -outform PEM -in current-key.pem -out new-key.pem -nocrypt")
+            } else {
+                val privateKeyPEM = key
+                    .replace("-----[^-]+-----".toRegex(), "")
+                    .replace("\\s".toRegex(), "")
+                val decoded: ByteArray = Base64.getDecoder().decode(privateKeyPEM)
+                val keyFactory: KeyFactory = KeyFactory.getInstance("RSA")
+                val keySpec = PKCS8EncodedKeySpec(decoded)
+                return keyFactory.generatePrivate(keySpec) as RSAPrivateKey
+            }
         }
     }
 
