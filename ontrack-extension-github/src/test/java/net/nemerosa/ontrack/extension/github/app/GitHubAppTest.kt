@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.github.app
 
+import net.nemerosa.ontrack.extension.github.app.client.GitHubAppAccount
+import net.nemerosa.ontrack.extension.github.app.client.GitHubAppInstallation
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -32,8 +34,8 @@ class GitHubAppTest {
         // Mocking
         val client = MockGitHubAppClient().registerInstallation(jwt, "123456789", "test")
         // Getting the installation
-        val installationId = GitHubApp(client).getInstallation(jwt, testAppId, null)
-        assertEquals("123456789", installationId)
+        val installation = GitHubApp(client).getInstallation(jwt, testAppId, null)
+        assertEquals("123456789", installation.id)
     }
 
     @Test
@@ -83,8 +85,8 @@ class GitHubAppTest {
             .registerInstallation(jwt, "123456789", "test-1")
             .registerInstallation(jwt, "234567890", "test-2")
         // Getting the installation
-        val installationId = GitHubApp(client).getInstallation(jwt, testAppId, "test-2")
-        assertEquals("234567890", installationId)
+        val installation = GitHubApp(client).getInstallation(jwt, testAppId, "test-2")
+        assertEquals("234567890", installation.id)
     }
 
     @Test
@@ -94,7 +96,7 @@ class GitHubAppTest {
         // Mocking
         val client = MockGitHubAppClient()
         // Installation token
-        val token = GitHubApp(client).generateInstallationToken(jwt, "1234567890")
+        val token = GitHubApp(client).generateInstallationToken(jwt, GitHubAppInstallation("1234567890", GitHubAppAccount("test", "")))
         assertEquals("12345678900000", token.token)
     }
 

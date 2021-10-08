@@ -29,11 +29,20 @@ class DefaultOntrackGitHubClient(
     private val logger: Logger = LoggerFactory.getLogger(OntrackGitHubClient::class.java)
 
     override val organizations: List<GitHubUser>
-        get() {
+        get() = if (configuration.authenticationType() == GitHubAuthenticationType.APP) {
+            listOf(
+                gitHubAppTokenService.getAppInstallationAccount(configuration).run {
+                    GitHubUser(
+                        login = login,
+                        url = url,
+                    )
+                }
+            )
+        } else {
             // Getting a client
             val client = createGitHubRestTemplate()
             // Gets the organization names
-            return client("Gets list of organizations") {
+            client("Gets list of organizations") {
                 getForObject<JsonNode>("/user/orgs?per_page=100").map { node ->
                     node.parse()
                 }

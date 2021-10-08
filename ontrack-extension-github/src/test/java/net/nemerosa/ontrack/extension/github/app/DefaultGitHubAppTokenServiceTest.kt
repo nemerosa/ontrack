@@ -77,7 +77,7 @@ class DefaultGitHubAppTokenServiceTest {
         every { client.getAppInstallations(any()) } returns listOf(
             GitHubAppInstallation(
                 TEST_APP_INSTALLATION_ID,
-                GitHubAppAccount(TEST_APP_INSTALLATION_ACCOUNT_LOGIN)
+                GitHubAppAccount(TEST_APP_INSTALLATION_ACCOUNT_LOGIN, "")
             )
         )
         every {

@@ -34,7 +34,8 @@ class MockGitHubAppClient : GitHubAppClient {
             GitHubAppInstallation(
                 id = installationId,
                 account = GitHubAppAccount(
-                    login = installationAccountName
+                    login = installationAccountName,
+                    url = "uri://installation",
                 )
             )
         )

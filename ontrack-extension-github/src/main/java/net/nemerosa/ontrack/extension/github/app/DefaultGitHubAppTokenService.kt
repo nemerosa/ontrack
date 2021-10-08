@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.app
 
+import net.nemerosa.ontrack.extension.github.app.client.GitHubAppAccount
 import net.nemerosa.ontrack.extension.github.app.client.GitHubAppClient
 import org.springframework.stereotype.Service
 import java.util.concurrent.ConcurrentHashMap
@@ -24,18 +25,32 @@ class DefaultGitHubAppTokenService(
         appPrivateKey: String,
         appInstallationAccountName: String?
     ): String {
-        return cache.compute(configurationName) { _, existingToken: GitHubAppToken? ->
-            existingToken
-                // If token is defined, checks its validity
-                ?.takeIf { it.isValid() }
-                // If not defined or not valid, regenerate it
-                ?: renewToken(
-                    appId,
-                    appPrivateKey,
-                    appInstallationAccountName
-                )
-        }?.token ?: throw GitHubAppNoTokenException(appId)
+        return gitHubAppToken(configurationName, appId, appPrivateKey, appInstallationAccountName).token
     }
+
+    override fun getAppInstallationAccount(
+        configurationName: String,
+        appId: String,
+        appPrivateKey: String,
+        appInstallationAccountName: String?,
+    ): GitHubAppAccount = gitHubAppToken(configurationName, appId, appPrivateKey, appInstallationAccountName).installation.account
+
+    private fun gitHubAppToken(
+        configurationName: String,
+        appId: String,
+        appPrivateKey: String,
+        appInstallationAccountName: String?
+    ): GitHubAppToken = cache.compute(configurationName) { _, existingToken: GitHubAppToken? ->
+        existingToken
+            // If token is defined, checks its validity
+            ?.takeIf { it.isValid() }
+            // If not defined or not valid, regenerate it
+            ?: renewToken(
+                appId,
+                appPrivateKey,
+                appInstallationAccountName
+            )
+    } ?: throw GitHubAppNoTokenException(appId)
 
     private fun renewToken(
         appId: String,
