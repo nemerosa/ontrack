@@ -28,9 +28,9 @@ class DefaultOntrackGitHubClientIT {
 
     @Test
     fun `Getting the list of organizations`() {
-        val orgs = client.organizations
+        val organizations = client.organizations
         assertTrue(
-            orgs.any { it.login == githubTestEnv.organization },
+            organizations.any { it.login == githubTestEnv.organization },
             "Can get the list of organizations"
         )
     }

@@ -34,7 +34,7 @@ class DefaultOntrackGitHubClient(
             val client = createGitHubRestTemplate()
             // Gets the organization names
             return client("Gets list of organizations") {
-                getForObject<JsonNode>("/organizations").map { node ->
+                getForObject<JsonNode>("/user/orgs?per_page=100").map { node ->
                     node.parse()
                 }
             }
@@ -91,22 +91,30 @@ class DefaultOntrackGitHubClient(
         // Gets the repository for this project
         val (owner, name) = getRepositoryParts(repository)
         // Gets the issue
-        return client("Get issue $repository#$id") {
-            getForObject<JsonNode?>("/repos/$owner/$name/issues/$id")?.let {
-                GitHubIssue(
-                    id = id,
-                    url = it.getRequiredTextField("html_url"),
-                    summary = it.getRequiredTextField("title"),
-                    body = it.getTextField("body") ?: "",
-                    bodyHtml = it.getTextField("body") ?: "",
-                    assignee = it.getUserField("assignee"),
-                    labels = it.getLabels(),
-                    state = it.getState(),
-                    milestone = it.getMilestone(),
-                    createdAt = it.getCreatedAt(),
-                    updateTime = it.getUpdatedAt(),
-                    closedAt = it.getClosedAt(),
-                )
+        return try {
+            client("Get issue $repository#$id") {
+                getForObject<JsonNode>("/repos/$owner/$name/issues/$id").let {
+                    GitHubIssue(
+                        id = id,
+                        url = it.getRequiredTextField("html_url"),
+                        summary = it.getRequiredTextField("title"),
+                        body = it.getTextField("body") ?: "",
+                        bodyHtml = it.getTextField("body") ?: "",
+                        assignee = it.getUserField("assignee"),
+                        labels = it.getLabels(),
+                        state = it.getState(),
+                        milestone = it.getMilestone(),
+                        createdAt = it.getCreatedAt(),
+                        updateTime = it.getUpdatedAt(),
+                        closedAt = it.getClosedAt(),
+                    )
+                }
+            }
+        } catch (ex: GitHubErrorsException) {
+            if (ex.status == 404) {
+                null
+            } else {
+                throw ex
             }
         }
     }
@@ -272,7 +280,7 @@ class DefaultOntrackGitHubClient(
                 val json = ex.responseBodyAsString
                 try {
                     val error: GitHubErrorMessage = json.parseAsJson().parse()
-                    throw GitHubErrorsException(message, error)
+                    throw GitHubErrorsException(message, error, ex.rawStatusCode)
                 } catch (_: JsonParseException) {
                     throw ex
                 }
@@ -478,7 +486,8 @@ class DefaultOntrackGitHubClient(
 
     private class GitHubErrorsException(
         message: String,
-        error: GitHubErrorMessage
+        error: GitHubErrorMessage,
+        val status: Int,
     ) : BaseException(error.format(message))
 
     @JsonIgnoreProperties(ignoreUnknown = true)
