@@ -79,7 +79,13 @@ inline fun <reified E : Enum<E>> JsonNode.getEnum(field: String): E? {
 /**
  * Gets a field as [Int].
  */
-fun JsonNode.getInt(field: String): Int? =
+@Deprecated(message = "Use getIntField", replaceWith = ReplaceWith("getIntField"))
+fun JsonNode.getInt(field: String): Int? = getIntField(field)
+
+/**
+ * Gets a field as [Int].
+ */
+fun JsonNode.getIntField(field: String): Int? =
     if (has(field)) {
         get(field).asInt()
     } else {
@@ -128,6 +134,13 @@ fun JsonNode.getBooleanField(field: String): Boolean? = if (has(field)) {
  */
 fun JsonNode.getRequiredBooleanField(field: String): Boolean =
     getBooleanField(field)
+        ?: throw JsonParseException("Missing field $field")
+
+/**
+ * Gets a required int field
+ */
+fun JsonNode.getRequiredIntField(field: String): Int =
+    getIntField(field)
         ?: throw JsonParseException("Missing field $field")
 
 /**

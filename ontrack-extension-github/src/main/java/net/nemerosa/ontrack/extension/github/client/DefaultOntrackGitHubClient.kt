@@ -3,56 +3,40 @@ package net.nemerosa.ontrack.extension.github.client
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.BaseException
-import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.model.*
-import net.nemerosa.ontrack.json.JsonParseException
-import net.nemerosa.ontrack.json.getBooleanField
-import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.json.parseAsJson
-import org.apache.commons.lang3.StringUtils
-import org.eclipse.egit.github.core.*
-import org.eclipse.egit.github.core.client.GitHubClient
-import org.eclipse.egit.github.core.client.RequestException
-import org.eclipse.egit.github.core.service.IssueService
-import org.eclipse.egit.github.core.service.OrganizationService
-import org.eclipse.egit.github.core.service.PullRequestService
+import net.nemerosa.ontrack.json.*
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestTemplate
-import java.io.IOException
-import java.net.HttpURLConnection
+import org.springframework.web.client.getForObject
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
 
+/**
+ * GitHub client which uses the GitHub Rest API at https://docs.github.com/en/rest
+ */
 class DefaultOntrackGitHubClient(
     private val configuration: GitHubEngineConfiguration,
     private val gitHubAppTokenService: GitHubAppTokenService,
 ) : OntrackGitHubClient {
 
-    private val logger = LoggerFactory.getLogger(OntrackGitHubClient::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(OntrackGitHubClient::class.java)
 
     override val organizations: List<GitHubUser>
         get() {
             // Getting a client
-            val client = createGitHubClient()
-            // Service
-            val service = OrganizationService(client)
+            val client = createGitHubRestTemplate()
             // Gets the organization names
-            return try {
-                service.organizations.map {
-                    GitHubUser(
-                        login = it.login,
-                        url = it.htmlUrl
-                    )
+            return client("Gets list of organizations") {
+                getForObject<JsonNode>("/organizations").map { node ->
+                    node.parse()
                 }
-            } catch (e: IOException) {
-                throw OntrackGitHubClientException(e)
             }
         }
 
@@ -86,10 +70,10 @@ class DefaultOntrackGitHubClient(
                 description = node.path("description").asText(),
                 lastUpdate = node.path("updatedAt")?.asText()
                     ?.takeIf { it.isNotBlank() }
-                    ?.let { LocalDateTime.parse(it, DateTimeFormatter.ISO_DATE_TIME) },
+                    ?.let { parseLocalDateTime(it) },
                 createdAt = node.path("createdAt")?.asText()
                     ?.takeIf { it.isNotBlank() }
-                    ?.let { LocalDateTime.parse(it, DateTimeFormatter.ISO_DATE_TIME) }
+                    ?.let { parseLocalDateTime(it) }
             )
         } ?: throw GitHubNoGraphQLResponseException("Getting repositories for organization $organization")
 
@@ -103,37 +87,28 @@ class DefaultOntrackGitHubClient(
         // Logging
         logger.debug("[github] Getting issue {}/{}", repository, id)
         // Getting a client
-        val client = createGitHubClient()
-        // Issue service using this client
-        val service = IssueService(client)
+        val client = createGitHubRestTemplate()
         // Gets the repository for this project
         val (owner, name) = getRepositoryParts(repository)
-        val issue: Issue = try {
-            service.getIssue(owner, name, id)
-        } catch (ex: RequestException) {
-            return if (ex.status == 404) {
-                null
-            } else {
-                throw OntrackGitHubClientException(ex)
+        // Gets the issue
+        return client("Get issue $repository#$id") {
+            getForObject<JsonNode?>("/repos/$owner/$name/issues/$id")?.let {
+                GitHubIssue(
+                    id = id,
+                    url = it.getRequiredTextField("html_url"),
+                    summary = it.getRequiredTextField("title"),
+                    body = it.getTextField("body") ?: "",
+                    bodyHtml = it.getTextField("body") ?: "",
+                    assignee = it.getUserField("assignee"),
+                    labels = it.getLabels(),
+                    state = it.getState(),
+                    milestone = it.getMilestone(),
+                    createdAt = it.getCreatedAt(),
+                    updateTime = it.getUpdatedAt(),
+                    closedAt = it.getClosedAt(),
+                )
             }
-        } catch (e: IOException) {
-            throw OntrackGitHubClientException(e)
         }
-        // Conversion
-        return GitHubIssue(
-            id = id,
-            url = issue.htmlUrl,
-            summary = issue.title,
-            body = issue.bodyText ?: "",
-            bodyHtml = issue.bodyHtml ?: "",
-            assignee = toUser(issue.assignee),
-            labels = toLabels(issue.labels),
-            state = toState(issue.state),
-            milestone = toMilestone(repository, issue.milestone),
-            createdAt = toDateTime(issue.createdAt)!!,
-            updateTime = toDateTime(issue.updatedAt) ?: toDateTime(issue.createdAt)!!,
-            closedAt = toDateTime(issue.closedAt)
-        )
     }
 
     override fun getOrganizationTeams(login: String): List<GitHubTeam>? =
@@ -322,62 +297,34 @@ class DefaultOntrackGitHubClient(
                     defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${configuration.oauth2Token}")
                 }
                 GitHubAuthenticationType.APP -> {
-                    defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${gitHubAppTokenService.getAppInstallationToken(configuration)}")
+                    defaultHeader(
+                        HttpHeaders.AUTHORIZATION,
+                        "Bearer ${gitHubAppTokenService.getAppInstallationToken(configuration)}"
+                    )
                 }
             }
         }
         .build()
 
-    override fun createGitHubClient(): GitHubClient {
-        // GitHub client (non authentified)
-        val client: GitHubClient = object : GitHubClient() {
-            override fun configureRequest(request: HttpURLConnection): HttpURLConnection {
-                val connection = super.configureRequest(request)
-                connection.setRequestProperty(HEADER_ACCEPT, "application/vnd.github.v3.full+json")
-                return connection
-            }
-        }
-        // Authentication
-        val oAuth2Token = configuration.oauth2Token
-        if (StringUtils.isNotBlank(oAuth2Token)) {
-            client.setOAuth2Token(oAuth2Token)
-        } else {
-            val user = configuration.user
-            val password = configuration.password
-            if (StringUtils.isNotBlank(user)) {
-                client.setCredentials(user, password)
-            }
-        }
-        return client
-    }
-
     override fun getPullRequest(repository: String, id: Int, ignoreError: Boolean): GitPullRequest? {
         // Getting a client
-        val client = createGitHubClient()
-        // PR service using this client
-        val service = PullRequestService(client)
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
         // Getting the PR
-        val pr: PullRequest = try {
-            service.getPullRequest(RepositoryId.createFromId(repository), id)
-        } catch (ex: RequestException) {
-            return if (ex.status == 404 || ignoreError) {
-                null
-            } else {
-                throw OntrackGitHubClientException(ex)
+        return client("Get PR $repository#$id") {
+            getForObject<JsonNode?>("/repos/$owner/$name/pulls/$id")?.run {
+                GitPullRequest(
+                    id = id,
+                    key = "#$id",
+                    source = path("head").path("ref").asText(),
+                    target = path("base").path("ref").asText(),
+                    title = getRequiredTextField("title"),
+                    status = getRequiredTextField("state"),
+                    url = getRequiredTextField("html_url"),
+                )
             }
-        } catch (e: IOException) {
-            throw OntrackGitHubClientException(e)
         }
-        // Conversion
-        return GitPullRequest(
-            id = id,
-            key = "#$id",
-            source = pr.head.ref,
-            target = pr.base.ref,
-            title = pr.title,
-            status = pr.state,
-            url = pr.htmlUrl
-        )
     }
 
     override fun getRepositorySettings(repository: String, askVisibility: Boolean): GitHubRepositorySettings {
@@ -435,39 +382,71 @@ class DefaultOntrackGitHubClient(
         }
     }
 
-    private fun toDateTime(date: Date?): LocalDateTime? = Time.from(date, null)
-
-    private fun toMilestone(repository: String, milestone: Milestone?): GitHubMilestone? =
-        milestone?.run {
-            GitHubMilestone(
-                title,
-                toState(state),
-                number, String.format(
-                    "%s/%s/issues?milestone=%d&state=open",
-                    configuration.url,
-                    repository,
-                    number
+    private fun JsonNode.getUserField(field: String): GitHubUser? =
+        if (has(field)) {
+            get(field)?.run {
+                GitHubUser(
+                    login = getRequiredTextField("login"),
+                    url = getTextField("html_url"),
                 )
-            )
+            }
+        } else {
+            null
         }
 
-    private fun toState(state: String): GitHubState = GitHubState.valueOf(state)
-
-    private fun toLabels(labels: List<Label>?): List<GitHubLabel> = labels
-        ?.map { label: Label ->
-            GitHubLabel(
-                label.name,
-                label.color
-            )
-        } ?: emptyList()
-
-    private fun toUser(user: User?): GitHubUser? =
-        user?.run {
-            GitHubUser(
-                login,
-                htmlUrl
-            )
+    private fun JsonNode.getLabels(): List<GitHubLabel> {
+        val field = "labels"
+        return if (has(field)) {
+            val list = get(field)
+            list.map { node ->
+                GitHubLabel(
+                    name = node.getRequiredTextField("name"),
+                    color = node.getRequiredTextField("color"),
+                )
+            }
+        } else {
+            emptyList()
         }
+    }
+
+    private fun JsonNode.getState(): GitHubState {
+        val value = getRequiredTextField("state")
+        return GitHubState.valueOf(value)
+    }
+
+    private fun JsonNode.getMilestone(): GitHubMilestone? {
+        val field = "milestone"
+        return if (has(field)) {
+            val node = get(field)
+            GitHubMilestone(
+                title = node.getRequiredTextField("title"),
+                state = node.getState(),
+                number = node.getRequiredIntField("number"),
+                url = node.getRequiredTextField("html_url"),
+            )
+        } else {
+            null
+        }
+    }
+
+    private fun JsonNode.getCreatedAt(): LocalDateTime =
+        getRequiredDateTime("created_at")
+
+    private fun JsonNode.getUpdatedAt(): LocalDateTime =
+        getRequiredDateTime("updated_at")
+
+    private fun JsonNode.getClosedAt(): LocalDateTime? =
+        getDateTime("closed_at")
+
+    private fun JsonNode.getRequiredDateTime(field: String): LocalDateTime =
+        getDateTime(field) ?: throw JsonParseException("Missing field $field")
+
+    private fun JsonNode.getDateTime(field: String): LocalDateTime? =
+        getTextField(field)?.let {
+            parseLocalDateTime(it)
+        }
+
+    private fun parseLocalDateTime(value: String) = LocalDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME)
 
     companion object {
         fun getApiRoot(url: String): String =

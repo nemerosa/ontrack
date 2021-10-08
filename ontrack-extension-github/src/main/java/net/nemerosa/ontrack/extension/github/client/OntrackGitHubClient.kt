@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.github.client
 
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.model.*
-import org.eclipse.egit.github.core.client.GitHubClient
 import org.springframework.web.client.RestTemplate
 
 
@@ -32,13 +31,6 @@ interface OntrackGitHubClient {
      * @return List of repository in this [organization]
      */
     fun findRepositoriesByOrganization(organization: String): List<GitHubRepository>
-
-    /**
-     * Gets the underlying / native GitHub client so that extensions
-     * can add features.
-     */
-    @Deprecated("Prefer using the RestTemplate")
-    fun createGitHubClient(): GitHubClient
 
     /**
      * Creates a [RestTemplate] for accessing GitHub.
