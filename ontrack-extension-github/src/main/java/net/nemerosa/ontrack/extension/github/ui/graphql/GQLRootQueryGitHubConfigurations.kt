@@ -26,9 +26,7 @@ class GQLRootQueryGitHubConfigurations(
         .dataFetcher { env ->
             val name: String? = env.getArgument("name")
             if (name.isNullOrBlank()) {
-                gitHubConfigurationService.configurations.map {
-                    it.obfuscate()
-                }
+                gitHubConfigurationService.configurations
             } else {
                 listOfNotNull(
                     gitHubConfigurationService.getOptionalConfiguration(name).getOrNull()
