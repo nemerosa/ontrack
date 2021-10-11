@@ -9,9 +9,7 @@ import net.nemerosa.ontrack.git.model.*
 import net.nemerosa.ontrack.git.model.plot.GitPlotRenderer
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringUtils
-import org.eclipse.jgit.api.CloneCommand
-import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.api.ListBranchCommand
+import org.eclipse.jgit.api.*
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.api.errors.NoHeadException
 import org.eclipse.jgit.diff.DiffEntry
@@ -54,10 +52,22 @@ class GitRepositoryClientImpl(
 
     override val isReady: Boolean get() = isClonedOrCloning && !sync.isLocked
 
+    /**
+     * Setting up the command with authentication
+     */
+    private fun <C : TransportCommand<C, *>> C.configure(): C =
+        this
+            .setTransportConfigCallback { transport ->
+                this@GitRepositoryClientImpl.repository.authenticator?.configureTransport(transport)
+            }
+            .setCredentialsProvider(credentialsProvider)
+
     override val remoteBranches: List<String>
         get() {
             try {
-                return git.lsRemote().setHeads(true).call()
+                return git.lsRemote()
+                    .configure()
+                    .setHeads(true).call()
                     .map { ref -> StringUtils.removeStart(ref.name, "refs/heads/") }
             } catch (e: GitAPIException) {
                 throw GitRepositoryAPIException(repository.remote, e)
@@ -145,7 +155,7 @@ class GitRepositoryClientImpl(
             try {
                 val repo = git.repository
                 val revWalk = RevWalk(repo)
-                return repo.refDatabase.getRefs(Constants.R_TAGS).values
+                return repo.refDatabase.getRefsByPrefix(Constants.R_TAGS)
                     .map { ref -> getGitTagFromRef(revWalk, ref) }
             } catch (e: IOException) {
                 throw GitRepositoryIOException(repository.remote, e)
@@ -177,12 +187,12 @@ class GitRepositoryClientImpl(
         logger.debug(format("[git] Listing the remote heads in %s", repository.remote))
         try {
             git.lsRemote()
+                .configure()
                 .setRemote(repository.remote)
                 .setHeads(true)
                 .setTransportConfigCallback { transport ->
                     repository.authenticator?.configureTransport(transport)
                 }
-                .setCredentialsProvider(credentialsProvider)
                 .call()
         } catch (e: GitAPIException) {
             throw GitTestException(e.message)
@@ -214,7 +224,7 @@ class GitRepositoryClientImpl(
         logger.accept(format("[git] Pulling %s", repository.remote))
         try {
             git.fetch()
-                .setCredentialsProvider(credentialsProvider)
+                .configure()
                 .call()
         } catch (e: GitAPIException) {
             throw GitRepositoryAPIException(repository.remote, e)
@@ -228,7 +238,7 @@ class GitRepositoryClientImpl(
         logger.accept(format("[git] Cloning %s", repository.remote))
         try {
             CloneCommand()
-                .setCredentialsProvider(credentialsProvider)
+                .configure()
                 .setDirectory(repositoryDir)
                 .setURI(repository.remote)
                 .call()
