@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.github.githubTestEnv
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -36,7 +37,7 @@ class GQLRootQueryGitHubConfigurationsIT : AbstractGitHubTestSupport() {
     }
 
     @Test
-    fun `Getting information about a real configuration`() {
+    fun `Getting information about a real configuration using app authentication`() {
         val config = GitHubEngineConfiguration(
             name = uid("GH"),
             url = null,
@@ -83,6 +84,56 @@ class GQLRootQueryGitHubConfigurationsIT : AbstractGitHubTestSupport() {
                 assertTrue(it.path("rateLimits").path("core").path("limit").asInt() > 0)
                 assertTrue(it.path("rateLimits").path("graphql").path("limit").asInt() > 0)
                 assertTrue(it.path("appToken").path("valid").asBoolean(), "App token is still valid")
+            }
+        }
+    }
+
+    @Test
+    fun `Getting information about a real configuration using token authentication`() {
+        val config = GitHubEngineConfiguration(
+            name = uid("GH"),
+            url = null,
+            oauth2Token = githubTestEnv.token,
+        )
+        asAdmin {
+            gitConfigurationService.newConfiguration(config)
+        }
+        run(
+            """
+            {
+                gitHubConfigurations(name: "${config.name}") {
+                    name
+                    url
+                    user
+                    appId
+                    appInstallationAccountName
+                    authenticationType
+                    appToken {
+                        valid
+                        validUntil
+                    }
+                    rateLimits {
+                      core {
+                        limit
+                        used
+                      }
+                      graphql {
+                        limit
+                        used
+                      }
+                    }
+                }
+            }
+        """
+        ) { data ->
+            val node = data["gitHubConfigurations"].first()
+            assertNotNull(node) {
+                assertEquals(config.name, it.getTextField("name"))
+                assertEquals("https://github.com", it.getTextField("url"))
+                assertEquals("TOKEN", it.getTextField("authenticationType"))
+                assertTrue(it.path("rateLimits").path("core").path("limit").asInt() > 0)
+                assertTrue(it.path("rateLimits").path("graphql").path("limit").asInt() > 0)
+                assertJsonNull(it.path("appToken"))
             }
         }
     }
