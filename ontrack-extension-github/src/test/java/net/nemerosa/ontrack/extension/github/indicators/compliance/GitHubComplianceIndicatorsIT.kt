@@ -95,26 +95,14 @@ class GitHubComplianceIndicatorsIT : AbstractGitHubTestSupport() {
                     val values = indicators.associate {
                         it.type.id to it.value
                     }
-                    // Map key x compliance
-                    val compliances = indicators.associate {
-                        it.type.id to it.compliance?.value
-                    }
                     // Checks some values
-                    assertEquals(false, values[RepositoryDefaultBranchShouldBeMain.ID])
-                    assertEquals(false, values[RepositoryMustHaveMaintainingTeam.ID])
-                    assertEquals(false, values[RepositoryTeamMustHaveDescription.ID])
-                    assertEquals(true, values[RepositoryMustHaveDescription.ID])
-                    assertEquals(false, values[RepositoryMustNotHaveAnyAdmin.ID])
-                    assertEquals(true, values[RepositoryMustHaveAReadme.ID])
+                    assertEquals(true, values[RepositoryDefaultBranchShouldBeMain.ID], "Test repo default branch should be main")
+                    assertEquals(false, values[RepositoryMustHaveMaintainingTeam.ID], "Test repo must has no maintaining team")
+                    assertEquals(true, values[RepositoryTeamMustHaveDescription.ID], "Test repo must have a description")
+                    assertEquals(true, values[RepositoryMustHaveDescription.ID], "Test repo must have a description")
+                    assertEquals(true, values[RepositoryMustNotHaveAnyAdmin.ID],"Test repo has no admin")
+                    assertEquals(true, values[RepositoryMustHaveAReadme.ID], "Test repo must have a readme")
                     // TODO assertEquals(false, values[RepositoryShouldBeInternalOrPrivate.ID])
-                    // Checks some compliance
-                    assertEquals(50, compliances[RepositoryDefaultBranchShouldBeMain.ID])
-                    assertEquals(0, compliances[RepositoryMustHaveMaintainingTeam.ID])
-                    assertEquals(0, compliances[RepositoryTeamMustHaveDescription.ID])
-                    assertEquals(100, compliances[RepositoryMustHaveDescription.ID])
-                    assertEquals(0, compliances[RepositoryMustNotHaveAnyAdmin.ID])
-                    assertEquals(100, compliances[RepositoryMustHaveAReadme.ID])
-                    // TODO assertEquals(50, compliances[RepositoryShouldBeInternalOrPrivate.ID])
                 }
             } finally {
                 listOf(
