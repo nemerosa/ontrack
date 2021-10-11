@@ -83,6 +83,16 @@ inline fun <reified E : Enum<E>> JsonNode.getEnum(field: String): E? {
 fun JsonNode.getInt(field: String): Int? = getIntField(field)
 
 /**
+ * Gets a field as a JSON node, but returns `null` if this is a null node.
+ */
+fun JsonNode.getJsonField(field: String): JsonNode? =
+    if (has(field)) {
+        get(field)?.takeIf { !it.isNull }
+    } else {
+        null
+    }
+
+/**
  * Gets a field as [Int].
  */
 fun JsonNode.getIntField(field: String): Int? =

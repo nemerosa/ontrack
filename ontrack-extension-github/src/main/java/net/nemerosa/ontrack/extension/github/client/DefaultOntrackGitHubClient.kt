@@ -408,15 +408,11 @@ class DefaultOntrackGitHubClient(
     }
 
     private fun JsonNode.getUserField(field: String): GitHubUser? =
-        if (has(field)) {
-            get(field)?.run {
-                GitHubUser(
-                    login = getRequiredTextField("login"),
-                    url = getTextField("html_url"),
-                )
-            }
-        } else {
-            null
+        getJsonField(field)?.run {
+            GitHubUser(
+                login = getRequiredTextField("login"),
+                url = getTextField("html_url"),
+            )
         }
 
     private fun JsonNode.getLabels(): List<GitHubLabel> {
@@ -439,19 +435,13 @@ class DefaultOntrackGitHubClient(
         return GitHubState.valueOf(value)
     }
 
-    private fun JsonNode.getMilestone(): GitHubMilestone? {
-        val field = "milestone"
-        return if (has(field)) {
-            val node = get(field)
-            GitHubMilestone(
-                title = node.getRequiredTextField("title"),
-                state = node.getState(),
-                number = node.getRequiredIntField("number"),
-                url = node.getRequiredTextField("html_url"),
-            )
-        } else {
-            null
-        }
+    private fun JsonNode.getMilestone(): GitHubMilestone? = getJsonField("milestone")?.let { node ->
+        GitHubMilestone(
+            title = node.getRequiredTextField("title"),
+            state = node.getState(),
+            number = node.getRequiredIntField("number"),
+            url = node.getRequiredTextField("html_url"),
+        )
     }
 
     private fun JsonNode.getCreatedAt(): LocalDateTime =
