@@ -33,6 +33,10 @@ class GitHubConfigurationServiceImpl(
     ontrackConfigProperties
 ), GitHubConfigurationService {
 
+    override fun checkConfigurationFields(configuration: GitHubEngineConfiguration) {
+        configuration.checkFields()
+    }
+
     override fun validate(configuration: GitHubEngineConfiguration): ConnectionResult =
         try {
             // Gets the client

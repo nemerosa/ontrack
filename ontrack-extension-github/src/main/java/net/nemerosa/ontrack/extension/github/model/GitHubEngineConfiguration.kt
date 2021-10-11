@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.model
 
+import net.nemerosa.ontrack.extension.github.app.GitHubApp
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Memo
 import net.nemerosa.ontrack.model.form.Password
@@ -146,6 +147,41 @@ open class GitHubEngineConfiguration(
         result = 31 * result + (appInstallationAccountName?.hashCode() ?: 0)
         result = 31 * result + url.hashCode()
         return result
+    }
+
+    fun checkFields() {
+        // Password
+        if (!password.isNullOrBlank() && user.isNullOrBlank()) {
+            throw GitHubEngineConfigurationUserRequiredWithPasswordException()
+        }
+        if (!password.isNullOrBlank()) {
+            if (!oauth2Token.isNullOrBlank()) {
+                throw GitHubEngineConfigurationTokenMustBeVoidWithPasswordException()
+            }
+            if (!appId.isNullOrBlank() || !appPrivateKey.isNullOrBlank() || !appInstallationAccountName.isNullOrBlank()) {
+                throw GitHubEngineConfigurationAppMustBeVoidWithPasswordException()
+            }
+        }
+        // Token
+        if (!oauth2Token.isNullOrBlank()) {
+            if (!appId.isNullOrBlank() || !appPrivateKey.isNullOrBlank() || !appInstallationAccountName.isNullOrBlank()) {
+                throw GitHubEngineConfigurationAppMustBeVoidWithTokenException()
+            }
+        }
+        // App ID
+        if (!appId.isNullOrBlank()) {
+            if (appPrivateKey.isNullOrBlank()) {
+                throw GitHubEngineConfigurationAppPrivateKeyRequiredException()
+            }
+        }
+        // App key
+        if (!appPrivateKey.isNullOrBlank()) {
+            try {
+                GitHubApp.readPrivateKey(appPrivateKey)
+            } catch (any: Exception) {
+                throw GitHubEngineConfigurationIncorrectAppPrivateKeyException(any.message ?: "")
+            }
+        }
     }
 
     override fun toString(): String {

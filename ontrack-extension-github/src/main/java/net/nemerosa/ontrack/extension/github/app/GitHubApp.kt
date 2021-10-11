@@ -40,7 +40,7 @@ class GitHubApp(
                 .compact()
         }
 
-        internal fun readPrivateKey(key: String): RSAPrivateKey {
+        fun readPrivateKey(key: String): RSAPrivateKey {
             if (" RSA " in key) {
                 throw InvalidKeySpecException("Private key must be a PKCS#8 formatted string, to convert it from PKCS#1 use: openssl pkcs8 -topk8 -inform PEM -outform PEM -in current-key.pem -out new-key.pem -nocrypt")
             } else {

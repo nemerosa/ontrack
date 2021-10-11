@@ -116,6 +116,7 @@ abstract class AbstractConfigurationService<T : Configuration<T>>(
     }
 
     private fun validateAndCheck(configuration: T) {
+        checkConfigurationFields(configuration)
         if (ontrackConfigProperties.configurationTest) {
             val result = validate(configuration)
             if (result.type == ConnectionResult.ConnectionResultType.ERROR) {
@@ -125,11 +126,18 @@ abstract class AbstractConfigurationService<T : Configuration<T>>(
     }
 
     override fun test(configuration: T): ConnectionResult {
-        return validate(injectCredentials(configuration))
+        val completeConfiguration = injectCredentials(configuration)
+        checkConfigurationFields(completeConfiguration)
+        return validate(completeConfiguration)
     }
 
     /**
-     * Validates a configuration
+     * Checking the fields of this configuration. Throws [net.nemerosa.ontrack.model.exceptions.InputException] in case of error.
+     */
+    protected open fun checkConfigurationFields(configuration: T) {}
+
+    /**
+     * Validates a configuration by connecting to its target
      */
     protected abstract fun validate(configuration: T): ConnectionResult
 

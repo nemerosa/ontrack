@@ -4,8 +4,123 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class GitHubEngineConfigurationTest {
+
+    @Test
+    fun `User is required when password is filled in`() {
+        assertFailsWith<GitHubEngineConfigurationUserRequiredWithPasswordException> {
+            GitHubEngineConfiguration(
+                "test", null,
+                user = "",
+                password = "test",
+            ).checkFields()
+        }
+    }
+
+    @Test
+    fun `Token must not be filled when password is filled in`() {
+        assertFailsWith<GitHubEngineConfigurationTokenMustBeVoidWithPasswordException> {
+            GitHubEngineConfiguration(
+                "test", null,
+                user = "test",
+                password = "test",
+                oauth2Token = "not welcomed"
+            ).checkFields()
+        }
+    }
+
+    @Test
+    fun `App ID must not be filled when password is filled in`() {
+        assertFailsWith<GitHubEngineConfigurationAppMustBeVoidWithPasswordException> {
+            GitHubEngineConfiguration(
+                "test", null,
+                user = "test",
+                password = "test",
+                appId = "not welcomed"
+            ).checkFields()
+        }
+    }
+
+    @Test
+    fun `App private key must not be filled when password is filled in`() {
+        assertFailsWith<GitHubEngineConfigurationAppMustBeVoidWithPasswordException> {
+            GitHubEngineConfiguration(
+                "test", null,
+                user = "test",
+                password = "test",
+                appPrivateKey = "not welcomed"
+            ).checkFields()
+        }
+    }
+
+    @Test
+    fun `App installation account name must not be filled when password is filled in`() {
+        assertFailsWith<GitHubEngineConfigurationAppMustBeVoidWithPasswordException> {
+            GitHubEngineConfiguration(
+                "test", null,
+                user = "test",
+                password = "test",
+                appInstallationAccountName = "not welcomed"
+            ).checkFields()
+        }
+    }
+
+    @Test
+    fun `App ID must not be filled when token is filled in`() {
+        assertFailsWith<GitHubEngineConfigurationAppMustBeVoidWithTokenException> {
+            GitHubEngineConfiguration(
+                "test", null,
+                oauth2Token = "xxxx",
+                appId = "not welcomed",
+            ).checkFields()
+        }
+    }
+
+    @Test
+    fun `App private key must not be filled when token is filled in`() {
+        assertFailsWith<GitHubEngineConfigurationAppMustBeVoidWithTokenException> {
+            GitHubEngineConfiguration(
+                "test", null,
+                oauth2Token = "xxxx",
+                appPrivateKey = "not welcomed"
+            ).checkFields()
+        }
+    }
+
+    @Test
+    fun `App installation account name must not be filled when token is filled in`() {
+        assertFailsWith<GitHubEngineConfigurationAppMustBeVoidWithTokenException> {
+            GitHubEngineConfiguration(
+                "test", null,
+                oauth2Token = "xxxx",
+                appInstallationAccountName = "not welcomed"
+            ).checkFields()
+        }
+    }
+
+    @Test
+    fun `App private key is required when app ID is filled in`() {
+        assertFailsWith<GitHubEngineConfigurationAppPrivateKeyRequiredException> {
+            GitHubEngineConfiguration(
+                "test", null,
+                appId = "123456",
+                appPrivateKey = "",
+            ).checkFields()
+        }
+    }
+
+    @Test
+    fun `App private key must be well formed`() {
+        assertFailsWith<GitHubEngineConfigurationIncorrectAppPrivateKeyException> {
+            GitHubEngineConfiguration(
+                "test", null,
+                appId = "123456",
+                appPrivateKey = "xxxxx",
+            ).checkFields()
+        }
+    }
 
     @Test
     fun obfuscation_of_password() {
