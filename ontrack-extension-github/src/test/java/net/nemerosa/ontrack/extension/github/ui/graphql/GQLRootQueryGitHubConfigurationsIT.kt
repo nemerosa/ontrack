@@ -61,6 +61,7 @@ class GQLRootQueryGitHubConfigurationsIT : AbstractGitHubTestSupport() {
                     appToken {
                         valid
                         validUntil
+                        createdAt
                     }
                     rateLimits {
                       core {
@@ -111,6 +112,7 @@ class GQLRootQueryGitHubConfigurationsIT : AbstractGitHubTestSupport() {
                     appToken {
                         valid
                         validUntil
+                        createdAt
                     }
                     rateLimits {
                       core {

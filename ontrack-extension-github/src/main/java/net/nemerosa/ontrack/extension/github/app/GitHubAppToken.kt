@@ -8,11 +8,13 @@ import java.time.LocalDateTime
  * Token information
  *
  * @property token Value of the token
+ * @property createdAt Date/time of the creation of this token
  * @property validUntil Validity of the token
  * @property installation Installation of the app
  */
 data class GitHubAppToken(
     val token: String,
+    val createdAt: LocalDateTime,
     val validUntil: LocalDateTime,
     val installation: GitHubAppInstallation,
 ) {

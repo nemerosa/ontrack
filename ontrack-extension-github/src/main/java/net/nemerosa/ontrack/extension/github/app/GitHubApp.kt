@@ -103,6 +103,7 @@ class GitHubApp(
         gitHubAppClient.generateInstallationToken(jwt, appInstallation.id).run {
             GitHubAppToken(
                 token = token,
+                createdAt = Time.now(),
                 installation = appInstallation,
                 validUntil = Time.from(expiresAt, null) ?: error("Cannot convert the GH App token expiration date")
             )

@@ -40,6 +40,7 @@ angular.module('ontrack.extension.github', [
                     appInstallationAccountName
                     appToken {
                         valid
+                        createdAt
                         validUntil
                     }
                     links {

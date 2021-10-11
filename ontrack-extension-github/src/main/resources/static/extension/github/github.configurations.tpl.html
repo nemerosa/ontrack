@@ -49,7 +49,7 @@
                                 (for <code>{{ configuration.appInstallationAccountName }}</code>)
                             </span>
                             <span ng-if="configuration.appToken">
-                                <span>Valid until: {{ configuration.appToken.validUntil }} (UTC)</span>
+                                <span title="Created at {{ configuration.appToken.createdAt }} UTC">Valid until: {{ configuration.appToken.validUntil }} (UTC)</span>
                                 <span ng-if="configuration.appToken.valid">
                                     <span class="fa fa-check text-success"></span>
                                     Valid

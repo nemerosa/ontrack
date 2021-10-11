@@ -12,14 +12,14 @@ class GitHubAppTokenTest {
     @Test
     fun `Valid before the date`() {
         val now = Time.now()
-        val token = GitHubAppToken("xxx", validUntil = now.plusMinutes(1), installation = installation())
+        val token = GitHubAppToken("xxx", createdAt = now, validUntil = now.plusMinutes(1), installation = installation())
         assertTrue(token.isValid(), "Token is still valid")
     }
 
     @Test
     fun `Invalid before the date when invalidated`() {
         val now = Time.now()
-        val token = GitHubAppToken("xxx", validUntil = now.plusMinutes(1), installation = installation())
+        val token = GitHubAppToken("xxx", createdAt = now, validUntil = now.plusMinutes(1), installation = installation())
         assertTrue(token.isValid(), "Token is still valid")
         token.invalidate()
         assertFalse(token.isValid(), "Token is no longer valid")
@@ -28,7 +28,7 @@ class GitHubAppTokenTest {
     @Test
     fun `Invalid after the date`() {
         val now = Time.now()
-        val token = GitHubAppToken("xxx", validUntil = now.minusMinutes(1), installation = installation())
+        val token = GitHubAppToken("xxx", createdAt = now, validUntil = now.minusMinutes(1), installation = installation())
         assertFalse(token.isValid(), "Token is no longer valid")
     }
 

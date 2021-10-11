@@ -25,6 +25,7 @@ class GQLTypeGitHubAppToken : GQLType {
                     token.isValid()
                 }
         }
+        .dateField(GitHubAppToken::createdAt.name, "Date of creation")
         .dateField(GitHubAppToken::validUntil.name, "Date of validity")
         .build()
 }
