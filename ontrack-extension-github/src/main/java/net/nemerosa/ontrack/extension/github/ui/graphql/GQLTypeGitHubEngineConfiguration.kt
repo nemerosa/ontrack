@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ui.graphql
 
+import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
@@ -50,6 +51,15 @@ class GQLTypeGitHubEngineConfiguration(
                     val config: GitHubEngineConfiguration = env.getSource()
                     val client = gitHubClientFactory.create(config)
                     client.getRateLimit()
+                }
+        }
+        .field {
+            it.name("authenticationType")
+                .description("Authentication type")
+                .type(GraphQLString)
+                .dataFetcher { env ->
+                    val config: GitHubEngineConfiguration = env.getSource()
+                    config.authenticationType().name
                 }
         }
         .fields(GitHubEngineConfiguration::class.java.graphQLFieldContributions(fieldContributors))
