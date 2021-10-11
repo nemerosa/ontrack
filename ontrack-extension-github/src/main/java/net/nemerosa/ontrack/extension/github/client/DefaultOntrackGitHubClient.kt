@@ -28,6 +28,13 @@ class DefaultOntrackGitHubClient(
 
     private val logger: Logger = LoggerFactory.getLogger(OntrackGitHubClient::class.java)
 
+    override fun getRateLimit(): GitHubRateLimit? =
+        createGitHubRestTemplate()("Gets rate limit") {
+            getForObject<JsonNode>("/rate_limit").getJsonField("resources")?.run {
+                parse()
+            }
+        }
+
     override val organizations: List<GitHubUser>
         get() = if (configuration.authenticationType() == GitHubAuthenticationType.APP) {
             listOf(

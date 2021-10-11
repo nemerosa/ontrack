@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ui.graphql
 
 import graphql.schema.GraphQLObjectType
+import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
 import net.nemerosa.ontrack.graphql.schema.GQLType
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Component
 @Component
 class GQLTypeGitHubEngineConfiguration(
     private val fieldContributors: List<GQLFieldContributor>,
+    private val gqlTypeGitHubRateLimit: GQLTypeGitHubRateLimit,
+    private val gitHubClientFactory: OntrackGitHubClientFactory,
 ) : GQLType {
 
     override fun getTypeName(): String = GitHubEngineConfiguration::class.java.simpleName
@@ -39,6 +42,16 @@ class GQLTypeGitHubEngineConfiguration(
             GitHubEngineConfiguration::appInstallationAccountName,
             "Name of the account where the GitHub App is installed."
         )
+        .field {
+            it.name("rateLimits")
+                .description("Rate limits for this configuration")
+                .type(gqlTypeGitHubRateLimit.typeRef)
+                .dataFetcher { env ->
+                    val config: GitHubEngineConfiguration = env.getSource()
+                    val client = gitHubClientFactory.create(config)
+                    client.getRateLimit()
+                }
+        }
         .fields(GitHubEngineConfiguration::class.java.graphQLFieldContributions(fieldContributors))
         .build()
 }

@@ -11,6 +11,11 @@ import org.springframework.web.client.RestTemplate
 interface OntrackGitHubClient {
 
     /**
+     * Gets the rate limits for the current authentication.
+     */
+    fun getRateLimit(): GitHubRateLimit?
+
+    /**
      * Gets an issue from a repository.
      *
      * @param repository Repository name, like `nemerosa/ontrack`
