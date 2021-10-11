@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.git.model;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.git.GitRepositoryAuthenticator;
 import net.nemerosa.ontrack.git.UsernamePasswordGitRepositoryAuthenticator;
-import net.nemerosa.ontrack.model.support.UserPassword;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
