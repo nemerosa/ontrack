@@ -49,7 +49,6 @@ class DefaultOntrackGitHubClientIT {
         val issue = client.getIssue(githubTestEnv.fullRepository, githubTestEnv.issue)
         assertNotNull(issue, "Issue ${githubTestEnv.fullRepository}#${githubTestEnv.issue} has been found") {
             assertEquals("#${githubTestEnv.issue}", it.displayKey)
-            assertEquals("Collect repositories from teams, not teams from repositories", it.summary)
         }
     }
 
