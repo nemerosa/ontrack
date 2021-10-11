@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.github.ui.graphql
 
+import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLFieldDefinition
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
 import net.nemerosa.ontrack.graphql.support.listType
@@ -16,9 +18,21 @@ class GQLRootQueryGitHubConfigurations(
         .name("gitHubConfigurations")
         .description("List of GitHub configurations")
         .type(listType(gqlTypeGitHubEngineConfiguration.typeRef))
-        .dataFetcher {
-            gitHubConfigurationService.configurations.map {
-                it.obfuscate()
+        .argument {
+            it.name("name")
+                .description("Name of the configuration to get")
+                .type(GraphQLString)
+        }
+        .dataFetcher { env ->
+            val name: String? = env.getArgument("name")
+            if (name.isNullOrBlank()) {
+                gitHubConfigurationService.configurations.map {
+                    it.obfuscate()
+                }
+            } else {
+                listOfNotNull(
+                    gitHubConfigurationService.getOptionalConfiguration(name).getOrNull()
+                )
             }
         }
         .build()
