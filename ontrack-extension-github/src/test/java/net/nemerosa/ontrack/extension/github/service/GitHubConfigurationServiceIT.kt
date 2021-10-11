@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.service
 
 import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
+import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -62,11 +63,12 @@ class GitHubConfigurationServiceIT : AbstractGitHubTestSupport() {
 
     @Test
     fun `App private key is kept on save`() {
+        val appPrivateKey = TestUtils.resourceString("/test-app.pem")
         val config = GitHubEngineConfiguration(
             name = uid("GH"),
             url = null,
             appId = "123456",
-            appPrivateKey = "xxxxx",
+            appPrivateKey = appPrivateKey, // We do need a valid key for the test
         )
         withDisabledConfigurationTest {
             asAdmin {
@@ -82,7 +84,7 @@ class GitHubConfigurationServiceIT : AbstractGitHubTestSupport() {
                     )
                 )
                 // Checks the password is still there
-                assertEquals("xxxxx", gitConfigurationService.getConfiguration(config.name).appPrivateKey)
+                assertEquals(appPrivateKey, gitConfigurationService.getConfiguration(config.name).appPrivateKey)
             }
         }
     }
