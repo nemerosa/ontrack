@@ -24,9 +24,24 @@ angular.module('ontrack.extension.github', [
                 gitHubConfigurations {
                     name
                     url
+                    authenticationType
+                    rateLimits {
+                        core {
+                            limit
+                            used
+                        }
+                        graphql {
+                            limit
+                            used
+                        }
+                    }
                     user
                     appId
                     appInstallationAccountName
+                    appToken {
+                        valid
+                        validUntil
+                    }
                     links {
                         _update
                         _delete

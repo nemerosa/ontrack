@@ -10,6 +10,8 @@
                 <tr>
                     <th>Name</th>
                     <th>URL</th>
+                    <th>Authentication</th>
+                    <th>Used rate limits</th>
                     <th>User</th>
                     <th>GitHub App</th>
                     <th>&nbsp;</th>
@@ -24,6 +26,18 @@
                         <a href="{{configuration.url}}">{{configuration.url}}</a>
                     </td>
                     <td>
+                        {{ configuration.authenticationType }}
+                    </td>
+                    <td>
+                        <p ng-if="configuration.rateLimits">
+                            core: {{ configuration.rateLimits.core.used }}/{{ configuration.rateLimits.core.limit }}
+                        </p>
+                        <p ng-if="configuration.rateLimits">
+                            graphql: {{ configuration.rateLimits.graphql.used }}/{{ configuration.rateLimits.graphql.limit }}
+                        </p>
+                        <span ng-if="!configuration.rateLimits">-</span>
+                    </td>
+                    <td>
                         <span ng-if="configuration.user">
                             {{configuration.user}}
                         </span>
@@ -33,6 +47,17 @@
                             {{ configuration.appId }}
                             <span ng-if="configuration.appInstallationAccountName">
                                 (for <code>{{ configuration.appInstallationAccountName }}</code>)
+                            </span>
+                            <span ng-if="configuration.appToken">
+                                <span>Valid until: {{ configuration.appToken.validUntil }} (UTC)</span>
+                                <span ng-if="configuration.appToken.valid">
+                                    <span class="fa fa-check text-success"></span>
+                                    Valid
+                                </span>
+                                <span ng-if="!configuration.appToken.valid">
+                                    <span class="fa fa-exclamation-circle text-danger"></span>
+                                    Invalid
+                                </span>
                             </span>
                         </span>
                     </td>
