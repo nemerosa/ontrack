@@ -14,6 +14,13 @@ interface GitHubAppTokenService {
         appInstallationAccountName: String?,
     ): String
 
+    fun getAppInstallationTokenInformation(
+        configurationName: String,
+        appId: String,
+        appPrivateKey: String,
+        appInstallationAccountName: String?,
+    ): GitHubAppToken
+
     fun invalidateAppInstallationToken(configurationName: String)
 
     /**

@@ -57,6 +57,10 @@ class GQLRootQueryGitHubConfigurationsIT : AbstractGitHubTestSupport() {
                     appId
                     appInstallationAccountName
                     authenticationType
+                    appToken {
+                        valid
+                        validUntil
+                    }
                     rateLimits {
                       core {
                         limit
@@ -78,6 +82,7 @@ class GQLRootQueryGitHubConfigurationsIT : AbstractGitHubTestSupport() {
                 assertEquals("APP", it.getTextField("authenticationType"))
                 assertTrue(it.path("rateLimits").path("core").path("limit").asInt() > 0)
                 assertTrue(it.path("rateLimits").path("graphql").path("limit").asInt() > 0)
+                assertTrue(it.path("appToken").path("valid").asBoolean(), "App token is still valid")
             }
         }
     }

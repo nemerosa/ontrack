@@ -2,8 +2,11 @@ package net.nemerosa.ontrack.extension.github.ui.graphql
 
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
+import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
+import net.nemerosa.ontrack.extension.github.model.GitHubAuthenticationType
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
+import net.nemerosa.ontrack.extension.github.model.getAppInstallationTokenInformation
 import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
@@ -15,7 +18,9 @@ import org.springframework.stereotype.Component
 class GQLTypeGitHubEngineConfiguration(
     private val fieldContributors: List<GQLFieldContributor>,
     private val gqlTypeGitHubRateLimit: GQLTypeGitHubRateLimit,
+    private val gqlTypeGitHubAppToken: GQLTypeGitHubAppToken,
     private val gitHubClientFactory: OntrackGitHubClientFactory,
+    private val gitHubAppTokenService: GitHubAppTokenService,
 ) : GQLType {
 
     override fun getTypeName(): String = GitHubEngineConfiguration::class.java.simpleName
@@ -60,6 +65,19 @@ class GQLTypeGitHubEngineConfiguration(
                 .dataFetcher { env ->
                     val config: GitHubEngineConfiguration = env.getSource()
                     config.authenticationType().name
+                }
+        }
+        .field {
+            it.name("appToken")
+                .description("GitHub App token information")
+                .type(gqlTypeGitHubAppToken.typeRef)
+                .dataFetcher { env ->
+                    val config: GitHubEngineConfiguration = env.getSource()
+                    if (config.authenticationType() == GitHubAuthenticationType.APP) {
+                        gitHubAppTokenService.getAppInstallationTokenInformation(config)
+                    } else {
+                        null
+                    }
                 }
         }
         .fields(GitHubEngineConfiguration::class.java.graphQLFieldContributions(fieldContributors))

@@ -24,9 +24,14 @@ class DefaultGitHubAppTokenService(
         appId: String,
         appPrivateKey: String,
         appInstallationAccountName: String?
-    ): String {
-        return gitHubAppToken(configurationName, appId, appPrivateKey, appInstallationAccountName).token
-    }
+    ): String = gitHubAppToken(configurationName, appId, appPrivateKey, appInstallationAccountName).token
+
+    override fun getAppInstallationTokenInformation(
+        configurationName: String,
+        appId: String,
+        appPrivateKey: String,
+        appInstallationAccountName: String?
+    ): GitHubAppToken = gitHubAppToken(configurationName, appId, appPrivateKey, appInstallationAccountName)
 
     override fun getAppInstallationAccount(
         configurationName: String,
