@@ -56,11 +56,7 @@ class GitRepositoryClientImpl(
      * Setting up the command with authentication
      */
     private fun <C : TransportCommand<C, *>> C.configure(): C =
-        this
-            .setTransportConfigCallback { transport ->
-                this@GitRepositoryClientImpl.repository.authenticator?.configureTransport(transport)
-            }
-            .setCredentialsProvider(credentialsProvider)
+        this.setCredentialsProvider(credentialsProvider)
 
     override val remoteBranches: List<String>
         get() {
@@ -190,9 +186,6 @@ class GitRepositoryClientImpl(
                 .configure()
                 .setRemote(repository.remote)
                 .setHeads(true)
-                .setTransportConfigCallback { transport ->
-                    repository.authenticator?.configureTransport(transport)
-                }
                 .call()
         } catch (e: GitAPIException) {
             throw GitTestException(e.message)
