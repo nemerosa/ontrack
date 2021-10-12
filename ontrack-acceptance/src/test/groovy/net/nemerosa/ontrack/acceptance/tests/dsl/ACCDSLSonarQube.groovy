@@ -13,7 +13,7 @@ class ACCDSLSonarQube extends AbstractACCDSL {
     void 'SonarQube configuration'() {
         def name = uid('S')
         ontrack.configure {
-            sonarQube name, 'http://sonarqube.nemerosa.net'
+            sonarQubeWithToken name, 'http://sonarqube.nemerosa.net', 'xxx'
         }
         assert ontrack.config.sonarQube.find { it == name } != null
     }
@@ -39,7 +39,7 @@ class ACCDSLSonarQube extends AbstractACCDSL {
         // Creating a configuration
         def name = uid('S')
         ontrack.configure {
-            sonarQube name, 'http://sonarqube.nemerosa.net'
+            sonarQubeWithToken name, 'http://sonarqube.nemerosa.net', 'xxx'
         }
         // Configuring a project
         String projectName = uid("P")
@@ -70,7 +70,7 @@ class ACCDSLSonarQube extends AbstractACCDSL {
         // Creating a configuration
         def name = uid('S')
         ontrack.configure {
-            sonarQube name, 'http://sonarqube.nemerosa.net'
+            sonarQubeWithToken name, 'http://sonarqube.nemerosa.net', 'xxx'
         }
         // Configuring a project
         String projectName = uid("P")

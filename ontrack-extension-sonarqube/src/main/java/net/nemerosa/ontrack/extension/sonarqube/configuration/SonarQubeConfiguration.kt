@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.sonarqube.configuration
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.CredentialsConfiguration
 
@@ -11,6 +12,7 @@ import net.nemerosa.ontrack.model.support.CredentialsConfiguration
  * @property password Connection token (called `password` for legacy reasons)
  */
 // TODO #532 Using `open` as a workaround
+@JsonIgnoreProperties(ignoreUnknown = true)
 open class SonarQubeConfiguration(
     override val name: String,
     val url: String,
@@ -47,4 +49,24 @@ open class SonarQubeConfiguration(
         url = url,
         password = decrypting(password),
     )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SonarQubeConfiguration) return false
+
+        if (name != other.name) return false
+        if (url != other.url) return false
+        if (password != other.password) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + url.hashCode()
+        result = 31 * result + (password?.hashCode() ?: 0)
+        return result
+    }
+
+
 }

@@ -416,7 +416,8 @@ class Config {
      * SonarQube extension
      */
 
-    @DSLMethod(value = "Creates or updates a SonarQube configuration.", count = 4)
+    @DSLMethod(value = "Creates or updates a SonarQube configuration. Deprecated, use `sonarQubeWithToken` instead. This method will be removed in V5.", count = 4)
+    @Deprecated
     def sonarQube(String name, String url, String user = '', String password = '') {
         ontrack.post(
                 'extension/sonarqube/configurations/create', [
@@ -424,6 +425,16 @@ class Config {
                 url     : url,
                 user    : user,
                 password: password
+        ])
+    }
+
+    @DSLMethod(value = "Creates or updates a SonarQube configuration using a token.")
+    def sonarQubeWithToken(String name, String url, String token) {
+        ontrack.post(
+                'extension/sonarqube/configurations/create', [
+                name    : name,
+                url     : url,
+                password: token
         ])
     }
 
