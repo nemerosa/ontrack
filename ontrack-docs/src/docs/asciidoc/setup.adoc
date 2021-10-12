@@ -62,6 +62,17 @@ ontrack:
         groupFilter: ontrack-.*
 ----
 
+To add a <<integration-github,GitHub configuration>> based on an OAuth2 token:
+
+[source,yaml]
+----
+ontrack:
+  config:
+    github:
+      - name: GitHub
+        token: <your secret token>
+----
+
 [[casc-control]]
 ==== Controls
 
