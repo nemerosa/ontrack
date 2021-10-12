@@ -123,6 +123,23 @@ class GitHubEngineConfigurationTest {
     }
 
     @Test
+    fun `Backward compatibiity and check`() {
+        assertEquals(
+            GitHubEngineConfiguration(
+                "test", "https://github.com",
+                oauth2Token = "xxxx",
+            ),
+            mapOf(
+                "name" to "test",
+                "url" to "https://github.com",
+                "oauth2Token" to "xxxx"
+            ).asJson().parse<GitHubEngineConfiguration>().apply {
+                checkFields()
+            }
+        )
+    }
+
+    @Test
     fun obfuscation_of_password() {
         val configuration = GitHubEngineConfiguration(
             "ontrack",

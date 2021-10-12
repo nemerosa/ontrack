@@ -1,13 +1,85 @@
 package net.nemerosa.ontrack.extension.github.service
 
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
+import net.nemerosa.ontrack.model.support.ConfigurationRepository
 import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class GitHubConfigurationServiceIT : AbstractGitHubTestSupport() {
+
+    @Autowired
+    private lateinit var configurationRepository: ConfigurationRepository
+
+    @Test
+    fun `Encrypting and decrypting the token`() {
+        val config = GitHubEngineConfiguration(
+            name = uid("GH"),
+            url = null,
+            oauth2Token = "xxxxx",
+        )
+        withDisabledConfigurationTest {
+            asAdmin {
+                gitConfigurationService.newConfiguration(config)
+                // Gets the raw configuration
+                assertNotNull(
+                    configurationRepository.find(GitHubEngineConfiguration::class.java, config.name).getOrNull()
+                ) {
+                    // Checks it's encrypted
+                    assertFalse(it.oauth2Token.isNullOrBlank(), "Token is saved")
+                    assertTrue(it.oauth2Token != "xxxxx", "Token is not plain")
+                }
+                // Loading the configuration
+                gitConfigurationService.getConfiguration(config.name).apply {
+                    // Checks its token has been decrypted
+                    assertEquals("xxxxx", oauth2Token)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Backward compatibility with previously plain tokens`() {
+        val config = GitHubEngineConfiguration(
+            name = uid("GH"),
+            url = null,
+            oauth2Token = "xxxxx",
+        )
+        withDisabledConfigurationTest {
+            asAdmin {
+                // Saving a configuration using the old format (non encrypted)
+                configurationRepository.save(config)
+                // Checks it's saved in plain
+                assertNotNull(configurationRepository.find(GitHubEngineConfiguration::class.java, config.name).getOrNull()) {
+                    assertEquals("xxxxx", it.oauth2Token)
+                }
+                // Testing it can be read again
+                gitConfigurationService.getConfiguration(config.name).apply {
+                    // Checks its token has been decrypted
+                    assertEquals("xxxxx", oauth2Token)
+                }
+                // Saving it again
+                gitConfigurationService.updateConfiguration(config.name, config)
+                // Checks it's now encrypted
+                assertNotNull(configurationRepository.find(GitHubEngineConfiguration::class.java, config.name).getOrNull()) {
+                    assertFalse(it.oauth2Token.isNullOrBlank(), "Token is saved")
+                    assertTrue(it.oauth2Token != "xxxxx", "Token is encrypted")
+                }
+                // Testing it can be read again
+                gitConfigurationService.getConfiguration(config.name).apply {
+                    // Checks its token has been decrypted
+                    assertEquals("xxxxx", oauth2Token)
+                }
+            }
+        }
+    }
 
     @Test
     fun `Password is kept on save`() {
