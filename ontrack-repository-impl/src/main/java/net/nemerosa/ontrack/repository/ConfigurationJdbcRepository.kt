@@ -55,7 +55,7 @@ class ConfigurationJdbcRepository(
         )
     }
 
-    override fun <T : Configuration<T>> migrate(configurationClass: Class<T>, migration: (raw: JsonNode) -> T) {
+    override fun <T : Configuration<T>> migrate(configurationClass: Class<T>, migration: (raw: JsonNode) -> T?) {
         namedParameterJdbcTemplate!!.query(
             "SELECT * FROM CONFIGURATIONS WHERE TYPE = :type ORDER BY NAME",
             params("type", configurationClass.name)
@@ -63,10 +63,12 @@ class ConfigurationJdbcRepository(
             val id = rs.getInt("id")
             val content = readJson(rs, "content")
             val newValue = migration(content)
-            namedParameterJdbcTemplate!!.update(
-                "UPDATE CONFIGURATIONS SET CONTENT = CAST(:content AS JSONB) WHERE ID = :id",
-                params("content", writeJson(newValue)).addValue("id", id)
-            )
+            if (newValue != null) {
+                namedParameterJdbcTemplate!!.update(
+                    "UPDATE CONFIGURATIONS SET CONTENT = CAST(:content AS JSONB) WHERE ID = :id",
+                    params("content", writeJson(newValue)).addValue("id", id)
+                )
+            }
         }
     }
 }

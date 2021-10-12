@@ -111,25 +111,11 @@ open class GitHubEngineConfiguration(
         url = url,
         user = user,
         password = decrypting(password?.takeIf { it.isNotBlank() }),
-        oauth2Token = decryptToken(decrypting),
+        oauth2Token = decrypting(oauth2Token?.takeIf { it.isNotBlank() }),
         appId = appId,
         appPrivateKey = decrypting(appPrivateKey?.takeIf { it.isNotBlank() }),
         appInstallationAccountName = appInstallationAccountName,
     )
-
-    /**
-     * Backward compatibility - the token used to be stored in plain.
-     */
-    private fun decryptToken(decrypting: (encrypted: String?) -> String?): String? =
-        if (oauth2Token.isNullOrBlank()) {
-            null
-        } else {
-            try {
-                decrypting(oauth2Token)
-            } catch (any: Exception) {
-                oauth2Token
-            }
-        }
 
     fun asForm(): Form = form(this)
 

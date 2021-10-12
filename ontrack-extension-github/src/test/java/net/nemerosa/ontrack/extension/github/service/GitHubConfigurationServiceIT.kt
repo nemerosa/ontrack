@@ -45,42 +45,6 @@ class GitHubConfigurationServiceIT : AbstractGitHubTestSupport() {
     }
 
     @Test
-    fun `Backward compatibility with previously plain tokens`() {
-        val config = GitHubEngineConfiguration(
-            name = uid("GH"),
-            url = null,
-            oauth2Token = "xxxxx",
-        )
-        withDisabledConfigurationTest {
-            asAdmin {
-                // Saving a configuration using the old format (non encrypted)
-                configurationRepository.save(config)
-                // Checks it's saved in plain
-                assertNotNull(configurationRepository.find(GitHubEngineConfiguration::class.java, config.name)) {
-                    assertEquals("xxxxx", it.oauth2Token)
-                }
-                // Testing it can be read again
-                gitConfigurationService.getConfiguration(config.name).apply {
-                    // Checks its token has been decrypted
-                    assertEquals("xxxxx", oauth2Token)
-                }
-                // Saving it again
-                gitConfigurationService.updateConfiguration(config.name, config)
-                // Checks it's now encrypted
-                assertNotNull(configurationRepository.find(GitHubEngineConfiguration::class.java, config.name)) {
-                    assertFalse(it.oauth2Token.isNullOrBlank(), "Token is saved")
-                    assertTrue(it.oauth2Token != "xxxxx", "Token is encrypted")
-                }
-                // Testing it can be read again
-                gitConfigurationService.getConfiguration(config.name).apply {
-                    // Checks its token has been decrypted
-                    assertEquals("xxxxx", oauth2Token)
-                }
-            }
-        }
-    }
-
-    @Test
     fun `Password is kept on save`() {
         val config = GitHubEngineConfiguration(
             name = uid("GH"),

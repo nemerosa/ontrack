@@ -39,7 +39,7 @@ include::api.adoc[]
 
 include::administration.adoc[]
 
-// TODO Development
+include::development.adoc[]
 
 include::architecture.adoc[]
 

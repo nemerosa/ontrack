@@ -29,10 +29,10 @@ interface ConfigurationRepository {
      *
      * @param configurationClass Type of the configuration
      * @param migration This code takes the raw JSON representation and converts it into a new format just before
-     * being saved.
+     * being saved. If it returns null, the configuration does not have to change.
      */
     fun <T : Configuration<T>> migrate(
         configurationClass: Class<T>,
-        migration: (raw: JsonNode) -> T
+        migration: (raw: JsonNode) -> T?
     )
 }
