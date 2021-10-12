@@ -13,7 +13,7 @@ angular.module('ontrack.extension.github', [
         });
     })
     .controller('GitHubConfigurationsCtrl', function ($scope, $http, ot, otFormService, otAlertService, otConfigurationService, otGraphqlService) {
-        var view = ot.view();
+        const view = ot.view();
         view.title = 'GitHub configurations';
         view.description = 'Management of the GitHub configurations.';
         view.commands = [];
@@ -52,7 +52,9 @@ angular.module('ontrack.extension.github', [
         `;
 
         // Loading the configurations
+        $scope.loadingConfigurations = true;
         function load() {
+            $scope.loadingConfigurations = true;
             otGraphqlService.pageGraphQLCall(query).then((data) => {
                 $scope.configurations = data.gitHubConfigurations;
                 view.commands = [
@@ -64,6 +66,8 @@ angular.module('ontrack.extension.github', [
                     },
                     ot.viewCloseCommand('/home')
                 ];
+            }).finally(() => {
+                $scope.loadingConfigurations = false;
             });
         }
 
