@@ -13,8 +13,6 @@ import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Optional;
-
 import static net.nemerosa.ontrack.extension.api.support.TestConfiguration.PLAIN_PASSWORD;
 import static net.nemerosa.ontrack.extension.api.support.TestConfiguration.config;
 import static org.mockito.Mockito.*;
@@ -59,7 +57,7 @@ public class ConfigurationServiceTest {
         TestConfiguration config = config("test");
         Event event = Event.of(EventFactory.UPDATE_CONFIGURATION).with("configuration", "test").get();
         when(eventFactory.updateConfiguration(config)).thenReturn(event);
-        when(configurationRepository.find(TestConfiguration.class, "test")).thenReturn(Optional.of(config));
+        when(configurationRepository.find(TestConfiguration.class, "test")).thenReturn(config);
         configurationService.updateConfiguration("test", config);
         verify(eventPostService).post(event);
     }
@@ -68,7 +66,7 @@ public class ConfigurationServiceTest {
     public void event_on_delete_configuration() {
         TestConfiguration config = config("test");
         Event event = Event.of(EventFactory.DELETE_CONFIGURATION).with("configuration", "test").get();
-        when(configurationRepository.find(TestConfiguration.class, "test")).thenReturn(Optional.of(config));
+        when(configurationRepository.find(TestConfiguration.class, "test")).thenReturn(config);
         when(eventFactory.deleteConfiguration(config.withPassword("xxxxx"))).thenReturn(event);
         when(encryptionService.decrypt(PLAIN_PASSWORD)).thenReturn("xxxxx");
         configurationService.deleteConfiguration("test");

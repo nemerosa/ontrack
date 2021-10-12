@@ -1,28 +1,38 @@
-package net.nemerosa.ontrack.model.support;
+package net.nemerosa.ontrack.model.support
 
-import java.util.List;
-import java.util.Optional;
+import com.fasterxml.jackson.databind.JsonNode
 
-public interface ConfigurationRepository {
-
+interface ConfigurationRepository {
     /**
      * Gets the list of items for this configuration class
      */
-    <T extends Configuration<T>> List<T> list(Class<T> configurationClass);
+    fun <T : Configuration<T>> list(configurationClass: Class<T>): List<T>
 
     /**
      * Gets a configuration using its name
      */
-    <T extends Configuration<T>> Optional<T> find(Class<T> configurationClass, String name);
+    fun <T : Configuration<T>> find(configurationClass: Class<T>, name: String): T?
 
     /**
      * Saves or creates a configuration
      */
-    <T extends Configuration<T>> T save(T configuration);
+    fun <T : Configuration<T>> save(configuration: T): T
 
     /**
      * Deletes a configuration
      */
-    <T extends Configuration<T>> void delete(Class<T> configurationClass, String name);
+    fun <T : Configuration<T>> delete(configurationClass: Class<T>, name: String)
 
+    /**
+     * Method used to migrate existing configurations using their JSON representation as a source
+     * and rewrites them before saving them.
+     *
+     * @param configurationClass Type of the configuration
+     * @param migration This code takes the raw JSON representation and converts it into a new format just before
+     * being saved.
+     */
+    fun <T : Configuration<T>> migrate(
+        configurationClass: Class<T>,
+        migration: (raw: JsonNode) -> T
+    )
 }

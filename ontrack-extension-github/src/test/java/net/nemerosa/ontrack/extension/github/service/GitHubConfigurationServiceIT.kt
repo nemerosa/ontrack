@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.github.service
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.model.support.ConfigurationRepository
@@ -30,7 +29,7 @@ class GitHubConfigurationServiceIT : AbstractGitHubTestSupport() {
                 gitConfigurationService.newConfiguration(config)
                 // Gets the raw configuration
                 assertNotNull(
-                    configurationRepository.find(GitHubEngineConfiguration::class.java, config.name).getOrNull()
+                    configurationRepository.find(GitHubEngineConfiguration::class.java, config.name)
                 ) {
                     // Checks it's encrypted
                     assertFalse(it.oauth2Token.isNullOrBlank(), "Token is saved")
@@ -57,7 +56,7 @@ class GitHubConfigurationServiceIT : AbstractGitHubTestSupport() {
                 // Saving a configuration using the old format (non encrypted)
                 configurationRepository.save(config)
                 // Checks it's saved in plain
-                assertNotNull(configurationRepository.find(GitHubEngineConfiguration::class.java, config.name).getOrNull()) {
+                assertNotNull(configurationRepository.find(GitHubEngineConfiguration::class.java, config.name)) {
                     assertEquals("xxxxx", it.oauth2Token)
                 }
                 // Testing it can be read again
@@ -68,7 +67,7 @@ class GitHubConfigurationServiceIT : AbstractGitHubTestSupport() {
                 // Saving it again
                 gitConfigurationService.updateConfiguration(config.name, config)
                 // Checks it's now encrypted
-                assertNotNull(configurationRepository.find(GitHubEngineConfiguration::class.java, config.name).getOrNull()) {
+                assertNotNull(configurationRepository.find(GitHubEngineConfiguration::class.java, config.name)) {
                     assertFalse(it.oauth2Token.isNullOrBlank(), "Token is saved")
                     assertTrue(it.oauth2Token != "xxxxx", "Token is encrypted")
                 }

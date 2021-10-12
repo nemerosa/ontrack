@@ -44,7 +44,7 @@ class BitbucketCloudConfigurationController(
      */
     @PostMapping("test")
     fun testConfiguration(@RequestBody configuration: BitbucketCloudConfiguration?): ConnectionResult {
-        return configurationService.test(configuration)
+        return configurationService.test(configuration!!)
     }
 
     /**
@@ -91,9 +91,7 @@ class BitbucketCloudConfigurationController(
      */
     @GetMapping("{name:.*}/update")
     fun updateConfigurationForm(@PathVariable name: String): Form =
-        configurationService.getConfiguration(name).let {
-            getConfigurationForm(it)
-        }
+        getConfigurationForm(configurationService.getConfiguration(name))
 
     /**
      * Updating one configuration

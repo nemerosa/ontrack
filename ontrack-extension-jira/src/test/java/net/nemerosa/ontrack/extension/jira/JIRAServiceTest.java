@@ -12,8 +12,6 @@ import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Optional;
-
 import static org.mockito.Mockito.*;
 
 public class JIRAServiceTest {
@@ -50,9 +48,7 @@ public class JIRAServiceTest {
         when(encryptionService.encrypt("secret")).thenReturn("xxxxx");
         when(encryptionService.decrypt("xxxxx")).thenReturn("secret");
         when(configurationRepository.find(JIRAConfiguration.class, "test")).thenReturn(
-                Optional.of(
-                        new JIRAConfiguration("test", "http://host", "user", "xxxxx")
-                )
+            new JIRAConfiguration("test", "http://host", "user", "xxxxx")
         );
         jiraService.updateConfiguration("test", new JIRAConfiguration("test", "http://host", "user", ""));
         verify(configurationRepository, times(1)).save(new JIRAConfiguration("test", "http://host", "user", "xxxxx"));
@@ -62,9 +58,7 @@ public class JIRAServiceTest {
     public void update_blank_password_for_different_user() {
         when(encryptionService.encrypt("")).thenReturn("xxxxx");
         when(configurationRepository.find(JIRAConfiguration.class, "test")).thenReturn(
-                Optional.of(
-                        new JIRAConfiguration("test", "http://host", "user", "xxxxx")
-                )
+            new JIRAConfiguration("test", "http://host", "user", "xxxxx")
         );
         jiraService.updateConfiguration("test", new JIRAConfiguration("test", "http://host", "user1", ""));
         verify(configurationRepository, times(1)).save(new JIRAConfiguration("test", "http://host", "user1", "xxxxx"));
@@ -74,9 +68,7 @@ public class JIRAServiceTest {
     public void update_new_password() {
         when(encryptionService.encrypt("pwd")).thenReturn("xxxxx");
         when(configurationRepository.find(JIRAConfiguration.class, "test")).thenReturn(
-                Optional.of(
-                        new JIRAConfiguration("test", "http://host", "user", "xxxxx")
-                )
+            new JIRAConfiguration("test", "http://host", "user", "xxxxx")
         );
         jiraService.updateConfiguration("test", new JIRAConfiguration("test", "http://host", "user", "pwd"));
         verify(configurationRepository, times(1)).save(new JIRAConfiguration("test", "http://host", "user", "xxxxx"));

@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.support
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventPostService
 import net.nemerosa.ontrack.model.security.EncryptionException
@@ -30,17 +29,14 @@ abstract class AbstractConfigurationService<T : Configuration<T>>(
         securityService.checkGlobalFunction(GlobalSettings::class.java)
     }
 
-    override fun getConfigurations(): List<T> {
-        return configurationRepository.list(configurationClass)
+    override val configurations: List<T>
+        get() = configurationRepository.list(configurationClass)
             .map { config: T -> decrypt(config) }
-    }
 
-    override fun getConfigurationDescriptors(): List<ConfigurationDescriptor> {
-        return securityService.asAdmin {
-            configurations
-                .map { it.descriptor }
+    override val configurationDescriptors: List<ConfigurationDescriptor>
+        get() = securityService.asAdmin {
+            configurations.map { it.descriptor }
         }
-    }
 
     override fun newConfiguration(configuration: T): T {
         checkAccess()
@@ -60,16 +56,13 @@ abstract class AbstractConfigurationService<T : Configuration<T>>(
             ?: throw ConfigurationNotFoundException(name)
     }
 
-    private fun findConfiguration(name: String): T? {
-        return configurationRepository
+    override fun findConfiguration(name: String): T? =
+        configurationRepository
             .find(configurationClass, name)
-            .getOrNull()
             ?.run { decrypt(this) }
-    }
 
-    override fun getOptionalConfiguration(name: String): Optional<T> {
-        return configurationRepository.find(configurationClass, name).map { config: T -> decrypt(config) }
-    }
+    override fun getOptionalConfiguration(name: String): Optional<T> =
+        Optional.ofNullable(findConfiguration(name))
 
     override fun deleteConfiguration(name: String) {
         checkAccess()
@@ -148,9 +141,7 @@ abstract class AbstractConfigurationService<T : Configuration<T>>(
         return configuration
     }
 
-    override fun getConfigurationType(): Class<T> {
-        return configurationClass
-    }
+    override val configurationType: Class<T> = configurationClass
 
     protected fun encrypt(config: T): T {
         return config.encrypt {

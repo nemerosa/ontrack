@@ -36,7 +36,7 @@ public class CombinedIssueServiceConfigurationServiceImpl implements CombinedIss
 
     @Override
     public Optional<CombinedIssueServiceConfiguration> getConfigurationByName(String name) {
-        return configurationRepository.find(CombinedIssueServiceConfiguration.class, name);
+        return Optional.ofNullable(configurationRepository.find(CombinedIssueServiceConfiguration.class, name));
     }
 
     @Override

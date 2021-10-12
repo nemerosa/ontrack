@@ -71,7 +71,7 @@ class SonarQubeController(
      */
     @GetMapping("configurations")
     fun getConfigurations(): Resources<SonarQubeConfiguration> {
-        return Resources.of<SonarQubeConfiguration>(
+        return Resources.of(
                 configurationService.configurations,
                 uri(on(javaClass).getConfigurations())
         )
@@ -84,7 +84,7 @@ class SonarQubeController(
      */
     @PostMapping("configurations/test")
     fun testConfiguration(@RequestBody configuration: SonarQubeConfiguration?): ConnectionResult {
-        return configurationService.test(configuration)
+        return configurationService.test(configuration ?: error("Expecting a non null body"))
     }
 
     /**

@@ -1,74 +1,72 @@
-package net.nemerosa.ontrack.repository;
+package net.nemerosa.ontrack.repository
 
-import net.nemerosa.ontrack.model.support.Configuration;
-import net.nemerosa.ontrack.model.support.ConfigurationRepository;
-import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.stereotype.Repository;
-
-import javax.sql.DataSource;
-import java.util.List;
-import java.util.Optional;
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.model.support.Configuration
+import net.nemerosa.ontrack.model.support.ConfigurationRepository
+import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
+import org.springframework.stereotype.Repository
+import javax.sql.DataSource
 
 @Repository
-public class ConfigurationJdbcRepository extends AbstractJdbcRepository implements ConfigurationRepository {
+class ConfigurationJdbcRepository(
+    dataSource: DataSource
+) : AbstractJdbcRepository(dataSource), ConfigurationRepository {
 
-    @Autowired
-    public ConfigurationJdbcRepository(DataSource dataSource) {
-        super(dataSource);
-    }
+    override fun <T : Configuration<T>> list(configurationClass: Class<T>): List<T> =
+        namedParameterJdbcTemplate!!.query(
+            "SELECT * FROM CONFIGURATIONS WHERE TYPE = :type ORDER BY NAME",
+            params("type", configurationClass.name)
+        ) { rs, _ -> readJson(configurationClass, rs, "content") }
 
-    @Override
-    public <T extends Configuration<T>> List<T> list(Class<T> configurationClass) {
-        return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM CONFIGURATIONS WHERE TYPE = :type ORDER BY NAME",
-                params("type", configurationClass.getName()),
-                (rs, rowNum) -> readJson(configurationClass, rs, "content")
-        );
-    }
+    override fun <T : Configuration<T>> find(configurationClass: Class<T>, name: String): T? =
+        getFirstItem<T>(
+            "SELECT * FROM CONFIGURATIONS WHERE TYPE = :type AND NAME = :name",
+            params("type", configurationClass.name).addValue("name", name)
+        ) { rs, _ -> readJson(configurationClass, rs, "content") }
 
-    @Override
-    public <T extends Configuration<T>> Optional<T> find(Class<T> configurationClass, String name) {
-        return Optional.ofNullable(
-                getFirstItem(
-                        "SELECT * FROM CONFIGURATIONS WHERE TYPE = :type AND NAME = :name",
-                        params("type", configurationClass.getName()).addValue("name", name),
-                        (rs, rowNum) -> readJson(configurationClass, rs, "content")
-                )
-        );
-    }
-
-    @Override
-    public <T extends Configuration<T>> T save(T configuration) {
-        MapSqlParameterSource params = params("type", configuration.getClass().getName()).addValue("name", configuration.getName());
-        Integer id = getFirstItem(
-                "SELECT ID FROM CONFIGURATIONS WHERE TYPE = :type AND NAME = :name",
-                params,
-                Integer.class
-        );
+    override fun <T : Configuration<T>> save(configuration: T): T {
+        val params = params("type", configuration.javaClass.name).addValue("name", configuration.name)
+        val id = getFirstItem(
+            "SELECT ID FROM CONFIGURATIONS WHERE TYPE = :type AND NAME = :name",
+            params,
+            Int::class.java
+        )
         if (id != null) {
             // Update
-            getNamedParameterJdbcTemplate().update(
-                    "UPDATE CONFIGURATIONS SET CONTENT = CAST(:content AS JSONB) WHERE ID = :id",
-                    params.addValue("content", writeJson(configuration)).addValue("id", id)
-            );
+            namedParameterJdbcTemplate!!.update(
+                "UPDATE CONFIGURATIONS SET CONTENT = CAST(:content AS JSONB) WHERE ID = :id",
+                params.addValue("content", writeJson(configuration)).addValue("id", id)
+            )
         } else {
             // Creation
-            getNamedParameterJdbcTemplate().update(
-                    "INSERT INTO CONFIGURATIONS(TYPE, NAME, CONTENT) VALUES (:type, :name, CAST(:content AS JSONB))",
-                    params.addValue("content", writeJson(configuration))
-            );
+            namedParameterJdbcTemplate!!.update(
+                "INSERT INTO CONFIGURATIONS(TYPE, NAME, CONTENT) VALUES (:type, :name, CAST(:content AS JSONB))",
+                params.addValue("content", writeJson(configuration))
+            )
         }
         // OK
-        return configuration;
+        return configuration
     }
 
-    @Override
-    public <T extends Configuration<T>> void delete(Class<T> configurationClass, String name) {
-        getNamedParameterJdbcTemplate().update(
-                "DELETE FROM CONFIGURATIONS WHERE TYPE = :type AND NAME = :name",
-                params("type", configurationClass.getName()).addValue("name", name)
-        );
+    override fun <T : Configuration<T>> delete(configurationClass: Class<T>, name: String) {
+        namedParameterJdbcTemplate!!.update(
+            "DELETE FROM CONFIGURATIONS WHERE TYPE = :type AND NAME = :name",
+            params("type", configurationClass.name).addValue("name", name)
+        )
+    }
+
+    override fun <T : Configuration<T>> migrate(configurationClass: Class<T>, migration: (raw: JsonNode) -> T) {
+        namedParameterJdbcTemplate!!.query(
+            "SELECT * FROM CONFIGURATIONS WHERE TYPE = :type ORDER BY NAME",
+            params("type", configurationClass.name)
+        ) { rs ->
+            val id = rs.getInt("id")
+            val content = readJson(rs, "content")
+            val newValue = migration(content)
+            namedParameterJdbcTemplate!!.update(
+                "UPDATE CONFIGURATIONS SET CONTENT = CAST(:content AS JSONB) WHERE ID = :id",
+                params("content", writeJson(newValue)).addValue("id", id)
+            )
+        }
     }
 }
