@@ -50,17 +50,20 @@ class GitHubConfigurationTokenMigrationIT : AbstractGitHubTestSupport() {
                 assertNotNull(configurationRepository.find(GitHubEngineConfiguration::class.java, config.name)) {
                     assertEquals("xxxxx", it.oauth2Token)
                 }
-                // Runs the migration
-                migration.start()
-                // Testing it can be read again
-                gitConfigurationService.getConfiguration(config.name).apply {
-                    // Checks its token has been decrypted
-                    assertEquals("xxxxx", oauth2Token)
-                }
-                // Checks it's now encrypted in the database
-                assertNotNull(configurationRepository.find(GitHubEngineConfiguration::class.java, config.name)) {
-                    assertFalse(it.oauth2Token.isNullOrBlank(), "Token is saved")
-                    assertTrue(it.oauth2Token != "xxxxx", "Token is encrypted")
+                // Running the migration twice and checking it's idempotent
+                repeat(3) {
+                    // Runs the migration
+                    migration.start()
+                    // Testing it can be read again
+                    gitConfigurationService.getConfiguration(config.name).apply {
+                        // Checks its token has been decrypted
+                        assertEquals("xxxxx", oauth2Token)
+                    }
+                    // Checks it's now encrypted in the database
+                    assertNotNull(configurationRepository.find(GitHubEngineConfiguration::class.java, config.name)) {
+                        assertFalse(it.oauth2Token.isNullOrBlank(), "Token is saved")
+                        assertTrue(it.oauth2Token != "xxxxx", "Token is encrypted")
+                    }
                 }
             }
         }
