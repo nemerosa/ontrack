@@ -72,28 +72,38 @@ open class GitHubEngineConfiguration(
             appInstallationAccountName = appInstallationAccountName,
         )
 
-    override fun injectCredentials(oldConfig: GitHubEngineConfiguration) = GitHubEngineConfiguration(
-        name = name,
-        url = url,
-        user = user,
-        password = if (user != null && oldConfig.user == user && password.isNullOrBlank()) {
-            oldConfig.password
-        } else {
-            password
-        },
-        oauth2Token = if (oauth2Token.isNullOrBlank()) {
-            oldConfig.oauth2Token
-        } else {
-            oauth2Token
-        },
-        appId = appId,
-        appPrivateKey = if (appPrivateKey.isNullOrBlank()) {
-            oldConfig.appPrivateKey
-        } else {
-            appPrivateKey
-        },
-        appInstallationAccountName = appInstallationAccountName,
-    )
+    /**
+     * We inject a credentials field (password, token or app private key) only
+     * when:
+     *
+     * - the receiver (this) entry is not filled in
+     * - no other receiver credentials entry is filled in (type == anonymous)
+     */
+    override fun injectCredentials(oldConfig: GitHubEngineConfiguration): GitHubEngineConfiguration {
+        val authenticationType = this.authenticationType()
+        return GitHubEngineConfiguration(
+            name = name,
+            url = url,
+            user = user,
+            password = if (authenticationType == GitHubAuthenticationType.ANONYMOUS && user != null && oldConfig.user == user && password.isNullOrBlank()) {
+                oldConfig.password
+            } else {
+                password
+            },
+            oauth2Token = if (authenticationType == GitHubAuthenticationType.ANONYMOUS && oauth2Token.isNullOrBlank()) {
+                oldConfig.oauth2Token
+            } else {
+                oauth2Token
+            },
+            appId = appId,
+            appPrivateKey = if (authenticationType == GitHubAuthenticationType.ANONYMOUS && appPrivateKey.isNullOrBlank()) {
+                oldConfig.appPrivateKey
+            } else {
+                appPrivateKey
+            },
+            appInstallationAccountName = appInstallationAccountName,
+        )
+    }
 
     override fun encrypt(crypting: (plain: String?) -> String?) = GitHubEngineConfiguration(
         name = name,

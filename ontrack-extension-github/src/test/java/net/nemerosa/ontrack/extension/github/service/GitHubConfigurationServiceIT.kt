@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.service
 
 import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
+import net.nemerosa.ontrack.extension.github.model.GitHubAuthenticationType
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.model.support.ConfigurationRepository
 import net.nemerosa.ontrack.test.TestUtils
@@ -16,6 +17,38 @@ class GitHubConfigurationServiceIT : AbstractGitHubTestSupport() {
 
     @Autowired
     private lateinit var configurationRepository: ConfigurationRepository
+
+    @Test
+    fun `Updating a GitHub configuration to use a GitHub app`() {
+        withDisabledConfigurationTest {
+            asAdmin {
+                // Creating the initial configuration with a token
+                val config = gitConfigurationService.newConfiguration(
+                    GitHubEngineConfiguration(
+                        name = uid("GH"),
+                        url = null,
+                        oauth2Token = "xxxxx",
+                    )
+                )
+                // Updating this configuration to use an app
+                gitConfigurationService.updateConfiguration(
+                    config.name,
+                    GitHubEngineConfiguration(
+                        name = config.name,
+                        url = config.url,
+                        oauth2Token = "", // Not filled in
+                        appId = "123456",
+                        appPrivateKey = TestUtils.resourceString("/test-app.pem"),
+                    )
+                )
+                // Checks the new configuration
+                assertEquals(
+                    GitHubAuthenticationType.APP,
+                    gitConfigurationService.getConfiguration(config.name).authenticationType()
+                )
+            }
+        }
+    }
 
     @Test
     fun `Encrypting and decrypting the token`() {

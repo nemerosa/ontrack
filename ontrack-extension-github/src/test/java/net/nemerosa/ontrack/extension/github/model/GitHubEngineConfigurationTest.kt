@@ -2,11 +2,67 @@ package net.nemerosa.ontrack.extension.github.model
 
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class GitHubEngineConfigurationTest {
+
+    @Test
+    fun `Injection of password must be skipped when the token field is filled in`() {
+        val old = GitHubEngineConfiguration(
+            "test",
+            null,
+            user = "user",
+            password = "xxxxx"
+        )
+        val new = GitHubEngineConfiguration(
+            "test",
+            null,
+            oauth2Token = "xxxxx",
+        )
+        val injected = new.injectCredentials(old)
+        injected.checkFields() // Must pass
+        assertEquals(GitHubAuthenticationType.TOKEN, injected.authenticationType())
+    }
+
+    @Test
+    fun `Injection of password must be skipped when the app fields are filled in`() {
+        val old = GitHubEngineConfiguration(
+            "test",
+            null,
+            user = "user",
+            password = "xxxxx"
+        )
+        val new = GitHubEngineConfiguration(
+            "test",
+            null,
+            appId = "xxxxx",
+            appPrivateKey = TestUtils.resourceString("/test-app.pem")
+        )
+        val injected = new.injectCredentials(old)
+        injected.checkFields() // Must pass
+        assertEquals(GitHubAuthenticationType.APP, injected.authenticationType())
+    }
+
+    @Test
+    fun `Injection of token must be skipped when the app fields are filled in`() {
+        val old = GitHubEngineConfiguration(
+            "test",
+            null,
+            oauth2Token = "xxxxx"
+        )
+        val new = GitHubEngineConfiguration(
+            "test",
+            null,
+            appId = "xxxxx",
+            appPrivateKey = TestUtils.resourceString("/test-app.pem")
+        )
+        val injected = new.injectCredentials(old)
+        injected.checkFields() // Must pass
+        assertEquals(GitHubAuthenticationType.APP, injected.authenticationType())
+    }
 
     @Test
     fun `User is required when password is filled in`() {
