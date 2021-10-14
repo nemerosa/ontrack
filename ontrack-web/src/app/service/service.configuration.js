@@ -22,7 +22,7 @@ angular.module('ot.service.configuration', [
         self.test = function (url, data) {
             var d = $q.defer();
             ot.call($http.post(url, data)).then(function (result) {
-                if (result.type == 'OK') {
+                if (result.type === 'OK') {
                     d.resolve({
                         type: 'success',
                         content: "Connection OK"
@@ -31,6 +31,13 @@ angular.module('ot.service.configuration', [
                     d.resolve({
                         type: 'error',
                         content: result.message
+                    });
+                }
+            }, (error) => {
+                if (error.status === 400) {
+                    d.resolve({
+                        type: 'error',
+                        content: error.content
                     });
                 }
             });
