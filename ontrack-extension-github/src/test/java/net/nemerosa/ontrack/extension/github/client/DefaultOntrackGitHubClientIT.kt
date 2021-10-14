@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.github.app.MockGitHubAppClient
 import net.nemerosa.ontrack.extension.github.githubTestConfigReal
 import net.nemerosa.ontrack.extension.github.githubTestEnv
 import net.nemerosa.ontrack.extension.github.model.GitHubRepositoryPermission
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -23,7 +24,7 @@ class DefaultOntrackGitHubClientIT {
             configuration = githubTestConfigReal(),
             gitHubAppTokenService = DefaultGitHubAppTokenService(
                 gitHubAppClient = MockGitHubAppClient(),
-                applicationLogService = mockk(relaxed = true),
+                ontrackConfigProperties = OntrackConfigProperties(),
             ),
             applicationLogService = mockk(relaxed = true),
         )

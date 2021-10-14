@@ -2,16 +2,14 @@ package net.nemerosa.ontrack.extension.github.app
 
 import net.nemerosa.ontrack.extension.github.app.client.GitHubAppAccount
 import net.nemerosa.ontrack.extension.github.app.client.GitHubAppClient
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry
-import net.nemerosa.ontrack.model.support.ApplicationLogService
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.stereotype.Service
 import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class DefaultGitHubAppTokenService(
     private val gitHubAppClient: GitHubAppClient,
-    private val applicationLogService: ApplicationLogService,
+    private val ontrackConfigProperties: OntrackConfigProperties,
 ) : GitHubAppTokenService {
 
     /**
@@ -42,7 +40,8 @@ class DefaultGitHubAppTokenService(
         appId: String,
         appPrivateKey: String,
         appInstallationAccountName: String?,
-    ): GitHubAppAccount? = gitHubAppToken(configurationName, appId, appPrivateKey, appInstallationAccountName)?.installation?.account
+    ): GitHubAppAccount? =
+        gitHubAppToken(configurationName, appId, appPrivateKey, appInstallationAccountName)?.installation?.account
 
     private fun gitHubAppToken(
         configurationName: String,
@@ -66,25 +65,17 @@ class DefaultGitHubAppTokenService(
         appPrivateKey: String,
         appInstallationAccountName: String?
     ): GitHubAppToken? {
+        // If not checking, we don't return any token
+        if (!ontrackConfigProperties.configurationTest) {
+            return null
+        }
+        // Gets a client
         val appClient = GitHubApp(gitHubAppClient)
         // Generate JWT token
         val jwt = GitHubApp.generateJWT(appId, appPrivateKey)
         // Getting the installation
-        return try {
-            val appInstallationId = appClient.getInstallation(jwt, appId, appInstallationAccountName)
-            // Generating & storing the token
-            appClient.generateInstallationToken(jwt, appInstallationId)
-        } catch (any: Exception) {
-            // Logging an error
-            applicationLogService.log(
-                ApplicationLogEntry.error(
-                    any,
-                    NameDescription.nd("github-token", "Cannot generate GitHub app access token"),
-                    "Cannot generate GitHub app access token for app = $appId"
-                ).withDetail("app.id", appId).withDetail("app.installation", appInstallationAccountName ?: "")
-            )
-            // Not returning a token
-            null
-        }
+        val appInstallationId = appClient.getInstallation(jwt, appId, appInstallationAccountName)
+        // Generating & storing the token
+        return appClient.generateInstallationToken(jwt, appInstallationId)
     }
 }

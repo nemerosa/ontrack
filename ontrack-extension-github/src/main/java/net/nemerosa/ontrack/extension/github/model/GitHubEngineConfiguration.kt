@@ -85,7 +85,7 @@ open class GitHubEngineConfiguration(
             name = name,
             url = url,
             user = user,
-            password = if (authenticationType == GitHubAuthenticationType.ANONYMOUS && user != null && oldConfig.user == user && password.isNullOrBlank()) {
+            password = if (user != null && oldConfig.user == user && password.isNullOrBlank()) {
                 oldConfig.password
             } else {
                 password
@@ -96,7 +96,7 @@ open class GitHubEngineConfiguration(
                 oauth2Token
             },
             appId = appId,
-            appPrivateKey = if (authenticationType == GitHubAuthenticationType.ANONYMOUS && appPrivateKey.isNullOrBlank()) {
+            appPrivateKey = if (!appId.isNullOrBlank() && appPrivateKey.isNullOrBlank()) {
                 oldConfig.appPrivateKey
             } else {
                 appPrivateKey

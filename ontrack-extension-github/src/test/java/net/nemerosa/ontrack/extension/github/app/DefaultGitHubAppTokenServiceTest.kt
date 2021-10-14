@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.github.app.client.GitHubAppAccount
 import net.nemerosa.ontrack.extension.github.app.client.GitHubAppClient
 import net.nemerosa.ontrack.extension.github.app.client.GitHubAppInstallation
 import net.nemerosa.ontrack.extension.github.app.client.GitHubAppInstallationToken
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Before
@@ -23,7 +24,7 @@ class DefaultGitHubAppTokenServiceTest {
     @Before
     fun before() {
         client = mockk()
-        service = DefaultGitHubAppTokenService(client, mockk())
+        service = DefaultGitHubAppTokenService(client, OntrackConfigProperties())
     }
 
     @Test
