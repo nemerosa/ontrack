@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.extension.github.app.GitHubAppToken
 import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.app.client.GitHubAppAccount
 
-fun GitHubAppTokenService.getAppInstallationToken(configuration: GitHubEngineConfiguration): String =
+fun GitHubAppTokenService.getAppInstallationToken(configuration: GitHubEngineConfiguration): String? =
     if (configuration.authenticationType() == GitHubAuthenticationType.APP) {
         getAppInstallationToken(
             configuration.name,
@@ -28,7 +28,7 @@ fun GitHubAppTokenService.getAppInstallationTokenInformation(configuration: GitH
         null
     }
 
-fun GitHubAppTokenService.getAppInstallationAccount(configuration: GitHubEngineConfiguration): GitHubAppAccount =
+fun GitHubAppTokenService.getAppInstallationAccount(configuration: GitHubEngineConfiguration): GitHubAppAccount? =
     if (configuration.authenticationType() == GitHubAuthenticationType.APP) {
         getAppInstallationAccount(
             configuration.name,

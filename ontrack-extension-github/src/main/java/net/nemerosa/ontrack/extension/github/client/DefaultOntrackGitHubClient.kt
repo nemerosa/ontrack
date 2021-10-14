@@ -53,8 +53,8 @@ class DefaultOntrackGitHubClient(
 
     override val organizations: List<GitHubUser>
         get() = if (configuration.authenticationType() == GitHubAuthenticationType.APP) {
-            listOf(
-                gitHubAppTokenService.getAppInstallationAccount(configuration).run {
+            listOfNotNull(
+                gitHubAppTokenService.getAppInstallationAccount(configuration)?.run {
                     GitHubUser(
                         login = login,
                         url = url,

@@ -2,12 +2,16 @@ package net.nemerosa.ontrack.extension.github.app
 
 import net.nemerosa.ontrack.extension.github.app.client.GitHubAppAccount
 import net.nemerosa.ontrack.extension.github.app.client.GitHubAppClient
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.support.ApplicationLogEntry
+import net.nemerosa.ontrack.model.support.ApplicationLogService
 import org.springframework.stereotype.Service
 import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class DefaultGitHubAppTokenService(
-    private val gitHubAppClient: GitHubAppClient
+    private val gitHubAppClient: GitHubAppClient,
+    private val applicationLogService: ApplicationLogService,
 ) : GitHubAppTokenService {
 
     /**
@@ -24,28 +28,28 @@ class DefaultGitHubAppTokenService(
         appId: String,
         appPrivateKey: String,
         appInstallationAccountName: String?
-    ): String = gitHubAppToken(configurationName, appId, appPrivateKey, appInstallationAccountName).token
+    ): String? = gitHubAppToken(configurationName, appId, appPrivateKey, appInstallationAccountName)?.token
 
     override fun getAppInstallationTokenInformation(
         configurationName: String,
         appId: String,
         appPrivateKey: String,
         appInstallationAccountName: String?
-    ): GitHubAppToken = gitHubAppToken(configurationName, appId, appPrivateKey, appInstallationAccountName)
+    ): GitHubAppToken? = gitHubAppToken(configurationName, appId, appPrivateKey, appInstallationAccountName)
 
     override fun getAppInstallationAccount(
         configurationName: String,
         appId: String,
         appPrivateKey: String,
         appInstallationAccountName: String?,
-    ): GitHubAppAccount = gitHubAppToken(configurationName, appId, appPrivateKey, appInstallationAccountName).installation.account
+    ): GitHubAppAccount? = gitHubAppToken(configurationName, appId, appPrivateKey, appInstallationAccountName)?.installation?.account
 
     private fun gitHubAppToken(
         configurationName: String,
         appId: String,
         appPrivateKey: String,
         appInstallationAccountName: String?
-    ): GitHubAppToken = cache.compute(configurationName) { _, existingToken: GitHubAppToken? ->
+    ): GitHubAppToken? = cache.compute(configurationName) { _, existingToken: GitHubAppToken? ->
         existingToken
             // If token is defined, checks its validity
             ?.takeIf { it.isValid() }
@@ -55,19 +59,32 @@ class DefaultGitHubAppTokenService(
                 appPrivateKey,
                 appInstallationAccountName
             )
-    } ?: throw GitHubAppNoTokenException(appId)
+    }
 
     private fun renewToken(
         appId: String,
         appPrivateKey: String,
         appInstallationAccountName: String?
-    ): GitHubAppToken {
+    ): GitHubAppToken? {
         val appClient = GitHubApp(gitHubAppClient)
         // Generate JWT token
         val jwt = GitHubApp.generateJWT(appId, appPrivateKey)
         // Getting the installation
-        val appInstallationId = appClient.getInstallation(jwt, appId, appInstallationAccountName)
-        // Generating & storing the token
-        return appClient.generateInstallationToken(jwt, appInstallationId)
+        return try {
+            val appInstallationId = appClient.getInstallation(jwt, appId, appInstallationAccountName)
+            // Generating & storing the token
+            appClient.generateInstallationToken(jwt, appInstallationId)
+        } catch (any: Exception) {
+            // Logging an error
+            applicationLogService.log(
+                ApplicationLogEntry.error(
+                    any,
+                    NameDescription.nd("github-token", "Cannot generate GitHub app access token"),
+                    "Cannot generate GitHub app access token for app = $appId"
+                ).withDetail("app.id", appId).withDetail("app.installation", appInstallationAccountName ?: "")
+            )
+            // Not returning a token
+            null
+        }
     }
 }

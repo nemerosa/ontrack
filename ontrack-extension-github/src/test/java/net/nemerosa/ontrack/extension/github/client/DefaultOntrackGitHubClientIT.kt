@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.client
 
+import io.mockk.mockk
 import net.nemerosa.ontrack.extension.github.app.DefaultGitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.app.MockGitHubAppClient
 import net.nemerosa.ontrack.extension.github.githubTestConfigReal
@@ -21,8 +22,10 @@ class DefaultOntrackGitHubClientIT {
         client = DefaultOntrackGitHubClient(
             configuration = githubTestConfigReal(),
             gitHubAppTokenService = DefaultGitHubAppTokenService(
-                gitHubAppClient = MockGitHubAppClient()
+                gitHubAppClient = MockGitHubAppClient(),
+                applicationLogService = mockk(relaxed = true),
             ),
+            applicationLogService = mockk(relaxed = true),
         )
     }
 

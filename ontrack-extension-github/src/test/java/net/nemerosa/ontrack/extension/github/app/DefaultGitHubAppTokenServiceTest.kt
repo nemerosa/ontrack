@@ -23,7 +23,7 @@ class DefaultGitHubAppTokenServiceTest {
     @Before
     fun before() {
         client = mockk()
-        service = DefaultGitHubAppTokenService(client)
+        service = DefaultGitHubAppTokenService(client, mockk())
     }
 
     @Test
@@ -36,7 +36,7 @@ class DefaultGitHubAppTokenServiceTest {
             appPrivateKey = TestUtils.resourceString(TEST_APP_PRIVATE_KEY_RESOURCE_PATH),
             appInstallationAccountName = TEST_APP_INSTALLATION_ACCOUNT_LOGIN
         )
-        assertTrue(token.isNotBlank(), "Token has been generated")
+        assertTrue(token != null && token.isNotBlank(), "Token has been generated")
 
         // Gets the token again, it must be the same
         val secondToken = service.getAppInstallationToken(
@@ -58,7 +58,7 @@ class DefaultGitHubAppTokenServiceTest {
             appPrivateKey = TestUtils.resourceString(TEST_APP_PRIVATE_KEY_RESOURCE_PATH),
             appInstallationAccountName = TEST_APP_INSTALLATION_ACCOUNT_LOGIN
         )
-        assertTrue(token.isNotBlank(), "Token has been generated")
+        assertTrue(token != null && token.isNotBlank(), "Token has been generated")
         
         // Invalidates the token
         service.invalidateAppInstallationToken(TEST_CONFIG)

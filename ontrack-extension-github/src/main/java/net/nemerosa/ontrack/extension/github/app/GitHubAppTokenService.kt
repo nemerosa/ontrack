@@ -7,20 +7,31 @@ import net.nemerosa.ontrack.extension.github.app.client.GitHubAppAccount
  */
 interface GitHubAppTokenService {
 
+    /**
+     * Gets the current app installation access token, renews it if needed, and returns `null` if
+     * the token cannot get generated in any way.
+     */
     fun getAppInstallationToken(
         configurationName: String,
         appId: String,
         appPrivateKey: String,
         appInstallationAccountName: String?,
-    ): String
+    ): String?
 
+    /**
+     * Gets the current app installation access token information, renews it if needed, and returns `null` if
+     * the token cannot get generated in any way.
+     */
     fun getAppInstallationTokenInformation(
         configurationName: String,
         appId: String,
         appPrivateKey: String,
         appInstallationAccountName: String?,
-    ): GitHubAppToken
+    ): GitHubAppToken?
 
+    /**
+     * Invalidates any current token.
+     */
     fun invalidateAppInstallationToken(configurationName: String)
 
     /**
@@ -31,6 +42,6 @@ interface GitHubAppTokenService {
         appId: String,
         appPrivateKey: String,
         appInstallationAccountName: String?,
-    ): GitHubAppAccount
+    ): GitHubAppAccount?
 
 }

@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension
+import net.nemerosa.ontrack.extension.github.app.GitHubAppNoTokenException
 import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.model.GitHubAuthenticationType
@@ -72,7 +73,7 @@ class GitHubConfigurator(
             GitHubAuthenticationType.APP -> AppTokenGitRepositoryAuthenticator(
                 gitHubAppTokenService.getAppInstallationToken(
                     configuration
-                )
+                ) ?: throw GitHubAppNoTokenException(configuration.appId!!)
             )
         }
 
