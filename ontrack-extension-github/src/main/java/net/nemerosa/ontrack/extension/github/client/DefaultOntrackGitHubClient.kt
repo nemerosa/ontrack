@@ -7,6 +7,9 @@ import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.model.*
 import net.nemerosa.ontrack.json.*
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.support.ApplicationLogEntry
+import net.nemerosa.ontrack.model.support.ApplicationLogService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
@@ -24,15 +27,28 @@ import java.time.format.DateTimeFormatter
 class DefaultOntrackGitHubClient(
     private val configuration: GitHubEngineConfiguration,
     private val gitHubAppTokenService: GitHubAppTokenService,
+    private val applicationLogService: ApplicationLogService,
 ) : OntrackGitHubClient {
 
     private val logger: Logger = LoggerFactory.getLogger(OntrackGitHubClient::class.java)
 
     override fun getRateLimit(): GitHubRateLimit? =
-        createGitHubRestTemplate()("Gets rate limit") {
-            getForObject<JsonNode>("/rate_limit").getJsonField("resources")?.run {
-                parse()
+        try {
+            createGitHubRestTemplate()("Gets rate limit") {
+                getForObject<JsonNode>("/rate_limit").getJsonField("resources")?.run {
+                    parse()
+                }
             }
+        } catch (any: Exception) {
+            applicationLogService.log(
+                ApplicationLogEntry.error(
+                    any,
+                    NameDescription.nd("github-ratelimit", "Cannot get the GitHub rate limit"),
+                    "Cannot get the rate limit for GitHub at ${configuration.url}"
+                ).withDetail("configuration", configuration.name)
+            )
+            // No rate limit
+            null
         }
 
     override val organizations: List<GitHubUser>
