@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForObject
@@ -39,6 +40,9 @@ class DefaultOntrackGitHubClient(
                     parse()
                 }
             }
+        } catch (_: HttpClientErrorException.NotFound) {
+            // Rate limit not supported
+            null
         } catch (any: Exception) {
             applicationLogService.log(
                 ApplicationLogEntry.error(
