@@ -10,6 +10,18 @@ import static org.junit.Assert.assertEquals;
 public class JenkinsJobPropertyTest {
 
     @Test
+    public void getUrlForAnOrganizationBranch() {
+        JenkinsJobProperty property = new JenkinsJobProperty(
+                new JenkinsConfiguration("Test", "https://host", "", ""),
+                "organization/job/Repository/job/Branch"
+        );
+        assertEquals(
+                "https://host/job/organization/job/Repository/job/Branch",
+                property.getUrl()
+        );
+    }
+
+    @Test
     public void getPathComponentsForSimpleJob() {
         JenkinsJobProperty property = new JenkinsJobProperty(
                 new JenkinsConfiguration("Test", "http://jenkins", "", ""),
