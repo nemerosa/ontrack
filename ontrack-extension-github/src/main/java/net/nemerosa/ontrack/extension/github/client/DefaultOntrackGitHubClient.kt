@@ -269,14 +269,14 @@ class DefaultOntrackGitHubClient(
         return results
     }
 
-    private fun <T> graphQL(
+    override fun <T> graphQL(
         message: String,
         query: String,
-        variables: Map<String, *> = emptyMap<String, Any>(),
+        variables: Map<String, *>,
         code: (data: JsonNode) -> T
     ): T {
         // Getting a client
-        val client = createGitHubRestTemplate()
+        val client = createGitHubTemplate(graphql = true)
         // GraphQL call
         return client(message) {
             val response = postForObject(
@@ -326,8 +326,11 @@ class DefaultOntrackGitHubClient(
         }
     }
 
-    override fun createGitHubRestTemplate(): RestTemplate = RestTemplateBuilder()
-        .rootUri(getApiRoot(configuration.url))
+    override fun createGitHubRestTemplate(): RestTemplate =
+        createGitHubTemplate(graphql = false)
+
+    private fun createGitHubTemplate(graphql: Boolean): RestTemplate = RestTemplateBuilder()
+        .rootUri(getApiRoot(configuration.url, graphql))
         .run {
             when (configuration.authenticationType()) {
                 GitHubAuthenticationType.ANONYMOUS -> this // Nothing to be done
@@ -491,11 +494,29 @@ class DefaultOntrackGitHubClient(
     private fun parseLocalDateTime(value: String) = LocalDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME)
 
     companion object {
-        fun getApiRoot(url: String): String =
+        /**
+         * Cloud root API
+         */
+        private const val CLOUD_ROOT_API = "https://api.github.com"
+
+        /**
+         * Gets the API URL for the given server URL, for REST or for GraphQL.
+         *
+         * If [graphql] is true, the URL is returned _without_ the `/graphql` suffix.
+         */
+        fun getApiRoot(url: String, graphql: Boolean): String =
+            // Cloud version
             if (url.trimEnd('/') == "https://github.com") {
-                "https://api.github.com"
-            } else {
-                "${url.trimEnd('/')}/api/v3"
+                CLOUD_ROOT_API
+            }
+            // Enterprise version
+            else {
+                val rootUrl = url.trimEnd('/')
+                if (graphql) {
+                    "$rootUrl/api"
+                } else {
+                    "$rootUrl/api/v3"
+                }
             }
     }
 

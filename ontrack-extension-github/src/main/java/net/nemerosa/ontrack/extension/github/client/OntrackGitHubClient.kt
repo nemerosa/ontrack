@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.client
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.model.*
 import org.springframework.web.client.RestTemplate
@@ -38,9 +39,32 @@ interface OntrackGitHubClient {
     fun findRepositoriesByOrganization(organization: String): List<GitHubRepository>
 
     /**
-     * Creates a [RestTemplate] for accessing GitHub.
+     * Creates a [RestTemplate] for accessing GitHub using REST.
+     *
+     * This should be used exclusively for calling the REST API of GitHub. For GraphQL calls,
+     * please use the [graphQL] function.
+     *
+     * @see graphQL
      */
     fun createGitHubRestTemplate(): RestTemplate
+
+    /**
+     * Performs a GraphQL call against GitHub.
+     *
+     * @param message Title for the call (used in Ontrack logs)
+     * @param query GraphQL query
+     * @param variables GraphQL variables
+     * @param code Code to run against the `data` node of the GraphQL response. Note that GraphQL level errors
+     * have already been processed.
+     * @return Response returns by [code]
+     * @see createGitHubRestTemplate
+     */
+    fun <T> graphQL(
+        message: String,
+        query: String,
+        variables: Map<String, *> = emptyMap<String, Any>(),
+        code: (data: JsonNode) -> T
+    ): T
 
     /**
      * Gets a pull request using its ID
