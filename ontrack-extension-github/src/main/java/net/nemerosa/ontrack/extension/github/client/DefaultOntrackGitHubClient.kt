@@ -19,6 +19,7 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForObject
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -29,6 +30,7 @@ class DefaultOntrackGitHubClient(
     private val configuration: GitHubEngineConfiguration,
     private val gitHubAppTokenService: GitHubAppTokenService,
     private val applicationLogService: ApplicationLogService,
+    private val timeout: Duration,
 ) : OntrackGitHubClient {
 
     private val logger: Logger = LoggerFactory.getLogger(OntrackGitHubClient::class.java)
@@ -331,6 +333,8 @@ class DefaultOntrackGitHubClient(
 
     private fun createGitHubTemplate(graphql: Boolean): RestTemplate = RestTemplateBuilder()
         .rootUri(getApiRoot(configuration.url, graphql))
+        .setConnectTimeout(timeout)
+        .setReadTimeout(timeout)
         .run {
             when (configuration.authenticationType()) {
                 GitHubAuthenticationType.ANONYMOUS -> this // Nothing to be done
