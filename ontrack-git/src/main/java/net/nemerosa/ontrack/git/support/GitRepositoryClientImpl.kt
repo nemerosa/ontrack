@@ -39,7 +39,8 @@ import java.util.stream.Stream
 
 class GitRepositoryClientImpl(
     private val repositoryDir: File,
-    private val repository: GitRepository
+    private val repository: GitRepository,
+    private val timeoutSeconds: Int,
 ) : GitRepositoryClient {
 
     private val logger = LoggerFactory.getLogger(GitRepositoryClient::class.java)
@@ -57,6 +58,7 @@ class GitRepositoryClientImpl(
      */
     private fun <C : TransportCommand<C, *>> C.configure(): C =
         this.setCredentialsProvider(credentialsProvider)
+            .setTimeout(timeoutSeconds)
 
     override val remoteBranches: List<String>
         get() {

@@ -14,9 +14,27 @@ import java.time.temporal.ChronoUnit
 class GitConfigProperties {
 
     /**
+     * Sync properties
+     */
+    var sync = GitSyncConfigProperties()
+
+    /**
      * Pull requests configuration
      */
     var pullRequests = GitPullRequestConfigProperties()
+
+    /**
+     * General sync properties
+     */
+    class GitSyncConfigProperties {
+        /**
+         * Timeout in seconds for remote operations (like fetch & clone)
+         *
+         * Leave 0 to use the default system value. Set to 60 seconds by default.
+         */
+        @DurationUnit(ChronoUnit.SECONDS)
+        var timeoutSeconds: Duration = Duration.ofSeconds(60)
+    }
 
     /**
      * Pull requests configuration

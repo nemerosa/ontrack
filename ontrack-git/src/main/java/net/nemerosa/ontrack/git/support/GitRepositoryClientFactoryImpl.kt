@@ -12,7 +12,8 @@ import java.util.concurrent.locks.ReentrantLock
 
 class GitRepositoryClientFactoryImpl(
         private val root: File,
-        private val cacheManager: CacheManager
+        private val cacheManager: CacheManager,
+        private val timeoutSeconds: Int,
 ) : GitRepositoryClientFactory {
 
     companion object {
@@ -56,7 +57,7 @@ class GitRepositoryClientFactoryImpl(
         }
 
         // Creates the client
-        return GitRepositoryClientImpl(repositoryDir, repository)
+        return GitRepositoryClientImpl(repositoryDir, repository, timeoutSeconds)
     }
 
 }

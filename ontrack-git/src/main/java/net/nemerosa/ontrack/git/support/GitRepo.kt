@@ -10,6 +10,8 @@ import java.nio.file.Files.createTempDirectory
 
 /**
  * Utility class to deal with a Git repository.
+ *
+ * Used for tests only.
  */
 class GitRepo(val dir: File) : AutoCloseable {
     constructor() : this(createTempDirectory("ontrack-git").toFile())
@@ -44,7 +46,8 @@ class GitRepo(val dir: File) : AutoCloseable {
             // Creates the client
             return GitRepositoryClientImpl(
                     wd,
-                    originRepository
+                    originRepository,
+                    timeoutSeconds = 60,
             )
         }
 
@@ -56,7 +59,8 @@ class GitRepo(val dir: File) : AutoCloseable {
     val client: GitRepositoryClient
         get() = GitRepositoryClientImpl(
                 dir,
-                GitRepository("test", "test", "", authenticator = null)
+                GitRepository("test", "test", "", authenticator = null),
+                timeoutSeconds = 60, // Hardcoded for tests
         )
 
     /**
