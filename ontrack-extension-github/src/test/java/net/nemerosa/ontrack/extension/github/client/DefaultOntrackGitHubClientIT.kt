@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.github.model.GitHubRepositoryPermission
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.junit.Before
 import org.junit.Test
+import java.time.Duration
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -27,6 +28,7 @@ class DefaultOntrackGitHubClientIT {
                 ontrackConfigProperties = OntrackConfigProperties(),
             ),
             applicationLogService = mockk(relaxed = true),
+            timeout = Duration.ofSeconds(60),
         )
     }
 
