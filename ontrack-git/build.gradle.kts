@@ -14,4 +14,5 @@ dependencies {
     implementation(project(":ontrack-common"))
     implementation(project(":ontrack-extension-api"))
     implementation("org.slf4j:slf4j-api")
+    implementation("io.micrometer:micrometer-core")
 }

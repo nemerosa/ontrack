@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.model.*
+import net.nemerosa.ontrack.git.support.GitConnectionMetrics
 import net.nemerosa.ontrack.json.*
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
@@ -326,7 +327,7 @@ class DefaultOntrackGitHubClient(
                         val root = ExceptionUtils.getRootCause(any)
                         if (root is ConnectException) {
                             tries++
-                            // TODO Counter for the maximum of retries
+                            GitConnectionMetrics.connectRetry()
                             delay(interval.toMillis())
                         } else {
                             throw any
@@ -334,7 +335,7 @@ class DefaultOntrackGitHubClient(
                     }
                 }
             }
-            result ?: throw GitHubMaxRetriesException(message, retries, interval)
+            result ?: onTimeoutException(message)
         } catch (ex: RestClientResponseException) {
             @Suppress("UNNECESSARY_SAFE_CALL")
             val contentType: Any? = ex.responseHeaders?.contentType
@@ -350,6 +351,11 @@ class DefaultOntrackGitHubClient(
                 throw ex
             }
         }
+    }
+
+    private fun onTimeoutException(message: String): Nothing {
+        GitConnectionMetrics.connectError()
+        throw GitHubMaxRetriesException(message, retries, interval)
     }
 
     override fun createGitHubRestTemplate(): RestTemplate =

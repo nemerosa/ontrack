@@ -78,7 +78,7 @@ class GitRepositoryClientImpl(
                     val root = ExceptionUtils.getRootCause(any)
                     if (root is ConnectException) {
                         tries++
-                        // TODO Counter for the maximum of retries
+                        GitConnectionMetrics.connectRetry()
                         delay(interval.toMillis())
                     } else {
                         throw any
@@ -87,7 +87,12 @@ class GitRepositoryClientImpl(
             }
         }
         // End result or timeout
-        return result ?: throw GitRepoRemoteTimeoutException(message, retries, interval)
+        return result ?: onTimeoutException(message)
+    }
+
+    private fun onTimeoutException(message: String): Nothing {
+        GitConnectionMetrics.connectError()
+        throw GitRepoRemoteTimeoutException(message, retries, interval)
     }
 
     override val remoteBranches: List<String>
