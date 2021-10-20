@@ -20,7 +20,7 @@ class GitConfig(
         return GitRepositoryClientFactoryImpl(
             root = repositories,
             cacheManager = cacheManager,
-            timeoutSeconds = gitConfigProperties.sync.timeoutSeconds.toSeconds().toInt(),
+            timeoutSeconds = gitConfigProperties.remote.timeout.toSeconds().toInt(),
         )
     }
 

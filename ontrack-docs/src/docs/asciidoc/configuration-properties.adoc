@@ -118,7 +118,15 @@ ontrack.config.search.index.tracing = false
 
 # Timeout in seconds for remote operations (like fetch & clone)
 # Leave 0 to use the default system value. Set to 60 seconds by default.
-ontrack.config.extension.git.sync.timeout = 60s
+ontrack.config.extension.git.remote.timeout = 60s
+
+# Number of retries to run when there is a timeout.
+# Set to 0 for no retry.
+ontrack.config.extension.git.remote.retries = 3
+
+# Interval between retries (by default in seconds
+# and set to 30 seconds by default).
+ontrack.config.extension.git.remote.interval = 30s
 
 # Enabling pull requests
 ontrack.config.extension.git.pull-requests.enabled = true

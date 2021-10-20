@@ -14,9 +14,9 @@ import java.time.temporal.ChronoUnit
 class GitConfigProperties {
 
     /**
-     * Sync properties
+     * Remote properties
      */
-    var sync = GitSyncConfigProperties()
+    var remote = GitRemoteConfigProperties()
 
     /**
      * Pull requests configuration
@@ -26,14 +26,28 @@ class GitConfigProperties {
     /**
      * General sync properties
      */
-    class GitSyncConfigProperties {
+    class GitRemoteConfigProperties {
         /**
-         * Timeout in seconds for remote operations (like fetch & clone)
+         * Timeout (by default in seconds) for a given remote operation (like fetch & clone)
          *
          * Leave 0 to use the default system value. Set to 60 seconds by default.
          */
         @DurationUnit(ChronoUnit.SECONDS)
-        var timeoutSeconds: Duration = Duration.ofSeconds(60)
+        var timeout: Duration = Duration.ofSeconds(60)
+
+        /**
+         * Number of retries to run when there is a timeout.
+         *
+         * Set to 0 for no retry.
+         */
+        var retries: UInt = 3u
+
+        /**
+         * Interval between retries (by default in seconds and set to 30 seconds by default).
+         */
+        @DurationUnit(ChronoUnit.SECONDS)
+        var interval: Duration = Duration.ofSeconds(30)
+
     }
 
     /**
