@@ -8,12 +8,15 @@ import org.apache.commons.io.FileUtils
 import org.springframework.cache.CacheManager
 import java.io.File
 import java.io.IOException
+import java.time.Duration
 import java.util.concurrent.locks.ReentrantLock
 
 class GitRepositoryClientFactoryImpl(
-        private val root: File,
-        private val cacheManager: CacheManager,
-        private val timeoutSeconds: Int,
+    private val root: File,
+    private val cacheManager: CacheManager,
+    private val timeout: Duration = Duration.ofSeconds(60),
+    private val retries: UInt = 3u,
+    private val interval: Duration = Duration.ofSeconds(30),
 ) : GitRepositoryClientFactory {
 
     companion object {
@@ -27,7 +30,8 @@ class GitRepositoryClientFactoryImpl(
         lock.lock()
         try {
             // Gets any existing repository in the cache
-            val repositoryClient = cacheManager.getCache(CACHE_GIT_REPOSITORY_CLIENT)?.get(remote)?.get() as? GitRepositoryClient?
+            val repositoryClient =
+                cacheManager.getCache(CACHE_GIT_REPOSITORY_CLIENT)?.get(remote)?.get() as? GitRepositoryClient?
             return if (repositoryClient != null && repositoryClient.isCompatible(repository)) {
                 repositoryClient
             } else {
@@ -57,7 +61,7 @@ class GitRepositoryClientFactoryImpl(
         }
 
         // Creates the client
-        return GitRepositoryClientImpl(repositoryDir, repository, timeoutSeconds)
+        return GitRepositoryClientImpl(repositoryDir, repository, timeout, retries, interval)
     }
 
 }

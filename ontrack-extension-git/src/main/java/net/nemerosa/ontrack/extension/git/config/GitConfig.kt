@@ -10,9 +10,9 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class GitConfig(
-        private val envService: EnvService,
-        private val cacheManager: CacheManager,
-        private val gitConfigProperties: GitConfigProperties,
+    private val envService: EnvService,
+    private val cacheManager: CacheManager,
+    private val gitConfigProperties: GitConfigProperties,
 ) {
     @Bean
     fun gitRepositoryClientFactory(): GitRepositoryClientFactory {
@@ -20,7 +20,9 @@ class GitConfig(
         return GitRepositoryClientFactoryImpl(
             root = repositories,
             cacheManager = cacheManager,
-            timeoutSeconds = gitConfigProperties.remote.timeout.toSeconds().toInt(),
+            timeout = gitConfigProperties.remote.timeout,
+            retries = gitConfigProperties.remote.retries,
+            interval = gitConfigProperties.remote.interval,
         )
     }
 

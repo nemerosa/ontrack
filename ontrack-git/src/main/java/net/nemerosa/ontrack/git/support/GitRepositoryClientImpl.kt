@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.git.support
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.Utils
 import net.nemerosa.ontrack.git.GitRepository
@@ -9,6 +11,7 @@ import net.nemerosa.ontrack.git.model.*
 import net.nemerosa.ontrack.git.model.plot.GitPlotRenderer
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringUtils
+import org.apache.commons.lang3.exception.ExceptionUtils
 import org.eclipse.jgit.api.*
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.api.errors.NoHeadException
@@ -31,6 +34,8 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.lang.String.format
+import java.net.ConnectException
+import java.time.Duration
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import java.util.function.Consumer
@@ -40,7 +45,9 @@ import java.util.stream.Stream
 class GitRepositoryClientImpl(
     private val repositoryDir: File,
     private val repository: GitRepository,
-    private val timeoutSeconds: Int,
+    private val timeout: Duration,
+    private val retries: UInt,
+    private val interval: Duration,
 ) : GitRepositoryClient {
 
     private val logger = LoggerFactory.getLogger(GitRepositoryClient::class.java)
@@ -54,18 +61,41 @@ class GitRepositoryClientImpl(
     override val isReady: Boolean get() = isClonedOrCloning && !sync.isLocked
 
     /**
-     * Setting up the command with authentication
+     * Runs a remote command, with authentication, timeout & retry management.
      */
-    private fun <C : TransportCommand<C, *>> C.configure(): C =
-        this.setCredentialsProvider(credentialsProvider)
-            .setTimeout(timeoutSeconds)
+    private fun <C : TransportCommand<C, T>, T> C.invoke(message: String): T {
+        // Configuration
+        setCredentialsProvider(credentialsProvider)
+        setTimeout(timeout.toSeconds().toInt())
+        // Runs with retries
+        var result: T? = null
+        var tries = 0u
+        while (result == null && tries <= retries) {
+            runBlocking {
+                try {
+                    result = call()
+                } catch (any: Exception) {
+                    val root = ExceptionUtils.getRootCause(any)
+                    if (root is ConnectException) {
+                        tries++
+                        // TODO Counter for the maximum of retries
+                        delay(interval.toMillis())
+                    } else {
+                        throw any
+                    }
+                }
+            }
+        }
+        // End result or timeout
+        return result ?: throw GitRepoRemoteTimeoutException(message, retries, interval)
+    }
 
     override val remoteBranches: List<String>
         get() {
             try {
                 return git.lsRemote()
-                    .configure()
-                    .setHeads(true).call()
+                    .setHeads(true)
+                    .invoke<LsRemoteCommand, Collection<Ref>>("Getting remote branches at ${repository.remote}")
                     .map { ref -> StringUtils.removeStart(ref.name, "refs/heads/") }
             } catch (e: GitAPIException) {
                 throw GitRepositoryAPIException(repository.remote, e)
@@ -185,10 +215,9 @@ class GitRepositoryClientImpl(
         logger.debug(format("[git] Listing the remote heads in %s", repository.remote))
         try {
             git.lsRemote()
-                .configure()
                 .setRemote(repository.remote)
                 .setHeads(true)
-                .call()
+                .invoke("Listing remote heads at ${repository.remote}")
         } catch (e: GitAPIException) {
             throw GitTestException(e.message)
         }
@@ -218,9 +247,7 @@ class GitRepositoryClientImpl(
     private fun fetch(logger: Consumer<String>) {
         logger.accept(format("[git] Pulling %s", repository.remote))
         try {
-            git.fetch()
-                .configure()
-                .call()
+            git.fetch().invoke("Fetching ${repository.remote}")
         } catch (e: GitAPIException) {
             throw GitRepositoryAPIException(repository.remote, e)
         }
@@ -233,10 +260,9 @@ class GitRepositoryClientImpl(
         logger.accept(format("[git] Cloning %s", repository.remote))
         try {
             CloneCommand()
-                .configure()
                 .setDirectory(repositoryDir)
                 .setURI(repository.remote)
-                .call()
+                .invoke("Cloning ${repository.remote}")
         } catch (e: GitAPIException) {
             throw GitRepositoryAPIException(repository.remote, e)
         }
