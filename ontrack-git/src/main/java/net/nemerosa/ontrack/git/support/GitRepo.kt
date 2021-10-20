@@ -47,7 +47,6 @@ class GitRepo(val dir: File) : AutoCloseable {
             return GitRepositoryClientImpl(
                     wd,
                     originRepository,
-                    timeoutSeconds = 60,
             )
         }
 
@@ -60,7 +59,6 @@ class GitRepo(val dir: File) : AutoCloseable {
         get() = GitRepositoryClientImpl(
                 dir,
                 GitRepository("test", "test", "", authenticator = null),
-                timeoutSeconds = 60, // Hardcoded for tests
         )
 
     /**

@@ -45,9 +45,9 @@ import java.util.stream.Stream
 class GitRepositoryClientImpl(
     private val repositoryDir: File,
     private val repository: GitRepository,
-    private val timeout: Duration,
-    private val retries: UInt,
-    private val interval: Duration,
+    private val timeout: Duration = Duration.ofSeconds(60),
+    private val retries: UInt = 3u,
+    private val interval: Duration = Duration.ofSeconds(30),
 ) : GitRepositoryClient {
 
     private val logger = LoggerFactory.getLogger(GitRepositoryClient::class.java)
