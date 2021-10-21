@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.git.support
 
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.Utils
 import net.nemerosa.ontrack.git.GitRepository
@@ -11,7 +9,6 @@ import net.nemerosa.ontrack.git.model.*
 import net.nemerosa.ontrack.git.model.plot.GitPlotRenderer
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringUtils
-import org.apache.commons.lang3.exception.ExceptionUtils
 import org.eclipse.jgit.api.*
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.api.errors.NoHeadException
@@ -34,7 +31,6 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.lang.String.format
-import java.net.ConnectException
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
@@ -68,31 +64,9 @@ class GitRepositoryClientImpl(
         setCredentialsProvider(credentialsProvider)
         setTimeout(timeout.toSeconds().toInt())
         // Runs with retries
-        var result: T? = null
-        var tries = 0u
-        while (result == null && tries <= retries) {
-            runBlocking {
-                try {
-                    result = call()
-                } catch (any: Exception) {
-                    val root = ExceptionUtils.getRootCause(any)
-                    if (root is ConnectException) {
-                        tries++
-                        GitConnectionMetrics.connectRetry()
-                        delay(interval.toMillis())
-                    } else {
-                        throw any
-                    }
-                }
-            }
+        return GitConnectionRetry.retry(message, retries, interval) {
+            call()
         }
-        // End result or timeout
-        return result ?: onTimeoutException(message)
-    }
-
-    private fun onTimeoutException(message: String): Nothing {
-        GitConnectionMetrics.connectError()
-        throw GitRepoRemoteTimeoutException(message, retries, interval)
     }
 
     override val remoteBranches: List<String>

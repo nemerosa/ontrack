@@ -2,18 +2,15 @@ package net.nemerosa.ontrack.extension.github.client
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.model.*
-import net.nemerosa.ontrack.git.support.GitConnectionMetrics
+import net.nemerosa.ontrack.git.support.GitConnectionRetry
 import net.nemerosa.ontrack.json.*
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
-import org.apache.commons.lang3.exception.ExceptionUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
@@ -23,7 +20,6 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForObject
-import java.net.ConnectException
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -317,25 +313,9 @@ class DefaultOntrackGitHubClient(
     ): T {
         logger.debug("[github] {}", message)
         return try {
-            var tries = 0u
-            var result: T? = null
-            while (result == null && tries <= retries) {
-                runBlocking {
-                    try {
-                        result = code()
-                    } catch (any: Exception) {
-                        val root = ExceptionUtils.getRootCause(any)
-                        if (root is ConnectException) {
-                            tries++
-                            GitConnectionMetrics.connectRetry()
-                            delay(interval.toMillis())
-                        } else {
-                            throw any
-                        }
-                    }
-                }
+            GitConnectionRetry.retry(message, retries, interval) {
+                code()
             }
-            result ?: onTimeoutException(message)
         } catch (ex: RestClientResponseException) {
             @Suppress("UNNECESSARY_SAFE_CALL")
             val contentType: Any? = ex.responseHeaders?.contentType
@@ -351,11 +331,6 @@ class DefaultOntrackGitHubClient(
                 throw ex
             }
         }
-    }
-
-    private fun onTimeoutException(message: String): Nothing {
-        GitConnectionMetrics.connectError()
-        throw GitHubMaxRetriesException(message, retries, interval)
     }
 
     override fun createGitHubRestTemplate(): RestTemplate =
@@ -578,14 +553,6 @@ class DefaultOntrackGitHubClient(
         error: GitHubErrorMessage,
         val status: Int,
     ) : BaseException(error.format(message))
-
-    private class GitHubMaxRetriesException(
-        message: String,
-        retries: UInt,
-        interval: Duration,
-    ): BaseException(
-        "Maximum number of retries reached for $message ($retries retries every $interval, still getting connection errors)."
-    )
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private data class GitHubErrorMessage(
