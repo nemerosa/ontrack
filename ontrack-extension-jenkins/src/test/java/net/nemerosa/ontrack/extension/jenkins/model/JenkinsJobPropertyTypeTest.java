@@ -75,7 +75,7 @@ public class JenkinsJobPropertyTypeTest {
     }
 
     @Test
-    public void forStorage() throws JsonProcessingException {
+    public void forStorage() {
         JenkinsConfiguration configuration = new JenkinsConfiguration(
                 "MyConfig",
                 "http://jenkins",
@@ -111,13 +111,9 @@ public class JenkinsJobPropertyTypeTest {
                 .with("job", "MyJob")
                 .end();
         // Reading
-        assertEquals(
-                new JenkinsJobProperty(
-                        configuration,
-                        "MyJob"
-                ),
-                type.fromStorage(node)
-        );
+        JenkinsJobProperty retrieved = type.fromStorage(node);
+        assertEquals(configuration.getUrl(), retrieved.getConfiguration().getUrl());
+        assertEquals("MyJob", retrieved.getJob());
     }
 
     @Test
