@@ -18,6 +18,8 @@ class MonitoredRun(private val embedded: Runnable, private val runListener: Moni
             runListener.onFailure(ex)
             // Rethrows the error
             throw ex
+        } catch (err: Error) {
+            runListener.onFailure(JobErrorWrapperException(err))
         } finally {
             runListener.onCompletion()
         }
