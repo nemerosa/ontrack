@@ -7,22 +7,19 @@ import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
 
 @Component
-class WorkflowJobIngestionEventProcessor(
+class WorkflowRunIngestionEventProcessor(
     structureService: StructureService,
-) : AbstractWorkflowIngestionEventProcessor<WorkflowJobPayload>(
+) : AbstractWorkflowIngestionEventProcessor<WorkflowRunPayload>(
     structureService
 ) {
 
-    override val event: String = "workflow-job"
+    override val event: String = "workflow-run"
 
-    override val payloadType: KClass<WorkflowJobPayload> = WorkflowJobPayload::class
+    override val payloadType: KClass<WorkflowRunPayload> = WorkflowRunPayload::class
 
-    override fun process(payload: WorkflowJobPayload) {
+    override fun process(payload: WorkflowRunPayload) {
         // Build creation & setup
         val build = getOrCreateBuild(payload)
-        // TODO Build run info on job completed
-        // TODO Build link to the GitHub job
-        // TODO Build link to the GitHub job - status depending on the job action
         // TODO Validation stamps & run --> for the run
         // TODO Validation runs links to the GitHub workflow --> for the run
         // TODO Validation runs run info --> for the run
@@ -30,15 +27,8 @@ class WorkflowJobIngestionEventProcessor(
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class WorkflowJobPayload(
-    val action: WorkflowJobAction,
-    repository: Repository
+class WorkflowRunPayload(
+    repository: Repository,
 ) : AbstractWorkflowPayload(
     repository,
 )
-
-enum class WorkflowJobAction {
-    queued,
-    in_progress,
-    completed
-}
