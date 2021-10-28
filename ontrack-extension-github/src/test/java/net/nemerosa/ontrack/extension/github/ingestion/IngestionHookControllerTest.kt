@@ -27,9 +27,17 @@ class IngestionHookControllerTest {
             queuedPayload = this.arg(0)
         }
 
-        val body = IngestionHookFixtures.payload()
+        val body = IngestionHookFixtures.payloadBody()
+        val headers = IngestionHookFixtures.payloadHeaders()
 
-        controller.hook(body)
+        controller.hook(
+            body = body,
+            gitHubDelivery = headers.gitHubDelivery,
+            gitHubEvent = headers.gitHubEvent,
+            gitHubHookID = headers.gitHubHookID,
+            gitHubHookInstallationTargetID = headers.gitHubHookInstallationTargetID,
+            gitHubHookInstallationTargetType = headers.gitHubHookInstallationTargetType
+        )
 
         assertEquals(body, storedPayload?.payload)
         assertEquals(body, queuedPayload?.payload)

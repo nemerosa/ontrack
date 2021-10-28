@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayl
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
 
 /**
@@ -20,9 +21,21 @@ class IngestionHookController(
     @PostMapping("/")
     fun hook(
         @RequestBody body: JsonNode,
+        @RequestHeader("X-GitHub-Delivery") gitHubDelivery: String,
+        @RequestHeader("X-GitHub-Event") gitHubEvent: String,
+        @RequestHeader("X-GitHub-Hook-ID") gitHubHookID: Int,
+        @RequestHeader("X-GitHub-Hook-Installation-Target-ID") gitHubHookInstallationTargetID: Int,
+        @RequestHeader("X-GitHub-Hook-Installation-Target-Type") gitHubHookInstallationTargetType: String,
     ) {
         // Creates the payload object
-        val payload = IngestionHookPayload(payload = body)
+        val payload = IngestionHookPayload(
+            gitHubDelivery = gitHubDelivery,
+            gitHubEvent = gitHubEvent,
+            gitHubHookID = gitHubHookID,
+            gitHubHookInstallationTargetID = gitHubHookInstallationTargetID,
+            gitHubHookInstallationTargetType = gitHubHookInstallationTargetType,
+            payload = body,
+        )
         // Stores it
         storage.store(payload)
         // Pushes it on the queue

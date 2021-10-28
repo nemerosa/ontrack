@@ -22,9 +22,17 @@ class IngestionHookControllerIT : AbstractDSLTestSupport() {
             ingestionHookPayloadStorage,
         )
 
-        val body = IngestionHookFixtures.payload()
+        val body = IngestionHookFixtures.payloadBody()
+        val headers = IngestionHookFixtures.payloadHeaders()
 
-        controller.hook(body)
+        controller.hook(
+            body = body,
+            gitHubDelivery = headers.gitHubDelivery,
+            gitHubEvent = headers.gitHubEvent,
+            gitHubHookID = headers.gitHubHookID,
+            gitHubHookInstallationTargetID = headers.gitHubHookInstallationTargetID,
+            gitHubHookInstallationTargetType = headers.gitHubHookInstallationTargetType
+        )
 
         // Checks the payload is stored
         val payloads = ingestionHookPayloadStorage.list()
