@@ -1,18 +1,16 @@
-package net.nemerosa.ontrack.model.support;
+package net.nemerosa.ontrack.model.support
 
-import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.json.JsonUtils;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseInto
+import java.util.*
+import kotlin.reflect.KClass
 
 /**
  * Stores and retrieves arbitrary data using JSON.
  */
-public interface StorageService {
-
+interface StorageService {
     /**
      * Stores some JSON
      *
@@ -20,7 +18,7 @@ public interface StorageService {
      * @param key   Identifier of data
      * @param node  Data to store (null to delete)
      */
-    void storeJson(String store, String key, JsonNode node);
+    fun storeJson(store: String, key: String, node: JsonNode?)
 
     /**
      * Retrieves some JSON using a key
@@ -29,21 +27,31 @@ public interface StorageService {
      * @param key   Identifier of data
      * @return Data or empty if not found
      */
-    Optional<JsonNode> retrieveJson(String store, String key);
+    @Deprecated("Use retrieveJsonOrNull. Will be removed in V5.")
+    fun retrieveJson(store: String, key: String): Optional<JsonNode>
+
+    /**
+     * Retrieves some JSON using a key
+     *
+     * @param store Store (typically an extension class name)
+     * @param key   Identifier of data
+     * @return Data or null if not found
+     */
+    fun findJson(store: String, key: String): JsonNode?
 
     /**
      * Lists all keys for a store
      *
      * @param store Store (typically an extension class name)
      */
-    List<String> getKeys(String store);
+    fun getKeys(store: String): List<String>
 
     /**
      * Gets all the data for a store
      *
      * @param store Store (typically an extension class name)
      */
-    Map<String, JsonNode> getData(String store);
+    fun getData(store: String): Map<String, JsonNode>
 
     /**
      * Stores some object after having formatted it in JSON
@@ -52,8 +60,8 @@ public interface StorageService {
      * @param key   Identifier of data
      * @param data  Data to store (null to delete)
      */
-    default void store(String store, String key, Object data) {
-        storeJson(store, key, JsonUtils.format(data));
+    fun store(store: String, key: String, data: Any?) {
+        storeJson(store, key, data?.asJson())
     }
 
     /**
@@ -64,34 +72,73 @@ public interface StorageService {
      * @param type  Class of the data to retrieve
      * @return Data or empty if not found
      */
-    default <T> Optional<T> retrieve(String store, String key, Class<T> type) {
+    @Deprecated("Use find instead. Will be removed in V5.")
+    fun <T> retrieve(store: String, key: String, type: Class<T>): Optional<T> {
+        @Suppress("DEPRECATION")
         return retrieveJson(store, key)
-                .map(node -> JsonUtils.parse(node, type));
+            .map { node: JsonNode -> JsonUtils.parse(node, type) }
+    }
+
+    /**
+     * Retrieves some data using a key
+     *
+     * @param store Store (typically an extension class name)
+     * @param key   Identifier of data
+     * @param type  Class of the data to retrieve
+     * @return Data or null if not found
+     */
+    fun <T : Any> find(store: String, key: String, type: KClass<T>): T? {
+        return findJson(store, key)?.parseInto(type)
     }
 
     /**
      * Deletes an entry
      */
-    void delete(String store, String key);
+    fun delete(store: String, key: String)
 
     /**
      * Checks if an entry already exists.
      *
      * @param store Store to check
      * @param key Key to check
-     * @return <code>true</code> if the entry exists
+     * @return `true` if the entry exists
      */
-    boolean exists(String store, String key);
+    fun exists(store: String, key: String): Boolean
 
     /**
      * Looking for stored entries using JSON queries
      */
-    <T> List<T> findByJson(
-            String store,
-            String query,
-            Map<String,?> variables,
-            Class<T> type
-    );
+    @Deprecated("Use filter instead. Will be removed in V5.")
+    fun <T> findByJson(
+        store: String,
+        query: String,
+        variables: Map<String, *>,
+        type: Class<T>
+    ): List<T>
+
+    /**
+     * Gets the count of items in a store matching some criteria.
+     */
+    fun count(
+        store: String,
+        offset: Int = 0,
+        size: Int = 40,
+        query: String? = null,
+        queryVariables: Map<String, *>? = null,
+    ): Int
+
+    /**
+     * Gets items in a store matching some criteria.
+     */
+    fun <T : Any> filter(
+        store: String,
+        type: KClass<T>,
+        offset: Int = 0,
+        size: Int = 40,
+        query: String? = null,
+        queryVariables: Map<String, *>? = null,
+        orderQuery: String? = null,
+    ): List<T>
 
     /**
      * Gets all the data for a store
@@ -99,11 +146,10 @@ public interface StorageService {
      * @param store Store (typically an extension class name)
      * @param type  Class of the data to retrieve
      */
-    default <T> Map<String, T> getData(String store, Class<T> type) {
-        return getData(store).entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> JsonUtils.parse(entry.getValue(), type)
-                ));
+    fun <T> getData(store: String, type: Class<T>): Map<String, T> {
+        return getData(store)
+            .mapValues { (_, value) ->
+                JsonUtils.parse(value, type)
+            }
     }
 }

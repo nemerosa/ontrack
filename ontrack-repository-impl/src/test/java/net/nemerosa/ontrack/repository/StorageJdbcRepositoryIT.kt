@@ -3,14 +3,12 @@ package net.nemerosa.ontrack.repository
 import com.fasterxml.jackson.core.JsonProcessingException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.TestUtils.uid
-import net.nemerosa.ontrack.test.assertNotPresent
-import net.nemerosa.ontrack.test.assertPresent
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 @Transactional
 class StorageJdbcRepositoryIT : AbstractRepositoryTestSupport() {
@@ -21,8 +19,7 @@ class StorageJdbcRepositoryIT : AbstractRepositoryTestSupport() {
     @Test
     fun no_data_returns_empty() {
         val o = repository.retrieveJson(uid("C"), "1")
-        assertNotNull(o)
-        assertFalse(o.isPresent)
+        assertNull(o)
     }
 
     @Test
@@ -31,7 +28,7 @@ class StorageJdbcRepositoryIT : AbstractRepositoryTestSupport() {
         val store = uid("C")
         repository.storeJson(store, "1", json)
         val o = repository.retrieveJson(store, "1")
-        assertPresent(o) {
+        assertNotNull(o) {
             assertEquals(json, it)
         }
     }
@@ -43,7 +40,7 @@ class StorageJdbcRepositoryIT : AbstractRepositoryTestSupport() {
         repository.storeJson(store, "1", json)
         repository.delete(store, "1")
         val o = repository.retrieveJson(store, "1")
-        assertNotPresent(o)
+        assertNull(o)
     }
 
     @Test

@@ -27,7 +27,7 @@ class IngestionHookControllerTest {
             queuedPayload = this.arg(0)
         }
 
-        val body = IngestionHookFixtures.payload
+        val body = IngestionHookFixtures.payload()
 
         controller.hook(body)
 

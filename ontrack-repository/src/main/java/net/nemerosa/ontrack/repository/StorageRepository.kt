@@ -1,16 +1,34 @@
-package net.nemerosa.ontrack.repository;
+package net.nemerosa.ontrack.repository
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import com.fasterxml.jackson.databind.JsonNode
 
 /**
  * Stores and retrieves arbitrary data using JSON.
  */
-public interface StorageRepository {
+interface StorageRepository {
+
+    /**
+     * Gets the count of items in a store matching some criteria.
+     */
+    fun count(
+        store: String,
+        offset: Int = 0,
+        size: Int = 40,
+        query: String? = null,
+        queryVariables: Map<String, *>? = null,
+    ): Int
+
+    /**
+     * Gets items in a store matching some criteria.
+     */
+    fun filter(
+        store: String,
+        offset: Int = 0,
+        size: Int = 40,
+        query: String? = null,
+        queryVariables: Map<String, *>? = null,
+        orderQuery: String? = null,
+    ): List<JsonNode>
 
     /**
      * Stores some JSON
@@ -19,51 +37,42 @@ public interface StorageRepository {
      * @param key   Identifier of data
      * @param node  Data to store
      */
-    void storeJson(String store, String key, @NotNull JsonNode node);
+    fun storeJson(store: String, key: String, node: JsonNode)
 
     /**
      * Retrieves some JSON using a key
      *
      * @param store Store (typically an extension class name)
      * @param key   Identifier of data
-     * @return Data or empty if not found
+     * @return Data or null if not found
      */
-    Optional<JsonNode> retrieveJson(String store, String key);
+    fun retrieveJson(store: String, key: String): JsonNode?
 
     /**
      * Lists all keys for a store
      *
      * @param store Store (typically an extension class name)
      */
-    List<String> getKeys(String store);
+    fun getKeys(store: String): List<String>
 
     /**
      * Gets all the data for a store
      *
      * @param store Store (typically an extension class name)
      */
-    Map<String, JsonNode> getData(String store);
+    fun getData(store: String): Map<String, JsonNode>
 
     /**
      * Deletes an entry
      */
-    void delete(String store, String key);
+    fun delete(store: String, key: String)
 
     /**
      * Checks if an entry already exists.
      *
      * @param store Store to check
      * @param key Key to check
-     * @return <code>true</code> if the entry exists
+     * @return `true` if the entry exists
      */
-    boolean exists(String store, String key);
-
-    /**
-     * Looking for stored entries using JSON queries
-     */
-    List<JsonNode> findByJson(
-            String store,
-            String query,
-            Map<String,?> variables
-    );
+    fun exists(store: String, key: String): Boolean
 }

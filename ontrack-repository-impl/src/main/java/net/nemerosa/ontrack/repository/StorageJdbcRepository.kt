@@ -1,104 +1,113 @@
-package net.nemerosa.ontrack.repository;
+package net.nemerosa.ontrack.repository
 
-import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.stereotype.Repository;
-
-import javax.sql.DataSource;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
+import org.springframework.stereotype.Repository
+import java.sql.ResultSet
+import javax.sql.DataSource
 
 @Repository
-public class StorageJdbcRepository extends AbstractJdbcRepository implements StorageRepository {
+class StorageJdbcRepository(
+    dataSource: DataSource
+) : AbstractJdbcRepository(dataSource),
+    StorageRepository {
 
-    @Autowired
-    public StorageJdbcRepository(DataSource dataSource) {
-        super(dataSource);
-    }
-
-    @Override
-    public void delete(String store, String key) {
-        MapSqlParameterSource params = params("store", store).addValue("key", key);
+    override fun delete(store: String, key: String) {
+        val params = params("store", store).addValue("key", key)
         // Deleting first
-        getNamedParameterJdbcTemplate().update(
-                "DELETE FROM STORAGE WHERE STORE = :store AND NAME = :key",
-                params
-        );
+        namedParameterJdbcTemplate!!.update(
+            "DELETE FROM STORAGE WHERE STORE = :store AND NAME = :key",
+            params
+        )
     }
 
-    @Override
-    public boolean exists(String store, String key) {
+    override fun exists(store: String, key: String): Boolean {
         return getFirstItem(
-                "SELECT NAME FROM STORAGE WHERE STORE = :store AND NAME = :key",
-                params("store", store).addValue("key", key),
-                String.class
-        ) != null;
+            "SELECT NAME FROM STORAGE WHERE STORE = :store AND NAME = :key",
+            params("store", store).addValue("key", key),
+            String::class.java
+        ) != null
     }
 
-    @Override
-    public void storeJson(String store, String key, @NotNull JsonNode node) {
-        MapSqlParameterSource params = params("store", store)
-                .addValue("key", key)
-                .addValue("data", writeJson(node));
-        getNamedParameterJdbcTemplate().update(
-                "INSERT INTO STORAGE (STORE, NAME, DATA)" +
-                        " VALUES(:store, :key, CAST(:data AS JSONB)) " +
-                        " ON CONFLICT (STORE, NAME) " +
-                        " DO UPDATE SET DATA = EXCLUDED.DATA",
-                params
-        );
+    override fun storeJson(store: String, key: String, node: JsonNode) {
+        val params = params("store", store)
+            .addValue("key", key)
+            .addValue("data", writeJson(node))
+        namedParameterJdbcTemplate!!.update(
+            """
+                INSERT INTO STORAGE (STORE, NAME, DATA) 
+                VALUES(:store, :key, CAST(:data AS JSONB))
+                ON CONFLICT (STORE, NAME) DO
+                UPDATE SET DATA = EXCLUDED.DATA
+            """,
+            params
+        )
     }
 
-    @Override
-    public Optional<JsonNode> retrieveJson(String store, String key) {
-        return getOptional(
-                "SELECT DATA FROM STORAGE WHERE STORE = :store AND NAME = :key",
-                params("store", store).addValue("key", key),
-                (rs, rowNum) -> {
-                    return readJson(rs, "DATA");
-                }
-        );
+    override fun retrieveJson(store: String, key: String): JsonNode? = getFirstItem(
+        "SELECT DATA FROM STORAGE WHERE STORE = :store AND NAME = :key",
+        params("store", store).addValue("key", key)
+    ) { rs, _ -> readJson(rs, "DATA") }
+
+    override fun getKeys(store: String): List<String> {
+        return namedParameterJdbcTemplate!!.queryForList(
+            "SELECT NAME FROM STORAGE WHERE STORE = :store ORDER BY NAME",
+            params("store", store),
+            String::class.java
+        )
     }
 
-    @Override
-    public List<String> getKeys(String store) {
-        return getNamedParameterJdbcTemplate().queryForList(
-                "SELECT NAME FROM STORAGE WHERE STORE = :store ORDER BY NAME",
-                params("store", store),
-                String.class
-        );
+    override fun count(store: String, offset: Int, size: Int, query: String?, queryVariables: Map<String, *>?): Int {
+        var sql = "SELECT COUNT(*) FROM STORAGE WHERE STORE = :store"
+        if (query != null) sql += " $query"
+
+        val params = params("store", store)
+            .addValue("offset", offset)
+            .addValue("size", size)
+
+        if (queryVariables != null) {
+            params.addValues(queryVariables)
+        }
+
+        return namedParameterJdbcTemplate!!.queryForObject(sql, params, Int::class.java) ?: 0
     }
 
-    @Override
-    public List<JsonNode> findByJson(String store, String query, Map<String, ?> variables) {
-        return getNamedParameterJdbcTemplate().query(
-                "SELECT DATA FROM STORAGE WHERE STORE = :store AND " + query,
-                params("store", store).addValues(variables),
-                (rs, rowNum) -> {
-                    return readJson(rs, "DATA");
-                }
-        );
+    override fun filter(
+        store: String,
+        offset: Int,
+        size: Int,
+        query: String?,
+        queryVariables: Map<String, *>?,
+        orderQuery: String?
+    ): List<JsonNode> {
+        var sql = "SELECT DATA FROM STORAGE WHERE STORE = :store"
+        if (query != null) sql += " $query"
+        if (orderQuery != null) sql += " $orderQuery"
+        sql += " OFFSET :offset LIMIT :size"
+
+        val params = params("store", store)
+            .addValue("offset", offset)
+            .addValue("size", size)
+
+        if (queryVariables != null) {
+            params.addValues(queryVariables)
+        }
+
+        return namedParameterJdbcTemplate!!.query(sql, params) { rs, _ ->
+            readJson(rs, "DATA")
+        }
     }
 
-    @Override
-    public Map<String, JsonNode> getData(String store) {
-        Map<String, JsonNode> results = new LinkedHashMap<>();
-        //noinspection RedundantCast
-        getNamedParameterJdbcTemplate().query(
-                "SELECT NAME, DATA FROM STORAGE WHERE STORE = :store ORDER BY NAME",
-                params("store", store),
-                (RowCallbackHandler) rs -> {
-                    String name = rs.getString("NAME");
-                    JsonNode node = readJson(rs, "DATA");
-                    results.put(name, node);
-                }
-        );
-        return results;
+    override fun getData(store: String): Map<String, JsonNode> {
+        val results: MutableMap<String, JsonNode> = LinkedHashMap()
+        namedParameterJdbcTemplate!!.query(
+            "SELECT NAME, DATA FROM STORAGE WHERE STORE = :store ORDER BY NAME",
+            params("store", store)
+        ) { rs: ResultSet ->
+            val name = rs.getString("NAME")
+            val node = readJson(rs, "DATA")
+            results[name] = node
+        }
+        return results
     }
 }
