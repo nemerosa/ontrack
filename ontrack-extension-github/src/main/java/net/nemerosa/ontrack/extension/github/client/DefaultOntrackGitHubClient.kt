@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.model.*
+import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
 import net.nemerosa.ontrack.git.support.GitConnectionRetry
 import net.nemerosa.ontrack.json.*
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -499,8 +500,6 @@ class DefaultOntrackGitHubClient(
         getTextField(field)?.let {
             parseLocalDateTime(it)
         }
-
-    private fun parseLocalDateTime(value: String) = LocalDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME)
 
     companion object {
         /**

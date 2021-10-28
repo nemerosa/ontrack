@@ -1,15 +1,19 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.PullRequest
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.ontrackProjectName
+import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 import kotlin.reflect.KClass
 
 @Component
@@ -52,8 +56,7 @@ class WorkflowRunIngestionEventProcessor(
                 Build.of(
                     branch,
                     nd(buildName, ""),
-                    // TODO Use the payload for the signature
-                    Signature.Companion.of("test")
+                    Signature(payload.workflowRun.createdAtDate, payload.sender?.login ?: "hook")
                 )
             )
         // TODO Link between the build and the workflow
@@ -107,6 +110,7 @@ class WorkflowRunPayload(
     @JsonProperty("workflow_run")
     val workflowRun: WorkflowRun,
     repository: Repository,
+    val sender: User?,
 ) : AbstractWorkflowPayload(
     repository,
 )
@@ -125,6 +129,11 @@ class WorkflowRun(
     val headBranch: String,
     @JsonProperty("pull_requests")
     val pullRequests: List<PullRequest>,
+    @JsonProperty("created_at")
+    val createdAt: String,
 ) {
     fun isPullRequest() = pullRequests.isNotEmpty()
+
+    @JsonIgnore
+    val createdAtDate: LocalDateTime = parseLocalDateTime(createdAt)
 }
