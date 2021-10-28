@@ -29,6 +29,7 @@ class DefaultIngestionHookProcessingService(
                 }
                 meterRegistry.increment(payload, IngestionMetrics.PROCESSING_SUCCESS_COUNT)
             } catch (any: Exception) {
+                any.printStackTrace()
                 TODO("Processing of errors")
             } finally {
                 meterRegistry.increment(payload, IngestionMetrics.PROCESSING_FINISHED_COUNT)

@@ -13,13 +13,13 @@ class WorkflowJobIngestionEventProcessor(
     structureService
 ) {
 
-    override val event: String = "workflow-job"
+    override val event: String = "workflow_job"
 
     override val payloadType: KClass<WorkflowJobPayload> = WorkflowJobPayload::class
 
     override fun process(payload: WorkflowJobPayload) {
         // Build creation & setup
-        val build = getOrCreateBuild(payload)
+        // val build = getOrCreateBuild(payload)
         // TODO Build run info on job completed
         // TODO Build link to the GitHub job
         // TODO Build link to the GitHub job - status depending on the job action
