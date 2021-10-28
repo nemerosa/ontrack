@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-extension-indicators"))
     implementation("io.jsonwebtoken:jjwt-api")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
     runtimeOnly("io.jsonwebtoken:jjwt-impl")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson")

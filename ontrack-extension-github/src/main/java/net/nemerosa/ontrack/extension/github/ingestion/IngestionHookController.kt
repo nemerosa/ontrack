@@ -4,7 +4,9 @@ import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayl
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookSignatureService
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
+import net.nemerosa.ontrack.model.exceptions.InputException
 import org.springframework.web.bind.annotation.*
+import java.util.*
 
 /**
  * Hook to register in GitHub.
@@ -26,7 +28,7 @@ class IngestionHookController(
         @RequestHeader("X-GitHub-Hook-Installation-Target-ID") gitHubHookInstallationTargetID: Int,
         @RequestHeader("X-GitHub-Hook-Installation-Target-Type") gitHubHookInstallationTargetType: String,
         @RequestHeader("X-Hub-Signature-256") signature: String,
-    ) {
+    ): IngestionHookResponse {
         // Checking the signature
         val json = ingestionHookSignatureService.checkPayloadSignature(body, signature)
         // Creates the payload object
@@ -38,10 +40,44 @@ class IngestionHookController(
             gitHubHookInstallationTargetType = gitHubHookInstallationTargetType,
             payload = json,
         )
-        // Stores it
-        storage.store(payload)
-        // Pushes it on the queue
-        queue.queue(payload)
+        // Pre-sorting
+        val toBeProcessed = preFlightCheck(payload)
+        if (toBeProcessed) {
+            // Stores it
+            storage.store(payload)
+            // Pushes it on the queue
+            queue.queue(payload)
+            // Ok
+            return IngestionHookResponse(
+                message = "Ingestion request ${payload.uuid}/${payload.gitHubEvent} has been received and is processed in the background.",
+                uuid = payload.uuid,
+                event = payload.gitHubEvent,
+                processing = true,
+            )
+        } else {
+            return IngestionHookResponse(
+                message = "Ingestion request ${payload.uuid}/${payload.gitHubEvent} has been received correctly but won't be processed.",
+                uuid = payload.uuid,
+                event = payload.gitHubEvent,
+                processing = false,
+            )
+        }
     }
+
+    private fun preFlightCheck(payload: IngestionHookPayload) = when (payload.gitHubEvent) {
+        "ping" -> false
+        else -> throw GitHubIngestionHookEventNotSupportedException(payload.gitHubEvent)
+    }
+
+    class GitHubIngestionHookEventNotSupportedException(event: String) : InputException(
+        "Hook event $event is not supported."
+    )
+
+    class IngestionHookResponse(
+        val message: String,
+        val uuid: UUID,
+        val event: String,
+        val processing: Boolean,
+    )
 
 }
