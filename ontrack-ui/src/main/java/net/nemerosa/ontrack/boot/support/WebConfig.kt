@@ -76,7 +76,8 @@ class WebConfig(
         listOf(
                 "/graphql/**",
                 "/rest/**",
-                "/extension/**"
+                "/extension/**",
+                "/hook/secured/**",
         ).forEach {
             registry.addMapping(it).allowedMethods(*ALLOWED_API_METHODS.toTypedArray())
         }

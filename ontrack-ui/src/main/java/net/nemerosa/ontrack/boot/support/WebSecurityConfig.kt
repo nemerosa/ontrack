@@ -52,12 +52,14 @@ class WebSecurityConfig {
                 securityMatcher("/rest/**")
                 securityMatcher("/graphql/**")
                 securityMatcher("/extension/**")
+                securityMatcher("/hook/secured/**")
                 // Disables CSRF for the API calls
                 csrf {
                     disable()
                 }
                 // Requires authentication
                 authorizeRequests {
+                    authorize("/hook/secured/**", permitAll)
                     authorize(anyRequest, authenticated)
                 }
                 // Requires BASIC authentication
