@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayl
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookSignatureService
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
-import net.nemerosa.ontrack.model.exceptions.InputException
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -66,12 +65,10 @@ class IngestionHookController(
 
     private fun preFlightCheck(payload: IngestionHookPayload) = when (payload.gitHubEvent) {
         "ping" -> false
+        "workflow_job" -> true
+        "workflow_run" -> true
         else -> throw GitHubIngestionHookEventNotSupportedException(payload.gitHubEvent)
     }
-
-    class GitHubIngestionHookEventNotSupportedException(event: String) : InputException(
-        "Hook event $event is not supported."
-    )
 
     class IngestionHookResponse(
         val message: String,

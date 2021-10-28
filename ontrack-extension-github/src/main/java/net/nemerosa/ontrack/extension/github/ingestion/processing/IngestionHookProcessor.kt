@@ -11,13 +11,15 @@ import org.springframework.stereotype.Component
  * Processes hook payloads.
  */
 @Component
-class IngestionHookProcessor : IngestionHookQueueSubscriber {
+class IngestionHookProcessor(
+    private val ingestionHookProcessingService: IngestionHookProcessingService,
+) : IngestionHookQueueSubscriber {
 
     override fun onIngestionHookPayload(payload: IngestionHookPayload) {
         // TODO Remove the coroutine when switching to queue processing
         runBlocking {
             launch(Job()) {
-                TODO("Processing of payload ${payload.uuid} not implemented yet.")
+                ingestionHookProcessingService.process(payload)
             }
         }
     }

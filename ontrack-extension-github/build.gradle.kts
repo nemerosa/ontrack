@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":ontrack-extension-indicators"))
     implementation("io.jsonwebtoken:jjwt-api")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+    implementation("io.micrometer:micrometer-core")
 
     runtimeOnly("io.jsonwebtoken:jjwt-impl")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson")
