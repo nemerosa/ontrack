@@ -5,6 +5,8 @@ import io.mockk.mockk
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.format
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -14,7 +16,7 @@ class IngestionHookControllerTest {
     fun `Storage and queuing`() {
         val storage = mockk<IngestionHookPayloadStorage>()
         val queue = mockk<IngestionHookQueue>()
-        val controller = IngestionHookController(queue, storage)
+        val controller = IngestionHookController(queue, storage, MockIngestionHookSignatureService())
 
         var storedPayload: IngestionHookPayload? = null
         var queuedPayload: IngestionHookPayload? = null
@@ -27,7 +29,7 @@ class IngestionHookControllerTest {
             queuedPayload = this.arg(0)
         }
 
-        val body = IngestionHookFixtures.payloadBody()
+        val body = IngestionHookFixtures.payloadBody().format()
         val headers = IngestionHookFixtures.payloadHeaders()
 
         controller.hook(
@@ -36,11 +38,12 @@ class IngestionHookControllerTest {
             gitHubEvent = headers.gitHubEvent,
             gitHubHookID = headers.gitHubHookID,
             gitHubHookInstallationTargetID = headers.gitHubHookInstallationTargetID,
-            gitHubHookInstallationTargetType = headers.gitHubHookInstallationTargetType
+            gitHubHookInstallationTargetType = headers.gitHubHookInstallationTargetType,
+            signature = "",
         )
 
-        assertEquals(body, storedPayload?.payload)
-        assertEquals(body, queuedPayload?.payload)
+        assertEquals(body.asJson(), storedPayload?.payload)
+        assertEquals(body.asJson(), queuedPayload?.payload)
     }
 
 }

@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.github.ingestion
 
-import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
+import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookSignatureService
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -16,17 +16,21 @@ import org.springframework.web.bind.annotation.RestController
 class IngestionHookController(
     private val queue: IngestionHookQueue,
     private val storage: IngestionHookPayloadStorage,
+    private val ingestionHookSignatureService: IngestionHookSignatureService,
 ) {
 
     @PostMapping("/")
     fun hook(
-        @RequestBody body: JsonNode,
+        @RequestBody body: String,
         @RequestHeader("X-GitHub-Delivery") gitHubDelivery: String,
         @RequestHeader("X-GitHub-Event") gitHubEvent: String,
         @RequestHeader("X-GitHub-Hook-ID") gitHubHookID: Int,
         @RequestHeader("X-GitHub-Hook-Installation-Target-ID") gitHubHookInstallationTargetID: Int,
         @RequestHeader("X-GitHub-Hook-Installation-Target-Type") gitHubHookInstallationTargetType: String,
+        @RequestHeader("X-Hub-Signature-256") signature: String,
     ) {
+        // Checking the signature
+        val json = ingestionHookSignatureService.checkPayloadSignature(body, signature)
         // Creates the payload object
         val payload = IngestionHookPayload(
             gitHubDelivery = gitHubDelivery,
@@ -34,7 +38,7 @@ class IngestionHookController(
             gitHubHookID = gitHubHookID,
             gitHubHookInstallationTargetID = gitHubHookInstallationTargetID,
             gitHubHookInstallationTargetType = gitHubHookInstallationTargetType,
-            payload = body,
+            payload = json,
         )
         // Stores it
         storage.store(payload)
