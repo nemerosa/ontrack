@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Owner
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
@@ -13,6 +15,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 
 class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
@@ -52,7 +55,12 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
                     assertEquals("self", it.issueServiceConfigurationIdentifier)
                 }
                 assertNotNull(structureService.findBranchByName(project.name, branchName).getOrNull()) { branch ->
-                    // TODO Checks its Git configuration
+                    assertNotNull(getProperty(branch, GitBranchConfigurationPropertyType::class.java)) {
+                        assertEquals("release/1.0", it.branch)
+                        assertNotNull(it.buildCommitLink) { link ->
+                            assertEquals("git-commit-property", link.id)
+                        }
+                    }
                     assertNotNull(
                         structureService.findBuildByName(project.name, branch.name, buildName).getOrNull()
                     ) { build ->

@@ -4,6 +4,11 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
+import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
@@ -13,6 +18,7 @@ import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
+import net.nemerosa.ontrack.model.support.NoConfig
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import kotlin.reflect.KClass
@@ -22,6 +28,7 @@ class WorkflowRunIngestionEventProcessor(
     structureService: StructureService,
     private val gitHubConfigurationService: GitHubConfigurationService,
     private val propertyService: PropertyService,
+    private val gitCommitPropertyCommitLink: GitCommitPropertyCommitLink,
 ) : AbstractWorkflowIngestionEventProcessor<WorkflowRunPayload>(
     structureService
 ) {
@@ -84,7 +91,17 @@ class WorkflowRunIngestionEventProcessor(
                         )
                     )
                 )
-            // TODO Setup the Git configuration for this branch
+            // Setup the Git configuration for this branch
+            propertyService.editProperty(
+                branch,
+                GitBranchConfigurationPropertyType::class.java,
+                GitBranchConfigurationProperty(
+                    branch = gitBranch,
+                    buildCommitLink = ConfiguredBuildGitCommitLink(gitCommitPropertyCommitLink, NoConfig.INSTANCE).toServiceConfiguration(),
+                    isOverride = false,
+                    buildTagInterval = 0,
+                )
+            )
             // OK
             return branch
         }
