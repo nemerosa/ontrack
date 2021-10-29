@@ -290,7 +290,7 @@ data class WorkflowRun internal constructor(
         @JsonProperty("created_at")
         createdAt: String,
         @JsonProperty("updated_at")
-        updatedAt: String,
+        updatedAt: String?,
         @JsonProperty("html_url")
         htmlUrl: String,
         event: String,
@@ -301,7 +301,7 @@ data class WorkflowRun internal constructor(
         headSha = headSha,
         pullRequests = pullRequests,
         createdAtDate = parseLocalDateTime(createdAt),
-        updatedAtDate = parseLocalDateTime(updatedAt),
+        updatedAtDate = updatedAt?.run { parseLocalDateTime(this) },
         htmlUrl = htmlUrl,
         event = event,
     )
