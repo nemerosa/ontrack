@@ -28,7 +28,9 @@ class WorkflowRunPayloadTest {
                     headBranch = "main",
                     headSha = "1234567890",
                     createdAtDate = createdAtDate,
+                    updatedAtDate = null,
                     htmlUrl = "https://github.com/nemerosa/github-ingestion-poc/actions/runs/1395528922",
+                    event = "push",
                 ),
                 repository = Repository(
                     name = "my-repo",
@@ -46,7 +48,9 @@ class WorkflowRunPayloadTest {
                     "head_branch" to "main",
                     "head_sha" to "1234567890",
                     "created_at" to "2021-10-28T16:30:17Z",
+                    "updated_at" to null,
                     "html_url" to "https://github.com/nemerosa/github-ingestion-poc/actions/runs/1395528922",
+                    "event" to "push",
                 ),
                 "repository" to mapOf(
                     "name" to "my-repo",

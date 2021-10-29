@@ -16,6 +16,7 @@ import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunDecorator
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
+import net.nemerosa.ontrack.model.structure.RunInfoService
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,6 +30,9 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
 
     @Autowired
     private lateinit var buildGitHubWorkflowRunDecorator: BuildGitHubWorkflowRunDecorator
+
+    @Autowired
+    private lateinit var runInfoService: RunInfoService
 
     @Test
     fun `Build workflow run link running state`() {
@@ -88,6 +92,71 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
                     "GitHub Workflow link set"
                 ) { link ->
                     assertFalse(link.running, "Workflow is not running")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Build run info`() {
+        // Only one GitHub configuration
+        onlyOneGitHubConfig()
+        // Payload
+        val repoName = uid("R")
+        val owner = uid("o")
+        val commit = "1234567890"
+        val projectName = "$owner-$repoName"
+        val branchName = "release-1.0"
+        val buildName = "CI-1"
+        // Starting the run
+        val ref = Time.now()
+        asAdmin {
+            processor.process(
+                payload(
+                    action = WorkflowRunAction.requested,
+                    runNumber = 1,
+                    headBranch = "release/1.0",
+                    repoName = repoName,
+                    owner = owner,
+                    sender = owner,
+                    commit = commit,
+                    createdAtDate = ref.minusMinutes(5),
+                )
+            )
+            // Checks the run info is not there
+            assertNotNull(
+                structureService.findBuildByName(projectName, branchName, buildName).getOrNull(),
+                "Build created"
+            ) { build ->
+                assertNull(
+                    runInfoService.getRunInfo(build),
+                    "No run info yet"
+                )
+            }
+            // Sending a completed event
+            processor.process(
+                payload(
+                    action = WorkflowRunAction.completed,
+                    runNumber = 1,
+                    headBranch = "release/1.0",
+                    repoName = repoName,
+                    owner = owner,
+                    sender = owner,
+                    commit = commit,
+                    createdAtDate = ref.minusMinutes(5),
+                    updatedAtDate = ref,
+                )
+            )
+            // Checks the run info is filled in
+            assertNotNull(
+                structureService.findBuildByName(projectName, branchName, buildName).getOrNull(),
+                "Build created"
+            ) { build ->
+                assertNotNull(
+                    runInfoService.getRunInfo(build),
+                    "No run info yet"
+                ) { info ->
+                    assertEquals(300, info.runTime)
                 }
             }
         }
@@ -277,6 +346,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
         runNumber: Int,
         headBranch: String,
         createdAtDate: LocalDateTime = Time.now(),
+        updatedAtDate: LocalDateTime? = null,
         repoName: String,
         repoDescription: String = "Repository $repoName",
         owner: String,
@@ -293,6 +363,8 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
             headSha = commit,
             createdAtDate = createdAtDate,
             htmlUrl = htmlUrl,
+            updatedAtDate = updatedAtDate,
+            event = "push",
         ),
         repository = Repository(
             name = repoName,

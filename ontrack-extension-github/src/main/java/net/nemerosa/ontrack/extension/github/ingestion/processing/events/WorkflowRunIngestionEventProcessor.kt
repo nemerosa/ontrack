@@ -27,6 +27,7 @@ import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.support.NoConfig
 import org.springframework.stereotype.Component
+import java.time.Duration
 import java.time.LocalDateTime
 import kotlin.reflect.KClass
 
@@ -36,6 +37,7 @@ class WorkflowRunIngestionEventProcessor(
     private val gitHubConfigurationService: GitHubConfigurationService,
     private val propertyService: PropertyService,
     private val gitCommitPropertyCommitLink: GitCommitPropertyCommitLink,
+    private val runInfoService: RunInfoService,
 ) : AbstractWorkflowIngestionEventProcessor<WorkflowRunPayload>(
     structureService
 ) {
@@ -56,7 +58,22 @@ class WorkflowRunIngestionEventProcessor(
 
     private fun endBuild(payload: WorkflowRunPayload) {
         // Build creation & setup
-        getOrCreateBuild(payload, running = false)
+        val build = getOrCreateBuild(payload, running = false)
+        // Setting the run info
+        val runInfo = collectRunInfo(payload)
+        runInfoService.setRunInfo(build, runInfo)
+    }
+
+    private fun collectRunInfo(payload: WorkflowRunPayload): RunInfoInput {
+        // Build duration
+        val duration = Duration.between(payload.workflowRun.createdAtDate, payload.workflowRun.updatedAtDate)
+        // Run info
+        return RunInfoInput(
+            sourceType = "github-workflow",
+            sourceUri = payload.workflowRun.htmlUrl,
+            runTime = duration.toSeconds().toInt(),
+            triggerType = payload.workflowRun.event,
+        )
     }
 
     private fun startBuild(payload: WorkflowRunPayload) {
@@ -250,7 +267,9 @@ data class WorkflowRun internal constructor(
     val headSha: String,
     val pullRequests: List<PullRequest>,
     val createdAtDate: LocalDateTime,
+    val updatedAtDate: LocalDateTime?,
     val htmlUrl: String,
+    val event: String,
 ) {
 
     @JsonCreator
@@ -266,16 +285,21 @@ data class WorkflowRun internal constructor(
         pullRequests: List<PullRequest>,
         @JsonProperty("created_at")
         createdAt: String,
+        @JsonProperty("updated_at")
+        updatedAt: String,
         @JsonProperty("html_url")
         htmlUrl: String,
+        event: String,
     ) : this(
-        name,
-        runNumber,
-        headBranch,
-        headSha,
-        pullRequests,
-        parseLocalDateTime(createdAt),
-        htmlUrl,
+        name = name,
+        runNumber = runNumber,
+        headBranch = headBranch,
+        headSha = headSha,
+        pullRequests = pullRequests,
+        createdAtDate = parseLocalDateTime(createdAt),
+        updatedAtDate = parseLocalDateTime(updatedAt),
+        htmlUrl = htmlUrl,
+        event = event,
     )
 
     fun isPullRequest() = pullRequests.isNotEmpty()

@@ -37,7 +37,9 @@ object IngestionHookFixtures {
             headBranch = headBranch,
             headSha = commit,
             createdAtDate = createdAtDate,
+            updatedAtDate = null,
             htmlUrl = htmlUrl,
+            event = "push",
         ),
         repository = Repository(
             name = repoName,
