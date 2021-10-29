@@ -32,6 +32,19 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
     }
 
     @Test
+    fun `Setting up the build with one mismatch GitHub configuration`() {
+        // Only one GitHub configuration
+        val config = onlyOneGitHubConfig()
+        // Runs the test
+        assertFailsWith<GitHubConfigURLMismatchException> {
+            basicTest(
+                config,
+                htmlUrl = "https://github.enterprise.com/nemerosa/github-ingestion-poc/actions/runs/1395528922"
+            )
+        }
+    }
+
+    @Test
     fun `Setting up the build with no GitHub configuration`() {
         // Only one GitHub configuration
         noGitHubConfig()
@@ -42,7 +55,8 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
     }
 
     private fun basicTest(
-        config: GitHubEngineConfiguration?
+        config: GitHubEngineConfiguration?,
+        htmlUrl: String = "https://github.com/nemerosa/github-ingestion-poc/actions/runs/1395528922",
     ) {
         // Payload
         val repoName = uid("R")
@@ -56,6 +70,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
             owner = owner,
             sender = owner,
             commit = commit,
+            htmlUrl = htmlUrl,
         )
         // Processing
         asAdmin {
@@ -128,6 +143,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
         owner: String,
         sender: String,
         commit: String,
+        htmlUrl: String = "https://github.com/nemerosa/github-ingestion-poc/actions/runs/1395528922",
     ) = WorkflowRunPayload(
         action = action,
         workflowRun = WorkflowRun(
@@ -137,6 +153,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
             headBranch = headBranch,
             headSha = commit,
             createdAtDate = createdAtDate,
+            htmlUrl = htmlUrl,
         ),
         repository = Repository(
             name = repoName,

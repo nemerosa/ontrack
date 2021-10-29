@@ -141,7 +141,13 @@ class WorkflowRunIngestionEventProcessor(
         }
         // If only 1 config, use it
         else if (configurations.size == 1) {
-            configurations.first()
+            val candidate = configurations.first()
+            // Checks the URL
+            if (payload.workflowRun.htmlUrl.startsWith(candidate.url)) {
+                candidate
+            } else {
+                throw GitHubConfigURLMismatchException(payload.workflowRun.htmlUrl)
+            }
         }
         // If several configurations, select it based on the URL
         else {
@@ -206,6 +212,7 @@ data class WorkflowRun internal constructor(
     val headSha: String,
     val pullRequests: List<PullRequest>,
     val createdAtDate: LocalDateTime,
+    val htmlUrl: String,
 ) {
 
     @JsonCreator
@@ -221,6 +228,8 @@ data class WorkflowRun internal constructor(
         pullRequests: List<PullRequest>,
         @JsonProperty("created_at")
         createdAt: String,
+        @JsonProperty("html_url")
+        htmlUrl: String,
     ) : this(
         name,
         runNumber,
@@ -228,6 +237,7 @@ data class WorkflowRun internal constructor(
         headSha,
         pullRequests,
         parseLocalDateTime(createdAt),
+        htmlUrl,
     )
 
     fun isPullRequest() = pullRequests.isNotEmpty()
