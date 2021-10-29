@@ -1,16 +1,17 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing
 
-import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.PullRequest
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.ontrackProjectName
+import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
+import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
+import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -19,6 +20,8 @@ import kotlin.reflect.KClass
 @Component
 class WorkflowRunIngestionEventProcessor(
     structureService: StructureService,
+    private val gitHubConfigurationService: GitHubConfigurationService,
+    private val propertyService: PropertyService,
 ) : AbstractWorkflowIngestionEventProcessor<WorkflowRunPayload>(
     structureService
 ) {
@@ -56,7 +59,7 @@ class WorkflowRunIngestionEventProcessor(
                 Build.of(
                     branch,
                     nd(buildName, ""),
-                    Signature(payload.workflowRun.createdAtDate, payload.sender?.login ?: "hook")
+                    Signature.of(payload.workflowRun.createdAtDate, payload.sender?.login ?: "hook")
                 )
             )
         // TODO Link between the build and the workflow
@@ -99,8 +102,40 @@ class WorkflowRunIngestionEventProcessor(
                     )
                 )
             )
-        // TODO Setup the Git configuration for this project
+        // Setup the Git configuration for this project
+        setupProjectGitHubConfiguration(project, payload)
+        // OK
         return project
+    }
+
+    private fun setupProjectGitHubConfiguration(project: Project, payload: WorkflowRunPayload) {
+        // Gets the list of GH configs
+        val configurations = gitHubConfigurationService.configurations
+        // If no configuration, error
+        val configuration = if (configurations.isEmpty()) {
+            TODO()
+        }
+        // If only 1 config, use it
+        else if (configurations.size == 1) {
+            configurations.first()
+        }
+        // If several configurations, select it based on the URL
+        else {
+            TODO()
+        }
+        // Project property if not already defined
+        if (!propertyService.hasProperty(project, GitHubProjectConfigurationPropertyType::class.java)) {
+            propertyService.editProperty(
+                project,
+                GitHubProjectConfigurationPropertyType::class.java,
+                GitHubProjectConfigurationProperty(
+                    configuration = configuration,
+                    repository = payload.repository.fullName,
+                    indexationInterval = 30, // TODO Make it configurable
+                    issueServiceConfigurationIdentifier = "self"  // TODO Make it configurable
+                )
+            )
+        }
     }
 }
 
@@ -113,7 +148,25 @@ class WorkflowRunPayload(
     val sender: User?,
 ) : AbstractWorkflowPayload(
     repository,
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is WorkflowRunPayload) return false
+
+        if (action != other.action) return false
+        if (workflowRun != other.workflowRun) return false
+        if (sender != other.sender) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = action.hashCode()
+        result = 31 * result + workflowRun.hashCode()
+        result = 31 * result + (sender?.hashCode() ?: 0)
+        return result
+    }
+}
 
 enum class WorkflowRunAction {
     requested,
@@ -121,19 +174,33 @@ enum class WorkflowRunAction {
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class WorkflowRun(
+data class WorkflowRun internal constructor(
     val name: String,
-    @JsonProperty("run_number")
     val runNumber: Int,
-    @JsonProperty("head_branch")
     val headBranch: String,
-    @JsonProperty("pull_requests")
     val pullRequests: List<PullRequest>,
-    @JsonProperty("created_at")
-    val createdAt: String,
+    val createdAtDate: LocalDateTime,
 ) {
+
+    @JsonCreator
+    constructor(
+        name: String,
+        @JsonProperty("run_number")
+        runNumber: Int,
+        @JsonProperty("head_branch")
+        headBranch: String,
+        @JsonProperty("pull_requests")
+        pullRequests: List<PullRequest>,
+        @JsonProperty("created_at")
+        createdAt: String,
+    ) : this(
+        name,
+        runNumber,
+        headBranch,
+        pullRequests,
+        parseLocalDateTime(createdAt),
+    )
+
     fun isPullRequest() = pullRequests.isNotEmpty()
 
-    @JsonIgnore
-    val createdAtDate: LocalDateTime = parseLocalDateTime(createdAt)
 }
