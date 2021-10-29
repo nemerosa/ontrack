@@ -16,6 +16,10 @@ import java.util.*
  * @property gitHubHookInstallationTargetID Mapped to the `X-GitHub-Hook-Installation-Target-ID` header
  * @property gitHubHookInstallationTargetType Mapped to the `X-GitHub-Hook-Installation-Target-Type` header
  * @property payload JSON payload, raw from GitHub
+ * @property status Status of the processing
+ * @property started Timestamp for the start of the processing
+ * @property message Status message (exception stack trace in case of error)
+ * @property completion Timestamp for the end of the processing
  */
 data class IngestionHookPayload(
     val uuid: UUID = UUID.randomUUID(),
@@ -26,4 +30,8 @@ data class IngestionHookPayload(
     val gitHubHookInstallationTargetID: Int,
     val gitHubHookInstallationTargetType: String,
     val payload: JsonNode,
+    val status: IngestionHookPayloadStatus = IngestionHookPayloadStatus.SCHEDULED,
+    val started: LocalDateTime? = null,
+    val message: String? = null,
+    val completion: LocalDateTime? = null,
 )

@@ -11,6 +11,21 @@ interface IngestionHookPayloadStorage {
     fun store(payload: IngestionHookPayload)
 
     /**
+     * Adapt the status for a payload's processing starting
+     */
+    fun start(payload: IngestionHookPayload)
+
+    /**
+     * Adapt the status for a payload's processing successig
+     */
+    fun finished(payload: IngestionHookPayload)
+
+    /**
+     * Adapt the status for a payload's processing in error
+     */
+    fun error(payload: IngestionHookPayload, any: Throwable)
+
+    /**
      * Number of stored payloads
      */
     fun count(): Int
