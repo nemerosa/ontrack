@@ -16,6 +16,8 @@ import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
+import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
+import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
@@ -70,7 +72,18 @@ class WorkflowRunIngestionEventProcessor(
                     Signature.of(payload.workflowRun.createdAtDate, payload.sender?.login ?: "hook")
                 )
             )
-        // TODO Link between the build and the workflow
+        // Link between the build and the workflow
+        if (!propertyService.hasProperty(build, BuildGitHubWorkflowRunPropertyType::class.java)) {
+            propertyService.editProperty(
+                build,
+                BuildGitHubWorkflowRunPropertyType::class.java,
+                BuildGitHubWorkflowRunProperty(
+                    url = payload.workflowRun.htmlUrl,
+                    name = payload.workflowRun.name,
+                    runNumber = payload.workflowRun.runNumber,
+                )
+            )
+        }
         // Git commit property
         if (!propertyService.hasProperty(build, GitCommitPropertyType::class.java)) {
             propertyService.editProperty(

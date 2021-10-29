@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Reposito
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
+import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -141,6 +142,16 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
                     assertNotNull(
                         structureService.findBuildByName(project.name, branch.name, buildName).getOrNull()
                     ) { build ->
+                        // Build link to the run
+                        assertNotNull(
+                            getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java),
+                            "GitHub workflow run URL"
+                        ) {
+                            assertEquals(htmlUrl, it.url)
+                            assertEquals("CI", it.name)
+                            assertEquals(1, it.runNumber)
+                        }
+                        // Build commit property
                         assertNotNull(
                             getProperty(build, GitCommitPropertyType::class.java),
                             "Git commit property set on build"
@@ -173,7 +184,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
                     "https://github.enterprise1.com"
                 }
             )
-            gitHubConfig(url  = "https://github.enterprise2.com")
+            gitHubConfig(url = "https://github.enterprise2.com")
         }
 
     private fun noGitHubConfig() {
