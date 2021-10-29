@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
+import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
@@ -70,6 +71,12 @@ class WorkflowRunIngestionEventProcessor(
                 )
             )
         // TODO Link between the build and the workflow
+        // Git commit property
+        propertyService.editProperty(
+            build,
+            GitCommitPropertyType::class.java,
+            GitCommitProperty(payload.workflowRun.headSha)
+        )
         // OK
         return build
     }
@@ -185,6 +192,7 @@ class WorkflowRunPayload(
     }
 }
 
+@Suppress("EnumEntryName")
 enum class WorkflowRunAction {
     requested,
     completed
@@ -195,6 +203,7 @@ data class WorkflowRun internal constructor(
     val name: String,
     val runNumber: Int,
     val headBranch: String,
+    val headSha: String,
     val pullRequests: List<PullRequest>,
     val createdAtDate: LocalDateTime,
 ) {
@@ -206,6 +215,8 @@ data class WorkflowRun internal constructor(
         runNumber: Int,
         @JsonProperty("head_branch")
         headBranch: String,
+        @JsonProperty("head_sha")
+        headSha: String,
         @JsonProperty("pull_requests")
         pullRequests: List<PullRequest>,
         @JsonProperty("created_at")
@@ -214,6 +225,7 @@ data class WorkflowRun internal constructor(
         name,
         runNumber,
         headBranch,
+        headSha,
         pullRequests,
         parseLocalDateTime(createdAt),
     )

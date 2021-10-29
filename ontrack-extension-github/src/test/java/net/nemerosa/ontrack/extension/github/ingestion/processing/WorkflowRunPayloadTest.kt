@@ -23,6 +23,7 @@ class WorkflowRunPayloadTest {
                     runNumber = 2,
                     pullRequests = emptyList(),
                     headBranch = "main",
+                    headSha = "1234567890",
                     createdAtDate = createdAtDate,
                 ),
                 repository = Repository(
@@ -39,6 +40,7 @@ class WorkflowRunPayloadTest {
                     "run_number" to 2,
                     "pull_requests" to emptyList<Any>(),
                     "head_branch" to "main",
+                    "head_sha" to "1234567890",
                     "created_at" to "2021-10-28T16:30:17Z",
                 ),
                 "repository" to mapOf(

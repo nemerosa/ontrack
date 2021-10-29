@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
+import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Owner
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
@@ -30,6 +31,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
         // Payload
         val repoName = uid("R")
         val owner = uid("o")
+        val commit = "1234567890"
         val payload = payload(
             action = WorkflowRunAction.requested,
             runNumber = 1,
@@ -37,6 +39,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
             repoName = repoName,
             owner = owner,
             sender = owner,
+            commit = commit,
         )
         // Processing
         asAdmin {
@@ -48,14 +51,14 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
         val buildName = "CI-1"
         asAdmin {
             assertNotNull(structureService.findProjectByName(projectName).getOrNull()) { project ->
-                assertNotNull(getProperty(project, GitHubProjectConfigurationPropertyType::class.java)) {
+                assertNotNull(getProperty(project, GitHubProjectConfigurationPropertyType::class.java), "GitHub config set on project") {
                     assertEquals(config.name, it.configuration.name)
                     assertEquals("$owner/$repoName", it.repository)
                     assertEquals(30, it.indexationInterval)
                     assertEquals("self", it.issueServiceConfigurationIdentifier)
                 }
                 assertNotNull(structureService.findBranchByName(project.name, branchName).getOrNull()) { branch ->
-                    assertNotNull(getProperty(branch, GitBranchConfigurationPropertyType::class.java)) {
+                    assertNotNull(getProperty(branch, GitBranchConfigurationPropertyType::class.java), "Git config set on branch") {
                         assertEquals("release/1.0", it.branch)
                         assertNotNull(it.buildCommitLink) { link ->
                             assertEquals("git-commit-property", link.id)
@@ -64,7 +67,9 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
                     assertNotNull(
                         structureService.findBuildByName(project.name, branch.name, buildName).getOrNull()
                     ) { build ->
-                        // TODO Checks its Git commit
+                        assertNotNull(getProperty(build, GitCommitPropertyType::class.java), "Git commit property set on build") {
+                            assertEquals(commit, it.commit)
+                        }
                     }
                 }
             }
@@ -90,6 +95,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
         repoDescription: String = "Repository $repoName",
         owner: String,
         sender: String,
+        commit: String,
     ) = WorkflowRunPayload(
         action = action,
         workflowRun = WorkflowRun(
@@ -97,6 +103,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
             runNumber = runNumber,
             pullRequests = emptyList(),
             headBranch = headBranch,
+            headSha = commit,
             createdAtDate = createdAtDate,
         ),
         repository = Repository(
