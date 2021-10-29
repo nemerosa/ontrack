@@ -54,6 +54,43 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
         }
     }
 
+    @Test
+    fun `Setting up the build with several GitHub configurations and none matching`() {
+        // Only one GitHub configuration
+        severalGitHubConfigs()
+        // Runs the test
+        assertFailsWith<GitHubConfigURLNoMatchException> {
+            basicTest(
+                null,
+                htmlUrl = "https://github.enterprise0.com/nemerosa/github-ingestion-poc/actions/runs/1395528922"
+            )
+        }
+    }
+
+    @Test
+    fun `Setting up the build with several GitHub configurations and one matching`() {
+        // Only one GitHub configuration
+        val match = severalGitHubConfigs()
+        // Runs the test
+        basicTest(
+            match,
+            htmlUrl = "${match.url}/nemerosa/github-ingestion-poc/actions/runs/1395528922"
+        )
+    }
+
+    @Test
+    fun `Setting up the build with several GitHub configurations and several matching`() {
+        // Only one GitHub configuration
+        val match = severalGitHubConfigs(sameRoot = true)
+        // Runs the test
+        assertFailsWith<GitHubConfigURLSeveralMatchesException> {
+            basicTest(
+                match,
+                htmlUrl = "${match.url}/nemerosa/github-ingestion-poc/actions/runs/1395528922"
+            )
+        }
+    }
+
     private fun basicTest(
         config: GitHubEngineConfiguration?,
         htmlUrl: String = "https://github.com/nemerosa/github-ingestion-poc/actions/runs/1395528922",
@@ -122,6 +159,21 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
             noGitHubConfig()
             // Creating one config
             gitHubConfig()
+        }
+
+    private fun severalGitHubConfigs(sameRoot: Boolean = false): GitHubEngineConfiguration =
+        asAdmin {
+            // Removing all previous configuration
+            noGitHubConfig()
+            // Creating two configs, return the last one
+            gitHubConfig(
+                url = if (sameRoot) {
+                    "https://github.enterprise2.com"
+                } else {
+                    "https://github.enterprise1.com"
+                }
+            )
+            gitHubConfig(url  = "https://github.enterprise2.com")
         }
 
     private fun noGitHubConfig() {

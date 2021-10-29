@@ -21,13 +21,13 @@ abstract class AbstractGitHubTestSupport : AbstractQLKTITSupport() {
     @Autowired
     protected lateinit var gitFreeTextAnnotatorContributor: GitFreeTextAnnotatorContributor
 
-    protected fun gitHubConfig(gitConfigurationName: String = uid("C")): GitHubEngineConfiguration {
+    protected fun gitHubConfig(gitConfigurationName: String = uid("C"), url: String? = null): GitHubEngineConfiguration {
         return withDisabledConfigurationTest {
             asUser().with(GlobalSettings::class.java).call {
                 gitConfigurationService.newConfiguration(
                     GitHubEngineConfiguration(
                         gitConfigurationName,
-                        null,
+                        url,
                         null,
                         null,
                         null

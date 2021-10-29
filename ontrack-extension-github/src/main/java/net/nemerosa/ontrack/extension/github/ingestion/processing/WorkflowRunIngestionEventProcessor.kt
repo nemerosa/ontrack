@@ -159,7 +159,16 @@ class WorkflowRunIngestionEventProcessor(
             }
             // If several configurations, select it based on the URL
             else {
-                TODO()
+                val candidates = configurations.filter {
+                    payload.workflowRun.htmlUrl.startsWith(it.url)
+                }
+                if (candidates.isEmpty()) {
+                    throw GitHubConfigURLNoMatchException(payload.workflowRun.htmlUrl)
+                } else if (candidates.size == 1) {
+                    candidates.first()
+                } else {
+                    throw GitHubConfigURLSeveralMatchesException(payload.workflowRun.htmlUrl)
+                }
             }
             // Project property if not already defined
             propertyService.editProperty(
