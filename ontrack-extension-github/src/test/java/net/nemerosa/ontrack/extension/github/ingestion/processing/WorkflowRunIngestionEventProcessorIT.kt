@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Reposito
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
+import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunDecorator
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
@@ -23,6 +24,9 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
 
     @Autowired
     private lateinit var processor: WorkflowRunIngestionEventProcessor
+
+    @Autowired
+    private lateinit var buildGitHubWorkflowRunDecorator: BuildGitHubWorkflowRunDecorator
 
     @Test
     fun `Setting up the build with one unique GitHub configuration`() {
@@ -151,6 +155,13 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
                             assertEquals("CI", it.name)
                             assertEquals(1, it.runNumber)
                         }
+                        // Build link to the run as a decoration
+                        val decorations = buildGitHubWorkflowRunDecorator.getDecorations(build)
+                        assertEquals(1, decorations.size)
+                        val decoration = decorations.first()
+                        assertEquals(htmlUrl, decoration.data.url)
+                        assertEquals("CI", decoration.data.name)
+                        assertEquals(1, decoration.data.runNumber)
                         // Build commit property
                         assertNotNull(
                             getProperty(build, GitCommitPropertyType::class.java),
