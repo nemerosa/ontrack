@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
-import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Owner
@@ -16,7 +15,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
 class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
@@ -25,9 +24,26 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
     private lateinit var processor: WorkflowRunIngestionEventProcessor
 
     @Test
-    fun `Setting up the build`() {
+    fun `Setting up the build with one unique GitHub configuration`() {
         // Only one GitHub configuration
         val config = onlyOneGitHubConfig()
+        // Runs the test
+        basicTest(config)
+    }
+
+    @Test
+    fun `Setting up the build with no GitHub configuration`() {
+        // Only one GitHub configuration
+        noGitHubConfig()
+        // Runs the test
+        assertFailsWith<NoGitHubConfigException> {
+            basicTest(null)
+        }
+    }
+
+    private fun basicTest(
+        config: GitHubEngineConfiguration?
+    ) {
         // Payload
         val repoName = uid("R")
         val owner = uid("o")
@@ -51,14 +67,20 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
         val buildName = "CI-1"
         asAdmin {
             assertNotNull(structureService.findProjectByName(projectName).getOrNull()) { project ->
-                assertNotNull(getProperty(project, GitHubProjectConfigurationPropertyType::class.java), "GitHub config set on project") {
-                    assertEquals(config.name, it.configuration.name)
+                assertNotNull(
+                    getProperty(project, GitHubProjectConfigurationPropertyType::class.java),
+                    "GitHub config set on project"
+                ) {
+                    assertEquals(config?.name, it.configuration.name)
                     assertEquals("$owner/$repoName", it.repository)
                     assertEquals(30, it.indexationInterval)
                     assertEquals("self", it.issueServiceConfigurationIdentifier)
                 }
                 assertNotNull(structureService.findBranchByName(project.name, branchName).getOrNull()) { branch ->
-                    assertNotNull(getProperty(branch, GitBranchConfigurationPropertyType::class.java), "Git config set on branch") {
+                    assertNotNull(
+                        getProperty(branch, GitBranchConfigurationPropertyType::class.java),
+                        "Git config set on branch"
+                    ) {
                         assertEquals("release/1.0", it.branch)
                         assertNotNull(it.buildCommitLink) { link ->
                             assertEquals("git-commit-property", link.id)
@@ -67,7 +89,10 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
                     assertNotNull(
                         structureService.findBuildByName(project.name, branch.name, buildName).getOrNull()
                     ) { build ->
-                        assertNotNull(getProperty(build, GitCommitPropertyType::class.java), "Git commit property set on build") {
+                        assertNotNull(
+                            getProperty(build, GitCommitPropertyType::class.java),
+                            "Git commit property set on build"
+                        ) {
                             assertEquals(commit, it.commit)
                         }
                     }
@@ -79,12 +104,19 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
     private fun onlyOneGitHubConfig(): GitHubEngineConfiguration =
         asAdmin {
             // Removing all previous configuration
+            noGitHubConfig()
+            // Creating one config
+            gitHubConfig()
+        }
+
+    private fun noGitHubConfig() {
+        asAdmin {
+            // Removing all previous configuration
             gitConfigurationService.configurations.forEach {
                 gitConfigurationService.deleteConfiguration(it.name)
             }
-            // Creating one configuration
-            gitHubConfig()
         }
+    }
 
     private fun payload(
         action: WorkflowRunAction,

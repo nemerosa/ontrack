@@ -137,7 +137,7 @@ class WorkflowRunIngestionEventProcessor(
         val configurations = gitHubConfigurationService.configurations
         // If no configuration, error
         val configuration = if (configurations.isEmpty()) {
-            TODO()
+            throw NoGitHubConfigException()
         }
         // If only 1 config, use it
         else if (configurations.size == 1) {
