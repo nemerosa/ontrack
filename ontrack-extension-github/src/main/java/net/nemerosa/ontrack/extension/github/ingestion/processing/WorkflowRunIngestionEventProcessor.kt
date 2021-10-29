@@ -72,11 +72,13 @@ class WorkflowRunIngestionEventProcessor(
             )
         // TODO Link between the build and the workflow
         // Git commit property
-        propertyService.editProperty(
-            build,
-            GitCommitPropertyType::class.java,
-            GitCommitProperty(payload.workflowRun.headSha)
-        )
+        if (!propertyService.hasProperty(build, GitCommitPropertyType::class.java)) {
+            propertyService.editProperty(
+                build,
+                GitCommitPropertyType::class.java,
+                GitCommitProperty(payload.workflowRun.headSha)
+            )
+        }
         // OK
         return build
     }
@@ -99,16 +101,21 @@ class WorkflowRunIngestionEventProcessor(
                     )
                 )
             // Setup the Git configuration for this branch
-            propertyService.editProperty(
-                branch,
-                GitBranchConfigurationPropertyType::class.java,
-                GitBranchConfigurationProperty(
-                    branch = gitBranch,
-                    buildCommitLink = ConfiguredBuildGitCommitLink(gitCommitPropertyCommitLink, NoConfig.INSTANCE).toServiceConfiguration(),
-                    isOverride = false,
-                    buildTagInterval = 0,
+            if (!propertyService.hasProperty(branch, GitBranchConfigurationPropertyType::class.java)) {
+                propertyService.editProperty(
+                    branch,
+                    GitBranchConfigurationPropertyType::class.java,
+                    GitBranchConfigurationProperty(
+                        branch = gitBranch,
+                        buildCommitLink = ConfiguredBuildGitCommitLink(
+                            gitCommitPropertyCommitLink,
+                            NoConfig.INSTANCE
+                        ).toServiceConfiguration(),
+                        isOverride = false,
+                        buildTagInterval = 0,
+                    )
                 )
-            )
+            }
             // OK
             return branch
         }
@@ -133,28 +140,28 @@ class WorkflowRunIngestionEventProcessor(
     }
 
     private fun setupProjectGitHubConfiguration(project: Project, payload: WorkflowRunPayload) {
-        // Gets the list of GH configs
-        val configurations = gitHubConfigurationService.configurations
-        // If no configuration, error
-        val configuration = if (configurations.isEmpty()) {
-            throw NoGitHubConfigException()
-        }
-        // If only 1 config, use it
-        else if (configurations.size == 1) {
-            val candidate = configurations.first()
-            // Checks the URL
-            if (payload.workflowRun.htmlUrl.startsWith(candidate.url)) {
-                candidate
-            } else {
-                throw GitHubConfigURLMismatchException(payload.workflowRun.htmlUrl)
-            }
-        }
-        // If several configurations, select it based on the URL
-        else {
-            TODO()
-        }
-        // Project property if not already defined
         if (!propertyService.hasProperty(project, GitHubProjectConfigurationPropertyType::class.java)) {
+            // Gets the list of GH configs
+            val configurations = gitHubConfigurationService.configurations
+            // If no configuration, error
+            val configuration = if (configurations.isEmpty()) {
+                throw NoGitHubConfigException()
+            }
+            // If only 1 config, use it
+            else if (configurations.size == 1) {
+                val candidate = configurations.first()
+                // Checks the URL
+                if (payload.workflowRun.htmlUrl.startsWith(candidate.url)) {
+                    candidate
+                } else {
+                    throw GitHubConfigURLMismatchException(payload.workflowRun.htmlUrl)
+                }
+            }
+            // If several configurations, select it based on the URL
+            else {
+                TODO()
+            }
+            // Project property if not already defined
             propertyService.editProperty(
                 project,
                 GitHubProjectConfigurationPropertyType::class.java,
