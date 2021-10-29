@@ -108,13 +108,26 @@ class DefaultIngestionHookPayloadStorage(
         return storageService.count(store = INGESTION_HOOK_PAYLOAD_STORE)
     }
 
-    override fun list(offset: Int, size: Int): List<IngestionHookPayload> {
+    override fun list(
+        offset: Int,
+        size: Int,
+        statuses: List<IngestionHookPayloadStatus>?,
+    ): List<IngestionHookPayload> {
+        val query: String? = if (statuses != null && statuses.isNotEmpty()) {
+            "(" + statuses.joinToString(" OR ") { status ->
+                "data->>'status' = '$status'"
+            } + ")"
+        } else {
+            null
+        }
         return storageService.filter(
             store = INGESTION_HOOK_PAYLOAD_STORE,
             type = IngestionHookPayload::class,
             offset = offset,
-            size = size
-            // TODO Order by timestamp desc
+            size = size,
+            orderQuery = "order by data->>'timestamp' desc",
+            query = query,
+            queryVariables = null,
         )
     }
 

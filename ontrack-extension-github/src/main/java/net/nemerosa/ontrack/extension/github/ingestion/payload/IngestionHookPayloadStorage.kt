@@ -35,11 +35,13 @@ interface IngestionHookPayloadStorage {
      *
      * @param offset Start of the page
      * @param size Maximum of items in a page
+     * @param statuses List of statuses to filter on. Empty or null to get them all.
      * @return List of matching payloads
      */
     fun list(
         offset: Int = 0,
         size: Int = 40,
+        statuses: List<IngestionHookPayloadStatus>? = null,
     ): List<IngestionHookPayload>
 
 }
