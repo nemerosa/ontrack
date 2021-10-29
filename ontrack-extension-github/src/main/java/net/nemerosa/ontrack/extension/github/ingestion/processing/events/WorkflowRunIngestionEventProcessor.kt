@@ -66,12 +66,16 @@ class WorkflowRunIngestionEventProcessor(
 
     private fun collectRunInfo(payload: WorkflowRunPayload): RunInfoInput {
         // Build duration
-        val duration = Duration.between(payload.workflowRun.createdAtDate, payload.workflowRun.updatedAtDate)
+        val duration = if (payload.workflowRun.updatedAtDate != null) {
+            Duration.between(payload.workflowRun.createdAtDate, payload.workflowRun.updatedAtDate)
+        } else {
+            null
+        }
         // Run info
         return RunInfoInput(
             sourceType = "github-workflow",
             sourceUri = payload.workflowRun.htmlUrl,
-            runTime = duration.toSeconds().toInt(),
+            runTime = duration?.toSeconds()?.toInt(),
             triggerType = payload.workflowRun.event,
         )
     }
