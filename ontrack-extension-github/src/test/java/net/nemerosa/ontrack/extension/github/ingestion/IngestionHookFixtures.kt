@@ -2,9 +2,9 @@ package net.nemerosa.ontrack.extension.github.ingestion
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
-import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRun
-import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunAction
-import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunPayload
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunPayload
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Owner
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User

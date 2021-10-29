@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.github.ingestion.processing
+package net.nemerosa.ontrack.extension.github.ingestion.processing.events
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository

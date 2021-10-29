@@ -5,6 +5,10 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunIngestionEventProcessor
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunPayload
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Owner
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
@@ -16,9 +20,7 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNotNull
+import kotlin.test.*
 
 class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
 
@@ -27,6 +29,69 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
 
     @Autowired
     private lateinit var buildGitHubWorkflowRunDecorator: BuildGitHubWorkflowRunDecorator
+
+    @Test
+    fun `Build workflow run link running state`() {
+        // Only one GitHub configuration
+        onlyOneGitHubConfig()
+        // Payload
+        val repoName = uid("R")
+        val owner = uid("o")
+        val commit = "1234567890"
+        val projectName = "$owner-$repoName"
+        val branchName = "release-1.0"
+        val buildName = "CI-1"
+        // Starting the run
+        asAdmin {
+            processor.process(
+                payload(
+                    action = WorkflowRunAction.requested,
+                    runNumber = 1,
+                    headBranch = "release/1.0",
+                    repoName = repoName,
+                    owner = owner,
+                    sender = owner,
+                    commit = commit,
+                )
+            )
+            // Checks the build is running
+            assertNotNull(
+                structureService.findBuildByName(projectName, branchName, buildName).getOrNull(),
+                "Build created"
+            ) { build ->
+                assertNotNull(
+                    getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java),
+                    "GitHub Workflow link set"
+                ) { link ->
+                    assertTrue(link.running, "Workflow is running")
+                }
+            }
+            // Sending a completed event
+            processor.process(
+                payload(
+                    action = WorkflowRunAction.completed,
+                    runNumber = 1,
+                    headBranch = "release/1.0",
+                    repoName = repoName,
+                    owner = owner,
+                    sender = owner,
+                    commit = commit,
+                )
+            )
+            // Checks the build is not running any longer
+            assertNotNull(
+                structureService.findBuildByName(projectName, branchName, buildName).getOrNull(),
+                "Build created"
+            ) { build ->
+                assertNotNull(
+                    getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java),
+                    "GitHub Workflow link set"
+                ) { link ->
+                    assertFalse(link.running, "Workflow is not running")
+                }
+            }
+        }
+    }
 
     @Test
     fun `Setting up the build with one unique GitHub configuration`() {

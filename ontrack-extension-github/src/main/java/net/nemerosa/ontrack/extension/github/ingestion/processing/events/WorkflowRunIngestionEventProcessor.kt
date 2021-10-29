@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.github.ingestion.processing
+package net.nemerosa.ontrack.extension.github.ingestion.processing.events
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
@@ -10,6 +10,10 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
+import net.nemerosa.ontrack.extension.github.ingestion.processing.GitHubConfigURLMismatchException
+import net.nemerosa.ontrack.extension.github.ingestion.processing.GitHubConfigURLNoMatchException
+import net.nemerosa.ontrack.extension.github.ingestion.processing.GitHubConfigURLSeveralMatchesException
+import net.nemerosa.ontrack.extension.github.ingestion.processing.NoGitHubConfigException
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
@@ -43,18 +47,24 @@ class WorkflowRunIngestionEventProcessor(
     override fun process(payload: WorkflowRunPayload) {
         when (payload.action) {
             WorkflowRunAction.requested -> startBuild(payload)
+            WorkflowRunAction.completed -> endBuild(payload)
         }
         // TODO Validation stamps & run --> for the run
         // TODO Validation runs links to the GitHub workflow --> for the run
         // TODO Validation runs run info --> for the run
     }
 
-    private fun startBuild(payload: WorkflowRunPayload) {
+    private fun endBuild(payload: WorkflowRunPayload) {
         // Build creation & setup
-        val build = getOrCreateBuild(payload)
+        getOrCreateBuild(payload, running = false)
     }
 
-    private fun getOrCreateBuild(payload: WorkflowRunPayload): Build {
+    private fun startBuild(payload: WorkflowRunPayload) {
+        // Build creation & setup
+        getOrCreateBuild(payload, running = true)
+    }
+
+    private fun getOrCreateBuild(payload: WorkflowRunPayload, running: Boolean): Build {
         // Gets or creates the project
         val project = getOrCreateProject(payload)
         // Branch creation & setup
@@ -73,17 +83,16 @@ class WorkflowRunIngestionEventProcessor(
                 )
             )
         // Link between the build and the workflow
-        if (!propertyService.hasProperty(build, BuildGitHubWorkflowRunPropertyType::class.java)) {
-            propertyService.editProperty(
-                build,
-                BuildGitHubWorkflowRunPropertyType::class.java,
-                BuildGitHubWorkflowRunProperty(
-                    url = payload.workflowRun.htmlUrl,
-                    name = payload.workflowRun.name,
-                    runNumber = payload.workflowRun.runNumber,
-                )
+        propertyService.editProperty(
+            build,
+            BuildGitHubWorkflowRunPropertyType::class.java,
+            BuildGitHubWorkflowRunProperty(
+                url = payload.workflowRun.htmlUrl,
+                name = payload.workflowRun.name,
+                runNumber = payload.workflowRun.runNumber,
+                running = running,
             )
-        }
+        )
         // Git commit property
         if (!propertyService.hasProperty(build, GitCommitPropertyType::class.java)) {
             propertyService.editProperty(

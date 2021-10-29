@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing
 
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunPayload
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Owner
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User

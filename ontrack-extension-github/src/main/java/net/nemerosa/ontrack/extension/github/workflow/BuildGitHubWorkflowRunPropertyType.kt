@@ -4,10 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.model.form.Int
-import net.nemerosa.ontrack.model.form.Text
-import net.nemerosa.ontrack.model.form.Url
 import net.nemerosa.ontrack.model.security.BuildConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -53,6 +51,12 @@ class BuildGitHubWorkflowRunPropertyType(
                     .help("Run number")
                     .min(1)
                     .value(value?.runNumber)
+            )
+            .with(
+                YesNo.of(BuildGitHubWorkflowRunProperty::running.name)
+                    .label("Running")
+                    .help("Is the workflow still running?")
+                    .value(value?.running ?: false)
             )
 
     override fun fromClient(node: JsonNode): BuildGitHubWorkflowRunProperty = node.parse()
