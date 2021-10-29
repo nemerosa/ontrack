@@ -14,7 +14,7 @@ class DefaultIngestionHookPayloadStorageIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Storing and retrieving`() {
-        val payload = IngestionHookFixtures.payload()
+        val payload = IngestionHookFixtures.sampleWorkflowRunIngestionPayload()
         storage.store(payload)
         // Get it back
         assertTrue(storage.count() >= 1, "At least one item stored")

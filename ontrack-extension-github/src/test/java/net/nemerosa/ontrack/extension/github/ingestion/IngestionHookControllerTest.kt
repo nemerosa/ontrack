@@ -5,10 +5,11 @@ import io.mockk.mockk
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
-import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.format
+import net.nemerosa.ontrack.json.parseAsJson
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class IngestionHookControllerTest {
 
@@ -29,8 +30,8 @@ class IngestionHookControllerTest {
             queuedPayload = this.arg(0)
         }
 
-        val body = IngestionHookFixtures.payloadBody().format()
-        val headers = IngestionHookFixtures.payloadHeaders()
+        val body = IngestionHookFixtures.sampleWorkflowRunJsonPayload().format()
+        val headers = IngestionHookFixtures.payloadHeaders(event = "workflow_run")
 
         controller.hook(
             body = body,
@@ -42,8 +43,42 @@ class IngestionHookControllerTest {
             signature = "",
         )
 
-        assertEquals(body.asJson(), storedPayload?.payload)
-        assertEquals(body.asJson(), queuedPayload?.payload)
+        assertEquals(body.parseAsJson(), storedPayload?.payload)
+        assertEquals(body.parseAsJson(), queuedPayload?.payload)
+    }
+
+    @Test
+    fun `No storage nor queuing for a ping`() {
+        val storage = mockk<IngestionHookPayloadStorage>()
+        val queue = mockk<IngestionHookQueue>()
+        val controller = IngestionHookController(queue, storage, MockIngestionHookSignatureService())
+
+        var storedPayload: IngestionHookPayload? = null
+        var queuedPayload: IngestionHookPayload? = null
+
+        every { storage.store(any()) } answers {
+            storedPayload = this.arg(0)
+        }
+
+        every { queue.queue(any()) } answers {
+            queuedPayload = this.arg(0)
+        }
+
+        val body = IngestionHookFixtures.sampleWorkflowRunJsonPayload().format()
+        val headers = IngestionHookFixtures.payloadHeaders(event = "ping")
+
+        controller.hook(
+            body = body,
+            gitHubDelivery = headers.gitHubDelivery,
+            gitHubEvent = headers.gitHubEvent,
+            gitHubHookID = headers.gitHubHookID,
+            gitHubHookInstallationTargetID = headers.gitHubHookInstallationTargetID,
+            gitHubHookInstallationTargetType = headers.gitHubHookInstallationTargetType,
+            signature = "",
+        )
+
+        assertNull(storedPayload?.payload)
+        assertNull(queuedPayload?.payload)
     }
 
 }
