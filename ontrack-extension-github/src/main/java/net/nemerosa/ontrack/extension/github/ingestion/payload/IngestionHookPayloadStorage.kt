@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.payload
 
+import java.time.LocalDateTime
+
 /**
  * Management of the hook payloads.
  */
@@ -43,5 +45,12 @@ interface IngestionHookPayloadStorage {
         size: Int = 40,
         statuses: List<IngestionHookPayloadStatus>? = null,
     ): List<IngestionHookPayload>
+
+    /**
+     * Removes all payloads that are older than the [until] date.
+     *
+     * @return Number of items which have been deleted.
+     */
+    fun cleanUntil(until: LocalDateTime): Int
 
 }

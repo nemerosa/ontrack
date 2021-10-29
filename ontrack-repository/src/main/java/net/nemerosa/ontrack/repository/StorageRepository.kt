@@ -31,6 +31,17 @@ interface StorageRepository {
     ): List<JsonNode>
 
     /**
+     * Deletes items in a store matching some criteria.
+     *
+     * @return Number of items having been deleted
+     */
+    fun deleteWithFilter(
+        store: String,
+        query: String? = null,
+        queryVariables: Map<String, *>? = null,
+    ): Int
+
+    /**
      * Stores some JSON
      *
      * @param store Store (typically an extension class name)
@@ -66,6 +77,11 @@ interface StorageRepository {
      * Deletes an entry
      */
     fun delete(store: String, key: String)
+
+    /**
+     * Clears the whole store
+     */
+    fun clear(store: String)
 
     /**
      * Checks if an entry already exists.

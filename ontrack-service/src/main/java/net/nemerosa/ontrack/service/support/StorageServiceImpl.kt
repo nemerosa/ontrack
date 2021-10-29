@@ -38,6 +38,10 @@ class StorageServiceImpl(
         repository.delete(store, key)
     }
 
+    override fun clear(store: String) {
+        repository.clear(store)
+    }
+
     override fun exists(store: String, key: String): Boolean = repository.exists(store, key)
 
     override fun <T> findByJson(store: String, query: String, variables: Map<String, *>, type: Class<T>): List<T> {
@@ -68,4 +72,6 @@ class StorageServiceImpl(
             it.parseInto(type)
         }
 
+    override fun deleteWithFilter(store: String, query: String?, queryVariables: Map<String, *>?): Int =
+        repository.deleteWithFilter(store, query, queryVariables)
 }

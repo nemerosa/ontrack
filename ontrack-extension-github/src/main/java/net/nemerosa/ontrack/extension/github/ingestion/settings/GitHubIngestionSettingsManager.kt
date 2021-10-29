@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.settings
 
 import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.Int
 import net.nemerosa.ontrack.model.form.Password
 import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -28,6 +29,11 @@ class GitHubIngestionSettingsManager(
             settings.token,
             true,
         ) { encryptionService.encrypt(it) }
+        settingsRepository.setInt(
+            GitHubIngestionSettings::class.java,
+            GitHubIngestionSettings::retentionDays.name,
+            settings.retentionDays
+        )
     }
 
     override fun getSettingsForm(settings: GitHubIngestionSettings?): Form =
@@ -36,6 +42,13 @@ class GitHubIngestionSettingsManager(
                 Password.of(GitHubIngestionSettings::token.name)
                     .label("Token")
                     .help("Secret to set in the hook configuration")
+            )
+            .with(
+                Int.of(GitHubIngestionSettings::retentionDays.name)
+                    .label("Retention days")
+                    .help("Number of days to keep the received payloads (0 = forever)")
+                    .min(0)
+                    .value(settings?.retentionDays ?: GitHubIngestionSettings.DEFAULT_RETENTION_DAYS)
             )
 
     override fun getId(): String = "github-ingestion"

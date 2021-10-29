@@ -6,6 +6,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Component
@@ -130,6 +132,15 @@ class DefaultIngestionHookPayloadStorage(
             queryVariables = null,
         )
     }
+
+    override fun cleanUntil(until: LocalDateTime) =
+        storageService.deleteWithFilter(
+            store = INGESTION_HOOK_PAYLOAD_STORE,
+            query = "data->>'timestamp' < :until",
+            queryVariables = mapOf(
+                "until" to until.format(DateTimeFormatter.ISO_DATE_TIME),
+            ),
+        )
 
     companion object {
         private const val INGESTION_HOOK_PAYLOAD_STORE = "github.IngestionHookPayload"

@@ -52,14 +52,19 @@ object IngestionHookFixtures {
     /**
      * Sample payload
      */
-    fun sampleWorkflowRunIngestionPayload() = payloadHeaders(event = "workflow_run").run {
+    fun sampleWorkflowRunIngestionPayload(
+        timestamp: LocalDateTime = Time.now(),
+        message: String? = null,
+    ) = payloadHeaders(event = "workflow_run").run {
         IngestionHookPayload(
+            timestamp = timestamp,
             gitHubEvent = gitHubEvent,
             gitHubDelivery = gitHubDelivery,
             gitHubHookID = gitHubHookID,
             gitHubHookInstallationTargetID = gitHubHookInstallationTargetID,
             gitHubHookInstallationTargetType = gitHubHookInstallationTargetType,
             payload = sampleWorkflowRunJsonPayload(),
+            message = message,
         )
     }
 

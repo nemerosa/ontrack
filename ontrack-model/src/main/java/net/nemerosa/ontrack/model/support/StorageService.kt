@@ -97,6 +97,11 @@ interface StorageService {
     fun delete(store: String, key: String)
 
     /**
+     * Clears the whole store
+     */
+    fun clear(store: String)
+
+    /**
      * Checks if an entry already exists.
      *
      * @param store Store to check
@@ -139,6 +144,17 @@ interface StorageService {
         queryVariables: Map<String, *>? = null,
         orderQuery: String? = null,
     ): List<T>
+
+    /**
+     * Deletes items in a store matching some criteria.
+     *
+     * @return Number of items having been deleted
+     */
+    fun deleteWithFilter(
+        store: String,
+        query: String? = null,
+        queryVariables: Map<String, *>? = null,
+    ): Int
 
     /**
      * Gets all the data for a store

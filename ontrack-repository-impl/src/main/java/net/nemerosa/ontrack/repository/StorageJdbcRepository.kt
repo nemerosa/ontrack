@@ -98,6 +98,27 @@ class StorageJdbcRepository(
         }
     }
 
+    override fun clear(store: String) {
+        namedParameterJdbcTemplate!!.update(
+            "DELETE FROM STORAGE WHERE STORE = :store",
+            mapOf(
+                "store" to store,
+            )
+        )
+    }
+
+    override fun deleteWithFilter(store: String, query: String?, queryVariables: Map<String, *>?): Int {
+        var sql = "DELETE FROM STORAGE WHERE STORE = :store"
+        if (query != null) sql += " AND $query"
+
+        val params = params("store", store)
+        if (queryVariables != null) {
+            params.addValues(queryVariables)
+        }
+
+        return namedParameterJdbcTemplate!!.update(sql, params)
+    }
+
     override fun getData(store: String): Map<String, JsonNode> {
         val results: MutableMap<String, JsonNode> = LinkedHashMap()
         namedParameterJdbcTemplate!!.query(
