@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.repository
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.getIntField
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -66,5 +67,46 @@ class StorageJdbcRepositoryIT : AbstractRepositoryTestSupport() {
         assertEquals(2, data.size)
         assertEquals(data1, data["1"])
         assertEquals(data2, data["2"])
+    }
+
+    @Test
+    fun `Filtering with paging`() {
+        val store = uid("C")
+        repeat(20) {
+            val node = mapOf("value" to it).asJson()
+            repository.storeJson(store, it.toString(), node)
+        }
+        repository.filter(store, size = 10, orderQuery = "order by (data->>'value')::int asc").let { items ->
+            assertEquals(10, items.size)
+            assertEquals((0..9).toList(), items.map { it.getIntField("value") })
+        }
+        repository.filter(store, offset = 10, size = 5, orderQuery = "order by (data->>'value')::int asc")
+            .let { items ->
+                assertEquals(5, items.size)
+                assertEquals((10..14).toList(), items.map { it.getIntField("value") })
+            }
+        repository.filter(store, offset = 15, size = 10, orderQuery = "order by (data->>'value')::int asc")
+            .let { items ->
+                assertEquals(5, items.size)
+                assertEquals((15..19).toList(), items.map { it.getIntField("value") })
+            }
+    }
+
+    @Test
+    fun `Filtering with query`() {
+        val store = uid("C")
+        repeat(20) {
+            val node = mapOf("value" to it).asJson()
+            repository.storeJson(store, it.toString(), node)
+        }
+        repository.filter(
+            store,
+            size = 10,
+            query = "(data->>'value')::int = :value",
+            queryVariables = mapOf("value" to 10)
+        ).let { items ->
+            assertEquals(1, items.size)
+            assertEquals(10, items.first().getIntField("value"))
+        }
     }
 }

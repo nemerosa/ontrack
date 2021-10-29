@@ -81,7 +81,7 @@ class StorageJdbcRepository(
         orderQuery: String?
     ): List<JsonNode> {
         var sql = "SELECT DATA FROM STORAGE WHERE STORE = :store"
-        if (query != null) sql += " $query"
+        if (query != null) sql += " AND $query"
         if (orderQuery != null) sql += " $orderQuery"
         sql += " OFFSET :offset LIMIT :size"
 
