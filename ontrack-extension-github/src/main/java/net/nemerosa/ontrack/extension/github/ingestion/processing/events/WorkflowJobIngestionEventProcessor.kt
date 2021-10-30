@@ -36,7 +36,7 @@ class WorkflowJobIngestionEventProcessor(
 
     private fun onJob(payload: WorkflowJobPayload, finished: Boolean) {
         // Processes each step independently
-        payload.steps?.forEach { step ->
+        payload.workflowJob.steps?.forEach { step ->
             onStep(step, payload, finished)
         }
     }
@@ -45,9 +45,9 @@ class WorkflowJobIngestionEventProcessor(
         workflowJobProcessingService.setupValidation(
             owner = payload.repository.owner.login,
             repository = payload.repository.name,
-            runId = payload.runId,
-            runAttempt = payload.runAttempt,
-            job = payload.name,
+            runId = payload.workflowJob.runId,
+            runAttempt = payload.workflowJob.runAttempt,
+            job = payload.workflowJob.name,
             step = step.name,
             status = step.status,
             conclusion = step.conclusion,
@@ -59,18 +59,31 @@ class WorkflowJobIngestionEventProcessor(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class WorkflowJobPayload(
+    val action: WorkflowJobAction,
+    @JsonProperty("workflow_job")
+    val workflowJob: WorkflowJob,
+    repository: Repository,
+) : AbstractWorkflowPayload(
+    repository,
+)
+
+@Suppress("EnumEntryName")
+enum class WorkflowJobAction {
+    queued,
+    in_progress,
+    completed,
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class WorkflowJob(
     val runId: Long,
     val runAttempt: Int,
-    val action: WorkflowJobAction,
-    repository: Repository,
     val status: WorkflowJobStepStatus,
     val conclusion: WorkflowJobStepConclusion?,
     val startedAtDate: LocalDateTime?,
     val completedAtDate: LocalDateTime?,
     val name: String,
     val steps: List<WorkflowJobStep>?,
-) : AbstractWorkflowPayload(
-    repository,
 ) {
     @JsonCreator
     constructor(
@@ -78,8 +91,6 @@ class WorkflowJobPayload(
         runId: Long,
         @JsonProperty("run_attempt")
         runAttempt: Int,
-        action: WorkflowJobAction,
-        repository: Repository,
         status: WorkflowJobStepStatus,
         conclusion: WorkflowJobStepConclusion?,
         @JsonProperty("started_at")
@@ -91,8 +102,6 @@ class WorkflowJobPayload(
     ) : this(
         runId = runId,
         runAttempt = runAttempt,
-        action = action,
-        repository = repository,
         status = status,
         conclusion = conclusion,
         startedAtDate = startedAt?.let { parseLocalDateTime(it) },
@@ -100,13 +109,6 @@ class WorkflowJobPayload(
         name = name,
         steps = steps
     )
-}
-
-@Suppress("EnumEntryName")
-enum class WorkflowJobAction {
-    queued,
-    in_progress,
-    completed,
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
