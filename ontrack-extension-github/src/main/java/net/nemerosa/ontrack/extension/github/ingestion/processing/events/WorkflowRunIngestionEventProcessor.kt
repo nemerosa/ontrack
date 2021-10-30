@@ -51,9 +51,6 @@ class WorkflowRunIngestionEventProcessor(
             WorkflowRunAction.requested -> startBuild(payload)
             WorkflowRunAction.completed -> endBuild(payload)
         }
-        // TODO Validation stamps & run --> for the run
-        // TODO Validation runs links to the GitHub workflow --> for the run
-        // TODO Validation runs run info --> for the run
     }
 
     private fun endBuild(payload: WorkflowRunPayload) {
@@ -108,6 +105,7 @@ class WorkflowRunIngestionEventProcessor(
             build,
             BuildGitHubWorkflowRunPropertyType::class.java,
             BuildGitHubWorkflowRunProperty(
+                runId = payload.workflowRun.id,
                 url = payload.workflowRun.htmlUrl,
                 name = payload.workflowRun.name,
                 runNumber = payload.workflowRun.runNumber,
@@ -265,6 +263,7 @@ enum class WorkflowRunAction {
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class WorkflowRun internal constructor(
+    val id: Long,
     val name: String,
     val runNumber: Int,
     val headBranch: String,
@@ -278,6 +277,7 @@ data class WorkflowRun internal constructor(
 
     @JsonCreator
     constructor(
+        id: Long,
         name: String,
         @JsonProperty("run_number")
         runNumber: Int,
@@ -295,6 +295,7 @@ data class WorkflowRun internal constructor(
         htmlUrl: String,
         event: String,
     ) : this(
+        id = id,
         name = name,
         runNumber = runNumber,
         headBranch = headBranch,

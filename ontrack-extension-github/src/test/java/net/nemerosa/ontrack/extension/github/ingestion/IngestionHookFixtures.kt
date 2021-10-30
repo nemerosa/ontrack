@@ -18,6 +18,7 @@ object IngestionHookFixtures {
      * Workflow run payload
      */
     fun workflowRunPayload(
+        runId: Long = 1,
         action: WorkflowRunAction,
         runNumber: Int,
         headBranch: String,
@@ -31,6 +32,7 @@ object IngestionHookFixtures {
     ) = WorkflowRunPayload(
         action = action,
         workflowRun = WorkflowRun(
+            id = runId,
             name = "CI",
             runNumber = runNumber,
             pullRequests = emptyList(),

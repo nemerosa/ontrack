@@ -342,6 +342,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
     }
 
     private fun payload(
+        runId: Long = 1,
         action: WorkflowRunAction,
         runNumber: Int,
         headBranch: String,
@@ -356,6 +357,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
     ) = WorkflowRunPayload(
         action = action,
         workflowRun = WorkflowRun(
+            id = runId,
             name = "CI",
             runNumber = runNumber,
             pullRequests = emptyList(),

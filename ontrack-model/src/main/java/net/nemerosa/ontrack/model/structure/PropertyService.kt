@@ -127,6 +127,11 @@ interface PropertyService {
     fun <T> findByEntityTypeAndSearchkey(entityType: ProjectEntityType, propertyType: Class<out PropertyType<T>>, searchKey: String): List<ID>
 
     /**
+     * Finds a list of entities based on their type, a property and a list of search arguments.
+     */
+    fun <T> findByEntityTypeAndSearchArguments(entityType: ProjectEntityType, propertyType: KClass<out PropertyType<T>>, searchArguments: PropertySearchArguments?): List<ID>
+
+    /**
      * Tests if a property is defined.
      */
     fun <T> hasProperty(entity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>): Boolean

@@ -22,6 +22,7 @@ class WorkflowRunPayloadTest {
             WorkflowRunPayload(
                 action = WorkflowRunAction.requested,
                 workflowRun = WorkflowRun(
+                    id = 1,
                     name = "CI",
                     runNumber = 2,
                     pullRequests = emptyList(),
@@ -42,6 +43,7 @@ class WorkflowRunPayloadTest {
             mapOf(
                 "action" to "requested",
                 "workflow_run" to mapOf(
+                    "id" to 1,
                     "name" to "CI",
                     "run_number" to 2,
                     "pull_requests" to emptyList<Any>(),

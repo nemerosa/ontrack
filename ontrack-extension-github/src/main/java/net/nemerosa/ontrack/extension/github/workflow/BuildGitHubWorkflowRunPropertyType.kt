@@ -34,6 +34,12 @@ class BuildGitHubWorkflowRunPropertyType(
     override fun getEditionForm(entity: ProjectEntity, value: BuildGitHubWorkflowRunProperty?): Form =
         Form.create()
             .with(
+                Int.of(BuildGitHubWorkflowRunProperty::runId.name)
+                    .label("ID")
+                    .help("Unique ID of the workflow run")
+                    .value(value?.runId)
+            )
+            .with(
                 Url.of(BuildGitHubWorkflowRunProperty::url.name)
                     .label("URL")
                     .help("Link to the GitHub Workflow run")

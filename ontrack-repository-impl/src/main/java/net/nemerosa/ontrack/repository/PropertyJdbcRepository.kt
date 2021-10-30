@@ -152,7 +152,7 @@ class PropertyJdbcRepository(
         }
     }
 
-    override fun findByEntityTypeAndSearchkey(entityType: ProjectEntityType, typeName: String, searchArguments: PropertySearchArguments?): List<ID> {
+    override fun findByEntityTypeAndSearchArguments(entityType: ProjectEntityType, typeName: String, searchArguments: PropertySearchArguments?): List<ID> {
         val entityColumn: String = entityType.displayName
         val tables = StringBuilder("SELECT pp.$entityColumn FROM PROPERTIES pp ")
         val criteria = StringBuilder("WHERE pp.TYPE = :type AND pp.$entityColumn IS NOT NULL ")

@@ -243,10 +243,22 @@ class PropertyServiceImpl(
         // Gets the search arguments
         val searchArguments = actualPropertyType.getSearchArguments(searchKey)
         return if (searchArguments != null) {
-            propertyRepository.findByEntityTypeAndSearchkey(entityType, propertyType.name, searchArguments)
+            propertyRepository.findByEntityTypeAndSearchArguments(entityType, propertyType.name, searchArguments)
         } else {
             emptyList()
         }
+    }
+
+    override fun <T> findByEntityTypeAndSearchArguments(
+        entityType: ProjectEntityType,
+        propertyType: KClass<out PropertyType<T>>,
+        searchArguments: PropertySearchArguments?
+    ): List<ID> {
+        return propertyRepository.findByEntityTypeAndSearchArguments(
+            entityType,
+            propertyType.java.name,
+            searchArguments
+        )
     }
 
     override fun <T> copyProperty(sourceEntity: ProjectEntity, property: Property<T>, targetEntity: ProjectEntity, replacementFn: Function<String, String>) {
