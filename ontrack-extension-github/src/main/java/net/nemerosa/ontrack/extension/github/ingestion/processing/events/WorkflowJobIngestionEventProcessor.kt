@@ -46,6 +46,7 @@ class WorkflowJobIngestionEventProcessor(
             owner = payload.repository.owner.login,
             repository = payload.repository.name,
             runId = payload.runId,
+            runAttempt = payload.runAttempt,
             job = payload.name,
             step = step.name,
             status = step.status,
@@ -59,6 +60,7 @@ class WorkflowJobIngestionEventProcessor(
 @JsonIgnoreProperties(ignoreUnknown = true)
 class WorkflowJobPayload(
     val runId: Long,
+    val runAttempt: Int,
     val action: WorkflowJobAction,
     repository: Repository,
     val status: WorkflowJobStepStatus,
@@ -74,6 +76,8 @@ class WorkflowJobPayload(
     constructor(
         @JsonProperty("run_id")
         runId: Long,
+        @JsonProperty("run_attempt")
+        runAttempt: Int,
         action: WorkflowJobAction,
         repository: Repository,
         status: WorkflowJobStepStatus,
@@ -86,6 +90,7 @@ class WorkflowJobPayload(
         steps: List<WorkflowJobStep>?,
     ) : this(
         runId = runId,
+        runAttempt = runAttempt,
         action = action,
         repository = repository,
         status = status,

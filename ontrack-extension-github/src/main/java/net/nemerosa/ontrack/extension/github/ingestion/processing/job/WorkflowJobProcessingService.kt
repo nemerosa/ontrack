@@ -11,6 +11,7 @@ interface WorkflowJobProcessingService {
      * @param owner Repository owner
      * @param repository Repository name
      * @param runId Workflow run ID. Used to identify the build.
+     * @param runAttempt Number of times this job was attempted (starts with 1, with the very first run)
      * @param job Name of the workflow job
      * @param step Name of the step in the job (null when considering the job only
      * @param status Current status of the validation
@@ -22,6 +23,7 @@ interface WorkflowJobProcessingService {
         owner: String,
         repository: String,
         runId: Long,
+        runAttempt: Int,
         job: String,
         step: String?,
         status: WorkflowJobStepStatus,
