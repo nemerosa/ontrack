@@ -45,12 +45,13 @@ class DefaultWorkflowJobProcessingService(
         val vsName = getValidationStampName(job, step)
         val vsDescription = getValidationStampDescription(job, step)
         // Gets or creates a validation stamp for the branch
-        val vs = structureService.newValidationStamp(
-            ValidationStamp.of(
-                build.branch,
-                nd(vsName, vsDescription)
+        val vs = structureService.findValidationStampByName(build.project.name, build.branch.name, vsName).getOrNull()
+            ?: structureService.newValidationStamp(
+                ValidationStamp.of(
+                    build.branch,
+                    nd(vsName, vsDescription)
+                )
             )
-        )
         // Gets or creates the validation run based on the job number
         val run = setupValidationRun(
             build = build,
