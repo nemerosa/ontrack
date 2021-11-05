@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.events.Workflo
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Owner
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunDecorator
@@ -42,9 +43,9 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
         val repoName = uid("R")
         val owner = uid("o")
         val commit = "1234567890"
-        val projectName = "$owner-$repoName"
+        val projectName = normalizeName(repoName)
         val branchName = "release-1.0"
-        val buildName = "CI-1"
+        val buildName = "ci-1"
         // Starting the run
         asAdmin {
             processor.process(
@@ -105,9 +106,9 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
         val repoName = uid("R")
         val owner = uid("o")
         val commit = "1234567890"
-        val projectName = "$owner-$repoName"
+        val projectName = normalizeName(repoName)
         val branchName = "release-1.0"
-        val buildName = "CI-1"
+        val buildName = "ci-1"
         // Starting the run
         val ref = Time.now()
         asAdmin {
@@ -253,9 +254,9 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
             processor.process(payload)
         }
         // Checks the project, branch & build
-        val projectName = "$owner-$repoName"
+        val projectName = normalizeName(repoName)
         val branchName = "release-1.0"
-        val buildName = "CI-1"
+        val buildName = "ci-1"
         asAdmin {
             assertNotNull(structureService.findProjectByName(projectName).getOrNull()) { project ->
                 assertNotNull(
