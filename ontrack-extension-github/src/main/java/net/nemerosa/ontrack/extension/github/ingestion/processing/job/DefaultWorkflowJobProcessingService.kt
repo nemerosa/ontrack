@@ -5,7 +5,9 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Workflow
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.getProjectName
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
+import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import org.springframework.stereotype.Service
@@ -17,6 +19,7 @@ import java.time.LocalDateTime
 class DefaultWorkflowJobProcessingService(
     private val structureService: StructureService,
     private val propertyService: PropertyService,
+    private val cachedSettingsService: CachedSettingsService,
 ) : WorkflowJobProcessingService {
 
     override fun setupValidation(
@@ -31,8 +34,10 @@ class DefaultWorkflowJobProcessingService(
         startedAt: LocalDateTime?,
         completedAt: LocalDateTime?,
     ) {
+        // Settings
+        val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
         // Project name
-        val projectName = getProjectName(owner, repository)
+        val projectName = getProjectName(owner, repository, settings.orgProjectPrefix)
         // Gets the build
         val build = findBuild(projectName, runId)
             ?: throw BuildWithWorkflowRunIdNotFoundException(projectName, runId)

@@ -14,6 +14,7 @@ class GitHubIngestionSettingsIT : AbstractDSLTestSupport() {
                     GitHubIngestionSettings(
                         token = "secret",
                         retentionDays = 10,
+                        orgProjectPrefix = false,
                     )
                 )
                 cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java).apply {

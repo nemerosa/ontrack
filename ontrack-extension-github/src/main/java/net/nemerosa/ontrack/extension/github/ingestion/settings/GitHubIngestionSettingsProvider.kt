@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.settings
 import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.settings.SettingsProvider
 import net.nemerosa.ontrack.model.support.SettingsRepository
+import net.nemerosa.ontrack.model.support.getBoolean
 import net.nemerosa.ontrack.model.support.getInt
 import net.nemerosa.ontrack.model.support.getPassword
 import org.springframework.stereotype.Component
@@ -19,6 +20,10 @@ class GitHubIngestionSettingsProvider(
             GitHubIngestionSettings::retentionDays,
             GitHubIngestionSettings.DEFAULT_RETENTION_DAYS
         ),
+        orgProjectPrefix = settingsRepository.getBoolean(
+            GitHubIngestionSettings::orgProjectPrefix,
+            GitHubIngestionSettings.DEFAULT_ORG_PROJECT_PREFIX
+        )
     )
 
     override fun getSettingsClass(): Class<GitHubIngestionSettings> = GitHubIngestionSettings::class.java

@@ -16,12 +16,14 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.GitHubConfigUR
 import net.nemerosa.ontrack.extension.github.ingestion.processing.NoGitHubConfigException
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
+import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
@@ -38,6 +40,7 @@ class WorkflowRunIngestionEventProcessor(
     private val propertyService: PropertyService,
     private val gitCommitPropertyCommitLink: GitCommitPropertyCommitLink,
     private val runInfoService: RunInfoService,
+    private val cachedSettingsService: CachedSettingsService,
 ) : AbstractWorkflowIngestionEventProcessor<WorkflowRunPayload>(
     structureService
 ) {
@@ -163,7 +166,12 @@ class WorkflowRunIngestionEventProcessor(
     }
 
     private fun getOrCreateProject(payload: WorkflowRunPayload): Project {
-        val name = payload.repository.ontrackProjectName
+        val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
+        val name = getProjectName(
+            owner = payload.repository.owner.login,
+            repository = payload.repository.name,
+            orgProjectPrefix = settings.orgProjectPrefix,
+        )
         val project = structureService.findProjectByName(name)
             .getOrNull()
             ?: structureService.newProject(

@@ -29,6 +29,7 @@ class IngestionHookPayloadCleanupJobIT : AbstractDSLTestSupport() {
                     GitHubIngestionSettings(
                         token = "not-used",
                         retentionDays = 10,
+                        orgProjectPrefix = false,
                     )
                 )
             }
