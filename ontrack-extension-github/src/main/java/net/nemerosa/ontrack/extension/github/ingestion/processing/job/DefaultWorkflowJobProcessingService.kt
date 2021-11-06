@@ -7,7 +7,10 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Workflow
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.getProjectName
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
+import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
+import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobProperty
+import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobPropertyType
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
@@ -45,6 +48,9 @@ class DefaultWorkflowJobProcessingService(
         // Gets the build
         val build = findBuild(projectName, runId)
             ?: throw BuildWithWorkflowRunIdNotFoundException(projectName, runId)
+        // Gets the run property
+        val runProperty = propertyService.getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java).value
+            ?: error("Cannot find workflow run property on build")
         // Name & description of the validation stamp
         val vsName = getValidationStampName(job, step)
         val vsDescription = getValidationStampDescription(job, step)
@@ -75,6 +81,21 @@ class DefaultWorkflowJobProcessingService(
                 runTime = seconds,
             )
             runInfoService.setRunInfo(run, info)
+        }
+        // Property
+        if (run != null && !propertyService.hasProperty(run, ValidationRunGitHubWorkflowJobPropertyType::class.java)) {
+            propertyService.editProperty(
+                run,
+                ValidationRunGitHubWorkflowJobPropertyType::class.java,
+                ValidationRunGitHubWorkflowJobProperty(
+                    runId = runId,
+                    url = jobUrl,
+                    name = runProperty.name,
+                    runNumber = runProperty.runNumber,
+                    job = job,
+                    running = false, // Run won't be created until finished
+                )
+            )
         }
     }
 

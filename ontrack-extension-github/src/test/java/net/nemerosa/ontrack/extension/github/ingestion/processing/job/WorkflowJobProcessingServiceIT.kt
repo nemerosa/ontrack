@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Workflow
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
+import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobPropertyType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.RunInfoService
@@ -79,7 +80,7 @@ class WorkflowJobProcessingServiceIT : AbstractDSLTestSupport() {
                 BuildGitHubWorkflowRunProperty(
                     runId = runId,
                     url = "",
-                    name = "",
+                    name = "run-name",
                     runNumber = 1,
                     running = true,
                 )
@@ -115,6 +116,13 @@ class WorkflowJobProcessingServiceIT : AbstractDSLTestSupport() {
                         assertEquals(60, info.runTime, "Run time = 60 seconds")
                         assertEquals("github-workflow", info.sourceType)
                         assertEquals("uri:job", info.sourceUri)
+                    }
+                    assertNotNull(getProperty(run, ValidationRunGitHubWorkflowJobPropertyType::class.java)) { p ->
+                        assertEquals("build", p.job)
+                        assertEquals("run-name", p.name)
+                        assertEquals(1, p.runNumber)
+                        assertEquals("uri:job", p.url)
+                        assertEquals(false, p.running)
                     }
                 }
             }
