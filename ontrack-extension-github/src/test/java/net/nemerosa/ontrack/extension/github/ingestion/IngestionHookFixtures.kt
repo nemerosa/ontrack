@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
+import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStatus
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunPayload
@@ -57,6 +58,7 @@ object IngestionHookFixtures {
     fun sampleWorkflowRunIngestionPayload(
         timestamp: LocalDateTime = Time.now(),
         message: String? = null,
+        status: IngestionHookPayloadStatus = IngestionHookPayloadStatus.SCHEDULED,
     ) = payloadHeaders(event = "workflow_run").run {
         IngestionHookPayload(
             timestamp = timestamp,
@@ -67,6 +69,7 @@ object IngestionHookFixtures {
             gitHubHookInstallationTargetType = gitHubHookInstallationTargetType,
             payload = sampleWorkflowRunJsonPayload(),
             message = message,
+            status = status,
         )
     }
 

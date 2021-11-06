@@ -106,8 +106,13 @@ class DefaultIngestionHookPayloadStorage(
     private fun getByUUID(uuid: UUID) = findByUUID(uuid)
         ?: throw IngestionHookPayloadUUIDNotFoundException(uuid)
 
-    override fun count(): Int {
-        return storageService.count(store = INGESTION_HOOK_PAYLOAD_STORE)
+    override fun count(
+        statuses: List<IngestionHookPayloadStatus>?,
+    ): Int {
+        return storageService.count(
+            store = INGESTION_HOOK_PAYLOAD_STORE,
+            query = statusQuery(statuses),
+        )
     }
 
     override fun list(
@@ -115,13 +120,7 @@ class DefaultIngestionHookPayloadStorage(
         size: Int,
         statuses: List<IngestionHookPayloadStatus>?,
     ): List<IngestionHookPayload> {
-        val query: String? = if (statuses != null && statuses.isNotEmpty()) {
-            "(" + statuses.joinToString(" OR ") { status ->
-                "data->>'status' = '$status'"
-            } + ")"
-        } else {
-            null
-        }
+        val query: String? = statusQuery(statuses)
         return storageService.filter(
             store = INGESTION_HOOK_PAYLOAD_STORE,
             type = IngestionHookPayload::class,
@@ -132,6 +131,22 @@ class DefaultIngestionHookPayloadStorage(
             queryVariables = null,
         )
     }
+
+    override fun findByUUID(uuid: String): IngestionHookPayload? =
+        storageService.find(
+            INGESTION_HOOK_PAYLOAD_STORE,
+            uuid,
+            IngestionHookPayload::class
+        )
+
+    private fun statusQuery(statuses: List<IngestionHookPayloadStatus>?) =
+        if (statuses != null && statuses.isNotEmpty()) {
+            "(" + statuses.joinToString(" OR ") { status ->
+                "data->>'status' = '$status'"
+            } + ")"
+        } else {
+            null
+        }
 
     override fun cleanUntil(until: LocalDateTime) =
         storageService.deleteWithFilter(

@@ -19,8 +19,8 @@ fun TypeBuilder.booleanField(name: String, description: String): GraphQLObjectTy
 fun TypeBuilder.intField(name: String, description: String): GraphQLObjectType.Builder =
     field { it.name(name).description(description).type(GraphQLInt) }
 
-fun TypeBuilder.intField(property: KProperty<Int>, description: String): GraphQLObjectType.Builder =
-    field { it.name(property.name).description(description).type(GraphQLInt) }
+fun TypeBuilder.intField(property: KProperty<Int>, description: String? = null): GraphQLObjectType.Builder =
+    field { it.name(property.name).description(getDescription(property, description)).type(GraphQLInt) }
 
 fun TypeBuilder.stringField(name: String, description: String): GraphQLObjectType.Builder =
     field {

@@ -12,8 +12,6 @@ interface StorageRepository {
      */
     fun count(
         store: String,
-        offset: Int = 0,
-        size: Int = 40,
         query: String? = null,
         queryVariables: Map<String, *>? = null,
     ): Int

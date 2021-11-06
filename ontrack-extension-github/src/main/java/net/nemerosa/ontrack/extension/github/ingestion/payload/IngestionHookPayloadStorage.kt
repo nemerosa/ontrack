@@ -29,8 +29,12 @@ interface IngestionHookPayloadStorage {
 
     /**
      * Number of stored payloads
+     *
+     * @param statuses List of statuses to filter on. Empty or null to get them all.
      */
-    fun count(): Int
+    fun count(
+        statuses: List<IngestionHookPayloadStatus>? = null,
+    ): Int
 
     /**
      * Gets a list of stored payloads.
@@ -52,5 +56,10 @@ interface IngestionHookPayloadStorage {
      * @return Number of items which have been deleted.
      */
     fun cleanUntil(until: LocalDateTime): Int
+
+    /**
+     * Gets a payload using its UUID
+     */
+    fun findByUUID(uuid: String): IngestionHookPayload?
 
 }

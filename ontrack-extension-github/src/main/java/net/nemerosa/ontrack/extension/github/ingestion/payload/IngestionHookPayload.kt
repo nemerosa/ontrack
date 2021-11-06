@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.payload
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import java.time.LocalDateTime
 import java.util.*
 
@@ -22,16 +23,28 @@ import java.util.*
  * @property completion Timestamp for the end of the processing
  */
 data class IngestionHookPayload(
+    @APIDescription("Unique ID for this payload")
     val uuid: UUID = UUID.randomUUID(),
+    @APIDescription("Timestamp of reception for this payload")
     val timestamp: LocalDateTime = Time.now(),
+    @APIDescription("Mapped to the `X-GitHub-Delivery` header")
     val gitHubDelivery: String,
+    @APIDescription("Mapped to the `X-GitHub-Event` header")
     val gitHubEvent: String,
+    @APIDescription("Mapped to the `X-GitHub-Hook-ID` header")
     val gitHubHookID: Int,
+    @APIDescription("Mapped to the `X-GitHub-Hook-Installation-Target-ID` header")
     val gitHubHookInstallationTargetID: Int,
+    @APIDescription("Mapped to the `X-GitHub-Hook-Installation-Target-Type` header")
     val gitHubHookInstallationTargetType: String,
+    @APIDescription("JSON payload, raw from GitHub")
     val payload: JsonNode,
+    @APIDescription("Status of the processing")
     val status: IngestionHookPayloadStatus = IngestionHookPayloadStatus.SCHEDULED,
+    @APIDescription("Timestamp for the start of the processing")
     val started: LocalDateTime? = null,
+    @APIDescription("Status message (exception stack trace in case of error)")
     val message: String? = null,
+    @APIDescription("Timestamp for the end of the processing")
     val completion: LocalDateTime? = null,
 )
