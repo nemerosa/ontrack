@@ -35,6 +35,20 @@ class WorkflowJobProcessingServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Failed status`() {
+        project {
+            branch {
+                build {
+                    test(
+                        conclusion = WorkflowJobStepConclusion.failure,
+                        expectedStatus = "FAILED",
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Creation of a simple validation run twice`() {
         project {
             branch {
@@ -54,7 +68,8 @@ class WorkflowJobProcessingServiceIT : AbstractDSLTestSupport() {
         step: String? = "Publishing to the repository",
         status: WorkflowJobStepStatus = WorkflowJobStepStatus.completed,
         conclusion: WorkflowJobStepConclusion = WorkflowJobStepConclusion.success,
-        expectedVsName: String = normalizeName("$job-$step")
+        expectedVsName: String = normalizeName("$job-$step"),
+        expectedStatus: String = "PASSED",
     ) {
         val ref = Time.now()
         asAdmin {
@@ -95,7 +110,7 @@ class WorkflowJobProcessingServiceIT : AbstractDSLTestSupport() {
                     count = 1
                 )
                 assertNotNull(runs.firstOrNull()) { run ->
-                    assertEquals("PASSED", run.lastStatusId)
+                    assertEquals(expectedStatus, run.lastStatusId)
                     assertNotNull(runInfoService.getRunInfo(run), "Run info has been set") { info ->
                         assertEquals(60, info.runTime, "Run time = 60 seconds")
                         assertEquals("github-workflow", info.sourceType)

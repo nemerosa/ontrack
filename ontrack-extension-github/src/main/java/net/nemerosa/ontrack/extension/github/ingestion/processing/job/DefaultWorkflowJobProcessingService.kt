@@ -117,7 +117,7 @@ class DefaultWorkflowJobProcessingService(
         when (status) {
             WorkflowJobStepStatus.completed -> when (conclusion) {
                 WorkflowJobStepConclusion.success -> ValidationRunStatusID.STATUS_PASSED
-                // TODO Error status
+                WorkflowJobStepConclusion.failure -> ValidationRunStatusID.STATUS_FAILED
             }
             else -> null
         }
