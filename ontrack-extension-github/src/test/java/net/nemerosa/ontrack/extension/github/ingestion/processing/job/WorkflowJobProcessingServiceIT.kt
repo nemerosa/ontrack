@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProp
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.RunInfoService
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -18,6 +19,9 @@ class WorkflowJobProcessingServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var workflowJobProcessingService: WorkflowJobProcessingService
+
+    @Autowired
+    private lateinit var runInfoService: RunInfoService
 
     @Test
     fun `Creation of a simple validation run`() {
@@ -71,6 +75,7 @@ class WorkflowJobProcessingServiceIT : AbstractDSLTestSupport() {
                 runId = runId,
                 runAttempt = 1,
                 job = "build",
+                jobUrl = "uri:job",
                 step = "Publishing to the repository",
                 status = status,
                 conclusion = conclusion,
@@ -91,6 +96,11 @@ class WorkflowJobProcessingServiceIT : AbstractDSLTestSupport() {
                 )
                 assertNotNull(runs.firstOrNull()) { run ->
                     assertEquals("PASSED", run.lastStatusId)
+                    assertNotNull(runInfoService.getRunInfo(run), "Run info has been set") { info ->
+                        assertEquals(60, info.runTime, "Run time = 60 seconds")
+                        assertEquals("github-workflow", info.sourceType)
+                        assertEquals("uri:job", info.sourceUri)
+                    }
                 }
             }
         }

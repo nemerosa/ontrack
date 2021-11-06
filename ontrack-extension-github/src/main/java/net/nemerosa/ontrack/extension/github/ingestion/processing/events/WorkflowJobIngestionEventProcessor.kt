@@ -48,6 +48,7 @@ class WorkflowJobIngestionEventProcessor(
             runId = payload.workflowJob.runId,
             runAttempt = payload.workflowJob.runAttempt,
             job = payload.workflowJob.name,
+            jobUrl = payload.workflowJob.htmlUrl,
             step = step.name,
             status = step.status,
             conclusion = step.conclusion,
@@ -84,6 +85,7 @@ class WorkflowJob(
     val completedAtDate: LocalDateTime?,
     val name: String,
     val steps: List<WorkflowJobStep>?,
+    val htmlUrl: String,
 ) {
     @JsonCreator
     constructor(
@@ -99,6 +101,8 @@ class WorkflowJob(
         completedAt: String?,
         name: String,
         steps: List<WorkflowJobStep>?,
+        @JsonProperty("html_url")
+        htmlUrl: String,
     ) : this(
         runId = runId,
         runAttempt = runAttempt,
@@ -107,7 +111,8 @@ class WorkflowJob(
         startedAtDate = startedAt?.let { parseLocalDateTime(it) },
         completedAtDate = completedAt?.let { parseLocalDateTime(it) },
         name = name,
-        steps = steps
+        steps = steps,
+        htmlUrl = htmlUrl,
     )
 }
 

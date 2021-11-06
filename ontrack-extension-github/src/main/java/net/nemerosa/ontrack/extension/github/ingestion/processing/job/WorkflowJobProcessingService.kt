@@ -13,6 +13,7 @@ interface WorkflowJobProcessingService {
      * @param runId Workflow run ID. Used to identify the build.
      * @param runAttempt Number of times this job was attempted (starts with 1, with the very first run)
      * @param job Name of the workflow job
+     * @param jobUrl URL to the job
      * @param step Name of the step in the job (null when considering the job only
      * @param status Current status of the validation
      * @param conclusion Conclusion of the validation
@@ -25,6 +26,7 @@ interface WorkflowJobProcessingService {
         runId: Long,
         runAttempt: Int,
         job: String,
+        jobUrl: String,
         step: String?,
         status: WorkflowJobStepStatus,
         conclusion: WorkflowJobStepConclusion?,

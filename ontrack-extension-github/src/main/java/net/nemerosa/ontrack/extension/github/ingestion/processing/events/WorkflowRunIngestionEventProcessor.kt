@@ -10,10 +10,7 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
-import net.nemerosa.ontrack.extension.github.ingestion.processing.GitHubConfigURLMismatchException
-import net.nemerosa.ontrack.extension.github.ingestion.processing.GitHubConfigURLNoMatchException
-import net.nemerosa.ontrack.extension.github.ingestion.processing.GitHubConfigURLSeveralMatchesException
-import net.nemerosa.ontrack.extension.github.ingestion.processing.NoGitHubConfigException
+import net.nemerosa.ontrack.extension.github.ingestion.processing.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
@@ -73,7 +70,7 @@ class WorkflowRunIngestionEventProcessor(
         }
         // Run info
         return RunInfoInput(
-            sourceType = "github-workflow",
+            sourceType = WorkflowRunInfo.TYPE,
             sourceUri = payload.workflowRun.htmlUrl,
             runTime = duration?.toSeconds()?.toInt(),
             triggerType = payload.workflowRun.event,

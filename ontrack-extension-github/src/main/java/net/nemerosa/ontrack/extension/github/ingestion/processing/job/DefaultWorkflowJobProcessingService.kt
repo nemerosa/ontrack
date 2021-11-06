@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.job
 
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInfo
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.getProjectName
@@ -12,6 +13,7 @@ import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Duration
 import java.time.LocalDateTime
 
 @Service
@@ -20,6 +22,7 @@ class DefaultWorkflowJobProcessingService(
     private val structureService: StructureService,
     private val propertyService: PropertyService,
     private val cachedSettingsService: CachedSettingsService,
+    private val runInfoService: RunInfoService,
 ) : WorkflowJobProcessingService {
 
     override fun setupValidation(
@@ -28,6 +31,7 @@ class DefaultWorkflowJobProcessingService(
         runId: Long,
         runAttempt: Int,
         job: String,
+        jobUrl: String,
         step: String?,
         status: WorkflowJobStepStatus,
         conclusion: WorkflowJobStepConclusion?,
@@ -62,7 +66,16 @@ class DefaultWorkflowJobProcessingService(
             startedAt = startedAt,
             completedAt = completedAt,
         )
-        // TODO Sets the run info if step is finished
+        // Sets the run info if step is finished
+        if (run != null && startedAt != null && completedAt != null) {
+            val seconds = Duration.between(startedAt, completedAt).toSeconds().toInt()
+            val info = RunInfoInput(
+                sourceType = WorkflowRunInfo.TYPE,
+                sourceUri = jobUrl,
+                runTime = seconds,
+            )
+            runInfoService.setRunInfo(run, info)
+        }
     }
 
     private fun setupValidationRun(
