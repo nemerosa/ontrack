@@ -89,6 +89,8 @@ class DefaultWorkflowJobProcessingService(
     ): ValidationRun? {
         // If not finished, does not do anything
         if (conclusion == null || startedAt == null || completedAt == null) return null
+        // If skipped, does not do anything
+        if (conclusion == WorkflowJobStepConclusion.skipped) return null
         // Gets the status
         val runStatus = getValidationRunStatus(status, conclusion) ?: return null
         // Gets the existing validation runs
@@ -118,6 +120,7 @@ class DefaultWorkflowJobProcessingService(
             WorkflowJobStepStatus.completed -> when (conclusion) {
                 WorkflowJobStepConclusion.success -> ValidationRunStatusID.STATUS_PASSED
                 WorkflowJobStepConclusion.failure -> ValidationRunStatusID.STATUS_FAILED
+                else -> null
             }
             else -> null
         }

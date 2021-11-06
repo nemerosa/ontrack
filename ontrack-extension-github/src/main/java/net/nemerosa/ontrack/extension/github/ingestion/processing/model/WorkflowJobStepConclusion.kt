@@ -4,4 +4,5 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.model
 enum class WorkflowJobStepConclusion {
     success,
     failure,
+    skipped,
 }
