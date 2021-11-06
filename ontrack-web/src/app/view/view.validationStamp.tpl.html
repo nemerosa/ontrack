@@ -84,6 +84,9 @@
                             <span ng-if="validationRun.runInfo.runTime">
                                 <ot-duration duration="validationRun.runInfo.runTime"></ot-duration>
                             </span>
+                            <span ng-if="validationRun.runInfo.runTime === 0">
+                                Less than 1 second
+                            </span>
                         </td>
                     </tr>
                 </tbody>
