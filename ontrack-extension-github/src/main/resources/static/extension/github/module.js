@@ -22,11 +22,14 @@ angular.module('ontrack.extension.github', [
         const query = `
             query GetPayloads(
                 $offset: Int!, 
-                $size: Int!
+                $size: Int!,
+                $statuses: [IngestionHookPayloadStatus!]
             ) {
+                gitHubIngestionHookPayloadStatuses
                 gitHubIngestionHookPayloads(
                     offset: $offset,
                     size: $size,
+                    statuses: $statuses
                 ) {
                     pageInfo {
                         totalSize
@@ -68,6 +71,11 @@ angular.module('ontrack.extension.github', [
         const variables = {
             offset: 0,
             size: 20,
+            statuses: null,
+        };
+
+        $scope.filter = {
+            statuses: {}
         };
 
         $scope.loadingPayloads = true;
@@ -75,6 +83,7 @@ angular.module('ontrack.extension.github', [
         const loadPayloads = () => {
             $scope.loadingPayloads = true;
             otGraphqlService.pageGraphQLCall(query, variables).then(data => {
+                $scope.statuses = data.gitHubIngestionHookPayloadStatuses;
                 $scope.payloads = data.gitHubIngestionHookPayloads.pageItems;
                 $scope.pageInfo = data.gitHubIngestionHookPayloads.pageInfo;
             }).finally(() => {
@@ -83,6 +92,19 @@ angular.module('ontrack.extension.github', [
         };
 
         loadPayloads();
+
+        $scope.onStatusSelection = () => {
+            variables.statuses = [];
+            $scope.statuses.forEach((status) => {
+                if ($scope.filter.statuses[status] === true) {
+                    variables.statuses.push(status);
+                }
+            });
+            if (variables.statuses.length === 0) {
+                variables.statuses = null;
+            }
+            loadPayloads();
+        };
 
         const autoReloadKey = 'github-ingestion-hook-payloads-auto-reload';
         const storedAutoReload = localStorage.getItem(autoReloadKey);

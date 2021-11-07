@@ -22,15 +22,24 @@
                 <thead>
                 <tr>
                     <th colspan="5">
-                        <button class="btn"
-                                ng-class="{
-                                'btn-info': autoReload,
-                                'btn-default': !autoReload
-                                }"
-                                ng-click="toggleAutoReload()">
-                            <span class="fa fa-refresh"></span>
-                            <span>Auto reload</span>
-                        </button>
+                        <form class="form-inline">
+                            <div class="form-group">
+                                <button class="btn"
+                                        ng-class="{
+                                        'btn-info': autoReload,
+                                        'btn-default': !autoReload
+                                        }"
+                                        ng-click="toggleAutoReload()">
+                                    <span class="fa fa-refresh"></span>
+                                    <span>Auto reload</span>
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <label class="checkbox-inline" ng-repeat="status in statuses">
+                                    <input type="checkbox" id="status-{{ status }}" ng-value="status" ng-model="filter.statuses[status]" ng-change="onStatusSelection()"> {{ status }}
+                                </label>
+                            </div>
+                        </form>
                     </th>
                 </tr>
                 <tr>
