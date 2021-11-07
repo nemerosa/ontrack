@@ -50,6 +50,21 @@ angular.module('ontrack.extension.github', [
             }
         `;
 
+        const detailsQuery = `
+            query GetPayloadDetail(
+                $uuid: String!
+            ) {
+                gitHubIngestionHookPayloads(
+                    uuid: $uuid,
+                ) {
+                    pageItems {
+                        message
+                        payload
+                    }
+                }
+            }
+        `;
+
         const variables = {
             offset: 0,
             size: 20,
@@ -116,6 +131,22 @@ angular.module('ontrack.extension.github', [
                 variables.offset = $scope.pageInfo.nextPage.offset;
                 variables.size = $scope.pageInfo.nextPage.size;
                 loadPayloads();
+            }
+        };
+
+        $scope.toggleDetails = (payload) => {
+            if (!payload.loadingDetails) {
+                payload.showDetails = !payload.showDetails;
+                if (payload.showDetails && !payload.details) {
+                    // Loading the details
+                    payload.loadingDetails = true;
+                    otGraphqlService.pageGraphQLCall(detailsQuery, {uuid: payload.uuid}).then(data => {
+                        payload.details = data.gitHubIngestionHookPayloads.pageItems[0];
+                        payload.details.payloadJson = JSON.stringify(payload.details.payload, null, 3);
+                    }).finally(() => {
+                        payload.loadingDetails = false;
+                    });
+                }
             }
         };
 

@@ -44,7 +44,8 @@
                 <tbody ng-repeat="payload in payloads">
                 <tr>
                     <td>
-                        <code>{{ payload.uuid }}</code>
+                        <code class="ot-action" ng-click="toggleDetails(payload)">{{ payload.uuid }}</code>
+                        <span class="ot-loading-indicator" ng-show="payload.loadingDetails"></span>
                     </td>
                     <td>
                         {{ payload.timestamp | date:'yyyy-MM-dd HH:mm:ssZ' }}
@@ -59,6 +60,14 @@
                         <span ng-if="payload.completion">
                             {{ payload.completion | date:'yyyy-MM-dd HH:mm:ssZ' }}
                         </span>
+                    </td>
+                </tr>
+                <tr ng-if="payload.showDetails && !payload.loadingDetails && payload.details">
+                    <td colspan="5">
+                        <p ng-if="payload.details.message">
+                            {{ payload.details.message }}
+                        </p>
+                        <textarea readonly ng-bind="payload.details.payloadJson" style="width: 100%;" rows="20"></textarea>
                     </td>
                 </tr>
                 </tbody>
