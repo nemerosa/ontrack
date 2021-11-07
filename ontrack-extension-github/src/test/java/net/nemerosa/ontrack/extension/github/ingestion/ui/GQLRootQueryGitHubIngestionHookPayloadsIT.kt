@@ -8,10 +8,13 @@ import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayl
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredTextField
+import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.json.parse
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractQLKTITSupport() {
 
@@ -23,29 +26,59 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractQLKTITSupport() {
         val payload = IngestionHookFixtures.sampleWorkflowRunIngestionPayload(
             message = "Sample payload",
         )
-        ingestionHookPayloadStorage.store(payload)
-        run("""
-            {
-             gitHubIngestionHookPayloads(uuid: "${payload.uuid}") {
-                pageItems {
-                    uuid
-                    timestamp
-                    gitHubDelivery
-                    gitHubEvent
-                    gitHubHookID
-                    gitHubHookInstallationTargetID
-                    gitHubHookInstallationTargetType
-                    payload
-                    status
-                    started
-                    message
-                    completion
-                }
-             }
+        asAdmin {
+            ingestionHookPayloadStorage.store(payload)
+            run(
+                """
+                    {
+                     gitHubIngestionHookPayloads(uuid: "${payload.uuid}") {
+                        pageItems {
+                            uuid
+                            timestamp
+                            gitHubDelivery
+                            gitHubEvent
+                            gitHubHookID
+                            gitHubHookInstallationTargetID
+                            gitHubHookInstallationTargetType
+                            payload
+                            status
+                            started
+                            message
+                            completion
+                        }
+                     }
+                    }
+                """
+            ).let { data ->
+                val item =
+                    data.path("gitHubIngestionHookPayloads").path("pageItems").first().parse<IngestionHookPayload>()
+                assertEquals(payload.uuid, item.uuid)
             }
-        """).let { data ->
-            val item = data.path("gitHubIngestionHookPayloads").path("pageItems").first().parse<IngestionHookPayload>()
-            assertEquals(payload.uuid, item.uuid)
+        }
+    }
+
+    @Test
+    fun `Getting a payload by UUID is protected`() {
+        val payload = IngestionHookFixtures.sampleWorkflowRunIngestionPayload(
+            message = "Sample payload",
+        )
+        asAdmin {
+            ingestionHookPayloadStorage.store(payload)
+        }
+        asUser {
+            assertFailsWith<AccessDeniedException> {
+                run(
+                    """
+                        {
+                         gitHubIngestionHookPayloads(uuid: "${payload.uuid}") {
+                            pageItems {
+                                uuid
+                            }
+                         }
+                        }
+                    """
+                )
+            }
         }
     }
 
@@ -54,6 +87,20 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractQLKTITSupport() {
         testPayloads(
             expected = (40 downTo 21).toList(),
         )
+    }
+
+    @Test
+    fun `Getting the list of payloads is protected`() {
+        assertFailsWith<AccessDeniedException> {
+            testPayloads(
+                expected = (40 downTo 21).toList(),
+                security = { code ->
+                    asUser {
+                        code()
+                    }
+                }
+            )
+        }
     }
 
     @Test
@@ -88,44 +135,50 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractQLKTITSupport() {
         size: Int? = null,
         statuses: List<IngestionHookPayloadStatus>? = null,
         expected: List<Int>,
+        security: (code: () -> Unit) -> Unit = { code -> asAdmin { code() } },
     ) {
-        createPayloads()
-        run(
-            """
-                query Payloads(
-                    ${'$'}offset: Int,
-                    ${'$'}size: Int,
-                    ${'$'}statuses: [IngestionHookPayloadStatus!],
-                ) {
-                    gitHubIngestionHookPayloads(
-                        offset: ${'$'}offset,
-                        size: ${'$'}size,
-                        statuses: ${'$'}statuses,
+        asAdmin {
+            createPayloads()
+        }
+        security {
+            run(
+                """
+                    query Payloads(
+                        ${'$'}offset: Int,
+                        ${'$'}size: Int,
+                        ${'$'}statuses: [IngestionHookPayloadStatus!],
                     ) {
-                        pageItems {
-                            message
+                        gitHubIngestionHookPayloads(
+                            offset: ${'$'}offset,
+                            size: ${'$'}size,
+                            statuses: ${'$'}statuses,
+                        ) {
+                            pageItems {
+                                message
+                            }
                         }
                     }
-                }
-            """, mapOf(
-                "offset" to offset,
-                "size" to size,
-                "statuses" to statuses,
-            )
-        ).let { data ->
-            assertEquals(
-                expected.map { no ->
-                    "Payload #$no"
-                },
-                data.path("gitHubIngestionHookPayloads").path("pageItems").map { node ->
-                    node.getRequiredTextField("message")
-                }
-            )
+                """, mapOf(
+                    "offset" to offset,
+                    "size" to size,
+                    "statuses" to statuses,
+                )
+            ).let { data ->
+                assertEquals(
+                    expected.map { no ->
+                        "Payload #$no"
+                    },
+                    data.path("gitHubIngestionHookPayloads").path("pageItems").map { node ->
+                        node.getRequiredTextField("message")
+                    }
+                )
+            }
         }
     }
 
     private fun createPayloads() {
-        ingestionHookPayloadStorage.cleanUntil(Time.now())
+        val ref = Time.now()
+        ingestionHookPayloadStorage.cleanUntil(ref)
         val payloads = (1..40).map { no ->
             val status = when (no % 4) {
                 0 -> IngestionHookPayloadStatus.SCHEDULED
@@ -134,6 +187,7 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractQLKTITSupport() {
                 else -> IngestionHookPayloadStatus.ERRORED
             }
             IngestionHookFixtures.sampleWorkflowRunIngestionPayload(
+                timestamp = ref.minusDays(1).plusSeconds(no.toLong()),
                 message = "Payload #$no",
                 status = status,
             )

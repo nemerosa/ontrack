@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.github.ingestion.payload
 
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.model.security.GlobalSettings
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.springframework.stereotype.Component
@@ -14,10 +16,12 @@ import java.util.*
 @Transactional
 class DefaultIngestionHookPayloadStorage(
     private val storageService: StorageService,
+    private val securityService: SecurityService,
 ) : IngestionHookPayloadStorage {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun store(payload: IngestionHookPayload) {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
         storageService.store(
             INGESTION_HOOK_PAYLOAD_STORE,
             payload.uuid.toString(),
@@ -27,6 +31,7 @@ class DefaultIngestionHookPayloadStorage(
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun start(payload: IngestionHookPayload) {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
         // Gets the old payload
         val old = getByUUID(payload.uuid)
         // Saves the new version
@@ -52,6 +57,7 @@ class DefaultIngestionHookPayloadStorage(
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun finished(payload: IngestionHookPayload) {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
         // Gets the old payload
         val old = getByUUID(payload.uuid)
         // Saves the new version
@@ -77,6 +83,7 @@ class DefaultIngestionHookPayloadStorage(
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun error(payload: IngestionHookPayload, any: Throwable) {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
         // Gets the old payload
         val old = getByUUID(payload.uuid)
         // Saves the new version
@@ -100,15 +107,13 @@ class DefaultIngestionHookPayloadStorage(
         )
     }
 
-    private fun findByUUID(uuid: UUID) =
-        storageService.find(INGESTION_HOOK_PAYLOAD_STORE, uuid.toString(), IngestionHookPayload::class)
-
-    private fun getByUUID(uuid: UUID) = findByUUID(uuid)
+    private fun getByUUID(uuid: UUID) = findByUUID(uuid.toString())
         ?: throw IngestionHookPayloadUUIDNotFoundException(uuid)
 
     override fun count(
         statuses: List<IngestionHookPayloadStatus>?,
     ): Int {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
         return storageService.count(
             store = INGESTION_HOOK_PAYLOAD_STORE,
             query = statusQuery(statuses),
@@ -120,6 +125,7 @@ class DefaultIngestionHookPayloadStorage(
         size: Int,
         statuses: List<IngestionHookPayloadStatus>?,
     ): List<IngestionHookPayload> {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
         val query: String? = statusQuery(statuses)
         return storageService.filter(
             store = INGESTION_HOOK_PAYLOAD_STORE,
@@ -132,12 +138,14 @@ class DefaultIngestionHookPayloadStorage(
         )
     }
 
-    override fun findByUUID(uuid: String): IngestionHookPayload? =
-        storageService.find(
+    override fun findByUUID(uuid: String): IngestionHookPayload? {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
+        return storageService.find(
             INGESTION_HOOK_PAYLOAD_STORE,
             uuid,
             IngestionHookPayload::class
         )
+    }
 
     private fun statusQuery(statuses: List<IngestionHookPayloadStatus>?) =
         if (statuses != null && statuses.isNotEmpty()) {
@@ -148,14 +156,16 @@ class DefaultIngestionHookPayloadStorage(
             null
         }
 
-    override fun cleanUntil(until: LocalDateTime) =
-        storageService.deleteWithFilter(
+    override fun cleanUntil(until: LocalDateTime): Int {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
+        return storageService.deleteWithFilter(
             store = INGESTION_HOOK_PAYLOAD_STORE,
             query = "data->>'timestamp' < :until",
             queryVariables = mapOf(
                 "until" to until.format(DateTimeFormatter.ISO_DATE_TIME),
             ),
         )
+    }
 
     companion object {
         private const val INGESTION_HOOK_PAYLOAD_STORE = "github.IngestionHookPayload"

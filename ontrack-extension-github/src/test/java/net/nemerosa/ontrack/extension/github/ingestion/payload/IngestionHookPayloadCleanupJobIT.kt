@@ -37,18 +37,22 @@ class IngestionHookPayloadCleanupJobIT : AbstractDSLTestSupport() {
             storageService.clear("github.IngestionHookPayload")
             // Creates payload before and after the retention period
             val ref = Time.now()
-            (-20..-1).forEach { days ->
-                storage.store(
-                    IngestionHookFixtures.sampleWorkflowRunIngestionPayload(
-                        timestamp = ref.plusDays(days.toLong()).plusMinutes(1),
-                        message = "$days",
+            asAdmin {
+                (-20..-1).forEach { days ->
+                    storage.store(
+                        IngestionHookFixtures.sampleWorkflowRunIngestionPayload(
+                            timestamp = ref.plusDays(days.toLong()).plusMinutes(1),
+                            message = "$days",
+                        )
                     )
-                )
+                }
             }
             // Running the cleanup job
-            job.startingJobs.first().job.task.run(JobRunListener.out())
+            asAdmin {
+                job.startingJobs.first().job.task.run(JobRunListener.out())
+            }
             // Checks that only the most recent jobs have been kept
-            val items = storage.list(size = Int.MAX_VALUE)
+            val items = asAdmin { storage.list(size = Int.MAX_VALUE) }
             assertEquals(10, items.size)
             assertEquals(
                 (-10..-1).map { it.toString() }.toSet(),

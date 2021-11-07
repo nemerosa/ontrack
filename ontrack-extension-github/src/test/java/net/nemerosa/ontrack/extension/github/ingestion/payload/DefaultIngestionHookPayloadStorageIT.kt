@@ -15,10 +15,12 @@ class DefaultIngestionHookPayloadStorageIT : AbstractDSLTestSupport() {
     @Test
     fun `Storing and retrieving`() {
         val payload = IngestionHookFixtures.sampleWorkflowRunIngestionPayload()
-        storage.store(payload)
-        // Get it back
-        assertTrue(storage.count() >= 1, "At least one item stored")
-        assertNotNull(storage.list().find { it.uuid == payload.uuid }, "Item has been stored")
+        asAdmin {
+            storage.store(payload)
+            // Get it back
+            assertTrue(storage.count() >= 1, "At least one item stored")
+            assertNotNull(storage.list().find { it.uuid == payload.uuid }, "Item has been stored")
+        }
     }
 
 }
