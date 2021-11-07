@@ -5,6 +5,7 @@ import io.mockk.mockk
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
+import net.nemerosa.ontrack.it.MockSecurityService
 import net.nemerosa.ontrack.json.format
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -18,7 +19,7 @@ class IngestionHookControllerTest {
     fun `Storage and queuing`() {
         val storage = mockk<IngestionHookPayloadStorage>()
         val queue = mockk<IngestionHookQueue>()
-        val securityService = mockk<SecurityService>()
+        val securityService = MockSecurityService()
         val controller = IngestionHookController(queue, storage, MockIngestionHookSignatureService(), securityService)
 
         var storedPayload: IngestionHookPayload? = null
@@ -53,7 +54,7 @@ class IngestionHookControllerTest {
     fun `No storage nor queuing for a ping`() {
         val storage = mockk<IngestionHookPayloadStorage>()
         val queue = mockk<IngestionHookQueue>()
-        val securityService = mockk<SecurityService>()
+        val securityService = MockSecurityService()
         val controller = IngestionHookController(queue, storage, MockIngestionHookSignatureService(), securityService)
 
         var storedPayload: IngestionHookPayload? = null
