@@ -68,6 +68,28 @@ angular.module('ontrack.extension.github', [
 
         loadPayloads();
 
+        $scope.topPayloads = () => {
+            variables.offset = 0;
+            variables.size = 20;
+            loadPayloads();
+        };
+
+        $scope.newerPayloads = () => {
+            if ($scope.pageInfo.previousPage) {
+                variables.offset = $scope.pageInfo.previousPage.offset;
+                variables.size = $scope.pageInfo.previousPage.size;
+                loadPayloads();
+            }
+        };
+
+        $scope.olderPayloads = () => {
+            if ($scope.pageInfo.nextPage) {
+                variables.offset = $scope.pageInfo.nextPage.offset;
+                variables.size = $scope.pageInfo.nextPage.size;
+                loadPayloads();
+            }
+        };
+
     })
     .config(function ($stateProvider) {
         $stateProvider.state('github-configurations', {

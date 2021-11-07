@@ -49,6 +49,24 @@
                     </td>
                 </tr>
                 </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <button ng-disabled="!pageInfo.previousPage" class="btn btn-default" ng-click="topPayloads()">
+                            <span class="fa fa-fast-backward"></span>
+                            Newest payloads
+                        </button>
+                        <button ng-disabled="!pageInfo.previousPage" class="btn btn-default" ng-click="newerPayloads()">
+                            <span class="fa fa-backward"></span>
+                            Newer payloads
+                        </button>
+                        <button ng-disabled="!pageInfo.nextPage" class="btn btn-default" ng-click="olderPayloads()">
+                            <span class="fa fa-forward"></span>
+                            Older payloads
+                        </button>
+                    </td>
+                </tr>
+                </tfoot>
             </table>
         </div>
     </div>
