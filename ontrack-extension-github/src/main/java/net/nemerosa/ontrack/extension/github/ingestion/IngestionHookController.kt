@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayl
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookSignatureService
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
+import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -16,6 +17,7 @@ class IngestionHookController(
     private val queue: IngestionHookQueue,
     private val storage: IngestionHookPayloadStorage,
     private val ingestionHookSignatureService: IngestionHookSignatureService,
+    private val securityService: SecurityService,
 ) {
 
     @PostMapping("")
@@ -42,17 +44,19 @@ class IngestionHookController(
         // Pre-sorting
         val toBeProcessed = preFlightCheck(payload)
         if (toBeProcessed) {
-            // Stores it
-            storage.store(payload)
-            // Pushes it on the queue
-            queue.queue(payload)
-            // Ok
-            return IngestionHookResponse(
-                message = "Ingestion request ${payload.uuid}/${payload.gitHubEvent} has been received and is processed in the background.",
-                uuid = payload.uuid,
-                event = payload.gitHubEvent,
-                processing = true,
-            )
+            return securityService.asAdmin {
+                // Stores it
+                storage.store(payload)
+                // Pushes it on the queue
+                queue.queue(payload)
+                // Ok
+                IngestionHookResponse(
+                    message = "Ingestion request ${payload.uuid}/${payload.gitHubEvent} has been received and is processed in the background.",
+                    uuid = payload.uuid,
+                    event = payload.gitHubEvent,
+                    processing = true,
+                )
+            }
         } else {
             return IngestionHookResponse(
                 message = "Ingestion request ${payload.uuid}/${payload.gitHubEvent} has been received correctly but won't be processed.",

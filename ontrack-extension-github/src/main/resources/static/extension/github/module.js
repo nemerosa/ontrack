@@ -5,7 +5,71 @@ angular.module('ontrack.extension.github', [
     'ot.service.form'
 ])
     .config(function ($stateProvider) {
-        // Artifactory configurations
+        $stateProvider.state('github-ingestion-hook-payloads', {
+            url: '/extension/github/ingestion-hook-payloads',
+            templateUrl: 'extension/github/ingestion-hook-payloads.tpl.html',
+            controller: 'GitHubIngestionHookPayloadsCtrl'
+        });
+    })
+    .controller('GitHubIngestionHookPayloadsCtrl', function ($scope, ot, otGraphqlService) {
+        const view = ot.view();
+        view.title = 'GitHub Ingestion Hook Payloads';
+        view.description = 'List of payloads received and processed by the GitHub Ingestion Hook.';
+        view.commands = [];
+        view.breadcrumbs = ot.homeBreadcrumbs();
+
+        const query = `
+            query GetPayloads(
+                $offset: Int!, 
+                $size: Int!
+            ) {
+                gitHubIngestionHookPayloads(
+                    offset: $offset,
+                    size: $size,
+                ) {
+                    pageInfo {
+                        totalSize
+                        previousPage {
+                            offset
+                            size
+                        }
+                        nextPage {
+                            offset
+                            size
+                        }
+                    }
+                    pageItems {
+                        uuid
+                        timestamp
+                        gitHubEvent
+                        status
+                        completion
+                    }
+                }
+            }
+        `;
+
+        const variables = {
+            offset: 0,
+            size: 20,
+        };
+
+        $scope.loadingPayloads = true;
+
+        const loadPayloads = () => {
+            $scope.loadingPayloads = true;
+            otGraphqlService.pageGraphQLCall(query, variables).then(data => {
+                $scope.payloads = data.gitHubIngestionHookPayloads.pageItems;
+                $scope.pageInfo = data.gitHubIngestionHookPayloads.pageInfo;
+            }).finally(() => {
+                $scope.loadingPayloads = false;
+            });
+        };
+
+        loadPayloads();
+
+    })
+    .config(function ($stateProvider) {
         $stateProvider.state('github-configurations', {
             url: '/extension/github/configurations',
             templateUrl: 'extension/github/github.configurations.tpl.html',
