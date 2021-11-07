@@ -21,6 +21,19 @@
             <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
+                    <th colspan="5">
+                        <button class="btn"
+                                ng-class="{
+                                'btn-info': autoReload,
+                                'btn-default': !autoReload
+                                }"
+                                ng-click="toggleAutoReload()">
+                            <span class="fa fa-refresh"></span>
+                            <span>Auto reload</span>
+                        </button>
+                    </th>
+                </tr>
+                <tr>
                     <th>UUID</th>
                     <th>Timestamp</th>
                     <th>Event</th>

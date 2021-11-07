@@ -2,7 +2,8 @@ angular.module('ontrack.extension.github', [
     'ot.service.core',
     'ot.service.graphql',
     'ot.service.configuration',
-    'ot.service.form'
+    'ot.service.form',
+    'ot.service.task'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('github-ingestion-hook-payloads', {
@@ -11,7 +12,7 @@ angular.module('ontrack.extension.github', [
             controller: 'GitHubIngestionHookPayloadsCtrl'
         });
     })
-    .controller('GitHubIngestionHookPayloadsCtrl', function ($scope, ot, otGraphqlService) {
+    .controller('GitHubIngestionHookPayloadsCtrl', function ($scope, ot, otGraphqlService, otTaskService) {
         const view = ot.view();
         view.title = 'GitHub Ingestion Hook Payloads';
         view.description = 'List of payloads received and processed by the GitHub Ingestion Hook.';
@@ -67,6 +68,34 @@ angular.module('ontrack.extension.github', [
         };
 
         loadPayloads();
+
+        const autoReloadKey = 'github-ingestion-hook-payloads-auto-reload';
+        const storedAutoReload = localStorage.getItem(autoReloadKey);
+        if (storedAutoReload !== null) {
+            $scope.autoReload = storedAutoReload;
+        } else {
+            $scope.autoReload = false;
+        }
+
+        const interval = 10 * 1000; // 10 seconds
+        const taskName = 'GitHub Ingestion Hook Payloads';
+        const registerReload = () => {
+            otTaskService.register(taskName, loadPayloads, interval);
+        };
+
+        if ($scope.autoReload) {
+            registerReload();
+        }
+
+        $scope.toggleAutoReload = () => {
+            $scope.autoReload = !$scope.autoReload;
+            if ($scope.autoReload) {
+                registerReload();
+            } else {
+                otTaskService.stop(taskName);
+            }
+            localStorage.setItem(autoReloadKey, $scope.autoReload);
+        };
 
         $scope.topPayloads = () => {
             variables.offset = 0;
