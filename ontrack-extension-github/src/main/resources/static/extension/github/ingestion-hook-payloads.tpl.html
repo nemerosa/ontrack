@@ -9,20 +9,13 @@
         </div>
     </div>
 
-    <div class="row" ng-if="payloads.length == 0">
-        <div class="col-md-12">
-            <div class="alert alert-info">
-                No payload has been received yet by the GitHub Ingestion Hook.
-            </div>
-        </div>
-    </div>
-    <div class="row" ng-if="payloads && payloads.length > 0">
+    <div class="row">
         <div class="col-md-12">
             <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                    <th colspan="5">
-                        <form class="form-inline">
+                    <th colspan="6">
+                        <form class="form-inline" ng-submit="submitFilter()">
                             <div class="form-group">
                                 <button class="btn"
                                         ng-class="{
@@ -39,17 +32,45 @@
                                     <input type="checkbox" id="status-{{ status }}" ng-value="status" ng-model="filter.statuses[status]" ng-change="onStatusSelection()"> {{ status }}
                                 </label>
                             </div>
+                            <div class="form-group">
+                                <label for="filter_delivery">Delivery ID</label>
+                                <input type="text" class="form-control" id="filter_delivery" ng-model="filter.gitHubDelivery"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="filter_event">Event</label>
+                                <input type="text" class="form-control" id="filter_event" ng-model="filter.gitHubEvent"/>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="submit">
+                                    <span class="fa fa-search"></span>
+                                    <span>Filter</span>
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-default" type="button" ng-click="resetFilter()">
+                                    <span class="fa fa-ban"></span>
+                                    <span>Reset</span>
+                                </button>
+                            </div>
                         </form>
                     </th>
                 </tr>
                 <tr>
-                    <th>UUID</th>
+                    <th>Ontrack ID</th>
                     <th>Timestamp</th>
+                    <th>GitHub Delivery ID</th>
                     <th>Event</th>
                     <th>Status</th>
                     <th>Completion</th>
                 </tr>
                 </thead>
+                <tbody ng-if="payloads.length == 0">
+                <tr class="warning">
+                    <td colspan="6">
+                        No payload has been received or the filter is too restrictive.
+                    </td>
+                </tr>
+                </tbody>
                 <tbody ng-repeat="payload in payloads">
                 <tr>
                     <td>
@@ -58,6 +79,9 @@
                     </td>
                     <td>
                         {{ payload.timestamp | date:'yyyy-MM-dd HH:mm:ssZ' }}
+                    </td>
+                    <td>
+                        <code>{{ payload.gitHubDelivery }}</code>
                     </td>
                     <td>
                         <code>{{ payload.gitHubEvent }}</code>
@@ -72,7 +96,7 @@
                     </td>
                 </tr>
                 <tr ng-if="payload.showDetails && !payload.loadingDetails && payload.details">
-                    <td colspan="5">
+                    <td colspan="6">
                         <p ng-if="payload.details.message">
                             {{ payload.details.message }}
                         </p>
@@ -82,7 +106,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <td colspan="5">
+                    <td colspan="6">
                         <button ng-disabled="!pageInfo.previousPage" class="btn btn-default" ng-click="topPayloads()">
                             <span class="fa fa-fast-backward"></span>
                             Newest payloads

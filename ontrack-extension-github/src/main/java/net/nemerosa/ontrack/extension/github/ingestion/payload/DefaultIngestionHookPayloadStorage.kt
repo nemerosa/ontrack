@@ -112,11 +112,14 @@ class DefaultIngestionHookPayloadStorage(
 
     override fun count(
         statuses: List<IngestionHookPayloadStatus>?,
+        gitHubDelivery: String?,
+        gitHubEvent: String?,
     ): Int {
         securityService.checkGlobalFunction(GlobalSettings::class.java)
         return storageService.count(
             store = INGESTION_HOOK_PAYLOAD_STORE,
-            query = statusQuery(statuses),
+            query = query(statuses, gitHubDelivery, gitHubEvent),
+            queryVariables = queryVariables(statuses, gitHubDelivery, gitHubEvent),
         )
     }
 
@@ -124,9 +127,11 @@ class DefaultIngestionHookPayloadStorage(
         offset: Int,
         size: Int,
         statuses: List<IngestionHookPayloadStatus>?,
+        gitHubDelivery: String?,
+        gitHubEvent: String?,
     ): List<IngestionHookPayload> {
         securityService.checkGlobalFunction(GlobalSettings::class.java)
-        val query: String? = statusQuery(statuses)
+        val query: String? = query(statuses, gitHubDelivery, gitHubEvent)
         return storageService.filter(
             store = INGESTION_HOOK_PAYLOAD_STORE,
             type = IngestionHookPayload::class,
@@ -134,7 +139,7 @@ class DefaultIngestionHookPayloadStorage(
             size = size,
             orderQuery = "order by data->>'timestamp' desc",
             query = query,
-            queryVariables = null,
+            queryVariables = queryVariables(statuses, gitHubDelivery, gitHubEvent),
         )
     }
 
@@ -147,14 +152,44 @@ class DefaultIngestionHookPayloadStorage(
         )
     }
 
-    private fun statusQuery(statuses: List<IngestionHookPayloadStatus>?) =
+    private fun query(
+        statuses: List<IngestionHookPayloadStatus>?,
+        gitHubDelivery: String?,
+        gitHubEvent: String?,
+    ): String? {
+        val parts = mutableListOf<String>()
         if (statuses != null && statuses.isNotEmpty()) {
-            "(" + statuses.joinToString(" OR ") { status ->
+            parts += "(" + statuses.joinToString(" OR ") { status ->
                 "data->>'status' = '$status'"
             } + ")"
+        }
+        if (!gitHubDelivery.isNullOrBlank()) {
+            parts += "data->>'gitHubDelivery' = :gitHubDelivery"
+        }
+        if (!gitHubEvent.isNullOrBlank()) {
+            parts += "data->>'gitHubEvent' = :gitHubEvent"
+        }
+        return if (parts.isNotEmpty()) {
+            parts.joinToString(" AND ") { "( $it )" }
         } else {
             null
         }
+    }
+
+    private fun queryVariables(
+        @Suppress("UNUSED_PARAMETER") statuses: List<IngestionHookPayloadStatus>?,
+        gitHubDelivery: String?,
+        gitHubEvent: String?
+    ): Map<String, *>? {
+        val variables = mutableMapOf<String, Any?>()
+        if (!gitHubDelivery.isNullOrBlank()) {
+            variables["gitHubDelivery"] = gitHubDelivery
+        }
+        if (!gitHubEvent.isNullOrBlank()) {
+            variables["gitHubEvent"] = gitHubEvent
+        }
+        return variables.takeIf { it.isNotEmpty() }
+    }
 
     override fun cleanUntil(until: LocalDateTime): Int {
         securityService.checkGlobalFunction(GlobalSettings::class.java)

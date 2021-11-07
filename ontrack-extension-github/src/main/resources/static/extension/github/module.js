@@ -23,13 +23,17 @@ angular.module('ontrack.extension.github', [
             query GetPayloads(
                 $offset: Int!, 
                 $size: Int!,
-                $statuses: [IngestionHookPayloadStatus!]
+                $statuses: [IngestionHookPayloadStatus!],
+                $gitHubDelivery: String,
+                $gitHubEvent: String,
             ) {
                 gitHubIngestionHookPayloadStatuses
                 gitHubIngestionHookPayloads(
                     offset: $offset,
                     size: $size,
-                    statuses: $statuses
+                    statuses: $statuses,
+                    gitHubDelivery: $gitHubDelivery,
+                    gitHubEvent: $gitHubEvent,
                 ) {
                     pageInfo {
                         totalSize
@@ -46,6 +50,7 @@ angular.module('ontrack.extension.github', [
                         uuid
                         timestamp
                         gitHubEvent
+                        gitHubDelivery
                         status
                         completion
                     }
@@ -68,14 +73,18 @@ angular.module('ontrack.extension.github', [
             }
         `;
 
+        const defaultSize = 20;
+
         const variables = {
             offset: 0,
-            size: 20,
+            size: defaultSize,
             statuses: null,
         };
 
         $scope.filter = {
-            statuses: {}
+            statuses: {},
+            gitHubDelivery: '',
+            gitHubEvent: '',
         };
 
         $scope.loadingPayloads = true;
@@ -93,7 +102,32 @@ angular.module('ontrack.extension.github', [
 
         loadPayloads();
 
+        $scope.submitFilter = () => {
+            variables.offset = 0;
+            variables.size = defaultSize;
+            if ($scope.filter.gitHubDelivery) {
+                variables.gitHubDelivery = $scope.filter.gitHubDelivery;
+            } else {
+                variables.gitHubDelivery = null;
+            }
+            if ($scope.filter.gitHubEvent) {
+                variables.gitHubEvent = $scope.filter.gitHubEvent;
+            } else {
+                variables.gitHubEvent = null;
+            }
+            loadPayloads();
+        };
+
+        $scope.resetFilter = () => {
+            $scope.filter.statuses = {};
+            $scope.filter.gitHubDelivery = '';
+            $scope.filter.gitHubEvent = '';
+            $scope.submitFilter();
+        };
+
         $scope.onStatusSelection = () => {
+            variables.offset = 0;
+            variables.size = defaultSize;
             variables.statuses = [];
             $scope.statuses.forEach((status) => {
                 if ($scope.filter.statuses[status] === true) {
@@ -137,7 +171,7 @@ angular.module('ontrack.extension.github', [
 
         $scope.topPayloads = () => {
             variables.offset = 0;
-            variables.size = 20;
+            variables.size = defaultSize;
             loadPayloads();
         };
 

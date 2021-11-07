@@ -31,9 +31,13 @@ interface IngestionHookPayloadStorage {
      * Number of stored payloads
      *
      * @param statuses List of statuses to filter on. Empty or null to get them all.
+     * @param gitHubDelivery Filter on the GitHub Delivery ID
+     * @param gitHubEvent Filter on the GitHub Event
      */
     fun count(
         statuses: List<IngestionHookPayloadStatus>? = null,
+        gitHubDelivery: String? = null,
+        gitHubEvent: String? = null,
     ): Int
 
     /**
@@ -42,12 +46,16 @@ interface IngestionHookPayloadStorage {
      * @param offset Start of the page
      * @param size Maximum of items in a page
      * @param statuses List of statuses to filter on. Empty or null to get them all.
+     * @param gitHubDelivery Filter on the GitHub Delivery ID
+     * @param gitHubEvent Filter on the GitHub Event
      * @return List of matching payloads
      */
     fun list(
         offset: Int = 0,
         size: Int = 40,
         statuses: List<IngestionHookPayloadStatus>? = null,
+        gitHubDelivery: String? = null,
+        gitHubEvent: String? = null,
     ): List<IngestionHookPayload>
 
     /**
