@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayl
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
 import net.nemerosa.ontrack.json.format
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.security.SecurityService
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -17,7 +18,8 @@ class IngestionHookControllerTest {
     fun `Storage and queuing`() {
         val storage = mockk<IngestionHookPayloadStorage>()
         val queue = mockk<IngestionHookQueue>()
-        val controller = IngestionHookController(queue, storage, MockIngestionHookSignatureService())
+        val securityService = mockk<SecurityService>()
+        val controller = IngestionHookController(queue, storage, MockIngestionHookSignatureService(), securityService)
 
         var storedPayload: IngestionHookPayload? = null
         var queuedPayload: IngestionHookPayload? = null
@@ -51,7 +53,8 @@ class IngestionHookControllerTest {
     fun `No storage nor queuing for a ping`() {
         val storage = mockk<IngestionHookPayloadStorage>()
         val queue = mockk<IngestionHookQueue>()
-        val controller = IngestionHookController(queue, storage, MockIngestionHookSignatureService())
+        val securityService = mockk<SecurityService>()
+        val controller = IngestionHookController(queue, storage, MockIngestionHookSignatureService(), securityService)
 
         var storedPayload: IngestionHookPayload? = null
         var queuedPayload: IngestionHookPayload? = null

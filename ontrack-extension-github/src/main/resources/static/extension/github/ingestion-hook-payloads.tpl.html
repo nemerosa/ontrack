@@ -9,4 +9,48 @@
         </div>
     </div>
 
+    <div class="row" ng-if="payloads.length == 0">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                No payload has been received yet by the GitHub Ingestion Hook.
+            </div>
+        </div>
+    </div>
+    <div class="row" ng-if="payloads && payloads.length > 0">
+        <div class="col-md-12">
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>UUID</th>
+                    <th>Timestamp</th>
+                    <th>Event</th>
+                    <th>Status</th>
+                    <th>Completion</th>
+                </tr>
+                </thead>
+                <tbody ng-repeat="payload in payloads">
+                <tr>
+                    <td>
+                        <code>{{ payload.uuid }}</code>
+                    </td>
+                    <td>
+                        {{ payload.timestamp | date:'yyyy-MM-dd HH:mm:ssZ' }}
+                    </td>
+                    <td>
+                        <code>{{ payload.gitHubEvent }}</code>
+                    </td>
+                    <td>
+                        <code>{{ payload.status }}</code>
+                    </td>
+                    <td>
+                        <span ng-if="payload.completion">
+                            {{ payload.completion | date:'yyyy-MM-dd HH:mm:ssZ' }}
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </ot-view>
