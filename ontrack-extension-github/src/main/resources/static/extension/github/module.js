@@ -105,11 +105,12 @@ angular.module('ontrack.extension.github', [
         $scope.toggleAutoReload = () => {
             $scope.autoReload = !$scope.autoReload;
             if ($scope.autoReload) {
+                localStorage.setItem(autoReloadKey, $scope.autoReload);
                 registerReload();
             } else {
+                localStorage.removeItem(autoReloadKey);
                 otTaskService.stop(taskName);
             }
-            localStorage.setItem(autoReloadKey, $scope.autoReload);
         };
 
         $scope.topPayloads = () => {
