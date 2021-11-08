@@ -109,5 +109,8 @@ The following processing metrics are exported by Ontrack:
 * `ontrack_extension_github_ingestion_received_count` - number of payloads being received
 * `ontrack_extension_github_ingestion_processing_started_count` - number of payloads whose processing has started
 * `ontrack_extension_github_ingestion_processing_success_count` - number of payloads whose processing has completed successfully
+* `ontrack_extension_github_ingestion_processing_error_count` - number of payloads whose processing has failed
 * `ontrack_extension_github_ingestion_processing_finished_count` - number of payloads whose processing has completed, with an error or not
 * `ontrack_extension_github_ingestion_processing_time` - timer (in milliseconds) for the processing times
+
+All the processing metrics have the `event` tag attached.

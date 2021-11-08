@@ -37,6 +37,7 @@ class DefaultIngestionHookProcessingService(
                 meterRegistry.increment(payload, IngestionMetrics.PROCESSING_SUCCESS_COUNT)
                 ingestionHookPayloadStorage.finished(payload)
             } catch (any: Throwable) {
+                meterRegistry.increment(payload, IngestionMetrics.PROCESSING_ERROR_COUNT)
                 ingestionHookPayloadStorage.error(payload, any)
                 applicationLogService.log(
                     ApplicationLogEntry.error(
