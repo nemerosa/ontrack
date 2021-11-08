@@ -5,6 +5,8 @@ Ontrack interfaces with several systems, both for its own functioning and for co
 
 include::integration-github.adoc[]
 
+include::integration-github-ingestion.adoc[]
+
 include::integration-bitbucket-cloud.adoc[]
 
 include::integration-jira.adoc[]
