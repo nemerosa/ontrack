@@ -1,15 +1,44 @@
 package net.nemerosa.ontrack.extension.github.ingestion.payload
 
+import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import org.junit.Test
+import kotlin.test.assertEquals
 
 class IngestionHookSignatureTest {
 
     @Test
     fun `Checking a signature`() {
-        IngestionHookSignature.checkPayloadSignature(
-            body = "Sample payload",
-            signature = "sha256=55e4e68a6fe14b9fcfb80478d26be2127bbaf04f187c6ac1441e509c990a1e52",
-            token = "131413ebe7b82303ab937236e6294c03e8d53cf6",
+        assertEquals(
+            IngestionHookSignatureCheckResult.OK,
+            IngestionHookSignature.checkPayloadSignature(
+                body = IngestionHookFixtures.signatureTestBody,
+                signature = IngestionHookFixtures.signatureTestSignature,
+                token = IngestionHookFixtures.signatureTestToken,
+            )
+        )
+    }
+
+    @Test
+    fun `Checking a signature with wrong signature`() {
+        assertEquals(
+            IngestionHookSignatureCheckResult.MISMATCH,
+            IngestionHookSignature.checkPayloadSignature(
+                body = IngestionHookFixtures.signatureTestBody,
+                signature = "sha256=totally-wrong",
+                token = IngestionHookFixtures.signatureTestToken,
+            )
+        )
+    }
+
+    @Test
+    fun `Checking a signature with a fancy signature`() {
+        assertEquals(
+            IngestionHookSignatureCheckResult.MISMATCH,
+            IngestionHookSignature.checkPayloadSignature(
+                body = IngestionHookFixtures.signatureTestBody,
+                signature = "totally-wrong",
+                token = IngestionHookFixtures.signatureTestToken,
+            )
         )
     }
 

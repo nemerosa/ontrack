@@ -70,6 +70,11 @@ In the _Settings > GitHub workflow ingestion_ section, you can configure the fol
 
 The Ontrack hook receives all registered GitHub event payloads. The latter are processed in a queue and then kept for investigation and inspection.
 
+[NOTE]
+====
+The payloads whose signature cannot be be checked or is not OK are not stored.
+====
+
 The number of days these payloads are kept is configured in the <<integration-github-ingestion-settings,global settings>>.
 
 An Ontrack administrator can access the list of payloads using the _GitHub Ingestion Hook Payloads_ user menu:
@@ -95,9 +100,13 @@ image::images/integration-github-ingestion-management-details.png[Payload detail
 [[integration-github-ingestion-metrics]]
 ==== Metrics
 
-The following metrics are exported by Ontrack:
+The following metric is exported to track the number of calls received where the security signature does not match:
 
-* `ontrack_extension_github_ingestion_received` - number of payloads being received
+* `ontrack_extension_github_ingestion_signature_error_count` - the `event` tag contains the GitHub event
+
+The following processing metrics are exported by Ontrack:
+
+* `ontrack_extension_github_ingestion_received_count` - number of payloads being received
 * `ontrack_extension_github_ingestion_processing_started_count` - number of payloads whose processing has started
 * `ontrack_extension_github_ingestion_processing_success_count` - number of payloads whose processing has completed successfully
 * `ontrack_extension_github_ingestion_processing_finished_count` - number of payloads whose processing has completed, with an error or not

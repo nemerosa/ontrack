@@ -1,9 +1,13 @@
 package net.nemerosa.ontrack.extension.github.ingestion
 
-import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
-import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
-import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookSignatureService
+import io.micrometer.core.instrument.MeterRegistry
+import net.nemerosa.ontrack.extension.github.ingestion.metrics.INGESTION_METRIC_EVENT_TAG
+import net.nemerosa.ontrack.extension.github.ingestion.metrics.IngestionMetrics
+import net.nemerosa.ontrack.extension.github.ingestion.payload.*
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
+import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettingsMissingTokenException
+import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -18,6 +22,7 @@ class IngestionHookController(
     private val storage: IngestionHookPayloadStorage,
     private val ingestionHookSignatureService: IngestionHookSignatureService,
     private val securityService: SecurityService,
+    private val meterRegistry: MeterRegistry,
 ) {
 
     @PostMapping("")
@@ -31,7 +36,18 @@ class IngestionHookController(
         @RequestHeader("X-Hub-Signature-256") signature: String,
     ): IngestionHookResponse {
         // Checking the signature
-        val json = ingestionHookSignatureService.checkPayloadSignature(body, signature)
+        val check = ingestionHookSignatureService.checkPayloadSignature(body, signature)
+        val json = when (check) {
+            IngestionHookSignatureCheckResult.MISMATCH -> {
+                meterRegistry.increment(
+                    IngestionMetrics.SIGNATURE_ERROR_COUNT,
+                    INGESTION_METRIC_EVENT_TAG to gitHubEvent,
+                )
+                throw GitHubIngestionHookSignatureMismatchException()
+            }
+            IngestionHookSignatureCheckResult.MISSING_TOKEN -> throw GitHubIngestionSettingsMissingTokenException()
+            IngestionHookSignatureCheckResult.OK -> body.parseAsJson()
+        }
         // Creates the payload object
         val payload = IngestionHookPayload(
             gitHubDelivery = gitHubDelivery,

@@ -2,7 +2,8 @@ package net.nemerosa.ontrack.extension.github.ingestion.metrics
 
 object IngestionMetrics {
 
-    const val RECEIVED_COUNT = "ontrack_extension_github_ingestion_received"
+    const val SIGNATURE_ERROR_COUNT = "ontrack_extension_github_ingestion_signature_error_count"
+    const val RECEIVED_COUNT = "ontrack_extension_github_ingestion_received_count"
 
     const val PROCESSING_STARTED_COUNT = "ontrack_extension_github_ingestion_processing_started_count"
     const val PROCESSING_SUCCESS_COUNT = "ontrack_extension_github_ingestion_processing_success_count"
