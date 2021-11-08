@@ -11,7 +11,10 @@ interface IngestionEventProcessor {
 
     /**
      * Processes the payload
+     *
+     * @param payload Payload to process
+     * @return Outcome of the processing
      */
-    fun process(payload: IngestionHookPayload)
+    fun process(payload: IngestionHookPayload): IngestionEventProcessingResult
 
 }

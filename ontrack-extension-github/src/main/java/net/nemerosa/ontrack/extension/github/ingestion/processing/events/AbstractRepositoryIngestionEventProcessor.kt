@@ -5,13 +5,13 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.AbstractIngest
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.model.structure.StructureService
 
-abstract class AbstractWorkflowIngestionEventProcessor<T : AbstractWorkflowPayload>(
+abstract class AbstractRepositoryIngestionEventProcessor<T : AbstractRepositoryPayload>(
     protected val structureService: StructureService,
 ) : AbstractIngestionEventProcessor<T>() {
 
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-abstract class AbstractWorkflowPayload(
+abstract class AbstractRepositoryPayload(
     val repository: Repository,
 )

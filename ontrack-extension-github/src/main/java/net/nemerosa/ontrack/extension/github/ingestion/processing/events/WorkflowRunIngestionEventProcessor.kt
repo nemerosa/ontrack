@@ -38,7 +38,7 @@ class WorkflowRunIngestionEventProcessor(
     private val gitCommitPropertyCommitLink: GitCommitPropertyCommitLink,
     private val runInfoService: RunInfoService,
     private val cachedSettingsService: CachedSettingsService,
-) : AbstractWorkflowIngestionEventProcessor<WorkflowRunPayload>(
+) : AbstractRepositoryIngestionEventProcessor<WorkflowRunPayload>(
     structureService
 ) {
 
@@ -46,19 +46,20 @@ class WorkflowRunIngestionEventProcessor(
 
     override val payloadType: KClass<WorkflowRunPayload> = WorkflowRunPayload::class
 
-    override fun process(payload: WorkflowRunPayload) {
+    override fun process(payload: WorkflowRunPayload): IngestionEventProcessingResult =
         when (payload.action) {
             WorkflowRunAction.requested -> startBuild(payload)
             WorkflowRunAction.completed -> endBuild(payload)
         }
-    }
 
-    private fun endBuild(payload: WorkflowRunPayload) {
+    private fun endBuild(payload: WorkflowRunPayload): IngestionEventProcessingResult {
         // Build creation & setup
         val build = getOrCreateBuild(payload, running = false)
         // Setting the run info
         val runInfo = collectRunInfo(payload)
         runInfoService.setRunInfo(build, runInfo)
+        // OK
+        return IngestionEventProcessingResult.PROCESSED
     }
 
     private fun collectRunInfo(payload: WorkflowRunPayload): RunInfoInput {
@@ -77,9 +78,11 @@ class WorkflowRunIngestionEventProcessor(
         )
     }
 
-    private fun startBuild(payload: WorkflowRunPayload) {
+    private fun startBuild(payload: WorkflowRunPayload): IngestionEventProcessingResult {
         // Build creation & setup
         getOrCreateBuild(payload, running = true)
+        // OK
+        return IngestionEventProcessingResult.PROCESSED
     }
 
     private fun getOrCreateBuild(payload: WorkflowRunPayload, running: Boolean): Build {
@@ -238,7 +241,7 @@ class WorkflowRunPayload(
     val workflowRun: WorkflowRun,
     repository: Repository,
     val sender: User?,
-) : AbstractWorkflowPayload(
+) : AbstractRepositoryPayload(
     repository,
 ) {
     override fun equals(other: Any?): Boolean {

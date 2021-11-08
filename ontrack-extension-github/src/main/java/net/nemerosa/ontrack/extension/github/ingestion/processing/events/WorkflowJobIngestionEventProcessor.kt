@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.events
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
 import net.nemerosa.ontrack.extension.github.ingestion.processing.job.WorkflowJobProcessingService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
@@ -17,7 +18,7 @@ import kotlin.reflect.KClass
 class WorkflowJobIngestionEventProcessor(
     structureService: StructureService,
     private val workflowJobProcessingService: WorkflowJobProcessingService,
-) : AbstractWorkflowIngestionEventProcessor<WorkflowJobPayload>(
+) : AbstractRepositoryIngestionEventProcessor<WorkflowJobPayload>(
     structureService
 ) {
 
@@ -25,23 +26,23 @@ class WorkflowJobIngestionEventProcessor(
 
     override val payloadType: KClass<WorkflowJobPayload> = WorkflowJobPayload::class
 
-    override fun process(payload: WorkflowJobPayload) {
+    override fun process(payload: WorkflowJobPayload): IngestionEventProcessingResult =
         when (payload.action) {
-            WorkflowJobAction.in_progress -> onJob(payload, finished = false)
-            WorkflowJobAction.completed -> onJob(payload, finished = true)
-            else -> {
-            } // Nothing
+            WorkflowJobAction.in_progress -> onJob(payload)
+            WorkflowJobAction.completed -> onJob(payload)
+            else -> IngestionEventProcessingResult.IGNORED
         }
-    }
 
-    private fun onJob(payload: WorkflowJobPayload, finished: Boolean) {
+    private fun onJob(payload: WorkflowJobPayload): IngestionEventProcessingResult {
         // Processes each step independently
         payload.workflowJob.steps?.forEach { step ->
-            onStep(step, payload, finished)
+            onStep(step, payload)
         }
+        // OK
+        return IngestionEventProcessingResult.PROCESSED
     }
 
-    private fun onStep(step: WorkflowJobStep, payload: WorkflowJobPayload, finished: Boolean) {
+    private fun onStep(step: WorkflowJobStep, payload: WorkflowJobPayload) {
         workflowJobProcessingService.setupValidation(
             owner = payload.repository.owner.login,
             repository = payload.repository.name,
@@ -64,7 +65,7 @@ class WorkflowJobPayload(
     @JsonProperty("workflow_job")
     val workflowJob: WorkflowJob,
     repository: Repository,
-) : AbstractWorkflowPayload(
+) : AbstractRepositoryPayload(
     repository,
 )
 
@@ -81,7 +82,6 @@ class WorkflowJob(
     val runAttempt: Int,
     val status: WorkflowJobStepStatus,
     val conclusion: WorkflowJobStepConclusion?,
-    val startedAtDate: LocalDateTime?,
     val completedAtDate: LocalDateTime?,
     val name: String,
     val steps: List<WorkflowJobStep>?,
@@ -95,8 +95,6 @@ class WorkflowJob(
         runAttempt: Int,
         status: WorkflowJobStepStatus,
         conclusion: WorkflowJobStepConclusion?,
-        @JsonProperty("started_at")
-        startedAt: String?,
         @JsonProperty("completed_at")
         completedAt: String?,
         name: String,
@@ -108,7 +106,6 @@ class WorkflowJob(
         runAttempt = runAttempt,
         status = status,
         conclusion = conclusion,
-        startedAtDate = startedAt?.let { parseLocalDateTime(it) },
         completedAtDate = completedAt?.let { parseLocalDateTime(it) },
         name = name,
         steps = steps,

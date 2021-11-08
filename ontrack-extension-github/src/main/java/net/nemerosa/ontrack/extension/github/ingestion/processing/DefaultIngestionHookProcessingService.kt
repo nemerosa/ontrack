@@ -32,9 +32,13 @@ class DefaultIngestionHookProcessingService(
         securityService.asAdmin {
             try {
                 meterRegistry.timeForPayload(payload, IngestionMetrics.PROCESSING_TIME) {
-                    doProcess(payload)
+                    val outcome = doProcess(payload)
+                    val metric = when (outcome) {
+                        IngestionEventProcessingResult.PROCESSED -> IngestionMetrics.PROCESSING_SUCCESS_COUNT
+                        IngestionEventProcessingResult.IGNORED -> IngestionMetrics.PROCESSING_IGNORED_COUNT
+                    }
+                    meterRegistry.increment(payload, metric)
                 }
-                meterRegistry.increment(payload, IngestionMetrics.PROCESSING_SUCCESS_COUNT)
                 ingestionHookPayloadStorage.finished(payload)
             } catch (any: Throwable) {
                 meterRegistry.increment(payload, IngestionMetrics.PROCESSING_ERROR_COUNT)
@@ -56,12 +60,12 @@ class DefaultIngestionHookProcessingService(
         }
     }
 
-    private fun doProcess(payload: IngestionHookPayload) {
+    private fun doProcess(payload: IngestionHookPayload): IngestionEventProcessingResult {
         // Gets the processor for this event
         val eventProcessor = eventProcessors[payload.gitHubEvent]
             ?: throw GitHubIngestionHookEventNotSupportedException(payload.gitHubEvent)
         // Delegates the processing
-        eventProcessor.process(payload)
+        return eventProcessor.process(payload)
     }
 
 }

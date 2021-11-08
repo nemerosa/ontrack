@@ -6,9 +6,8 @@ import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayl
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunPayload
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Owner
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
+import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayload
 import net.nemerosa.ontrack.json.asJson
 import java.time.LocalDateTime
 import java.util.*
@@ -44,12 +43,33 @@ object IngestionHookFixtures {
             htmlUrl = htmlUrl,
             event = "push",
         ),
-        repository = Repository(
-            name = repoName,
-            description = repoDescription,
-            owner = Owner(login = owner),
-        ),
+        repository = sampleRepository(repoName, repoDescription, owner),
         sender = User(login = sender)
+    )
+
+    /**
+     * Push payload
+     */
+    fun pushPayload(
+        ref: String,
+        repoName: String,
+        repoDescription: String = "Repository $repoName",
+        owner: String,
+        commits: List<Commit>,
+    ) = PushPayload(
+        ref = ref,
+        repository = sampleRepository(repoName, repoDescription, owner),
+        commits = commits,
+    )
+
+    fun sampleRepository(
+        repoName: String = sampleRepository,
+        repoDescription: String? = null,
+        owner: String = sampleOwner,
+    ) = Repository(
+        name = repoName,
+        description = repoDescription,
+        owner = Owner(login = owner),
     )
 
     /**
@@ -79,12 +99,56 @@ object IngestionHookFixtures {
     fun sampleWorkflowRunPayload() = workflowRunPayload(
         action = WorkflowRunAction.requested,
         runNumber = 1,
-        headBranch = "main",
-        repoName = "my-repo",
-        owner = "my-owner",
+        headBranch = sampleBranch,
+        repoName = sampleRepository,
+        owner = sampleOwner,
         sender = "my-sender",
         commit = "01234567890",
     )
+
+    /**
+     * Sample push payload
+     */
+    fun samplePushPayload(
+        ref: String = "refs/heads/$sampleBranch",
+        added: List<String> = emptyList(),
+        modified: List<String> = emptyList(),
+        removed: List<String> = emptyList(),
+    ) = pushPayload(
+        ref = ref,
+        repoName = sampleRepository,
+        owner = sampleOwner,
+        commits = listOf(
+            Commit(
+                id = "01234567ef",
+                message = "Sample commit",
+                author = sampleAuthor(),
+                added = added,
+                removed = removed,
+                modified = modified,
+            )
+        )
+    )
+
+    fun sampleAuthor() = Author(
+        name = "Sample Author",
+        username = "sample-author",
+    )
+
+    /**
+     * Sample branch
+     */
+    const val sampleBranch = "main"
+
+    /**
+     * Sample owner
+     */
+    const val sampleOwner = "my-owner"
+
+    /**
+     * Sample repository
+     */
+    const val sampleRepository = "my-repo"
 
     /**
      * Sample payload body

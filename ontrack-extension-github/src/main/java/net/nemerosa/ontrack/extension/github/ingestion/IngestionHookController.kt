@@ -87,6 +87,7 @@ class IngestionHookController(
         "ping" -> false
         "workflow_job" -> true
         "workflow_run" -> true
+        "push" -> true
         else -> throw GitHubIngestionHookEventNotSupportedException(payload.gitHubEvent)
     }
 

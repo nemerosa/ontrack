@@ -6,14 +6,14 @@ import kotlin.reflect.KClass
 
 abstract class AbstractIngestionEventProcessor<T : Any> : IngestionEventProcessor {
 
-    final override fun process(payload: IngestionHookPayload) {
+    final override fun process(payload: IngestionHookPayload): IngestionEventProcessingResult {
         // Parsing of the payload
         val parsedPayload = parsePayload(payload)
         // Processes the payload
-        process(parsedPayload)
+        return process(parsedPayload)
     }
 
-    abstract fun process(payload: T)
+    abstract fun process(payload: T): IngestionEventProcessingResult
 
     private fun parsePayload(payload: IngestionHookPayload): T = payload.payload.parseInto(payloadType)
 
