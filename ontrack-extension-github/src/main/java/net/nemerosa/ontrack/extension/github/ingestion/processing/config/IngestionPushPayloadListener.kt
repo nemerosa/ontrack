@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
-import net.nemerosa.ontrack.extension.github.ingestion.config.ConfigService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayload
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayloadListener
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayloadListenerOutcome
@@ -13,16 +12,14 @@ class IngestionPushPayloadListener(
     override fun process(payload: PushPayload): PushPayloadListenerOutcome {
         return if (payload.isAddedOrModified(CONFIG_FILE_PATH)) {
             configService.saveConfig(
-                owner = payload.repository.owner.login,
-                repository = payload.repository.name,
+                repository = payload.repository,
                 branch = payload.branchName,
                 path = CONFIG_FILE_PATH,
             )
             PushPayloadListenerOutcome.PROCESSED
         } else if (payload.isRemoved(CONFIG_FILE_PATH)) {
             configService.removeConfig(
-                owner = payload.repository.owner.login,
-                repository = payload.repository.name,
+                repository = payload.repository,
                 branch = payload.branchName,
             )
             PushPayloadListenerOutcome.PROCESSED

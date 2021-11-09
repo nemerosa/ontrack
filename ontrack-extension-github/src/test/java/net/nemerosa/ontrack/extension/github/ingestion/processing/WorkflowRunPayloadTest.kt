@@ -37,6 +37,7 @@ class WorkflowRunPayloadTest {
                     name = "my-repo",
                     description = "My description",
                     owner = Owner(login = "my-owner"),
+                    htmlUrl = "uri:repository:my-repo",
                 ),
                 sender = User(login = "my-sender")
             ),
@@ -59,7 +60,8 @@ class WorkflowRunPayloadTest {
                     "description" to "My description",
                     "owner" to mapOf(
                         "login" to "my-owner",
-                    )
+                    ),
+                    "html_url" to "https://github.com/nemerosa/github-ingestion-poc",
                 ),
                 "sender" to mapOf(
                     "login" to "my-sender",

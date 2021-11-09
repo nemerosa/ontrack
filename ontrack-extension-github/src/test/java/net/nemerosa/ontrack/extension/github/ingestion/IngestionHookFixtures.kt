@@ -53,7 +53,7 @@ object IngestionHookFixtures {
     fun pushPayload(
         ref: String,
         repoName: String,
-        repoDescription: String = "Repository $repoName",
+        repoDescription: String? = null,
         owner: String,
         commits: List<Commit>,
     ) = PushPayload(
@@ -66,10 +66,12 @@ object IngestionHookFixtures {
         repoName: String = sampleRepository,
         repoDescription: String? = null,
         owner: String = sampleOwner,
+        htmlUrl: String = "https://github.com/$owner/$repoName",
     ) = Repository(
         name = repoName,
         description = repoDescription,
         owner = Owner(login = owner),
+        htmlUrl = htmlUrl,
     )
 
     /**

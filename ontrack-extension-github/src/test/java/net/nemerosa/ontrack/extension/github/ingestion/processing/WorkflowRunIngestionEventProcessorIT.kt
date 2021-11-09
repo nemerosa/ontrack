@@ -179,7 +179,8 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
         assertFailsWith<GitHubConfigURLMismatchException> {
             basicTest(
                 config,
-                htmlUrl = "https://github.enterprise.com/nemerosa/github-ingestion-poc/actions/runs/1395528922"
+                htmlUrl = "https://github.enterprise.com/nemerosa/github-ingestion-poc/actions/runs/1395528922",
+                repoUrl = "https://github.enterprise.com/nemerosa/github-ingestion-poc",
             )
         }
     }
@@ -214,7 +215,8 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
         // Runs the test
         basicTest(
             match,
-            htmlUrl = "${match.url}/nemerosa/github-ingestion-poc/actions/runs/1395528922"
+            htmlUrl = "${match.url}/nemerosa/github-ingestion-poc/actions/runs/1395528922",
+            repoUrl = "${match.url}/nemerosa/github-ingestion-poc",
         )
     }
 
@@ -226,7 +228,8 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
         assertFailsWith<GitHubConfigURLSeveralMatchesException> {
             basicTest(
                 match,
-                htmlUrl = "${match.url}/nemerosa/github-ingestion-poc/actions/runs/1395528922"
+                htmlUrl = "${match.url}/nemerosa/github-ingestion-poc/actions/runs/1395528922",
+                repoUrl = "${match.url}/nemerosa/github-ingestion-poc",
             )
         }
     }
@@ -234,6 +237,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
     private fun basicTest(
         config: GitHubEngineConfiguration?,
         htmlUrl: String = "https://github.com/nemerosa/github-ingestion-poc/actions/runs/1395528922",
+        repoUrl: String = "https://github.com/nemerosa/github-ingestion-poc",
     ) {
         // Payload
         val repoName = uid("R")
@@ -248,6 +252,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
             sender = owner,
             commit = commit,
             htmlUrl = htmlUrl,
+            repoUrl = repoUrl,
         )
         // Processing
         asAdmin {
@@ -355,6 +360,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
         sender: String,
         commit: String,
         htmlUrl: String = "https://github.com/nemerosa/github-ingestion-poc/actions/runs/1395528922",
+        repoUrl: String = "https://github.com/nemerosa/github-ingestion-poc",
     ) = WorkflowRunPayload(
         action = action,
         workflowRun = WorkflowRun(
@@ -373,6 +379,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
             name = repoName,
             description = repoDescription,
             owner = Owner(login = owner),
+            htmlUrl = repoUrl,
         ),
         sender = User(login = sender)
     )

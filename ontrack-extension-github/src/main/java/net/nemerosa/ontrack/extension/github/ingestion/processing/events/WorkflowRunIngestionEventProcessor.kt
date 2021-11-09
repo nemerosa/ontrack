@@ -10,19 +10,17 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
-import net.nemerosa.ontrack.extension.github.ingestion.processing.*
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
+import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInfo
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.PullRequest
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
-import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
-import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
-import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
-import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
+import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
-import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.support.NoConfig
 import org.springframework.stereotype.Component
@@ -33,11 +31,10 @@ import kotlin.reflect.KClass
 @Component
 class WorkflowRunIngestionEventProcessor(
     structureService: StructureService,
-    private val gitHubConfigurationService: GitHubConfigurationService,
     private val propertyService: PropertyService,
     private val gitCommitPropertyCommitLink: GitCommitPropertyCommitLink,
     private val runInfoService: RunInfoService,
-    private val cachedSettingsService: CachedSettingsService,
+    private val ingestionModelAccessService: IngestionModelAccessService,
 ) : AbstractRepositoryIngestionEventProcessor<WorkflowRunPayload>(
     structureService
 ) {
@@ -128,110 +125,35 @@ class WorkflowRunIngestionEventProcessor(
     }
 
     private fun getOrCreateBranch(project: Project, payload: WorkflowRunPayload): Branch {
-        if (payload.workflowRun.isPullRequest()) {
-            TODO("Pull requests are not supported yet.")
-        } else {
-            val gitBranch = payload.workflowRun.headBranch
-            val branchName = normalizeName(gitBranch)
-            val branch = structureService.findBranchByName(project.name, branchName)
-                .getOrNull()
-                ?: structureService.newBranch(
-                    Branch.of(
-                        project,
-                        nd(
-                            name = branchName,
-                            description = "$gitBranch branch",
-                        )
-                    )
-                )
-            // Setup the Git configuration for this branch
-            if (!propertyService.hasProperty(branch, GitBranchConfigurationPropertyType::class.java)) {
-                propertyService.editProperty(
-                    branch,
-                    GitBranchConfigurationPropertyType::class.java,
-                    GitBranchConfigurationProperty(
-                        branch = gitBranch,
-                        buildCommitLink = ConfiguredBuildGitCommitLink(
-                            gitCommitPropertyCommitLink,
-                            NoConfig.INSTANCE
-                        ).toServiceConfiguration(),
-                        isOverride = false,
-                        buildTagInterval = 0,
-                    )
-                )
-            }
-            // OK
-            return branch
-        }
-    }
-
-    private fun getOrCreateProject(payload: WorkflowRunPayload): Project {
-        val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
-        val name = getProjectName(
-            owner = payload.repository.owner.login,
-            repository = payload.repository.name,
-            orgProjectPrefix = settings.orgProjectPrefix,
+        val branch = ingestionModelAccessService.getOrCreateBranch(
+            project = project,
+            headBranch = payload.workflowRun.headBranch,
+            baseBranch = null, // TODO Missing PR support
         )
-        val project = structureService.findProjectByName(name)
-            .getOrNull()
-            ?: structureService.newProject(
-                Project.of(
-                    nd(
-                        name = name,
-                        description = payload.repository.description,
-                    )
-                )
-            )
-        // Setup the Git configuration for this project
-        setupProjectGitHubConfiguration(project, payload)
-        // OK
-        return project
-    }
-
-    private fun setupProjectGitHubConfiguration(project: Project, payload: WorkflowRunPayload) {
-        if (!propertyService.hasProperty(project, GitHubProjectConfigurationPropertyType::class.java)) {
-            // Gets the list of GH configs
-            val configurations = gitHubConfigurationService.configurations
-            // If no configuration, error
-            val configuration = if (configurations.isEmpty()) {
-                throw NoGitHubConfigException()
-            }
-            // If only 1 config, use it
-            else if (configurations.size == 1) {
-                val candidate = configurations.first()
-                // Checks the URL
-                if (payload.workflowRun.htmlUrl.startsWith(candidate.url)) {
-                    candidate
-                } else {
-                    throw GitHubConfigURLMismatchException(payload.workflowRun.htmlUrl)
-                }
-            }
-            // If several configurations, select it based on the URL
-            else {
-                val candidates = configurations.filter {
-                    payload.workflowRun.htmlUrl.startsWith(it.url)
-                }
-                if (candidates.isEmpty()) {
-                    throw GitHubConfigURLNoMatchException(payload.workflowRun.htmlUrl)
-                } else if (candidates.size == 1) {
-                    candidates.first()
-                } else {
-                    throw GitHubConfigURLSeveralMatchesException(payload.workflowRun.htmlUrl)
-                }
-            }
-            // Project property if not already defined
+        // Setup the Git configuration for this branch
+        if (!propertyService.hasProperty(branch, GitBranchConfigurationPropertyType::class.java)) {
             propertyService.editProperty(
-                project,
-                GitHubProjectConfigurationPropertyType::class.java,
-                GitHubProjectConfigurationProperty(
-                    configuration = configuration,
-                    repository = payload.repository.fullName,
-                    indexationInterval = 30, // TODO Make it configurable
-                    issueServiceConfigurationIdentifier = "self"  // TODO Make it configurable
+                branch,
+                GitBranchConfigurationPropertyType::class.java,
+                GitBranchConfigurationProperty(
+                    branch = payload.workflowRun.headBranch,
+                    buildCommitLink = ConfiguredBuildGitCommitLink(
+                        gitCommitPropertyCommitLink,
+                        NoConfig.INSTANCE
+                    ).toServiceConfiguration(),
+                    isOverride = false,
+                    buildTagInterval = 0,
                 )
             )
         }
+        // OK
+        return branch
     }
+
+    private fun getOrCreateProject(payload: WorkflowRunPayload): Project =
+        ingestionModelAccessService.getOrCreateProject(
+            repository = payload.repository,
+        )
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -314,7 +236,5 @@ data class WorkflowRun internal constructor(
         htmlUrl = htmlUrl,
         event = event,
     )
-
-    fun isPullRequest() = pullRequests.isNotEmpty()
 
 }

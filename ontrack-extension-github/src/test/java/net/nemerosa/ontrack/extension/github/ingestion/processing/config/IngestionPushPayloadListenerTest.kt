@@ -4,7 +4,6 @@ import io.mockk.Called
 import io.mockk.mockk
 import io.mockk.verify
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
-import net.nemerosa.ontrack.extension.github.ingestion.config.ConfigService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayloadListenerOutcome
 import org.junit.Before
 import org.junit.Test
@@ -32,8 +31,7 @@ class IngestionPushPayloadListenerTest {
         )
         verify {
             configService.saveConfig(
-                owner = IngestionHookFixtures.sampleOwner,
-                repository = IngestionHookFixtures.sampleRepository,
+                repository = IngestionHookFixtures.sampleRepository(),
                 branch = IngestionHookFixtures.sampleBranch,
                 path = IngestionPushPayloadListener.CONFIG_FILE_PATH,
             )
@@ -51,8 +49,7 @@ class IngestionPushPayloadListenerTest {
         )
         verify {
             configService.saveConfig(
-                owner = IngestionHookFixtures.sampleOwner,
-                repository = IngestionHookFixtures.sampleRepository,
+                repository = IngestionHookFixtures.sampleRepository(),
                 branch = IngestionHookFixtures.sampleBranch,
                 path = IngestionPushPayloadListener.CONFIG_FILE_PATH,
             )
@@ -70,8 +67,7 @@ class IngestionPushPayloadListenerTest {
         )
         verify {
             configService.removeConfig(
-                owner = IngestionHookFixtures.sampleOwner,
-                repository = IngestionHookFixtures.sampleRepository,
+                repository = IngestionHookFixtures.sampleRepository(),
                 branch = IngestionHookFixtures.sampleBranch,
             )
         }
