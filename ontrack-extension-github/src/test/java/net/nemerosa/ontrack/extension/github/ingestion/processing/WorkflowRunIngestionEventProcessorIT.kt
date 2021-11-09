@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
-import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunIngestionEventProcessor
@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 import kotlin.test.*
 
-class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
+class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
 
     @Autowired
     private lateinit var processor: WorkflowRunIngestionEventProcessor
@@ -311,38 +311,6 @@ class WorkflowRunIngestionEventProcessorIT : AbstractGitHubTestSupport() {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    private fun onlyOneGitHubConfig(): GitHubEngineConfiguration =
-        asAdmin {
-            // Removing all previous configuration
-            noGitHubConfig()
-            // Creating one config
-            gitHubConfig()
-        }
-
-    private fun severalGitHubConfigs(sameRoot: Boolean = false): GitHubEngineConfiguration =
-        asAdmin {
-            // Removing all previous configuration
-            noGitHubConfig()
-            // Creating two configs, return the last one
-            gitHubConfig(
-                url = if (sameRoot) {
-                    "https://github.enterprise2.com"
-                } else {
-                    "https://github.enterprise1.com"
-                }
-            )
-            gitHubConfig(url = "https://github.enterprise2.com")
-        }
-
-    private fun noGitHubConfig() {
-        asAdmin {
-            // Removing all previous configuration
-            gitConfigurationService.configurations.forEach {
-                gitConfigurationService.deleteConfiguration(it.name)
             }
         }
     }
