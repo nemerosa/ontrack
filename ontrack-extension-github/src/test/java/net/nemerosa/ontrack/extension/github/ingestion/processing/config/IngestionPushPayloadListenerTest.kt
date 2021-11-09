@@ -23,7 +23,7 @@ class IngestionPushPayloadListenerTest {
     @Test
     fun `Processing when config is added`() {
         val payload = IngestionHookFixtures.samplePushPayload(
-            added = listOf(IngestionPushPayloadListener.CONFIG_FILE_PATH)
+            added = listOf(INGESTION_CONFIG_FILE_PATH)
         )
         assertEquals(
             PushPayloadListenerOutcome.PROCESSED,
@@ -33,7 +33,7 @@ class IngestionPushPayloadListenerTest {
             configService.saveConfig(
                 repository = IngestionHookFixtures.sampleRepository(),
                 branch = IngestionHookFixtures.sampleBranch,
-                path = IngestionPushPayloadListener.CONFIG_FILE_PATH,
+                path = INGESTION_CONFIG_FILE_PATH,
             )
         }
     }
@@ -41,7 +41,7 @@ class IngestionPushPayloadListenerTest {
     @Test
     fun `Processing when config is modified`() {
         val payload = IngestionHookFixtures.samplePushPayload(
-            modified = listOf(IngestionPushPayloadListener.CONFIG_FILE_PATH)
+            modified = listOf(INGESTION_CONFIG_FILE_PATH)
         )
         assertEquals(
             PushPayloadListenerOutcome.PROCESSED,
@@ -51,7 +51,7 @@ class IngestionPushPayloadListenerTest {
             configService.saveConfig(
                 repository = IngestionHookFixtures.sampleRepository(),
                 branch = IngestionHookFixtures.sampleBranch,
-                path = IngestionPushPayloadListener.CONFIG_FILE_PATH,
+                path = INGESTION_CONFIG_FILE_PATH,
             )
         }
     }
@@ -59,7 +59,7 @@ class IngestionPushPayloadListenerTest {
     @Test
     fun `Processing when config is deleted`() {
         val payload = IngestionHookFixtures.samplePushPayload(
-            removed = listOf(IngestionPushPayloadListener.CONFIG_FILE_PATH)
+            removed = listOf(INGESTION_CONFIG_FILE_PATH)
         )
         assertEquals(
             PushPayloadListenerOutcome.PROCESSED,

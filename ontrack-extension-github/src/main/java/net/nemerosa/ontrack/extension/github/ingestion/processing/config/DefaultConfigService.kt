@@ -12,15 +12,16 @@ import org.springframework.transaction.annotation.Transactional
 class DefaultConfigService(
     private val ingestionModelAccessService: IngestionModelAccessService,
     private val entityDataService: EntityDataService,
+    private val configLoaderService: ConfigLoaderService,
 ) : ConfigService {
 
     override fun saveConfig(repository: Repository, branch: String, path: String) {
         val ontrackBranch = ingestionModelAccessService.getOrCreateBranch(
             repository = repository,
             headBranch = branch,
-            baseBranch = null, // TODO PRs not suported yet
+            baseBranch = null, // TODO PRs not supported yet
         )
-        TODO("Downloads the configuration")
+        val config = configLoaderService.loadConfig(ontrackBranch, path)
         TODO("Saves the configuration at branch level")
     }
 
@@ -28,11 +29,15 @@ class DefaultConfigService(
         val ontrackBranch = ingestionModelAccessService.getOrCreateBranch(
             repository = repository,
             headBranch = branch,
-            baseBranch = null, // TODO PRs not suported yet
+            baseBranch = null, // TODO PRs not supported yet
         )
         entityDataService.delete(
             ontrackBranch,
             IngestionConfig::class.java.name,
         )
+    }
+
+    override fun findConfig(repository: Repository, branch: String): IngestionConfig? {
+        TODO("Not yet implemented")
     }
 }

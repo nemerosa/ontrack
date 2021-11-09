@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.extension.github.ingestion
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStatus
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfig
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfigGeneral
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunPayload
@@ -166,6 +168,12 @@ object IngestionHookFixtures {
         gitHubHookID = 123456,
         gitHubHookInstallationTargetID = 1234567890,
         gitHubHookInstallationTargetType = "repository",
+    )
+
+    fun sampleIngestionConfig() = IngestionConfig(
+        general = IngestionConfigGeneral(
+            skipJobs = true,
+        )
     )
 
     /**

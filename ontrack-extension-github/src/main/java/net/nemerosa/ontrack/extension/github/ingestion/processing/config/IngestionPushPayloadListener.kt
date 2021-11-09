@@ -10,14 +10,14 @@ class IngestionPushPayloadListener(
     private val configService: ConfigService,
 ) : PushPayloadListener {
     override fun process(payload: PushPayload): PushPayloadListenerOutcome {
-        return if (payload.isAddedOrModified(CONFIG_FILE_PATH)) {
+        return if (payload.isAddedOrModified(INGESTION_CONFIG_FILE_PATH)) {
             configService.saveConfig(
                 repository = payload.repository,
                 branch = payload.branchName,
-                path = CONFIG_FILE_PATH,
+                path = INGESTION_CONFIG_FILE_PATH,
             )
             PushPayloadListenerOutcome.PROCESSED
-        } else if (payload.isRemoved(CONFIG_FILE_PATH)) {
+        } else if (payload.isRemoved(INGESTION_CONFIG_FILE_PATH)) {
             configService.removeConfig(
                 repository = payload.repository,
                 branch = payload.branchName,
@@ -26,9 +26,5 @@ class IngestionPushPayloadListener(
         } else {
             PushPayloadListenerOutcome.IGNORED
         }
-    }
-
-    companion object {
-        const val CONFIG_FILE_PATH = ".github/ontrack/ingestion.yaml"
     }
 }

@@ -106,4 +106,14 @@ interface OntrackGitHubClient {
      */
     fun getRepositorySettings(repository: String, askVisibility: Boolean = false): GitHubRepositorySettings
 
+    /**
+     * Downloads a file on a branch.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param branch Name of the branch (without refs/heads)
+     * @param path Path to the file
+     * @return Binary content of the file or null if the file cannot be found
+     */
+    fun getFileContent(repository: String, branch: String, path: String): ByteArray?
+
 }

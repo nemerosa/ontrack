@@ -23,7 +23,7 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForObject
 import java.time.Duration
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import java.util.*
 
 /**
  * GitHub client which uses the GitHub Rest API at https://docs.github.com/en/rest
@@ -444,6 +444,30 @@ class DefaultOntrackGitHubClient(
                 hasProjectsEnabled = hasProjectsEnabled,
                 visibility = visibility,
             )
+        }
+    }
+
+    override fun getFileContent(repository: String, branch: String, path: String): ByteArray? {
+        // Logging
+        logger.debug("[github] Getting file content {}/{}@{}", repository, path, branch)
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Gets the issue
+        return try {
+            client("Get file content $repository/$path@$branch") {
+                getForObject<JsonNode>("/repos/$owner/$name/contents/$path?ref=$branch").let {
+                    val encodedContent = it.getRequiredTextField("content")
+                    Base64.getDecoder().decode(encodedContent)
+                }
+            }
+        } catch (ex: GitHubErrorsException) {
+            if (ex.status == 404) {
+                null
+            } else {
+                throw ex
+            }
         }
     }
 
