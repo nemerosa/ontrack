@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.json.*
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
+import org.apache.commons.codec.binary.Base64
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
@@ -23,7 +24,6 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForObject
 import java.time.Duration
 import java.time.LocalDateTime
-import java.util.*
 
 /**
  * GitHub client which uses the GitHub Rest API at https://docs.github.com/en/rest
@@ -459,7 +459,7 @@ class DefaultOntrackGitHubClient(
             client("Get file content $repository/$path@$branch") {
                 getForObject<JsonNode>("/repos/$owner/$name/contents/$path?ref=$branch").let {
                     val encodedContent = it.getRequiredTextField("content")
-                    Base64.getDecoder().decode(encodedContent)
+                    Base64.decodeBase64(encodedContent)
                 }
             }
         } catch (ex: GitHubErrorsException) {
