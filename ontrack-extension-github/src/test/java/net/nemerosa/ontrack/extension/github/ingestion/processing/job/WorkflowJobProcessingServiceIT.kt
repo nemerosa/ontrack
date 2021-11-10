@@ -2,9 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.job
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobPropertyType
@@ -188,8 +186,12 @@ class WorkflowJobProcessingServiceIT : AbstractDSLTestSupport() {
                 )
             )
             workflowJobProcessingService.setupValidation(
-                owner = "nemerosa",
-                repository = project.name,
+                repository = Repository(
+                    name = project.name,
+                    description = null,
+                    htmlUrl = "https://github.com/nemerosa/${project.name}",
+                    owner = Owner(login = "nemerosa"),
+                ),
                 runId = runId,
                 runAttempt = 1,
                 job = job,

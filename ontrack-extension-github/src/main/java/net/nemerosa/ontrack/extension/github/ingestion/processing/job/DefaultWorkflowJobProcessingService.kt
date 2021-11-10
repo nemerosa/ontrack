@@ -2,12 +2,8 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.job
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInfo
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.getProjectName
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
-import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobProperty
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobPropertyType
@@ -29,8 +25,7 @@ class DefaultWorkflowJobProcessingService(
 ) : WorkflowJobProcessingService {
 
     override fun setupValidation(
-        owner: String,
-        repository: String,
+        repository: Repository,
         runId: Long,
         runAttempt: Int,
         job: String,
@@ -44,7 +39,7 @@ class DefaultWorkflowJobProcessingService(
         // Settings
         val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
         // Project name
-        val projectName = getProjectName(owner, repository, settings.orgProjectPrefix)
+        val projectName = getProjectName(repository.owner.login, repository.name, settings.orgProjectPrefix)
         // Gets the build
         val build = findBuild(projectName, runId)
             ?: throw BuildWithWorkflowRunIdNotFoundException(projectName, runId)

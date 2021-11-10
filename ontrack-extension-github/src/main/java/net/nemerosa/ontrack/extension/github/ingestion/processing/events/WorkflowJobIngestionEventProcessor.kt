@@ -44,8 +44,7 @@ class WorkflowJobIngestionEventProcessor(
 
     private fun onStep(step: WorkflowJobStep, payload: WorkflowJobPayload) {
         workflowJobProcessingService.setupValidation(
-            owner = payload.repository.owner.login,
-            repository = payload.repository.name,
+            repository = payload.repository,
             runId = payload.workflowJob.runId,
             runAttempt = payload.workflowJob.runAttempt,
             job = payload.workflowJob.name,

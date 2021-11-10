@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.job
 
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
 import java.time.LocalDateTime
@@ -8,8 +9,7 @@ interface WorkflowJobProcessingService {
     /**
      * Creates or updates a validation run.
      *
-     * @param owner Repository owner
-     * @param repository Repository name
+     * @param repository Repository
      * @param runId Workflow run ID. Used to identify the build.
      * @param runAttempt Number of times this job was attempted (starts with 1, with the very first run)
      * @param job Name of the workflow job
@@ -21,8 +21,7 @@ interface WorkflowJobProcessingService {
      * @param completedAt Completion timestamp for the validation
      */
     fun setupValidation(
-        owner: String,
-        repository: String,
+        repository: Repository,
         runId: Long,
         runAttempt: Int,
         job: String,
