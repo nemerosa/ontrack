@@ -1,21 +1,18 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import io.mockk.every
-import io.mockk.mockk
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Primary
 import org.springframework.test.context.ContextConfiguration
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-@ContextConfiguration(classes = [ConfigServiceIT.ConfigServiceITConfig::class])
+@ContextConfiguration(classes = [ConfigLoaderServiceITMockConfig::class])
 class ConfigServiceIT : AbstractIngestionTestSupport() {
 
     @Autowired
@@ -122,16 +119,6 @@ class ConfigServiceIT : AbstractIngestionTestSupport() {
         asAdmin {
             test(config)
         }
-    }
-
-    class ConfigServiceITConfig {
-
-        private val configLoaderService: ConfigLoaderService = mockk()
-
-        @Bean
-        @Primary
-        fun configLoaderService(): ConfigLoaderService = configLoaderService
-
     }
 
 }

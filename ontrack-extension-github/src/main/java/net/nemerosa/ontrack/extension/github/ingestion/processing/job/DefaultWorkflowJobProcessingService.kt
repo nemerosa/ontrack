@@ -1,7 +1,12 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.job
 
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.extension.git.model.GitBranchNotConfiguredException
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInfo
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigService
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.INGESTION_CONFIG_FILE_PATH
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
@@ -9,6 +14,7 @@ import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflo
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobPropertyType
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,6 +28,7 @@ class DefaultWorkflowJobProcessingService(
     private val propertyService: PropertyService,
     private val cachedSettingsService: CachedSettingsService,
     private val runInfoService: RunInfoService,
+    private val configService: ConfigService,
 ) : WorkflowJobProcessingService {
 
     override fun setupValidation(
@@ -43,12 +50,14 @@ class DefaultWorkflowJobProcessingService(
         // Gets the build
         val build = findBuild(projectName, runId)
             ?: throw BuildWithWorkflowRunIdNotFoundException(projectName, runId)
+        // Gets the ingestion configuration
+        val ingestionConfig = getOrLoadIngestionConfig(repository, build.branch)
         // Gets the run property
         val runProperty = propertyService.getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java).value
             ?: error("Cannot find workflow run property on build")
         // Name & description of the validation stamp
-        val vsName = getValidationStampName(job, step)
-        val vsDescription = getValidationStampDescription(job, step)
+        val vsName = getValidationStampName(ingestionConfig, job, step)
+        val vsDescription = getValidationStampDescription(ingestionConfig, job, step)
         // Gets or creates a validation stamp for the branch
         val vs = structureService.findValidationStampByName(build.project.name, build.branch.name, vsName).getOrNull()
             ?: structureService.newValidationStamp(
@@ -91,6 +100,17 @@ class DefaultWorkflowJobProcessingService(
                     running = false, // Run won't be created until finished
                 )
             )
+        }
+    }
+
+    private fun getOrLoadIngestionConfig(repository: Repository, branch: Branch): IngestionConfig {
+        val gitBranchProperty =
+            propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java).value
+        return if (gitBranchProperty != null) {
+            val gitBranch = gitBranchProperty.branch
+            configService.getOrLoadConfig(repository, gitBranch, INGESTION_CONFIG_FILE_PATH)
+        } else {
+            throw GitBranchNotConfiguredException(branch.id)
         }
     }
 
@@ -161,7 +181,7 @@ class DefaultWorkflowJobProcessingService(
         }
     }
 
-    private fun getValidationStampName(job: String, step: String?): String {
+    private fun getValidationStampName(ingestionConfig: IngestionConfig, job: String, step: String?): String {
         val baseName = if (step != null) {
             "$job-$step"
         } else {
@@ -171,7 +191,7 @@ class DefaultWorkflowJobProcessingService(
         return normalizeName(baseName)
     }
 
-    private fun getValidationStampDescription(job: String, step: String?): String =
+    private fun getValidationStampDescription(ingestionConfig: IngestionConfig, job: String, step: String?): String =
         // TODO Mapping in the ingestion configuration
         if (step != null) {
             "$job $step"

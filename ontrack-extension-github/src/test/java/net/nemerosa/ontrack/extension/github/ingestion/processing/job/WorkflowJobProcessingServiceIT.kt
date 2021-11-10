@@ -2,6 +2,11 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.job
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderService
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderServiceITMockConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
@@ -9,18 +14,30 @@ import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflo
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.RunInfoService
+import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.context.ContextConfiguration
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class WorkflowJobProcessingServiceIT : AbstractDSLTestSupport() {
+@ContextConfiguration(classes = [ConfigLoaderServiceITMockConfig::class])
+class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
 
     @Autowired
     private lateinit var workflowJobProcessingService: WorkflowJobProcessingService
 
     @Autowired
     private lateinit var runInfoService: RunInfoService
+
+    @Autowired
+    private lateinit var configLoaderService: ConfigLoaderService
+
+    @Before
+    fun before() {
+        onlyOneGitHubConfig()
+        ConfigLoaderServiceITMockConfig.defaultIngestionConfig(configLoaderService)
+    }
 
     @Test
     fun `Creation of a simple validation run`() {
@@ -174,6 +191,18 @@ class WorkflowJobProcessingServiceIT : AbstractDSLTestSupport() {
     ) {
         val ref = Time.now()
         asAdmin {
+            // Git branch at branch level
+            setProperty(
+                branch,
+                GitBranchConfigurationPropertyType::class.java,
+                GitBranchConfigurationProperty(
+                    branch = "main",
+                    buildCommitLink = null, // Not used
+                    isOverride = false,
+                    buildTagInterval = 0,
+                )
+            )
+            // Run ID for the build
             setProperty(
                 this,
                 BuildGitHubWorkflowRunPropertyType::class.java,
