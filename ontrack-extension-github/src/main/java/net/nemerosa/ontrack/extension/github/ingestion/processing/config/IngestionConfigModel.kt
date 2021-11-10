@@ -17,4 +17,5 @@ data class IngestionConfig(
  */
 data class IngestionConfigGeneral(
     val skipJobs: Boolean = true,
+    val indexationInterval: Int = 30,
 )
