@@ -9,7 +9,7 @@ const val INGESTION_CONFIG_FILE_PATH = ".github/ontrack/ingestion.yml"
  * Configuration for the ingestion.
  */
 data class IngestionConfig(
-    val general: IngestionConfigGeneral,
+    val general: IngestionConfigGeneral = IngestionConfigGeneral(),
 )
 
 /**
