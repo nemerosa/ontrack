@@ -7,6 +7,8 @@ import net.nemerosa.ontrack.extension.github.ingestion.payload.GitHubIngestionHo
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookSignatureCheckResult
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessor
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettingsMissingTokenException
 import net.nemerosa.ontrack.it.MockSecurityService
@@ -25,8 +27,19 @@ class IngestionHookControllerTest {
         val queue = mockk<IngestionHookQueue>()
         val securityService = MockSecurityService()
         val meterRegistry = mockk<MeterRegistry>()
+
+        val ingestionEventProcessor = mockIngestionEventProcessor()
+        every { ingestionEventProcessor.preProcessingCheck(any()) } returns IngestionEventPreprocessingCheck.TO_BE_PROCESSED
+
         val controller =
-            IngestionHookController(queue, storage, MockIngestionHookSignatureService(), securityService, meterRegistry)
+            IngestionHookController(
+                queue,
+                storage,
+                MockIngestionHookSignatureService(),
+                securityService,
+                meterRegistry,
+                listOf(ingestionEventProcessor)
+            )
 
         var storedPayload: IngestionHookPayload? = null
         var queuedPayload: IngestionHookPayload? = null
@@ -62,13 +75,15 @@ class IngestionHookControllerTest {
         val queue = mockk<IngestionHookQueue>()
         val securityService = MockSecurityService()
         val meterRegistry = mockk<MeterRegistry>()
+        val ingestionEventProcessor = mockIngestionEventProcessor()
         val controller =
             IngestionHookController(
                 queue,
                 storage,
                 MockIngestionHookSignatureService(IngestionHookSignatureCheckResult.MISSING_TOKEN),
                 securityService,
-                meterRegistry
+                meterRegistry,
+                listOf(ingestionEventProcessor),
             )
 
         val body = IngestionHookFixtures.sampleWorkflowRunJsonPayload().format()
@@ -93,13 +108,15 @@ class IngestionHookControllerTest {
         val queue = mockk<IngestionHookQueue>()
         val securityService = MockSecurityService()
         val meterRegistry = mockk<MeterRegistry>(relaxed = true)
+        val ingestionEventProcessor = mockIngestionEventProcessor()
         val controller =
             IngestionHookController(
                 queue,
                 storage,
                 MockIngestionHookSignatureService(IngestionHookSignatureCheckResult.MISMATCH),
                 securityService,
-                meterRegistry
+                meterRegistry,
+                listOf(ingestionEventProcessor),
             )
 
         val body = IngestionHookFixtures.sampleWorkflowRunJsonPayload().format()
@@ -124,8 +141,18 @@ class IngestionHookControllerTest {
         val queue = mockk<IngestionHookQueue>()
         val securityService = MockSecurityService()
         val meterRegistry = mockk<MeterRegistry>()
+        val ingestionEventProcessor = mockIngestionEventProcessor("ping")
+        every { ingestionEventProcessor.preProcessingCheck(any()) } returns IngestionEventPreprocessingCheck.IGNORED
+
         val controller =
-            IngestionHookController(queue, storage, MockIngestionHookSignatureService(), securityService, meterRegistry)
+            IngestionHookController(
+                queue,
+                storage,
+                MockIngestionHookSignatureService(),
+                securityService,
+                meterRegistry,
+                listOf(ingestionEventProcessor)
+            )
 
         var storedPayload: IngestionHookPayload? = null
         var queuedPayload: IngestionHookPayload? = null
@@ -153,6 +180,12 @@ class IngestionHookControllerTest {
 
         assertNull(storedPayload?.payload)
         assertNull(queuedPayload?.payload)
+    }
+
+    private fun mockIngestionEventProcessor(event: String = "workflow_run"): IngestionEventProcessor {
+        val ingestionEventProcessor = mockk<IngestionEventProcessor>()
+        every { ingestionEventProcessor.event } returns event
+        return ingestionEventProcessor
     }
 
 }

@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
 import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInfo
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.PullRequest
@@ -42,6 +43,10 @@ class WorkflowRunIngestionEventProcessor(
     override val event: String = "workflow_run"
 
     override val payloadType: KClass<WorkflowRunPayload> = WorkflowRunPayload::class
+
+    override fun preProcessingCheck(payload: WorkflowRunPayload): IngestionEventPreprocessingCheck {
+        return IngestionEventPreprocessingCheck.TO_BE_PROCESSED
+    }
 
     override fun process(payload: WorkflowRunPayload): IngestionEventProcessingResult =
         when (payload.action) {

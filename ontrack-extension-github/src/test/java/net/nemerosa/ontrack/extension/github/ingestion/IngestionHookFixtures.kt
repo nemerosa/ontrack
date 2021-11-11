@@ -92,6 +92,7 @@ object IngestionHookFixtures {
             gitHubHookInstallationTargetID = gitHubHookInstallationTargetID,
             gitHubHookInstallationTargetType = gitHubHookInstallationTargetType,
             payload = sampleWorkflowRunJsonPayload(),
+            repository = sampleRepository(),
             message = message,
             status = status,
         )

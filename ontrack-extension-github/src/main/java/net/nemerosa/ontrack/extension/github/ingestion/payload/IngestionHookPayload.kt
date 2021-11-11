@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.payload
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import java.time.LocalDateTime
 import java.util.*
@@ -17,6 +18,7 @@ import java.util.*
  * @property gitHubHookInstallationTargetID Mapped to the `X-GitHub-Hook-Installation-Target-ID` header
  * @property gitHubHookInstallationTargetType Mapped to the `X-GitHub-Hook-Installation-Target-Type` header
  * @property payload JSON payload, raw from GitHub
+ * @property repository Repository this payload refers to
  * @property status Status of the processing
  * @property started Timestamp for the start of the processing
  * @property message Status message (exception stack trace in case of error)
@@ -39,6 +41,8 @@ data class IngestionHookPayload(
     val gitHubHookInstallationTargetType: String,
     @APIDescription("JSON payload, raw from GitHub")
     val payload: JsonNode,
+    @APIDescription("Repository this payload refers to")
+    val repository: Repository?,
     @APIDescription("Status of the processing")
     val status: IngestionHookPayloadStatus = IngestionHookPayloadStatus.SCHEDULED,
     @APIDescription("Timestamp for the start of the processing")

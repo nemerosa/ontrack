@@ -10,6 +10,14 @@ interface IngestionEventProcessor {
     val event: String
 
     /**
+     * Pre-processing check, checking if the payload must be processed or not.
+     *
+     * @param payload Payload to check
+     * @return Result of the check
+     */
+    fun preProcessingCheck(payload: IngestionHookPayload): IngestionEventPreprocessingCheck
+
+    /**
      * Processes the payload
      *
      * @param payload Payload to process

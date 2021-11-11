@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.events
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
 import net.nemerosa.ontrack.extension.github.ingestion.processing.job.WorkflowJobProcessingService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
@@ -25,6 +26,10 @@ class WorkflowJobIngestionEventProcessor(
     override val event: String = "workflow_job"
 
     override val payloadType: KClass<WorkflowJobPayload> = WorkflowJobPayload::class
+
+    override fun preProcessingCheck(payload: WorkflowJobPayload): IngestionEventPreprocessingCheck {
+        return IngestionEventPreprocessingCheck.TO_BE_PROCESSED
+    }
 
     override fun process(payload: WorkflowJobPayload): IngestionEventProcessingResult =
         when (payload.action) {

@@ -4,8 +4,12 @@ import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.github.ingestion.metrics.INGESTION_METRIC_EVENT_TAG
 import net.nemerosa.ontrack.extension.github.ingestion.metrics.IngestionMetrics
 import net.nemerosa.ontrack.extension.github.ingestion.payload.*
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessor
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettingsMissingTokenException
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -23,7 +27,10 @@ class IngestionHookController(
     private val ingestionHookSignatureService: IngestionHookSignatureService,
     private val securityService: SecurityService,
     private val meterRegistry: MeterRegistry,
+    ingestionEventProcessors: List<IngestionEventProcessor>,
 ) {
+
+    private val eventProcessors = ingestionEventProcessors.associateBy { it.event }
 
     @PostMapping("")
     fun hook(
@@ -35,9 +42,11 @@ class IngestionHookController(
         @RequestHeader("X-GitHub-Hook-Installation-Target-Type") gitHubHookInstallationTargetType: String,
         @RequestHeader("X-Hub-Signature-256") signature: String,
     ): IngestionHookResponse {
+        // Gets the event processor if any
+        val eventProcessor =
+            eventProcessors[gitHubEvent] ?: throw GitHubIngestionHookEventNotSupportedException(gitHubEvent)
         // Checking the signature
-        val check = ingestionHookSignatureService.checkPayloadSignature(body, signature)
-        val json = when (check) {
+        val json = when (ingestionHookSignatureService.checkPayloadSignature(body, signature)) {
             IngestionHookSignatureCheckResult.MISMATCH -> {
                 meterRegistry.increment(
                     IngestionMetrics.SIGNATURE_ERROR_COUNT,
@@ -48,6 +57,12 @@ class IngestionHookController(
             IngestionHookSignatureCheckResult.MISSING_TOKEN -> throw GitHubIngestionSettingsMissingTokenException()
             IngestionHookSignatureCheckResult.OK -> body.parseAsJson()
         }
+        // Getting the repository
+        val repository = if (json.has("repository")) {
+            json.get("repository").parse<Repository>()
+        } else {
+            null
+        }
         // Creates the payload object
         val payload = IngestionHookPayload(
             gitHubDelivery = gitHubDelivery,
@@ -56,11 +71,11 @@ class IngestionHookController(
             gitHubHookInstallationTargetID = gitHubHookInstallationTargetID,
             gitHubHookInstallationTargetType = gitHubHookInstallationTargetType,
             payload = json,
+            repository = repository,
         )
         // Pre-sorting
-        val toBeProcessed = preFlightCheck(payload)
-        if (toBeProcessed) {
-            return securityService.asAdmin {
+        return when (eventProcessor.preProcessingCheck(payload)) {
+            IngestionEventPreprocessingCheck.TO_BE_PROCESSED -> securityService.asAdmin {
                 // Stores it
                 storage.store(payload)
                 // Pushes it on the queue
@@ -73,22 +88,13 @@ class IngestionHookController(
                     processing = true,
                 )
             }
-        } else {
-            return IngestionHookResponse(
+            IngestionEventPreprocessingCheck.IGNORED -> IngestionHookResponse(
                 message = "Ingestion request ${payload.uuid}/${payload.gitHubEvent} has been received correctly but won't be processed.",
                 uuid = payload.uuid,
                 event = payload.gitHubEvent,
                 processing = false,
             )
         }
-    }
-
-    private fun preFlightCheck(payload: IngestionHookPayload) = when (payload.gitHubEvent) {
-        "ping" -> false
-        "workflow_job" -> true
-        "workflow_run" -> true
-        "push" -> true
-        else -> throw GitHubIngestionHookEventNotSupportedException(payload.gitHubEvent)
     }
 
     class IngestionHookResponse(
