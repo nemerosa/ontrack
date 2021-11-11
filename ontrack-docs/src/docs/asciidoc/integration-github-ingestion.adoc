@@ -56,6 +56,60 @@ Go to the _Settings > Webhooks_ section and add a new webhook:
 ** Workflow runs
 ** Pushes (for autoconfiguration, see later)
 
+[[integration-github-ingestion-customization]]
+==== Customization
+
+The default behaviour of the ingestion can be customized by putting a `.github/ontrack/ingestion.yml` file in the repository.
+
+All fields are optional and when omitted, default values are used.
+
+This file is taken into account automatically, on push or when the ingestion configuration has not been loaded yet.
+
+[source,yaml]
+----
+# General settings
+general:
+  #  Must jobs be considered as validations?
+  skipJobs: true
+  # Git indexation interval
+  indexationInterval: 30
+# List of specific step configurations
+steps:
+  # Exact name of the step in the workflow (required)
+  - name: The step name
+    # Name of the validation stamp to use (instead of a generated one)
+    # Default value: the name of the step,
+    # adjusted for the Ontrack naming constraints & conventions
+    validation: the-step-name
+    # Must we use the job name as a prefix to the validation stamp?
+    # Default value: the job name is added as a prefix
+    validationJobPrefix: true
+    # Description for the validation stamp
+    # Default value: the name of the step
+    description: The step name
+# List of specific job configurations
+jobs:
+  # Exact name of the job in the workflow (required)
+  - name: Job name
+    # Name of the validation stamp to use (instead of a generated one)
+    # Default value: the name of the job,
+    # adjusted for Ontrack naming constraints & conventions
+    validation: job-name
+    # Description for the validation stamp
+    # Default value: the name of the job
+    description: Job name
+----
+
+For example, if we want to associate the vaidation stamp `unit-tests` to the step `Runs unit tests` in the `build` job, we can use:
+
+[source,yaml]
+----
+steps:
+  - name: Runs unit tests
+    validation: unit-tests
+    validationJobPrefix: false
+----
+
 [[integration-github-ingestion-settings]]
 ==== General settings
 
