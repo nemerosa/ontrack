@@ -7,11 +7,12 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderServiceITMockConfig
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfig
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfigGeneral
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobPropertyType
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.RunInfoService
 import org.junit.Before
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 @ContextConfiguration(classes = [ConfigLoaderServiceITMockConfig::class])
 class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
@@ -41,6 +43,25 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
 
     @Test
     fun `Creation of a simple validation run`() {
+        project {
+            branch {
+                build {
+                    runTest()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creation of a simple validation run and the associated job`() {
+        ConfigLoaderServiceITMockConfig.customIngestionConfig(
+            configLoaderService,
+            IngestionConfig(
+                general = IngestionConfigGeneral(
+                    skipJobs = false,
+                ),
+            )
+        )
         project {
             branch {
                 build {
@@ -142,6 +163,8 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
         conclusion: WorkflowJobStepConclusion? = WorkflowJobStepConclusion.success,
         expectedVsName: String = normalizeName("$job-$step"),
         expectedStatus: String = "PASSED",
+        expectedJob: Boolean = false,
+        expectedJobVsName: String = normalizeName(job),
     ) {
         setupTest(
             runId = runId,
@@ -178,6 +201,41 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
                         assertEquals(false, p.running)
                     }
                 }
+            }
+            // Checks the validation stamp & run for the job
+            if (expectedJob) {
+                assertNotNull(
+                    structureService.findValidationStampByName(project.name, branch.name, expectedJobVsName).getOrNull(),
+                    "Validation stamp for the job has been created"
+                ) { vs ->
+                    // Checks the validation run has been created
+                    val runs = structureService.getValidationRunsForBuildAndValidationStamp(
+                        id,
+                        vs.id,
+                        offset = 0,
+                        count = 1
+                    )
+                    assertNotNull(runs.firstOrNull()) { run ->
+                        assertEquals(expectedStatus, run.lastStatusId)
+                        assertNotNull(runInfoService.getRunInfo(run), "Run info has been set") { info ->
+                            assertEquals(60, info.runTime, "Run time = 60 seconds")
+                            assertEquals("github-workflow", info.sourceType)
+                            assertEquals("uri:job", info.sourceUri)
+                        }
+                        assertNotNull(getProperty(run, ValidationRunGitHubWorkflowJobPropertyType::class.java)) { p ->
+                            assertEquals("build", p.job)
+                            assertEquals("run-name", p.name)
+                            assertEquals(1, p.runNumber)
+                            assertEquals("uri:job", p.url)
+                            assertEquals(false, p.running)
+                        }
+                    }
+                }
+            } else {
+                assertNull(
+                    structureService.findValidationStampByName(project.name, branch.name, expectedJobVsName).getOrNull(),
+                    "Validation stamp for the job has not been created"
+                )
             }
         }
     }

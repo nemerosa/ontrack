@@ -38,6 +38,19 @@ class WorkflowJobIngestionEventProcessor(
         payload.workflowJob.steps?.forEach { step ->
             onStep(step, payload)
         }
+        // Processing of the job itself
+        workflowJobProcessingService.setupValidation(
+            repository = payload.repository,
+            runId = payload.workflowJob.runId,
+            runAttempt = payload.workflowJob.runAttempt,
+            job = payload.workflowJob.name,
+            jobUrl = payload.workflowJob.htmlUrl,
+            step = null,
+            status = payload.workflowJob.status,
+            conclusion = payload.workflowJob.conclusion,
+            startedAt = payload.workflowJob.startedAtDate,
+            completedAt = payload.workflowJob.completedAtDate,
+        )
         // OK
         return IngestionEventProcessingResult.PROCESSED
     }
@@ -81,6 +94,7 @@ class WorkflowJob(
     val runAttempt: Int,
     val status: WorkflowJobStepStatus,
     val conclusion: WorkflowJobStepConclusion?,
+    val startedAtDate: LocalDateTime?,
     val completedAtDate: LocalDateTime?,
     val name: String,
     val steps: List<WorkflowJobStep>?,
@@ -94,6 +108,8 @@ class WorkflowJob(
         runAttempt: Int,
         status: WorkflowJobStepStatus,
         conclusion: WorkflowJobStepConclusion?,
+        @JsonProperty("started_at")
+        startedAt: String?,
         @JsonProperty("completed_at")
         completedAt: String?,
         name: String,
@@ -105,6 +121,7 @@ class WorkflowJob(
         runAttempt = runAttempt,
         status = status,
         conclusion = conclusion,
+        startedAtDate = startedAt?.let { parseLocalDateTime(it) },
         completedAtDate = completedAt?.let { parseLocalDateTime(it) },
         name = name,
         steps = steps,

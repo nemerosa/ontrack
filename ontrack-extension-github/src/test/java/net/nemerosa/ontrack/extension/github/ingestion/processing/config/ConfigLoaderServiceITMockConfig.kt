@@ -16,12 +16,15 @@ class ConfigLoaderServiceITMockConfig {
     companion object {
         private val defaultIngestionConfig = IngestionConfig()
         fun defaultIngestionConfig(configLoaderService: ConfigLoaderService) {
+            customIngestionConfig(configLoaderService, defaultIngestionConfig)
+        }
+        fun customIngestionConfig(configLoaderService: ConfigLoaderService, config: IngestionConfig) {
             every {
                 configLoaderService.loadConfig(
                     any(),
                     INGESTION_CONFIG_FILE_PATH
                 )
-            } returns defaultIngestionConfig
+            } returns config
         }
     }
 

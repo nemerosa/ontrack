@@ -52,6 +52,10 @@ class DefaultWorkflowJobProcessingService(
             ?: throw BuildWithWorkflowRunIdNotFoundException(projectName, runId)
         // Gets the ingestion configuration
         val ingestionConfig = getOrLoadIngestionConfig(repository, build.branch)
+        // Skipping job or not, depending on the configuration
+        if (step == null && ingestionConfig.general.skipJobs) {
+            return
+        }
         // Gets the run property
         val runProperty = propertyService.getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java).value
             ?: error("Cannot find workflow run property on build")
