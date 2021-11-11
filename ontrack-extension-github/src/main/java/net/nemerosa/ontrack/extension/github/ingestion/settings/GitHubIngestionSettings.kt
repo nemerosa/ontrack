@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.settings
 
+import net.nemerosa.ontrack.model.annotations.APIDescription
+
 /**
  * Settings for the ingestion of GitHub workflows.
  *
@@ -9,9 +11,13 @@ package net.nemerosa.ontrack.extension.github.ingestion.settings
  * @property indexationInterval Default indexation interval when configuring the GitHub projects
  */
 class GitHubIngestionSettings(
+    @APIDescription("Secret token sent by the GitHub hook and signing the payload")
     val token: String,
+    @APIDescription("Number of days to keep the received payloads (0 = forever)")
     val retentionDays: Int,
+    @APIDescription("Must the organization name be used as a project name prefix?")
     val orgProjectPrefix: Boolean,
+    @APIDescription("Default indexation interval when configuring the GitHub projects")
     val indexationInterval: Int,
 ) {
     companion object {
