@@ -4,17 +4,17 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.model.GitBranchNotConfiguredException
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInfo
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigService
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.INGESTION_CONFIG_FILE_PATH
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfig
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.getProjectName
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobProperty
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobPropertyType
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -181,22 +181,10 @@ class DefaultWorkflowJobProcessingService(
         }
     }
 
-    private fun getValidationStampName(ingestionConfig: IngestionConfig, job: String, step: String?): String {
-        val baseName = if (step != null) {
-            "$job-$step"
-        } else {
-            job
-        }
-        // TODO Mapping in the ingestion configuration
-        return normalizeName(baseName)
-    }
+    private fun getValidationStampName(ingestionConfig: IngestionConfig, job: String, step: String?): String =
+        ingestionConfig.getValidationStampName(job, step)
 
     private fun getValidationStampDescription(ingestionConfig: IngestionConfig, job: String, step: String?): String =
-        // TODO Mapping in the ingestion configuration
-        if (step != null) {
-            "$job $step"
-        } else {
-            job
-        }
+        ingestionConfig.getValidationStampDescription(job, step)
 
 }

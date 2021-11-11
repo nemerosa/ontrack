@@ -16,7 +16,7 @@ class ConfigParserTest {
             """
         ) {
             assertEquals(false, it.general.skipJobs)
-            assertEquals(10, it.general.indexationInterval)
+            assertEquals(10U, it.general.indexationInterval)
         }
     }
 
@@ -29,7 +29,7 @@ class ConfigParserTest {
             """
         ) {
             assertEquals(true, it.general.skipJobs)
-            assertEquals(10, it.general.indexationInterval)
+            assertEquals(10U, it.general.indexationInterval)
         }
     }
 
@@ -42,7 +42,7 @@ class ConfigParserTest {
             """
         ) {
             assertEquals(false, it.general.skipJobs)
-            assertEquals(30, it.general.indexationInterval)
+            assertEquals(30U, it.general.indexationInterval)
         }
     }
 
