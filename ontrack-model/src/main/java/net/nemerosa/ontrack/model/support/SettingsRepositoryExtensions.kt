@@ -43,3 +43,10 @@ inline fun <reified T> SettingsRepository.setString(property: KProperty0<String?
 inline fun <reified T> SettingsRepository.setBoolean(property: KProperty0<Boolean>) {
     setBoolean(T::class.java, property.name, property.get())
 }
+
+/**
+ * Type safe setter of settings
+ */
+inline fun <reified T> SettingsRepository.setInt(property: KProperty0<Int>) {
+    setInt(T::class.java, property.name, property.get())
+}

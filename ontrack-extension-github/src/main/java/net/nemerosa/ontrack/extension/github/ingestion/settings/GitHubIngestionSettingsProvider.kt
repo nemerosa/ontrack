@@ -23,7 +23,11 @@ class GitHubIngestionSettingsProvider(
         orgProjectPrefix = settingsRepository.getBoolean(
             GitHubIngestionSettings::orgProjectPrefix,
             GitHubIngestionSettings.DEFAULT_ORG_PROJECT_PREFIX
-        )
+        ),
+        indexationInterval = settingsRepository.getInt(
+            GitHubIngestionSettings::indexationInterval,
+            GitHubIngestionSettings.DEFAULT_INDEXATION_INTERVAL,
+        ),
     )
 
     override fun getSettingsClass(): Class<GitHubIngestionSettings> = GitHubIngestionSettings::class.java

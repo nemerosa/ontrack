@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.GitHubConfigUR
 import net.nemerosa.ontrack.extension.github.ingestion.processing.GitHubConfigURLNoMatchException
 import net.nemerosa.ontrack.extension.github.ingestion.processing.GitHubConfigURLSeveralMatchesException
 import net.nemerosa.ontrack.extension.github.ingestion.processing.NoGitHubConfigException
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.getProjectName
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
@@ -56,6 +57,8 @@ class DefaultIngestionModelAccessService(
     private fun setupProjectGitHubConfiguration(
         project: Project,
         repository: Repository,
+        ingestionConfig: IngestionConfig,
+        settings: GitHubIngestionSettings,
     ) {
         if (!propertyService.hasProperty(project, GitHubProjectConfigurationPropertyType::class.java)) {
             // Gets the list of GH configs
@@ -94,7 +97,7 @@ class DefaultIngestionModelAccessService(
                 GitHubProjectConfigurationProperty(
                     configuration = configuration,
                     repository = repository.fullName,
-                    indexationInterval = 30, // TODO Make it configurable
+                    indexationInterval = ingestionConfig.general.indexationInterval?.toInt() ?: settings.indexationInterval,
                     issueServiceConfigurationIdentifier = "self"  // TODO Make it configurable
                 )
             )

@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.support.SettingsRepository
 import net.nemerosa.ontrack.model.support.setBoolean
+import net.nemerosa.ontrack.model.support.setInt
 import org.springframework.stereotype.Component
 
 @Component
@@ -37,6 +38,7 @@ class GitHubIngestionSettingsManager(
             settings.retentionDays
         )
         settingsRepository.setBoolean<GitHubIngestionSettings>(settings::orgProjectPrefix)
+        settingsRepository.setInt<GitHubIngestionSettings>(settings::indexationInterval)
     }
 
     override fun getSettingsForm(settings: GitHubIngestionSettings?): Form =
@@ -58,6 +60,13 @@ class GitHubIngestionSettingsManager(
                     .label("Org project prefix")
                     .help("Must the organization name be used as a project name prefix?")
                     .value(settings?.orgProjectPrefix ?: GitHubIngestionSettings.DEFAULT_ORG_PROJECT_PREFIX)
+            )
+            .with(
+                Int.of(GitHubIngestionSettings::indexationInterval.name)
+                    .label("Indexation interval")
+                    .help("Default indexation interval (in minutes) when configuring the GitHub projects")
+                    .min(0)
+                    .value(settings?.indexationInterval ?: GitHubIngestionSettings.DEFAULT_INDEXATION_INTERVAL)
             )
 
     override fun getId(): String = "github-ingestion"
