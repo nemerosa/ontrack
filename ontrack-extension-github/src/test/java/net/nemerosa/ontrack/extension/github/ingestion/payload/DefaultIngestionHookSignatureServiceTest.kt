@@ -61,6 +61,7 @@ class DefaultIngestionHookSignatureServiceTest {
             token = token,
             retentionDays = 30,
             orgProjectPrefix = false,
+            indexationInterval = 30,
         )
     }
 

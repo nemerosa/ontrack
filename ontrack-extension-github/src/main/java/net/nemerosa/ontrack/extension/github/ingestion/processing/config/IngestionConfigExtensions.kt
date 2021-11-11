@@ -25,7 +25,7 @@ fun IngestionConfig.getValidationStampName(job: String, step: String?): String =
                 stepConfig.validation
             }
         } else {
-            if (stepConfig?.validationJobPrefix == true) {
+            if (stepConfig == null || stepConfig.validationJobPrefix) {
                 val jobName = getValidationStampName(job, null)
                 "$jobName-$step"
             } else {

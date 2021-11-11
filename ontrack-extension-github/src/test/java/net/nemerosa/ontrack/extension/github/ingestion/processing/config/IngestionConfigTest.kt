@@ -41,11 +41,7 @@ class IngestionConfigTest {
     fun `Step validation stamp name without customization`() {
         assertEquals(
             "job-name-step-name",
-            IngestionConfig(
-                steps = listOf(
-                    StepConfig(name = "Step name"),
-                )
-            ).getValidationStampName("Job name", "Step name")
+            IngestionConfig().getValidationStampName("Job name", "Step name")
         )
     }
 

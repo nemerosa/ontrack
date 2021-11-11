@@ -30,6 +30,7 @@ class IngestionHookPayloadCleanupJobIT : AbstractDSLTestSupport() {
                         token = "not-used",
                         retentionDays = 10,
                         orgProjectPrefix = false,
+                        indexationInterval = 30,
                     )
                 )
             }

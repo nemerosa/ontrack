@@ -16,6 +16,7 @@ abstract class AbstractIngestionTestSupport : AbstractGitHubTestSupport() {
                 token = old.token,
                 retentionDays = old.retentionDays,
                 orgProjectPrefix = orgProjectPrefix ?: old.orgProjectPrefix,
+                indexationInterval = old.indexationInterval,
             )
             asAdmin {
                 settingsManagerService.saveSettings(new)

@@ -15,11 +15,13 @@ class GitHubIngestionSettingsIT : AbstractDSLTestSupport() {
                         token = "secret",
                         retentionDays = 10,
                         orgProjectPrefix = false,
+                        indexationInterval = 60,
                     )
                 )
                 cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java).apply {
                     assertEquals("secret", token)
                     assertEquals(10, retentionDays)
+                    assertEquals(60, indexationInterval)
                 }
             }
         }
