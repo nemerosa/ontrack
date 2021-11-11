@@ -22,11 +22,9 @@ data class IngestionConfig(
  * General settings
  *
  * @param skipJobs Must jobs be considered as validations?
- * @param indexationInterval Git indexation interval
  */
 data class IngestionConfigGeneral(
     val skipJobs: Boolean = true,
-    val indexationInterval: UInt? = 30U,
 )
 
 /**

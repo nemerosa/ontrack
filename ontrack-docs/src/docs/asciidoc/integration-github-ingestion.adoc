@@ -71,8 +71,6 @@ This file is taken into account automatically, on push or when the ingestion con
 general:
   #  Must jobs be considered as validations?
   skipJobs: true
-  # Git indexation interval
-  indexationInterval: 30
 # List of specific step configurations
 steps:
   # Exact name of the step in the workflow (required)
