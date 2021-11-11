@@ -33,11 +33,15 @@ interface IngestionHookPayloadStorage {
      * @param statuses List of statuses to filter on. Empty or null to get them all.
      * @param gitHubDelivery Filter on the GitHub Delivery ID
      * @param gitHubEvent Filter on the GitHub Event
+     * @param repository Filter on the repository
+     * @param owner Filter on the repository owner
      */
     fun count(
         statuses: List<IngestionHookPayloadStatus>? = null,
         gitHubDelivery: String? = null,
         gitHubEvent: String? = null,
+        repository: String? = null,
+        owner: String? = null,
     ): Int
 
     /**
@@ -48,6 +52,8 @@ interface IngestionHookPayloadStorage {
      * @param statuses List of statuses to filter on. Empty or null to get them all.
      * @param gitHubDelivery Filter on the GitHub Delivery ID
      * @param gitHubEvent Filter on the GitHub Event
+     * @param repository Filter on the repository
+     * @param owner Filter on the repository owner
      * @return List of matching payloads
      */
     fun list(
@@ -56,6 +62,8 @@ interface IngestionHookPayloadStorage {
         statuses: List<IngestionHookPayloadStatus>? = null,
         gitHubDelivery: String? = null,
         gitHubEvent: String? = null,
+        repository: String? = null,
+        owner: String? = null,
     ): List<IngestionHookPayload>
 
     /**

@@ -52,6 +52,16 @@ class GQLRootQueryGitHubIngestionHookPayloads(
                     .description("Filter on the GitHub Event")
                     .type(GraphQLString)
                     .build(),
+                GraphQLArgument.newArgument()
+                    .name(ARG_REPOSITORY)
+                    .description("Filter on the GitHub repository name")
+                    .type(GraphQLString)
+                    .build(),
+                GraphQLArgument.newArgument()
+                    .name(ARG_OWNER)
+                    .description("Filter on the GitHub repository owner name")
+                    .type(GraphQLString)
+                    .build(),
             ),
             itemPaginatedListProvider = { env, _, offset, size ->
                 val uuid: String? = env.getArgument(ARG_UUID)
@@ -65,6 +75,8 @@ class GQLRootQueryGitHubIngestionHookPayloads(
                 } else {
                     val delivery: String? = env.getArgument(ARG_GITHUB_DELIVERY)
                     val event: String? = env.getArgument(ARG_GITHUB_EVENT)
+                    val repository: String? = env.getArgument(ARG_REPOSITORY)
+                    val owner: String? = env.getArgument(ARG_OWNER)
                     val statusesList: List<String>? = env.getArgument(ARG_STATUSES)
                     val statuses = statusesList?.map {
                         IngestionHookPayloadStatus.valueOf(it)
@@ -73,11 +85,15 @@ class GQLRootQueryGitHubIngestionHookPayloads(
                         statuses = statuses,
                         gitHubDelivery = delivery,
                         gitHubEvent = event,
+                        repository = repository,
+                        owner = owner,
                     )
                     val items = ingestionHookPayloadStorage.list(offset, size,
                         statuses = statuses,
                         gitHubDelivery = delivery,
                         gitHubEvent = event,
+                        repository = repository,
+                        owner = owner,
                     )
                     PaginatedList.create(
                         items = items,
@@ -94,6 +110,8 @@ class GQLRootQueryGitHubIngestionHookPayloads(
         private const val ARG_STATUSES = "statuses"
         private const val ARG_GITHUB_DELIVERY = "gitHubDelivery"
         private const val ARG_GITHUB_EVENT = "gitHubEvent"
+        private const val ARG_REPOSITORY = "repository"
+        private const val ARG_OWNER = "owner"
     }
 
 }

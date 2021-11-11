@@ -130,10 +130,28 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractQLKTITSupport() {
         )
     }
 
+    @Test
+    fun `Filtering the list of payloads on the repository`() {
+        testPayloads(
+            repository = "repository-0",
+            expected = listOf(2, 1)
+        )
+    }
+
+    @Test
+    fun `Filtering the list of payloads on the owner`() {
+        testPayloads(
+            owner = "owner-0",
+            expected = listOf(4, 3, 2, 1)
+        )
+    }
+
     private fun testPayloads(
         offset: Int? = null,
         size: Int? = null,
         statuses: List<IngestionHookPayloadStatus>? = null,
+        repository: String? = null,
+        owner: String? = null,
         expected: List<Int>,
         security: (code: () -> Unit) -> Unit = { code -> asAdmin { code() } },
     ) {
@@ -147,11 +165,15 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractQLKTITSupport() {
                         ${'$'}offset: Int,
                         ${'$'}size: Int,
                         ${'$'}statuses: [IngestionHookPayloadStatus!],
+                        ${'$'}repository: String,
+                        ${'$'}owner: String,
                     ) {
                         gitHubIngestionHookPayloads(
                             offset: ${'$'}offset,
                             size: ${'$'}size,
                             statuses: ${'$'}statuses,
+                            repository: ${'$'}repository,
+                            owner: ${'$'}owner,
                         ) {
                             pageItems {
                                 message
@@ -162,6 +184,8 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractQLKTITSupport() {
                     "offset" to offset,
                     "size" to size,
                     "statuses" to statuses,
+                    "repository" to repository,
+                    "owner" to owner,
                 )
             ).let { data ->
                 assertEquals(
@@ -187,6 +211,8 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractQLKTITSupport() {
                 else -> IngestionHookPayloadStatus.ERRORED
             }
             IngestionHookFixtures.sampleWorkflowRunIngestionPayload(
+                repoName = "repository-${no / 3}",
+                owner = "owner-${no / 5}",
                 timestamp = ref.minusDays(1).plusSeconds(no.toLong()),
                 message = "Payload #$no",
                 status = status,

@@ -117,12 +117,14 @@ class DefaultIngestionHookPayloadStorage(
         statuses: List<IngestionHookPayloadStatus>?,
         gitHubDelivery: String?,
         gitHubEvent: String?,
+        repository: String?,
+        owner: String?,
     ): Int {
         securityService.checkGlobalFunction(GlobalSettings::class.java)
         return storageService.count(
             store = INGESTION_HOOK_PAYLOAD_STORE,
-            query = query(statuses, gitHubDelivery, gitHubEvent),
-            queryVariables = queryVariables(statuses, gitHubDelivery, gitHubEvent),
+            query = query(statuses, gitHubDelivery, gitHubEvent, repository, owner),
+            queryVariables = queryVariables(statuses, gitHubDelivery, gitHubEvent, repository, owner),
         )
     }
 
@@ -132,9 +134,11 @@ class DefaultIngestionHookPayloadStorage(
         statuses: List<IngestionHookPayloadStatus>?,
         gitHubDelivery: String?,
         gitHubEvent: String?,
+        repository: String?,
+        owner: String?
     ): List<IngestionHookPayload> {
         securityService.checkGlobalFunction(GlobalSettings::class.java)
-        val query: String? = query(statuses, gitHubDelivery, gitHubEvent)
+        val query: String? = query(statuses, gitHubDelivery, gitHubEvent, repository, owner)
         return storageService.filter(
             store = INGESTION_HOOK_PAYLOAD_STORE,
             type = IngestionHookPayload::class,
@@ -142,7 +146,7 @@ class DefaultIngestionHookPayloadStorage(
             size = size,
             orderQuery = "order by data->>'timestamp' desc",
             query = query,
-            queryVariables = queryVariables(statuses, gitHubDelivery, gitHubEvent),
+            queryVariables = queryVariables(statuses, gitHubDelivery, gitHubEvent, repository, owner),
         )
     }
 
@@ -159,6 +163,8 @@ class DefaultIngestionHookPayloadStorage(
         statuses: List<IngestionHookPayloadStatus>?,
         gitHubDelivery: String?,
         gitHubEvent: String?,
+        repository: String?,
+        owner: String?,
     ): String? {
         val parts = mutableListOf<String>()
         if (statuses != null && statuses.isNotEmpty()) {
@@ -172,6 +178,12 @@ class DefaultIngestionHookPayloadStorage(
         if (!gitHubEvent.isNullOrBlank()) {
             parts += "data->>'gitHubEvent' = :gitHubEvent"
         }
+        if (!repository.isNullOrBlank()) {
+            parts += "data->'repository'->>'name' = :repository"
+        }
+        if (!owner.isNullOrBlank()) {
+            parts += "data->'repository'->'owner'->>'login' = :owner"
+        }
         return if (parts.isNotEmpty()) {
             parts.joinToString(" AND ") { "( $it )" }
         } else {
@@ -182,7 +194,9 @@ class DefaultIngestionHookPayloadStorage(
     private fun queryVariables(
         @Suppress("UNUSED_PARAMETER") statuses: List<IngestionHookPayloadStatus>?,
         gitHubDelivery: String?,
-        gitHubEvent: String?
+        gitHubEvent: String?,
+        repository: String?,
+        owner: String?,
     ): Map<String, *>? {
         val variables = mutableMapOf<String, Any?>()
         if (!gitHubDelivery.isNullOrBlank()) {
@@ -190,6 +204,12 @@ class DefaultIngestionHookPayloadStorage(
         }
         if (!gitHubEvent.isNullOrBlank()) {
             variables["gitHubEvent"] = gitHubEvent
+        }
+        if (!repository.isNullOrBlank()) {
+            variables["repository"] = repository
+        }
+        if (!owner.isNullOrBlank()) {
+            variables["owner"] = owner
         }
         return variables.takeIf { it.isNotEmpty() }
     }

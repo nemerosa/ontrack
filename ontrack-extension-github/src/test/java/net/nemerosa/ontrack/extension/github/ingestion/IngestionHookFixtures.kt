@@ -80,6 +80,8 @@ object IngestionHookFixtures {
      * Sample payload
      */
     fun sampleWorkflowRunIngestionPayload(
+        repoName: String = sampleRepository,
+        owner: String = sampleOwner,
         timestamp: LocalDateTime = Time.now(),
         message: String? = null,
         status: IngestionHookPayloadStatus = IngestionHookPayloadStatus.SCHEDULED,
@@ -92,7 +94,7 @@ object IngestionHookFixtures {
             gitHubHookInstallationTargetID = gitHubHookInstallationTargetID,
             gitHubHookInstallationTargetType = gitHubHookInstallationTargetType,
             payload = sampleWorkflowRunJsonPayload(),
-            repository = sampleRepository(),
+            repository = sampleRepository(repoName = repoName, owner = owner),
             message = message,
             status = status,
         )

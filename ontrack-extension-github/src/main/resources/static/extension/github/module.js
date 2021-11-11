@@ -26,6 +26,8 @@ angular.module('ontrack.extension.github', [
                 $statuses: [IngestionHookPayloadStatus!],
                 $gitHubDelivery: String,
                 $gitHubEvent: String,
+                $repository: String,
+                $owner: String,
             ) {
                 gitHubIngestionHookPayloadStatuses
                 gitHubIngestionHookPayloads(
@@ -34,6 +36,8 @@ angular.module('ontrack.extension.github', [
                     statuses: $statuses,
                     gitHubDelivery: $gitHubDelivery,
                     gitHubEvent: $gitHubEvent,
+                    repository: $repository,
+                    owner: $owner,
                 ) {
                     pageInfo {
                         totalSize
@@ -53,6 +57,13 @@ angular.module('ontrack.extension.github', [
                         gitHubDelivery
                         status
                         completion
+                        repository {
+                            name
+                            htmlUrl
+                            owner {
+                                login
+                            }
+                        }
                     }
                 }
             }
@@ -79,12 +90,16 @@ angular.module('ontrack.extension.github', [
             offset: 0,
             size: defaultSize,
             statuses: null,
+            repository: null,
+            owner: null,
         };
 
         $scope.filter = {
             statuses: {},
             gitHubDelivery: '',
             gitHubEvent: '',
+            repository: '',
+            owner: '',
         };
 
         $scope.loadingPayloads = true;
@@ -115,6 +130,16 @@ angular.module('ontrack.extension.github', [
             } else {
                 variables.gitHubEvent = null;
             }
+            if ($scope.filter.repository) {
+                variables.repository = $scope.filter.repository;
+            } else {
+                variables.repository = null;
+            }
+            if ($scope.filter.owner) {
+                variables.owner = $scope.filter.owner;
+            } else {
+                variables.owner = null;
+            }
             loadPayloads();
         };
 
@@ -122,6 +147,8 @@ angular.module('ontrack.extension.github', [
             $scope.filter.statuses = {};
             $scope.filter.gitHubDelivery = '';
             $scope.filter.gitHubEvent = '';
+            $scope.filter.repository = '';
+            $scope.filter.owner = '';
             $scope.submitFilter();
         };
 

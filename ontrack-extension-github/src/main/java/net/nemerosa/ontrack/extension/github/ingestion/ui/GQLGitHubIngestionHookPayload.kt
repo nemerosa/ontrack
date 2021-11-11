@@ -9,7 +9,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLGitHubIngestionHookPayload(
-    private val gqlEnumIngestionHookPayloadStatus: GQLEnumIngestionHookPayloadStatus
+    private val gqlEnumIngestionHookPayloadStatus: GQLEnumIngestionHookPayloadStatus,
+    private val gqlGitHubRepository: GQLGitHubRepository,
 ) : GQLType {
 
     override fun getTypeName(): String = "GitHubIngestionHookPayload"
@@ -49,5 +50,10 @@ class GQLGitHubIngestionHookPayload(
             IngestionHookPayload::completion.name,
             getDescription(IngestionHookPayload::completion),
         )
+        .field {
+            it.name(IngestionHookPayload::repository.name)
+                .description(getDescription(IngestionHookPayload::repository))
+                .type(gqlGitHubRepository.typeRef)
+        }
         .build()
 }
