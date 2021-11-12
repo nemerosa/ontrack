@@ -21,11 +21,11 @@ class GitHubIngestionSettings(
     @APIDescription("Secret token sent by the GitHub hook and signing the payload")
     val token: String,
     @APIDescription("Number of days to keep the received payloads (0 = forever)")
-    val retentionDays: Int,
+    val retentionDays: Int = DEFAULT_RETENTION_DAYS,
     @APIDescription("Must the organization name be used as a project name prefix?")
-    val orgProjectPrefix: Boolean,
+    val orgProjectPrefix: Boolean = DEFAULT_ORG_PROJECT_PREFIX,
     @APIDescription("Default indexation interval when configuring the GitHub projects")
-    val indexationInterval: Int,
+    val indexationInterval: Int = DEFAULT_INDEXATION_INTERVAL,
     @APIName("Include repositories")
     @APIDescription("Regular expression to include repositories")
     val repositoryIncludes: String = DEFAULT_REPOSITORY_INCLUDES,

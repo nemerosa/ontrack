@@ -8,11 +8,14 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEvent
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessor
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
+import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
+import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettingsHelper
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettingsMissingTokenException
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -27,6 +30,7 @@ class IngestionHookController(
     private val ingestionHookSignatureService: IngestionHookSignatureService,
     private val securityService: SecurityService,
     private val meterRegistry: MeterRegistry,
+    private val cachedSettingsService: CachedSettingsService,
     ingestionEventProcessors: List<IngestionEventProcessor>,
 ) {
 
@@ -62,6 +66,23 @@ class IngestionHookController(
             json.get("repository").parse<Repository>()
         } else {
             null
+        }
+        // Repository-based filter
+        if (repository != null) {
+            val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
+            if (GitHubIngestionSettingsHelper.excludes(
+                    repository.name,
+                    settings.repositoryIncludes,
+                    settings.repositoryExcludes
+                )
+            ) {
+                return IngestionHookResponse(
+                    message = "Ingestion request for event $gitHubEvent and repository ${repository.fullName} has been received correctly but won't be processed because of the exclusion rules",
+                    uuid = null,
+                    event = gitHubEvent,
+                    processing = false,
+                )
+            }
         }
         // Creates the payload object
         val payload = IngestionHookPayload(
@@ -99,7 +120,7 @@ class IngestionHookController(
 
     class IngestionHookResponse(
         val message: String,
-        val uuid: UUID,
+        val uuid: UUID?,
         val event: String,
         val processing: Boolean,
     )
