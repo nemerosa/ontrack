@@ -5,10 +5,7 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderService
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderServiceITMockConfig
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfig
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfigGeneral
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
@@ -79,6 +76,44 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
     }
 
     @Test
+    fun `Excluding a step based on the ingestion config for step exclusion`() {
+        ConfigLoaderServiceITMockConfig.customIngestionConfig(
+            configLoaderService,
+            IngestionConfig(
+                stepsFilter = FilterConfig(excludes = "publishing.*")
+            )
+        )
+        withGitHubIngestionSettings {
+            project {
+                branch {
+                    build {
+                        runTest(expectedStep = false)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Excluding a step based on the ingestion config for job exclusion`() {
+        ConfigLoaderServiceITMockConfig.customIngestionConfig(
+            configLoaderService,
+            IngestionConfig(
+                jobsFilter = FilterConfig(excludes = "build")
+            )
+        )
+        withGitHubIngestionSettings {
+            project {
+                branch {
+                    build {
+                        runTest(expectedStep = false)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Creation of a simple validation run and the associated job`() {
         ConfigLoaderServiceITMockConfig.customIngestionConfig(
             configLoaderService,
@@ -100,12 +135,24 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
     @Test
     fun `Exclusion of job based on settings`() {
         withGitHubIngestionSettings(jobExcludes = "build") {
+            ConfigLoaderServiceITMockConfig.defaultIngestionConfig(configLoaderService)
+            project {
+                branch {
+                    build {
+                        runTest(step = null, expectedStep = false, expectedJob = false)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Exclusion of job based on the ingestion config`() {
+        withGitHubIngestionSettings {
             ConfigLoaderServiceITMockConfig.customIngestionConfig(
                 configLoaderService,
                 IngestionConfig(
-                    general = IngestionConfigGeneral(
-                        skipJobs = false,
-                    ),
+                    jobsFilter = FilterConfig(excludes = "build")
                 )
             )
             project {

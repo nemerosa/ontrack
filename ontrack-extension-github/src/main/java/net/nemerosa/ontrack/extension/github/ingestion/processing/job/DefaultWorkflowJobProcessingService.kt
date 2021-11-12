@@ -112,12 +112,12 @@ class DefaultWorkflowJobProcessingService(
     }
 
     private fun ignoreJob(job: String, settings: GitHubIngestionSettings, ingestionConfig: IngestionConfig): Boolean =
-        FilterHelper.excludes(job, settings.jobIncludes, settings.jobExcludes)
-    // TODO Filter at ingestion configuration level
+        FilterHelper.excludes(job, settings.jobIncludes, settings.jobExcludes) ||
+                !ingestionConfig.filterJob(job)
 
     private fun ignoreStep(step: String, settings: GitHubIngestionSettings, ingestionConfig: IngestionConfig): Boolean =
-        FilterHelper.excludes(step, settings.stepIncludes, settings.stepExcludes)
-    // TODO Filter at ingestion configuration level
+        FilterHelper.excludes(step, settings.stepIncludes, settings.stepExcludes) ||
+                !ingestionConfig.filterStep(step)
 
     private fun getOrLoadIngestionConfig(repository: Repository, branch: Branch): IngestionConfig {
         val gitBranchProperty =

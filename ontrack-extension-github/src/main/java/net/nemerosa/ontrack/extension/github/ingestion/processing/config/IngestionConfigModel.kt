@@ -11,11 +11,15 @@ const val INGESTION_CONFIG_FILE_PATH = ".github/ontrack/ingestion.yml"
  * @param general General settings
  * @param steps List of specific step configurations
  * @param jobs List of specific job configurations
+ * @param jobsFilter Filtering on the jobs
+ * @param stepsFilter Filtering on the steps
  */
 data class IngestionConfig(
     val general: IngestionConfigGeneral = IngestionConfigGeneral(),
     val steps: List<StepConfig> = emptyList(),
     val jobs: List<JobConfig> = emptyList(),
+    val jobsFilter: FilterConfig = FilterConfig(),
+    val stepsFilter: FilterConfig = FilterConfig(),
 )
 
 /**
@@ -25,6 +29,17 @@ data class IngestionConfig(
  */
 data class IngestionConfigGeneral(
     val skipJobs: Boolean = true,
+)
+
+/**
+ * Filter rule
+ *
+ * @param includes Regular expression to include the items
+ * @param excludes Regular expression to exclude the items (empty = no exclusion)
+ */
+data class FilterConfig(
+    val includes: String = ".*",
+    val excludes: String = "",
 )
 
 /**

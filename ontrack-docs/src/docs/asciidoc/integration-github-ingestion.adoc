@@ -96,6 +96,18 @@ jobs:
     # Description for the validation stamp
     # Default value: the name of the job
     description: Job name
+# Filter for the jobs
+jobsFilter:
+  # Inclusion rule (by default, all jobs are included)
+  includes: ".*"
+  # Exclusion rule (by default, no job is excluded)
+  excluded: ""
+# Filter for the steps
+stepsFilter:
+  # Inclusion rule (by default, all steps are included)
+  includes: ".*"
+  # Exclusion rule (by default, no step is excluded)
+  excluded: ""
 ----
 
 For example, if we want to associate the vaidation stamp `unit-tests` to the step `Runs unit tests` in the `build` job, we can use:

@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class IngestionConfigTest {
 
@@ -158,5 +160,19 @@ class IngestionConfigTest {
                 )
             ).getValidationStampDescription("Job name", "Step name")
         )
+    }
+
+    @Test
+    fun `Filter on jobs`() {
+        assertTrue(IngestionConfig().filterJob("My job"))
+        assertTrue(IngestionConfig(jobsFilter = FilterConfig(includes = "My.*")).filterJob("My job"))
+        assertFalse(IngestionConfig(jobsFilter = FilterConfig(excludes = "My.*")).filterJob("My job"))
+    }
+
+    @Test
+    fun `Filter on steps`() {
+        assertTrue(IngestionConfig().filterStep("My step"))
+        assertTrue(IngestionConfig(stepsFilter = FilterConfig(includes = "My.*")).filterStep("My step"))
+        assertFalse(IngestionConfig(stepsFilter = FilterConfig(excludes = "My.*")).filterStep("My step"))
     }
 }

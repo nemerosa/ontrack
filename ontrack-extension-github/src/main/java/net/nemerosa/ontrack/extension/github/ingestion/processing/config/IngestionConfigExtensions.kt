@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
+import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 
 /**
  * Mapping of a step into a validation stamp name.
@@ -72,3 +73,33 @@ fun IngestionConfig.findStepConfig(step: String): StepConfig? =
  */
 fun IngestionConfig.findJobConfig(job: String): JobConfig? =
     jobs.find { it.name == job }
+
+/**
+ * Checking if a job must be included.
+ *
+ * @receiver The ingestion configuration
+ * @param job Exact name of the job
+ * @return True if the job must be processed
+ */
+fun IngestionConfig.filterJob(job: String): Boolean =
+    jobsFilter.includes(job)
+
+/**
+ * Checking if a step must be included.
+ *
+ * @receiver The ingestion configuration
+ * @param step Exact name of the step
+ * @return True if the step must be processed
+ */
+fun IngestionConfig.filterStep(step: String): Boolean =
+    stepsFilter.includes(step)
+
+/**
+ * Inclusion filter based on the [FilterConfig].
+ *
+ * @receiver The filter config
+ * @param name The value to filter
+ * @receiver True if the [name] must be included
+ */
+fun FilterConfig.includes(name: String) =
+    FilterHelper.includes(name, includes, excludes)
