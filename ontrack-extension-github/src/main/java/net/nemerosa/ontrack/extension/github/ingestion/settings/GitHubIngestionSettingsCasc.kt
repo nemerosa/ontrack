@@ -26,6 +26,12 @@ class GitHubIngestionSettingsCasc(
         cascField(GitHubIngestionSettings::retentionDays, required = false),
         cascField(GitHubIngestionSettings::orgProjectPrefix, required = false),
         cascField(GitHubIngestionSettings::indexationInterval, required = false),
+        cascField(GitHubIngestionSettings::repositoryIncludes, required = false),
+        cascField(GitHubIngestionSettings::repositoryExcludes, required = false),
+        cascField(GitHubIngestionSettings::jobIncludes, required = false),
+        cascField(GitHubIngestionSettings::jobExcludes, required = false),
+        cascField(GitHubIngestionSettings::stepIncludes, required = false),
+        cascField(GitHubIngestionSettings::stepExcludes, required = false),
     )
 
     override fun adjustNodeBeforeParsing(node: JsonNode): JsonNode =
@@ -33,5 +39,11 @@ class GitHubIngestionSettingsCasc(
             GitHubIngestionSettings::retentionDays to GitHubIngestionSettings.DEFAULT_RETENTION_DAYS,
             GitHubIngestionSettings::orgProjectPrefix to GitHubIngestionSettings.DEFAULT_ORG_PROJECT_PREFIX,
             GitHubIngestionSettings::indexationInterval to GitHubIngestionSettings.DEFAULT_INDEXATION_INTERVAL,
+            GitHubIngestionSettings::repositoryIncludes to GitHubIngestionSettings.DEFAULT_REPOSITORY_INCLUDES,
+            GitHubIngestionSettings::repositoryExcludes to GitHubIngestionSettings.DEFAULT_REPOSITORY_EXCLUDES,
+            GitHubIngestionSettings::jobIncludes to GitHubIngestionSettings.DEFAULT_JOB_INCLUDES,
+            GitHubIngestionSettings::jobExcludes to GitHubIngestionSettings.DEFAULT_JOB_EXCLUDES,
+            GitHubIngestionSettings::stepIncludes to GitHubIngestionSettings.DEFAULT_STEP_INCLUDES,
+            GitHubIngestionSettings::stepExcludes to GitHubIngestionSettings.DEFAULT_STEP_EXCLUDES,
         )
 }

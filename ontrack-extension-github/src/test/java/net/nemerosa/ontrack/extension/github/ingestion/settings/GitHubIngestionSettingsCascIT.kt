@@ -32,6 +32,12 @@ class GitHubIngestionSettingsCascIT : AbstractCascTestSupport() {
                 assertEquals(30, settings.retentionDays)
                 assertEquals(false, settings.orgProjectPrefix)
                 assertEquals(30, settings.indexationInterval)
+                assertEquals(".*", settings.repositoryIncludes)
+                assertEquals("", settings.repositoryExcludes)
+                assertEquals(".*", settings.jobIncludes)
+                assertEquals("", settings.jobExcludes)
+                assertEquals(".*", settings.stepIncludes)
+                assertEquals("", settings.stepExcludes)
             }
         }
     }
@@ -58,6 +64,12 @@ class GitHubIngestionSettingsCascIT : AbstractCascTestSupport() {
                                     retentionDays: 60
                                     orgProjectPrefix: true
                                     indexationInterval: 60
+                                    repositoryIncludes: "ontrack-.*"
+                                    repositoryExcludes: ".*pro.*"
+                                    jobIncludes: ".*"
+                                    jobExcludes: ".*prod.*"
+                                    stepIncludes: ".*"
+                                    stepExcludes: ".*ontrack.*"
                 """.trimIndent()
                 )
                 val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
@@ -65,6 +77,12 @@ class GitHubIngestionSettingsCascIT : AbstractCascTestSupport() {
                 assertEquals(60, settings.retentionDays)
                 assertEquals(true, settings.orgProjectPrefix)
                 assertEquals(60, settings.indexationInterval)
+                assertEquals("ontrack-.*", settings.repositoryIncludes)
+                assertEquals(".*pro.*", settings.repositoryExcludes)
+                assertEquals(".*", settings.jobIncludes)
+                assertEquals(".*prod.*", settings.jobExcludes)
+                assertEquals(".*", settings.stepIncludes)
+                assertEquals(".*ontrack.*", settings.stepExcludes)
             }
         }
     }
