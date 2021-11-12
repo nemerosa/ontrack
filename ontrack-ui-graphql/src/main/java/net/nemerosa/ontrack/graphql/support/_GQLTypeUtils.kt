@@ -7,6 +7,7 @@ import graphql.schema.GraphQLOutputType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIName
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
@@ -40,32 +41,44 @@ fun TypeBuilder.booleanField(property: KProperty<Boolean>, description: String? 
             .type(GraphQLBoolean)
     }
 
-fun <T> TypeBuilder.field(property: KProperty<T?>, type: GQLType, description: String? = null): GraphQLObjectType.Builder =
-        field {
-            val outputType: GraphQLOutputType = if (property.returnType.isMarkedNullable) {
-                type.typeRef
-            } else {
-                GraphQLNonNull(type.typeRef)
-            }
-            it.name(property.name)
-                    .description(getDescription(property, description))
-                    .type(outputType)
+fun <T> TypeBuilder.field(
+    property: KProperty<T?>,
+    type: GQLType,
+    description: String? = null
+): GraphQLObjectType.Builder =
+    field {
+        val outputType: GraphQLOutputType = if (property.returnType.isMarkedNullable) {
+            type.typeRef
+        } else {
+            GraphQLNonNull(type.typeRef)
         }
+        it.name(property.name)
+            .description(getDescription(property, description))
+            .type(outputType)
+    }
 
-fun <T> TypeBuilder.field(property: KProperty<T?>, typeName: String, description: String? = null): GraphQLObjectType.Builder =
+fun <T> TypeBuilder.field(
+    property: KProperty<T?>,
+    typeName: String,
+    description: String? = null
+): GraphQLObjectType.Builder =
     field(property, GraphQLTypeReference(typeName), description)
 
-fun <T> TypeBuilder.field(property: KProperty<T?>, ref: GraphQLTypeReference, description: String? = null): GraphQLObjectType.Builder =
-        field {
-            val outputType: GraphQLOutputType = if (property.returnType.isMarkedNullable) {
-                ref
-            } else {
-                GraphQLNonNull(ref)
-            }
-            it.name(property.name)
-                    .description(getDescription(property, description))
-                    .type(outputType)
+fun <T> TypeBuilder.field(
+    property: KProperty<T?>,
+    ref: GraphQLTypeReference,
+    description: String? = null
+): GraphQLObjectType.Builder =
+    field {
+        val outputType: GraphQLOutputType = if (property.returnType.isMarkedNullable) {
+            ref
+        } else {
+            GraphQLNonNull(ref)
         }
+        it.name(property.name)
+            .description(getDescription(property, description))
+            .type(outputType)
+    }
 
 fun <E : Enum<E>> TypeBuilder.enumAsStringField(
     property: KProperty<E?>,
@@ -78,11 +91,11 @@ fun <E : Enum<E>> TypeBuilder.enumAsStringField(
     }
 
 fun TypeBuilder.stringField(property: KProperty<String?>, description: String? = null): GraphQLObjectType.Builder =
-        field {
-            it.name(property.name)
-                .description(getDescription(property, description))
-                .type(nullableOutputType(GraphQLString, property.returnType.isMarkedNullable))
-        }
+    field {
+        it.name(property.name)
+            .description(getDescription(property, description))
+            .type(nullableOutputType(GraphQLString, property.returnType.isMarkedNullable))
+    }
 
 fun TypeBuilder.gqlTypeField(
     name: String,
@@ -100,9 +113,13 @@ fun getDescription(type: KClass<*>, description: String? = null): String =
         ?: type.java.simpleName
 
 fun getDescription(property: KProperty<*>, defaultDescription: String? = null): String =
-        defaultDescription
-                ?: property.findAnnotation<APIDescription>()?.value
-                ?: "${property.name} property"
+    defaultDescription
+        ?: property.findAnnotation<APIDescription>()?.value
+        ?: "${property.name} property"
+
+fun getName(property: KProperty<*>): String =
+    property.findAnnotation<APIName>()?.value
+        ?: property.name
 
 fun nullableOutputType(type: GraphQLOutputType, nullable: Boolean) =
     if (nullable) {

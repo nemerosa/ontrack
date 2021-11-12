@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.settings
 
 import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.settings.SettingsProvider
-import net.nemerosa.ontrack.model.support.SettingsRepository
-import net.nemerosa.ontrack.model.support.getBoolean
-import net.nemerosa.ontrack.model.support.getInt
-import net.nemerosa.ontrack.model.support.getPassword
+import net.nemerosa.ontrack.model.support.*
 import org.springframework.stereotype.Component
 
 @Component
@@ -27,6 +24,30 @@ class GitHubIngestionSettingsProvider(
         indexationInterval = settingsRepository.getInt(
             GitHubIngestionSettings::indexationInterval,
             GitHubIngestionSettings.DEFAULT_INDEXATION_INTERVAL,
+        ),
+        repositoryIncludes = settingsRepository.getString(
+            GitHubIngestionSettings::repositoryIncludes,
+            GitHubIngestionSettings.DEFAULT_REPOSITORY_INCLUDES,
+        ),
+        repositoryExcludes = settingsRepository.getString(
+            GitHubIngestionSettings::repositoryExcludes,
+            GitHubIngestionSettings.DEFAULT_REPOSITORY_EXCLUDES,
+        ),
+        jobIncludes = settingsRepository.getString(
+            GitHubIngestionSettings::jobIncludes,
+            GitHubIngestionSettings.DEFAULT_JOB_INCLUDES,
+        ),
+        jobExcludes = settingsRepository.getString(
+            GitHubIngestionSettings::jobExcludes,
+            GitHubIngestionSettings.DEFAULT_JOB_EXCLUDES,
+        ),
+        stepIncludes = settingsRepository.getString(
+            GitHubIngestionSettings::stepIncludes,
+            GitHubIngestionSettings.DEFAULT_STEP_INCLUDES,
+        ),
+        stepExcludes = settingsRepository.getString(
+            GitHubIngestionSettings::stepExcludes,
+            GitHubIngestionSettings.DEFAULT_STEP_EXCLUDES,
         ),
     )
 
