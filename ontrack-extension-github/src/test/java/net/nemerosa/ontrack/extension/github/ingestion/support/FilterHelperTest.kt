@@ -1,12 +1,12 @@
-package net.nemerosa.ontrack.extension.github.ingestion.settings
+package net.nemerosa.ontrack.extension.github.ingestion.support
 
-import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettingsHelper.excludes
-import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettingsHelper.includes
+import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper.excludes
+import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper.includes
 import org.junit.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class GitHubIngestionSettingsHelperTest {
+class FilterHelperTest {
 
     @Test
     fun `Inclusions and exclusions`() {

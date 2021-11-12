@@ -53,6 +53,32 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
     }
 
     @Test
+    fun `Excluding a step based on the global settings for step exclusion`() {
+        withGitHubIngestionSettings(stepExcludes = "publishing.*") {
+            project {
+                branch {
+                    build {
+                        runTest(expectedStep = false)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Excluding a step based on the global settings for job exclusion`() {
+        withGitHubIngestionSettings(jobExcludes = "build") {
+            project {
+                branch {
+                    build {
+                        runTest(expectedStep = false)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Creation of a simple validation run and the associated job`() {
         ConfigLoaderServiceITMockConfig.customIngestionConfig(
             configLoaderService,
@@ -65,7 +91,28 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
         project {
             branch {
                 build {
-                    runTest()
+                    runTest(step = null, expectedStep = false, expectedJob = true)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Exclusion of job based on settings`() {
+        withGitHubIngestionSettings(jobExcludes = "build") {
+            ConfigLoaderServiceITMockConfig.customIngestionConfig(
+                configLoaderService,
+                IngestionConfig(
+                    general = IngestionConfigGeneral(
+                        skipJobs = false,
+                    ),
+                )
+            )
+            project {
+                branch {
+                    build {
+                        runTest(step = null, expectedStep = false, expectedJob = false)
+                    }
                 }
             }
         }
@@ -161,6 +208,7 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
         step: String? = "Publishing to the repository",
         status: WorkflowJobStepStatus = WorkflowJobStepStatus.completed,
         conclusion: WorkflowJobStepConclusion? = WorkflowJobStepConclusion.success,
+        expectedStep: Boolean = true,
         expectedVsName: String = normalizeName("$job-$step"),
         expectedStatus: String = "PASSED",
         expectedJob: Boolean = false,
@@ -174,33 +222,41 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
             conclusion = conclusion,
         )
         asAdmin {
-            // Checks the validation stamp has been created
-            assertNotNull(
-                structureService.findValidationStampByName(project.name, branch.name, expectedVsName).getOrNull(),
-                "Validation stamp has been created"
-            ) { vs ->
-                // Checks the validation run has been created
-                val runs = structureService.getValidationRunsForBuildAndValidationStamp(
-                    id,
-                    vs.id,
-                    offset = 0,
-                    count = 1
-                )
-                assertNotNull(runs.firstOrNull()) { run ->
-                    assertEquals(expectedStatus, run.lastStatusId)
-                    assertNotNull(runInfoService.getRunInfo(run), "Run info has been set") { info ->
-                        assertEquals(60, info.runTime, "Run time = 60 seconds")
-                        assertEquals("github-workflow", info.sourceType)
-                        assertEquals("uri:job", info.sourceUri)
-                    }
-                    assertNotNull(getProperty(run, ValidationRunGitHubWorkflowJobPropertyType::class.java)) { p ->
-                        assertEquals("build", p.job)
-                        assertEquals("run-name", p.name)
-                        assertEquals(1, p.runNumber)
-                        assertEquals("uri:job", p.url)
-                        assertEquals(false, p.running)
+            if (expectedStep) {
+                // Checks the validation stamp has been created
+                assertNotNull(
+                    structureService.findValidationStampByName(project.name, branch.name, expectedVsName).getOrNull(),
+                    "Validation stamp has been created"
+                ) { vs ->
+                    // Checks the validation run has been created
+                    val runs = structureService.getValidationRunsForBuildAndValidationStamp(
+                        id,
+                        vs.id,
+                        offset = 0,
+                        count = 1
+                    )
+                    assertNotNull(runs.firstOrNull()) { run ->
+                        assertEquals(expectedStatus, run.lastStatusId)
+                        assertNotNull(runInfoService.getRunInfo(run), "Run info has been set") { info ->
+                            assertEquals(60, info.runTime, "Run time = 60 seconds")
+                            assertEquals("github-workflow", info.sourceType)
+                            assertEquals("uri:job", info.sourceUri)
+                        }
+                        assertNotNull(getProperty(run, ValidationRunGitHubWorkflowJobPropertyType::class.java)) { p ->
+                            assertEquals("build", p.job)
+                            assertEquals("run-name", p.name)
+                            assertEquals(1, p.runNumber)
+                            assertEquals("uri:job", p.url)
+                            assertEquals(false, p.running)
+                        }
                     }
                 }
+            } else {
+                // Checks the validation stamp has NOT been created
+                assertNull(
+                    structureService.findValidationStampByName(project.name, branch.name, expectedVsName).getOrNull(),
+                    "Validation stamp has not been created"
+                )
             }
             // Checks the validation stamp & run for the job
             if (expectedJob) {

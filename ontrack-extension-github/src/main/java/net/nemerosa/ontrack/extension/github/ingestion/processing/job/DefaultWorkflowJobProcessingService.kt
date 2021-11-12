@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Workflow
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.getProjectName
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
+import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobProperty
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobPropertyType
@@ -56,6 +57,9 @@ class DefaultWorkflowJobProcessingService(
         if (step == null && ingestionConfig.general.skipJobs) {
             return
         }
+        // Filtering on jobs and steps
+        if (ignoreJob(job, settings, ingestionConfig)) return
+        if (step != null && ignoreStep(step, settings, ingestionConfig)) return
         // Gets the run property
         val runProperty = propertyService.getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java).value
             ?: error("Cannot find workflow run property on build")
@@ -106,6 +110,14 @@ class DefaultWorkflowJobProcessingService(
             )
         }
     }
+
+    private fun ignoreJob(job: String, settings: GitHubIngestionSettings, ingestionConfig: IngestionConfig): Boolean =
+        FilterHelper.excludes(job, settings.jobIncludes, settings.jobExcludes)
+    // TODO Filter at ingestion configuration level
+
+    private fun ignoreStep(step: String, settings: GitHubIngestionSettings, ingestionConfig: IngestionConfig): Boolean =
+        FilterHelper.excludes(step, settings.stepIncludes, settings.stepExcludes)
+    // TODO Filter at ingestion configuration level
 
     private fun getOrLoadIngestionConfig(repository: Repository, branch: Branch): IngestionConfig {
         val gitBranchProperty =

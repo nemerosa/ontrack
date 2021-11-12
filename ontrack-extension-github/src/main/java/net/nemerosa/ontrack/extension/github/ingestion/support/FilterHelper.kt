@@ -1,6 +1,6 @@
-package net.nemerosa.ontrack.extension.github.ingestion.settings
+package net.nemerosa.ontrack.extension.github.ingestion.support
 
-object GitHubIngestionSettingsHelper {
+object FilterHelper {
 
     fun includes(name: String, includes: String, excludes: String): Boolean {
         val includesRegex = includes.toRegex(RegexOption.IGNORE_CASE)

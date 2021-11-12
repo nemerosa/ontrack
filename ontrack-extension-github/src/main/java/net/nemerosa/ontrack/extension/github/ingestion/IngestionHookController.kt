@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEvent
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
-import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettingsHelper
+import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettingsMissingTokenException
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
@@ -70,7 +70,7 @@ class IngestionHookController(
         // Repository-based filter
         if (repository != null) {
             val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
-            if (GitHubIngestionSettingsHelper.excludes(
+            if (FilterHelper.excludes(
                     repository.name,
                     settings.repositoryIncludes,
                     settings.repositoryExcludes

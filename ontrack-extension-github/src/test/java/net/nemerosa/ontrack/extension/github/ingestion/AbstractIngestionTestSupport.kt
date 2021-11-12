@@ -8,6 +8,8 @@ abstract class AbstractIngestionTestSupport : AbstractGitHubTestSupport() {
 
     protected fun withGitHubIngestionSettings(
         @Suppress("SameParameterValue") orgProjectPrefix: Boolean? = false,
+        stepExcludes: String? = GitHubIngestionSettings.DEFAULT_STEP_EXCLUDES,
+        jobExcludes: String? = GitHubIngestionSettings.DEFAULT_JOB_EXCLUDES,
         code: () -> Unit,
     ) {
         withSettings<GitHubIngestionSettings> {
@@ -17,6 +19,8 @@ abstract class AbstractIngestionTestSupport : AbstractGitHubTestSupport() {
                 retentionDays = old.retentionDays,
                 orgProjectPrefix = orgProjectPrefix ?: old.orgProjectPrefix,
                 indexationInterval = old.indexationInterval,
+                stepExcludes = stepExcludes ?: old.stepExcludes,
+                jobExcludes = jobExcludes ?: old.jobExcludes,
             )
             asAdmin {
                 settingsManagerService.saveSettings(new)
