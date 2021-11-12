@@ -116,6 +116,10 @@ In the _Settings > GitHub workflow ingestion_ section, you can configure the fol
 * the secret token used by the GitHub hook
 * the number of days GitHub hook payloads are kept by Ontrack
 * if the organization name must be used as a prefix for the generated project names
+* the default Git indexation interval to use for the projects
+* inclusion/exclusion rules for the repositories to be ingested
+* inclusion/exclusion rules for the jobs to be ingested
+* inclusion/exclusion rules for the steps to be ingested
 
 [[integration-github-ingestion-management]]
 ==== Management
