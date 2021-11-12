@@ -69,9 +69,21 @@ fun <T> MeterRegistry.timeForPayload(
  */
 private fun IngestionHookPayload.metricsTags() = arrayOf(
     INGESTION_METRIC_EVENT_TAG to gitHubEvent,
+    INGESTION_METRIC_OWNER_TAG to (repository?.owner?.login ?: ""),
+    INGESTION_METRIC_REPOSITORY_TAG to (repository?.name ?: ""),
 )
 
 /**
  * Event tag
  */
 const val INGESTION_METRIC_EVENT_TAG = "event"
+
+/**
+ * Owner tag
+ */
+const val INGESTION_METRIC_OWNER_TAG = "owner"
+
+/**
+ * Owner tag
+ */
+const val INGESTION_METRIC_REPOSITORY_TAG = "repository"

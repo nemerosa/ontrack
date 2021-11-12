@@ -16,7 +16,7 @@ class DirectIngestionHookQueue(
     private val meterRegistry: MeterRegistry,
 ) : IngestionHookQueue {
     override fun queue(payload: IngestionHookPayload) {
-        meterRegistry.increment(payload, IngestionMetrics.RECEIVED_COUNT)
+        meterRegistry.increment(payload, IngestionMetrics.Queue.receivedCount)
         subscriber.onIngestionHookPayload(payload)
     }
 }

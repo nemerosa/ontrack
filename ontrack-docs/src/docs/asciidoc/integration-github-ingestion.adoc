@@ -168,18 +168,92 @@ image::images/integration-github-ingestion-management-details.png[Payload detail
 [[integration-github-ingestion-metrics]]
 ==== Metrics
 
-The following metric is exported to track the number of calls received where the security signature does not match:
+The metrics are grouped in the following categories:
 
-* `ontrack_extension_github_ingestion_signature_error_count` - the `event` tag contains the GitHub event
+* hook reception level
+* ingestion queing
+* ingestion processing
 
-The following processing metrics are exported by Ontrack:
+[[integration-github-ingestion-metrics-hook]]
+===== Hook metrics
 
-* `ontrack_extension_github_ingestion_received_count` - number of payloads being received
-* `ontrack_extension_github_ingestion_processing_started_count` - number of payloads whose processing has started
-* `ontrack_extension_github_ingestion_processing_success_count` - number of payloads whose processing has completed successfully
-* `ontrack_extension_github_ingestion_processing_ignored_count` - number of payloads which were not processed under normal circumstances (exclusion rules for example)
-* `ontrack_extension_github_ingestion_processing_error_count` - number of payloads whose processing has failed
-* `ontrack_extension_github_ingestion_processing_finished_count` - number of payloads whose processing has completed, with an error or not
-* `ontrack_extension_github_ingestion_processing_time` - timer (in milliseconds) for the processing times
+|===
+|Metric |Type |Tags |Description
 
-All the processing metrics have the `event` tag attached.
+|ontrack_extension_github_ingestion_hook_signature_error_count
+|Counter
+|event
+|Number of rejections because of signature mismatch
+
+| ontrack_extension_github_ingestion_hook_repository_rejected_count
+|Counter
+|event,owner,repository
+|Number of repository-based events rejected because the repository was rejected
+
+|ontrack_extension_github_ingestion_hook_repository_accepted_count
+|Counter
+|event,owner,repository
+|Number of accepted repository-based events
+
+|ontrack_extension_github_ingestion_hook_accepted_count
+|Counter
+|event,owner?,repository?
+|Number of events which are scheduled for processing
+
+|ontrack_extension_github_ingestion_hook_ignored_count
+|Counter
+|event,owner?,repository?
+|Number of events which were accepted but won't be processed
+|===
+
+[[integration-github-ingestion-metrics-queue]]
+===== Queue metrics
+
+|===
+|Metric |Type |Tags |Description
+
+|ontrack_extension_github_ingestion_queue_received_count
+|Counter
+|event,owner?,repository?
+|Number of payloads received by the queue(s)
+
+|===
+
+[[integration-github-ingestion-metrics-process]]
+===== Processing metrics
+
+|===
+|Metric |Type |Tags |Description
+
+|ontrack_extension_github_ingestion_process_started_count
+|Counter
+|event,owner?,repository?
+|Number of payloads whose processing has started
+
+|ontrack_extension_github_ingestion_process_success_count
+|Counter
+|event,owner?,repository?
+|Number of payloads whose processing has succeeded
+
+|ontrack_extension_github_ingestion_process_ignored_count
+|Counter
+|event,owner?,repository?
+|Number of payloads whose processing has been ignored
+
+|ontrack_extension_github_ingestion_process_error_count
+|Counter
+|event,owner?,repository?
+|Number of payloads whose processing has finished with an error
+
+|ontrack_extension_github_ingestion_process_finished_count
+|Counter
+|event,owner?,repository?
+|Number of payloads whose processing has finished
+
+|ontrack_extension_github_ingestion_process_time
+|Timer
+|event,owner?,repository?
+|Time it took to process this payload
+
+|===
+

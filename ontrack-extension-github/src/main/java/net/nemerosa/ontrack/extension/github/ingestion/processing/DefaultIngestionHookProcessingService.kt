@@ -28,20 +28,20 @@ class DefaultIngestionHookProcessingService(
 
     override fun process(payload: IngestionHookPayload) {
         ingestionHookPayloadStorage.start(payload)
-        meterRegistry.increment(payload, IngestionMetrics.PROCESSING_STARTED_COUNT)
+        meterRegistry.increment(payload, IngestionMetrics.Process.startedCount)
         securityService.asAdmin {
             try {
-                meterRegistry.timeForPayload(payload, IngestionMetrics.PROCESSING_TIME) {
+                meterRegistry.timeForPayload(payload, IngestionMetrics.Process.time) {
                     val outcome = doProcess(payload)
                     val metric = when (outcome) {
-                        IngestionEventProcessingResult.PROCESSED -> IngestionMetrics.PROCESSING_SUCCESS_COUNT
-                        IngestionEventProcessingResult.IGNORED -> IngestionMetrics.PROCESSING_IGNORED_COUNT
+                        IngestionEventProcessingResult.PROCESSED -> IngestionMetrics.Process.successCount
+                        IngestionEventProcessingResult.IGNORED -> IngestionMetrics.Process.ignoredCount
                     }
                     meterRegistry.increment(payload, metric)
                 }
                 ingestionHookPayloadStorage.finished(payload)
             } catch (any: Throwable) {
-                meterRegistry.increment(payload, IngestionMetrics.PROCESSING_ERROR_COUNT)
+                meterRegistry.increment(payload, IngestionMetrics.Process.errorCount)
                 ingestionHookPayloadStorage.error(payload, any)
                 applicationLogService.log(
                     ApplicationLogEntry.error(
@@ -55,7 +55,7 @@ class DefaultIngestionHookProcessingService(
                     )
                 )
             } finally {
-                meterRegistry.increment(payload, IngestionMetrics.PROCESSING_FINISHED_COUNT)
+                meterRegistry.increment(payload, IngestionMetrics.Process.finishedCount)
             }
         }
     }

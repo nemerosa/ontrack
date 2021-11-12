@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.github.ingestion
 
 import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.github.ingestion.metrics.INGESTION_METRIC_EVENT_TAG
+import net.nemerosa.ontrack.extension.github.ingestion.metrics.INGESTION_METRIC_OWNER_TAG
+import net.nemerosa.ontrack.extension.github.ingestion.metrics.INGESTION_METRIC_REPOSITORY_TAG
 import net.nemerosa.ontrack.extension.github.ingestion.metrics.IngestionMetrics
 import net.nemerosa.ontrack.extension.github.ingestion.payload.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
@@ -9,8 +11,8 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEvent
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
-import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettingsMissingTokenException
+import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.metrics.increment
@@ -53,7 +55,7 @@ class IngestionHookController(
         val json = when (ingestionHookSignatureService.checkPayloadSignature(body, signature)) {
             IngestionHookSignatureCheckResult.MISMATCH -> {
                 meterRegistry.increment(
-                    IngestionMetrics.SIGNATURE_ERROR_COUNT,
+                    IngestionMetrics.Hook.signatureErrorCount,
                     INGESTION_METRIC_EVENT_TAG to gitHubEvent,
                 )
                 throw GitHubIngestionHookSignatureMismatchException()
@@ -76,11 +78,24 @@ class IngestionHookController(
                     settings.repositoryExcludes
                 )
             ) {
+                meterRegistry.increment(
+                    IngestionMetrics.Hook.repositoryRejectedCount,
+                    INGESTION_METRIC_EVENT_TAG to gitHubEvent,
+                    INGESTION_METRIC_OWNER_TAG to repository.owner.login,
+                    INGESTION_METRIC_REPOSITORY_TAG to repository.name,
+                )
                 return IngestionHookResponse(
                     message = "Ingestion request for event $gitHubEvent and repository ${repository.fullName} has been received correctly but won't be processed because of the exclusion rules",
                     uuid = null,
                     event = gitHubEvent,
                     processing = false,
+                )
+            } else {
+                meterRegistry.increment(
+                    IngestionMetrics.Hook.repositoryAcceptedCount,
+                    INGESTION_METRIC_EVENT_TAG to gitHubEvent,
+                    INGESTION_METRIC_OWNER_TAG to repository.owner.login,
+                    INGESTION_METRIC_REPOSITORY_TAG to repository.name,
                 )
             }
         }
@@ -97,6 +112,12 @@ class IngestionHookController(
         // Pre-sorting
         return when (eventProcessor.preProcessingCheck(payload)) {
             IngestionEventPreprocessingCheck.TO_BE_PROCESSED -> securityService.asAdmin {
+                meterRegistry.increment(
+                    IngestionMetrics.Hook.acceptedCount,
+                    INGESTION_METRIC_EVENT_TAG to gitHubEvent,
+                    INGESTION_METRIC_OWNER_TAG to (repository?.owner?.login ?: ""),
+                    INGESTION_METRIC_REPOSITORY_TAG to (repository?.name ?: ""),
+                )
                 // Stores it
                 storage.store(payload)
                 // Pushes it on the queue
@@ -109,12 +130,20 @@ class IngestionHookController(
                     processing = true,
                 )
             }
-            IngestionEventPreprocessingCheck.IGNORED -> IngestionHookResponse(
-                message = "Ingestion request ${payload.uuid}/${payload.gitHubEvent} has been received correctly but won't be processed.",
-                uuid = payload.uuid,
-                event = payload.gitHubEvent,
-                processing = false,
-            )
+            IngestionEventPreprocessingCheck.IGNORED -> {
+                meterRegistry.increment(
+                    IngestionMetrics.Hook.ignoredCount,
+                    INGESTION_METRIC_EVENT_TAG to gitHubEvent,
+                    INGESTION_METRIC_OWNER_TAG to (repository?.owner?.login ?: ""),
+                    INGESTION_METRIC_REPOSITORY_TAG to (repository?.name ?: ""),
+                )
+                IngestionHookResponse(
+                    message = "Ingestion request ${payload.uuid}/${payload.gitHubEvent} has been received correctly but won't be processed.",
+                    uuid = payload.uuid,
+                    event = payload.gitHubEvent,
+                    processing = false,
+                )
+            }
         }
     }
 
