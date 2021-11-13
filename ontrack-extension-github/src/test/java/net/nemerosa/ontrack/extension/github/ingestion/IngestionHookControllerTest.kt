@@ -28,7 +28,7 @@ class IngestionHookControllerTest {
         val storage = mockk<IngestionHookPayloadStorage>()
         val queue = mockk<IngestionHookQueue>()
         val securityService = MockSecurityService()
-        val meterRegistry = mockk<MeterRegistry>()
+        val meterRegistry = mockk<MeterRegistry>(relaxed = true)
 
         val ingestionEventProcessor = mockIngestionEventProcessor()
         every { ingestionEventProcessor.preProcessingCheck(any()) } returns IngestionEventPreprocessingCheck.TO_BE_PROCESSED
@@ -77,7 +77,7 @@ class IngestionHookControllerTest {
         val storage = mockk<IngestionHookPayloadStorage>()
         val queue = mockk<IngestionHookQueue>()
         val securityService = MockSecurityService()
-        val meterRegistry = mockk<MeterRegistry>()
+        val meterRegistry = mockk<MeterRegistry>(relaxed = true)
 
         val ingestionEventProcessor = mockIngestionEventProcessor()
         every { ingestionEventProcessor.preProcessingCheck(any()) } returns IngestionEventPreprocessingCheck.TO_BE_PROCESSED
@@ -196,7 +196,7 @@ class IngestionHookControllerTest {
         val storage = mockk<IngestionHookPayloadStorage>()
         val queue = mockk<IngestionHookQueue>()
         val securityService = MockSecurityService()
-        val meterRegistry = mockk<MeterRegistry>()
+        val meterRegistry = mockk<MeterRegistry>(relaxed = true)
         val ingestionEventProcessor = mockIngestionEventProcessor("ping")
         every { ingestionEventProcessor.preProcessingCheck(any()) } returns IngestionEventPreprocessingCheck.IGNORED
 
