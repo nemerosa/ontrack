@@ -10,6 +10,8 @@ abstract class AbstractIngestionTestSupport : AbstractGitHubTestSupport() {
         @Suppress("SameParameterValue") orgProjectPrefix: Boolean? = false,
         stepExcludes: String? = GitHubIngestionSettings.DEFAULT_STEP_EXCLUDES,
         jobExcludes: String? = GitHubIngestionSettings.DEFAULT_JOB_EXCLUDES,
+        issueServiceIdentifier: String? = GitHubIngestionSettings.DEFAULT_ISSUE_SERVICE_IDENTIFIER,
+        indexationInterval: Int? = GitHubIngestionSettings.DEFAULT_INDEXATION_INTERVAL,
         code: () -> Unit,
     ) {
         withSettings<GitHubIngestionSettings> {
@@ -18,9 +20,10 @@ abstract class AbstractIngestionTestSupport : AbstractGitHubTestSupport() {
                 token = old.token,
                 retentionDays = old.retentionDays,
                 orgProjectPrefix = orgProjectPrefix ?: old.orgProjectPrefix,
-                indexationInterval = old.indexationInterval,
                 stepExcludes = stepExcludes ?: old.stepExcludes,
                 jobExcludes = jobExcludes ?: old.jobExcludes,
+                indexationInterval = indexationInterval ?: old.indexationInterval,
+                issueServiceIdentifier = issueServiceIdentifier ?: old.issueServiceIdentifier,
             )
             asAdmin {
                 settingsManagerService.saveSettings(new)

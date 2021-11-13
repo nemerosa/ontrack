@@ -96,7 +96,7 @@ class DefaultIngestionModelAccessService(
                     configuration = configuration,
                     repository = repository.fullName,
                     indexationInterval = settings.indexationInterval,
-                    issueServiceConfigurationIdentifier = "self"  // TODO Make it configurable
+                    issueServiceConfigurationIdentifier = settings.issueServiceIdentifier,
                 )
             )
         }

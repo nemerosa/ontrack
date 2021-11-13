@@ -113,13 +113,31 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
         }
     }
 
+    @Test
+    fun `Configuration of the issue service identifier`() {
+        val config = onlyOneGitHubConfig()
+        testProject(config, issueServiceIdentifier = "jira//config")
+    }
+
+    @Test
+    fun `Configuration of the indexation interval`() {
+        val config = onlyOneGitHubConfig()
+        testProject(config, indexationInterval = 60)
+    }
+
     private fun testProject(
         config: GitHubEngineConfiguration?,
         owner: String = "nemerosa",
         name: String = "github-ingestion-poc",
         htmlUrl: String = "${config?.url ?: "https://github.com"}/$owner/$name",
+        issueServiceIdentifier: String = "self",
+        indexationInterval: Int = 30,
     ) {
-        withGitHubIngestionSettings(orgProjectPrefix = false) {
+        withGitHubIngestionSettings(
+            orgProjectPrefix = false,
+            issueServiceIdentifier = issueServiceIdentifier,
+            indexationInterval = indexationInterval,
+        ) {
             asAdmin {
                 ingestionModelAccessService.getOrCreateProject(
                     Repository(
@@ -137,8 +155,8 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
                     ) {
                         assertEquals(config?.name, it.configuration.name)
                         assertEquals("$owner/$name", it.repository)
-                        assertEquals(30, it.indexationInterval)
-                        assertEquals("self", it.issueServiceConfigurationIdentifier)
+                        assertEquals(indexationInterval, it.indexationInterval)
+                        assertEquals(issueServiceIdentifier, it.issueServiceConfigurationIdentifier)
                     }
                 }
             }

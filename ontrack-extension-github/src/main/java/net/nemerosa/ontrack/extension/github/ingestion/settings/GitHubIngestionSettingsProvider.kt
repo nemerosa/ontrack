@@ -49,6 +49,10 @@ class GitHubIngestionSettingsProvider(
             GitHubIngestionSettings::stepExcludes,
             GitHubIngestionSettings.DEFAULT_STEP_EXCLUDES,
         ),
+        issueServiceIdentifier = settingsRepository.getString(
+            GitHubIngestionSettings::issueServiceIdentifier,
+            GitHubIngestionSettings.DEFAULT_ISSUE_SERVICE_IDENTIFIER,
+        ),
     )
 
     override fun getSettingsClass(): Class<GitHubIngestionSettings> = GitHubIngestionSettings::class.java

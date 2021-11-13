@@ -12,7 +12,7 @@ data class IssueServiceConfigurationIdentifier(
 
     companion object {
 
-        private const val DELIMITER = "//"
+        const val DELIMITER = "//"
 
         @JvmStatic
         fun parse(value: String?): IssueServiceConfigurationIdentifier? {

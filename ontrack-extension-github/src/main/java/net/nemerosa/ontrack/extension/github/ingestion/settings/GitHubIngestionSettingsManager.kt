@@ -46,6 +46,7 @@ class GitHubIngestionSettingsManager(
         settingsRepository.setString<GitHubIngestionSettings>(settings::jobExcludes)
         settingsRepository.setString<GitHubIngestionSettings>(settings::stepIncludes)
         settingsRepository.setString<GitHubIngestionSettings>(settings::stepExcludes)
+        settingsRepository.setString<GitHubIngestionSettings>(settings::issueServiceIdentifier)
     }
 
     override fun getSettingsForm(settings: GitHubIngestionSettings?): Form =
@@ -110,6 +111,12 @@ class GitHubIngestionSettingsManager(
                     .label(getName(GitHubIngestionSettings::stepExcludes))
                     .help(getDescription(GitHubIngestionSettings::stepExcludes))
                     .value(settings?.stepExcludes ?: GitHubIngestionSettings.DEFAULT_STEP_EXCLUDES)
+            )
+            .with(
+                Text.of(GitHubIngestionSettings::issueServiceIdentifier.name)
+                    .label(getName(GitHubIngestionSettings::issueServiceIdentifier))
+                    .help(getDescription(GitHubIngestionSettings::issueServiceIdentifier))
+                    .value(settings?.issueServiceIdentifier ?: GitHubIngestionSettings.DEFAULT_ISSUE_SERVICE_IDENTIFIER)
             )
 
     override fun getId(): String = "github-ingestion"

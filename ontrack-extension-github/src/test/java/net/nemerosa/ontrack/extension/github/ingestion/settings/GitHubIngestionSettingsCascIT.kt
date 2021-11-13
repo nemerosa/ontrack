@@ -38,6 +38,7 @@ class GitHubIngestionSettingsCascIT : AbstractCascTestSupport() {
                 assertEquals("", settings.jobExcludes)
                 assertEquals(".*", settings.stepIncludes)
                 assertEquals("", settings.stepExcludes)
+                assertEquals("self", settings.issueServiceIdentifier)
             }
         }
     }
@@ -70,6 +71,7 @@ class GitHubIngestionSettingsCascIT : AbstractCascTestSupport() {
                                     jobExcludes: ".*prod.*"
                                     stepIncludes: ".*"
                                     stepExcludes: ".*ontrack.*"
+                                    issueServiceIdentifier: "jira//config"
                 """.trimIndent()
                 )
                 val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
@@ -83,6 +85,7 @@ class GitHubIngestionSettingsCascIT : AbstractCascTestSupport() {
                 assertEquals(".*prod.*", settings.jobExcludes)
                 assertEquals(".*", settings.stepIncludes)
                 assertEquals(".*ontrack.*", settings.stepExcludes)
+                assertEquals("jira//config", settings.issueServiceIdentifier)
             }
         }
     }

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.settings
 
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIName
 
@@ -44,6 +45,9 @@ class GitHubIngestionSettings(
     @APIName("Exclude steps")
     @APIDescription("Regular expression to exclude steps")
     val stepExcludes: String = DEFAULT_STEP_EXCLUDES,
+    @APIName("Default issue service identifier")
+    @APIDescription("Identifier of the issue service to use by default. For example `self` for GitHub issues or `jira//config`.")
+    val issueServiceIdentifier: String = DEFAULT_ISSUE_SERVICE_IDENTIFIER,
 ) {
     companion object {
         /**
@@ -90,5 +94,10 @@ class GitHubIngestionSettings(
          * By default, not excluding any step
          */
         const val DEFAULT_STEP_EXCLUDES = ""
+
+        /**
+         * By default, using the GitHub issues.
+         */
+        const val DEFAULT_ISSUE_SERVICE_IDENTIFIER = IssueServiceConfigurationRepresentation.SELF_ID
     }
 }

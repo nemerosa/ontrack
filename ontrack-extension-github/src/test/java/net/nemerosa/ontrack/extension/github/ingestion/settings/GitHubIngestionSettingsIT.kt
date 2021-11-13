@@ -16,12 +16,14 @@ class GitHubIngestionSettingsIT : AbstractDSLTestSupport() {
                         retentionDays = 10,
                         orgProjectPrefix = false,
                         indexationInterval = 60,
+                        issueServiceIdentifier = "jira//config",
                     )
                 )
                 cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java).apply {
                     assertEquals("secret", token)
                     assertEquals(10, retentionDays)
                     assertEquals(60, indexationInterval)
+                    assertEquals("jira//config", issueServiceIdentifier)
                 }
             }
         }

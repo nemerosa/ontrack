@@ -18,7 +18,7 @@ class IssueServiceConfigurationRepresentation(
 
     companion object {
 
-        private const val SELF_ID = "self"
+        const val SELF_ID = "self"
 
         fun of(issueServiceExtension: IssueServiceExtension, issueServiceConfiguration: IssueServiceConfiguration): IssueServiceConfigurationRepresentation {
             return IssueServiceConfigurationRepresentation(

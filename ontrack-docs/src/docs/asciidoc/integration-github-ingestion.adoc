@@ -132,6 +132,7 @@ In the _Settings > GitHub workflow ingestion_ section, you can configure the fol
 * inclusion/exclusion rules for the repositories to be ingested
 * inclusion/exclusion rules for the jobs to be ingested
 * inclusion/exclusion rules for the steps to be ingested
+* the identifier of the issue service to use by default. For example `self` for GitHub issues or `jira//config`.
 
 [[integration-github-ingestion-management]]
 ==== Management
