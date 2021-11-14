@@ -40,6 +40,10 @@ class DefaultConfigService(
         }
     }
 
+    override fun saveConfig(branch: Branch, config: IngestionConfig) {
+        config.store(branch)
+    }
+
     private fun IngestionConfig.store(ontrackBranch: Branch) {
         entityDataService.store(
             ontrackBranch,
@@ -68,6 +72,8 @@ class DefaultConfigService(
         )
         return load(ontrackBranch)
     }
+
+    override fun findConfig(branch: Branch): IngestionConfig? = load(branch)
 
     private fun load(ontrackBranch: Branch) = entityDataService.retrieve(
         ontrackBranch,

@@ -8,6 +8,20 @@ import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
 
 /**
+ * Getting the type name for a class.
+ *
+ * Will use by order to priority:
+ *
+ * # the provided [name] if any
+ * # the [APIName] annotation if any
+ * # the simple name of the class
+ */
+fun getTypeName(type: KClass<*>, name: String? = null): String =
+    name
+        ?: type.findAnnotation<APIName>()?.value
+        ?: type.java.simpleName
+
+/**
  * Getting the description for a class.
  *
  * Will use by order to priority:
@@ -17,9 +31,9 @@ import kotlin.reflect.full.findAnnotation
  * # a generated string based on the type name
  */
 fun getTypeDescription(type: KClass<*>, description: String? = null): String =
-        description
-                ?: type.findAnnotation<APIDescription>()?.value
-                ?: type.java.simpleName
+    description
+        ?: type.findAnnotation<APIDescription>()?.value
+        ?: type.java.simpleName
 
 /**
  * Getting the description for a property.
@@ -28,9 +42,9 @@ fun getTypeDescription(type: KClass<*>, description: String? = null): String =
  * and as a fallback, a generated string based on the property name.
  */
 fun getPropertyDescription(property: KProperty<*>, description: String? = null): String =
-        description
-                ?: property.findAnnotation<APIDescription>()?.value
-                ?: "${getPropertyName(property)} field"
+    description
+        ?: property.findAnnotation<APIDescription>()?.value
+        ?: "${getPropertyName(property)} field"
 
 
 /**
@@ -44,7 +58,7 @@ fun getPropertyDescription(property: KProperty<*>, description: String? = null):
  * # the property name
  */
 fun getPropertyName(property: KProperty<*>): String =
-        property.findAnnotation<APIName>()?.value
-                ?: property.findAnnotation<JsonProperty>()?.value
-                ?: property.getter.findAnnotation<JsonProperty>()?.value
-                ?: property.name
+    property.findAnnotation<APIName>()?.value
+        ?: property.findAnnotation<JsonProperty>()?.value
+        ?: property.getter.findAnnotation<JsonProperty>()?.value
+        ?: property.name

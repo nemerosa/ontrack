@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
+import net.nemerosa.ontrack.model.structure.Branch
 
 /**
  * Management of ingestion configurations.
@@ -17,6 +18,14 @@ interface ConfigService {
     fun saveConfig(repository: Repository, branch: String, path: String): IngestionConfig?
 
     /**
+     * Saves a configuration for a branch.
+     *
+     * @param branch Branch
+     * @param config Configuration to save
+     */
+    fun saveConfig(branch: Branch, config: IngestionConfig)
+
+    /**
      * Removes the ingestion configuration for a repository.
      *
      * @param repository GitHub repository
@@ -28,6 +37,11 @@ interface ConfigService {
      * Loads the existing ingestion configuration for a repository and a branch.
      */
     fun findConfig(repository: Repository, branch: String): IngestionConfig?
+
+    /**
+     * Loads the existing ingestion configuration for a branch.
+     */
+    fun findConfig(branch: Branch): IngestionConfig?
 
     /**
      * Gets the existing configuration for a repository and a branch, loads it if necessary.
