@@ -18,7 +18,7 @@ const val INGESTION_CONFIG_FILE_PATH = ".github/ontrack/ingestion.yml"
  * @param stepsFilter Filtering on the steps
  */
 @APIName("GitHubIngestionConfig")
-@APIDescription("Configuration for the ingestion of GitHub Actions worrkflows.")
+@APIDescription("Configuration for the ingestion of GitHub Actions workflows.")
 data class IngestionConfig(
     @APIDescription("General settings")
     val general: IngestionConfigGeneral = IngestionConfigGeneral(),

@@ -20,4 +20,10 @@ object ConfigParser {
             null // Ignoring any parsing exception
         }
 
+    /**
+     * Renders the [config][ingestion config] as a YAML document.
+     */
+    fun toYaml(config: IngestionConfig): String =
+        mapper.writeValueAsString(config)
+
 }

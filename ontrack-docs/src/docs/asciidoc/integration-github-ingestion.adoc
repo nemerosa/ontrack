@@ -120,6 +120,44 @@ steps:
     validationJobPrefix: false
 ----
 
+The ingestion configuration is saved together with the branch and is visible in the UI as an extra information:
+
+image::images/integration-github-ingestion-branch-config.png[Branch ingestion configuration,50%]
+
+This information is also available programmatically using a GraphQL query:
+
+[source,graphql]
+----
+{
+  branches(id: 589) {
+    gitHubIngestionConfig {
+      general {
+        skipJobs
+      }
+      steps {
+        name
+        validation
+        validationJobPrefix
+        description
+      }
+      jobs {
+        name
+        validation
+        description
+      }
+      jobsFilter {
+        includes
+        excludes
+      }
+      stepsFilter {
+        includes
+        excludes
+      }
+    }
+  }
+}
+----
+
 [[integration-github-ingestion-settings]]
 ==== General settings
 

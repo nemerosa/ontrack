@@ -86,6 +86,7 @@ class GitHubIngestionSettingsManager(
                 Text.of(GitHubIngestionSettings::repositoryExcludes.name)
                     .label(getName(GitHubIngestionSettings::repositoryExcludes))
                     .help(getDescription(GitHubIngestionSettings::repositoryExcludes))
+                    .optional()
                     .value(settings?.repositoryExcludes ?: GitHubIngestionSettings.DEFAULT_REPOSITORY_EXCLUDES)
             )
             .with(
@@ -98,6 +99,7 @@ class GitHubIngestionSettingsManager(
                 Text.of(GitHubIngestionSettings::jobExcludes.name)
                     .label(getName(GitHubIngestionSettings::jobExcludes))
                     .help(getDescription(GitHubIngestionSettings::jobExcludes))
+                    .optional()
                     .value(settings?.jobExcludes ?: GitHubIngestionSettings.DEFAULT_JOB_EXCLUDES)
             )
             .with(
@@ -110,6 +112,7 @@ class GitHubIngestionSettingsManager(
                 Text.of(GitHubIngestionSettings::stepExcludes.name)
                     .label(getName(GitHubIngestionSettings::stepExcludes))
                     .help(getDescription(GitHubIngestionSettings::stepExcludes))
+                    .optional()
                     .value(settings?.stepExcludes ?: GitHubIngestionSettings.DEFAULT_STEP_EXCLUDES)
             )
             .with(

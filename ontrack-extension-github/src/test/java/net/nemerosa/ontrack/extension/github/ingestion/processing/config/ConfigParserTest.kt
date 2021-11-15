@@ -63,6 +63,43 @@ class ConfigParserTest {
         }
     }
 
+    @Test
+    fun `Rendering a configuration as Yaml`() {
+        val yaml = ConfigParser.toYaml(
+            IngestionConfig(
+                steps = listOf(
+                    StepConfig(name = "Some step", validation = "some-validation"),
+                ),
+                jobs = listOf(
+                    JobConfig(name = "Some job", validation = "some-job"),
+                )
+            )
+        )
+        assertEquals(
+            """
+                ---
+                general:
+                  skipJobs: true
+                steps:
+                - name: "Some step"
+                  validation: "some-validation"
+                  validationJobPrefix: true
+                  description: null
+                jobs:
+                - name: "Some job"
+                  validation: "some-job"
+                  description: null
+                jobsFilter:
+                  includes: ".*"
+                  excludes: ""
+                stepsFilter:
+                  includes: ".*"
+                  excludes: ""
+            """.trimIndent().trim(),
+            yaml.trim()
+        )
+    }
+
     fun test(
         yaml: String,
         code: (config: IngestionConfig) -> Unit,
