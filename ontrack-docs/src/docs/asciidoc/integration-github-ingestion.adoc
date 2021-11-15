@@ -296,3 +296,7 @@ The metrics are grouped in the following categories:
 
 |===
 
+[[integration-github-ingestion-properties]]
+==== Configuration properties
+
+See <<configuration-properties>>.

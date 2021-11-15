@@ -148,4 +148,12 @@ ontrack.config.extension.git.pull-requests.cleanup.disabling = 1
 
 # Days before deleting
 ontrack.config.extension.git.pull-requests.cleanup.deleting = 7
+
+#################################
+# GitHub configuration properties
+#################################
+
+# Behaviour of the queuing
+# By default, true, using a RabbitMQ engine
+ontrack.extension.github.ingestion.queue.async = true
 ----

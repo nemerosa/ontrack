@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.extension.github.ingestion.payload
 
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class DefaultIngestionHookPayloadStorageIT : AbstractDSLTestSupport() {
+class DefaultIngestionHookPayloadStorageIT : AbstractIngestionTestSupport() {
 
     @Autowired
     private lateinit var storage: IngestionHookPayloadStorage

@@ -3,7 +3,13 @@ package net.nemerosa.ontrack.extension.github.ingestion
 import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
+import org.springframework.test.context.TestPropertySource
 
+@TestPropertySource(
+    properties = [
+        "ontrack.extension.github.ingestion.queue.async=false",
+    ]
+)
 abstract class AbstractIngestionTestSupport : AbstractGitHubTestSupport() {
 
     protected fun withGitHubIngestionSettings(
