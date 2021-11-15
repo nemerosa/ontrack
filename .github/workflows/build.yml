@@ -1,0 +1,21 @@
+name: Building a branch
+
+on:
+  push:
+    branches:
+      - main
+      - release/*
+      - feature/*
+
+concurrency: ci-${{ github.ref }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Compute the version
+        run: |
+          ./gradlew \
+            versionDisplay \
+            versionFile

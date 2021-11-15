@@ -1,0 +1,6 @@
+general:
+  skipJobs: false
+steps:
+  - name: Compute the version
+    validation: version
+    validationJobPrefix: false
