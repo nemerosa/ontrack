@@ -44,6 +44,18 @@ services:
     volumes:
       - "ontrack_elasticsearch:/usr/share/elasticsearch/data"
 
+  # Rabbit MQ
+  rabbit:
+    image: rabbitmq:3.8.25-management
+    restart: always
+    hostname: rabbit
+    environment:
+      RABBITMQ_DEFAULT_USER: ontrack
+      RABBITMQ_DEFAULT_PASS: ontrack
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
 volumes:
   ontrack_postgres:
   ontrack_elasticsearch:

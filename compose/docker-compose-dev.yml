@@ -45,3 +45,15 @@ services:
       DB_VENDOR: h2
     ports:
       - 8008:8080
+
+  # Rabbit MQ
+  rabbit:
+    image: rabbitmq:3.8.25-management
+    restart: always
+    hostname: rabbit
+    environment:
+      RABBITMQ_DEFAULT_USER: ontrack
+      RABBITMQ_DEFAULT_PASS: ontrack
+    ports:
+      - "15672:15672"
+      - "5672:5672"
