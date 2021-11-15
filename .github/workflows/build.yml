@@ -3,9 +3,9 @@ name: Building a branch
 on:
   push:
     branches:
-      - main
-      - release/*
-      - feature/*
+      # - main
+      # - release/*
+      - feature/*github*
 
 concurrency: ci-${{ github.ref }}
 
