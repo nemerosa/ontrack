@@ -18,7 +18,7 @@ class GitHubIngestionRabbitMQConfig(
         val declarables = mutableListOf<Declarable>()
         // TODO Gets the queues & bindings from the configuration properties
         val defaultQueue = Queue(
-            "$QUEUE_PREFIX.default",
+            "$QUEUE_PREFIX.$DEFAULT",
             true, // We keep the queue alive for reprocessing
         ).apply {
             declarables += this
@@ -47,6 +47,10 @@ class GitHubIngestionRabbitMQConfig(
          * Prefix for the queue names
          */
         const val QUEUE_PREFIX = TOPIC
+        /**
+         * Default queuing
+         */
+        const val DEFAULT = "default"
 
         /**
          * Prefix for the queue names
