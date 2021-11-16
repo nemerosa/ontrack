@@ -18,10 +18,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("io.micrometer:micrometer-core")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
+    implementation(project(":ontrack-rabbitmq"))
 
     runtimeOnly("io.jsonwebtoken:jjwt-impl")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson")
-    runtimeOnly(project(":ontrack-rabbitmq"))
 
     testImplementation(project(":ontrack-test-utils"))
     testImplementation(project(":ontrack-it-utils"))

@@ -7,6 +7,11 @@ spring:
     url: "jdbc:postgresql://localhost/ontrack"
     username: ontrack
     password: ontrack
+  # Rabbit MQ configuration
+  rabbitmq:
+    host: localhost
+    username: ontrack
+    password: ontrack
   # Default profile
   profiles:
     active: prod
