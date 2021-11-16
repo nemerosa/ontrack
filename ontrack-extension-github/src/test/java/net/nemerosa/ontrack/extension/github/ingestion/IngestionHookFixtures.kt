@@ -103,11 +103,13 @@ object IngestionHookFixtures {
     /**
      * Sample payload
      */
-    fun sampleWorkflowRunPayload() = workflowRunPayload(
+    fun sampleWorkflowRunPayload(
+        repoName: String = sampleRepository,
+    ) = workflowRunPayload(
         action = WorkflowRunAction.requested,
         runNumber = 1,
         headBranch = sampleBranch,
-        repoName = sampleRepository,
+        repoName = repoName,
         owner = sampleOwner,
         sender = "my-sender",
         commit = "01234567890",
@@ -160,7 +162,11 @@ object IngestionHookFixtures {
     /**
      * Sample payload body
      */
-    fun sampleWorkflowRunJsonPayload() = sampleWorkflowRunPayload().asJson()
+    fun sampleWorkflowRunJsonPayload(
+        repoName: String = sampleRepository,
+    ) = sampleWorkflowRunPayload(
+        repoName = repoName,
+    ).asJson()
 
     /**
      * Sample headers for a hook request

@@ -1,9 +1,16 @@
 package net.nemerosa.ontrack.extension.github.ingestion
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.time.withTimeout
 import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
+import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStatus
+import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
+import java.time.Duration
 
 @TestPropertySource(
     properties = [
@@ -12,7 +19,11 @@ import org.springframework.test.context.TestPropertySource
 )
 abstract class AbstractIngestionTestSupport : AbstractGitHubTestSupport() {
 
+    @Autowired
+    private lateinit var ingestionHookPayloadStorage: IngestionHookPayloadStorage
+
     protected fun withGitHubIngestionSettings(
+        token: String? = IngestionHookFixtures.signatureTestToken,
         @Suppress("SameParameterValue") orgProjectPrefix: Boolean? = false,
         stepExcludes: String? = GitHubIngestionSettings.DEFAULT_STEP_EXCLUDES,
         jobExcludes: String? = GitHubIngestionSettings.DEFAULT_JOB_EXCLUDES,
@@ -23,7 +34,7 @@ abstract class AbstractIngestionTestSupport : AbstractGitHubTestSupport() {
         withSettings<GitHubIngestionSettings> {
             val old = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
             val new = GitHubIngestionSettings(
-                token = old.token,
+                token = token ?: old.token,
                 retentionDays = old.retentionDays,
                 orgProjectPrefix = orgProjectPrefix ?: old.orgProjectPrefix,
                 stepExcludes = stepExcludes ?: old.stepExcludes,
@@ -66,6 +77,31 @@ abstract class AbstractIngestionTestSupport : AbstractGitHubTestSupport() {
             // Removing all previous configuration
             gitConfigurationService.configurations.forEach {
                 gitConfigurationService.deleteConfiguration(it.name)
+            }
+        }
+    }
+
+    protected fun waitUntilIngestion(
+        statuses: List<IngestionHookPayloadStatus>? = null,
+        @Suppress("SameParameterValue")
+        gitHubEvent: String? = null,
+        repository: String? = null,
+    ) {
+        runBlocking {
+            withTimeout(Duration.ofSeconds(60)) {
+                var count = 0
+                while (count == 0) {
+                    count = asAdmin {
+                        ingestionHookPayloadStorage.count(
+                            statuses = statuses,
+                            gitHubEvent = gitHubEvent,
+                            repository = repository,
+                        )
+                    }
+                    if (count == 0) {
+                        delay(1_000)
+                    }
+                }
             }
         }
     }

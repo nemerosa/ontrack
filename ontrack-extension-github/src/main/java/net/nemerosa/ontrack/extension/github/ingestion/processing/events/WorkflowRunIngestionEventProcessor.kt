@@ -204,7 +204,9 @@ data class WorkflowRun internal constructor(
     val headBranch: String,
     val headSha: String,
     val pullRequests: List<PullRequest>,
+    @JsonProperty("created_at")
     val createdAtDate: LocalDateTime,
+    @JsonProperty("updated_at")
     val updatedAtDate: LocalDateTime?,
     val htmlUrl: String,
     val event: String,
