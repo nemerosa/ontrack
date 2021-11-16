@@ -251,10 +251,15 @@ The metrics are grouped in the following categories:
 |===
 |Metric |Type |Tags |Description
 
-|ontrack_extension_github_ingestion_queue_received_count
+|ontrack_extension_github_ingestion_queue_produced_count
 |Counter
-|event,owner?,repository?
-|Number of payloads received by the queue(s)
+|event,owner?,repository?,routing
+|Number of payloads sent to the queues
+
+|ontrack_extension_github_ingestion_queue_consumed_count
+|Counter
+|event,owner?,repository?,queue
+|Number of payloads received by the queues
 
 |===
 
