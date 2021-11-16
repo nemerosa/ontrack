@@ -21,6 +21,7 @@ dependencies {
 
     runtimeOnly("io.jsonwebtoken:jjwt-impl")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson")
+    runtimeOnly(project(":ontrack-rabbitmq"))
 
     testImplementation(project(":ontrack-test-utils"))
     testImplementation(project(":ontrack-it-utils"))

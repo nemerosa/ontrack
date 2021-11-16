@@ -29,6 +29,7 @@ dependencies {
 
     runtimeOnly(project(":ontrack-service"))
     runtimeOnly(project(":ontrack-repository-impl"))
+    runtimeOnly(project(":ontrack-rabbitmq"))
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("org.flywaydb:flyway-core")
 
