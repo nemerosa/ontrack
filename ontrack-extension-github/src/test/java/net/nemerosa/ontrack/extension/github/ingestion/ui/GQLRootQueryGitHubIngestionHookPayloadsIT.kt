@@ -5,19 +5,14 @@ import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupp
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStatus
-import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.parse
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestSupport() {
-
-    @Autowired
-    private lateinit var ingestionHookPayloadStorage: IngestionHookPayloadStorage
 
     @Test
     fun `Getting a payload by UUID`() {

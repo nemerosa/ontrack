@@ -43,10 +43,11 @@ private fun <T> MeterRegistry.time(
 fun MeterRegistry.increment(
     payload: IngestionHookPayload,
     name: String,
+    vararg additionalTags: Pair<String,String>,
 ) {
     increment(
         name,
-        *payload.metricsTags()
+        *payload.metricsTags(*additionalTags)
     )
 }
 
@@ -67,11 +68,11 @@ fun <T> MeterRegistry.timeForPayload(
 /**
  * Tags for a payload
  */
-private fun IngestionHookPayload.metricsTags() = arrayOf(
+private fun IngestionHookPayload.metricsTags(vararg additionalTags: Pair<String,String>,) = arrayOf(
     INGESTION_METRIC_EVENT_TAG to gitHubEvent,
     INGESTION_METRIC_OWNER_TAG to (repository?.owner?.login ?: ""),
     INGESTION_METRIC_REPOSITORY_TAG to (repository?.name ?: ""),
-)
+) + additionalTags
 
 /**
  * Event tag
@@ -87,3 +88,13 @@ const val INGESTION_METRIC_OWNER_TAG = "owner"
  * Owner tag
  */
 const val INGESTION_METRIC_REPOSITORY_TAG = "repository"
+
+/**
+ * Routing tag
+ */
+const val INGESTION_METRIC_ROUTING_TAG = "routing"
+
+/**
+ * Queue tag
+ */
+const val INGESTION_METRIC_QUEUE_TAG = "queue"

@@ -11,7 +11,8 @@ object IngestionMetrics {
     }
 
     object Queue {
-        const val receivedCount = "ontrack_extension_github_ingestion_queue_received_count"
+        const val producedCount = "ontrack_extension_github_ingestion_queue_produced_count"
+        const val consumedCount = "ontrack_extension_github_ingestion_queue_consumed_count"
     }
 
     object Process {

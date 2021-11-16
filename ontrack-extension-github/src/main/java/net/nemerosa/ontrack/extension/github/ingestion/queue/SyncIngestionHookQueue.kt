@@ -26,9 +26,10 @@ class SyncIngestionHookQueue(
     private val meterRegistry: MeterRegistry,
 ) : IngestionHookQueue {
     override fun queue(payload: IngestionHookPayload) {
-        meterRegistry.increment(payload, IngestionMetrics.Queue.receivedCount)
+        meterRegistry.increment(payload, IngestionMetrics.Queue.producedCount)
         runBlocking {
             launch(Job()) {
+                meterRegistry.increment(payload, IngestionMetrics.Queue.consumedCount)
                 ingestionHookProcessingService.process(payload)
             }
         }

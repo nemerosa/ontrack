@@ -14,13 +14,13 @@ import java.time.Duration
 
 @TestPropertySource(
     properties = [
-        "ontrack.extension.github.ingestion.queue.async=false",
+        "ontrack.extension.github.ingestion.processing.async=false",
     ]
 )
 abstract class AbstractIngestionTestSupport : AbstractGitHubTestSupport() {
 
     @Autowired
-    private lateinit var ingestionHookPayloadStorage: IngestionHookPayloadStorage
+    protected lateinit var ingestionHookPayloadStorage: IngestionHookPayloadStorage
 
     protected fun withGitHubIngestionSettings(
         token: String? = IngestionHookFixtures.signatureTestToken,

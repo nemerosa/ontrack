@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.test.context.TestPropertySource
 import org.springframework.transaction.PlatformTransactionManager
-import org.springframework.transaction.TransactionDefinition
 import org.springframework.transaction.TransactionDefinition.PROPAGATION_REQUIRES_NEW
 import org.springframework.transaction.support.TransactionTemplate
 import kotlin.test.assertIs
@@ -23,18 +22,18 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
- * Integration test using RabbitMQ.
+ * Integration test using RabbitMQ in different configurations
  */
 @TestPropertySource(
     properties = [
         // Overriding the settings in AbstractIngestionTestSupport
-        "ontrack.extension.github.ingestion.queue.async=true",
+        "ontrack.extension.github.ingestion.processing.async=true",
     ]
 )
-class IngestionHookRabbitMQIT : AbstractIngestionTestSupport() {
+abstract class AbstractIngestionHookRabbitMQTestSupport : AbstractIngestionTestSupport() {
 
     @Autowired
-    private lateinit var ingestionConfigProperties: IngestionConfigProperties
+    protected lateinit var ingestionConfigProperties: IngestionConfigProperties
 
     @Autowired
     private lateinit var ingestionHookQueue: IngestionHookQueue
@@ -56,14 +55,22 @@ class IngestionHookRabbitMQIT : AbstractIngestionTestSupport() {
 
     @Test
     fun `Configuration check`() {
-        assertTrue(ingestionConfigProperties.queue.async, "Running in async mode")
+        assertTrue(ingestionConfigProperties.processing.async, "Running in async mode")
         assertIs<AsyncIngestionHookQueue>(ingestionHookQueue, "Running in async mode")
     }
 
-    @Test
-    fun `Default processing of a workflow run event`() {
+    open val repositoryName: String by lazy {
+        uid("r")
+    }
+
+    protected open fun preChecks() {}
+
+    protected open fun postChecks() {}
+
+    @Test(timeout = 120_000L)
+    fun `Processing of a workflow run event`() {
         // Preparing a test payload
-        val name = uid("r")
+        val name = repositoryName
         val body = IngestionHookFixtures.sampleWorkflowRunJsonPayload(
             repoName = name,
         ).format()
@@ -72,6 +79,8 @@ class IngestionHookRabbitMQIT : AbstractIngestionTestSupport() {
         transactionTemplate.execute {
             onlyOneGitHubConfig()
         }
+        // Pre-checks
+        preChecks()
         // Sending the event
         ingestionHookController.hook(
             body = body,
@@ -104,6 +113,7 @@ class IngestionHookRabbitMQIT : AbstractIngestionTestSupport() {
                     )
                 }
             }
+            postChecks()
         }
     }
 
