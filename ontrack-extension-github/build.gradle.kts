@@ -10,7 +10,6 @@ dependencies {
     api(project(":ontrack-extension-git"))
 
     implementation(project(":ontrack-ui-graphql"))
-    implementation(project(":ontrack-queue"))
     implementation("org.apache.commons:commons-lang3")
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-extension-indicators"))
