@@ -29,9 +29,6 @@ import kotlin.test.assertTrue
     properties = [
         // Overriding the settings in AbstractIngestionTestSupport
         "ontrack.extension.github.ingestion.queue.async=true",
-        "spring.rabbitmq.host=localhost",
-        "spring.rabbitmq.username=ontrack",
-        "spring.rabbitmq.password=ontrack",
     ]
 )
 class IngestionHookRabbitMQIT : AbstractIngestionTestSupport() {

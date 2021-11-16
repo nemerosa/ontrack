@@ -20,6 +20,7 @@ import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,13 @@ import static net.nemerosa.ontrack.test.TestUtils.uid;
                 AbstractITTestSupport.AbstractIntegrationTestConfiguration.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.NONE
+)
+@TestPropertySource(
+        properties = {
+                "spring.rabbitmq.host=localhost",
+                "spring.rabbitmq.username=ontrack",
+                "spring.rabbitmq.password=ontrack"
+        }
 )
 public abstract class AbstractITTestSupport extends AbstractTransactionalJUnit4SpringContextTests {
 
