@@ -5,6 +5,10 @@ import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayl
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionHookProcessingService
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.support.ApplicationLogEntry
+import net.nemerosa.ontrack.model.support.ApplicationLogService
 import org.springframework.amqp.core.MessageListener
 import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerEndpoint
@@ -16,6 +20,8 @@ import org.springframework.stereotype.Component
 class AsyncIngestionHookQueueListener(
     private val ingestionConfigProperties: IngestionConfigProperties,
     private val ingestionHookProcessingService: IngestionHookProcessingService,
+    private val securityService: SecurityService,
+    private val applicationLogService: ApplicationLogService,
 ) : RabbitListenerConfigurer {
 
     private val listener = MessageListener { message ->
@@ -42,6 +48,18 @@ class AsyncIngestionHookQueueListener(
 
     private fun onMessage(message: String) {
         val payload = message.parseAsJson().parse<IngestionHookPayload>()
-        ingestionHookProcessingService.process(payload)
+        try {
+            securityService.asAdmin {
+                ingestionHookProcessingService.process(payload)
+            }
+        } catch (any: Exception) {
+            applicationLogService.log(
+                ApplicationLogEntry.error(
+                    any,
+                    NameDescription.nd("github-ingestion-error", "Catch-all error in GitHub ingestion processing"),
+                    "Uncaught error during the GitHub ingestion processing"
+                )
+            )
+        }
     }
 }
