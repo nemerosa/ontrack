@@ -155,5 +155,11 @@ ontrack.config.extension.git.pull-requests.cleanup.deleting = 7
 
 # Behaviour of the queuing
 # By default, true, using a RabbitMQ engine
-ontrack.extension.github.ingestion.queue.async = true
+ontrack.extension.github.ingestion.processing.async = true
+
+# Declaring other queues for repositories
+# Regex for the repository owner, null for match all
+# ontrack.extension.github.ingestion.processing.repositories.very-active.owner=
+# Regex for the repository name, null for match all
+# ontrack.extension.github.ingestion.processing.repositories.very-active.repository
 ----

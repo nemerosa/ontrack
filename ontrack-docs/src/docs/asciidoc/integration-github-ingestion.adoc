@@ -301,7 +301,30 @@ The metrics are grouped in the following categories:
 
 |===
 
-[[integration-github-ingestion-properties]]
-==== Configuration properties
+[[integration-github-ingestion-configuration]]
+==== Configuration
 
-See <<configuration-properties>>.
+See <<configuration-properties>> for the list of all available properties.
+
+[[integration-github-ingestion-configuration-routing]]
+===== Routing
+
+By default, Ontrack uses one unique RabbitMQ queue to process all incoming payloads, with a maximum concurrency of 10.
+
+In some cases, when some repositories are more active than others, it may be useful to create other queues in order to prioritize the work.
+
+You can define routing configurations based on regular expressions matching the repository owner & names. For example:
+
+[source,yaml]
+----
+ontrack:
+  extension:
+    github:
+      ingestion:
+        processing:
+          repositories:
+            very-active:
+              repository: my-very-active-repository
+----
+
+This will create an additional queue, called `github.ingestion.very-active` where all the processing for the `my-very-active-repository` repository will be sent to.
