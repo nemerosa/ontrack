@@ -17,6 +17,9 @@ data class MetricCollection(
         name: String,
         vararg tags: Pair<String, String>,
     ): Int? {
-        TODO("Getting the value for a counter")
+        val counter = list.find {
+            it.name == name && it.type == "counter"
+        } ?: return null
+        return counter.getValue(*tags)
     }
 }
