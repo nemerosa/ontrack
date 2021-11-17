@@ -1,0 +1,7 @@
+query FindByProjectByName(
+    $name: String!,
+) {
+    projects(name: $name) {
+        ...ProjectFragment
+    }
+}
