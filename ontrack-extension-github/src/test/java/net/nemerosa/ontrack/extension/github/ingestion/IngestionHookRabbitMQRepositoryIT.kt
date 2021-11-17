@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.metrics.INGESTION_METRIC_
 import net.nemerosa.ontrack.extension.github.ingestion.metrics.INGESTION_METRIC_ROUTING_TAG
 import net.nemerosa.ontrack.extension.github.ingestion.metrics.IngestionMetrics
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
@@ -26,6 +27,7 @@ import kotlin.test.assertTrue
         "ontrack.extension.github.ingestion.processing.repositories.test.repository=$TEST_REPOSITORY",
     ]
 )
+@Ignore
 class IngestionHookRabbitMQRepositoryIT : AbstractIngestionHookRabbitMQTestSupport() {
 
     @Autowired
