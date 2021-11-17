@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.metrics
 /**
  * List of metrics
  */
-class MetricCollection(
+data class MetricCollection(
     val list: List<Metric>,
 ) {
     /**
