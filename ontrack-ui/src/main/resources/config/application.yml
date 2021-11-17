@@ -43,9 +43,9 @@ management:
       # InfluxDB disabled by default
       influx:
         enabled: false
-      # Prometheus disabled by default
+      # Prometheus enabled by default
       prometheus:
-        enabled: false
+        enabled: true
   # Health indicators
   health:
     # Disable LDAP health indicator
