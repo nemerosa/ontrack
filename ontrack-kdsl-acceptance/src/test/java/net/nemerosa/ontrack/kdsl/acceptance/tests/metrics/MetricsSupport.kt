@@ -9,9 +9,9 @@ import net.nemerosa.ontrack.kdsl.connector.client.OntractMgtConnectionProperties
 object MetricsSupport {
 
     /**
-     * Getting all metrics from Ontrack
+     * Parses Prometheus metrics from Ontrack
      */
-    fun getMetrics(ontractMgtConnectionProperties: OntractMgtConnectionProperties): MetricCollection {
+    fun parseMetrics(body: String): MetricCollection {
         TODO("")
     }
 

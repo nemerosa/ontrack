@@ -39,7 +39,7 @@ class ACCDSLGitHubIngestion : AbstractACCDSLGitHubTestSupport() {
         // Payload: preparing the payload for a test repository
         val payload = resourceAsJson("/github/ingestion/workflow_run.json")
         // Payload: sending the payload for the GitHub configuration")
-        val response = connector().post(
+        val response = rawConnector().post(
             "/hook/secured/github/ingestion",
             headers = mapOf(
                 "Content-Type" to "application/json",

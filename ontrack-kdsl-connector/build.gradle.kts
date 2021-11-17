@@ -7,6 +7,7 @@ dependencies {
     implementation("com.apollographql.apollo:apollo-runtime:2.5.11")
     implementation("com.apollographql.apollo:apollo-coroutines-support:2.5.11")
     implementation("org.apache.httpcomponents:httpclient:4.5.13")
+    implementation("org.springframework.boot:spring-boot-starter-web")
 }
 
 //

@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.kdsl.connector.client
+package net.nemerosa.ontrack.kdsl.connector
 
 import java.nio.charset.Charset
 
