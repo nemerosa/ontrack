@@ -13,8 +13,10 @@ object ACCProperties {
         val token: String by lazy {
             obtainToken()
         }
-        val username: String? by optionalFromEnv()
-        val password: String? by optionalFromEnv()
+        @DefaultValue("admin")
+        val username: String? by fromEnv()
+        @DefaultValue("admin")
+        val password: String? by fromEnv()
 
         object Mgt {
             @DefaultValue("http://localhost:8800/manage")
@@ -53,11 +55,11 @@ object ACCProperties {
         val connector = DefaultConnector(
             url = url,
             defaultHeaders = mapOf(
-                "Authentication" to "Basic $basic"
+                "Authorization" to "Basic $basic"
             )
         )
         // Getting a new token
-        return connector.post("rest/tokens/new")
+        return connector.post("/rest/tokens/new")
             .apply {
                 if (statusCode != 200) {
                     error("Cannot get a new token")

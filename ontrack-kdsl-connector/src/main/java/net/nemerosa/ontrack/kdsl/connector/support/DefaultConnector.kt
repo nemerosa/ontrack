@@ -7,6 +7,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
+import org.springframework.web.client.postForEntity
 import java.nio.charset.Charset
 
 class DefaultConnector(
@@ -31,21 +32,20 @@ class DefaultConnector(
     }
 
     override fun post(path: String, headers: Map<String, String>, body: Any?): ConnectorResponse {
-        TODO("Not yet implemented")
+        val response = restTemplate(headers).postForEntity<ByteArray>(path, body)
+        return RestTemplateConnectorResponse(response)
     }
 
     private fun restTemplate(
         headers: Map<String, String>,
-    ): RestTemplate =
-        RestTemplateBuilder()
-            .rootUri(url)
-            .apply {
-                defaultHeaders.forEach { (name, value) ->
-                    defaultHeader(name, value)
-                }
-                headers.forEach { (name, value) ->
-                    defaultHeader(name, value)
-                }
-            }
-            .build()
+    ): RestTemplate {
+        var builder = RestTemplateBuilder().rootUri(url)
+        defaultHeaders.forEach { (name, value) ->
+            builder = builder.defaultHeader(name, value)
+        }
+        headers.forEach { (name, value) ->
+            builder = builder.defaultHeader(name, value)
+        }
+        return builder.build()
+    }
 }
