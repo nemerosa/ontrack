@@ -1,17 +1,29 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests
 
+import net.nemerosa.ontrack.kdsl.connector.support.DefaultConnector
+import java.util.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.full.findAnnotation
 
 object ACCProperties {
 
     object Connection {
+        @DefaultValue("http://localhost:8080")
+        val url: String by fromEnv()
+        val token: String by lazy {
+            obtainToken()
+        }
+        val username: String? by optionalFromEnv()
+        val password: String? by optionalFromEnv()
+
         object Mgt {
             @DefaultValue("http://localhost:8800/manage")
             val url: String by fromEnv()
         }
     }
 
+    @Target(AnnotationTarget.PROPERTY)
+    @Retention(AnnotationRetention.RUNTIME)
     annotation class DefaultValue(
         val value: String = NONE,
     ) {
@@ -20,7 +32,50 @@ object ACCProperties {
         }
     }
 
+    private fun obtainToken(): String {
+        val providedToken = optionalFromEnv().getValue(Connection, Connection::token)
+        return if (providedToken != null) {
+            providedToken
+        } else {
+            val url = Connection.url
+            val username = Connection.username ?: error("Username is required to get a token")
+            val password = Connection.username ?: error("Password is required to get a token")
+            getOrCreateToken(url, username, password)
+        }
+    }
+
+    private fun getOrCreateToken(url: String, username: String, password: String): String {
+        // Basic authentication
+        val basic: String = "$username:$password".run {
+            Base64.getEncoder().encodeToString(toByteArray(Charsets.UTF_8))
+        }
+        // Creating a connector for this URl and these credentials
+        val connector = DefaultConnector(
+            url = url,
+            defaultHeaders = mapOf(
+                "Authentication" to "Basic $basic"
+            )
+        )
+        // Getting a new token
+        return connector.post("rest/tokens/new")
+            .apply {
+                if (statusCode != 200) {
+                    error("Cannot get a new token")
+                }
+            }
+            .body.asJson()
+            .path("token")
+            .path("value")
+            .asText()
+    }
+
     private fun fromEnv(): ReadOnlyProperty<Any, String> =
+        ReadOnlyProperty { thisRef, property ->
+            optionalFromEnv().getValue(thisRef, property)
+                ?: error("No system property not environment variable found for $property in $thisRef.")
+        }
+
+    private fun optionalFromEnv(): ReadOnlyProperty<Any, String?> =
         ReadOnlyProperty { thisRef, property ->
             val className = thisRef::class.qualifiedName ?: error("Expecting a full class name")
             val propName = property.name
@@ -37,7 +92,6 @@ object ACCProperties {
                     property.findAnnotation<DefaultValue>()
                         ?.value
                         ?.takeIf { it != DefaultValue.NONE }
-                        ?: error("No system property $sysProperty not environment variable $envProperty is available.")
                 }
             }
         }

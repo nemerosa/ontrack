@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.kdsl.spec
 
-class Ontrack {
+import net.nemerosa.ontrack.kdsl.connector.Connected
+import net.nemerosa.ontrack.kdsl.connector.Connector
+
+class Ontrack(connector: Connector) : Connected(connector) {
 
     /**
      * Getting a project using its name

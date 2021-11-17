@@ -24,15 +24,28 @@ abstract class AbstractACCTestSupport {
      * Connection to the application
      */
     private val ontractConnectionProperties: OntractConnectionProperties by lazy {
-        TODO("Get the Ontrack connection properties from the environment")
+        OntractConnectionProperties(
+            url = ACCProperties.Connection.url,
+            token = ACCProperties.Connection.token,
+        )
     }
 
     /**
      * Connection to the management
      */
-    protected fun mgtConnector(): Connector = DefaultConnector(
+    private fun mgtConnector(): Connector = DefaultConnector(
         ontractMgtConnectionProperties.url,
         emptyMap(),
+    )
+
+    /**
+     * Authenticated connector to the application
+     */
+    private fun connector(): Connector = DefaultConnector(
+        url = ontractConnectionProperties.url,
+        defaultHeaders = mapOf(
+            "X-Ontrack-Token" to ontractConnectionProperties.token,
+        )
     )
 
     /**
@@ -44,7 +57,7 @@ abstract class AbstractACCTestSupport {
      * Root Ontrack object
      */
     protected val ontrack: Ontrack by lazy {
-        TODO("Get the Ontrack root object from the environment")
+        Ontrack(connector = connector())
     }
 
     /**
