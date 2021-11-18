@@ -11,9 +11,12 @@ import org.springframework.web.client.postForEntity
 import java.nio.charset.Charset
 
 class DefaultConnector(
-    private val url: String,
+    override val url: String,
     private val defaultHeaders: Map<String, String>,
 ) : Connector {
+
+    override val token: String?
+        get() = defaultHeaders["X-Ontrack-Token"]
 
     override fun get(path: String, headers: Map<String, String>): ConnectorResponse {
         val response = restTemplate(headers).getForEntity<ByteArray>(path)

@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.kdsl.spec
 
+import net.nemerosa.ontrack.kdsl.connector.Connector
+
 /**
  * Representation of a project.
  *
@@ -8,10 +10,11 @@ package net.nemerosa.ontrack.kdsl.spec
  * @property description Project description
  */
 class Project(
-    val id: UInt,
+    connector: Connector,
+    id: UInt,
     val name: String,
     val description: String?,
-) {
+) : ProjectEntity(connector, id) {
     /**
      * Deletes this project
      */

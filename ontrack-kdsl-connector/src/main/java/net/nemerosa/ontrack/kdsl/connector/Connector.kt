@@ -6,6 +6,16 @@ package net.nemerosa.ontrack.kdsl.connector
 interface Connector {
 
     /**
+     * Associated URL
+     */
+    val url: String
+
+    /**
+     * Associated token, if any
+     */
+    val token: String?
+
+    /**
      * Gets some content from a relative URL.
      */
     fun get(
