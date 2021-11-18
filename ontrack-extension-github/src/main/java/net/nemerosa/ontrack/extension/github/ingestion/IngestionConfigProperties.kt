@@ -11,8 +11,25 @@ import org.springframework.stereotype.Component
 @Component
 @ConfigurationProperties(prefix = IngestionConfigProperties.PREFIX)
 class IngestionConfigProperties(
+    var hook: HookConfig = HookConfig(),
     var processing: ProcessingConfig = ProcessingConfig(),
 ) {
+    /**
+     * Hook configuration
+     *
+     * @property
+     */
+    class HookConfig(
+        var signature: HookSignatureConfig = HookSignatureConfig()
+    )
+    /**
+     * Hook signature configuration
+     *
+     * @property disabled Set to `true` to disable the signature checks (OK for testing, NOT for production)
+     */
+    class HookSignatureConfig(
+        var disabled: Boolean = false,
+    )
     /**
      * Processing configuration
      *
