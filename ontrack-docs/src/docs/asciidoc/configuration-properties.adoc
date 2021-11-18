@@ -153,8 +153,11 @@ ontrack.config.extension.git.pull-requests.cleanup.deleting = 7
 # GitHub configuration properties
 #################################
 
-# Behaviour of the queuing
+# Set to `true` to disable the signature checks (OK for testing, NOT for production)
+ontrack.extension.github.ingestion.hook.signature.disabled = false
+
 # By default, true, using a RabbitMQ engine
+# Set to false to use a direct processing (synchronous)
 ontrack.extension.github.ingestion.processing.async = true
 
 # Declaring other queues for repositories
