@@ -51,7 +51,9 @@ abstract class AbstractACCTestSupport {
     /**
      * Raw connection to the application, without any authentication
      */
-    protected fun rawConnector(): Connector = TODO()
+    protected fun rawConnector(): Connector = DefaultConnector(
+        url = ontractConnectionProperties.url,
+    )
 
     /**
      * Root Ontrack object

@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHub
 import net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion.ingestion
 import org.junit.Test
+import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -43,7 +44,12 @@ class ACCDSLGitHubIngestion : AbstractACCDSLGitHubTestSupport() {
             "/hook/secured/github/ingestion",
             headers = mapOf(
                 "Content-Type" to "application/json",
-                // TODO Ingestion headers
+                "X-GitHub-Delivery" to UUID.randomUUID().toString(),
+                "X-GitHub-Event" to "workflow_run",
+                "X-GitHub-Hook-ID" to "123456789",
+                "X-GitHub-Hook-Installation-Target-ID" to "1234567890",
+                "X-GitHub-Hook-Installation-Target-Type" to "organization",
+                "X-Hub-Signature-256" to "signature-is-not-checked",
             ),
             body = payload,
         )

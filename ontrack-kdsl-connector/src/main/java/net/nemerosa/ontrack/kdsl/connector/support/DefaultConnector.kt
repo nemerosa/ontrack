@@ -12,7 +12,7 @@ import java.nio.charset.Charset
 
 class DefaultConnector(
     override val url: String,
-    private val defaultHeaders: Map<String, String>,
+    private val defaultHeaders: Map<String, String> = emptyMap(),
 ) : Connector {
 
     override val token: String?
