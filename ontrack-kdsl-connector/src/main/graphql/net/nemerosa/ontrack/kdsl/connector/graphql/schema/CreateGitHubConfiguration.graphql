@@ -1,0 +1,28 @@
+mutation CreateGitHubConfiguration(
+    $name: String!,
+    $url: String,
+    $user: String,
+    $password: String,
+    $oauth2Token: String,
+    $appId: String,
+    $appPrivateKey: String,
+    $appInstallationAccountName: String,
+) {
+    createGitHubConfiguration(input: {
+        name: $name,
+        url: $url,
+        user: $user,
+        password: $password,
+        oauth2Token: $oauth2Token,
+        appId: $appId,
+        appPrivateKey: $appPrivateKey,
+        appInstallationAccountName: $appInstallationAccountName,
+    }) {
+        configuration {
+            url
+        }
+        errors {
+            ...UserErrorFragment
+        }
+    }
+}

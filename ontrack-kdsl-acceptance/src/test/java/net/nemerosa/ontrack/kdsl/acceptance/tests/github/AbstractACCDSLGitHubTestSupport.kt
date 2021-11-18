@@ -13,6 +13,10 @@ abstract class AbstractACCDSLGitHubTestSupport : AbstractACCDSLTestSupport() {
      */
     protected fun fakeGitHubConfiguration(
         name: String = uid("GH"),
-    ): GitHubConfiguration = TODO()
+    ): GitHubConfiguration = GitHubConfiguration(
+        name = name,
+        url = null, // github.com by default
+        oauth2Token = null, // TODO Use the ACCProperties GitHub properties
+    )
 
 }

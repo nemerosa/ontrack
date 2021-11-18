@@ -1,0 +1,5 @@
+fragment UserErrorFragment on UserError {
+    message
+    exception
+    location
+}

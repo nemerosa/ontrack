@@ -4295,6 +4295,140 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "CreateGitHubConfigurationInput",
+          "description": "Input type for the createGitHubConfiguration mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "appId",
+              "description": "ID of the GitHub App to use for authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "appInstallationAccountName",
+              "description": "Account name of the GitHub App installation (used when more than 1 installation for the app)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "appPrivateKey",
+              "description": "GitHub App private key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Name of this configuration",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "oauth2Token",
+              "description": "Personal Access Token",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "password",
+              "description": "Password for authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "url",
+              "description": "GitHub server URL. Null will be replaced by https://github.com",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "user",
+              "description": "User name for authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "CreateGitHubConfigurationPayload",
+          "description": "Output type for the createGitHubConfiguration mutation.",
+          "fields": [
+            {
+              "name": "configuration",
+              "description": "Saved configuration",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GitHubEngineConfiguration",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "CreateProjectInput",
           "description": "Input type for the createProject mutation.",
           "fields": null,
@@ -16800,6 +16934,29 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "ValidateBuildWithPercentagePayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "createGitHubConfiguration",
+              "description": "Creates a new GitHub configuration.",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "CreateGitHubConfigurationInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "CreateGitHubConfigurationPayload",
                 "ofType": null
               },
               "isDeprecated": false,

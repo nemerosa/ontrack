@@ -5,6 +5,4 @@ import net.nemerosa.ontrack.kdsl.spec.Ontrack
 /**
  * Management of GitHub in Ontrack.
  */
-val Ontrack.gitHub: GitHubMgt by lazy {
-    GitHubMgt()
-}
+val Ontrack.gitHub: GitHubMgt get() = GitHubMgt(connector)
