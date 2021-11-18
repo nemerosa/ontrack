@@ -1,0 +1,15 @@
+fragment PageInfoContent on PageInfo {
+    totalSize
+    currentOffset
+    currentSize
+    previousPage {
+        offset
+        size
+    }
+    nextPage {
+        offset
+        size
+    }
+    pageTotal
+    pageIndex
+}

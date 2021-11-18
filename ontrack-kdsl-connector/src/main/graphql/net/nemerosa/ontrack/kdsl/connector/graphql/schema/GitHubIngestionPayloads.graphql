@@ -1,0 +1,23 @@
+query GitHubIngestionPayloads(
+    $offset: Int = 0,
+    $size: Int = 10,
+    $statuses: [IngestionHookPayloadStatus!],
+    $gitHubEvent: String,
+    $repository: String,
+) {
+    gitHubIngestionHookPayloads(
+        offset: $offset,
+        size: $size,
+        statuses: $statuses,
+        gitHubEvent: $gitHubEvent,
+        repository: $repository,
+    ) {
+        pageInfo {
+            ...PageInfoContent
+        }
+        pageItems {
+            uuid
+            status
+        }
+    }
+}
