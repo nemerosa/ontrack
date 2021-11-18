@@ -1,12 +1,10 @@
 package net.nemerosa.ontrack.kdsl.connector.graphql
 
-object GraphQLConnectorUtils {
-
-    fun <T, R> checkData(data: T?, code: (T) -> R): R =
-        if (data != null) {
-            code(data)
-        } else {
-            throw GraphQLClientException("No data was returned")
-        }
-
+fun <T : Any, R> T?.checkData(
+    code: (T) -> R,
+) = if (this != null) {
+    val r = code(this)
+    r ?: throw GraphQLClientException("No data node was returned")
+} else {
+    throw GraphQLClientException("No data was returned")
 }

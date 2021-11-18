@@ -1,0 +1,7 @@
+fragment PayloadUserErrors on Payload {
+    errors {
+        message
+        exception
+        location
+    }
+}

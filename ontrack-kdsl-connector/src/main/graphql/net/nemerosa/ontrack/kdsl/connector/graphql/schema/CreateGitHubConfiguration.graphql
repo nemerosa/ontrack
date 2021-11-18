@@ -21,8 +21,6 @@ mutation CreateGitHubConfiguration(
         configuration {
             url
         }
-        errors {
-            ...UserErrorFragment
-        }
+        ...PayloadUserErrors
     }
 }

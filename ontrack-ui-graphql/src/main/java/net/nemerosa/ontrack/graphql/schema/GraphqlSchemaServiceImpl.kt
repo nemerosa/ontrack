@@ -109,12 +109,10 @@ class GraphqlSchemaServiceImpl(
                     .name("${mutation.typePrefix}Payload")
                     .description("Output type for the ${mutation.name} mutation.")
                     .fields(mutation.outputFields)
-                    // Error management fields
-                    .field {
-                        it.name("errors")
-                                .description("List of errors")
-                                .type(GraphQLList(GraphQLTypeReference(GQLTypeUserError.USER_ERROR)))
-                    }
+                    // All mutation payloads inherit from the Payload type
+                    .withInterface(GraphQLTypeReference(GQLInterfacePayload.PAYLOAD))
+                    // Errors field
+                    .field(GQLInterfacePayload.payloadErrorsField())
                     // OK
                     .build()
                     .apply { dictionary.add(this) }

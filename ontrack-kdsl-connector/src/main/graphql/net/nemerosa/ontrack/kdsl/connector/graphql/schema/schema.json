@@ -4002,7 +4002,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -4041,7 +4047,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -4250,7 +4262,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -4289,7 +4307,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -4423,7 +4447,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -4552,7 +4582,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -4591,7 +4627,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -4679,7 +4721,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -4795,7 +4843,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -4923,7 +4977,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -5079,7 +5139,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -5202,7 +5268,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -5280,7 +5352,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -5344,7 +5422,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -5422,7 +5506,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -5486,7 +5576,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -5564,7 +5660,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -5628,7 +5730,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -5720,7 +5828,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -5784,7 +5898,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -5876,7 +5996,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -5940,7 +6066,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -6032,7 +6164,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -6096,7 +6234,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -6188,7 +6332,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -6252,7 +6402,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -6316,7 +6472,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -6380,7 +6542,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -6444,7 +6612,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -6508,7 +6682,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -6572,7 +6752,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -6636,7 +6822,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -6700,7 +6892,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -6764,7 +6962,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -6828,7 +7032,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -6892,7 +7102,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -6956,7 +7172,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -7045,7 +7267,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -7109,7 +7337,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -7173,7 +7407,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -7237,7 +7477,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -7264,7 +7510,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -7328,7 +7580,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -7392,7 +7650,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -7456,7 +7720,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -7548,7 +7818,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -7612,7 +7888,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -7704,7 +7986,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -7768,7 +8056,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -7860,7 +8154,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -7924,7 +8224,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -8030,7 +8336,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -8094,7 +8406,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -8200,7 +8518,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -8264,7 +8588,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -8384,7 +8714,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -8448,7 +8784,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -8568,7 +8910,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -8632,7 +8980,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -8724,7 +9078,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -8788,7 +9148,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -8880,7 +9246,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -8944,7 +9316,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -9008,7 +9386,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -9072,7 +9456,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -9136,7 +9526,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -9286,7 +9682,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -13045,7 +13447,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -13151,7 +13559,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -13289,7 +13703,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -13363,7 +13783,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -17213,6 +17639,799 @@
           "interfaces": [],
           "enumValues": null,
           "possibleTypes": null
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "Payload",
+          "description": "Interface implemented by all mutation payloads",
+          "fields": [
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "CreateBranchOrGetPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "CreateBranchPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "CreateBuildOrGetPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "CreateBuildPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "CreateGitHubConfigurationPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "CreateProjectOrGetPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "CreateProjectPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "CreatePromotionRunByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "CreatePromotionRunPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "CreateValidationRunByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "CreateValidationRunPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteBranchGitConfigPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteBranchGitConfigPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteBranchMessagePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteBranchMessagePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteBranchMetaInfoPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteBranchMetaInfoPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteBuildGitCommitPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteBuildGitCommitPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteBuildMessagePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteBuildMessagePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteBuildMetaInfoPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteBuildMetaInfoPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteBuildReleasePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteBuildReleasePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectAutoPromotionLevelPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectAutoPromotionLevelPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectAutoValidationStampPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectAutoValidationStampPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectBitbucketCloudConfigurationPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectBitbucketCloudConfigurationPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectBitbucketConfigurationPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectBitbucketConfigurationPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectGitHubConfigurationPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectGitHubConfigurationPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectGitLabConfigurationPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectGitLabConfigurationPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectMessagePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectMessagePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectMetaInfoPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectMetaInfoPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectStalePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectStalePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeletePromotionLevelAutoPromotionPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeletePromotionLevelAutoPromotionPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeletePromotionLevelMessagePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeletePromotionLevelMessagePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeletePromotionLevelMetaInfoPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeletePromotionLevelMetaInfoPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeletePromotionRunMessagePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeletePromotionRunMessagePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeletePromotionRunMetaInfoPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeletePromotionRunMetaInfoPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteValidationRunMessagePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteValidationRunMessagePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteValidationRunMetaInfoPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteValidationRunMetaInfoPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteValidationStampMessagePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteValidationStampMessagePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteValidationStampMetaInfoPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteValidationStampMetaInfoPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DisableAccountPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DisableProjectPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "EnableAccountPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "EnableProjectPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "FavouriteProjectPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "LinkBuildByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "LinkBuildPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "LinksBuildPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "LockAccountPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "ReloadCascPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBranchGitConfigPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBranchGitConfigPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBranchMessagePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBranchMessagePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBranchMetaInfoPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBranchMetaInfoPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBranchPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBranchPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBuildGitCommitPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBuildGitCommitPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBuildMessagePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBuildMessagePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBuildMetaInfoPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBuildMetaInfoPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBuildPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBuildPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBuildReleasePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBuildReleasePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectAutoPromotionLevelPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectAutoPromotionLevelPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectAutoValidationStampPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectAutoValidationStampPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectBitbucketCloudConfigurationPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectBitbucketCloudConfigurationPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectBitbucketConfigurationPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectBitbucketConfigurationPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectGitHubConfigurationPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectGitHubConfigurationPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectGitLabConfigurationPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectGitLabConfigurationPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectMessagePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectMessagePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectMetaInfoPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectMetaInfoPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectStalePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectStalePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetPromotionLevelAutoPromotionPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetPromotionLevelAutoPromotionPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetPromotionLevelMessagePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetPromotionLevelMessagePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetPromotionLevelMetaInfoPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetPromotionLevelMetaInfoPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetPromotionLevelPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetPromotionLevelPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetPromotionRunMessagePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetPromotionRunMessagePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetPromotionRunMetaInfoPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetPromotionRunMetaInfoPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetPromotionRunPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetPromotionRunPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetValidationRunMessagePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetValidationRunMessagePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetValidationRunMetaInfoPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetValidationRunMetaInfoPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetValidationRunPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetValidationRunPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetValidationStampMessagePropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetValidationStampMessagePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetValidationStampMetaInfoPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetValidationStampMetaInfoPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetValidationStampPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetValidationStampPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetupCHMLValidationStampPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetupMetricsValidationStampPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetupPercentageValidationStampPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetupPromotionLevelPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetupTestSummaryValidationStampPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetupValidationStampPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "UnfavouriteProjectPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "UnlockAccountPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "UpdateProjectPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "ValidateBuildByIdWithCHMLPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "ValidateBuildByIdWithMetricsPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "ValidateBuildByIdWithPercentagePayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "ValidateBuildByIdWithTestsPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "ValidateBuildWithCHMLPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "ValidateBuildWithMetricsPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "ValidateBuildWithPercentagePayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "ValidateBuildWithTestsPayload",
+              "ofType": null
+            }
+          ]
         },
         {
           "kind": "OBJECT",
@@ -22388,7 +23607,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -23311,7 +24536,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -23403,7 +24634,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -23495,7 +24732,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -23601,7 +24844,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -23696,7 +24945,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -23805,7 +25060,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -23893,7 +25154,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -23995,7 +25262,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -24073,7 +25346,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -24179,7 +25458,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -24271,7 +25556,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -24391,7 +25682,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -24486,7 +25783,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -24609,7 +25912,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -24697,7 +26006,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -24813,7 +26128,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -24891,7 +26212,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -24997,7 +26324,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -25071,7 +26404,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -25145,7 +26484,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -25229,7 +26574,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -25313,7 +26664,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -25425,7 +26782,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -25537,7 +26900,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -25663,7 +27032,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -25789,7 +27164,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -25901,7 +27282,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -26013,7 +27400,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -26125,7 +27518,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -26237,7 +27636,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -26329,7 +27734,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -26421,7 +27832,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -26516,7 +27933,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -26611,7 +28034,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -26699,7 +28128,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -26787,7 +28222,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -26913,7 +28354,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -27039,7 +28486,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -27159,7 +28612,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -27307,7 +28766,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -27399,7 +28864,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -27519,7 +28990,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -27614,7 +29091,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -27737,7 +29220,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -27825,7 +29314,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -27941,7 +29436,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -28033,7 +29534,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -28167,7 +29674,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -28262,7 +29775,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -28399,7 +29918,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -28487,7 +30012,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -28617,7 +30148,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -28709,7 +30246,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -28857,7 +30400,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -28952,7 +30501,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -29103,7 +30658,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -29191,7 +30752,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -29335,7 +30902,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -29427,7 +31000,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -29547,7 +31126,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -29642,7 +31227,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -29765,7 +31356,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -29853,7 +31450,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -29969,7 +31572,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -30126,7 +31735,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -30228,7 +31843,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -30360,7 +31981,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -30462,7 +32089,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -30574,7 +32207,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -30696,7 +32335,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -31104,7 +32749,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -31168,7 +32819,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -31262,7 +32919,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -31523,7 +33186,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -31652,7 +33321,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -31774,7 +33449,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -31924,7 +33605,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -32100,7 +33787,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -32257,7 +33950,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -32407,7 +34106,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -32585,7 +34290,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
