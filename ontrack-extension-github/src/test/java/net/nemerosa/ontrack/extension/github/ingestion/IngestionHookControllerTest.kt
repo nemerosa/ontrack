@@ -66,6 +66,7 @@ class IngestionHookControllerTest {
             gitHubHookInstallationTargetID = headers.gitHubHookInstallationTargetID,
             gitHubHookInstallationTargetType = headers.gitHubHookInstallationTargetType,
             signature = "",
+            configuration = null,
         )
 
         assertEquals(body.parseAsJson(), storedPayload?.payload)
@@ -117,6 +118,7 @@ class IngestionHookControllerTest {
             gitHubHookInstallationTargetID = headers.gitHubHookInstallationTargetID,
             gitHubHookInstallationTargetType = headers.gitHubHookInstallationTargetType,
             signature = "",
+            configuration = null,
         )
 
         assertNull(storedPayload?.payload)
@@ -153,6 +155,7 @@ class IngestionHookControllerTest {
                 gitHubHookInstallationTargetID = headers.gitHubHookInstallationTargetID,
                 gitHubHookInstallationTargetType = headers.gitHubHookInstallationTargetType,
                 signature = "",
+                configuration = null,
             )
         }
     }
@@ -187,6 +190,7 @@ class IngestionHookControllerTest {
                 gitHubHookInstallationTargetID = headers.gitHubHookInstallationTargetID,
                 gitHubHookInstallationTargetType = headers.gitHubHookInstallationTargetType,
                 signature = "",
+                configuration = null,
             )
         }
     }
@@ -233,6 +237,7 @@ class IngestionHookControllerTest {
             gitHubHookInstallationTargetID = headers.gitHubHookInstallationTargetID,
             gitHubHookInstallationTargetType = headers.gitHubHookInstallationTargetType,
             signature = "",
+            configuration = null,
         )
 
         assertNull(storedPayload?.payload)

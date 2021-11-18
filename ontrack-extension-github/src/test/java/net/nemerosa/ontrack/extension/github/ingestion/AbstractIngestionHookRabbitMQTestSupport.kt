@@ -90,6 +90,7 @@ abstract class AbstractIngestionHookRabbitMQTestSupport : AbstractIngestionTestS
             gitHubHookInstallationTargetID = headers.gitHubHookInstallationTargetID,
             gitHubHookInstallationTargetType = headers.gitHubHookInstallationTargetType,
             signature = "", // Not checking the signature for testing
+            configuration = null,
         )
         // Need to wait until the event has been processed (async processing here!)
         waitUntilIngestion(

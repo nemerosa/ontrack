@@ -1,10 +1,15 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import io.mockk.Called
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayloadListenerCheck
+import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.structure.Project
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -12,12 +17,27 @@ import kotlin.test.assertEquals
 class IngestionPushPayloadListenerTest {
 
     private lateinit var configService: ConfigService
+    private lateinit var ingestionModelAccessService: IngestionModelAccessService
     private lateinit var listener: IngestionPushPayloadListener
+
+    private lateinit var branch: Branch
 
     @Before
     fun before() {
         configService = mockk(relaxed = true)
-        listener = IngestionPushPayloadListener(configService)
+        ingestionModelAccessService = mockk()
+        listener = IngestionPushPayloadListener(configService, ingestionModelAccessService)
+
+        branch = Branch.of(
+            Project.of(NameDescription.nd("project", "")),
+            NameDescription.nd("main", ""),
+        )
+        every {
+            ingestionModelAccessService.getOrCreateProject(IngestionHookFixtures.sampleRepository())
+        } returns branch.project
+        every {
+            ingestionModelAccessService.getOrCreateBranch(branch.project, IngestionHookFixtures.sampleBranch, null)
+        } returns branch
     }
 
     @Test
@@ -27,9 +47,8 @@ class IngestionPushPayloadListenerTest {
         )
         listener.process(payload)
         verify {
-            configService.saveConfig(
-                repository = IngestionHookFixtures.sampleRepository(),
-                branch = IngestionHookFixtures.sampleBranch,
+            configService.loadAndSaveConfig(
+                branch = branch,
                 path = INGESTION_CONFIG_FILE_PATH,
             )
         }
@@ -42,9 +61,8 @@ class IngestionPushPayloadListenerTest {
         )
         listener.process(payload)
         verify {
-            configService.saveConfig(
-                repository = IngestionHookFixtures.sampleRepository(),
-                branch = IngestionHookFixtures.sampleBranch,
+            configService.loadAndSaveConfig(
+                branch = branch,
                 path = INGESTION_CONFIG_FILE_PATH,
             )
         }
@@ -58,8 +76,7 @@ class IngestionPushPayloadListenerTest {
         listener.process(payload)
         verify {
             configService.removeConfig(
-                repository = IngestionHookFixtures.sampleRepository(),
-                branch = IngestionHookFixtures.sampleBranch,
+                branch = branch,
             )
         }
     }

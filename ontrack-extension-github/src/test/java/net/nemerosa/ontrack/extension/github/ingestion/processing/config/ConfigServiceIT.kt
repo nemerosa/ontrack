@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 import io.mockk.every
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
+import net.nemerosa.ontrack.model.structure.Branch
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,9 +28,9 @@ class ConfigServiceIT : AbstractIngestionTestSupport() {
 
     @Test
     fun `Saving the configuration`() {
-        withSavedConfiguration { config, repository, branch ->
+        withSavedConfiguration { config, branch ->
             // Loading the configuration
-            assertNotNull(configService.findConfig(repository, branch), "Configuration saved") {
+            assertNotNull(configService.findConfig(branch), "Configuration saved") {
                 assertEquals(config, it)
             }
         }
@@ -38,30 +38,29 @@ class ConfigServiceIT : AbstractIngestionTestSupport() {
 
     @Test
     fun `Removing the configuration`() {
-        withSavedConfiguration { _, repository, branch ->
+        withSavedConfiguration { _, branch ->
             // Loading the configuration
-            assertNotNull(configService.findConfig(repository, branch), "Configuration saved")
+            assertNotNull(configService.findConfig(branch), "Configuration saved")
             // Removing the configuration
-            configService.removeConfig(repository, branch)
+            configService.removeConfig(branch)
             // Loading the configuration
-            assertNull(configService.findConfig(repository, branch), "Configuration removed")
+            assertNull(configService.findConfig(branch), "Configuration removed")
         }
     }
 
     @Test
     fun `Get or load with already saved configuration`() {
-        withSavedConfiguration { saved, repository, branch ->
-            val config = configService.getOrLoadConfig(repository, branch, INGESTION_CONFIG_FILE_PATH)
+        withSavedConfiguration { saved, branch ->
+            val config = configService.getOrLoadConfig(branch, INGESTION_CONFIG_FILE_PATH)
             assertEquals(saved, config)
         }
     }
 
     @Test
     fun `Get or load with loading configuration`() {
-        withLoadingConfiguration(existing = true) { config ->
+        withLoadingConfiguration(existing = true) { config, branch ->
             val loaded = configService.getOrLoadConfig(
-                IngestionHookFixtures.sampleRepository(),
-                IngestionHookFixtures.sampleBranch,
+                branch,
                 INGESTION_CONFIG_FILE_PATH
             )
             assertEquals(config, loaded)
@@ -70,10 +69,9 @@ class ConfigServiceIT : AbstractIngestionTestSupport() {
 
     @Test
     fun `Get or load with loading non existent configuration`() {
-        withLoadingConfiguration(existing = false) {
+        withLoadingConfiguration(existing = false) { _, branch ->
             val loaded = configService.getOrLoadConfig(
-                IngestionHookFixtures.sampleRepository(),
-                IngestionHookFixtures.sampleBranch,
+                branch,
                 INGESTION_CONFIG_FILE_PATH
             )
             assertEquals(IngestionConfig(), loaded, "Loaded configuration is the default configuration")
@@ -81,43 +79,44 @@ class ConfigServiceIT : AbstractIngestionTestSupport() {
     }
 
     fun withSavedConfiguration(
-        test: (config: IngestionConfig, repository: Repository, branch: String) -> Unit
+        test: (config: IngestionConfig, branch: Branch) -> Unit
     ) {
-        withLoadingConfiguration(existing = true) { config ->
-            val repository = IngestionHookFixtures.sampleRepository()
-            val branch = IngestionHookFixtures.sampleBranch
-            configService.saveConfig(
-                repository,
+        withLoadingConfiguration(existing = true) { config, branch ->
+            configService.loadAndSaveConfig(
                 branch,
                 INGESTION_CONFIG_FILE_PATH,
             )
             // Testing
-            test(config, repository, branch)
+            test(config, branch)
         }
     }
 
     fun withLoadingConfiguration(
         existing: Boolean,
-        test: (config: IngestionConfig) -> Unit
+        test: (config: IngestionConfig, branch: Branch) -> Unit
     ) {
-        val config = IngestionHookFixtures.sampleIngestionConfig()
-        if (existing) {
-            every {
-                configLoaderService.loadConfig(
-                    any(),
-                    INGESTION_CONFIG_FILE_PATH
-                )
-            } returns config
-        } else {
-            every {
-                configLoaderService.loadConfig(
-                    any(),
-                    INGESTION_CONFIG_FILE_PATH
-                )
-            } returns null
-        }
         asAdmin {
-            test(config)
+            project {
+                branch {
+                    val config = IngestionHookFixtures.sampleIngestionConfig()
+                    if (existing) {
+                        every {
+                            configLoaderService.loadConfig(
+                                this@branch,
+                                INGESTION_CONFIG_FILE_PATH
+                            )
+                        } returns config
+                    } else {
+                        every {
+                            configLoaderService.loadConfig(
+                                this@branch,
+                                INGESTION_CONFIG_FILE_PATH
+                            )
+                        } returns null
+                    }
+                    test(config, this)
+                }
+            }
         }
     }
 

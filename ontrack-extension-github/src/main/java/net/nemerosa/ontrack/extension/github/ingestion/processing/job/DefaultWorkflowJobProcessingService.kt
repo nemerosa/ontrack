@@ -123,8 +123,7 @@ class DefaultWorkflowJobProcessingService(
         val gitBranchProperty =
             propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java).value
         return if (gitBranchProperty != null) {
-            val gitBranch = gitBranchProperty.branch
-            configService.getOrLoadConfig(repository, gitBranch, INGESTION_CONFIG_FILE_PATH)
+            configService.getOrLoadConfig(branch, INGESTION_CONFIG_FILE_PATH)
         } else {
             throw GitBranchNotConfiguredException(branch.id)
         }

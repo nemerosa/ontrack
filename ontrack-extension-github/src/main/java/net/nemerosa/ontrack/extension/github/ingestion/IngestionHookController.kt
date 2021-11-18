@@ -47,6 +47,7 @@ class IngestionHookController(
         @RequestHeader("X-GitHub-Hook-Installation-Target-ID") gitHubHookInstallationTargetID: Int,
         @RequestHeader("X-GitHub-Hook-Installation-Target-Type") gitHubHookInstallationTargetType: String,
         @RequestHeader("X-Hub-Signature-256") signature: String,
+        @RequestParam(value = "configuration", required = false) configuration: String?,
     ): IngestionHookResponse {
         // Gets the event processor if any
         val eventProcessor =
@@ -108,6 +109,7 @@ class IngestionHookController(
             gitHubHookInstallationTargetType = gitHubHookInstallationTargetType,
             payload = json,
             repository = repository,
+            configuration = configuration,
         )
         // Pre-sorting
         return when (eventProcessor.preProcessingCheck(payload)) {
