@@ -57,7 +57,8 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                     owner = owner,
                     sender = owner,
                     commit = commit,
-                )
+                ),
+                configuration = null,
             )
             // Checks the build is running
             assertNotNull(
@@ -81,7 +82,8 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                     owner = owner,
                     sender = owner,
                     commit = commit,
-                )
+                ),
+                configuration = null,
             )
             // Checks the build is not running any longer
             assertNotNull(
@@ -122,7 +124,8 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                     sender = owner,
                     commit = commit,
                     createdAtDate = ref.minusMinutes(5),
-                )
+                ),
+                configuration = null,
             )
             // Checks the run info is not there
             assertNotNull(
@@ -146,7 +149,8 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                     commit = commit,
                     createdAtDate = ref.minusMinutes(5),
                     updatedAtDate = ref,
-                )
+                ),
+                configuration = null,
             )
             // Checks the run info is filled in
             assertNotNull(
@@ -256,7 +260,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
         )
         // Processing
         asAdmin {
-            processor.process(payload)
+            processor.process(payload, configuration = null)
         }
         // Checks the project, branch & build
         val projectName = normalizeName(repoName)

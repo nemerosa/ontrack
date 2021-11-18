@@ -145,7 +145,8 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
                         description = null,
                         owner = Owner(login = owner),
                         htmlUrl = htmlUrl,
-                    )
+                    ),
+                    configuration = null,
                 )
                 val projectName = normalizeName(name)
                 assertNotNull(structureService.findProjectByName(projectName).getOrNull()) { project ->

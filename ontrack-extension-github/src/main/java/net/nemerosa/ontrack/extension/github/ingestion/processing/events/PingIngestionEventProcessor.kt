@@ -13,7 +13,7 @@ class PingIngestionEventProcessor : AbstractIngestionEventProcessor<PingPayload>
     /**
      * Not doing anything
      */
-    override fun process(payload: PingPayload): IngestionEventProcessingResult =
+    override fun process(payload: PingPayload, configuration: String?): IngestionEventProcessingResult =
         IngestionEventProcessingResult.IGNORED
 
     override val payloadType: KClass<PingPayload> = PingPayload::class

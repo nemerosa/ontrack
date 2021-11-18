@@ -20,9 +20,10 @@ class IngestionPushPayloadListener(
             PushPayloadListenerCheck.IGNORED
         }
 
-    override fun process(payload: PushPayload) {
+    override fun process(payload: PushPayload, configuration: String?) {
         val branch = ingestionModelAccessService.getOrCreateBranch(
             repository = payload.repository,
+            configuration = configuration,
             headBranch = payload.branchName,
             baseBranch = null, // TODO PR support
         )

@@ -17,6 +17,7 @@ interface PushPayloadListener {
      * Processes the payload.
      *
      * @param payload Payload to process
+     * @param configuration GitHub config name
      */
-    fun process(payload: PushPayload)
+    fun process(payload: PushPayload, configuration: String?)
 }

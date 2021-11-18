@@ -4,10 +4,11 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Reposito
 
 fun IngestionModelAccessService.getOrCreateBranch(
     repository: Repository,
+    configuration: String?,
     headBranch: String,
     baseBranch: String?,
 ) = getOrCreateBranch(
-    project = getOrCreateProject(repository),
+    project = getOrCreateProject(repository, configuration),
     headBranch = headBranch,
     baseBranch = baseBranch
 )

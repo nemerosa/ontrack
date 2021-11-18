@@ -33,7 +33,7 @@ class IngestionPushPayloadListenerTest {
             NameDescription.nd("main", ""),
         )
         every {
-            ingestionModelAccessService.getOrCreateProject(IngestionHookFixtures.sampleRepository())
+            ingestionModelAccessService.getOrCreateProject(IngestionHookFixtures.sampleRepository(), null)
         } returns branch.project
         every {
             ingestionModelAccessService.getOrCreateBranch(branch.project, IngestionHookFixtures.sampleBranch, null)
@@ -45,7 +45,7 @@ class IngestionPushPayloadListenerTest {
         val payload = IngestionHookFixtures.samplePushPayload(
             added = listOf(INGESTION_CONFIG_FILE_PATH)
         )
-        listener.process(payload)
+        listener.process(payload, null)
         verify {
             configService.loadAndSaveConfig(
                 branch = branch,
@@ -59,7 +59,7 @@ class IngestionPushPayloadListenerTest {
         val payload = IngestionHookFixtures.samplePushPayload(
             modified = listOf(INGESTION_CONFIG_FILE_PATH)
         )
-        listener.process(payload)
+        listener.process(payload, null)
         verify {
             configService.loadAndSaveConfig(
                 branch = branch,
@@ -73,7 +73,7 @@ class IngestionPushPayloadListenerTest {
         val payload = IngestionHookFixtures.samplePushPayload(
             removed = listOf(INGESTION_CONFIG_FILE_PATH)
         )
-        listener.process(payload)
+        listener.process(payload, null)
         verify {
             configService.removeConfig(
                 branch = branch,
@@ -88,7 +88,7 @@ class IngestionPushPayloadListenerTest {
             modified = listOf("any/other/path"),
             removed = listOf("any/other/path"),
         )
-        listener.process(payload)
+        listener.process(payload, null)
         verify {
             configService wasNot Called
         }

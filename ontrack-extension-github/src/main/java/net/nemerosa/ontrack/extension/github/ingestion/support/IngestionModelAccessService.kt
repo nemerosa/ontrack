@@ -14,9 +14,11 @@ interface IngestionModelAccessService {
      * Gets or creates a project for the given repository.
      *
      * @param repository Repository
+     * @param configuration GitHub configuration name
      */
     fun getOrCreateProject(
-        repository: Repository
+        repository: Repository,
+        configuration: String?,
     ): Project
 
     /**

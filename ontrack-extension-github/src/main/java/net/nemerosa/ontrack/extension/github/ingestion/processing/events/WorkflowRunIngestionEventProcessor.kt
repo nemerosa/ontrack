@@ -48,15 +48,15 @@ class WorkflowRunIngestionEventProcessor(
         return IngestionEventPreprocessingCheck.TO_BE_PROCESSED
     }
 
-    override fun process(payload: WorkflowRunPayload): IngestionEventProcessingResult =
+    override fun process(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResult =
         when (payload.action) {
-            WorkflowRunAction.requested -> startBuild(payload)
-            WorkflowRunAction.completed -> endBuild(payload)
+            WorkflowRunAction.requested -> startBuild(payload, configuration)
+            WorkflowRunAction.completed -> endBuild(payload, configuration)
         }
 
-    private fun endBuild(payload: WorkflowRunPayload): IngestionEventProcessingResult {
+    private fun endBuild(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResult {
         // Build creation & setup
-        val build = getOrCreateBuild(payload, running = false)
+        val build = getOrCreateBuild(payload, running = false, configuration = configuration)
         // Setting the run info
         val runInfo = collectRunInfo(payload)
         runInfoService.setRunInfo(build, runInfo)
@@ -80,16 +80,16 @@ class WorkflowRunIngestionEventProcessor(
         )
     }
 
-    private fun startBuild(payload: WorkflowRunPayload): IngestionEventProcessingResult {
+    private fun startBuild(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResult {
         // Build creation & setup
-        getOrCreateBuild(payload, running = true)
+        getOrCreateBuild(payload, running = true, configuration = configuration)
         // OK
         return IngestionEventProcessingResult.PROCESSED
     }
 
-    private fun getOrCreateBuild(payload: WorkflowRunPayload, running: Boolean): Build {
+    private fun getOrCreateBuild(payload: WorkflowRunPayload, running: Boolean, configuration: String?): Build {
         // Gets or creates the project
-        val project = getOrCreateProject(payload)
+        val project = getOrCreateProject(payload, configuration)
         // Branch creation & setup
         val branch = getOrCreateBranch(project, payload)
         // Build creation & setup
@@ -155,9 +155,10 @@ class WorkflowRunIngestionEventProcessor(
         return branch
     }
 
-    private fun getOrCreateProject(payload: WorkflowRunPayload): Project =
+    private fun getOrCreateProject(payload: WorkflowRunPayload, configuration: String?): Project =
         ingestionModelAccessService.getOrCreateProject(
             repository = payload.repository,
+            configuration = configuration,
         )
 }
 

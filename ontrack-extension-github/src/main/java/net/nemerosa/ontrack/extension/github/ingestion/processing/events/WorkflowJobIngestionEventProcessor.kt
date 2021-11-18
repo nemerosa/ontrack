@@ -31,7 +31,7 @@ class WorkflowJobIngestionEventProcessor(
         return IngestionEventPreprocessingCheck.TO_BE_PROCESSED
     }
 
-    override fun process(payload: WorkflowJobPayload): IngestionEventProcessingResult =
+    override fun process(payload: WorkflowJobPayload, configuration: String?): IngestionEventProcessingResult =
         when (payload.action) {
             WorkflowJobAction.in_progress -> onJob(payload)
             WorkflowJobAction.completed -> onJob(payload)

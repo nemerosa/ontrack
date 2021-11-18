@@ -32,9 +32,9 @@ class PushIngestionEventProcessor(
         }
     }
 
-    override fun process(payload: PushPayload): IngestionEventProcessingResult {
+    override fun process(payload: PushPayload, configuration: String?): IngestionEventProcessingResult {
         pushPayloadListeners.map { listener ->
-            listener.process(payload)
+            listener.process(payload, configuration)
         }
         return IngestionEventProcessingResult.PROCESSED
     }

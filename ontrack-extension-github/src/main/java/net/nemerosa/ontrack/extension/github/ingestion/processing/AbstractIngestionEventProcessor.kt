@@ -17,12 +17,12 @@ abstract class AbstractIngestionEventProcessor<T : Any> : IngestionEventProcesso
         // Parsing of the payload
         val parsedPayload = parsePayload(payload)
         // Processes the payload
-        return process(parsedPayload)
+        return process(parsedPayload, payload.configuration)
     }
 
     abstract fun preProcessingCheck(payload: T): IngestionEventPreprocessingCheck
 
-    abstract fun process(payload: T): IngestionEventProcessingResult
+    abstract fun process(payload: T, configuration: String?): IngestionEventProcessingResult
 
     private fun parsePayload(payload: IngestionHookPayload): T = payload.payload.parseInto(payloadType)
 
