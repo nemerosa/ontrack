@@ -1,0 +1,26 @@
+{
+  "action": "completed",
+  "workflow_run": {
+    "id": 1,
+    "name": "CI",
+    "run_number": 1,
+    "pull_requests": [],
+    "head_branch": "main",
+    "head_sha": "commit",
+    "created_at": "2021-11-18T16:54.00.000Z",
+    "updated_at": "2021-11-18T16:58.00.000Z",
+    "html_url": "",
+    "event": "push"
+  },
+  "repository": {
+    "name": "test-repository",
+    "description": "",
+    "owner": {
+      "login": "nemerosa"
+    },
+    "html_url": "https://github.com/nemerosa/test-repository"
+  },
+  "sender": {
+    "login": "sender"
+  }
+}

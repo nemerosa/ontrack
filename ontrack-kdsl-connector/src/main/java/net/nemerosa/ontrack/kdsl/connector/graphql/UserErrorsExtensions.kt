@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.schema.fragment.PayloadUserEr
 
 fun PayloadUserErrors.convert() =
     UserErrors(
-        errors = this.errors().map {
+        errors = this.errors()?.map {
             UserError(
                 message = it.message(),
                 exception = it.exception(),
