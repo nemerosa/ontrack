@@ -13,12 +13,12 @@
     "event": "push"
   },
   "repository": {
-    "name": "test-repository",
+    "name": "default-routing-repository",
     "description": "",
     "owner": {
       "login": "nemerosa"
     },
-    "html_url": "https://github.com/nemerosa/test-repository"
+    "html_url": "https://github.com/nemerosa/default-routing-repository"
   },
   "sender": {
     "login": "sender"

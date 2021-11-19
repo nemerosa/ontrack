@@ -20,18 +20,42 @@ class ACCDSLGitHubIngestion : AbstractACCDSLGitHubTestSupport() {
 
     @Test
     fun `Workflow run on the default queue`() {
+        runTest(
+            name = "default-routing-repository",
+            payloadResourcePath = "/github/ingestion/workflow_run_default_routing.json",
+            expectedRouting = "default",
+            nonExpectedRouting = "test",
+        )
+    }
+
+    @Test
+    fun `Workflow run on the test queue`() {
+        runTest(
+            name = "test-routing-repository",
+            payloadResourcePath = "/github/ingestion/workflow_run_test_routing.json",
+            expectedRouting = "test",
+            nonExpectedRouting = "default",
+        )
+    }
+
+    fun runTest(
+        name: String,
+        payloadResourcePath: String,
+        expectedRouting: String,
+        nonExpectedRouting: String,
+    ) {
         // Pre-check: getting the initial counters
         val preMetrics = getMetrics()
 
         // Cleanup of existing target project
-        ontrack.findProjectByName("test-repository")?.delete()
+        ontrack.findProjectByName(name)?.delete()
 
         // Configuration: create a GitHub configuration
         val gitHubConfiguration = fakeGitHubConfiguration()
         ontrack.gitHub.createConfig(gitHubConfiguration)
 
         // Payload: preparing the payload for a test repository
-        val payload = resourceAsJson("/github/ingestion/workflow_run.json")
+        val payload = resourceAsJson(payloadResourcePath)
         // Payload: sending the payload for the GitHub configuration")
         val response = rawConnector().post(
             "/hook/secured/github/ingestion?configuration=${gitHubConfiguration.name}",
@@ -73,12 +97,12 @@ class ACCDSLGitHubIngestion : AbstractACCDSLGitHubTestSupport() {
         }
 
         // Check: project, branch & build
-        assertNotNull(ontrack.findBuildByName("test-repository", "main", "ci-1"), "Build has been created")
+        assertNotNull(ontrack.findBuildByName(name, "main", "ci-1"), "Build has been created")
 
         // Post-check: getting the new counters & comparison
         val postMetrics = getMetrics()
-        checkNotUsed(preMetrics, postMetrics, "test")
-        checkUsed(preMetrics, postMetrics, "default")
+        checkNotUsed(preMetrics, postMetrics, nonExpectedRouting)
+        checkUsed(preMetrics, postMetrics, expectedRouting)
     }
 
     private fun checkUsed(preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
