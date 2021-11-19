@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
+import org.springframework.amqp.core.Message
 import org.springframework.amqp.core.MessageListener
 import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerEndpoint
@@ -31,18 +32,7 @@ class AsyncIngestionHookQueueListener(
     private val meterRegistry: MeterRegistry,
 ) : RabbitListenerConfigurer {
 
-    private val listener = MessageListener { message ->
-        val body = message.body.toString(Charsets.UTF_8)
-        val payload = body.parseAsJson().parse<IngestionHookPayload>()
-        val queue = message.messageProperties.consumerQueue
-        ingestionHookPayloadStorage.queue(payload, queue)
-        meterRegistry.increment(
-            payload,
-            IngestionMetrics.Queue.consumedCount,
-            INGESTION_METRIC_QUEUE_TAG to queue
-        )
-        onMessage(payload)
-    }
+    private val listener = MessageListener(::onMessage)
 
     override fun configureRabbitListeners(registrar: RabbitListenerEndpointRegistrar) {
         // Registers listeners for configured repositories
@@ -61,31 +51,45 @@ class AsyncIngestionHookQueueListener(
         config: IngestionConfigProperties.RepositoryQueueConfig
     ) {
         val queue = "${AsyncIngestionHookQueueConfig.QUEUE_PREFIX}.$name"
-        val endpoint = SimpleRabbitListenerEndpoint().apply {
-            id = queue
-            setQueueNames(queue)
-            concurrency = "1-${config.config.concurrency}"
-            messageListener = listener
-        }
+        val endpoint = SimpleRabbitListenerEndpoint().configure(
+            queue,
+            config.config
+        )
         registrar.registerEndpoint(endpoint)
     }
 
     private fun createDefaultListener(): RabbitListenerEndpoint {
         val queue = "${AsyncIngestionHookQueueConfig.QUEUE_PREFIX}.${AsyncIngestionHookQueueConfig.DEFAULT}"
-        return SimpleRabbitListenerEndpoint().apply {
-            id = queue
-            setQueueNames(queue)
-            concurrency = "1-${ingestionConfigProperties.processing.default.concurrency}"
-            messageListener = listener
-        }
+        return SimpleRabbitListenerEndpoint().configure(queue, ingestionConfigProperties.processing.default)
     }
 
-    private fun onMessage(payload: IngestionHookPayload) {
+    private fun SimpleRabbitListenerEndpoint.configure(
+        queue: String,
+        config: IngestionConfigProperties.QueueConfig,
+    ): SimpleRabbitListenerEndpoint {
+        id = queue
+        setQueueNames(queue)
+        val max = config.concurrency
+        concurrency = "$max-$max"
+        messageListener = listener
+        return this
+    }
+
+    private fun onMessage(message: Message) {
         try {
+            val body = message.body.toString(Charsets.UTF_8)
+            val payload = body.parseAsJson().parse<IngestionHookPayload>()
+            val queue = message.messageProperties.consumerQueue
+            meterRegistry.increment(
+                payload,
+                IngestionMetrics.Queue.consumedCount,
+                INGESTION_METRIC_QUEUE_TAG to queue
+            )
             securityService.asAdmin {
+                ingestionHookPayloadStorage.queue(payload, queue)
                 ingestionHookProcessingService.process(payload)
             }
-        } catch (any: Exception) {
+        } catch (any: Throwable) {
             applicationLogService.log(
                 ApplicationLogEntry.error(
                     any,
