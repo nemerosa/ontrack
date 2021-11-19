@@ -1,0 +1,7 @@
+mutation DeleteProjectById(
+    $id: Int!,
+) {
+    deleteProject(input: {id: $id}) {
+        ...PayloadUserErrors
+    }
+}

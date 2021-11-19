@@ -1,4 +1,4 @@
-query FindByProjectByName(
+query FindProjectByName(
     $name: String!,
 ) {
     projects(name: $name) {

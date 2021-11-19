@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.kdsl.spec
 
 import net.nemerosa.ontrack.kdsl.connector.Connector
+import net.nemerosa.ontrack.kdsl.connector.graphql.convert
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.DeleteProjectByIdMutation
+import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
 /**
  * Representation of a project.
@@ -18,6 +21,12 @@ class Project(
     /**
      * Deletes this project
      */
-    fun delete(): Unit = TODO()
+    fun delete() {
+        graphqlConnector.mutate(
+            DeleteProjectByIdMutation(id.toInt())
+        ) {
+            it?.deleteProject()?.fragments()?.payloadUserErrors()?.convert()
+        }
+    }
 
 }

@@ -1,0 +1,9 @@
+query FindByBuildByName(
+    $project: String!,
+    $branch: String!,
+    $build: String!,
+) {
+    builds(project: $project, branch: $branch, name: $build) {
+        ...BuildFragment
+    }
+}

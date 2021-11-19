@@ -1,0 +1,16 @@
+{
+  "name": "Ontrack GraphQL Schema",
+  "schemaPath": "schema.graphql",
+  "extensions": {
+    "endpoints": {
+      "Default GraphQL Endpoint": {
+        "url": "http://localhost:8080/graphql",
+        "headers": {
+          "user-agent": "JS GraphQL",
+          "Authorization": "Basic YWRtaW46YWRtaW4="
+        },
+        "introspect": true
+      }
+    }
+  }
+}
