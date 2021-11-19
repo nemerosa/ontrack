@@ -12,16 +12,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
 }
 
-//
-//val downloadGraphQL by tasks.registering {
-//    doLast {
-//        val dir = "src/main/graphql/net/nemerosa/ontrack/kdsl/connector/graphql/queries"
-//        project.mkdir(dir)
-//        ant.withGroovyBuilder {
-//            "get"(
-//                "src" to "http://localhost:8080/schema/ontrack-pro.json",
-//                "dest" to "$dir/schema.json"
-//            )
-//        }
-//    }
-//}
+tasks.named("javadoc", Javadoc::class) {
+    exclude("net/nemerosa/ontrack/kdsl/connector/graphql/schema/**")
+}
