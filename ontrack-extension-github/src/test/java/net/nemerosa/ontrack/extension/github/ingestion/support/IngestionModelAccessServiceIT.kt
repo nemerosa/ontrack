@@ -2,15 +2,13 @@ package net.nemerosa.ontrack.extension.github.ingestion.support
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
-import net.nemerosa.ontrack.extension.github.ingestion.processing.GitHubConfigURLMismatchException
-import net.nemerosa.ontrack.extension.github.ingestion.processing.GitHubConfigURLNoMatchException
-import net.nemerosa.ontrack.extension.github.ingestion.processing.GitHubConfigURLSeveralMatchesException
-import net.nemerosa.ontrack.extension.github.ingestion.processing.NoGitHubConfigException
+import net.nemerosa.ontrack.extension.github.ingestion.processing.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Owner
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -28,6 +26,16 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
         val config = onlyOneGitHubConfig()
         // Runs the test
         testProject(config)
+    }
+
+    @Test
+    fun `Setting up the project with one unique GitHub configuration and a non matching configuration name`() {
+        // Only one GitHub configuration
+        val config = onlyOneGitHubConfig()
+        // Runs the test
+        assertFailsWith<GitHubConfigProvidedNameNotFoundException> {
+            testProject(config, configName = uid("C"))
+        }
     }
 
     @Test
@@ -64,6 +72,17 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
                 htmlUrl = "https://github.enterprise0.com/nemerosa/github-ingestion-poc"
             )
         }
+    }
+
+    @Test
+    fun `Setting up the build with several GitHub configurations and an explicit configuration name`() {
+        // Only one GitHub configuration
+        val config = severalGitHubConfigs()
+        // Runs the test
+        testProject(
+            config,
+            configName = config.name,
+        )
     }
 
     @Test
@@ -127,6 +146,7 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
 
     private fun testProject(
         config: GitHubEngineConfiguration?,
+        configName: String? = null,
         owner: String = "nemerosa",
         name: String = "github-ingestion-poc",
         htmlUrl: String = "${config?.url ?: "https://github.com"}/$owner/$name",
@@ -146,7 +166,7 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
                         owner = Owner(login = owner),
                         htmlUrl = htmlUrl,
                     ),
-                    configuration = null,
+                    configuration = configName,
                 )
                 val projectName = normalizeName(name)
                 assertNotNull(structureService.findProjectByName(projectName).getOrNull()) { project ->
