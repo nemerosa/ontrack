@@ -35,9 +35,7 @@ include(":ontrack-postgresql-migration")
 include(":ontrack-docs")
 
 // KDSL
-include(":ontrack-kdsl-spec")
-include(":ontrack-kdsl-connector")
-include(":ontrack-kdsl-http")
+include(":ontrack-kdsl")
 include(":ontrack-kdsl-acceptance")
 
 // Core extensions

@@ -94,5 +94,5 @@ fragment TypeRef on __Type {
 To generate classes:
 
 ```
-./gradlew :ontrack-kdsl-connector:generateApolloSources
+./gradlew :ontrack-kdsl:generateApolloSources
 ```
