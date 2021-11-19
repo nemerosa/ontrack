@@ -139,6 +139,33 @@ pipeline {
             }
         }
 
+        stage('KDSL acceptance tests') {
+            when {
+                not {
+                    branch 'master'
+                }
+            }
+            steps {
+                timeout(time: 25, unit: 'MINUTES') {
+                    sh '''
+                        ./gradlew \\
+                            -Dorg.gradle.jvmargs=-Xmx2048m \\
+                            --stacktrace \\
+                            --console plain \\
+                            :ontrack-kdsl-acceptance:kdslAcceptanceTest
+                        '''
+                }
+            }
+            post {
+                always {
+                    ontrackCliValidateTests(
+                            stamp: 'KDSL.ACCEPTANCE',
+                            pattern: 'ontrack-kdsl-acceptance/build/test-results/**/*.xml',
+                    )
+                }
+            }
+        }
+
         stage('Local acceptance tests') {
             when {
                 not {
