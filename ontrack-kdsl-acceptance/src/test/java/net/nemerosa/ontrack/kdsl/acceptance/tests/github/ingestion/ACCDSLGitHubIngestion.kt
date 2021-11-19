@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.github.ingestion
 
 import net.nemerosa.ontrack.kdsl.acceptance.annotations.AcceptanceTestSuite
 import net.nemerosa.ontrack.kdsl.acceptance.tests.github.AbstractACCDSLGitHubTestSupport
+import net.nemerosa.ontrack.kdsl.acceptance.tests.metrics.MetricCollection
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.resourceAsJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.connector.parse
@@ -21,28 +22,19 @@ class ACCDSLGitHubIngestion : AbstractACCDSLGitHubTestSupport() {
     fun `Workflow run on the default queue`() {
         // Pre-check: getting the initial counters
         val preMetrics = getMetrics()
-        val preRoutingCount =
-            preMetrics.getCounter("ontrack_extension_github_ingestion_queue_produced_count", "routing" to "test") ?: 0
-        val preDefaultCount = preMetrics.getCounter(
-            "ontrack_extension_github_ingestion_queue_consumed_count",
-            "queue" to "github.ingestion.default"
-        ) ?: 0
-        val preRepositoryCount = preMetrics.getCounter(
-            "ontrack_extension_github_ingestion_queue_consumed_count",
-            "queue" to "github.ingestion.test"
-        ) ?: 0
 
         // Cleanup of existing target project
         ontrack.findProjectByName("test-repository")?.delete()
 
         // Configuration: create a GitHub configuration
-        ontrack.gitHub.createConfig(fakeGitHubConfiguration())
+        val gitHubConfiguration = fakeGitHubConfiguration()
+        ontrack.gitHub.createConfig(gitHubConfiguration)
 
         // Payload: preparing the payload for a test repository
         val payload = resourceAsJson("/github/ingestion/workflow_run.json")
         // Payload: sending the payload for the GitHub configuration")
         val response = rawConnector().post(
-            "/hook/secured/github/ingestion",
+            "/hook/secured/github/ingestion?configuration=${gitHubConfiguration.name}",
             headers = mapOf(
                 "Content-Type" to "application/json",
                 "X-GitHub-Delivery" to UUID.randomUUID().toString(),
@@ -85,19 +77,54 @@ class ACCDSLGitHubIngestion : AbstractACCDSLGitHubTestSupport() {
 
         // Post-check: getting the new counters & comparison
         val postMetrics = getMetrics()
-        val postRoutingCount =
-            postMetrics.getCounter("ontrack_extension_github_ingestion_queue_produced_count", "routing" to "test") ?: 0
-        val postDefaultCount = postMetrics.getCounter(
-            "ontrack_extension_github_ingestion_queue_consumed_count",
-            "queue" to "github.ingestion.default"
-        ) ?: 0
-        val postRepositoryCount = postMetrics.getCounter(
-            "ontrack_extension_github_ingestion_queue_consumed_count",
-            "queue" to "github.ingestion.test"
-        ) ?: 0
-        assertTrue(postRoutingCount > preRoutingCount, "Test routing has been used")
-        assertTrue(postRepositoryCount > preRepositoryCount, "Test queue has been used")
-        assertEquals(postDefaultCount, preDefaultCount, "Default queue has not been used")
+        checkNotUsed(preMetrics, postMetrics, "test")
+        checkUsed(preMetrics, postMetrics, "default")
     }
+
+    private fun checkUsed(preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
+        checkProducedUsed(preMetrics, postMetrics, key)
+        checkConsumeUsed(preMetrics, postMetrics, key)
+    }
+
+    private fun checkProducedUsed(preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
+        val preCount = preMetrics.getProducedCount(key)
+        val postCount = postMetrics.getProducedCount(key)
+        assertTrue(postCount > preCount, "$key routing has been used.")
+    }
+
+    private fun checkConsumeUsed(preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
+        val preCount = preMetrics.getConsumedCount(key)
+        val postCount = postMetrics.getConsumedCount(key)
+        assertTrue(postCount > preCount, "$key queue has been used.")
+    }
+
+    private fun checkNotUsed(preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
+        checkProducedNotUsed(preMetrics, postMetrics, key)
+        checkConsumeNotUsed(preMetrics, postMetrics, key)
+    }
+
+    private fun checkProducedNotUsed(preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
+        val preCount = preMetrics.getProducedCount(key)
+        val postCount = postMetrics.getProducedCount(key)
+        assertEquals(preCount, postCount, "$key routing has not been used.")
+    }
+
+    private fun checkConsumeNotUsed(preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
+        val preCount = preMetrics.getConsumedCount(key)
+        val postCount = postMetrics.getConsumedCount(key)
+        assertEquals(preCount, postCount, "$key queue has not been used.")
+    }
+
+    private fun MetricCollection.getProducedCount(routing: String): Int =
+        getCounter(
+            "ontrack_extension_github_ingestion_queue_produced_count_total",
+            "routing" to routing
+        ) ?: 0
+
+    private fun MetricCollection.getConsumedCount(queue: String): Int =
+        getCounter(
+            "ontrack_extension_github_ingestion_queue_consumed_count_total",
+            "queue" to "github.ingestion.$queue"
+        ) ?: 0
 
 }
