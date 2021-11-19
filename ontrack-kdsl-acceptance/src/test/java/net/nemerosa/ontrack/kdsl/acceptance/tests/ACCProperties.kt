@@ -60,27 +60,17 @@ object ACCProperties {
                 "Authorization" to "Basic $basic"
             )
         )
-        // Getting or creating a new token
-        return connector.get("/rest/tokens/current")
+        // Creating a new token
+        return connector.post("/rest/tokens/new")
             .apply {
                 if (statusCode != 200) {
                     error("Cannot get a new token")
                 }
             }
             .body.asJson()
-            .get("token")
-            .takeIf { !it.isNull }
-            ?.asText()
-            ?: connector.post("/rest/tokens/new")
-                .apply {
-                    if (statusCode != 200) {
-                        error("Cannot get a new token")
-                    }
-                }
-                .body.asJson()
-                .path("token")
-                .path("value")
-                .asText()
+            .path("token")
+            .path("value")
+            .asText()
     }
 
     private fun fromEnv(): ReadOnlyProperty<Any, String> =
