@@ -56,6 +56,28 @@ Go to the _Settings > Webhooks_ section and add a new webhook:
 ** Workflow runs
 ** Pushes (for autoconfiguration, see later)
 
+[[integration-github-ingestion-setup-github-config]]
+==== Link to the GitHub configuration
+
+Upon reception of hook events by Ontrack, the created projects will be associated with a <<integration-github,GitHub configuration>> using the following order of priority:
+
+* the `configuration` parameter of the hook request (see below) is used to get an existing GitHub configuration by name
+* if there is one and only one existing GitHub configuration, it's used
+* if there are more than one GitHub configuration, we get the list of configurations whose URL matches the incoming event. If there one and only one matching configuration, it is used
+* in all other cases, the payload is marked as being <<integration-github-ingestion-management,failed>>.
+
+When <<integration-github-ingestion-setup-github,configuring the hook>> in GitHub, the `configuration` parameter may be added to explicitly select an existing GitHub configuration:
+
+[source]
+----
+<ontrack>/hook/secured/github/ingestion?configuration=<name>
+----
+
+[NOTE]
+====
+If you have only one configuration in Ontrack, this parameter is not needed. Use it only when dealing with several configurations using the same root URL (for example, when having several organizations using a GitHub App for authentication).
+====
+
 [[integration-github-ingestion-customization]]
 ==== Customization
 
