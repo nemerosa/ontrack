@@ -12,6 +12,7 @@ import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.test.fail
 
 @AcceptanceTestSuite
 class ACCDSLGitHubIngestion : AbstractACCDSLGitHubTestSupport() {
@@ -55,17 +56,28 @@ class ACCDSLGitHubIngestion : AbstractACCDSLGitHubTestSupport() {
         )
         // Payload: response checks
         assertEquals(200, response.statusCode)
-        response.body.parse<GitHubIngestionHookResponse>().apply {
+        val payloadUuid = response.body.parse<GitHubIngestionHookResponse>().run {
             assertTrue(processing, "Processing has started")
             assertNotNull(uuid, "The payload has been assigned a UUID")
+            // Getting the UUID
+            uuid
         }
         // Payload: wait until the payload processing is complete
         waitUntil {
-            ontrack.gitHub.ingestion.payloads(
-                statuses = listOf("COMPLETED"),
-                gitHubEvent = "workflow_run",
-                repository = "test-repository",
-            ).items.isNotEmpty()
+            val processedPayload = ontrack.gitHub.ingestion.payloads(
+                uuid = payloadUuid.toString()
+            ).items.firstOrNull()
+            if (processedPayload != null) {
+                // Completed
+                // Not completed yet
+                when (processedPayload.status) {
+                    "COMPLETED" -> true
+                    "ERRORED" -> fail("Payload was processed but finished with an error: ${processedPayload.message}")
+                    else -> false
+                }
+            } else {
+                false // Not available yet
+            }
         }
 
         // Check: project, branch & build

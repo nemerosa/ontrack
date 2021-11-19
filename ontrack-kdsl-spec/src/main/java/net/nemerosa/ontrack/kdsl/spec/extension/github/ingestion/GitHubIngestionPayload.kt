@@ -6,4 +6,5 @@ package net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion
 class GitHubIngestionPayload(
     val uuid: String,
     val status: String,
+    val message: String?,
 )

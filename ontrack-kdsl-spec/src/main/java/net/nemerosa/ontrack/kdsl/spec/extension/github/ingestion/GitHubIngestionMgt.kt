@@ -21,6 +21,7 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
     fun payloads(
         offset: Int = 0,
         size: Int = 10,
+        uuid: String? = null,
         statuses: List<String>? = null,
         gitHubEvent: String? = null,
         repository: String? = null,
@@ -28,6 +29,7 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
         GitHubIngestionPayloadsQuery(
             Input.fromNullable(offset),
             Input.fromNullable(size),
+            Input.fromNullable(uuid),
             Input.fromNullable(
                 statuses?.map {
                     IngestionHookPayloadStatus.valueOf(it)
@@ -43,6 +45,7 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
         GitHubIngestionPayload(
             uuid = it.uuid()!!,
             status = it.status().name,
+            message = it.message(),
         )
     } ?: emptyPaginatedList()
 

@@ -1,6 +1,7 @@
 query GitHubIngestionPayloads(
     $offset: Int = 0,
     $size: Int = 10,
+    $uuid: String,
     $statuses: [IngestionHookPayloadStatus!],
     $gitHubEvent: String,
     $repository: String,
@@ -8,6 +9,7 @@ query GitHubIngestionPayloads(
     gitHubIngestionHookPayloads(
         offset: $offset,
         size: $size,
+        uuid: $uuid,
         statuses: $statuses,
         gitHubEvent: $gitHubEvent,
         repository: $repository,
@@ -18,6 +20,7 @@ query GitHubIngestionPayloads(
         pageItems {
             uuid
             status
+            message
         }
     }
 }
