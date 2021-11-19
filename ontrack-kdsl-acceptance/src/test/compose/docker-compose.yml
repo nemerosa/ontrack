@@ -29,6 +29,7 @@ services:
     image: "nemerosa/ontrack:${ONTRACK_VERSION:-latest}"
     ports:
       - "8080"
+      - "8800"
     depends_on:
       postgres:
         condition: service_started
