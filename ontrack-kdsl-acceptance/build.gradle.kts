@@ -1,4 +1,5 @@
 import com.avast.gradle.dockercompose.ComposeExtension
+import com.avast.gradle.dockercompose.tasks.ComposeUp
 
 plugins {
     `java-library`
@@ -22,20 +23,24 @@ configure<ComposeExtension> {
     }
 }
 
-//val preIntegrationTest by tasks.registering {
-//    dependsOn("integrationTestComposeUp")
-//    // When done
-//    doLast {
-//        val host = tasks.named<ComposeUp>("integrationTestComposeUp").get().servicesInfos["db"]?.host!!
-//        val port = tasks.named<ComposeUp>("integrationTestComposeUp").get().servicesInfos["db"]?.firstContainer?.tcpPort!!
-//        val url = "jdbc:postgresql://$host:$port/ontrack"
-//        val jdbcUrl: String by rootProject.extra(url)
-//        logger.info("Pre integration test JDBC URL = $jdbcUrl")
-//    }
-//}
-//
-//// Post-integration tests: stopping Postgresql
-//
-//val postIntegrationTest by tasks.registering {
-//    dependsOn("integrationTestComposeDown")
-//}
+val kdslAcceptanceTestComposeUp by tasks.named("kdslAcceptanceTestComposeUp") {
+    dependsOn(":dockerBuild")
+}
+
+val kdslPreAcceptanceTest by tasks.registering {
+    dependsOn("kdslAcceptanceTestComposeUp")
+    // When done
+    doLast {
+        val host = tasks.named<ComposeUp>("kdslAcceptanceTestComposeUp").get().servicesInfos["ontrack"]?.host!!
+        val port = tasks.named<ComposeUp>("kdslAcceptanceTestComposeUp").get().servicesInfos["ontrack"]?.firstContainer?.tcpPort!!
+        val url = "http://$host:$port"
+        val ontrackUrl: String by rootProject.extra(url)
+        logger.info("KDSL Acceptance Test Ontrack URL = $ontrackUrl")
+    }
+}
+
+// Pre-acceptance tests: stopping the environment
+
+val kdslPostAcceptanceTest by tasks.registering {
+    dependsOn("kdslAcceptanceTestComposeDown")
+}
