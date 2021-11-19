@@ -13,8 +13,10 @@ object ACCProperties {
         val token: String by lazy {
             obtainToken()
         }
+
         @DefaultValue("admin")
         val username: String? by fromEnv()
+
         @DefaultValue("admin")
         val password: String? by fromEnv()
 
@@ -58,17 +60,27 @@ object ACCProperties {
                 "Authorization" to "Basic $basic"
             )
         )
-        // Getting a new token
-        return connector.post("/rest/tokens/new")
+        // Getting or creating a new token
+        return connector.get("/rest/tokens/current")
             .apply {
                 if (statusCode != 200) {
                     error("Cannot get a new token")
                 }
             }
             .body.asJson()
-            .path("token")
-            .path("value")
-            .asText()
+            .get("token")
+            .takeIf { !it.isNull }
+            ?.asText()
+            ?: connector.post("/rest/tokens/new")
+                .apply {
+                    if (statusCode != 200) {
+                        error("Cannot get a new token")
+                    }
+                }
+                .body.asJson()
+                .path("token")
+                .path("value")
+                .asText()
     }
 
     private fun fromEnv(): ReadOnlyProperty<Any, String> =
