@@ -30,6 +30,64 @@ class DefaultIngestionHookPayloadStorage(
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    override fun routing(payload: IngestionHookPayload, routing: String) {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
+        // Gets the old payload
+        val old = getByUUID(payload.uuid)
+        // Saves the new version
+        storageService.store(
+            INGESTION_HOOK_PAYLOAD_STORE,
+            payload.uuid.toString(),
+            IngestionHookPayload(
+                uuid = payload.uuid,
+                timestamp = old.timestamp,
+                gitHubDelivery = old.gitHubDelivery,
+                gitHubEvent = old.gitHubEvent,
+                gitHubHookID = old.gitHubHookID,
+                gitHubHookInstallationTargetID = old.gitHubHookInstallationTargetID,
+                gitHubHookInstallationTargetType = old.gitHubHookInstallationTargetType,
+                payload = old.payload,
+                repository = old.repository,
+                status = old.status,
+                started = old.started,
+                message = old.message,
+                completion = old.completion,
+                routing = routing,
+                queue = old.queue,
+            )
+        )
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    override fun queue(payload: IngestionHookPayload, queue: String) {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
+        // Gets the old payload
+        val old = getByUUID(payload.uuid)
+        // Saves the new version
+        storageService.store(
+            INGESTION_HOOK_PAYLOAD_STORE,
+            payload.uuid.toString(),
+            IngestionHookPayload(
+                uuid = payload.uuid,
+                timestamp = old.timestamp,
+                gitHubDelivery = old.gitHubDelivery,
+                gitHubEvent = old.gitHubEvent,
+                gitHubHookID = old.gitHubHookID,
+                gitHubHookInstallationTargetID = old.gitHubHookInstallationTargetID,
+                gitHubHookInstallationTargetType = old.gitHubHookInstallationTargetType,
+                payload = old.payload,
+                repository = old.repository,
+                status = old.status,
+                started = old.started,
+                message = old.message,
+                completion = old.completion,
+                routing = old.routing,
+                queue = queue,
+            )
+        )
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun start(payload: IngestionHookPayload) {
         securityService.checkGlobalFunction(GlobalSettings::class.java)
         // Gets the old payload
@@ -52,6 +110,8 @@ class DefaultIngestionHookPayloadStorage(
                 started = Time.now(),
                 message = null,
                 completion = null,
+                routing = old.routing,
+                queue = old.queue,
             )
         )
     }
@@ -79,6 +139,8 @@ class DefaultIngestionHookPayloadStorage(
                 started = old.started,
                 message = null,
                 completion = Time.now(),
+                routing = old.routing,
+                queue = old.queue,
             )
         )
     }
@@ -106,6 +168,8 @@ class DefaultIngestionHookPayloadStorage(
                 started = old.started,
                 message = ExceptionUtils.getStackTrace(any),
                 completion = Time.now(),
+                routing = old.routing,
+                queue = old.queue,
             )
         )
     }
@@ -119,12 +183,14 @@ class DefaultIngestionHookPayloadStorage(
         gitHubEvent: String?,
         repository: String?,
         owner: String?,
+        routing: String?,
+        queue: String?,
     ): Int {
         securityService.checkGlobalFunction(GlobalSettings::class.java)
         return storageService.count(
             store = INGESTION_HOOK_PAYLOAD_STORE,
-            query = query(statuses, gitHubDelivery, gitHubEvent, repository, owner),
-            queryVariables = queryVariables(statuses, gitHubDelivery, gitHubEvent, repository, owner),
+            query = query(statuses, gitHubDelivery, gitHubEvent, repository, owner, routing, queue),
+            queryVariables = queryVariables(statuses, gitHubDelivery, gitHubEvent, repository, owner, routing, queue),
         )
     }
 
@@ -135,10 +201,12 @@ class DefaultIngestionHookPayloadStorage(
         gitHubDelivery: String?,
         gitHubEvent: String?,
         repository: String?,
-        owner: String?
+        owner: String?,
+        routing: String?,
+        queue: String?,
     ): List<IngestionHookPayload> {
         securityService.checkGlobalFunction(GlobalSettings::class.java)
-        val query: String? = query(statuses, gitHubDelivery, gitHubEvent, repository, owner)
+        val query: String? = query(statuses, gitHubDelivery, gitHubEvent, repository, owner, routing, queue)
         return storageService.filter(
             store = INGESTION_HOOK_PAYLOAD_STORE,
             type = IngestionHookPayload::class,
@@ -146,7 +214,7 @@ class DefaultIngestionHookPayloadStorage(
             size = size,
             orderQuery = "order by data->>'timestamp' desc",
             query = query,
-            queryVariables = queryVariables(statuses, gitHubDelivery, gitHubEvent, repository, owner),
+            queryVariables = queryVariables(statuses, gitHubDelivery, gitHubEvent, repository, owner, routing, queue),
         )
     }
 
@@ -165,6 +233,8 @@ class DefaultIngestionHookPayloadStorage(
         gitHubEvent: String?,
         repository: String?,
         owner: String?,
+        routing: String?,
+        queue: String?,
     ): String? {
         val parts = mutableListOf<String>()
         if (statuses != null && statuses.isNotEmpty()) {
@@ -184,6 +254,12 @@ class DefaultIngestionHookPayloadStorage(
         if (!owner.isNullOrBlank()) {
             parts += "data->'repository'->'owner'->>'login' = :owner"
         }
+        if (!routing.isNullOrBlank()) {
+            parts += "data->>'routing' = :routing"
+        }
+        if (!queue.isNullOrBlank()) {
+            parts += "data->>'queue' = :queue"
+        }
         return if (parts.isNotEmpty()) {
             parts.joinToString(" AND ") { "( $it )" }
         } else {
@@ -197,6 +273,8 @@ class DefaultIngestionHookPayloadStorage(
         gitHubEvent: String?,
         repository: String?,
         owner: String?,
+        routing: String?,
+        queue: String?,
     ): Map<String, *>? {
         val variables = mutableMapOf<String, Any?>()
         if (!gitHubDelivery.isNullOrBlank()) {
@@ -210,6 +288,12 @@ class DefaultIngestionHookPayloadStorage(
         }
         if (!owner.isNullOrBlank()) {
             variables["owner"] = owner
+        }
+        if (!routing.isNullOrBlank()) {
+            variables["routing"] = routing
+        }
+        if (!queue.isNullOrBlank()) {
+            variables["queue"] = queue
         }
         return variables.takeIf { it.isNotEmpty() }
     }

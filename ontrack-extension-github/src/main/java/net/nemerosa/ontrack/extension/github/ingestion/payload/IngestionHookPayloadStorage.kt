@@ -13,6 +13,22 @@ interface IngestionHookPayloadStorage {
     fun store(payload: IngestionHookPayload)
 
     /**
+     * Routing information
+     *
+     * @param payload Payload to save
+     * @param routing Routing information to save
+     */
+    fun routing(payload: IngestionHookPayload, routing: String)
+
+    /**
+     * Queue information
+     *
+     * @param payload Payload to save
+     * @param queue Queue information to save
+     */
+    fun queue(payload: IngestionHookPayload, queue: String)
+
+    /**
      * Adapt the status for a payload's processing starting
      */
     fun start(payload: IngestionHookPayload)
@@ -35,6 +51,8 @@ interface IngestionHookPayloadStorage {
      * @param gitHubEvent Filter on the GitHub Event
      * @param repository Filter on the repository
      * @param owner Filter on the repository owner
+     * @param routing Filter on the routing information
+     * @param queue Filter on the queue information
      */
     fun count(
         statuses: List<IngestionHookPayloadStatus>? = null,
@@ -42,6 +60,8 @@ interface IngestionHookPayloadStorage {
         gitHubEvent: String? = null,
         repository: String? = null,
         owner: String? = null,
+        routing: String? = null,
+        queue: String? = null,
     ): Int
 
     /**
@@ -54,6 +74,8 @@ interface IngestionHookPayloadStorage {
      * @param gitHubEvent Filter on the GitHub Event
      * @param repository Filter on the repository
      * @param owner Filter on the repository owner
+     * @param routing Filter on the routing information
+     * @param queue Filter on the queue information
      * @return List of matching payloads
      */
     fun list(
@@ -64,6 +86,8 @@ interface IngestionHookPayloadStorage {
         gitHubEvent: String? = null,
         repository: String? = null,
         owner: String? = null,
+        routing: String? = null,
+        queue: String? = null,
     ): List<IngestionHookPayload>
 
     /**

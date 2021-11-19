@@ -24,6 +24,8 @@ import java.util.*
  * @property message Status message (exception stack trace in case of error)
  * @property completion Timestamp for the end of the processing
  * @property configuration Name of the GitHub configuration to use
+ * @property routing Routing information
+ * @property queue Queue information
  */
 data class IngestionHookPayload(
     @APIDescription("Unique ID for this payload")
@@ -54,4 +56,8 @@ data class IngestionHookPayload(
     val completion: LocalDateTime? = null,
     @APIDescription("Name of the GitHub configuration to use")
     val configuration: String? = null,
+    @APIDescription("Routing information")
+    val routing: String? = null,
+    @APIDescription("Queue information")
+    val queue: String? = null,
 )

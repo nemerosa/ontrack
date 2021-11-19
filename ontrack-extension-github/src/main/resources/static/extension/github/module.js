@@ -28,6 +28,8 @@ angular.module('ontrack.extension.github', [
                 $gitHubEvent: String,
                 $repository: String,
                 $owner: String,
+                $routing: String,
+                $queue: String,
             ) {
                 gitHubIngestionHookPayloadStatuses
                 gitHubIngestionHookPayloads(
@@ -38,6 +40,8 @@ angular.module('ontrack.extension.github', [
                     gitHubEvent: $gitHubEvent,
                     repository: $repository,
                     owner: $owner,
+                    routing: $routing,
+                    queue: $queue,
                 ) {
                     pageInfo {
                         totalSize
@@ -57,6 +61,8 @@ angular.module('ontrack.extension.github', [
                         gitHubDelivery
                         status
                         completion
+                        routing
+                        queue
                         repository {
                             name
                             htmlUrl
@@ -92,6 +98,8 @@ angular.module('ontrack.extension.github', [
             statuses: null,
             repository: null,
             owner: null,
+            routing: null,
+            queue: null,
         };
 
         $scope.filter = {
@@ -100,6 +108,8 @@ angular.module('ontrack.extension.github', [
             gitHubEvent: '',
             repository: '',
             owner: '',
+            routing: '',
+            queue: '',
         };
 
         $scope.loadingPayloads = true;
@@ -140,6 +150,16 @@ angular.module('ontrack.extension.github', [
             } else {
                 variables.owner = null;
             }
+            if ($scope.filter.routing) {
+                variables.routing = $scope.filter.routing;
+            } else {
+                variables.routing = null;
+            }
+            if ($scope.filter.queue) {
+                variables.queue = $scope.filter.queue;
+            } else {
+                variables.queue = null;
+            }
             loadPayloads();
         };
 
@@ -149,6 +169,8 @@ angular.module('ontrack.extension.github', [
             $scope.filter.gitHubEvent = '';
             $scope.filter.repository = '';
             $scope.filter.owner = '';
+            $scope.filter.routing = '';
+            $scope.filter.queue = '';
             $scope.submitFilter();
         };
 

@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.metrics.INGESTION_METRIC_
 import net.nemerosa.ontrack.extension.github.ingestion.metrics.IngestionMetrics
 import net.nemerosa.ontrack.extension.github.ingestion.metrics.increment
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
+import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.format
 import org.springframework.amqp.core.AmqpTemplate
@@ -25,10 +26,12 @@ import org.springframework.stereotype.Component
 class AsyncIngestionHookQueue(
     private val meterRegistry: MeterRegistry,
     private val amqpTemplate: AmqpTemplate,
+    private val ingestionHookPayloadStorage: IngestionHookPayloadStorage,
     private val ingestionConfigProperties: IngestionConfigProperties,
 ) : IngestionHookQueue {
     override fun queue(payload: IngestionHookPayload) {
         val routingKey = AsyncIngestionHookQueueConfig.getRoutingKey(ingestionConfigProperties, payload.repository)
+        ingestionHookPayloadStorage.routing(payload, routingKey)
         meterRegistry.increment(payload, IngestionMetrics.Queue.producedCount, INGESTION_METRIC_ROUTING_TAG to routingKey)
         val message = payload.asJson().format()
         amqpTemplate.convertAndSend(

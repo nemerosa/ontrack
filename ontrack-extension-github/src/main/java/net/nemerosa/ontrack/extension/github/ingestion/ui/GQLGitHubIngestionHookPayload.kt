@@ -55,5 +55,7 @@ class GQLGitHubIngestionHookPayload(
                 .description(getDescription(IngestionHookPayload::repository))
                 .type(gqlGitHubRepository.typeRef)
         }
+        .stringField(IngestionHookPayload::routing)
+        .stringField(IngestionHookPayload::queue)
         .build()
 }

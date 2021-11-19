@@ -14,7 +14,7 @@
             <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                    <th colspan="8">
+                    <th colspan="10">
                         <form class="form-inline" ng-submit="submitFilter()">
                             <div class="form-group">
                                 <button class="btn"
@@ -49,6 +49,14 @@
                                 <input type="text" class="form-control" id="filter_owner" ng-model="filter.owner"/>
                             </div>
                             <div class="form-group">
+                                <label for="filter_routing">Routing</label>
+                                <input type="text" class="form-control" id="filter_routing" ng-model="filter.routing"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="filter_queue">Queue</label>
+                                <input type="text" class="form-control" id="filter_queue" ng-model="filter.queue"/>
+                            </div>
+                            <div class="form-group">
                                 <button class="btn btn-primary" type="submit">
                                     <span class="fa fa-search"></span>
                                     <span>Filter</span>
@@ -70,13 +78,15 @@
                     <th>Event</th>
                     <th>Repository</th>
                     <th>Owner</th>
+                    <th>Routing</th>
+                    <th>Queue</th>
                     <th>Status</th>
                     <th>Completion</th>
                 </tr>
                 </thead>
                 <tbody ng-if="payloads.length == 0">
                 <tr class="warning">
-                    <td colspan="8">
+                    <td colspan="10">
                         No payload has been received or the filter is too restrictive.
                     </td>
                 </tr>
@@ -103,6 +113,12 @@
                         <code>{{ payload.repository.owner.login }}</code>
                     </td>
                     <td>
+                        <code>{{ payload.routing }}</code>
+                    </td>
+                    <td>
+                        <code>{{ payload.queue }}</code>
+                    </td>
+                    <td>
                         <code>{{ payload.status }}</code>
                     </td>
                     <td>
@@ -112,7 +128,7 @@
                     </td>
                 </tr>
                 <tr ng-if="payload.showDetails && !payload.loadingDetails && payload.details">
-                    <td colspan="6">
+                    <td colspan="10">
                         <p ng-if="payload.details.message">
                             {{ payload.details.message }}
                         </p>
@@ -122,7 +138,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <td colspan="8">
+                    <td colspan="10">
                         <button ng-disabled="!pageInfo.previousPage" class="btn btn-default" ng-click="topPayloads()">
                             <span class="fa fa-fast-backward"></span>
                             Newest payloads

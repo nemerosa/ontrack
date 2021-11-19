@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.metrics.INGESTION_METRIC_
 import net.nemerosa.ontrack.extension.github.ingestion.metrics.IngestionMetrics
 import net.nemerosa.ontrack.extension.github.ingestion.metrics.increment
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
+import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionHookProcessingService
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component
 class AsyncIngestionHookQueueListener(
     private val ingestionConfigProperties: IngestionConfigProperties,
     private val ingestionHookProcessingService: IngestionHookProcessingService,
+    private val ingestionHookPayloadStorage: IngestionHookPayloadStorage,
     private val securityService: SecurityService,
     private val applicationLogService: ApplicationLogService,
     private val meterRegistry: MeterRegistry,
@@ -32,10 +34,12 @@ class AsyncIngestionHookQueueListener(
     private val listener = MessageListener { message ->
         val body = message.body.toString(Charsets.UTF_8)
         val payload = body.parseAsJson().parse<IngestionHookPayload>()
+        val queue = message.messageProperties.consumerQueue
+        ingestionHookPayloadStorage.queue(payload, queue)
         meterRegistry.increment(
             payload,
             IngestionMetrics.Queue.consumedCount,
-            INGESTION_METRIC_QUEUE_TAG to message.messageProperties.consumerQueue
+            INGESTION_METRIC_QUEUE_TAG to queue
         )
         onMessage(payload)
     }
