@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.github.ingestion
 
-import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.kdsl.acceptance.annotations.AcceptanceTestSuite
 import net.nemerosa.ontrack.kdsl.acceptance.tests.github.AbstractACCDSLGitHubTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.resourceAsJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
+import net.nemerosa.ontrack.kdsl.connector.parse
 import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHub
 import net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion.ingestion
 import org.junit.Test
@@ -55,8 +55,9 @@ class ACCDSLGitHubIngestion : AbstractACCDSLGitHubTestSupport() {
         )
         // Payload: response checks
         assertEquals(200, response.statusCode)
-        response.body.asText().parseAsJson().apply {
-            // TODO Checks response body
+        response.body.parse<GitHubIngestionHookResponse>().apply {
+            assertTrue(processing, "Processing has started")
+            assertNotNull(uuid, "The payload has been assigned a UUID")
         }
         // Payload: wait until the payload processing is complete
         waitUntil {
