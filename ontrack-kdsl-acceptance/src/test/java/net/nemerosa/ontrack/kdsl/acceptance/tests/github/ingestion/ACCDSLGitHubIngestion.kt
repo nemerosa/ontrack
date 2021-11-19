@@ -101,54 +101,56 @@ class ACCDSLGitHubIngestion : AbstractACCDSLGitHubTestSupport() {
 
         // Post-check: getting the new counters & comparison
         val postMetrics = getMetrics()
-        checkNotUsed(preMetrics, postMetrics, nonExpectedRouting)
-        checkUsed(preMetrics, postMetrics, expectedRouting)
+        checkNotUsed(name, preMetrics, postMetrics, nonExpectedRouting)
+        checkUsed(name, preMetrics, postMetrics, expectedRouting)
     }
 
-    private fun checkUsed(preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
-        checkProducedUsed(preMetrics, postMetrics, key)
-        checkConsumeUsed(preMetrics, postMetrics, key)
+    private fun checkUsed(name: String, preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
+        checkProducedUsed(name, preMetrics, postMetrics, key)
+        checkConsumeUsed(name, preMetrics, postMetrics, key)
     }
 
-    private fun checkProducedUsed(preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
-        val preCount = preMetrics.getProducedCount(key)
-        val postCount = postMetrics.getProducedCount(key)
-        assertTrue(postCount > preCount, "$key routing has been used.")
+    private fun checkProducedUsed(name: String, preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
+        val preCount = preMetrics.getProducedCount(name, key)
+        val postCount = postMetrics.getProducedCount(name, key)
+        assertTrue(postCount > preCount, "$key routing has been used for repository $name.")
     }
 
-    private fun checkConsumeUsed(preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
-        val preCount = preMetrics.getConsumedCount(key)
-        val postCount = postMetrics.getConsumedCount(key)
-        assertTrue(postCount > preCount, "$key queue has been used.")
+    private fun checkConsumeUsed(name: String, preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
+        val preCount = preMetrics.getConsumedCount(name, key)
+        val postCount = postMetrics.getConsumedCount(name, key)
+        assertTrue(postCount > preCount, "$key queue has been used for repository $name.")
     }
 
-    private fun checkNotUsed(preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
-        checkProducedNotUsed(preMetrics, postMetrics, key)
-        checkConsumeNotUsed(preMetrics, postMetrics, key)
+    private fun checkNotUsed(name: String, preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
+        checkProducedNotUsed(name, preMetrics, postMetrics, key)
+        checkConsumeNotUsed(name, preMetrics, postMetrics, key)
     }
 
-    private fun checkProducedNotUsed(preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
-        val preCount = preMetrics.getProducedCount(key)
-        val postCount = postMetrics.getProducedCount(key)
-        assertEquals(preCount, postCount, "$key routing has not been used.")
+    private fun checkProducedNotUsed(name: String, preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
+        val preCount = preMetrics.getProducedCount(key, name)
+        val postCount = postMetrics.getProducedCount(key, name)
+        assertEquals(preCount, postCount, "$key routing has not been used for repository $name.")
     }
 
-    private fun checkConsumeNotUsed(preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
-        val preCount = preMetrics.getConsumedCount(key)
-        val postCount = postMetrics.getConsumedCount(key)
-        assertEquals(preCount, postCount, "$key queue has not been used.")
+    private fun checkConsumeNotUsed(name: String, preMetrics: MetricCollection, postMetrics: MetricCollection, key: String) {
+        val preCount = preMetrics.getConsumedCount(key, name)
+        val postCount = postMetrics.getConsumedCount(key, name)
+        assertEquals(preCount, postCount, "$key queue has not been used for repository $name.")
     }
 
-    private fun MetricCollection.getProducedCount(routing: String): Int =
+    private fun MetricCollection.getProducedCount(repository: String, routing: String): Int =
         getCounter(
             "ontrack_extension_github_ingestion_queue_produced_count_total",
-            "routing" to routing
+            "routing" to routing,
+            "repository" to repository,
         ) ?: 0
 
-    private fun MetricCollection.getConsumedCount(queue: String): Int =
+    private fun MetricCollection.getConsumedCount(repository: String, queue: String): Int =
         getCounter(
             "ontrack_extension_github_ingestion_queue_consumed_count_total",
-            "queue" to "github.ingestion.$queue"
+            "queue" to "github.ingestion.$queue",
+            "repository" to repository,
         ) ?: 0
 
 }
