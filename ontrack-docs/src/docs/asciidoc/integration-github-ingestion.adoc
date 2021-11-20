@@ -350,3 +350,26 @@ ontrack:
 ----
 
 This will create an additional queue, called `github.ingestion.very-active` where all the processing for the `my-very-active-repository` repository will be sent to.
+
+[[integration-github-ingestion-configuration-queue]]
+===== Queues configurations
+
+Both the default queue and the repository specific queues can have their number of consumers being configured:
+
+[source,yaml]
+----
+ontrack:
+  extension:
+    github:
+      ingestion:
+        processing:
+          repositories:
+            very-active:
+              repository: my-very-active-repository
+              config:
+                concurrency: 20
+          default:
+            concurrency: 10
+----
+
+See <<configuration-properties>> for the list of all available properties.
