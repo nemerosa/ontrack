@@ -16,6 +16,7 @@ const val INGESTION_CONFIG_FILE_PATH = ".github/ontrack/ingestion.yml"
  * @param jobs List of specific job configurations
  * @param jobsFilter Filtering on the jobs
  * @param stepsFilter Filtering on the steps
+ * @param promotions Auto promotion configuration
  */
 @APIName("GitHubIngestionConfig")
 @APIDescription("Configuration for the ingestion of GitHub Actions workflows.")
@@ -30,6 +31,8 @@ data class IngestionConfig(
     val jobsFilter: FilterConfig = FilterConfig(),
     @APIDescription("Filtering on the steps")
     val stepsFilter: FilterConfig = FilterConfig(),
+    @APIDescription("Auto promotion configuration")
+    val promotions: List<PromotionConfig> = emptyList(),
 )
 
 /**
@@ -94,4 +97,21 @@ data class JobConfig(
     val validation: String? = null,
     @APIDescription("Description for the validation stamp")
     val description: String? = null,
+)
+
+/**
+ * Promotion configuration
+ *
+ * @param name Unique name for the promotion in the branch
+ */
+@APIName("GitHubIngestionPromotionConfig")
+data class PromotionConfig(
+    @APIDescription("Unique name for the promotion in the branch")
+    val name: String,
+    @APIDescription("Optional description")
+    val description: String? = null,
+    @APIDescription("List of validations triggering this promotion. Important: these names are the names of the validations after step name resolution.")
+    val validations: List<String> = emptyList(),
+    @APIDescription("List of promotions triggering this promotion")
+    val promotions: List<String> = emptyList(),
 )

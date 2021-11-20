@@ -130,6 +130,20 @@ stepsFilter:
   includes: ".*"
   # Exclusion rule (by default, no step is excluded)
   excluded: ""
+# Auto promotion configuration
+promotions:
+  # One item per promotion to define
+  - name: promotion-name
+    # Optional description
+    description: Promotion description
+    # List of validations triggering this promotion
+    # Important: these names are the names of the validations after step name resolution
+    validations:
+      - validation-1
+      - validation-2
+    # List of promotions triggering this promotion
+    promotions:
+      - other-promotion
 ----
 
 For example, if we want to associate the vaidation stamp `unit-tests` to the step `Runs unit tests` in the `build` job, we can use:
@@ -178,6 +192,28 @@ This information is also available programmatically using a GraphQL query:
     }
   }
 }
+----
+
+[[integration-github-ingestion-customization-examples]]
+===== Customization examples
+
+To configure auto-promotions:
+
+[source,yaml]
+----
+promotions:
+  - name: BRONZE
+    description: Basic build is OK.
+    validations:
+      - build
+      - unit-tests
+  - name: SILVER
+    description: End to end tests are OK.
+    validations:
+      - ui-acceptance
+      - api-acceptance
+    promotions:
+      - BRONZE
 ----
 
 [[integration-github-ingestion-settings]]
