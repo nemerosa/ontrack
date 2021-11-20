@@ -3,6 +3,9 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.job
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.PromotionLevel
+import net.nemerosa.ontrack.model.structure.ValidationStamp
 import java.time.LocalDateTime
 
 interface WorkflowJobProcessingService {
@@ -32,4 +35,30 @@ interface WorkflowJobProcessingService {
         startedAt: LocalDateTime?,
         completedAt: LocalDateTime?
     )
+
+    /**
+     * Gets or creates a validation stamp
+     *
+     * @param branch Parent branch
+     * @param vsName Name of the validation stamp
+     * @param vsDescription Description of the validation stamp
+     */
+    fun setupValidationStamp(
+        branch: Branch,
+        vsName: String,
+        vsDescription: String?
+    ): ValidationStamp
+
+    /**
+     * Gets or creates a promotion level
+     *
+     * @param branch Parent branch
+     * @param plName Name of the promotion level
+     * @param plDescription Description of the promotion level
+     */
+    fun setupPromotionLevel(
+        branch: Branch,
+        plName: String,
+        plDescription: String?
+    ): PromotionLevel
 }

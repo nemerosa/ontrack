@@ -11,6 +11,7 @@ dependencies {
 
     implementation(project(":ontrack-ui-graphql"))
     implementation("org.apache.commons:commons-lang3")
+    implementation(project(":ontrack-extension-general"))
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-extension-indicators"))
     implementation("io.jsonwebtoken:jjwt-api")

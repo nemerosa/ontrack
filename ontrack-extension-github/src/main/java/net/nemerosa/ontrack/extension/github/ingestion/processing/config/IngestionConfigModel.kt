@@ -114,4 +114,8 @@ data class PromotionConfig(
     val validations: List<String> = emptyList(),
     @APIDescription("List of promotions triggering this promotion")
     val promotions: List<String> = emptyList(),
+    @APIDescription("Regular expression to include validation stamps by name")
+    val include: String? = null,
+    @APIDescription("Regular expression to exclude validation stamps by name")
+    val exclude: String? = null,
 )

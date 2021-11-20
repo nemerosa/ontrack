@@ -52,7 +52,7 @@ class DefaultWorkflowJobProcessingService(
         val build = findBuild(projectName, runId)
             ?: throw BuildWithWorkflowRunIdNotFoundException(projectName, runId)
         // Gets the ingestion configuration
-        val ingestionConfig = getOrLoadIngestionConfig(repository, build.branch)
+        val ingestionConfig = getOrLoadIngestionConfig(build.branch)
         // Skipping job or not, depending on the configuration
         if (step == null && ingestionConfig.general.skipJobs) {
             return
@@ -67,13 +67,7 @@ class DefaultWorkflowJobProcessingService(
         val vsName = getValidationStampName(ingestionConfig, job, step)
         val vsDescription = getValidationStampDescription(ingestionConfig, job, step)
         // Gets or creates a validation stamp for the branch
-        val vs = structureService.findValidationStampByName(build.project.name, build.branch.name, vsName).getOrNull()
-            ?: structureService.newValidationStamp(
-                ValidationStamp.of(
-                    build.branch,
-                    nd(vsName, vsDescription)
-                )
-            )
+        val vs = setupValidationStamp(build.branch, vsName, vsDescription)
         // Gets or creates the validation run based on the job number
         val run = setupValidationRun(
             build = build,
@@ -111,6 +105,58 @@ class DefaultWorkflowJobProcessingService(
         }
     }
 
+    override fun setupValidationStamp(
+        branch: Branch,
+        vsName: String,
+        vsDescription: String?
+    ): ValidationStamp {
+        val existing = structureService.findValidationStampByName(branch.project.name, branch.name, vsName).getOrNull()
+        return if (existing != null) {
+            // Adapt description if need be
+            if (vsDescription != null && vsDescription != existing.description) {
+                val adapted = existing.withDescription(vsDescription)
+                structureService.saveValidationStamp(
+                    adapted
+                )
+                adapted
+            } else {
+                // Done
+                existing
+            }
+        } else {
+            structureService.newValidationStamp(
+                ValidationStamp.of(
+                    branch,
+                    nd(vsName, vsDescription)
+                )
+            )
+        }
+    }
+
+    override fun setupPromotionLevel(branch: Branch, plName: String, plDescription: String?): PromotionLevel {
+        val existing = structureService.findPromotionLevelByName(branch.project.name, branch.name, plName).getOrNull()
+        return if (existing != null) {
+            // Adapt description if need be
+            if (plDescription != null && plDescription != existing.description) {
+                val adapted = existing.withDescription(plDescription)
+                structureService.savePromotionLevel(
+                    adapted
+                )
+                adapted
+            } else {
+                // Done
+                existing
+            }
+        } else {
+            structureService.newPromotionLevel(
+                PromotionLevel.of(
+                    branch,
+                    nd(plName, plDescription)
+                )
+            )
+        }
+    }
+
     private fun ignoreJob(job: String, settings: GitHubIngestionSettings, ingestionConfig: IngestionConfig): Boolean =
         FilterHelper.excludes(job, settings.jobIncludes, settings.jobExcludes) ||
                 !ingestionConfig.filterJob(job)
@@ -119,7 +165,7 @@ class DefaultWorkflowJobProcessingService(
         FilterHelper.excludes(step, settings.stepIncludes, settings.stepExcludes) ||
                 !ingestionConfig.filterStep(step)
 
-    private fun getOrLoadIngestionConfig(repository: Repository, branch: Branch): IngestionConfig {
+    private fun getOrLoadIngestionConfig(branch: Branch): IngestionConfig {
         val gitBranchProperty =
             propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java).value
         return if (gitBranchProperty != null) {

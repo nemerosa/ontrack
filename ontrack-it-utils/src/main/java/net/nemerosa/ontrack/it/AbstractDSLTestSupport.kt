@@ -151,9 +151,10 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      */
     fun Branch.validationStamp(
             name: String = uid("VS"),
+            description: String = "",
             validationDataTypeConfig: ValidationDataTypeConfig<*>? = null
     ): ValidationStamp =
-            doCreateValidationStamp(this, NameDescription.nd(name, ""), validationDataTypeConfig)
+            doCreateValidationStamp(this, NameDescription.nd(name, description), validationDataTypeConfig)
 
     /**
      * Deletes a validation stamp

@@ -395,4 +395,92 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
         }
     }
 
+    @Test
+    fun `Setup validation stamp when non existing`() {
+        project {
+            branch {
+                asAdmin {
+                    val setup = workflowJobProcessingService.setupValidationStamp(this, "VS", "Validation stamp name")
+                    assertEquals("VS", setup.name)
+                    assertEquals("Validation stamp name", setup.description)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Setup validation stamp when existing with null input description`() {
+        project {
+            branch {
+                val vs = validationStamp("VS", description = "Validation stamp name")
+                asAdmin {
+                    val setup = workflowJobProcessingService.setupValidationStamp(this, "VS", null)
+                    assertEquals(vs.id, setup.id)
+                    assertEquals("VS", setup.name)
+                    assertEquals("Validation stamp name", setup.description)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Setup validation stamp when existing with new input description`() {
+        project {
+            branch {
+                val vs = validationStamp("VS", description = "Validation stamp name")
+                asAdmin {
+                    val setup = workflowJobProcessingService.setupValidationStamp(this, "VS", "Another description")
+                    assertEquals(vs.id, setup.id)
+                    assertEquals("VS", setup.name)
+                    assertEquals("Another description", setup.description)
+                    assertEquals(setup.description, structureService.getValidationStamp(vs.id).description)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Setup promotion level when non existing`() {
+        project {
+            branch {
+                asAdmin {
+                    val setup = workflowJobProcessingService.setupPromotionLevel(this, "PL", "Promotion level name")
+                    assertEquals("PL", setup.name)
+                    assertEquals("Promotion level name", setup.description)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Setup promotion level when existing with null input description`() {
+        project {
+            branch {
+                val pl = promotionLevel("PL", "Promotion level name")
+                asAdmin {
+                    val setup = workflowJobProcessingService.setupPromotionLevel(this, "PL", null)
+                    assertEquals(pl.id, setup.id)
+                    assertEquals("PL", setup.name)
+                    assertEquals("Promotion level name", setup.description)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Setup promotion level when existing with new input description`() {
+        project {
+            branch {
+                val pl = promotionLevel("PL", "Promotion level name")
+                asAdmin {
+                    val setup = workflowJobProcessingService.setupPromotionLevel(this, "PL", "Another description")
+                    assertEquals(pl.id, setup.id)
+                    assertEquals("PL", setup.name)
+                    assertEquals("Another description", setup.description)
+                    assertEquals(setup.description, structureService.getPromotionLevel(pl.id).description)
+                }
+            }
+        }
+    }
+
 }

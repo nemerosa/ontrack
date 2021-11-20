@@ -144,6 +144,10 @@ promotions:
     # List of promotions triggering this promotion
     promotions:
       - other-promotion
+    # Regular expression to include validation stamps by name
+    # include:
+    # Regular expression to exclude validation stamps by name
+    # exclude:
 ----
 
 For example, if we want to associate the vaidation stamp `unit-tests` to the step `Runs unit tests` in the `build` job, we can use:
