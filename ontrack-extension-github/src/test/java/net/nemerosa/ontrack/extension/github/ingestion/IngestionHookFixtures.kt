@@ -17,6 +17,11 @@ import java.util.*
 object IngestionHookFixtures {
 
     /**
+     * Run name
+     */
+    val sampleRunName = "CI"
+
+    /**
      * Workflow run payload
      */
     fun workflowRunPayload(
@@ -35,7 +40,7 @@ object IngestionHookFixtures {
         action = action,
         workflowRun = WorkflowRun(
             id = runId,
-            name = "CI",
+            name = sampleRunName,
             runNumber = runNumber,
             pullRequests = emptyList(),
             headBranch = headBranch,
