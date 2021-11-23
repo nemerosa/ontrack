@@ -23,6 +23,17 @@ Builds and validation runs are associated with properties & decorations linking 
 
 The creation of the validation runs occurs as the workflow run is in progress, allowing Ontrack to collect information as it goes.
 
+[[integration-github-ingestion-release-property]]
+===== Release property on tag
+
+If a tag is pushed, Ontrack will look for all builds being associated with tag's commit, and the release property will be set on these builds using the shortened tag name.
+
+For example:
+
+* a build has been created with commit property set to `1abcdef`
+* a tag `1.2.1` is pushed for the `1abcdef` commit
+* the build is "tagged" (its release property is set) to `1.2.1`
+
 [[integration-github-ingestion-setup-ontrack]]
 ==== Ontrack setup
 
