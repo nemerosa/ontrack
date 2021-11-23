@@ -7,7 +7,7 @@ data class Commit(
     val id: String,
     val message: String,
     val author: Author?,
-    val added: List<String>,
-    val removed: List<String>,
-    val modified: List<String>,
+    val added: List<String> = emptyList(),
+    val removed: List<String> = emptyList(),
+    val modified: List<String> = emptyList(),
 )

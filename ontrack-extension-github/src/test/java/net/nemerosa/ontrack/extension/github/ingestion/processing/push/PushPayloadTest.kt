@@ -8,6 +8,12 @@ import kotlin.test.assertEquals
 class PushPayloadTest {
 
     @Test
+    fun `Tag push payload`() {
+        assertEquals(null, payload().getTag())
+        assertEquals("1.0", payload(ref = "refs/tags/1.0").getTag())
+    }
+
+    @Test
     fun `Checking the paths`() {
         assertEquals(true, payload().isAdded("added-path-in-commit-1"))
         assertEquals(true, payload().isAddedOrModified("added-path-in-commit-1"))
@@ -26,9 +32,11 @@ class PushPayloadTest {
         assertEquals(true, payload().isRemoved("removed-path-in-commit-2"))
     }
 
-    private fun payload() = PushPayload(
+    private fun payload(
+        ref: String = "refs/heads/${IngestionHookFixtures.sampleBranch}",
+    ) = PushPayload(
         repository = IngestionHookFixtures.sampleRepository(),
-        ref = "refs/heads/${IngestionHookFixtures.sampleBranch}",
+        ref = ref,
         commits = listOf(
             Commit(
                 id = "commit-1",
@@ -58,7 +66,21 @@ class PushPayloadTest {
                     "removed-path-in-commit-2",
                 ),
             ),
-        )
+        ),
+        headCommit = Commit(
+            id = "commit-1",
+            message = "Commit 1",
+            author = IngestionHookFixtures.sampleAuthor(),
+            added = listOf(
+                "added-path-in-commit-1",
+            ),
+            modified = listOf(
+                "modified-path-in-commit-1",
+            ),
+            removed = listOf(
+                "removed-path-in-commit-1",
+            ),
+        ),
     )
 
 }
