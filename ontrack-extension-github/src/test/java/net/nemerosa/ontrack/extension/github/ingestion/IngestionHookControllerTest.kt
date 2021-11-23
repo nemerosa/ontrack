@@ -74,6 +74,44 @@ class IngestionHookControllerTest {
     }
 
     @Test
+    fun `Disabling the ingestion`() {
+        val storage = mockk<IngestionHookPayloadStorage>()
+        val queue = mockk<IngestionHookQueue>()
+        val securityService = MockSecurityService()
+        val meterRegistry = mockk<MeterRegistry>()
+
+        val ingestionEventProcessor = mockIngestionEventProcessor()
+        every { ingestionEventProcessor.preProcessingCheck(any()) } returns IngestionEventPreprocessingCheck.TO_BE_PROCESSED
+
+        val controller =
+            IngestionHookController(
+                queue,
+                storage,
+                MockIngestionHookSignatureService(),
+                securityService,
+                meterRegistry,
+                mockSettings(enabled = false),
+                listOf(ingestionEventProcessor),
+            )
+
+        val body = IngestionHookFixtures.sampleWorkflowRunJsonPayload().format()
+        val headers = IngestionHookFixtures.payloadHeaders(event = "workflow_run")
+
+        assertFailsWith<GitHubIngestionHookDisabledException> {
+            controller.hook(
+                body = body,
+                gitHubDelivery = headers.gitHubDelivery,
+                gitHubEvent = headers.gitHubEvent,
+                gitHubHookID = headers.gitHubHookID,
+                gitHubHookInstallationTargetID = headers.gitHubHookInstallationTargetID,
+                gitHubHookInstallationTargetType = headers.gitHubHookInstallationTargetType,
+                signature = "",
+                configuration = null,
+            )
+        }
+    }
+
+    @Test
     fun `Excluding a repository`() {
         val storage = mockk<IngestionHookPayloadStorage>()
         val queue = mockk<IngestionHookQueue>()
@@ -251,11 +289,13 @@ class IngestionHookControllerTest {
     }
 
     private fun mockSettings(
+        enabled: Boolean = true,
         repositoryIncludes: String = GitHubIngestionSettings.DEFAULT_REPOSITORY_INCLUDES,
         repositoryExcludes: String = GitHubIngestionSettings.DEFAULT_REPOSITORY_EXCLUDES,
     ): CachedSettingsService {
         val cachedSettingsService = mockk<CachedSettingsService>()
         val settings = GitHubIngestionSettings(
+            enabled = enabled,
             token = "token",
             repositoryIncludes = repositoryIncludes,
             repositoryExcludes = repositoryExcludes,

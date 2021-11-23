@@ -225,6 +225,7 @@ promotions:
 
 In the _Settings > GitHub workflow ingestion_ section, you can configure the following features:
 
+* if the ingestion of GitHub hooks is enabled or not
 * the secret token used by the GitHub hook
 * the number of days GitHub hook payloads are kept by Ontrack
 * if the organization name must be used as a prefix for the generated project names

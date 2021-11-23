@@ -17,6 +17,7 @@ import net.nemerosa.ontrack.model.annotations.APIName
  * @property jobExcludes Regular expression to exclude jobs
  * @property stepIncludes Regular expression to include steps
  * @property stepExcludes Regular expression to exclude steps
+ * @property enabled Is the ingestion of the GitHub events enabled?
  */
 class GitHubIngestionSettings(
     @APIDescription("Secret token sent by the GitHub hook and signing the payload")
@@ -48,6 +49,9 @@ class GitHubIngestionSettings(
     @APIName("Default issue service identifier")
     @APIDescription("Identifier of the issue service to use by default. For example `self` for GitHub issues or `jira//config`.")
     val issueServiceIdentifier: String = DEFAULT_ISSUE_SERVICE_IDENTIFIER,
+    @APIName("Ingestion enabled")
+    @APIDescription("Is the ingestion of the GitHub events enabled?")
+    val enabled: Boolean = DEFAULT_ENABLED,
 ) {
     companion object {
         /**
@@ -99,5 +103,10 @@ class GitHubIngestionSettings(
          * By default, using the GitHub issues.
          */
         const val DEFAULT_ISSUE_SERVICE_IDENTIFIER = IssueServiceConfigurationRepresentation.SELF_ID
+
+        /**
+         * By default, enabling the ingestion
+         */
+        const val DEFAULT_ENABLED = true
     }
 }

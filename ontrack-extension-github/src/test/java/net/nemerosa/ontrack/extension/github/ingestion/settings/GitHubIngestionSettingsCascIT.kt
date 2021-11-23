@@ -39,6 +39,7 @@ class GitHubIngestionSettingsCascIT : AbstractCascTestSupport() {
                 assertEquals(".*", settings.stepIncludes)
                 assertEquals("", settings.stepExcludes)
                 assertEquals("self", settings.issueServiceIdentifier)
+                assertEquals(true, settings.enabled)
             }
         }
     }
@@ -61,6 +62,7 @@ class GitHubIngestionSettingsCascIT : AbstractCascTestSupport() {
                         config:
                             settings:
                                 github-ingestion:
+                                    enabled: false
                                     token: new-token
                                     retentionDays: 60
                                     orgProjectPrefix: true
@@ -86,6 +88,7 @@ class GitHubIngestionSettingsCascIT : AbstractCascTestSupport() {
                 assertEquals(".*", settings.stepIncludes)
                 assertEquals(".*ontrack.*", settings.stepExcludes)
                 assertEquals("jira//config", settings.issueServiceIdentifier)
+                assertEquals(false, settings.enabled)
             }
         }
     }

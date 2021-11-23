@@ -53,6 +53,10 @@ class GitHubIngestionSettingsProvider(
             GitHubIngestionSettings::issueServiceIdentifier,
             GitHubIngestionSettings.DEFAULT_ISSUE_SERVICE_IDENTIFIER,
         ),
+        enabled = settingsRepository.getBoolean(
+            GitHubIngestionSettings::enabled,
+            GitHubIngestionSettings.DEFAULT_ENABLED,
+        ),
     )
 
     override fun getSettingsClass(): Class<GitHubIngestionSettings> = GitHubIngestionSettings::class.java

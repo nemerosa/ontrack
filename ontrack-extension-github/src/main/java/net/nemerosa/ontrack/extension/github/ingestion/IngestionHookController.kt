@@ -49,6 +49,11 @@ class IngestionHookController(
         @RequestHeader("X-Hub-Signature-256") signature: String,
         @RequestParam(value = "configuration", required = false) configuration: String?,
     ): IngestionHookResponse {
+        // Checking if the hook is enabled
+        val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
+        if (!settings.enabled) {
+            throw GitHubIngestionHookDisabledException()
+        }
         // Gets the event processor if any
         val eventProcessor =
             eventProcessors[gitHubEvent] ?: throw GitHubIngestionHookEventNotSupportedException(gitHubEvent)
@@ -72,7 +77,6 @@ class IngestionHookController(
         }
         // Repository-based filter
         if (repository != null) {
-            val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
             if (FilterHelper.excludes(
                     repository.name,
                     settings.repositoryIncludes,

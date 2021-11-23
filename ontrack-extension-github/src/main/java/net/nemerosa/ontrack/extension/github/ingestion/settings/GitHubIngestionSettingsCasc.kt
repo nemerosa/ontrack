@@ -33,6 +33,7 @@ class GitHubIngestionSettingsCasc(
         cascField(GitHubIngestionSettings::stepIncludes, required = false),
         cascField(GitHubIngestionSettings::stepExcludes, required = false),
         cascField(GitHubIngestionSettings::issueServiceIdentifier, required = false),
+        cascField(GitHubIngestionSettings::enabled, required = false),
     )
 
     override fun adjustNodeBeforeParsing(node: JsonNode): JsonNode =
@@ -47,5 +48,6 @@ class GitHubIngestionSettingsCasc(
             GitHubIngestionSettings::stepIncludes to GitHubIngestionSettings.DEFAULT_STEP_INCLUDES,
             GitHubIngestionSettings::stepExcludes to GitHubIngestionSettings.DEFAULT_STEP_EXCLUDES,
             GitHubIngestionSettings::issueServiceIdentifier to GitHubIngestionSettings.DEFAULT_ISSUE_SERVICE_IDENTIFIER,
+            GitHubIngestionSettings::enabled to GitHubIngestionSettings.DEFAULT_ENABLED,
         )
 }

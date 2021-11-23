@@ -47,10 +47,17 @@ class GitHubIngestionSettingsManager(
         settingsRepository.setString<GitHubIngestionSettings>(settings::stepIncludes)
         settingsRepository.setString<GitHubIngestionSettings>(settings::stepExcludes)
         settingsRepository.setString<GitHubIngestionSettings>(settings::issueServiceIdentifier)
+        settingsRepository.setBoolean<GitHubIngestionSettings>(settings::enabled)
     }
 
     override fun getSettingsForm(settings: GitHubIngestionSettings?): Form =
         Form.create()
+            .with(
+                YesNo.of(GitHubIngestionSettings::enabled.name)
+                    .label(getName(GitHubIngestionSettings::enabled))
+                    .help(getDescription(GitHubIngestionSettings::enabled))
+                    .value(settings?.enabled ?: GitHubIngestionSettings.DEFAULT_ENABLED)
+            )
             .with(
                 Password.of(GitHubIngestionSettings::token.name)
                     .label("Token")
