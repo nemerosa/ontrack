@@ -95,6 +95,7 @@ class ConfigParserTest {
                 stepsFilter:
                   includes: ".*"
                   excludes: ""
+                promotions: []
             """.trimIndent().trim(),
             yaml.trim()
         )
