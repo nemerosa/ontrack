@@ -151,8 +151,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      */
     fun Branch.validationStamp(
             name: String = uid("VS"),
+            validationDataTypeConfig: ValidationDataTypeConfig<*>? = null,
             description: String = "",
-            validationDataTypeConfig: ValidationDataTypeConfig<*>? = null
     ): ValidationStamp =
             doCreateValidationStamp(this, NameDescription.nd(name, description), validationDataTypeConfig)
 
