@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.events.Workflo
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Owner
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import org.junit.Test
@@ -32,6 +33,8 @@ class WorkflowRunPayloadTest {
                     updatedAtDate = null,
                     htmlUrl = "https://github.com/nemerosa/github-ingestion-poc/actions/runs/1395528922",
                     event = "push",
+                    status = WorkflowJobStepStatus.in_progress,
+                    conclusion = null,
                 ),
                 repository = Repository(
                     name = "my-repo",

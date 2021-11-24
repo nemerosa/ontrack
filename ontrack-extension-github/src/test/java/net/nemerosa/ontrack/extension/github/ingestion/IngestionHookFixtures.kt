@@ -49,6 +49,8 @@ object IngestionHookFixtures {
             updatedAtDate = null,
             htmlUrl = htmlUrl,
             event = "push",
+            status = WorkflowJobStepStatus.in_progress,
+            conclusion = null,
         ),
         repository = sampleRepository(repoName, repoDescription, owner),
         sender = User(login = sender)

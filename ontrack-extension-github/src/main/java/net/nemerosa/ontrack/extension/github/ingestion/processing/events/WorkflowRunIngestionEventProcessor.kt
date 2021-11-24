@@ -18,15 +18,14 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInf
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.INGESTION_CONFIG_FILE_PATH
 import net.nemerosa.ontrack.extension.github.ingestion.processing.job.WorkflowJobProcessingService
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.PullRequest
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.support.NoConfig
 import org.springframework.stereotype.Component
@@ -253,6 +252,8 @@ data class WorkflowRun internal constructor(
     val updatedAtDate: LocalDateTime?,
     val htmlUrl: String,
     val event: String,
+    val status: WorkflowJobStepStatus,
+    val conclusion: WorkflowJobStepConclusion?,
 ) {
 
     @JsonCreator
@@ -274,6 +275,8 @@ data class WorkflowRun internal constructor(
         @JsonProperty("html_url")
         htmlUrl: String,
         event: String,
+        status: WorkflowJobStepStatus,
+        conclusion: WorkflowJobStepConclusion?,
     ) : this(
         id = id,
         name = name,
@@ -285,6 +288,8 @@ data class WorkflowRun internal constructor(
         updatedAtDate = updatedAt?.run { parseLocalDateTime(this) },
         htmlUrl = htmlUrl,
         event = event,
+        status = status,
+        conclusion = conclusion,
     )
 
 }

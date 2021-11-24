@@ -10,10 +10,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.events.Workflo
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunIngestionEventProcessor
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunPayload
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Owner
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunDecorator
@@ -358,6 +355,8 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
             htmlUrl = htmlUrl,
             updatedAtDate = updatedAtDate,
             event = "push",
+            status = WorkflowJobStepStatus.in_progress,
+            conclusion = null,
         ),
         repository = Repository(
             name = repoName,
