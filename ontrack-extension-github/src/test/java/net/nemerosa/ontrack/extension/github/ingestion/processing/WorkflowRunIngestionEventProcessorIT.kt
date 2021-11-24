@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunIngestionEventProcessor
@@ -20,10 +21,13 @@ import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProp
 import net.nemerosa.ontrack.model.structure.RunInfoService
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
+import org.junit.Before
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.context.ContextConfiguration
 import java.time.LocalDateTime
 import kotlin.test.*
 
+@ContextConfiguration(classes = [ConfigLoaderServiceITMockConfig::class])
 class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
 
     @Autowired
@@ -34,6 +38,14 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
 
     @Autowired
     private lateinit var runInfoService: RunInfoService
+
+    @Autowired
+    private lateinit var configLoaderService: ConfigLoaderService
+
+    @Before
+    fun init() {
+        ConfigLoaderServiceITMockConfig.defaultIngestionConfig(configLoaderService)
+    }
 
     @Test
     fun `Build workflow run link running state`() {
