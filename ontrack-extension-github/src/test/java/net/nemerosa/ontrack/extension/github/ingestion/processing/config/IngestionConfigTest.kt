@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
+import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -11,7 +12,7 @@ class IngestionConfigTest {
     fun `Job validation stamp name without customization`() {
         assertEquals(
             "job",
-            IngestionConfig().getValidationStampName("job", null)
+            IngestionConfig().getValidationStampName(settings(), "job", null)
         )
     }
 
@@ -23,7 +24,7 @@ class IngestionConfigTest {
                 jobs = listOf(
                     JobConfig(name = "job"),
                 )
-            ).getValidationStampName("job", null)
+            ).getValidationStampName(settings(), "job", null)
         )
     }
 
@@ -35,7 +36,7 @@ class IngestionConfigTest {
                 jobs = listOf(
                     JobConfig(name = "job", validation = "job-validation"),
                 )
-            ).getValidationStampName("job", null)
+            ).getValidationStampName(settings(), "job", null)
         )
     }
 
@@ -43,7 +44,7 @@ class IngestionConfigTest {
     fun `Step validation stamp name without customization`() {
         assertEquals(
             "job-name-step-name",
-            IngestionConfig().getValidationStampName("Job name", "Step name")
+            IngestionConfig().getValidationStampName(settings(), "Job name", "Step name")
         )
     }
 
@@ -55,7 +56,7 @@ class IngestionConfigTest {
                 steps = listOf(
                     StepConfig(name = "Step name", validation = "step-validation"),
                 )
-            ).getValidationStampName("Job name", "Step name")
+            ).getValidationStampName(settings(), "Job name", "Step name")
         )
     }
 
@@ -70,7 +71,7 @@ class IngestionConfigTest {
                 jobs = listOf(
                     JobConfig(name = "Job name", validation = "job-validation")
                 ),
-            ).getValidationStampName("Job name", "Step name")
+            ).getValidationStampName(settings(), "Job name", "Step name")
         )
     }
 
@@ -82,7 +83,7 @@ class IngestionConfigTest {
                 steps = listOf(
                     StepConfig(name = "Step name", validation = "step-validation", validationJobPrefix = false),
                 )
-            ).getValidationStampName("Job name", "Step name")
+            ).getValidationStampName(settings(), "Job name", "Step name")
         )
     }
 
@@ -94,7 +95,7 @@ class IngestionConfigTest {
                 steps = listOf(
                     StepConfig(name = "Step name", validationJobPrefix = false),
                 )
-            ).getValidationStampName("Job name", "Step name")
+            ).getValidationStampName(settings(), "Job name", "Step name")
         )
     }
 
@@ -175,4 +176,104 @@ class IngestionConfigTest {
         assertTrue(IngestionConfig(stepsFilter = FilterConfig(includes = "My.*")).filterStep("My step"))
         assertFalse(IngestionConfig(stepsFilter = FilterConfig(excludes = "My.*")).filterStep("My step"))
     }
+
+    @Test
+    fun `Step validation stamp name using defaults in settings to add the job prefix`() {
+        assertEquals(
+            "job-name-step-name",
+            IngestionConfig(
+                steps = listOf(
+                    StepConfig(name = "Step name"),
+                )
+            ).getValidationStampName(settings(validationJobPrefix = true), "Job name", "Step name")
+        )
+    }
+
+    @Test
+    fun `Step validation stamp name using defaults in settings to remove the job prefix`() {
+        assertEquals(
+            "step-name",
+            IngestionConfig(
+                steps = listOf(
+                    StepConfig(name = "Step name"),
+                )
+            ).getValidationStampName(settings(validationJobPrefix = false), "Job name", "Step name")
+        )
+    }
+
+    @Test
+    fun `Step validation stamp name using defaults in general config to add the job prefix`() {
+        assertEquals(
+            "job-name-step-name",
+            IngestionConfig(
+                general = IngestionConfigGeneral(
+                    validationJobPrefix = true
+                ),
+                steps = listOf(
+                    StepConfig(name = "Step name"),
+                )
+            ).getValidationStampName(settings(validationJobPrefix = false), "Job name", "Step name")
+        )
+    }
+
+    @Test
+    fun `Step validation stamp name using defaults in job config to add the job prefix`() {
+        assertEquals(
+            "job-name-step-name",
+            IngestionConfig(
+                general = IngestionConfigGeneral(
+                    validationJobPrefix = false
+                ),
+                steps = listOf(
+                    StepConfig(name = "Step name"),
+                ),
+                jobs = listOf(
+                    JobConfig(name = "Job name", validationJobPrefix = true)
+                )
+            ).getValidationStampName(settings(validationJobPrefix = false), "Job name", "Step name")
+        )
+    }
+
+    @Test
+    fun `Step validation stamp name using step config to add the job prefix`() {
+        assertEquals(
+            "job-name-step-name",
+            IngestionConfig(
+                general = IngestionConfigGeneral(
+                    validationJobPrefix = false
+                ),
+                steps = listOf(
+                    StepConfig(name = "Step name", validationJobPrefix = true),
+                ),
+                jobs = listOf(
+                    JobConfig(name = "Job name", validationJobPrefix = false)
+                )
+            ).getValidationStampName(settings(validationJobPrefix = false), "Job name", "Step name")
+        )
+    }
+
+    @Test
+    fun `Step validation stamp name using step config to remove the job prefix`() {
+        assertEquals(
+            "step-name",
+            IngestionConfig(
+                general = IngestionConfigGeneral(
+                    validationJobPrefix = true
+                ),
+                steps = listOf(
+                    StepConfig(name = "Step name", validationJobPrefix = false),
+                ),
+                jobs = listOf(
+                    JobConfig(name = "Job name", validationJobPrefix = true)
+                )
+            ).getValidationStampName(settings(validationJobPrefix = true), "Job name", "Step name")
+        )
+    }
+
+    private fun settings(
+        validationJobPrefix: Boolean = true,
+    ) = GitHubIngestionSettings(
+        token = "some-token",
+        validationJobPrefix = validationJobPrefix,
+    )
 }

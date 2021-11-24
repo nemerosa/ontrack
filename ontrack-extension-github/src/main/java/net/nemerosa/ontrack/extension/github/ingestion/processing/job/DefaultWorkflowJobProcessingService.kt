@@ -64,7 +64,7 @@ class DefaultWorkflowJobProcessingService(
         val runProperty = propertyService.getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java).value
             ?: error("Cannot find workflow run property on build")
         // Name & description of the validation stamp
-        val vsName = getValidationStampName(ingestionConfig, job, step)
+        val vsName = getValidationStampName(settings, ingestionConfig, job, step)
         val vsDescription = getValidationStampDescription(ingestionConfig, job, step)
         // Gets or creates a validation stamp for the branch
         val vs = setupValidationStamp(build.branch, vsName, vsDescription)
@@ -242,8 +242,8 @@ class DefaultWorkflowJobProcessingService(
         }
     }
 
-    private fun getValidationStampName(ingestionConfig: IngestionConfig, job: String, step: String?): String =
-        ingestionConfig.getValidationStampName(job, step)
+    private fun getValidationStampName(settings: GitHubIngestionSettings, ingestionConfig: IngestionConfig, job: String, step: String?): String =
+        ingestionConfig.getValidationStampName(settings, job, step)
 
     private fun getValidationStampDescription(ingestionConfig: IngestionConfig, job: String, step: String?): String =
         ingestionConfig.getValidationStampDescription(job, step)

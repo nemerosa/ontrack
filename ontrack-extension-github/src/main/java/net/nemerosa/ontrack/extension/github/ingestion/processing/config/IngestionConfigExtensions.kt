@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
+import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
 import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 
 /**
@@ -9,38 +10,40 @@ import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 private fun IngestionConfig.mustUseValidationJobPrefix(
     job: String,
     stepConfig: StepConfig?,
+    settings: GitHubIngestionSettings,
 ): Boolean =
     stepConfig?.validationJobPrefix // Trying at step config level
         ?: findJobConfig(job)?.validationJobPrefix // Trying at job level
         ?: general.validationJobPrefix // Trying at general level
-        ?: TODO("Using the settings") // Using the settings
+        ?: settings.validationJobPrefix // Using the settings
 
 /**
  * Mapping of a step into a validation stamp name.
  *
  * @receiver The ingestion configuration
+ * @param settings The ingestion global settings
  * @param job The exact name of the job in the workflow
  * @param step The exact name of the step in the workflow (null when dealing with the job level)
  * @return Name of the validation stamp to use
  */
-fun IngestionConfig.getValidationStampName(job: String, step: String?): String =
+fun IngestionConfig.getValidationStampName(settings: GitHubIngestionSettings, job: String, step: String?): String =
     if (step == null) {
         val jobConfig = findJobConfig(job)
         val baseName = jobConfig?.validation ?: job
         normalizeName(baseName)
     } else {
         val stepConfig = findStepConfig(step)
-        val stepValidationJobPrefix = mustUseValidationJobPrefix(job, stepConfig)
+        val stepValidationJobPrefix = mustUseValidationJobPrefix(job, stepConfig, settings)
         val baseName = if (stepConfig?.validation != null) {
             if (stepValidationJobPrefix) {
-                val jobName = getValidationStampName(job, null)
+                val jobName = getValidationStampName(settings, job, null)
                 "$jobName-${stepConfig.validation}"
             } else {
                 stepConfig.validation
             }
         } else {
             if (stepValidationJobPrefix) {
-                val jobName = getValidationStampName(job, null)
+                val jobName = getValidationStampName(settings, job, null)
                 "$jobName-$step"
             } else {
                 step
