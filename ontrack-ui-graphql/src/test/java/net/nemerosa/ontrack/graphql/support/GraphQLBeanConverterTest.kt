@@ -90,7 +90,6 @@ class GraphQLBeanConverterTest {
                 "username" to "String!",
                 "password" to "String!",
                 "identity" to "Person!",
-                "roles" to "[String!]!",
             ),
             fields
         )
