@@ -18,6 +18,7 @@ import net.nemerosa.ontrack.model.annotations.APIName
  * @property stepIncludes Regular expression to include steps
  * @property stepExcludes Regular expression to exclude steps
  * @property enabled Is the ingestion of the GitHub events enabled?
+ * @property validationJobPrefix Must we use the job name as a prefix to the validation stamp?
  */
 class GitHubIngestionSettings(
     @APIDescription("Secret token sent by the GitHub hook and signing the payload")
@@ -52,6 +53,9 @@ class GitHubIngestionSettings(
     @APIName("Ingestion enabled")
     @APIDescription("Is the ingestion of the GitHub events enabled?")
     val enabled: Boolean = DEFAULT_ENABLED,
+    @APIName("Using job name as validation name prefix")
+    @APIDescription("Must we use the job name as a prefix to the validation stamp?")
+    val validationJobPrefix: Boolean = DEFAULT_VALIDATION_JOB_PREFIX,
 ) {
     companion object {
         /**
@@ -108,5 +112,10 @@ class GitHubIngestionSettings(
          * By default, enabling the ingestion
          */
         const val DEFAULT_ENABLED = true
+
+        /**
+         * By default, using the job name as a prefix for the validation stamps
+         */
+        const val DEFAULT_VALIDATION_JOB_PREFIX = true
     }
 }

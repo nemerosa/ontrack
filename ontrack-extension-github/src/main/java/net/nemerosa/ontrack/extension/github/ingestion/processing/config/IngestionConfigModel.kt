@@ -39,12 +39,15 @@ data class IngestionConfig(
  * General settings
  *
  * @param skipJobs Must jobs be considered as validations?
+ * @param validationJobPrefix Must we use the job name as a prefix to the validation stamp?
  */
 @APIName("GitHubIngestionConfigGeneral")
 @APIDescription("General settings")
 data class IngestionConfigGeneral(
     @APIDescription("Must jobs be considered as validations?")
     val skipJobs: Boolean = true,
+    @APIDescription("Must we use the job name as a prefix to the validation stamp?")
+    val validationJobPrefix: Boolean? = null,
 )
 
 /**
@@ -77,7 +80,7 @@ data class StepConfig(
     @APIDescription("Name of the validation stamp to use (instead of a generated one)")
     val validation: String? = null,
     @APIDescription("Must we use the job name as a prefix to the validation stamp?")
-    val validationJobPrefix: Boolean = true,
+    val validationJobPrefix: Boolean? = null,
     @APIDescription("Description for the validation stamp")
     val description: String? = null,
 )
@@ -88,6 +91,7 @@ data class StepConfig(
  * @param name Exact name of the job in the workflow
  * @param validation Name of the validation stamp to use (instead of a generated one)
  * @param description Description for the validation stamp
+ * @param validationJobPrefix Must we use the job name as a prefix to the validation stamp?
  */
 @APIName("GitHubIngestionJobConfig")
 data class JobConfig(
@@ -97,6 +101,8 @@ data class JobConfig(
     val validation: String? = null,
     @APIDescription("Description for the validation stamp")
     val description: String? = null,
+    @APIDescription("Must we use the job name as a prefix to the validation stamp?")
+    val validationJobPrefix: Boolean? = null,
 )
 
 /**

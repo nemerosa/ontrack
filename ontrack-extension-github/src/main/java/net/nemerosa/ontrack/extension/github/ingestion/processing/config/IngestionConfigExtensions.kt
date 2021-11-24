@@ -4,6 +4,18 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normaliz
 import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 
 /**
+ *
+ */
+private fun IngestionConfig.mustUseValidationJobPrefix(
+    job: String,
+    stepConfig: StepConfig?,
+): Boolean =
+    stepConfig?.validationJobPrefix // Trying at step config level
+        ?: findJobConfig(job)?.validationJobPrefix // Trying at job level
+        ?: general.validationJobPrefix // Trying at general level
+        ?: TODO("Using the settings") // Using the settings
+
+/**
  * Mapping of a step into a validation stamp name.
  *
  * @receiver The ingestion configuration
@@ -18,15 +30,16 @@ fun IngestionConfig.getValidationStampName(job: String, step: String?): String =
         normalizeName(baseName)
     } else {
         val stepConfig = findStepConfig(step)
+        val stepValidationJobPrefix = mustUseValidationJobPrefix(job, stepConfig)
         val baseName = if (stepConfig?.validation != null) {
-            if (stepConfig.validationJobPrefix) {
+            if (stepValidationJobPrefix) {
                 val jobName = getValidationStampName(job, null)
                 "$jobName-${stepConfig.validation}"
             } else {
                 stepConfig.validation
             }
         } else {
-            if (stepConfig == null || stepConfig.validationJobPrefix) {
+            if (stepValidationJobPrefix) {
                 val jobName = getValidationStampName(job, null)
                 "$jobName-$step"
             } else {

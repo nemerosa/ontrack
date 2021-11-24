@@ -57,6 +57,10 @@ class GitHubIngestionSettingsProvider(
             GitHubIngestionSettings::enabled,
             GitHubIngestionSettings.DEFAULT_ENABLED,
         ),
+        validationJobPrefix = settingsRepository.getBoolean(
+            GitHubIngestionSettings::validationJobPrefix,
+            GitHubIngestionSettings.DEFAULT_VALIDATION_JOB_PREFIX,
+        ),
     )
 
     override fun getSettingsClass(): Class<GitHubIngestionSettings> = GitHubIngestionSettings::class.java

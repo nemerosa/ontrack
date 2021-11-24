@@ -49,16 +49,18 @@ class ConfigParserTest {
             """
         ) {
             assertEquals(true, it.general.skipJobs)
+            assertEquals(null, it.general.validationJobPrefix)
 
             assertEquals(1, it.steps.size)
             assertEquals("Step name", it.steps.first().name)
             assertEquals(null, it.steps.first().validation)
-            assertEquals(true, it.steps.first().validationJobPrefix)
+            assertEquals(null, it.steps.first().validationJobPrefix)
             assertEquals(null, it.steps.first().description)
 
             assertEquals(1, it.jobs.size)
             assertEquals("Job name", it.jobs.first().name)
             assertEquals(null, it.jobs.first().validation)
+            assertEquals(null, it.jobs.first().validationJobPrefix)
             assertEquals(null, it.jobs.first().description)
         }
     }
@@ -80,15 +82,17 @@ class ConfigParserTest {
                 ---
                 general:
                   skipJobs: true
+                  validationJobPrefix: null
                 steps:
                 - name: "Some step"
                   validation: "some-validation"
-                  validationJobPrefix: true
+                  validationJobPrefix: null
                   description: null
                 jobs:
                 - name: "Some job"
                   validation: "some-job"
                   description: null
+                  validationJobPrefix: null
                 jobsFilter:
                   includes: ".*"
                   excludes: ""

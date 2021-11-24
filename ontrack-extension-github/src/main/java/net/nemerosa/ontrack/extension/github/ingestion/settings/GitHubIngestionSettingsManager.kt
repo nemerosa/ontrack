@@ -48,6 +48,7 @@ class GitHubIngestionSettingsManager(
         settingsRepository.setString<GitHubIngestionSettings>(settings::stepExcludes)
         settingsRepository.setString<GitHubIngestionSettings>(settings::issueServiceIdentifier)
         settingsRepository.setBoolean<GitHubIngestionSettings>(settings::enabled)
+        settingsRepository.setBoolean<GitHubIngestionSettings>(settings::validationJobPrefix)
     }
 
     override fun getSettingsForm(settings: GitHubIngestionSettings?): Form =
@@ -127,6 +128,12 @@ class GitHubIngestionSettingsManager(
                     .label(getName(GitHubIngestionSettings::issueServiceIdentifier))
                     .help(getDescription(GitHubIngestionSettings::issueServiceIdentifier))
                     .value(settings?.issueServiceIdentifier ?: GitHubIngestionSettings.DEFAULT_ISSUE_SERVICE_IDENTIFIER)
+            )
+            .with(
+                YesNo.of(GitHubIngestionSettings::validationJobPrefix.name)
+                    .label(getName(GitHubIngestionSettings::validationJobPrefix))
+                    .help(getDescription(GitHubIngestionSettings::validationJobPrefix))
+                    .value(settings?.validationJobPrefix ?: GitHubIngestionSettings.DEFAULT_VALIDATION_JOB_PREFIX)
             )
 
     override fun getId(): String = "github-ingestion"
