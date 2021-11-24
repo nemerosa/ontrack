@@ -100,6 +100,11 @@ class ConfigParserTest {
                   includes: ".*"
                   excludes: ""
                 promotions: []
+                runs:
+                  enabled: null
+                  filter:
+                    includes: ".*"
+                    excludes: ""
             """.trimIndent().trim(),
             yaml.trim()
         )

@@ -57,6 +57,8 @@ class WorkflowRunPayloadTest {
                     "updated_at" to null,
                     "html_url" to "https://github.com/nemerosa/github-ingestion-poc/actions/runs/1395528922",
                     "event" to "push",
+                    "status" to "in_progress",
+                    "conclusion" to null,
                 ),
                 "repository" to mapOf(
                     "name" to "my-repo",
