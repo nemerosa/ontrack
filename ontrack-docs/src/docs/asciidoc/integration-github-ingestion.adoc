@@ -104,6 +104,9 @@ This file is taken into account automatically, on push or when the ingestion con
 general:
   #  Must jobs be considered as validations?
   skipJobs: true
+  # Must we use the job name as a prefix to the validation stamp?
+  # Default value: using the global Ontrack settings
+  # validationJobPrefix: null
 # List of specific step configurations
 steps:
   # Exact name of the step in the workflow (required)
@@ -113,8 +116,8 @@ steps:
     # adjusted for the Ontrack naming constraints & conventions
     validation: the-step-name
     # Must we use the job name as a prefix to the validation stamp?
-    # Default value: the job name is added as a prefix
-    validationJobPrefix: true
+    # Default value: using the settings at job level
+    # validationJobPrefix: null
     # Description for the validation stamp
     # Default value: the name of the step
     description: The step name
@@ -126,6 +129,9 @@ jobs:
     # Default value: the name of the job,
     # adjusted for Ontrack naming constraints & conventions
     validation: job-name
+    # Must we use the job name as a prefix to the validation stamp?
+    # Default value: using the settings at general level
+    # validationJobPrefix: null
     # Description for the validation stamp
     # Default value: the name of the job
     description: Job name
@@ -184,6 +190,7 @@ This information is also available programmatically using a GraphQL query:
     gitHubIngestionConfig {
       general {
         skipJobs
+        validationJobPrefix
       }
       steps {
         name
@@ -194,6 +201,7 @@ This information is also available programmatically using a GraphQL query:
       jobs {
         name
         validation
+        validationJobPrefix
         description
       }
       jobsFilter {
@@ -245,6 +253,37 @@ In the _Settings > GitHub workflow ingestion_ section, you can configure the fol
 * inclusion/exclusion rules for the jobs to be ingested
 * inclusion/exclusion rules for the steps to be ingested
 * the identifier of the issue service to use by default. For example `self` for GitHub issues or `jira//config`.
+* if the job name must be used as a prefix for the validation stamp names
+
+[[integration-github-ingestion-validations]]
+==== Validation stamp names
+
+By default, a step `My step` running in the `My job` job will be associated with the following name: `my-job-my-step`. This can be configured in many ways.
+
+The validation stamp name can be specified in the <<integration-github-ingestion-customization,step configuration>> using the `validation` field. For example, we can force the `My step` to be named `my-job-unit-tests` by using the following configuration:
+
+[source,yaml]
+----
+steps:
+  - name: My step
+    validation: unit-tests
+----
+
+The job prefix (`my-job` in our example) is added by default, and is computed from the job name, and can also be configured using the `validation` field in the <<integration-github-ingestion-customization,job configuration>>.
+
+Configuring the addition or not of the job as a prefix to the general validation stamp can be done at several levels:
+
+* at the step ingestion configuration level
+* at the job ingestion configuration level
+* at the general ingestion configuration level
+* in the general <<integration-github-ingestion-settings,ingestion settings>>
+
+When facing the naming of a step, how to decide if the job prefix must be used or not?
+
+* if defined at step level, use this value
+* if defined at job level, use this value
+* if defined at general level, use this value
+* use the settings value (defaults to true)
 
 [[integration-github-ingestion-management]]
 ==== Management
