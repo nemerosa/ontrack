@@ -35,6 +35,7 @@ class GitHubIngestionSettingsCasc(
         cascField(GitHubIngestionSettings::issueServiceIdentifier, required = false),
         cascField(GitHubIngestionSettings::enabled, required = false),
         cascField(GitHubIngestionSettings::validationJobPrefix, required = false),
+        cascField(GitHubIngestionSettings::runValidations, required = false),
     )
 
     override fun adjustNodeBeforeParsing(node: JsonNode): JsonNode =
@@ -51,5 +52,6 @@ class GitHubIngestionSettingsCasc(
             GitHubIngestionSettings::issueServiceIdentifier to GitHubIngestionSettings.DEFAULT_ISSUE_SERVICE_IDENTIFIER,
             GitHubIngestionSettings::enabled to GitHubIngestionSettings.DEFAULT_ENABLED,
             GitHubIngestionSettings::validationJobPrefix to GitHubIngestionSettings.DEFAULT_VALIDATION_JOB_PREFIX,
+            GitHubIngestionSettings::runValidations to GitHubIngestionSettings.DEFAULT_RUN_VALIDATION,
         )
 }

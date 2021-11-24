@@ -18,6 +18,7 @@ class GitHubIngestionSettingsIT : AbstractIngestionTestSupport() {
                         indexationInterval = 60,
                         issueServiceIdentifier = "jira//config",
                         validationJobPrefix = false,
+                        runValidations = true,
                     )
                 )
                 cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java).apply {
@@ -26,6 +27,7 @@ class GitHubIngestionSettingsIT : AbstractIngestionTestSupport() {
                     assertEquals(60, indexationInterval)
                     assertEquals("jira//config", issueServiceIdentifier)
                     assertEquals(false, validationJobPrefix)
+                    assertEquals(true, runValidations)
                 }
             }
         }

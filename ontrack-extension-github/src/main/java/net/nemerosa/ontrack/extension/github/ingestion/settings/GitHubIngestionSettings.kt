@@ -19,6 +19,7 @@ import net.nemerosa.ontrack.model.annotations.APIName
  * @property stepExcludes Regular expression to exclude steps
  * @property enabled Is the ingestion of the GitHub events enabled?
  * @property validationJobPrefix Must we use the job name as a prefix to the validation stamp?
+ * @property runValidations Must workflow runs be shown at validations?
  */
 class GitHubIngestionSettings(
     @APIDescription("Secret token sent by the GitHub hook and signing the payload")
@@ -56,6 +57,9 @@ class GitHubIngestionSettings(
     @APIName("Using job name as validation name prefix")
     @APIDescription("Must we use the job name as a prefix to the validation stamp?")
     val validationJobPrefix: Boolean = DEFAULT_VALIDATION_JOB_PREFIX,
+    @APIName("Runs as validations")
+    @APIDescription("Must workflow runs be shown at validations?")
+    val runValidations: Boolean = DEFAULT_RUN_VALIDATION,
 ) {
     companion object {
         /**
@@ -117,5 +121,10 @@ class GitHubIngestionSettings(
          * By default, using the job name as a prefix for the validation stamps
          */
         const val DEFAULT_VALIDATION_JOB_PREFIX = true
+
+        /**
+         * By default, workflow runs are not created as validations
+         */
+        const val DEFAULT_RUN_VALIDATION = false
     }
 }

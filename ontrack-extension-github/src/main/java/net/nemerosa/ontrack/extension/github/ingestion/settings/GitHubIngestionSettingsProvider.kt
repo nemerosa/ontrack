@@ -61,6 +61,10 @@ class GitHubIngestionSettingsProvider(
             GitHubIngestionSettings::validationJobPrefix,
             GitHubIngestionSettings.DEFAULT_VALIDATION_JOB_PREFIX,
         ),
+        runValidations = settingsRepository.getBoolean(
+            GitHubIngestionSettings::runValidations,
+            GitHubIngestionSettings.DEFAULT_RUN_VALIDATION,
+        ),
     )
 
     override fun getSettingsClass(): Class<GitHubIngestionSettings> = GitHubIngestionSettings::class.java

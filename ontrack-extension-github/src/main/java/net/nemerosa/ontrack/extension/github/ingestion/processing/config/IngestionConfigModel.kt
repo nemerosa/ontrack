@@ -33,6 +33,8 @@ data class IngestionConfig(
     val stepsFilter: FilterConfig = FilterConfig(),
     @APIDescription("Auto promotion configuration")
     val promotions: List<PromotionConfig> = emptyList(),
+    @APIDescription("Run validations")
+    val runs: IngestionRunConfig = IngestionRunConfig(),
 )
 
 /**
@@ -48,6 +50,18 @@ data class IngestionConfigGeneral(
     val skipJobs: Boolean = true,
     @APIDescription("Must we use the job name as a prefix to the validation stamp?")
     val validationJobPrefix: Boolean? = null,
+)
+
+/**
+ * Run configuration
+ */
+@APIName("GitHubIngestionConfigRun")
+@APIDescription("Settings for the workflow run level")
+data class IngestionRunConfig(
+    @APIDescription("Should we consider the runs to create a validation run?")
+    val enabled: Boolean? = null,
+    @APIDescription("Filter on the run names")
+    val filter: FilterConfig = FilterConfig(),
 )
 
 /**
