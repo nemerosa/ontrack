@@ -89,10 +89,27 @@ class GraphQLBeanConverterTest {
             mapOf(
                 "username" to "String!",
                 "password" to "String!",
-                "identity" to "Person!"
+                "identity" to "Person!",
+                "roles" to "[String!]!",
             ),
             fields
         )
+    }
+
+    @Test
+    fun `List of strings`() {
+        val type = GraphQLBeanConverter.asObjectType(StringListWrapper::class, cache)
+        assertNotNull(type.fieldDefinitions.find { it.name == "list" }) { listField ->
+            assertIs<GraphQLNonNull>(listField.type) { nonNullList ->
+                assertIs<GraphQLList>(nonNullList.wrappedType) { list ->
+                    assertIs<GraphQLNonNull>(list.wrappedType) { nonNullItem ->
+                        assertIs<GraphQLScalarType>(nonNullItem.wrappedType) { scalar ->
+                            assertEquals("String", scalar.name)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Test

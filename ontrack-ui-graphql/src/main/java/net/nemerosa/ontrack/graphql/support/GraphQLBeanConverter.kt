@@ -155,9 +155,11 @@ object GraphQLBeanConverter {
                                 val elementType = listArguments.first()
                                 if (elementType is Class<*>) {
                                     val elementKClass = Reflection.createKotlinClass(elementType)
-                                    val elementGraphQLType = cache.getOrCreate(
-                                        getTypeName(elementKClass)
-                                    ) { asObjectType(elementKClass, cache) }
+                                    val elementScalarType = getScalarType(elementKClass.java)
+                                    val elementGraphQLType = elementScalarType
+                                        ?: cache.getOrCreate(
+                                            getTypeName(elementKClass)
+                                        ) { asObjectType(elementKClass, cache) }
                                     GraphQLList(elementGraphQLType.toNotNull())
                                 } else {
                                     throw IllegalStateException("Only list elements being Java classes are supported")
