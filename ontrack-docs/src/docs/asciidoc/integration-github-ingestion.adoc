@@ -106,7 +106,18 @@ general:
   skipJobs: true
   # Must we use the job name as a prefix to the validation stamp?
   # Default value: using the global Ontrack settings
-  # validationJobPrefix: null
+  validationJobPrefix: null
+# Configuration at workflow run level
+runs:
+  # Set to true or false to enable (or not) the creation of validations for the complete workflow run
+  # By default, it's defined using the general Ontrack settings
+  enabled: null
+  # Filter on the workflow run name, using include/exclude regular expressions
+  filter:
+    # All run names by default
+    includes: .*
+    # No run name is excluded by default
+    excludes: ""
 # List of specific step configurations
 steps:
   # Exact name of the step in the workflow (required)
@@ -117,7 +128,7 @@ steps:
     validation: the-step-name
     # Must we use the job name as a prefix to the validation stamp?
     # Default value: using the settings at job level
-    # validationJobPrefix: null
+    validationJobPrefix: null
     # Description for the validation stamp
     # Default value: the name of the step
     description: The step name
@@ -131,7 +142,7 @@ jobs:
     validation: job-name
     # Must we use the job name as a prefix to the validation stamp?
     # Default value: using the settings at general level
-    # validationJobPrefix: null
+    validationJobPrefix: null
     # Description for the validation stamp
     # Default value: the name of the job
     description: Job name
@@ -140,13 +151,13 @@ jobsFilter:
   # Inclusion rule (by default, all jobs are included)
   includes: ".*"
   # Exclusion rule (by default, no job is excluded)
-  excluded: ""
+  excludes: ""
 # Filter for the steps
 stepsFilter:
   # Inclusion rule (by default, all steps are included)
   includes: ".*"
   # Exclusion rule (by default, no step is excluded)
-  excluded: ""
+  excludes: ""
 # Auto promotion configuration
 promotions:
   # One item per promotion to define
@@ -254,6 +265,7 @@ In the _Settings > GitHub workflow ingestion_ section, you can configure the fol
 * inclusion/exclusion rules for the steps to be ingested
 * the identifier of the issue service to use by default. For example `self` for GitHub issues or `jira//config`.
 * if the job name must be used as a prefix for the validation stamp names
+* if workflow runs must be associated by default to a validation (can be overridden at the ingestion configuration level)
 
 [[integration-github-ingestion-validations]]
 ==== Validation stamp names
