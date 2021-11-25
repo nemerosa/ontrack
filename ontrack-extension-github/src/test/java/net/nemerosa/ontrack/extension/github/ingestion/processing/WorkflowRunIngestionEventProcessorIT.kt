@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
+import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
@@ -16,9 +17,10 @@ import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfiguration
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunDecorator
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.model.structure.RunInfoService
+import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
 import org.junit.Before
+import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import java.time.LocalDateTime
@@ -42,6 +44,100 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
     @Before
     fun init() {
         ConfigLoaderServiceITMockConfig.defaultIngestionConfig(configLoaderService)
+    }
+
+    @Test
+    fun `No validation for the workflow run using the ingestion settings`() {
+        // Only one GitHub configuration
+        onlyOneGitHubConfig()
+        // Starting the run
+        asAdmin {
+            withGitHubIngestionSettings(runValidations = false) {
+                workflowRunValidationTest(expectValidation = false)
+            }
+        }
+    }
+
+    @Test
+    fun `No validation for the workflow run using the ingestion configuration`() {
+        // Only one GitHub configuration
+        onlyOneGitHubConfig()
+        // Starting the run
+        asAdmin {
+            withGitHubIngestionSettings(runValidations = true) {
+                ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
+                    runs = IngestionRunConfig(enabled = false),
+                ))
+                workflowRunValidationTest(expectValidation = false)
+            }
+        }
+    }
+
+    @Test
+    fun `Validation for the workflow run using the ingestion settings`() {
+        // Only one GitHub configuration
+        onlyOneGitHubConfig()
+        // Starting the run
+        asAdmin {
+            withGitHubIngestionSettings(runValidations = true) {
+                workflowRunValidationTest()
+            }
+        }
+    }
+
+    @Test
+    fun `Validation for the workflow run using the ingestion configuration`() {
+        // Only one GitHub configuration
+        onlyOneGitHubConfig()
+        // Starting the run
+        asAdmin {
+            withGitHubIngestionSettings(runValidations = false) {
+                ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
+                    runs = IngestionRunConfig(enabled = true),
+                ))
+                workflowRunValidationTest()
+            }
+        }
+    }
+
+    private fun workflowRunValidationTest(
+        expectValidation: Boolean = true,
+    ) {
+        val payload = payload(
+            status = WorkflowJobStepStatus.completed,
+            conclusion = WorkflowJobStepConclusion.success,
+        )
+        processor.process(
+            payload,
+            null
+        )
+        assertNotNull(structureService.findProjectByName(payload.repository.name).getOrNull()) { project ->
+            assertNotNull(
+                structureService.findBranchByName(project.name, payload.workflowRun.headBranch).getOrNull()
+            ) { branch ->
+                if (expectValidation) {
+                    assertNotNull(
+                        structureService.findValidationStampByName(branch.project.name, branch.name, "ci-run")
+                            .getOrNull()
+                    ) { vs ->
+                        assertNotNull(
+                            structureService.findBuildByName(project.name, branch.name, "ci-1").getOrNull()
+                        ) { build ->
+                            val runs =
+                                structureService.getValidationRunsForBuildAndValidationStamp(build.id, vs.id, 0, 10)
+                            assertEquals(1, runs.size)
+                            val run = runs.first()
+                            assertEquals(ValidationRunStatusID.STATUS_PASSED, run.lastStatus.statusID)
+                        }
+                    }
+                } else {
+                    assertNull(
+                        structureService.findValidationStampByName(branch.project.name, branch.name, "ci-run")
+                            .getOrNull()
+                    )
+                }
+            }
+        }
     }
 
     @Test
@@ -330,18 +426,20 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
 
     private fun payload(
         runId: Long = 1,
-        action: WorkflowRunAction,
-        runNumber: Int,
-        headBranch: String,
+        action: WorkflowRunAction = WorkflowRunAction.completed,
+        runNumber: Int = 1,
+        headBranch: String = "main",
         createdAtDate: LocalDateTime = Time.now(),
-        updatedAtDate: LocalDateTime? = null,
-        repoName: String,
+        updatedAtDate: LocalDateTime? = Time.now().plusSeconds(10),
+        repoName: String = IngestionHookFixtures.sampleRepository,
         repoDescription: String = "Repository $repoName",
-        owner: String,
-        sender: String,
-        commit: String,
-        htmlUrl: String = "https://github.com/nemerosa/github-ingestion-poc/actions/runs/1395528922",
-        repoUrl: String = "https://github.com/nemerosa/github-ingestion-poc",
+        owner: String = IngestionHookFixtures.sampleOwner,
+        sender: String = IngestionHookFixtures.sampleOwner,
+        commit: String = "some-commit",
+        htmlUrl: String = "https://github.com/$owner/$repoName/actions/runs/1395528922",
+        repoUrl: String = "https://github.com/$owner/$repoName",
+        status: WorkflowJobStepStatus = WorkflowJobStepStatus.in_progress,
+        conclusion: WorkflowJobStepConclusion? = null,
     ) = WorkflowRunPayload(
         action = action,
         workflowRun = WorkflowRun(
@@ -355,8 +453,8 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
             htmlUrl = htmlUrl,
             updatedAtDate = updatedAtDate,
             event = "push",
-            status = WorkflowJobStepStatus.in_progress,
-            conclusion = null,
+            status = status,
+            conclusion = conclusion,
         ),
         repository = Repository(
             name = repoName,

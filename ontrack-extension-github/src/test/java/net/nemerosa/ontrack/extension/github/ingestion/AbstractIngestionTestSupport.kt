@@ -29,6 +29,7 @@ abstract class AbstractIngestionTestSupport : AbstractGitHubTestSupport() {
         jobExcludes: String? = GitHubIngestionSettings.DEFAULT_JOB_EXCLUDES,
         issueServiceIdentifier: String? = GitHubIngestionSettings.DEFAULT_ISSUE_SERVICE_IDENTIFIER,
         indexationInterval: Int? = GitHubIngestionSettings.DEFAULT_INDEXATION_INTERVAL,
+        runValidations: Boolean? = GitHubIngestionSettings.DEFAULT_RUN_VALIDATION,
         code: () -> Unit,
     ) {
         withSettings<GitHubIngestionSettings> {
@@ -41,6 +42,7 @@ abstract class AbstractIngestionTestSupport : AbstractGitHubTestSupport() {
                 jobExcludes = jobExcludes ?: old.jobExcludes,
                 indexationInterval = indexationInterval ?: old.indexationInterval,
                 issueServiceIdentifier = issueServiceIdentifier ?: old.issueServiceIdentifier,
+                runValidations = runValidations ?: old.runValidations,
             )
             asAdmin {
                 settingsManagerService.saveSettings(new)
