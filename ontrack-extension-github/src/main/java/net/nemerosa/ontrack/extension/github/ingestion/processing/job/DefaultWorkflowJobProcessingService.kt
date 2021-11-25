@@ -175,7 +175,7 @@ class DefaultWorkflowJobProcessingService(
         }
     }
 
-    private fun setupValidationRun(
+    override fun setupValidationRun(
         build: Build,
         vs: ValidationStamp,
         runAttempt: Int,

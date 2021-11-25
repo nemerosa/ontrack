@@ -3,9 +3,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.job
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.PromotionLevel
-import net.nemerosa.ontrack.model.structure.ValidationStamp
+import net.nemerosa.ontrack.model.structure.*
 import java.time.LocalDateTime
 
 interface WorkflowJobProcessingService {
@@ -35,6 +33,19 @@ interface WorkflowJobProcessingService {
         startedAt: LocalDateTime?,
         completedAt: LocalDateTime?
     )
+
+    /**
+     * Generic method to create a validation run
+     */
+    fun setupValidationRun(
+        build: Build,
+        vs: ValidationStamp,
+        runAttempt: Int,
+        status: WorkflowJobStepStatus,
+        conclusion: WorkflowJobStepConclusion?,
+        startedAt: LocalDateTime?,
+        completedAt: LocalDateTime?
+    ): ValidationRun?
 
     /**
      * Gets or creates a validation stamp
