@@ -10,7 +10,9 @@
     "created_at": "2021-11-18T16:54:00Z",
     "updated_at": "2021-11-18T16:58:00Z",
     "html_url": "",
-    "event": "push"
+    "event": "push",
+    "status": "completed",
+    "conclusion": "success"
   },
   "repository": {
     "name": "default-routing-repository",
