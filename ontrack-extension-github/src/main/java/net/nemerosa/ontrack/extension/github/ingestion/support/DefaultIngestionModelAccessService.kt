@@ -1,7 +1,12 @@
 package net.nemerosa.ontrack.extension.github.ingestion.support
 
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
 import net.nemerosa.ontrack.extension.github.ingestion.processing.*
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.PullRequest
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.getProjectName
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
@@ -15,6 +20,7 @@ import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.support.NoConfig
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -25,6 +31,7 @@ class DefaultIngestionModelAccessService(
     private val gitHubConfigurationService: GitHubConfigurationService,
     private val propertyService: PropertyService,
     private val cachedSettingsService: CachedSettingsService,
+    private val gitCommitPropertyCommitLink: GitCommitPropertyCommitLink,
 ) : IngestionModelAccessService {
 
     override fun getOrCreateProject(repository: Repository, configuration: String?): Project {
@@ -108,24 +115,43 @@ class DefaultIngestionModelAccessService(
     override fun getOrCreateBranch(
         project: Project,
         headBranch: String,
-        baseBranch: String?,
+        pullRequest: PullRequest?,
     ): Branch {
-        if (baseBranch != null) {
-            TODO("Pull requests are not supported yet.")
+        val (branchName, gitBranch) = if (pullRequest != null) {
+            val key = "PR-${pullRequest.number}"
+            key to key
         } else {
-            val branchName = normalizeName(headBranch)
-            return structureService.findBranchByName(project.name, branchName)
-                .getOrNull()
-                ?: structureService.newBranch(
-                    Branch.of(
-                        project,
-                        nd(
-                            name = branchName,
-                            description = "$headBranch branch",
-                        )
+            normalizeName(headBranch) to headBranch
+        }
+        val branch = structureService.findBranchByName(project.name, branchName)
+            .getOrNull()
+            ?: structureService.newBranch(
+                Branch.of(
+                    project,
+                    nd(
+                        name = branchName,
+                        description = "$headBranch branch",
                     )
                 )
+            )
+        // Setup the Git configuration for this branch
+        if (!propertyService.hasProperty(branch, GitBranchConfigurationPropertyType::class.java)) {
+            propertyService.editProperty(
+                branch,
+                GitBranchConfigurationPropertyType::class.java,
+                GitBranchConfigurationProperty(
+                    branch = gitBranch,
+                    buildCommitLink = ConfiguredBuildGitCommitLink(
+                        gitCommitPropertyCommitLink,
+                        NoConfig.INSTANCE
+                    ).toServiceConfiguration(),
+                    isOverride = false,
+                    buildTagInterval = 0,
+                )
+            )
         }
+        // OK
+        return branch
     }
 
 }

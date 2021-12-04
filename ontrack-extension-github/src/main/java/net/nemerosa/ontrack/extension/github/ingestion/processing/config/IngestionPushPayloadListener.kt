@@ -25,7 +25,7 @@ class IngestionPushPayloadListener(
             repository = payload.repository,
             configuration = configuration,
             headBranch = payload.branchName,
-            baseBranch = null, // TODO PR support
+            pullRequest = null, // No PR on push (see PR `synchronize` event)
         )
         when {
             payload.isAddedOrModified(INGESTION_CONFIG_FILE_PATH) -> configService.loadAndSaveConfig(

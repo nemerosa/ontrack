@@ -40,7 +40,6 @@ import kotlin.reflect.KClass
 class WorkflowRunIngestionEventProcessor(
     structureService: StructureService,
     private val propertyService: PropertyService,
-    private val gitCommitPropertyCommitLink: GitCommitPropertyCommitLink,
     private val runInfoService: RunInfoService,
     private val ingestionModelAccessService: IngestionModelAccessService,
     private val configService: ConfigService,
@@ -151,7 +150,8 @@ class WorkflowRunIngestionEventProcessor(
         config.promotions.forEach { plConfig ->
             val promotion = promotions[plConfig.name]
             if (promotion != null) {
-                val existingAutoPromotionProperty: AutoPromotionProperty? = propertyService.getProperty(promotion, AutoPromotionPropertyType::class.java).value
+                val existingAutoPromotionProperty: AutoPromotionProperty? =
+                    propertyService.getProperty(promotion, AutoPromotionPropertyType::class.java).value
                 val autoPromotionProperty = AutoPromotionProperty(
                     validationStamps = plConfig.validations.mapNotNull { validations[it] },
                     promotionLevels = plConfig.promotions.mapNotNull { promotions[it] },
@@ -159,7 +159,9 @@ class WorkflowRunIngestionEventProcessor(
                     exclude = plConfig.exclude ?: "",
                 )
                 if (existingAutoPromotionProperty == null || existingAutoPromotionProperty != autoPromotionProperty) {
-                    propertyService.editProperty(promotion, AutoPromotionPropertyType::class.java, autoPromotionProperty)
+                    propertyService.editProperty(promotion,
+                        AutoPromotionPropertyType::class.java,
+                        autoPromotionProperty)
                 }
             }
         }
@@ -211,24 +213,8 @@ class WorkflowRunIngestionEventProcessor(
         val branch = ingestionModelAccessService.getOrCreateBranch(
             project = project,
             headBranch = payload.workflowRun.headBranch,
-            baseBranch = null, // TODO Missing PR support
+            pullRequest = payload.workflowRun.pullRequests.firstOrNull(),
         )
-        // Setup the Git configuration for this branch
-        if (!propertyService.hasProperty(branch, GitBranchConfigurationPropertyType::class.java)) {
-            propertyService.editProperty(
-                branch,
-                GitBranchConfigurationPropertyType::class.java,
-                GitBranchConfigurationProperty(
-                    branch = payload.workflowRun.headBranch,
-                    buildCommitLink = ConfiguredBuildGitCommitLink(
-                        gitCommitPropertyCommitLink,
-                        NoConfig.INSTANCE
-                    ).toServiceConfiguration(),
-                    isOverride = false,
-                    buildTagInterval = 0,
-                )
-            )
-        }
         // OK
         return branch
     }
