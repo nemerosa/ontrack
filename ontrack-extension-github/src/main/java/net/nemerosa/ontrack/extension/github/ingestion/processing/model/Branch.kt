@@ -12,4 +12,5 @@ class Branch(
 @JsonIgnoreProperties(ignoreUnknown = true)
 class BranchRepo(
     val name: String,
+    val owner: Owner,
 )
