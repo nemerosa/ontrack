@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.events
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.AutoPromotionProperty
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
@@ -205,11 +206,15 @@ class WorkflowRunIngestionEventProcessor(
     }
 
     private fun getOrCreateBranch(project: Project, payload: WorkflowRunPayload): Branch =
-        ingestionModelAccessService.getOrCreateBranch(
-            project = project,
-            headBranch = payload.workflowRun.headBranch,
-            pullRequest = payload.workflowRun.pullRequests.firstOrNull(),
-        )
+        if (payload.workflowRun.pullRequests.size > 1) {
+            throw WorkflowRunMoreThanOnePRException()
+        } else {
+            ingestionModelAccessService.getOrCreateBranch(
+                project = project,
+                headBranch = payload.workflowRun.headBranch,
+                pullRequest = payload.workflowRun.pullRequests.firstOrNull(),
+            )
+        }
 
     private fun getOrCreateProject(payload: WorkflowRunPayload, configuration: String?): Project =
         ingestionModelAccessService.getOrCreateProject(
@@ -308,3 +313,7 @@ data class WorkflowRun internal constructor(
     )
 
 }
+
+class WorkflowRunMoreThanOnePRException : BaseException(
+    "Workflow runs for more than 1 PR are not supported."
+)
