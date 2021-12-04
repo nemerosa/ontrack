@@ -50,7 +50,16 @@ class WorkflowRunIngestionEventProcessor(
     override val payloadType: KClass<WorkflowRunPayload> = WorkflowRunPayload::class
 
     override fun preProcessingCheck(payload: WorkflowRunPayload): IngestionEventPreprocessingCheck {
-        return IngestionEventPreprocessingCheck.TO_BE_PROCESSED
+        val pr = payload.workflowRun.pullRequests.firstOrNull()
+        return if (pr != null) {
+            if (pr.sameRepo()) {
+                IngestionEventPreprocessingCheck.TO_BE_PROCESSED
+            } else {
+                IngestionEventPreprocessingCheck.IGNORED
+            }
+        } else {
+            IngestionEventPreprocessingCheck.TO_BE_PROCESSED
+        }
     }
 
     override fun process(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResult =

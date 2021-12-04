@@ -10,4 +10,8 @@ class PullRequest(
     val base: Branch,
     val merged: Boolean,
     val mergeable: Boolean?,
-)
+) {
+    fun sameRepo() =
+        head.repo.owner.login == base.repo.owner.login &&
+                head.repo.name == base.repo.name
+}
