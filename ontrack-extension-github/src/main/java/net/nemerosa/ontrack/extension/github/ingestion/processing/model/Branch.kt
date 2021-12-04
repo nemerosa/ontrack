@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 @JsonIgnoreProperties(ignoreUnknown = true)
 class Branch(
     val ref: String,
+    val sha: String,
     val repo: BranchRepo,
 )
 
