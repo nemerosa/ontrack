@@ -6,12 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.AutoPromotionProperty
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
-import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
-import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
-import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
-import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
 import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInfo
@@ -30,7 +26,6 @@ import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
-import net.nemerosa.ontrack.model.support.NoConfig
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.LocalDateTime
@@ -209,15 +204,12 @@ class WorkflowRunIngestionEventProcessor(
         return build
     }
 
-    private fun getOrCreateBranch(project: Project, payload: WorkflowRunPayload): Branch {
-        val branch = ingestionModelAccessService.getOrCreateBranch(
+    private fun getOrCreateBranch(project: Project, payload: WorkflowRunPayload): Branch =
+        ingestionModelAccessService.getOrCreateBranch(
             project = project,
             headBranch = payload.workflowRun.headBranch,
             pullRequest = payload.workflowRun.pullRequests.firstOrNull(),
         )
-        // OK
-        return branch
-    }
 
     private fun getOrCreateProject(payload: WorkflowRunPayload, configuration: String?): Project =
         ingestionModelAccessService.getOrCreateProject(
