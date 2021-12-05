@@ -1,0 +1,6 @@
+fragment BranchFragment on Branch {
+    id
+    name
+    description
+    disabled
+}

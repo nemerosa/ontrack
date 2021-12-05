@@ -1,0 +1,8 @@
+query FindBranchByName(
+    $project: String!,
+    $branch: String!,
+) {
+    branches(project: $project, name: $branch) {
+        ...BranchFragment
+    }
+}
