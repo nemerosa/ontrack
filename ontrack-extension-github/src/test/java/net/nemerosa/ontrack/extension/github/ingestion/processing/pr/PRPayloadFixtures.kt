@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.pr
 
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Branch
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.BranchRepo
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.PullRequest
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.PullRequestState
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 
 object PRPayloadFixtures {
 
@@ -25,14 +22,18 @@ object PRPayloadFixtures {
             state = state,
             head = Branch(
                 ref = "refs/heads/feature/sample-pr",
+                sha = "any-commit-pr",
                 repo = BranchRepo(
                     name = repoName,
+                    owner = Owner(login = IngestionHookFixtures.sampleOwner),
                 ),
             ),
             base = Branch(
                 ref = "refs/heads/main",
+                sha = "any-commit-main",
                 repo = BranchRepo(
                     name = repoName,
+                    owner = Owner(login = IngestionHookFixtures.sampleOwner),
                 ),
             ),
             merged = merged,
