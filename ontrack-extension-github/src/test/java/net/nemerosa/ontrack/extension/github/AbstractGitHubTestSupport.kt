@@ -71,12 +71,14 @@ abstract class AbstractGitHubTestSupport : AbstractQLKTITSupport() {
         return property
     }
 
-    protected fun Branch.gitRealConfig() {
+    protected fun Branch.gitRealConfig(
+        branch: String = githubTestEnv.branch,
+    ) {
         setProperty(
             this,
             GitBranchConfigurationPropertyType::class.java,
             GitBranchConfigurationProperty(
-                branch = githubTestEnv.branch,
+                branch = branch,
                 buildCommitLink = ConfiguredBuildGitCommitLink(
                     gitCommitPropertyCommitLink,
                     NoConfig.INSTANCE

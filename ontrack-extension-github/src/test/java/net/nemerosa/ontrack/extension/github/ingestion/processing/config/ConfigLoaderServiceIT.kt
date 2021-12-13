@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
+import net.nemerosa.ontrack.extension.github.githubTestEnv
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,6 +18,21 @@ class ConfigLoaderServiceIT : AbstractIngestionTestSupport() {
             gitHubRealConfig()
             branch {
                 gitRealConfig()
+                val config = configLoaderService.loadConfig(this, INGESTION_CONFIG_FILE_PATH)
+                assertNotNull(config, "Ingestion configuration was loaded") {
+                    assertFalse(it.general.skipJobs, "Skip jobs property has been set to false")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting the ingestion configuration for a pull request`() {
+        project {
+            gitHubRealConfig()
+            val prName = "PR-${githubTestEnv.pr}"
+            branch(name = prName) {
+                gitRealConfig(branch = prName)
                 val config = configLoaderService.loadConfig(this, INGESTION_CONFIG_FILE_PATH)
                 assertNotNull(config, "Ingestion configuration was loaded") {
                     assertFalse(it.general.skipJobs, "Skip jobs property has been set to false")

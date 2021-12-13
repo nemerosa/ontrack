@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
@@ -64,6 +65,9 @@ class DefaultConfigLoaderServiceTest {
         val project = Project.of(NameDescription.nd("test", ""))
         val branch = Branch.of(project, NameDescription.nd("main", ""))
 
+        val gitService = mockk<GitService>()
+        every { gitService.getBranchAsPullRequest(any()) } returns null
+
         val gitHubClientFactory = mockk<OntrackGitHubClientFactory>()
         val gitHubClient = mockk<OntrackGitHubClient>()
         every { gitHubClientFactory.create(any()) } returns gitHubClient
@@ -117,6 +121,7 @@ class DefaultConfigLoaderServiceTest {
         val configLoaderService = DefaultConfigLoaderService(
             gitHubClientFactory = gitHubClientFactory,
             propertyService = propertyService,
+            gitService = gitService,
         )
         val config = configLoaderService.loadConfig(branch, INGESTION_CONFIG_FILE_PATH)
         if (expectedConfig) {
