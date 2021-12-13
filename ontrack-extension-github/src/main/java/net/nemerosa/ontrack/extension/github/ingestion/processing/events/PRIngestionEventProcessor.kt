@@ -17,7 +17,7 @@ class PRIngestionEventProcessor(
     structureService
 ) {
 
-    override val event: String = "pull_requesr"
+    override val event: String = "pull_request"
 
     override val payloadType: KClass<PRPayload> = PRPayload::class
 
