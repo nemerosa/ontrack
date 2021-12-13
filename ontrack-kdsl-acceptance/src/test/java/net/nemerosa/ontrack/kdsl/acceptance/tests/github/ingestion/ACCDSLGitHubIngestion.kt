@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.kdsl.acceptance.annotations.AcceptanceTestSuite
 import net.nemerosa.ontrack.kdsl.acceptance.tests.github.AbstractACCDSLGitHubTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.metrics.MetricCollection
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.resourceAsJson
-import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.connector.parse
 import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHub
@@ -18,61 +17,6 @@ import kotlin.test.fail
 
 @AcceptanceTestSuite
 class ACCDSLGitHubIngestion : AbstractACCDSLGitHubTestSupport() {
-
-    /**
-     * End-to-end integration test for the ingestion of PRs.
-     *
-     * The following events will be simulated and checked:
-     *
-     * * PR is `opened`
-     *    * PR branch is created
-     *    * PR build is run
-     * * PR is `synchronized`
-     *    * PR build is run
-     * * PR is `closed` and merged
-     *    * PR branch is disabled
-     */
-    @Test
-    fun `End-to-end test for the ingestion of PRs`() {
-        // Creating a base branch
-        val base = uid("base-")
-        github.repository.createBranch(base)
-        // Creating a feature branch from the base branch
-        val feature = uid("feature-")
-        github.repository.createBranch(feature, base)
-        // Adding some content to the feature branch
-        github.repository.createFile(feature, uid("file-"), "Some content")
-        // Creating a PR from the feature branch to the base branch
-        val pr = github.repository.createPR(feature, base, "PR for $feature", "Sample PR")
-        // Checks the PR build has been created
-        waitUntil {
-            ontrack.findBuildByName(
-                project = github.repository.name,
-                branch = "PR-${pr.number}",
-                build = "1"
-            ) != null
-        }
-        // Adding another file to the PR
-        github.repository.createFile(feature, uid("file-"), "Some additional content")
-        // Checks that another PR build has been created
-        waitUntil {
-            ontrack.findBuildByName(
-                project = github.repository.name,
-                branch = "PR-${pr.number}",
-                build = "2"
-            ) != null
-        }
-        // Merges the PR
-        github.repository.mergePR(pr)
-        // Checks that the PR branch has been disabled
-        waitUntil {
-            val branch = ontrack.findBranchByName(
-                project = github.repository.name,
-                branch = "PR-${pr.number}",
-            )
-            branch != null && branch.disabled
-        }
-    }
 
     @Test
     fun `Workflow run on the default queue`() {
