@@ -79,6 +79,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                         assertEquals("self", it.issueServiceConfigurationIdentifier)
                     }
                     assertNotNull(structureService.findBranchByName(project.name, "PR-1").getOrNull()) { branch ->
+                        assertFalse(branch.isDisabled, "PR branch is not disabled")
                         assertNotNull(
                             getProperty(branch, GitBranchConfigurationPropertyType::class.java),
                             "Git config set on branch"

@@ -13,7 +13,7 @@ class ClosedPRPayloadListener(
     private val ingestionModelAccessService: IngestionModelAccessService,
     private val structureService: StructureService,
 ) : AbstractPRPayloadListener(
-    action = PRPayloadAction.opened
+    action = PRPayloadAction.closed
 ) {
     override fun process(payload: PRPayload, configuration: String?) {
         val branch = ingestionModelAccessService.getOrCreateBranch(

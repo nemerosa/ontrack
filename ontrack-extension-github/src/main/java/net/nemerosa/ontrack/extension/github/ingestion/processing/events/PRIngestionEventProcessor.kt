@@ -34,7 +34,9 @@ class PRIngestionEventProcessor(
 
     override fun process(payload: PRPayload, configuration: String?): IngestionEventProcessingResult {
         prPayloadListeners.map { listener ->
-            listener.process(payload, configuration)
+            if (listener.preProcessCheck(payload) == PRPayloadListenerCheck.TO_BE_PROCESSED) {
+                listener.process(payload, configuration)
+            }
         }
         return IngestionEventProcessingResult.PROCESSED
     }
