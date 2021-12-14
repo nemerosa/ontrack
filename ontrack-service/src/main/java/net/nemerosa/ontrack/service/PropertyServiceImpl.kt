@@ -155,10 +155,11 @@ class PropertyServiceImpl(
         return if (value != null) Property.of(type, value, type.getPropertyDecorations(value)) else Property.empty(type)
     }
 
-    protected fun <T> getPropertyValue(type: PropertyType<T>?, entity: ProjectEntity): T? {
+    protected fun <T> getPropertyValue(type: PropertyType<T>, entity: ProjectEntity): T? {
         // Supported entity?
-        if (!type!!.supportedEntityTypes.contains(entity.projectEntityType)) {
-            throw PropertyUnsupportedEntityTypeException(type.javaClass.name, entity.projectEntityType)
+        val typeName = type.javaClass.name
+        if (!type.supportedEntityTypes.contains(entity.projectEntityType)) {
+            throw PropertyUnsupportedEntityTypeException(typeName, entity.projectEntityType)
         }
         // Checks for viewing
         if (!type.canView(entity, securityService)) {
@@ -166,7 +167,7 @@ class PropertyServiceImpl(
         }
         // Gets the raw information from the repository
         val t = propertyRepository.loadProperty(
-                type.javaClass.name,
+            typeName,
                 entity.projectEntityType,
                 entity.id)
                 ?: return null

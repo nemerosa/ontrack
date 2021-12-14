@@ -78,10 +78,12 @@ class GitConfigProperties {
          * Cleanup enabled
          */
         var enabled: Boolean = true
+
         /**
          * Days before disabling
          */
         var disabling: Int = 1
+
         /**
          * Days after disabling, before deleting
          */
@@ -102,11 +104,6 @@ class GitConfigProperties {
          */
         @DurationUnit(ChronoUnit.MINUTES)
         var duration: Duration = Duration.ofMinutes(30)
-
-        /**
-         * Size of the cache
-         */
-        var size: Int = 200
     }
 
 }
