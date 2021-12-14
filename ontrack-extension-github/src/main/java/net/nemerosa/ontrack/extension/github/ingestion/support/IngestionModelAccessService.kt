@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.support
 
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.PullRequest
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.IPullRequest
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
@@ -32,6 +32,6 @@ interface IngestionModelAccessService {
     fun getOrCreateBranch(
         project: Project,
         headBranch: String,
-        pullRequest: PullRequest?,
+        pullRequest: IPullRequest?,
     ): Branch
 }

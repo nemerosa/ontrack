@@ -6,7 +6,10 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderService
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderServiceITMockConfig
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfig
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionRunConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunIngestionEventProcessor
@@ -44,6 +47,61 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
     @Before
     fun init() {
         ConfigLoaderServiceITMockConfig.defaultIngestionConfig(configLoaderService)
+    }
+
+    @Test
+    fun `Workflow run for a PR`() {
+        // Only one GitHub configuration
+        val config = onlyOneGitHubConfig()
+        // Starting a run
+        val repo = uid("r")
+        val owner = IngestionHookFixtures.sampleOwner
+        asAdmin {
+            withGitHubIngestionSettings {
+                val payload: WorkflowRunPayload = IngestionHookFixtures.sampleWorkflowRunPayload(
+                    repoName = repo,
+                    pullRequest = IngestionHookFixtures.sampleWorkflowRunPR(
+                        repoName = repo,
+                    )
+                )
+                processor.process(
+                    payload,
+                    null
+                )
+                assertNotNull(structureService.findProjectByName(repo).getOrNull()) { project ->
+                    assertNotNull(
+                        getProperty(project, GitHubProjectConfigurationPropertyType::class.java),
+                        "GitHub config set on project"
+                    ) {
+                        assertEquals(config.name, it.configuration.name)
+                        assertEquals("$owner/$repo", it.repository)
+                        assertEquals(30, it.indexationInterval)
+                        assertEquals("self", it.issueServiceConfigurationIdentifier)
+                    }
+                    assertNotNull(structureService.findBranchByName(project.name, "PR-1").getOrNull()) { branch ->
+                        assertNotNull(
+                            getProperty(branch, GitBranchConfigurationPropertyType::class.java),
+                            "Git config set on branch"
+                        ) {
+                            assertEquals("PR-1", it.branch)
+                            assertNotNull(it.buildCommitLink) { link ->
+                                assertEquals("git-commit-property", link.id)
+                            }
+                        }
+                        assertNotNull(
+                            structureService.findBuildByName(project.name, branch.name, "ci-1").getOrNull(),
+                            "PR build has been created"
+                        ) { build ->
+                            // Build commit property
+                            assertNotNull(
+                                getProperty(build, GitCommitPropertyType::class.java),
+                                "Git commit property set on build"
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Test

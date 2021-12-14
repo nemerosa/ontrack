@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
 import net.nemerosa.ontrack.extension.github.ingestion.processing.*
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.PullRequest
+import net.nemerosa.ontrack.extension.github.ingestion.processing.model.IPullRequest
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.getProjectName
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
@@ -115,7 +115,7 @@ class DefaultIngestionModelAccessService(
     override fun getOrCreateBranch(
         project: Project,
         headBranch: String,
-        pullRequest: PullRequest?,
+        pullRequest: IPullRequest?,
     ): Branch {
         val (branchName, gitBranch) = if (pullRequest != null) {
             val key = "PR-${pullRequest.number}"

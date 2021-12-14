@@ -5,9 +5,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayl
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStatus
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfigGeneral
-import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
-import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
-import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunPayload
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayload
 import net.nemerosa.ontrack.json.asJson
@@ -36,13 +34,14 @@ object IngestionHookFixtures {
         sender: String,
         commit: String,
         htmlUrl: String = "https://github.com/nemerosa/github-ingestion-poc/actions/runs/1395528922",
+        pullRequest: WorkflowRunPullRequest? = null,
     ) = WorkflowRunPayload(
         action = action,
         workflowRun = WorkflowRun(
             id = runId,
             name = sampleRunName,
             runNumber = runNumber,
-            pullRequests = emptyList(),
+            pullRequests = listOfNotNull(pullRequest),
             headBranch = headBranch,
             headSha = commit,
             createdAtDate = createdAtDate,
@@ -84,6 +83,30 @@ object IngestionHookFixtures {
     )
 
     /**
+     * Sample PR for a workflow run
+     */
+    fun sampleWorkflowRunPR(
+        repoName: String,
+        owner: String = sampleOwner,
+    ) = WorkflowRunPullRequest(
+        number = 1,
+        head = WorkflowRunPullRequestBranch(
+            ref = "feature/pr",
+            repo = WorkflowRunPullRequestBranchRepo(
+                name = repoName,
+                url = "https://api.github.com/repos/$owner/$repoName",
+            )
+        ),
+        base = WorkflowRunPullRequestBranch(
+            ref = "main",
+            repo = WorkflowRunPullRequestBranchRepo(
+                name = repoName,
+                url = "https://api.github.com/repos/$owner/$repoName",
+            )
+        ),
+    )
+
+    /**
      * Sample payload
      */
     fun sampleWorkflowRunIngestionPayload(
@@ -112,6 +135,7 @@ object IngestionHookFixtures {
      */
     fun sampleWorkflowRunPayload(
         repoName: String = sampleRepository,
+        pullRequest: WorkflowRunPullRequest? = null,
     ) = workflowRunPayload(
         action = WorkflowRunAction.requested,
         runNumber = 1,
@@ -120,6 +144,7 @@ object IngestionHookFixtures {
         owner = sampleOwner,
         sender = "my-sender",
         commit = "01234567890",
+        pullRequest = pullRequest,
     )
 
     /**

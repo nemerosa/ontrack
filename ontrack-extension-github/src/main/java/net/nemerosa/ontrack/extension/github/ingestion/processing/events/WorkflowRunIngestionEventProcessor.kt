@@ -274,7 +274,7 @@ data class WorkflowRun internal constructor(
     val runNumber: Int,
     val headBranch: String,
     val headSha: String,
-    val pullRequests: List<PullRequest>,
+    val pullRequests: List<WorkflowRunPullRequest>,
     @JsonProperty("created_at")
     val createdAtDate: LocalDateTime,
     @JsonProperty("updated_at")
@@ -296,7 +296,7 @@ data class WorkflowRun internal constructor(
         @JsonProperty("head_sha")
         headSha: String,
         @JsonProperty("pull_requests")
-        pullRequests: List<PullRequest>,
+        pullRequests: List<WorkflowRunPullRequest>,
         @JsonProperty("created_at")
         createdAt: String,
         @JsonProperty("updated_at")
@@ -322,6 +322,27 @@ data class WorkflowRun internal constructor(
     )
 
 }
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class WorkflowRunPullRequest(
+    override val number: Int,
+    val head: WorkflowRunPullRequestBranch,
+    val base: WorkflowRunPullRequestBranch,
+): IPullRequest {
+    fun sameRepo() = head.repo.url == base.repo.url
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class WorkflowRunPullRequestBranch(
+    val ref: String,
+    val repo: WorkflowRunPullRequestBranchRepo,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class WorkflowRunPullRequestBranchRepo(
+    val name: String,
+    val url: String,
+)
 
 class WorkflowRunMoreThanOnePRException : BaseException(
     "Workflow runs for more than 1 PR are not supported."
