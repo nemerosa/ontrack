@@ -297,6 +297,22 @@ When facing the naming of a step, how to decide if the job prefix must be used o
 * if defined at general level, use this value
 * use the settings value (defaults to true)
 
+[[integration-github-ingestion-pr]]
+==== Support for pull requests
+
+Ingestion of events for the pull requests is supported.
+
+[NOTE]
+====
+The support for the ingestion of pull request events is in `beta` mode so changes are expected to happen in subsequent releases.
+====
+
+From an Ontrack point of view, the following lifecycle is supported:
+
+* a PR is `opened` - a corresponding branch is opened
+* a PR is built or is `synchronized` - if a workflow is run for this PR, a build and its validation stamps will be created the same way as for regular branches. Note that the ingestion configuration for a PR is always fetched from the head branch of the pull request.
+* a PR is `closed` (merged or not) - the corresponding branch is disabled
+
 [[integration-github-ingestion-management]]
 ==== Management
 
