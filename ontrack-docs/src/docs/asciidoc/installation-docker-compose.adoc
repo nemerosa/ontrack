@@ -19,8 +19,9 @@ This starts three services:
 * Ontrack itself at http://localhost:8080
 * a Postgres database
 * an Elasticsearch single node
+* a RabbitMQ message broker
 
-Neither Postgres or Elasticsearch are exposed by default, but you can of course edit the Docker Compose file at your convenience.
+Neither Postgres, Elasticsearch and RabbitMQ are exposed by default, but you can of course edit the Docker Compose file at your convenience.
 
 The version of Ontrack is set by default to `4` (latest 4.x version) but
 you can override it using the `ONTRACK_VERSION` environment variable.

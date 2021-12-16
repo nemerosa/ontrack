@@ -9,6 +9,7 @@ To run Ontrack, you need to make sure that the minimal <<installation-dependenci
 
 * Postgres
 * Elasticsearch
+* RabbitMQ
 
 [[installation-rpm]]
 ==== RPM installation

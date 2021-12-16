@@ -13,6 +13,7 @@ This sets up:
 
 * a Postgres database
 * an ElasticSearch (single node)
+* a RabbitMQ message broker
 * Ontrack running on port 8080
 
 Go to http://localhost:8080 and start using Ontrack.

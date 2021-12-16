@@ -13,6 +13,7 @@ To run Ontrack, you need to make sure that the minimal <<installation-dependenci
 
 * Postgres
 * Elasticsearch
+* RabbitMQ
 
 NOTE: See <<installation-dependencies>> for details.
 
@@ -27,6 +28,9 @@ docker container run \
     -e SPRING_DATASOURCE_USERNAME=<Postgres Ontrack DB Username> \
     -e SPRING_DATASOURCE_PASSWORD=<Postgres Ontrack DB Password> \
     -e SPRING_ELASTICSEARCH_REST_URIS=<Elasticsearch URL> \
+    -e SPRING_RABBITMQ_HOST=<RabbitMQ Host>
+    -e SPRING_RABBITMQ_USERNAME=<RabbitMQ Username>
+    -e SPRING_RABBITMQ_PASSWORD=<RabbitMQ Password>
     nemerosa/ontrack:4
 ----
 

@@ -11,8 +11,14 @@ services:
     environment:
       PROFILE: prod
       JAVA_OPTIONS: "${JAVA_OPTIONS:--Xms1024m -Xmx1024m}"
+      # Database
       SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
+      # Elasticsearch
       SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
+      # Rabbit MQ
+      SPRING_RABBITMQ_HOST: rabbit
+      SPRING_RABBITMQ_USERNAME: ontrack
+      SPRING_RABBITMQ_PASSWORD: ontrack
     depends_on:
       postgres:
         condition: service_started
