@@ -451,7 +451,8 @@ pipeline {
                         sh '''
                             git status
                             ./gradlew \\
-                                publishToMavenCentral \\
+                                publishToSonatype \\
+                                closeAndReleaseSonatypeStagingRepository \\
                                 -Pdocumentation \\
                                 -PbowerOptions='--allow-root' \\
                                 -Psigning.keyId=${GPG_KEY_USR} \\

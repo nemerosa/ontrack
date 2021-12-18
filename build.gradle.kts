@@ -4,7 +4,6 @@ import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import com.netflix.gradle.plugins.deb.Deb
 import com.netflix.gradle.plugins.packaging.SystemPackagingTask
 import com.netflix.gradle.plugins.rpm.Rpm
-import de.marcphilipp.gradle.nexus.NexusPublishExtension
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import net.nemerosa.ontrack.gradle.GitterAnnouncement
 import net.nemerosa.ontrack.gradle.OntrackChangeLog
@@ -17,7 +16,6 @@ import org.jetbrains.kotlin.allopen.gradle.AllOpenExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.redline_rpm.header.Os
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
-import java.time.Duration
 
 buildscript {
     repositories {
@@ -49,8 +47,7 @@ plugins {
     id("org.springframework.boot") version Versions.springBootVersion apply false
     id("io.freefair.aggregate-javadoc") version "4.1.2"
     id("com.github.breadmoirai.github-release") version "2.2.11"
-    id("io.codearte.nexus-staging") version "0.21.2"
-    id("de.marcphilipp.nexus-publish") version "0.4.0" apply false
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     // Site
     id("org.ajoberstar.git-publish") version "2.1.1"
 }
@@ -140,7 +137,6 @@ configure(javaProjects) p@{
     apply(plugin = "java")
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
-    apply(plugin = "de.marcphilipp.nexus-publish")
 
     // Java level
     java.sourceCompatibility = JavaVersion.VERSION_11
@@ -234,24 +230,8 @@ configure(exportedProjects) p@ {
         }
     }
 
-    configure<NexusPublishExtension> {
-        clientTimeout.set(Duration.ofMinutes(10))
-        connectTimeout.set(Duration.ofMinutes(10))
-        repositories {
-            sonatype {
-                username.set(ossrhUsername)
-                password.set(ossrhPassword)
-            }
-        }
-    }
-
     tasks.named("assemble") {
         dependsOn("generatePomFileForMavenCustomPublication")
-    }
-
-    tasks.named("publishToSonatype") {
-        dependsOn(tasks.named("signMavenCustomPublication"))
-        dependsOn(tasks.named("assemble"))
     }
 
     // Signature
@@ -564,25 +544,13 @@ if (hasProperty("documentation")) {
  * Maven Central staging
  */
 
-nexusStaging {
-    packageGroup = "net.nemerosa"
-    username = ossrhUsername
-    password = ossrhPassword
-    numberOfRetries = 60
-    delayBetweenRetriesInMillis = 10000 // Workaround for OSSRH-21248
-}
-
-val publishToMavenCentral by tasks.registering {
-    dependsOn(tasks.closeAndReleaseRepository)
-}
-
-configure(exportedProjects) {
-    val publishToSonatype = tasks.named("publishToSonatype")
-    rootProject.tasks.closeRepository {
-        dependsOn(publishToSonatype)
-    }
-    publishToMavenCentral {
-        dependsOn(publishToSonatype)
+nexusPublishing {
+    packageGroup.set("net.nemerosa")
+    repositories {
+        sonatype {
+            username.set(ossrhUsername)
+            password.set(ossrhPassword)
+        }
     }
 }
 
