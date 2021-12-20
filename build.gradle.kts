@@ -554,6 +554,13 @@ nexusPublishing {
     }
 }
 
+val initializeSonatypeStagingRepository by tasks.existing
+configure(exportedProjects) p@ {
+    initializeSonatypeStagingRepository {
+        dependsOn(tasks.withType<Sign>())
+    }
+}
+
 /**
  * GitHub release
  */
