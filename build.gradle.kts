@@ -322,7 +322,7 @@ configure(coreProjects) p@{
     val integrationTest by tasks.registering(Test::class) {
         mustRunAfter("test")
         include("**/*IT.class")
-        minHeapSize = "512m"
+        minHeapSize = "128m"
         maxHeapSize = "3072m"
         dependsOn(":preIntegrationTest")
         finalizedBy(":postIntegrationTest")
