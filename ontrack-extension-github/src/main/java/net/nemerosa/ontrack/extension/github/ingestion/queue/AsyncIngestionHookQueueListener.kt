@@ -36,8 +36,8 @@ class AsyncIngestionHookQueueListener(
 
     override fun configureRabbitListeners(registrar: RabbitListenerEndpointRegistrar) {
         // Registers listeners for configured repositories
-        ingestionConfigProperties.processing.repositories.forEach { (name, config) ->
-            createSpecificListener(registrar, name, config)
+        ingestionConfigProperties.processing.repositories.forEach { (name, _) ->
+            createSpecificListener(registrar, name)
         }
         // Listener for the default
         registrar.registerEndpoint(
@@ -48,29 +48,23 @@ class AsyncIngestionHookQueueListener(
     private fun createSpecificListener(
         registrar: RabbitListenerEndpointRegistrar,
         name: String,
-        config: IngestionConfigProperties.RepositoryQueueConfig
     ) {
         val queue = "${AsyncIngestionHookQueueConfig.QUEUE_PREFIX}.$name"
-        val endpoint = SimpleRabbitListenerEndpoint().configure(
-            queue,
-            config.config
-        )
+        val endpoint = SimpleRabbitListenerEndpoint().configure(queue)
         registrar.registerEndpoint(endpoint)
     }
 
     private fun createDefaultListener(): RabbitListenerEndpoint {
         val queue = "${AsyncIngestionHookQueueConfig.QUEUE_PREFIX}.${AsyncIngestionHookQueueConfig.DEFAULT}"
-        return SimpleRabbitListenerEndpoint().configure(queue, ingestionConfigProperties.processing.default)
+        return SimpleRabbitListenerEndpoint().configure(queue)
     }
 
     private fun SimpleRabbitListenerEndpoint.configure(
         queue: String,
-        config: IngestionConfigProperties.QueueConfig,
     ): SimpleRabbitListenerEndpoint {
         id = queue
         setQueueNames(queue)
-        val max = config.concurrency
-        concurrency = "$max-$max"
+        concurrency = "1-1" // No concurrency, we want the events to be processed in turn
         messageListener = listener
         return this
     }

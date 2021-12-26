@@ -20,8 +20,9 @@ class IngestionConfigProperties(
      * @property
      */
     class HookConfig(
-        var signature: HookSignatureConfig = HookSignatureConfig()
+        var signature: HookSignatureConfig = HookSignatureConfig(),
     )
+
     /**
      * Hook signature configuration
      *
@@ -30,16 +31,15 @@ class IngestionConfigProperties(
     class HookSignatureConfig(
         var disabled: Boolean = false,
     )
+
     /**
      * Processing configuration
      *
      * @property async Behaviour of the processing. By default, true, using a RabbitMQ engine
-     * @property default Configuration for the default queue.
      * @property repositories List of specific bindings
      */
     class ProcessingConfig(
         var async: Boolean = true,
-        var default: QueueConfig = QueueConfig(),
         var repositories: Map<String, RepositoryQueueConfig> = emptyMap(),
     )
 
@@ -48,12 +48,10 @@ class IngestionConfigProperties(
      *
      * @property owner Regex for the repository owner, null for match all
      * @property repository Regex for the repository name, null for match all
-     * @property config Configuration to use
      */
     class RepositoryQueueConfig(
         var owner: String? = null,
         var repository: String? = null,
-        var config: QueueConfig = QueueConfig(),
     ) {
         fun matches(owner: String, repository: String) =
             matching(this.owner?.toRegex(), owner) && matching(this.repository?.toRegex(), repository)
@@ -62,24 +60,10 @@ class IngestionConfigProperties(
             regex == null || regex.matches(value)
     }
 
-    /**
-     * Queue configuration
-     *
-     * @property concurrency Maximum concurrency for a queue
-     */
-    class QueueConfig(
-        var concurrency: UInt = DEFAULT_CONCURRENCY,
-    )
-
     companion object {
         /**
          * Prefix for the properties
          */
         const val PREFIX = "ontrack.extension.github.ingestion"
-
-        /**
-         * Default concurrency for a queue
-         */
-        const val DEFAULT_CONCURRENCY = 10U
     }
 }

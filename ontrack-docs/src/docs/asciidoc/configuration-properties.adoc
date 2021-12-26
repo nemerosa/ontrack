@@ -157,15 +157,9 @@ ontrack.extension.github.ingestion.hook.signature.disabled = false
 # Set to false to use a direct processing (synchronous)
 ontrack.extension.github.ingestion.processing.async = true
 
-# Configuration for the default queue
-# Number of consumers for the default queue
-ontrack.extension.github.ingestion.processing.default.concurrency = 10
-
 # Declaring other queues for repositories
 # Regex for the repository owner, null for match all
 # ontrack.extension.github.ingestion.processing.repositories.very-active.owner=
 # Regex for the repository name, null for match all
 # ontrack.extension.github.ingestion.processing.repositories.very-active.repository = very-active-repository
-# Number of consumers for this queue
-# ontrack.extension.github.ingestion.processing.repositories.very-active.config.concurrency = 10
 ----
