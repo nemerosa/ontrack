@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.events
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import net.nemerosa.ontrack.extension.github.ingestion.processing.AbstractIngestionEventProcessor
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
@@ -27,4 +28,5 @@ class PingIngestionEventProcessor : AbstractIngestionEventProcessor<PingPayload>
         IngestionEventPreprocessingCheck.IGNORED
 }
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 class PingPayload(repository: Repository) : AbstractRepositoryPayload(repository)
