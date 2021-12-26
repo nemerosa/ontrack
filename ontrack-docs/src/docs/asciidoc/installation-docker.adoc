@@ -27,7 +27,7 @@ docker container run \
     -e SPRING_DATASOURCE_URL=<Postgres Ontrack DB JDBC URL> \
     -e SPRING_DATASOURCE_USERNAME=<Postgres Ontrack DB Username> \
     -e SPRING_DATASOURCE_PASSWORD=<Postgres Ontrack DB Password> \
-    -e SPRING_ELASTICSEARCH_REST_URIS=<Elasticsearch URL> \
+    -e SPRING_ELASTICSEARCH_URIS=<Elasticsearch URL> \
     -e SPRING_RABBITMQ_HOST=<RabbitMQ Host>
     -e SPRING_RABBITMQ_USERNAME=<RabbitMQ Username>
     -e SPRING_RABBITMQ_PASSWORD=<RabbitMQ Password>

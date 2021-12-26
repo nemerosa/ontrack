@@ -47,8 +47,8 @@ By default, Ontrack will use the following
 |===
 | Property | Env variable | Description | Default value
 
-| spring.elasticsearch.rest.uris
-| SPRING_ELASTICSEARCH_REST_URIS
+| spring.elasticsearch.uris
+| SPRING_ELASTICSEARCH_URIS
 | REST URI of Elasticsearch
 | `http://localhost:9200`
 |===

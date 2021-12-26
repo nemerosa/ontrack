@@ -58,7 +58,7 @@ services:
          # Elastic search
          ONTRACK_CONFIG_SEARCH_ENGINE: "elasticsearch"
          ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
-         SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
+         SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
    selenium:
       image: "selenium/standalone-chrome:91.0"
       shm_size: 2g

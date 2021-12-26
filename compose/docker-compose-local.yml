@@ -28,7 +28,7 @@ services:
       ONTRACK_INFLUXDB_ENABLED: "true"
       ONTRACK_INFLUXDB_URI: "http://influxdb:8086"
       # Elastic search
-      SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
+      SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
       PROFILE: acceptance
     volumes:
       - "./ci/ontrack:/var/ontrack/conf"

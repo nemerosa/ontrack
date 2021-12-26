@@ -50,7 +50,7 @@ services:
       # Elastic search
       ONTRACK_CONFIG_SEARCH_ENGINE: "elasticsearch"
       ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
-      SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
+      SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
       # RabbitMQ
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_USERNAME: ontrack
