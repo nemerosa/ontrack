@@ -24,7 +24,7 @@ services:
 
   # Postgresql database
   postgresql:
-    image: postgres:9.5.5
+    image: postgres:11
     environment:
       POSTGRES_DB      : ontrack
       POSTGRES_USER    : ontrack
