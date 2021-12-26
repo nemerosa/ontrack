@@ -12,7 +12,7 @@ services:
 
   # Search engine
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
     environment:
       - "discovery.type=single-node"
 
