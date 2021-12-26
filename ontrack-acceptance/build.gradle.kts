@@ -49,7 +49,7 @@ val bootJar = tasks.getByName<BootJar>("bootJar") {
         into("classes")
     }
     classpath(configurations.named("testRuntimeClasspath"))
-    mainClassName = "net.nemerosa.ontrack.acceptance.boot.Start"
+    mainClass.set("net.nemerosa.ontrack.acceptance.boot.Start")
 }
 
 val normaliseJar by tasks.registering(Copy::class) {

@@ -24,7 +24,7 @@ tasks.getByName<Jar>("jar") {
 
 
 tasks.getByName<BootJar>("bootJar") {
-    mainClassName = "net.nemerosa.ontrack.shell.ShellApplication"
+    mainClass.set("net.nemerosa.ontrack.shell.ShellApplication")
     launchScript()
     archiveClassifier.set("executable")
 }

@@ -32,7 +32,7 @@ fun <T> MeterRegistry.time(
         code: () -> T
 ): T {
     val timer = timer(name, tags.map { Tag.of(it.first, it.second) })
-    return timer.record(code)
+    return timer.record(code)!!
 }
 
 
