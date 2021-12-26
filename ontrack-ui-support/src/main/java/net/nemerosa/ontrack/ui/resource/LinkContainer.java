@@ -31,10 +31,6 @@ public abstract class LinkContainer<L extends LinkContainer<L>> {
         }
     }
 
-    private L with(Link link) {
-        return with(link.getName(), link.getHref());
-    }
-
     public L with(String name, URI uri) {
         links.put(name, uri);
         //noinspection unchecked

@@ -33,7 +33,7 @@ private fun <T> MeterRegistry.time(
     code: () -> T
 ): T {
     val timer = timer(name, tags.map { Tag.of(it.first, it.second) })
-    return timer.record(code)
+    return timer.record(code)!!
 }
 
 
@@ -68,7 +68,7 @@ fun <T> MeterRegistry.timeForPayload(
 /**
  * Tags for a payload
  */
-private fun IngestionHookPayload.metricsTags(vararg additionalTags: Pair<String,String>,) = arrayOf(
+private fun IngestionHookPayload.metricsTags(vararg additionalTags: Pair<String,String>) = arrayOf(
     INGESTION_METRIC_EVENT_TAG to gitHubEvent,
     INGESTION_METRIC_OWNER_TAG to (repository?.owner?.login ?: ""),
     INGESTION_METRIC_REPOSITORY_TAG to (repository?.name ?: ""),

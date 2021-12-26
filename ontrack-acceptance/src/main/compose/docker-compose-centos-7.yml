@@ -2,7 +2,7 @@ version: "2.1"
 
 services:
    postgres:
-    image: postgres:9.5.2
+    image: postgres:11
     environment:
       POSTGRES_DB      : ontrack
       POSTGRES_USER    : ontrack
@@ -21,7 +21,7 @@ services:
       command: "/bin/cat"
       environment:
          SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
-         SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
+         SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
       depends_on:
          postgres:
             condition: service_started

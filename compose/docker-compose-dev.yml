@@ -3,7 +3,7 @@ version: "2.1"
 services:
 
   postgresql:
-    image: postgres:9.5.5
+    image: postgres:11
     container_name: "${POSTGRES_NAME:-postgresql}"
     environment:
       POSTGRES_DB: ontrack

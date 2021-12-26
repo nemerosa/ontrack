@@ -14,7 +14,7 @@ services:
       # Database
       SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
       # Elasticsearch
-      SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
+      SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
       # Rabbit MQ
       SPRING_RABBITMQ_HOST: rabbit
       SPRING_RABBITMQ_USERNAME: ontrack
@@ -32,7 +32,7 @@ services:
 
   # Postgresql database
   postgres:
-    image: postgres:9.5
+    image: postgres:11
     restart: always
     environment:
       POSTGRES_DB: ${ONTRACK_POSTGRES_DB:-ontrack}

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.ui.resource;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.impl.ObjectIdWriter;
 import com.fasterxml.jackson.databind.ser.std.BeanSerializerBase;
 import org.apache.commons.lang3.Validate;
@@ -62,6 +63,16 @@ public class ResourceDecoratorSerializer<T> extends BeanSerializerBase {
     @Override
     public BeanSerializerBase withFilterId(Object filterId) {
         throw new UnsupportedOperationException("withFilterId");
+    }
+
+    @Override
+    protected BeanSerializerBase withByNameInclusion(Set<String> toIgnore, Set<String> toInclude) {
+        throw new UnsupportedOperationException("withByNameInclusion");
+    }
+
+    @Override
+    protected BeanSerializerBase withProperties(BeanPropertyWriter[] beanPropertyWriters, BeanPropertyWriter[] beanPropertyWriters1) {
+        throw new UnsupportedOperationException("withProperties");
     }
 
     @Override

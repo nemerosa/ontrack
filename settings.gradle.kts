@@ -31,7 +31,6 @@ include(":ontrack-ui-graphql")
 include(":ontrack-ui-support")
 include(":ontrack-web")
 include(":ontrack-acceptance")
-include(":ontrack-postgresql-migration")
 include(":ontrack-docs")
 
 // KDSL
