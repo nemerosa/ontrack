@@ -261,6 +261,7 @@ configure(coreProjects) p@{
         imports {
             mavenBom(SpringBootPlugin.BOM_COORDINATES) {
                 bomProperty("kotlin.version", Versions.kotlinVersion)
+                bomProperty("elasticsearch.version", Versions.elasticSearchVersion)
             }
         }
         dependencies {
