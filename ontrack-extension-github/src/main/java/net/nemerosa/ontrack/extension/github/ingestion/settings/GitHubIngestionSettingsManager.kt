@@ -64,6 +64,7 @@ class GitHubIngestionSettingsManager(
                 Password.of(GitHubIngestionSettings::token.name)
                     .label("Token")
                     .help("Secret to set in the hook configuration")
+                    .optional()
             )
             .with(
                 Int.of(GitHubIngestionSettings::retentionDays.name)
