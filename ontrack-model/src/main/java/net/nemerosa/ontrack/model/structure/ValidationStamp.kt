@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.model.structure
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonView
+import javax.validation.constraints.Max
+import javax.validation.constraints.Size
 
 /**
  *
@@ -9,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonView
  */
 data class ValidationStamp(
         override val id: ID,
+        @Size(max = NAME_MAX_LENGTH)
         val name: String,
         override val description: String?,
         @JsonView(value = [ValidationStamp::class])
@@ -21,6 +24,12 @@ data class ValidationStamp(
 ) : ProjectEntity {
 
     companion object {
+
+        /**
+         * Maximum length for the name of a validation stamp.
+         */
+        const val NAME_MAX_LENGTH = 120
+
         @JvmStatic
         fun of(branch: Branch, nameDescription: NameDescription): ValidationStamp {
             Entity.isEntityDefined(branch, "Branch must be defined")
