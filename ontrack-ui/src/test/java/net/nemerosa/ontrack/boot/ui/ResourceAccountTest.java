@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.model.preferences.Preferences;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AuthenticationSource;
 import net.nemerosa.ontrack.model.security.ConnectedAccount;
@@ -45,7 +46,8 @@ public class ResourceAccountTest {
                 Resource.of(
                         ConnectedAccount.of(
                                 Account.of("admin", "Administrator", "", SecurityRole.ADMINISTRATOR, AuthenticationSource.none(), false, false)
-                                        .withId(ID.of(1))
+                                        .withId(ID.of(1)),
+                                new Preferences()
                         ),
                         URI.create("urn:user")
                 )
