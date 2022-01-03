@@ -4,6 +4,7 @@
         <div class="col-md-12 ot-view-title">
             <span id="ot-view-title">{{branch.name}}</span>
             <ot-entity-decorations entity="branch"></ot-entity-decorations>
+            <span ng-hide="user.preferences.branchViewLegacy" title="New experimental branch view" class="label label-warning">New view</span>
             <div ng-if="branch.description" class="ot-description" ng-bind-html="branchView.annotatedDescription"></div>
         </div>
     </div>

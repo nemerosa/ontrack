@@ -8,7 +8,8 @@ angular.module('ot.view.branch', [
     'ot.service.copy',
     'ot.dialog.validationStampRunView',
     'ot.dialog.promotionRuns',
-    'ot.service.graphql'
+    'ot.service.graphql',
+    'ot.service.user'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('branch', {
@@ -17,9 +18,9 @@ angular.module('ot.view.branch', [
             controller: 'BranchCtrl'
         });
     })
-    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location,
+    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location, $rootScope,
                                         ot, otFormService, otStructureService, otAlertService, otTaskService, otNotificationService, otCopyService,
-                                        otBuildFilterService, otGraphqlService) {
+                                        otBuildFilterService, otGraphqlService, otUserService) {
         const view = ot.view();
         // Branch's id
         const branchId = $stateParams.branchId;
@@ -244,7 +245,7 @@ angular.module('ot.view.branch', [
             });
         }
 
-// Loading the build view
+        // Loading the build view
         function loadBuildView() {
             // Parameters for the call
             let filterType = null;
@@ -305,6 +306,30 @@ angular.module('ot.view.branch', [
                 view.breadcrumbs = ot.projectBreadcrumbs(branchResource.project);
                 // Branch commands
                 view.commands = [
+                    {
+                        condition: () => $rootScope.user.preferences.branchViewLegacy,
+                        id: 'branchViewNg',
+                        name: "New branch view",
+                        cls: 'ot-command-branch-view-ng',
+                        action: () => {
+                            otUserService.setPreferences({
+                                branchViewLegacy: false
+                            });
+                            loadBuildView();
+                        }
+                    },
+                    {
+                        condition: () => !$rootScope.user.preferences.branchViewLegacy,
+                        id: 'branchViewLegacy',
+                        name: "Legacy branch view",
+                        cls: 'ot-command-branch-view-legacy',
+                        action: () => {
+                            otUserService.setPreferences({
+                                branchViewLegacy: true
+                            });
+                            loadBuildView();
+                        }
+                    },
                     {
                         condition: function () {
                             return branchResource._createBuild;

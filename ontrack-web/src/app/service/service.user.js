@@ -1,8 +1,8 @@
 angular.module('ot.service.user', [
     'ot.service.core',
-    'ot.service.form'
+    'ot.service.graphql'
 ])
-    .service('otUserService', function (ot, $q, $state, $location, $log, $interval, $http, $rootScope, otNotificationService, otFormService) {
+    .service('otUserService', function (ot, $q, $state, $location, $log, $interval, $http, $rootScope, otNotificationService, otGraphqlService) {
         var self = {};
 
         /**
@@ -41,6 +41,46 @@ angular.module('ot.service.user', [
                     otNotificationService.error('Cannot connect. Please try later');
                 }
             );
+        };
+
+        /**
+         * Sets the preferences of the user
+         */
+        self.setPreferences = (preferences) => {
+            const input = {};
+            if (preferences.branchViewLegacy !== undefined) {
+                input.branchViewLegacy = preferences.branchViewLegacy;
+            }
+            if (preferences.branchViewVsNames !== undefined) {
+                input.branchViewVsNames = preferences.branchViewVsNames;
+            }
+            if (preferences.branchViewVsGroups !== undefined) {
+                input.branchViewVsGroups = preferences.branchViewVsGroups;
+            }
+            otGraphqlService.pageGraphQLCall(`
+                mutation(
+                  $branchViewLegacy: Boolean,
+                  $branchViewVsNames: Boolean,
+                  $branchViewVsGroups: Boolean,
+                ) {
+                  setPreferences(input: {
+                    branchViewLegacy: $branchViewLegacy,
+                    branchViewVsNames: $branchViewVsNames,
+                    branchViewVsGroups: $branchViewVsGroups,
+                  }) {
+                    preferences {
+                      branchViewLegacy
+                      branchViewVsNames
+                      branchViewVsGroups
+                    }
+                    errors {
+                      message
+                    }
+                  }
+                }
+            `, input).finally(() => {
+                angular.copy(preferences, $rootScope.user.preferences);
+            });
         };
 
         return self;
