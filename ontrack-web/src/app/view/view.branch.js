@@ -96,6 +96,7 @@ angular.module('ot.view.branch', [
                     if (group) {
                         build.groupedValidations.push({
                             statusID: statusID,
+                            description: `Validations with status ${statusID.name}`,
                             count: group.count,
                             validations: group.validations
                         });
@@ -189,6 +190,8 @@ angular.module('ot.view.branch', [
                     validationStamp {
                       id
                       name
+                      image
+                      _image
                       dataType {
                         descriptor {
                           id

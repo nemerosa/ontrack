@@ -262,7 +262,11 @@
         </td>
         <!-- Groups of validation stamps per status -->
         <td ng-if="!user.preferences.branchViewLegacy && user.preferences.branchViewVsGroups" class="ot-branch-build-view-validation-groups">
-            Groups: {{ build.groupedValidations }}
+            <div class="ot-branch-build-view-validation-group" ng-repeat="group in build.groupedValidations">
+                <ot-validation-run-status status="group"></ot-validation-run-status>
+                <span ng-if="group.count == 1"><ot-entity-image entity="group.validations[0].validationStamp">{{ group.validations[0].validationStamp.name }}</ot-entity-image> {{ group.statusID.name }}</span>
+                <span ng-if="group.count > 1">{{ group.count }} {{ group.statusID.name }}</span>
+            </div>
         </td>
         <!-- Validation runs -->
         <td ng-repeat="validation in build.validations | filter:validationStampRunViewFilter"
