@@ -163,6 +163,8 @@
                 Loading...
             </button>
         </th>
+        <!-- Empty cell in case of groups -->
+        <th ng-if="!user.preferences.branchViewLegacy && user.preferences.branchViewVsGroups">&nbsp;</th>
         <!-- All validation stamps -->
         <th ng-repeat="validationStamp in validationStamps | filter:validationStampFilterFn"
             class="ot-branch-build-view-validation"
@@ -209,6 +211,8 @@
     </tr>
     <!-- Validation stamps decorations -->
     <tr>
+        <!-- Empty cell in case of groups -->
+        <th ng-if="!user.preferences.branchViewLegacy && user.preferences.branchViewVsGroups">&nbsp;</th>
         <!-- For each validation stamp -->
         <th ng-repeat="validationStamp in validationStamps | filter:validationStampFilterFn"
             class="ot-branch-build-view-validation">
@@ -255,6 +259,10 @@
                     </span>
                 </span>
             </span>
+        </td>
+        <!-- Groups of validation stamps per status -->
+        <td ng-if="!user.preferences.branchViewLegacy && user.preferences.branchViewVsGroups" class="ot-branch-build-view-validation-groups">
+            Groups: {{ build.groupedValidations }}
         </td>
         <!-- Validation runs -->
         <td ng-repeat="validation in build.validations | filter:validationStampRunViewFilter"

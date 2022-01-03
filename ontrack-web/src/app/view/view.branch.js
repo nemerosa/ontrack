@@ -726,10 +726,14 @@ angular.module('ot.view.branch', [
         };
 
         $scope.validationStampFilterCount = function (plus) {
+            let placeForGroups = 0;
+            if (!$rootScope.user.preferences.branchViewLegacy && $rootScope.user.preferences.branchViewVsGroups) {
+                placeForGroups = 1;
+            }
             if ($scope.validationStamps) {
-                return plus + $scope.validationStamps.filter($scope.validationStampFilterFn).length;
+                return placeForGroups + plus + $scope.validationStamps.filter($scope.validationStampFilterFn).length;
             } else {
-                return plus;
+                return placeForGroups + plus;
             }
         };
 
