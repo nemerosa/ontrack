@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.preferences
 
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.preferences.Preferences
 import net.nemerosa.ontrack.model.preferences.PreferencesService
@@ -19,4 +20,7 @@ class PreferencesServiceImpl(
             ?.parse()
             ?: Preferences()
 
+    override fun setPreferences(account: Account, preferences: Preferences) {
+        preferencesRepository.setPreferences(account.id(), preferences.asJson())
+    }
 }

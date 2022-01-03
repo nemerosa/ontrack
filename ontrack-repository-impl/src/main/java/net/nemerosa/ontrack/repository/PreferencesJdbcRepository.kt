@@ -20,4 +20,18 @@ class PreferencesJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository
             readJson(rs, "CONTENT")
         }.firstOrNull()
 
+    override fun setPreferences(accountId: Int, json: JsonNode) {
+        namedParameterJdbcTemplate!!.update(
+            """
+                INSERT INTO PREFERENCES (ACCOUNTID, CONTENT) 
+                VALUES (:accountId, CAST(:content AS JSONB))
+                ON CONFLICT (ACCOUNTID) DO
+                UPDATE SET CONTENT = EXCLUDED.CONTENT
+            """,
+            mapOf(
+                "accountId" to accountId,
+                "content" to writeJson(json),
+            )
+        )
+    }
 }

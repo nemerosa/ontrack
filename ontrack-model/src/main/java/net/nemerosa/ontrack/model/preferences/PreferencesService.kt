@@ -15,4 +15,12 @@ interface PreferencesService {
      */
     fun getPreferences(account: Account): Preferences
 
+    /**
+     * Sets the preferences of the [account].
+     *
+     * @param account Account to set the preferences for
+     * @param preferences Account's preferences.
+     */
+    fun setPreferences(account: Account, preferences: Preferences)
+
 }
