@@ -79,7 +79,15 @@ angular.module('ot.service.user', [
                   }
                 }
             `, input).finally(() => {
-                angular.copy(preferences, $rootScope.user.preferences);
+                if (preferences.branchViewLegacy !== undefined) {
+                    $rootScope.user.preferences.branchViewLegacy = preferences.branchViewLegacy;
+                }
+                if (preferences.branchViewVsNames !== undefined) {
+                    $rootScope.user.preferences.branchViewVsNames = preferences.branchViewVsNames;
+                }
+                if (preferences.branchViewVsGroups !== undefined) {
+                    $rootScope.user.preferences.branchViewVsGroups = preferences.branchViewVsGroups;
+                }
             });
         };
 

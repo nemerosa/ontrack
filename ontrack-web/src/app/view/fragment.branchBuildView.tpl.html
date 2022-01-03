@@ -7,6 +7,8 @@
     </p>
 </div>
 
+{{ user.preferences }}
+
 <table class="ot-branch-build-view">
     <thead>
     <tr>
@@ -179,7 +181,7 @@
             <span ng-if="!validationStampFilter || !validationStampFilter._update || !validationStampFilterEdition">
                 <ot-entity-image entity="validationStamp"
                                  title="{{validationStamp.name}} - {{validationStamp.description}}"
-                                 link="#/validationStamp/{{validationStamp.id}}"></ot-entity-image>
+                                 link="#/validationStamp/{{validationStamp.id}}"><span ng-show="!user.preferences.branchViewLegacy && user.preferences.branchViewVsNames">{{ validationStamp.name }}</span></ot-entity-image>
             </span>
         </th>
     </tr>
