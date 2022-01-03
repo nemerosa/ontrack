@@ -861,5 +861,12 @@ angular.module('ot.view.branch', [
             }
         };
 
+        $scope.toggleBranchViewVsNames = () => {
+            otUserService.setPreferences({
+                branchViewVsNames: !$rootScope.user.preferences.branchViewVsNames
+            });
+            loadBuildView();
+        };
+
     })
 ;

@@ -139,6 +139,16 @@
                             New filter...
                         </a>
                     </li>
+                    <!-- Displaying the validation stamp names -->
+                    <li ng-if="!user.preferences.branchViewLegacy" class="divider"></li>
+                    <li ng-if="!user.preferences.branchViewLegacy">
+                        <a>
+                            <!-- Selected? -->
+                            <span class="fa fa-check" ng-show="user.preferences.branchViewVsNames"></span>
+                            <!-- Name -->
+                            <span ng-click="toggleBranchViewVsNames()">Display validation stamp names</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
             <!-- Loading -->
