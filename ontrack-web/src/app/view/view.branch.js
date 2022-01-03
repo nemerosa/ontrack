@@ -68,6 +68,30 @@ angular.module('ot.view.branch', [
         // Switch branches loaded?
         let switchBranchesLoaded = false;
 
+        const computeGroupedValidations = (builds) => {
+            builds.forEach(build => {
+                build.groupedValidations = {};
+                build.validations.forEach(validation => {
+                    const name = validation.validationStamp.name;
+                    if (validation.validationRuns.length > 0) {
+                        const statusID = validation.validationRuns[0].validationRunStatuses[0].statusID;
+                        const group = build.groupedValidations[statusID.id];
+                        if (!group) {
+                            build.groupedValidations[statusID.id] = {
+                                count: 1,
+                                validations: [
+                                    validation
+                                ]
+                            };
+                        } else {
+                            group.count = group.count + 1;
+                            group.validations.push(validation);
+                        }
+                    }
+                });
+            });
+        };
+
         function callBuildView(filterType, filterData) {
             $scope.loadingBuildView = true;
             otGraphqlService.pageGraphQLCall(`query BranchView($branchId: Int!, $filterType: String, $filterData: String) {
@@ -191,6 +215,10 @@ angular.module('ot.view.branch', [
             ).then(function (data) {
                 $scope.branchView = data.branches[0];
                 $scope.builds = data.branches[0].builds;
+                // Groups of validation stamps per status
+                if (!$rootScope.user.preferences.branchViewLegacy && $rootScope.user.preferences.branchViewVsGroups) {
+                    computeGroupedValidations($scope.builds);
+                }
                 // Management of promotion levels
                 $scope.promotionLevels = data.branches[0].promotionLevels;
                 $scope.promotionLevelSortOptions = {
