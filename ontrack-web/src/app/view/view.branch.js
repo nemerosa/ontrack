@@ -733,6 +733,25 @@ angular.module('ot.view.branch', [
             }
         };
 
+        $scope.validationStampFilterNameMaxHeight = () => {
+            if (!$rootScope.user.preferences.branchViewLegacy && $rootScope.user.preferences.branchViewVsNames && $scope.validationStamps) {
+                const nameLengths = $scope.validationStamps.map(vs => $scope.validationStampFilterNameElapsed(vs.name).length);
+                const maxLength = Math.max(...nameLengths);
+                return `${Math.floor(maxLength / 1.4142)}em`;
+            } else {
+                return "36px";
+            }
+        };
+
+        $scope.validationStampFilterNameElapsed = (name) => {
+            const maxLength = 20;
+            if (name.length <= maxLength) {
+                return name;
+            } else {
+                return name.substring(0, maxLength) + '…';
+            }
+        };
+
         $scope.editBranchValidationStampFilter = function (validationStampFilter) {
             if (validationStampFilter._update) {
                 $scope.validationStampFilterEdition = false;
