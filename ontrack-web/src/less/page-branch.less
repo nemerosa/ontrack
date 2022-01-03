@@ -43,3 +43,25 @@ th.ot-branch-build-view-validation-name-rotated > div {
     rotate(315deg);
   width: 30px;
 }
+
+@otBranchBuildViewValidationGroupHeight: 32px;
+@otBranchBuildViewValidationGroupPadding: 4px;
+
+.ot-branch-build-view-validation-groups {
+  white-space: nowrap;
+}
+
+.ot-branch-build-view-validation-group {
+  display: inline-block;
+  white-space: nowrap;
+  min-height: @otBranchBuildViewValidationGroupHeight;
+  max-height: @otBranchBuildViewValidationGroupHeight;
+  height: @otBranchBuildViewValidationGroupHeight;
+  padding: @otBranchBuildViewValidationGroupPadding;
+  border: 1px solid darkgray;
+  border-radius: 16px;
+}
+
+.ot-branch-build-view-validation-group + .ot-branch-build-view-validation-group {
+  margin-left: 5px;
+}
