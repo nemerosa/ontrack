@@ -887,5 +887,12 @@ angular.module('ot.view.branch', [
             loadBuildView();
         };
 
+        $scope.toggleBranchViewVsGroups = () => {
+            otUserService.setPreferences({
+                branchViewVsGroups: !$rootScope.user.preferences.branchViewVsGroups
+            });
+            loadBuildView();
+        };
+
     })
 ;
