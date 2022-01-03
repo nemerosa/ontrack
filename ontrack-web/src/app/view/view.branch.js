@@ -68,16 +68,16 @@ angular.module('ot.view.branch', [
         // Switch branches loaded?
         let switchBranchesLoaded = false;
 
-        const computeGroupedValidations = (builds) => {
+        const computeGroupedValidations = (builds, validationRunStatusIDList) => {
             builds.forEach(build => {
-                build.groupedValidations = {};
+                const statuses = {};
                 build.validations.forEach(validation => {
                     const name = validation.validationStamp.name;
                     if (validation.validationRuns.length > 0) {
                         const statusID = validation.validationRuns[0].validationRunStatuses[0].statusID;
-                        const group = build.groupedValidations[statusID.id];
+                        const group = statuses[statusID.id];
                         if (!group) {
-                            build.groupedValidations[statusID.id] = {
+                            statuses[statusID.id] = {
                                 count: 1,
                                 validations: [
                                     validation
@@ -89,12 +89,28 @@ angular.module('ot.view.branch', [
                         }
                     }
                 });
+                // Sorting
+                build.groupedValidations = [];
+                validationRunStatusIDList.forEach(statusID => {
+                    const group = statuses[statusID.id];
+                    if (group) {
+                        build.groupedValidations.push({
+                            statusID: statusID,
+                            count: group.count,
+                            validations: group.validations
+                        });
+                    }
+                });
             });
         };
 
         function callBuildView(filterType, filterData) {
             $scope.loadingBuildView = true;
             otGraphqlService.pageGraphQLCall(`query BranchView($branchId: Int!, $filterType: String, $filterData: String) {
+              validationRunStatusIDList {
+                id
+                name
+              }
               branches(id: $branchId) {
                 id
                 name
@@ -217,7 +233,7 @@ angular.module('ot.view.branch', [
                 $scope.builds = data.branches[0].builds;
                 // Groups of validation stamps per status
                 if (!$rootScope.user.preferences.branchViewLegacy && $rootScope.user.preferences.branchViewVsGroups) {
-                    computeGroupedValidations($scope.builds);
+                    computeGroupedValidations($scope.builds, data.validationRunStatusIDList);
                 }
                 // Management of promotion levels
                 $scope.promotionLevels = data.branches[0].promotionLevels;
