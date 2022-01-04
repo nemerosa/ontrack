@@ -1,13 +1,10 @@
 [[features]]
 == Features
 
-//[[basics]]
-//== Basics
-//
-//include::usage-projects.adoc[]
-//
-//include::usage-branches.adoc[]
-//
+include::feature-projects.adoc[]
+
+include::feature-branches.adoc[]
+
 //include::usage-validation-stamps.adoc[]
 //
 //include::usage-promotion-levels.adoc[]
@@ -19,9 +16,6 @@
 //include::usage-validation-runs.adoc[]
 //
 //include::usage-properties.adoc[]
-
-[[topics]]
-=== Topics
 
 //include::usage-scm.adoc[]
 //
