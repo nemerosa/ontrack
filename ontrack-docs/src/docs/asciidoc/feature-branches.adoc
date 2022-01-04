@@ -70,3 +70,6 @@ the <<dsl-projectproperties-stale,DSL>>.
 
 // ==== Validation stamp filters
 include::feature-validation-stamp-filters.adoc[]
+
+// ==== Validation stamp display options
+include::feature-validation-stamp-display-options.adoc[]
