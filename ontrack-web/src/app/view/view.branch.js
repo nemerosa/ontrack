@@ -740,8 +740,25 @@ angular.module('ot.view.branch', [
             }
         };
 
+        /**
+         * Checks if a given validation stamp must be displayed or not.
+         *
+         * A validation stamp is displayed if:
+         *
+         * * there is a selected validation stamp filter (VSF), then
+         *   * the VSF is being edited
+         *   * OR the VSF contains the validation stamp
+         * * there is no selected VSF, then
+         *   * NOT if groups are displayed
+         * @param validationStamp Validation stamp to check
+         * @returns {boolean|boolean|*} `true` if the validation must be displayed.
+         */
         $scope.validationStampFilterFn = function (validationStamp) {
-            return !$scope.validationStampFilter || $scope.validationStampFilterEdition || $scope.validationStampFilter.vsNames.indexOf(validationStamp.name) >= 0;
+            if ($scope.validationStampFilter) {
+                return $scope.validationStampFilterEdition || $scope.validationStampFilter.vsNames.indexOf(validationStamp.name) >= 0;
+            } else {
+                return !$rootScope.user.preferences.branchViewVsGroups;
+            }
         };
 
         $scope.validationStampRunViewFilter = function (validation) {
