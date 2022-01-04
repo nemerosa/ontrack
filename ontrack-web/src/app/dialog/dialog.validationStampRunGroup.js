@@ -12,7 +12,7 @@ angular.module('ot.dialog.validationStampRunGroup', [
             // Closes this dialog first
             $scope.cancel();
             // Opening the validation only
-            $scope.callbackOnRunOpen($scope.config.build, validation.validationStamp);
+            $scope.config.callbackOnRunOpen($scope.config.build, validation.validationStamp);
         };
     })
 ;
