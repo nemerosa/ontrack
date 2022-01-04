@@ -13,7 +13,11 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 @APIDescription("Preferences of a user")
 data class Preferences(
     @APIDescription("Branch view VS names")
-    var branchViewVsNames: Boolean = false,
+    var branchViewVsNames: Boolean = DEFAULT_BRANCH_VIEW_OPTION,
     @APIDescription("Branch view VS groups")
-    var branchViewVsGroups: Boolean = false,
-)
+    var branchViewVsGroups: Boolean = DEFAULT_BRANCH_VIEW_OPTION,
+) {
+    companion object {
+        const val DEFAULT_BRANCH_VIEW_OPTION = false
+    }
+}
