@@ -290,7 +290,9 @@
                     {{ group.statusID.name }}
                 </span>
                 <span ng-if="group.count > 1">
-                    <ot-validation-run-status status="group"></ot-validation-run-status>
+                    <span class="ot-action" ng-click="displayValidationRunsGroup(build, group)">
+                        <ot-validation-run-status status="group"></ot-validation-run-status>
+                    </span>
                     {{ group.count }} {{ group.statusID.name }}
                 </span>
             </div>

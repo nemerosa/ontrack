@@ -7,6 +7,7 @@ angular.module('ot.view.branch', [
     'ot.service.buildfilter',
     'ot.service.copy',
     'ot.dialog.validationStampRunView',
+    'ot.dialog.validationStampRunGroup',
     'ot.dialog.promotionRuns',
     'ot.service.graphql',
     'ot.service.user'
@@ -568,6 +569,27 @@ angular.module('ot.view.branch', [
                             validationStamp: validationStamp,
                             callbackOnStatusChange: function () {
                                 loadBranch();
+                            }
+                        };
+                    }
+                }
+            });
+        };
+
+        /**
+         * Displaying a list of validation runs grouped by status
+         */
+        $scope.displayValidationRunsGroup = (build, group) => {
+            $modal.open({
+                templateUrl: 'app/dialog/dialog.validationStampRunGroup.tpl.html',
+                controller: 'otDialogValidationStampRunGroup',
+                resolve: {
+                    config: function () {
+                        return {
+                            build: build,
+                            group: group,
+                            callbackOnRunOpen: (validationStamp) => {
+                                $scope.displayValidationRuns(build, validationStamp);
                             }
                         };
                     }

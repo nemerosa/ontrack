@@ -1,0 +1,15 @@
+<div class="modal-header">
+    <h3 ng-click="cancel()">
+        <ot-validation-run-status status="config.group"></ot-validation-run-status>
+        {{ config.group.count }} {{ config.group.statusID.name }}
+        in build
+        <a href="#/build/{{build.id}}">
+            {{ config.build.name }}
+        </a>
+    </h3>
+</div>
+<div class="modal-body">
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="submit" ng-click="cancel()">OK</button>
+</div>
