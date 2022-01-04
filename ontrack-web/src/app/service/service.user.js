@@ -48,9 +48,6 @@ angular.module('ot.service.user', [
          */
         self.setPreferences = (preferences) => {
             const input = {};
-            if (preferences.branchViewLegacy !== undefined) {
-                input.branchViewLegacy = preferences.branchViewLegacy;
-            }
             if (preferences.branchViewVsNames !== undefined) {
                 input.branchViewVsNames = preferences.branchViewVsNames;
             }
@@ -59,17 +56,14 @@ angular.module('ot.service.user', [
             }
             otGraphqlService.pageGraphQLCall(`
                 mutation(
-                  $branchViewLegacy: Boolean,
                   $branchViewVsNames: Boolean,
                   $branchViewVsGroups: Boolean,
                 ) {
                   setPreferences(input: {
-                    branchViewLegacy: $branchViewLegacy,
                     branchViewVsNames: $branchViewVsNames,
                     branchViewVsGroups: $branchViewVsGroups,
                   }) {
                     preferences {
-                      branchViewLegacy
                       branchViewVsNames
                       branchViewVsGroups
                     }
@@ -79,9 +73,6 @@ angular.module('ot.service.user', [
                   }
                 }
             `, input).finally(() => {
-                if (preferences.branchViewLegacy !== undefined) {
-                    $rootScope.user.preferences.branchViewLegacy = preferences.branchViewLegacy;
-                }
                 if (preferences.branchViewVsNames !== undefined) {
                     $rootScope.user.preferences.branchViewVsNames = preferences.branchViewVsNames;
                 }

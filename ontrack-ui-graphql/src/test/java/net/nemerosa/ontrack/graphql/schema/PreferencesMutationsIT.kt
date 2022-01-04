@@ -16,9 +16,8 @@ class PreferencesMutationsIT : AbstractQLKTITSupport() {
     fun `Getting the default preferences`() {
         asUser {
             val preferences = getPreferences()
-            assertEquals(true, preferences.branchViewLegacy)
-            assertEquals(true, preferences.branchViewVsNames)
-            assertEquals(true, preferences.branchViewVsGroups)
+            assertEquals(false, preferences.branchViewVsNames)
+            assertEquals(false, preferences.branchViewVsGroups)
         }
     }
 
@@ -28,12 +27,10 @@ class PreferencesMutationsIT : AbstractQLKTITSupport() {
             run("""
                 mutation {
                     setPreferences(input: {
-                        branchViewLegacy: false,
-                        branchViewVsNames: false,
-                        branchViewVsGroups: false,
+                        branchViewVsNames: true,
+                        branchViewVsGroups: true,
                     }) {
                         preferences {
-                            branchViewLegacy
                             branchViewVsNames
                             branchViewVsGroups
                         }
@@ -41,13 +38,11 @@ class PreferencesMutationsIT : AbstractQLKTITSupport() {
                 }
             """) { data ->
                 val preferences = data["setPreferences"]["preferences"]
-                assertEquals(false, preferences.getBooleanField("branchViewLegacy"))
-                assertEquals(false, preferences.getBooleanField("branchViewVsNames"))
-                assertEquals(false, preferences.getBooleanField("branchViewVsGroups"))
+                assertEquals(true, preferences.getBooleanField("branchViewVsNames"))
+                assertEquals(true, preferences.getBooleanField("branchViewVsGroups"))
                 getPreferences().let {
-                    assertEquals(false, it.branchViewLegacy)
-                    assertEquals(false, it.branchViewVsNames)
-                    assertEquals(false, it.branchViewVsGroups)
+                    assertEquals(true, it.branchViewVsNames)
+                    assertEquals(true, it.branchViewVsGroups)
                 }
             }
         }
@@ -59,10 +54,9 @@ class PreferencesMutationsIT : AbstractQLKTITSupport() {
             run("""
                 mutation {
                     setPreferences(input: {
-                        branchViewLegacy: false,
+                        branchViewVsNames: true,
                     }) {
                         preferences {
-                            branchViewLegacy
                             branchViewVsNames
                             branchViewVsGroups
                         }
@@ -70,13 +64,11 @@ class PreferencesMutationsIT : AbstractQLKTITSupport() {
                 }
             """) { data ->
                 val preferences = data["setPreferences"]["preferences"]
-                assertEquals(false, preferences.getBooleanField("branchViewLegacy"))
                 assertEquals(true, preferences.getBooleanField("branchViewVsNames"))
-                assertEquals(true, preferences.getBooleanField("branchViewVsGroups"))
+                assertEquals(false, preferences.getBooleanField("branchViewVsGroups"))
                 getPreferences().let {
-                    assertEquals(false, it.branchViewLegacy)
                     assertEquals(true, it.branchViewVsNames)
-                    assertEquals(true, it.branchViewVsGroups)
+                    assertEquals(false, it.branchViewVsGroups)
                 }
             }
         }

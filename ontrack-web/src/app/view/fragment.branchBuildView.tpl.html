@@ -138,8 +138,8 @@
                         </a>
                     </li>
                     <!-- Validation stamps preferences -->
-                    <li ng-if="!user.preferences.branchViewLegacy" class="divider"></li>
-                    <li ng-if="!user.preferences.branchViewLegacy">
+                    <li class="divider"></li>
+                    <li>
                         <a>
                             <!-- Selected? -->
                             <span class="fa fa-check" ng-show="user.preferences.branchViewVsNames"></span>
@@ -147,7 +147,7 @@
                             <span ng-click="toggleBranchViewVsNames()">Display validation stamp names</span>
                         </a>
                     </li>
-                    <li ng-if="!user.preferences.branchViewLegacy">
+                    <li>
                         <a>
                             <!-- Selected? -->
                             <span class="fa fa-check" ng-show="user.preferences.branchViewVsGroups"></span>
@@ -171,7 +171,7 @@
             }"
             ng-class="{
                 'ot-validation-stamp-filter-edition': validationStampFilter && validationStampFilter._update && validationStampFilterEdition,
-                'ot-branch-build-view-validation-name-rotated': !user.preferences.branchViewLegacy && user.preferences.branchViewVsNames
+                'ot-branch-build-view-validation-name-rotated': user.preferences.branchViewVsNames
             }">
             <div>
                 <!-- VS filter edition ON -->
@@ -183,7 +183,7 @@
                             }"
                           ng-click="toggleValidationStampFromFilter(validationStamp.name)"
                     >
-                        <ot-entity-image entity="validationStamp"><span ng-show="!user.preferences.branchViewLegacy && user.preferences.branchViewVsNames">{{ validationStampFilterNameElapsed(validationStamp.name) }}</span></ot-entity-image>
+                        <ot-entity-image entity="validationStamp"><span ng-show="user.preferences.branchViewVsNames">{{ validationStampFilterNameElapsed(validationStamp.name) }}</span></ot-entity-image>
                     </span>
                     <span
                             ng-if="validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStamp.name) >= 0"
@@ -202,12 +202,12 @@
                 <span ng-if="!validationStampFilter || !validationStampFilter._update || !validationStampFilterEdition">
                     <ot-entity-image entity="validationStamp"
                                      title="{{validationStamp.name}} - {{validationStamp.description}}"
-                                     link="#/validationStamp/{{validationStamp.id}}"><span ng-show="!user.preferences.branchViewLegacy && user.preferences.branchViewVsNames">{{ validationStampFilterNameElapsed(validationStamp.name) }}</span></ot-entity-image>
+                                     link="#/validationStamp/{{validationStamp.id}}"><span ng-show="user.preferences.branchViewVsNames">{{ validationStampFilterNameElapsed(validationStamp.name) }}</span></ot-entity-image>
                 </span>
             </div>
         </th>
         <!-- Empty cell in case of groups -->
-        <th ng-if="!user.preferences.branchViewLegacy && user.preferences.branchViewVsGroups">&nbsp;</th>
+        <th ng-if="user.preferences.branchViewVsGroups">&nbsp;</th>
     </tr>
     <!-- Validation stamps decorations -->
     <tr>
@@ -218,7 +218,7 @@
                     decorations="validationStamp.decorations"></ot-entity-embedded-decorations>
         </th>
         <!-- Empty cell in case of groups -->
-        <th ng-if="!user.preferences.branchViewLegacy && user.preferences.branchViewVsGroups">&nbsp;</th>
+        <th ng-if="user.preferences.branchViewVsGroups">&nbsp;</th>
     </tr>
     </thead>
     <tbody>
@@ -280,7 +280,7 @@
             </span>
         </td>
         <!-- Groups of validation stamps per status -->
-        <td ng-if="!user.preferences.branchViewLegacy && user.preferences.branchViewVsGroups" class="ot-branch-build-view-validation-groups">
+        <td ng-if="user.preferences.branchViewVsGroups" class="ot-branch-build-view-validation-groups">
             <div class="ot-branch-build-view-validation-group" ng-repeat="group in build.groupedValidations">
                 <ot-validation-run-status status="group"></ot-validation-run-status>
                 <span ng-if="group.count == 1"><ot-entity-image entity="group.validations[0].validationStamp" link="#/validationStamp/{{group.validations[0].validationStamp.id}}">{{ group.validations[0].validationStamp.name }}</ot-entity-image> {{ group.statusID.name }}</span>

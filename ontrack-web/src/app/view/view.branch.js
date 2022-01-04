@@ -235,7 +235,7 @@ angular.module('ot.view.branch', [
                 $scope.branchView = data.branches[0];
                 $scope.builds = data.branches[0].builds;
                 // Groups of validation stamps per status
-                if (!$rootScope.user.preferences.branchViewLegacy && $rootScope.user.preferences.branchViewVsGroups) {
+                if ($rootScope.user.preferences.branchViewVsGroups) {
                     computeGroupedValidations($scope.builds, data.validationRunStatusIDList);
                 }
                 // Management of promotion levels
@@ -353,30 +353,6 @@ angular.module('ot.view.branch', [
                 view.breadcrumbs = ot.projectBreadcrumbs(branchResource.project);
                 // Branch commands
                 view.commands = [
-                    {
-                        condition: () => $rootScope.user.preferences.branchViewLegacy,
-                        id: 'branchViewNg',
-                        name: "New branch view",
-                        cls: 'ot-command-branch-view-ng',
-                        action: () => {
-                            otUserService.setPreferences({
-                                branchViewLegacy: false
-                            });
-                            loadBuildView();
-                        }
-                    },
-                    {
-                        condition: () => !$rootScope.user.preferences.branchViewLegacy,
-                        id: 'branchViewLegacy',
-                        name: "Legacy branch view",
-                        cls: 'ot-command-branch-view-legacy',
-                        action: () => {
-                            otUserService.setPreferences({
-                                branchViewLegacy: true
-                            });
-                            loadBuildView();
-                        }
-                    },
                     {
                         condition: function () {
                             return branchResource._createBuild;
@@ -774,7 +750,7 @@ angular.module('ot.view.branch', [
 
         $scope.validationStampFilterCount = function (plus) {
             let placeForGroups = 0;
-            if (!$rootScope.user.preferences.branchViewLegacy && $rootScope.user.preferences.branchViewVsGroups) {
+            if ($rootScope.user.preferences.branchViewVsGroups) {
                 placeForGroups = 1;
             }
             if ($scope.validationStamps) {
@@ -785,7 +761,7 @@ angular.module('ot.view.branch', [
         };
 
         $scope.validationStampFilterNameMaxHeight = () => {
-            if (!$rootScope.user.preferences.branchViewLegacy && $rootScope.user.preferences.branchViewVsNames && $scope.validationStamps) {
+            if ($rootScope.user.preferences.branchViewVsNames && $scope.validationStamps) {
                 const nameLengths = $scope.validationStamps.map(vs => $scope.validationStampFilterNameElapsed(vs.name).length);
                 const maxLength = Math.max(...nameLengths);
                 return `${Math.floor(maxLength / 1.4142)}em`;

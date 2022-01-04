@@ -35,7 +35,6 @@ class PreferencesMutations(
             val current = preferencesService.getPreferences(account)
             // Adapts the preferences
             val new = Preferences(
-                branchViewLegacy = input.branchViewLegacy ?: current.branchViewLegacy,
                 branchViewVsNames = input.branchViewVsNames ?: current.branchViewVsNames,
                 branchViewVsGroups = input.branchViewVsGroups ?: current.branchViewVsGroups,
             )
@@ -64,7 +63,6 @@ class GQLTypePreferences : GQLType {
 }
 
 data class SetPreferencesInput(
-    val branchViewLegacy: Boolean? = null,
     val branchViewVsNames: Boolean? = null,
     val branchViewVsGroups: Boolean? = null,
 )
