@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.stale
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.model.structure.Project
 import org.junit.Test
@@ -11,7 +11,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class StaleBranchesJobIT : AbstractDSLTestSupport() {
+class StaleBranchesJobIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var staleJobService: StaleJobService

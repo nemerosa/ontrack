@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.ui.resource
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder
 import org.junit.Before
 import kotlin.test.assertTrue
 
-abstract class AbstractResourceDecoratorTestSupport : AbstractDSLTestSupport() {
+abstract class AbstractResourceDecoratorTestSupport : AbstractDSLTestJUnit4Support() {
 
     private lateinit var resourceContext: ResourceContext
 

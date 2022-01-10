@@ -2,12 +2,12 @@ package net.nemerosa.ontrack.extension.general.indicator
 
 import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicatorService
 import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicatorState
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class OntrackPropertiesIndicatorComputerIT: AbstractDSLTestSupport() {
+class OntrackPropertiesIndicatorComputerIT: AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var ontrackPropertiesIndicatorComputer: OntrackPropertiesIndicatorComputer

@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.configuration
 
 import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigReal
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.support.ConnectionResult
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class BitbucketCloudConfigurationServiceIT : AbstractDSLTestSupport() {
+class BitbucketCloudConfigurationServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var bitbucketCloudConfigurationService: BitbucketCloudConfigurationService

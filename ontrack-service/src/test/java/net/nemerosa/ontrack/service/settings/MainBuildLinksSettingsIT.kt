@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.service.settings
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class MainBuildLinksSettingsIT : AbstractDSLTestSupport() {
+class MainBuildLinksSettingsIT : AbstractDSLTestJUnit4Support() {
 
     @Test
     fun `Setting and restoring the main build settings`() {

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.Project
 import org.junit.Test
@@ -12,7 +12,7 @@ import kotlin.test.assertTrue
 /**
  * Testing the basic security conditions.
  */
-class SecuritySetupIT : AbstractDSLTestSupport() {
+class SecuritySetupIT : AbstractDSLTestJUnit4Support() {
 
     @Test
     fun `Authentication is required to create a project`() {

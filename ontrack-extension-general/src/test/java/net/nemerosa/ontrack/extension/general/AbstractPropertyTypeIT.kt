@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.support.NameValue
 
-abstract class AbstractPropertyTypeIT : AbstractDSLTestSupport() {
+abstract class AbstractPropertyTypeIT : AbstractDSLTestJUnit4Support() {
 
     protected fun ProjectEntity.links(vararg data: Pair<String, String>) {
         setProperty(

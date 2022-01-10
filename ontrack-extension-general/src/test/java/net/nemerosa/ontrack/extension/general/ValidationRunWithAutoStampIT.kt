@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.general
 import net.nemerosa.ontrack.extension.general.validation.FractionValidationData
 import net.nemerosa.ontrack.extension.general.validation.FractionValidationDataType
 import net.nemerosa.ontrack.extension.general.validation.ThresholdConfig
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.assertIs
@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class ValidationRunWithAutoStampIT : AbstractDSLTestSupport() {
+class ValidationRunWithAutoStampIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var fractionValidationDataType: FractionValidationDataType

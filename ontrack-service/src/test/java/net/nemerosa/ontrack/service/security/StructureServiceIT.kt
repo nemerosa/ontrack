@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.common.Document
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException
 import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException
 import net.nemerosa.ontrack.model.security.ProjectList
@@ -16,7 +16,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
-class StructureServiceIT : AbstractDSLTestSupport() {
+class StructureServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Test(expected = IllegalStateException::class)
     fun `Cannot accept an ID when creating a project`() {

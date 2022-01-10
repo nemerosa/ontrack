@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.PromotionLevelCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
@@ -19,7 +19,7 @@ import kotlin.test.assertTrue
 /**
  * This class supersedes [StructureServiceIT], which cannot be replaced as yet.
  */
-class StructureServiceNewIT : AbstractDSLTestSupport() {
+class StructureServiceNewIT : AbstractDSLTestJUnit4Support() {
 
     @Test
     fun `Looking for projects using a pattern`() {

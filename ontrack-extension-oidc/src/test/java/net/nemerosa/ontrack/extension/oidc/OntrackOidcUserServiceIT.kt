@@ -4,7 +4,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import net.nemerosa.ontrack.extension.oidc.settings.OIDCSettingsService
 import net.nemerosa.ontrack.extension.oidc.settings.OntrackOIDCProvider
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.AccountInput
 import net.nemerosa.ontrack.model.security.AuthenticationSource
 import net.nemerosa.ontrack.model.security.ProvidedGroupsService
@@ -20,7 +20,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-class OntrackOidcUserServiceIT : AbstractDSLTestSupport() {
+class OntrackOidcUserServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var providedGroupsService: ProvidedGroupsService

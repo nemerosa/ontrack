@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.StandardBuildFilterData
@@ -8,7 +8,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-class StandardBuildFilterProviderIT : AbstractDSLTestSupport() {
+class StandardBuildFilterProviderIT : AbstractDSLTestJUnit4Support() {
 
 
     @Test

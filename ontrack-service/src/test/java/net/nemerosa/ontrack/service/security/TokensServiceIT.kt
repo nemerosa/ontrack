@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountManagement
 import net.nemerosa.ontrack.model.structure.ID
@@ -12,7 +12,7 @@ import java.time.Duration
 import java.util.*
 import kotlin.test.*
 
-class TokensServiceIT : AbstractDSLTestSupport() {
+class TokensServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var tokensService: TokensService

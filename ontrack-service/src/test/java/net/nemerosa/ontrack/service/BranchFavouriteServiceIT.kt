@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.structure.BranchFavouriteService
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class BranchFavouriteServiceIT: AbstractDSLTestSupport() {
+class BranchFavouriteServiceIT: AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var service: BranchFavouriteService

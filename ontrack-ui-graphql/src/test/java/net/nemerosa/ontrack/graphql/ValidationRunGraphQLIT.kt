@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql
 
 import com.fasterxml.jackson.databind.node.TextNode
-import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationConfig
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
 import net.nemerosa.ontrack.extension.general.validation.TextValidationDataType

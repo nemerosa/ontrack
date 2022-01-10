@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.*
 import org.junit.Test
 import org.springframework.security.access.AccessDeniedException
@@ -9,7 +9,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class AccountServiceIT : AbstractDSLTestSupport() {
+class AccountServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Test
     fun `Creating a disabled account`() {

@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.git
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.CacheManager
 import kotlin.test.assertNotNull
 
-class GitControllerIT : AbstractDSLTestSupport() {
+class GitControllerIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var cacheManager: CacheManager

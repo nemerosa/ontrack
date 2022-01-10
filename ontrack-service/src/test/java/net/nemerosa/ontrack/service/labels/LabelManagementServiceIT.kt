@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.labels
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.labels.LabelForm
 import net.nemerosa.ontrack.model.labels.LabelManagement
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -8,7 +8,7 @@ import org.junit.Test
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.*
 
-class LabelManagementServiceIT : AbstractDSLTestSupport() {
+class LabelManagementServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Test
     fun `Creating, updating and deleting a label`() {

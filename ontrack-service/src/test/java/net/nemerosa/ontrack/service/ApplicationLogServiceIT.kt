@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.common.BaseException
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogEntryFilter
@@ -18,7 +18,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 @DirtiesContext
-class ApplicationLogServiceIT : AbstractDSLTestSupport() {
+class ApplicationLogServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var sampleService: SampleService

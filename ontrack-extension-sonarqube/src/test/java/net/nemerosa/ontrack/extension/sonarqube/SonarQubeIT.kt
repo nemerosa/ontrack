@@ -18,7 +18,7 @@ import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresInform
 import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresSettings
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.Build
@@ -37,7 +37,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class SonarQubeIT : AbstractDSLTestSupport() {
+class SonarQubeIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var sonarQubeConfigurationService: SonarQubeConfigurationService

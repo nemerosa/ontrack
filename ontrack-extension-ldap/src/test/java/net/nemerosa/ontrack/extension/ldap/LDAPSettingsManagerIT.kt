@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.ldap
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class LDAPSettingsManagerIT : AbstractDSLTestSupport() {
+class LDAPSettingsManagerIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var service: LDAPSettingsManager

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.vault
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.ConfidentialStore
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertIs
@@ -19,7 +19,7 @@ import kotlin.test.assertNotNull
         ]
 )
 @DirtiesContext
-class VaultConfidentialStoreIT : AbstractDSLTestSupport() {
+class VaultConfidentialStoreIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var store: ConfidentialStore

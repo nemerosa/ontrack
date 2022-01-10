@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.it.links
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.links.*
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
 @Deprecated(message = "JUnit is deprecated", replaceWith = ReplaceWith("AbstractBranchLinksTestSupport"))
-abstract class AbstractBranchLinksTestJUnit4Support : AbstractDSLTestSupport() {
+abstract class AbstractBranchLinksTestJUnit4Support : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     protected lateinit var branchLinksService: BranchLinksService

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.exceptions.ValidationStampFilterNameAlreadyDefinedException
 import net.nemerosa.ontrack.model.exceptions.ValidationStampFilterNotFoundException
 import net.nemerosa.ontrack.model.security.GlobalSettings
@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import java.util.*
 
-class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
+class ValidationStampFilterServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var filterService: ValidationStampFilterService
