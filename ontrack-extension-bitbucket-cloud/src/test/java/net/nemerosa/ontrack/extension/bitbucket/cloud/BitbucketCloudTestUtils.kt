@@ -6,6 +6,9 @@ import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.stale.StaleExtensionFeature
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.getEnv
+import net.nemerosa.ontrack.test.getOptionalEnv
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledIf
 
 class BitbucketCloudTestEnv(
     val workspace: String,
@@ -52,3 +55,24 @@ fun bitbucketCloudTestConfigMock(
         user = "user",
         password = "token",
     )
+
+/**
+ * Annotation to use on tests relying on an external Bitbucket Cloud repository.
+ */
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@Test
+@EnabledIf("net.nemerosa.ontrack.extension.bitbucket.cloud.TestOnBitbucketCloudCondition#isTestOnBitbucketCloudEnabled")
+annotation class TestOnBitbucketCloud
+
+/**
+ * Testing if the environment is set for testing against Bitbucket Cloud
+ */
+class TestOnBitbucketCloudCondition {
+
+    companion object {
+        @JvmStatic
+        fun isTestOnBitbucketCloudEnabled(): Boolean =
+            !getOptionalEnv("ontrack.test.extension.bitbucket.cloud.workspace").isNullOrBlank()
+    }
+}
