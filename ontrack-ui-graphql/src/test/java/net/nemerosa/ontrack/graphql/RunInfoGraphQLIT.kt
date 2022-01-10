@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class RunInfoGraphQLIT : AbstractQLKTITSupport() {
+class RunInfoGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     private lateinit var runInfoService: RunInfoService

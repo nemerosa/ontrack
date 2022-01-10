@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.casc
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.settings.HomePageSettings
 import net.nemerosa.ontrack.model.settings.SecuritySettings
 import org.junit.Test
@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class CascStartupIT : AbstractDSLTestSupport() {
+class CascStartupIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var cascStartup: CascStartup

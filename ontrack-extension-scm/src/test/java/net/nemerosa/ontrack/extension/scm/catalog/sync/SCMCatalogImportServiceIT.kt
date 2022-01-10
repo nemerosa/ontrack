@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalog
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogEntry
 import net.nemerosa.ontrack.extension.scm.catalog.mock.MockSCMCatalogProvider
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertNotPresent
@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class SCMCatalogImportServiceIT : AbstractDSLTestSupport() {
+class SCMCatalogImportServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var scmCatalogImportService: SCMCatalogImportService

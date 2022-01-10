@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.github.service
 
-import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
+import net.nemerosa.ontrack.extension.github.AbstractGitHubTestJUnit4Support
 import net.nemerosa.ontrack.extension.github.model.GitHubAuthenticationType
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.model.support.ConfigurationRepository
@@ -13,7 +13,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class GitHubConfigurationServiceIT : AbstractGitHubTestSupport() {
+class GitHubConfigurationServiceIT : AbstractGitHubTestJUnit4Support() {
 
     @Autowired
     private lateinit var configurationRepository: ConfigurationRepository

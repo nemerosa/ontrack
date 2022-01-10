@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.support
 
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
 import net.nemerosa.ontrack.model.security.ApplicationManagement
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 
 import static net.nemerosa.ontrack.model.support.ApplicationLogEntryFilter.none
 
-class ApplicationLogServiceImplIT extends AbstractServiceTestSupport {
+class ApplicationLogServiceImplIT extends AbstractServiceTestJUnit4Support {
 
     @Autowired
     private ApplicationLogService logService

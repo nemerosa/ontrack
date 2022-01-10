@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.github.ingestion.settings
 
-import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class GitHubIngestionSettingsIT : AbstractIngestionTestSupport() {
+class GitHubIngestionSettingsIT : AbstractIngestionTestJUnit4Support() {
 
     @Test
     fun `Saving settings`() {

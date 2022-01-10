@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.json.isNullOrNullNode
-import net.nemerosa.ontrack.model.security.ProjectCreation
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.BranchFavouriteService
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -14,7 +13,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class BranchGraphQLIT : AbstractQLKTITSupport() {
+class BranchGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     private lateinit var branchFavouriteService: BranchFavouriteService

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import net.nemerosa.ontrack.extension.github.ingestion.processing.AbstractIngestionEventProcessor
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
 
@@ -29,4 +28,6 @@ class PingIngestionEventProcessor : AbstractIngestionEventProcessor<PingPayload>
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class PingPayload(repository: Repository) : AbstractRepositoryPayload(repository)
+data class PingPayload(
+    val zen: String,
+)

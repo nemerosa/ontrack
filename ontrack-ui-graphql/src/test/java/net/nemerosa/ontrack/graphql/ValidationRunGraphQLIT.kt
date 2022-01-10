@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql
 
 import com.fasterxml.jackson.databind.node.TextNode
-import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationConfig
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
 import net.nemerosa.ontrack.extension.general.validation.TextValidationDataType
@@ -16,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ValidationRunGraphQLIT : AbstractQLKTITSupport() {
+class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     private lateinit var textValidationDataType: TextValidationDataType

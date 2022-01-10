@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.events
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
-import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
@@ -21,7 +21,7 @@ import kotlin.test.fail
  * Testing the auto promotion setup.
  */
 @ContextConfiguration(classes = [ConfigLoaderServiceITMockConfig::class])
-class AutoPromotionIT : AbstractIngestionTestSupport() {
+class AutoPromotionIT : AbstractIngestionTestJUnit4Support() {
 
     @Autowired
     private lateinit var configLoaderService: ConfigLoaderService

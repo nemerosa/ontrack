@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.extension.gitlab.property.GitLabProjectConfiguration
 import net.nemerosa.ontrack.extension.gitlab.service.GitLabConfigurationService
 import net.nemerosa.ontrack.extension.issues.model.toIdentifier
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
@@ -15,7 +15,7 @@ import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class GitLabFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
+class GitLabFreeTextAnnotatorContributorIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var gitLabConfigurationService: GitLabConfigurationService

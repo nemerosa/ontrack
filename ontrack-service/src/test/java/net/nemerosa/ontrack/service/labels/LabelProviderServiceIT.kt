@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.labels
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.labels.*
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -14,7 +14,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class LabelProviderServiceIT : AbstractDSLTestSupport() {
+class LabelProviderServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var labelProviderService: LabelProviderService

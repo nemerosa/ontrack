@@ -5,7 +5,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class LabelGraphQLIT : AbstractQLKTITSupport() {
+class LabelGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     @Test
     fun `Schema OK`() {

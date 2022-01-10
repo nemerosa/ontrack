@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
 import net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
@@ -15,7 +15,7 @@ import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class BitBucketFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
+class BitBucketFreeTextAnnotatorContributorIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var stashConfigurationService: StashConfigurationService

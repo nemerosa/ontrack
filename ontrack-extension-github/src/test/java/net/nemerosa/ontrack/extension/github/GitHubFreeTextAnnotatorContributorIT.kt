@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.extension.issues.model.toIdentifier
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import org.junit.Test
 
-class GitHubFreeTextAnnotatorContributorIT : AbstractGitHubTestSupport() {
+class GitHubFreeTextAnnotatorContributorIT : AbstractGitHubTestJUnit4Support() {
 
     @Test
     fun `GitHub Git configuration`() {

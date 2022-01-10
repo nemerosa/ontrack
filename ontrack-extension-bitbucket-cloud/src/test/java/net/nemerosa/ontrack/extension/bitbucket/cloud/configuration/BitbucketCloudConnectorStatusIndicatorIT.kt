@@ -1,10 +1,11 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.configuration
 
 import net.nemerosa.ontrack.extension.bitbucket.cloud.AbstractBitbucketCloudTestSupport
+import net.nemerosa.ontrack.extension.bitbucket.cloud.TestOnBitbucketCloud
 import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigMock
 import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigReal
 import net.nemerosa.ontrack.model.support.ConnectorStatus
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -14,7 +15,7 @@ class BitbucketCloudConnectorStatusIndicatorIT : AbstractBitbucketCloudTestSuppo
     @Autowired
     private lateinit var bitbucketCloudConnectorStatusIndicator: BitbucketCloudConnectorStatusIndicator
 
-    @Test
+    @TestOnBitbucketCloud
     fun `Connector status indicator OK`() {
         val config = bitbucketCloudTestConfigReal()
         doTest(config) {

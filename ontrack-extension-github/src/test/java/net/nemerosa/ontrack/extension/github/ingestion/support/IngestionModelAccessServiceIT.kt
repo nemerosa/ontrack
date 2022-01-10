@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.support
 
 import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
 import net.nemerosa.ontrack.extension.github.ingestion.processing.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Owner
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
@@ -15,7 +15,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
-internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
+internal class IngestionModelAccessServiceIT : AbstractIngestionTestJUnit4Support() {
 
     @Autowired
     private lateinit var ingestionModelAccessService: IngestionModelAccessService

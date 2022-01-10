@@ -2,12 +2,12 @@ package net.nemerosa.ontrack.extension.indicators.ui
 
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorPortfolioAccess
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorRoleContributor
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.Roles
 import org.junit.Test
 import kotlin.test.assertTrue
 
-class IndicatorPortfolioAccessIT : AbstractDSLTestSupport() {
+class IndicatorPortfolioAccessIT : AbstractDSLTestJUnit4Support() {
 
     @Test
     fun `Administrators have access to the portfolios`() {

@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.stash.service;
 
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration;
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.junit.Test;
@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertFalse;
 
-public class StashConfigurationServiceIT extends AbstractServiceTestSupport {
+public class StashConfigurationServiceIT extends AbstractServiceTestJUnit4Support {
 
     @Autowired
     private StashConfigurationService configurationService;

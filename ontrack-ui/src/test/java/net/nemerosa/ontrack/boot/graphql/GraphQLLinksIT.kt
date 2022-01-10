@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.boot.graphql
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
-class GraphQLLinksIT : AbstractQLKTITSupport() {
+class GraphQLLinksIT : AbstractQLKTITJUnit4Support() {
 
     @Test
     fun `Validation stamp image link`() {

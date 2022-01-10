@@ -16,7 +16,7 @@ import kotlin.test.assertTrue
 /**
  * Integration tests around the `validationStamp` root query.
  */
-class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
+class ValidationStampGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     private lateinit var chmlValidationDataType: CHMLValidationDataType

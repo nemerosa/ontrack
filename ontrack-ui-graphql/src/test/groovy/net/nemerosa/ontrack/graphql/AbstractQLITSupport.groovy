@@ -6,12 +6,12 @@ import graphql.ExceptionWhileDataFetching
 import graphql.ExecutionResult
 import graphql.GraphQL
 import net.nemerosa.ontrack.graphql.schema.GraphqlSchemaService
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
 import org.springframework.beans.factory.annotation.Autowired
 
 import static org.junit.Assert.fail
 
-abstract class AbstractQLITSupport extends AbstractServiceTestSupport {
+abstract class AbstractQLITSupport extends AbstractServiceTestJUnit4Support {
 
     @Autowired
     private GraphqlSchemaService schemaService

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.security.BranchEdit
 import net.nemerosa.ontrack.model.security.BranchFilterMgt
@@ -11,7 +11,7 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class BuildFilterServiceIT : AbstractDSLTestSupport() {
+class BuildFilterServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var copyService: CopyService

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountInput
 import net.nemerosa.ontrack.model.security.UserService
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertFailsWith
 
-class UserServiceIT : AbstractDSLTestSupport() {
+class UserServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var userService: UserService

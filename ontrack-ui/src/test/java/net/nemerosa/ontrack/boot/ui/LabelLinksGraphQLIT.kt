@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.boot.ui
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
 import net.nemerosa.ontrack.model.labels.LabelManagement
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class LabelLinksGraphQLIT : AbstractQLKTITSupport() {
+class LabelLinksGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     @Test
     fun `Links for admin`() {

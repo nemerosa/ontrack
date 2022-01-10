@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.security.ProjectEdit
@@ -17,7 +17,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class RunInfoServiceIT : AbstractServiceTestSupport() {
+class RunInfoServiceIT : AbstractServiceTestJUnit4Support() {
 
     @Autowired
     private lateinit var runInfoService: RunInfoService

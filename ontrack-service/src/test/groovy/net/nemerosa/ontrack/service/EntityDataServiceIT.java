@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service;
 
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support;
 import net.nemerosa.ontrack.model.structure.EntityDataService;
 import net.nemerosa.ontrack.model.structure.Project;
 import org.junit.Test;
@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static net.nemerosa.ontrack.test.TestUtils.uid;
 import static org.junit.Assert.assertEquals;
 
-public class EntityDataServiceIT extends AbstractServiceTestSupport {
+public class EntityDataServiceIT extends AbstractServiceTestJUnit4Support {
 
     @Autowired
     private EntityDataService entityDataService;

@@ -2,14 +2,14 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import java.time.LocalDateTime
 
-abstract class AbstractBuildFilterIT : AbstractDSLTestSupport() {
+abstract class AbstractBuildFilterIT : AbstractDSLTestJUnit4Support() {
 
     protected lateinit var branch: Branch
     protected lateinit var copper: PromotionLevel

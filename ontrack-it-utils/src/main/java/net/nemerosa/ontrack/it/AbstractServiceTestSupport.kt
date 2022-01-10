@@ -528,4 +528,3 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     )
 }
 
-private class TestOntrackUser(account: Account) : AccountOntrackUser(account)

@@ -1,10 +1,9 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
 import net.nemerosa.ontrack.model.security.*
 import org.junit.Assert.*
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.lang.IllegalStateException
@@ -14,7 +13,7 @@ const val extGlobalRole = "EXT_AUTOMATER"
 const val newProjectRole = "NEW_PROJECT"
 const val extProjectRole = "EXT_PARTICIPANT"
 
-class RolesServiceIT : AbstractServiceTestSupport() {
+class RolesServiceIT : AbstractServiceTestJUnit4Support() {
 
     interface TestGlobalFunction : GlobalFunction
     interface TestProject1Function : ProjectFunction

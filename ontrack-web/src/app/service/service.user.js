@@ -1,8 +1,8 @@
 angular.module('ot.service.user', [
     'ot.service.core',
-    'ot.service.form'
+    'ot.service.graphql'
 ])
-    .service('otUserService', function (ot, $q, $state, $location, $log, $interval, $http, $rootScope, otNotificationService, otFormService) {
+    .service('otUserService', function (ot, $q, $state, $location, $log, $interval, $http, $rootScope, otNotificationService, otGraphqlService) {
         var self = {};
 
         /**
@@ -41,6 +41,45 @@ angular.module('ot.service.user', [
                     otNotificationService.error('Cannot connect. Please try later');
                 }
             );
+        };
+
+        /**
+         * Sets the preferences of the user
+         */
+        self.setPreferences = (preferences) => {
+            const input = {};
+            if (preferences.branchViewVsNames !== undefined) {
+                input.branchViewVsNames = preferences.branchViewVsNames;
+            }
+            if (preferences.branchViewVsGroups !== undefined) {
+                input.branchViewVsGroups = preferences.branchViewVsGroups;
+            }
+            otGraphqlService.pageGraphQLCall(`
+                mutation(
+                  $branchViewVsNames: Boolean,
+                  $branchViewVsGroups: Boolean,
+                ) {
+                  setPreferences(input: {
+                    branchViewVsNames: $branchViewVsNames,
+                    branchViewVsGroups: $branchViewVsGroups,
+                  }) {
+                    preferences {
+                      branchViewVsNames
+                      branchViewVsGroups
+                    }
+                    errors {
+                      message
+                    }
+                  }
+                }
+            `, input).finally(() => {
+                if (preferences.branchViewVsNames !== undefined) {
+                    $rootScope.user.preferences.branchViewVsNames = preferences.branchViewVsNames;
+                }
+                if (preferences.branchViewVsGroups !== undefined) {
+                    $rootScope.user.preferences.branchViewVsGroups = preferences.branchViewVsGroups;
+                }
+            });
         };
 
         return self;

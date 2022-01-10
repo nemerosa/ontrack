@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.support;
 
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support;
 import net.nemerosa.ontrack.model.security.ApplicationManagement;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.NameDescription;
@@ -17,7 +17,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class ApplicationLogFatalInfoProviderIT extends AbstractServiceTestSupport {
+public class ApplicationLogFatalInfoProviderIT extends AbstractServiceTestJUnit4Support {
 
     @Autowired
     private ApplicationLogService logService;

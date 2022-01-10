@@ -17,7 +17,7 @@ import kotlin.test.assertTrue
 /**
  * Integration tests around the `promotionLevel` root query.
  */
-class PromotionLevelGraphQLIT : AbstractQLKTITSupport() {
+class PromotionLevelGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     @Test
     fun `Creation of a promotion level`() {

@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.casc.schema
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertNotNull
 
-class CascSchemaIT : AbstractDSLTestSupport() {
+class CascSchemaIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var cascSchemaService: CascSchemaService

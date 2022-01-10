@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.*
 
-class AdminQLIT : AbstractQLKTITSupport() {
+class AdminQLIT : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     private lateinit var mappingService: AccountGroupMappingService

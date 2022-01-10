@@ -165,8 +165,12 @@ angular.module('ot.directive.entity', [
                     const id = validationRunStatus.statusID.name;
                     const description = validationRunStatus.description;
                     if (description) {
-                        const user = validationRunStatus.creation.user;
-                        return `${id} - ${description} (${user})`;
+                        if (validationRunStatus.creation && validationRunStatus.creation.user) {
+                            const user = validationRunStatus.creation.user;
+                            return `${id} - ${description} (${user})`;
+                        } else {
+                            return `${id} - ${description}`;
+                        }
                     } else {
                         return id;
                     }

@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProper
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
 import net.nemerosa.ontrack.extension.issues.model.toIdentifier
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
@@ -14,7 +14,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class BasicGitFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
+class BasicGitFreeTextAnnotatorContributorIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var gitConfigurationService: GitConfigurationService

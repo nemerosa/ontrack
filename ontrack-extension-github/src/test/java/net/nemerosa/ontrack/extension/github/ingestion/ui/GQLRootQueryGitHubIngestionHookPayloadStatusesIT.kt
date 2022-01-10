@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.github.ingestion.ui
 
-import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStatus
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class GQLRootQueryGitHubIngestionHookPayloadStatusesIT : AbstractIngestionTestSupport() {
+class GQLRootQueryGitHubIngestionHookPayloadStatusesIT : AbstractIngestionTestJUnit4Support() {
 
     @Test
     fun `Getting the list of statuses`() {

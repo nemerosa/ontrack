@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.scm.catalog
 
 import net.nemerosa.ontrack.extension.scm.catalog.mock.MockSCMCatalogProvider
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.structure.Project
 import org.junit.Before
 import org.junit.Test
@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class SCMCatalogProjectFilterServiceIT : AbstractDSLTestSupport() {
+class SCMCatalogProjectFilterServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var scmCatalog: SCMCatalog

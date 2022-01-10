@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.AuthenticationSource
 import net.nemerosa.ontrack.model.security.ProvidedGroupsService
 import org.junit.Test
@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ProvidedGroupsServiceIT : AbstractDSLTestSupport() {
+class ProvidedGroupsServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var providedGroupsService: ProvidedGroupsService

@@ -4,7 +4,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class PromotionRunGraphQLIT : AbstractQLKTITSupport() {
+class PromotionRunGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     @Test
     fun `Creating a promotion run where build is identified by ID`() {

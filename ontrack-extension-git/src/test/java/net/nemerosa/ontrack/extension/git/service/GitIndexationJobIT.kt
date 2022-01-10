@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProper
 import net.nemerosa.ontrack.extension.issues.model.toIdentifier
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.git.support.GitRepo
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.JobScheduler
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class GitIndexationJobIT : AbstractServiceTestSupport() {
+class GitIndexationJobIT : AbstractServiceTestJUnit4Support() {
 
     @Autowired
     private lateinit var gitConfigurationService: GitConfigurationService

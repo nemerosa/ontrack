@@ -2,8 +2,7 @@ package net.nemerosa.ontrack.boot.search
 
 import net.nemerosa.ontrack.extension.general.ReleaseProperty
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
-import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
@@ -13,7 +12,7 @@ import org.springframework.test.context.TestPropertySource
             "ontrack.config.search.index.immediate=true"
         ]
 )
-abstract class AbstractSearchTestSupport : AbstractQLKTITSupport() {
+abstract class AbstractSearchTestSupport : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     protected lateinit var searchService: SearchService

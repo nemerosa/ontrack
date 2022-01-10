@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.support;
 
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support;
 import net.nemerosa.ontrack.model.support.StorageService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,7 @@ import java.util.Optional;
 import static net.nemerosa.ontrack.test.TestUtils.uid;
 import static org.junit.Assert.*;
 
-public class StorageServiceIT extends AbstractServiceTestSupport {
+public class StorageServiceIT extends AbstractServiceTestJUnit4Support {
 
     @Autowired
     private StorageService storageService;

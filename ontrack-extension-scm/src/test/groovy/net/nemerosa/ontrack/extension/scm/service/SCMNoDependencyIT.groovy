@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.service
 
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
 import org.junit.Test
 
 /**
@@ -8,7 +8,7 @@ import org.junit.Test
  *
  * This allows extension modules to use the SCM module for their tests.
  */
-class SCMNoDependencyIT extends AbstractServiceTestSupport {
+class SCMNoDependencyIT extends AbstractServiceTestJUnit4Support {
 
     @Test
     void 'Loaded'() {

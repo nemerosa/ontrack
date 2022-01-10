@@ -15,7 +15,7 @@ import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfigurati
 import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.git.support.GitRepo
-import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
 import net.nemerosa.ontrack.model.security.GlobalSettings
@@ -29,7 +29,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
+abstract class AbstractGitTestSupport : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     protected lateinit var gitConfigProperties: GitConfigProperties

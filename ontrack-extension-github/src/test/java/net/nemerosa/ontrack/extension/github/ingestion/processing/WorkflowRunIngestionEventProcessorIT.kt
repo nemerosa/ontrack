@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
-import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderServiceITMockConfig
@@ -30,7 +30,7 @@ import java.time.LocalDateTime
 import kotlin.test.*
 
 @ContextConfiguration(classes = [ConfigLoaderServiceITMockConfig::class])
-class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
+class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestJUnit4Support() {
 
     @Autowired
     private lateinit var processor: WorkflowRunIngestionEventProcessor

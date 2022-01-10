@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.oidc.settings
 
 import net.nemerosa.ontrack.extension.oidc.OidcAuthenticationSourceProvider
 import net.nemerosa.ontrack.extension.oidc.settings.OntrackOIDCProviderFixtures.testProvider
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.AccountGroupMappingInput
 import net.nemerosa.ontrack.model.security.AccountGroupMappingService
 import net.nemerosa.ontrack.model.security.AccountInput
@@ -13,7 +13,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
-class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
+class OIDCSettingsServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var service: OIDCSettingsService

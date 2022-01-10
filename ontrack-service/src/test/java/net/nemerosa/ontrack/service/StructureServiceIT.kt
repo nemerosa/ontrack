@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.BuildEdit
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.BuildSearchForm
@@ -17,7 +17,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class StructureServiceIT : AbstractDSLTestSupport() {
+class StructureServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Test
     fun `Project signature at creation`() {

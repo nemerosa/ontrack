@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class AutoPromotionLevelPropertyMutationProviderIT : AbstractQLKTITSupport() {
+class AutoPromotionLevelPropertyMutationProviderIT : AbstractQLKTITJUnit4Support() {
 
     @Test
     fun `Setting the auto promotion level property on a project by ID and then removing it`() {

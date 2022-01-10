@@ -11,7 +11,7 @@ import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfi
 import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncProperty
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
 import net.nemerosa.ontrack.test.assertIs
@@ -23,13 +23,12 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
-import kotlin.streams.asSequence
 import kotlin.streams.toList
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
+class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var service: ArtifactoryPromotionSyncService

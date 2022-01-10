@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.labels.LabelManagement;
+import net.nemerosa.ontrack.model.preferences.Preferences;
+import net.nemerosa.ontrack.model.preferences.PreferencesService;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.model.support.PasswordChange;
@@ -24,12 +26,14 @@ public class UserController extends AbstractResourceController {
     private final SecurityService securityService;
     private final UserService userService;
     private final ExtensionManager extensionManager;
+    private final PreferencesService preferencesService;
 
     @Autowired
-    public UserController(SecurityService securityService, UserService userService, ExtensionManager extensionManager) {
+    public UserController(SecurityService securityService, UserService userService, ExtensionManager extensionManager, PreferencesService preferencesService) {
         this.securityService = securityService;
         this.userService = userService;
         this.extensionManager = extensionManager;
+        this.preferencesService = preferencesService;
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
@@ -38,7 +42,8 @@ public class UserController extends AbstractResourceController {
         OntrackAuthenticatedUser user = securityService.getCurrentAccount();
         // Account present
         if (user != null) {
-            return userMenu(ConnectedAccount.of(user.getAccount()));
+            Preferences preferences = preferencesService.getPreferences(user.getAccount());
+            return userMenu(ConnectedAccount.of(user.getAccount(), preferences));
         }
         // Not logged
         else {

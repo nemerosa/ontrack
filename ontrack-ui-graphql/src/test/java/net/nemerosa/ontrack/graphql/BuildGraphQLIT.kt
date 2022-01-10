@@ -23,7 +23,7 @@ import kotlin.test.fail
 /**
  * Integration tests around the `builds` root query.
  */
-class BuildGraphQLIT : AbstractQLKTITSupport() {
+class BuildGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     @Test
     fun `Build creation`() {

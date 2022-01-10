@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData
 import net.nemerosa.ontrack.model.structure.Build
@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class IntervalBuildFilterIT : AbstractDSLTestSupport() {
+class IntervalBuildFilterIT : AbstractDSLTestJUnit4Support() {
 
     protected fun filter(data: BuildIntervalFilterData): BuildFilterProviderData<BuildIntervalFilterData> {
         return buildFilterService.getBuildFilterProviderData(

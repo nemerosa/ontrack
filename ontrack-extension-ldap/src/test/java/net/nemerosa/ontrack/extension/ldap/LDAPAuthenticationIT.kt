@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.ldap
 
 import net.nemerosa.ontrack.extension.ldap.support.UnboundIdContainer
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertIs
@@ -16,7 +16,7 @@ import kotlin.test.*
 /**
  * Integration tests for authentication w/ LDAP.
  */
-class LDAPAuthenticationIT : AbstractDSLTestSupport() {
+class LDAPAuthenticationIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var authenticationProvider: LDAPCachedAuthenticationProvider

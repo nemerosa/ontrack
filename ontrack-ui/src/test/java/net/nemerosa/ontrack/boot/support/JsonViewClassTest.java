@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.boot.support;
 
-import net.nemerosa.ontrack.it.AbstractITTestSupport;
+import net.nemerosa.ontrack.it.AbstractITTestJUnit4Support;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -31,7 +31,7 @@ public class JsonViewClassTest {
     }
 
     private Project project() {
-        return Project.of(AbstractITTestSupport.nameDescription());
+        return Project.of(AbstractITTestJUnit4Support.nameDescription());
     }
 
     @Test

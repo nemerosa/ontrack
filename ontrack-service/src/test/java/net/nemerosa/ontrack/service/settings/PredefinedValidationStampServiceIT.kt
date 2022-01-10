@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.service.settings
 
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
 import net.nemerosa.ontrack.model.exceptions.PredefinedValidationStampNameAlreadyDefinedException
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ValidationStampBulkUpdate
@@ -18,7 +18,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
-class PredefinedValidationStampServiceIT : AbstractServiceTestSupport() {
+class PredefinedValidationStampServiceIT : AbstractServiceTestJUnit4Support() {
 
     @Autowired
     private lateinit var service: PredefinedValidationStampService

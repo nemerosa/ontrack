@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import io.mockk.every
-import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.model.structure.Branch
 import org.junit.Before
@@ -13,7 +13,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 @ContextConfiguration(classes = [ConfigLoaderServiceITMockConfig::class])
-class ConfigServiceIT : AbstractIngestionTestSupport() {
+class ConfigServiceIT : AbstractIngestionTestJUnit4Support() {
 
     @Autowired
     private lateinit var configLoaderService: ConfigLoaderService

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.resources
 
+import net.nemerosa.ontrack.model.preferences.Preferences
 import net.nemerosa.ontrack.model.security.ConnectedAccount
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecoratorTestSupport
 import org.junit.Test
@@ -17,7 +18,7 @@ class ConnectedAccountResourceDecoratorIT : AbstractResourceDecoratorTestSupport
             accountService.setAccountLocked(initial.id, true)
             accountService.getAccount(initial.id)
         }
-        val connectedAccount = ConnectedAccount.of(account)
+        val connectedAccount = ConnectedAccount.of(account, Preferences())
         connectedAccount.decorate(connectedAccountResourceDecorator) {
             assertLinkNotPresent("_changePassword")
         }

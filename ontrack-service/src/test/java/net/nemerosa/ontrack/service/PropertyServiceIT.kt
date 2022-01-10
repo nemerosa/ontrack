@@ -2,13 +2,13 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import org.junit.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class PropertyServiceIT : AbstractDSLTestSupport() {
+class PropertyServiceIT : AbstractDSLTestJUnit4Support() {
 
     @Test
     fun `Has property`() {

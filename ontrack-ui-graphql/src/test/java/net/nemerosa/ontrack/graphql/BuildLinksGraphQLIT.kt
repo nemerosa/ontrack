@@ -7,7 +7,7 @@ import kotlin.test.assertNotNull
 /**
  * Management of build links using GraphQL.
  */
-class BuildLinksGraphQLIT : AbstractQLKTITSupport() {
+class BuildLinksGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     @Test
     fun `Linking a build to another build using names`() {

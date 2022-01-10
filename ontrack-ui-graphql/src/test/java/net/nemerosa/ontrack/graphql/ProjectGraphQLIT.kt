@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.graphql
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.model.security.ProjectCreation
-import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.structure.BranchFavouriteService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
@@ -15,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.*
 
-class ProjectGraphQLIT : AbstractQLKTITSupport() {
+class ProjectGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     private lateinit var branchFavouriteService: BranchFavouriteService

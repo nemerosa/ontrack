@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.scm.catalog.sync
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class SCMCatalogImportJobIT : AbstractDSLTestSupport() {
+class SCMCatalogImportJobIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var scmCatalogImportJob: SCMCatalogImportJob

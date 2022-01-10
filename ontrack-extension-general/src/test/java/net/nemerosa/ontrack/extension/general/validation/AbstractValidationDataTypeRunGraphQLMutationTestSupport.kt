@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.general.validation
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.toJsonMap
 import net.nemerosa.ontrack.model.structure.Build
@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.model.structure.RunInfoInput
 import net.nemerosa.ontrack.model.structure.ValidationDataTypeConfig
 import kotlin.test.assertEquals
 
-abstract class AbstractValidationDataTypeRunGraphQLMutationTestSupport<C> : AbstractQLKTITSupport() {
+abstract class AbstractValidationDataTypeRunGraphQLMutationTestSupport<C> : AbstractQLKTITJUnit4Support() {
 
     protected fun testValidationByName(
         dataConfig: ValidationDataTypeConfig<C>,

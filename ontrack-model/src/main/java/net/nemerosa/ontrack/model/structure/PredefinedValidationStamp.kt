@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import javax.validation.constraints.Size
 
 /**
  * Validation stamp defined at global level, allowing some projects to create them automatically.
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
  */
 class PredefinedValidationStamp(
         override val id: ID,
+        @Size(max = ValidationStamp.NAME_MAX_LENGTH)
         val name: String,
         val description: String?,
         @JsonProperty("image")

@@ -1,12 +1,14 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
+import net.nemerosa.ontrack.extension.github.TestOnGitHub
 import net.nemerosa.ontrack.extension.github.githubTestEnv
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertNotNull
 import kotlin.test.assertFalse
 
+@TestOnGitHub
 class ConfigLoaderServiceIT : AbstractIngestionTestSupport() {
 
     @Autowired

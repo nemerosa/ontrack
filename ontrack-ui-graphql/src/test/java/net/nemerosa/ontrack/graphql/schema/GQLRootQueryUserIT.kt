@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class GQLRootQueryUserIT : AbstractQLKTITSupport() {
+class GQLRootQueryUserIT : AbstractQLKTITJUnit4Support() {
 
     @Test
     fun `Getting the current user`() {

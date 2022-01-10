@@ -3,14 +3,14 @@ package net.nemerosa.ontrack.extension.oidc
 import net.nemerosa.ontrack.extension.api.UILogin
 import net.nemerosa.ontrack.extension.oidc.settings.OIDCSettingsService
 import net.nemerosa.ontrack.extension.oidc.settings.OntrackOIDCProviderFixtures
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
-class OIDCUILoginExtensionIT : AbstractDSLTestSupport() {
+class OIDCUILoginExtensionIT : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var service: OIDCSettingsService

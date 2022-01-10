@@ -4,6 +4,8 @@ import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.getEnv
 import net.nemerosa.ontrack.test.getOptionalEnv
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledIf
 
 class GitHubTestEnv(
     val user: String,
@@ -53,4 +55,25 @@ fun githubTestConfigReal(name: String = TestUtils.uid("C")) = githubTestEnv.run 
         url = null,
         oauth2Token = token,
     )
+}
+
+/**
+ * Annotation to use on tests relying on an external GitHub repository.
+ */
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@Test
+@EnabledIf("net.nemerosa.ontrack.extension.github.TestOnGitHubCondition#isTestOnGitHubEnabled")
+annotation class TestOnGitHub
+
+/**
+ * Testing if the environment is set for testing against GitHub
+ */
+class TestOnGitHubCondition {
+
+    companion object {
+        @JvmStatic
+        fun isTestOnGitHubEnabled(): Boolean =
+            !getOptionalEnv("ontrack.test.extension.github.organization").isNullOrBlank()
+    }
 }

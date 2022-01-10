@@ -1,0 +1,25 @@
+<div class="modal-header">
+    <h3 ng-click="cancel()">
+        <ot-validation-run-status status="config.group"></ot-validation-run-status>
+        {{ config.group.count }} {{ config.group.statusID.name }}
+        in build
+        <a href="#/build/{{ config.build.id }}">
+            {{ config.build.name }}
+        </a>
+    </h3>
+</div>
+<div class="modal-body">
+    <div class="panel panel-default" style="height: 300px; overflow-y: scroll;">
+        <div class="panel-body" ng-repeat="validation in config.group.validations">
+            <ot-entity-image entity="validation.validationStamp">
+                <a ng-click="selectValidationRun(validation)" class="ot-action" title="Opens the details for this validation.">
+                    {{ validation.validationStamp.name }}
+                </a>
+            </ot-entity-image>
+            <span ng-if="validation.validationRuns[0].validationRunStatuses[0].description" class="ot-description">{{ validation.validationRuns[0].validationRunStatuses[0].description }}</span>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="submit" ng-click="cancel()">OK</button>
+</div>
