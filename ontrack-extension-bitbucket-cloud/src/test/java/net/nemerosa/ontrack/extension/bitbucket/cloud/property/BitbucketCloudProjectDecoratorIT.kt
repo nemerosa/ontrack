@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.property
 
-import net.nemerosa.ontrack.extension.bitbucket.cloud.AbstractBitbucketCloudTestSupport
+import net.nemerosa.ontrack.extension.bitbucket.cloud.AbstractBitbucketCloudJUnit4TestSupport
 import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigMock
 import net.nemerosa.ontrack.model.exceptions.PropertyUnsupportedEntityTypeException
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
@@ -11,7 +11,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
-class BitbucketCloudProjectDecoratorIT : AbstractBitbucketCloudTestSupport() {
+class BitbucketCloudProjectDecoratorIT : AbstractBitbucketCloudJUnit4TestSupport() {
 
     @Autowired
     private lateinit var decorator: BitbucketCloudProjectDecorator

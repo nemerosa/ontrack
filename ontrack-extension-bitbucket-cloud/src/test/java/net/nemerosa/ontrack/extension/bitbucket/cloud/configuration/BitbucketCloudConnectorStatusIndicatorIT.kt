@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.configuration
 
-import net.nemerosa.ontrack.extension.bitbucket.cloud.AbstractBitbucketCloudTestSupport
+import net.nemerosa.ontrack.extension.bitbucket.cloud.AbstractBitbucketCloudJUnit4TestSupport
 import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigMock
 import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigReal
 import net.nemerosa.ontrack.model.support.ConnectorStatus
@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class BitbucketCloudConnectorStatusIndicatorIT : AbstractBitbucketCloudTestSupport() {
+class BitbucketCloudConnectorStatusIndicatorIT : AbstractBitbucketCloudJUnit4TestSupport() {
 
     @Autowired
     private lateinit var bitbucketCloudConnectorStatusIndicator: BitbucketCloudConnectorStatusIndicator

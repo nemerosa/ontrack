@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.catalog
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.bitbucket.cloud.AbstractBitbucketCloudTestSupport
+import net.nemerosa.ontrack.extension.bitbucket.cloud.AbstractBitbucketCloudJUnit4TestSupport
 import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigMock
 import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigReal
 import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestEnv
@@ -11,7 +11,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
-class BitbucketCloudSCMCatalogProviderIT : AbstractBitbucketCloudTestSupport() {
+class BitbucketCloudSCMCatalogProviderIT : AbstractBitbucketCloudJUnit4TestSupport() {
 
     @Autowired
     private lateinit var bitbucketCloudSCMCatalogProvider: BitbucketCloudSCMCatalogProvider

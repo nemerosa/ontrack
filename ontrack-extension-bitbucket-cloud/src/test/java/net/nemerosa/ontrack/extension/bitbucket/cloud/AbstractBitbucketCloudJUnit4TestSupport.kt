@@ -8,7 +8,8 @@ import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.structure.Project
 import org.springframework.beans.factory.annotation.Autowired
 
-abstract class AbstractBitbucketCloudTestSupport : AbstractQLKTITSupport() {
+@Deprecated(message = "JUnit is deprecated", replaceWith = ReplaceWith("AbstractBitbucketCloudTestSupport"))
+abstract class AbstractBitbucketCloudJUnit4TestSupport : AbstractQLKTITSupport() {
 
     @Autowired
     protected lateinit var bitbucketCloudConfigurationService: BitbucketCloudConfigurationService
