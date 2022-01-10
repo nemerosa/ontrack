@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.service.links
 
 import net.nemerosa.ontrack.extension.api.support.TestMetricsExportExtension
-import net.nemerosa.ontrack.it.links.AbstractBranchLinksTestSupport
+import net.nemerosa.ontrack.it.links.AbstractBranchLinksTestJUnit4Support
 import net.nemerosa.ontrack.model.links.BranchLinksDirection
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -9,7 +9,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
+class BranchLinksServiceIT : AbstractBranchLinksTestJUnit4Support() {
 
     @Autowired
     private lateinit var testMetricsExportExtension: TestMetricsExportExtension

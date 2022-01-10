@@ -5,8 +5,7 @@ import graphql.GraphQL
 import net.nemerosa.ontrack.graphql.schema.GraphqlSchemaService
 import net.nemerosa.ontrack.graphql.schema.UserError
 import net.nemerosa.ontrack.graphql.support.exception
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.it.links.AbstractBranchLinksTestSupport
+import net.nemerosa.ontrack.it.links.AbstractBranchLinksTestJUnit4Support
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.json.parse
@@ -15,7 +14,7 @@ import kotlin.test.assertEquals
 import kotlin.test.fail
 
 @Deprecated(message = "JUnit is deprecated", replaceWith = ReplaceWith("AbstractQLKTITSupport"))
-abstract class AbstractQLKTITJUnit4Support : AbstractBranchLinksTestSupport() {
+abstract class AbstractQLKTITJUnit4Support : AbstractBranchLinksTestJUnit4Support() {
 
     @Autowired
     private lateinit var schemaService: GraphqlSchemaService
