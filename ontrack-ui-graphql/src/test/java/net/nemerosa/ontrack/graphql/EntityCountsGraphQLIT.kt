@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.graphql
 import org.junit.Test
 import kotlin.test.assertTrue
 
-class EntityCountsGraphQLIT: AbstractQLKTITSupport() {
+class EntityCountsGraphQLIT: AbstractQLKTITJUnit4Support() {
 
     @Test
     fun `Project counts`() {

@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.stale
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class StalePropertyMutationProviderIT : AbstractQLKTITSupport() {
+class StalePropertyMutationProviderIT : AbstractQLKTITJUnit4Support() {
 
     @Test
     fun `Setting minimal set of fields`() {

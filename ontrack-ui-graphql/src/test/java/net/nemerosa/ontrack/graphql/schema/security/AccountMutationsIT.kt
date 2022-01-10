@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.graphql.schema.security
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
 import net.nemerosa.ontrack.model.security.Account
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class AccountMutationsIT: AbstractQLKTITSupport() {
+class AccountMutationsIT: AbstractQLKTITJUnit4Support() {
 
     @Test
     fun `Disabling an account`() {

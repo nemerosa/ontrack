@@ -7,7 +7,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-class BuildFilterValidationGraphQLIT : AbstractQLKTITSupport() {
+class BuildFilterValidationGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     @Test
     fun `Filter validation for since promotion field`() {

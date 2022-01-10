@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
 import net.nemerosa.ontrack.json.getBooleanField
 import net.nemerosa.ontrack.model.preferences.PreferencesService
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class PreferencesMutationsIT : AbstractQLKTITSupport() {
+class PreferencesMutationsIT : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     private lateinit var preferencesService: PreferencesService

@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ValidationRunGraphQLIT : AbstractQLKTITSupport() {
+class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     private lateinit var textValidationDataType: TextValidationDataType

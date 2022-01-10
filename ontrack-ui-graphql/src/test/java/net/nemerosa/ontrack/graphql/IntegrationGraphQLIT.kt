@@ -7,7 +7,7 @@ import kotlin.test.assertFalse
 /**
  * Testing the integration of GraphQL with transactions and security boundaries.
  */
-class IntegrationGraphQLIT : AbstractQLKTITSupport() {
+class IntegrationGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     /**
      * Here, we check that the security context is propagated into the different branches

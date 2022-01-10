@@ -14,7 +14,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class BranchGraphQLIT : AbstractQLKTITSupport() {
+class BranchGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     private lateinit var branchFavouriteService: BranchFavouriteService

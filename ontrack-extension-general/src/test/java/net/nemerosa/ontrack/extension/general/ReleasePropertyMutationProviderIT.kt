@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class ReleasePropertyMutationProviderIT: AbstractQLKTITSupport() {
+class ReleasePropertyMutationProviderIT: AbstractQLKTITJUnit4Support() {
 
     @Test
     fun `Setting the release property on a build by ID and then removing it`() {

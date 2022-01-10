@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
-import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
@@ -19,7 +19,7 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-abstract class AbstractGitHubTestSupport : AbstractQLKTITSupport() {
+abstract class AbstractGitHubTestSupport : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     protected lateinit var gitConfigurationService: GitHubConfigurationService

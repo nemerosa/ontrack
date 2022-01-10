@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ConfigurationPropertyGraphQLIT : AbstractQLKTITSupport() {
+class ConfigurationPropertyGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     private lateinit var testConfigurationService: TestConfigurationService

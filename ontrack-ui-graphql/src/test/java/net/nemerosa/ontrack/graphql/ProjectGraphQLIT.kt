@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.*
 
-class ProjectGraphQLIT : AbstractQLKTITSupport() {
+class ProjectGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     private lateinit var branchFavouriteService: BranchFavouriteService

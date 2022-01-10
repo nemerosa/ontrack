@@ -4,12 +4,12 @@ import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketClo
 import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketCloudConfigurationService
 import net.nemerosa.ontrack.extension.bitbucket.cloud.property.BitbucketCloudProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.bitbucket.cloud.property.BitbucketCloudProjectConfigurationPropertyType
-import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
 import net.nemerosa.ontrack.model.structure.Project
 import org.springframework.beans.factory.annotation.Autowired
 
 @Deprecated(message = "JUnit is deprecated", replaceWith = ReplaceWith("AbstractBitbucketCloudTestSupport"))
-abstract class AbstractBitbucketCloudJUnit4TestSupport : AbstractQLKTITSupport() {
+abstract class AbstractBitbucketCloudJUnit4TestSupport : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     protected lateinit var bitbucketCloudConfigurationService: BitbucketCloudConfigurationService
