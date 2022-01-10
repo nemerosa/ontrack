@@ -1,22 +1,18 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.catalog
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.bitbucket.cloud.AbstractBitbucketCloudJUnit4TestSupport
-import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigMock
-import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigReal
-import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestEnv
+import net.nemerosa.ontrack.extension.bitbucket.cloud.*
 import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketCloudConfiguration
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogEntry
-import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
-class BitbucketCloudSCMCatalogProviderIT : AbstractBitbucketCloudJUnit4TestSupport() {
+class BitbucketCloudSCMCatalogProviderIT : AbstractBitbucketCloudTestSupport() {
 
     @Autowired
     private lateinit var bitbucketCloudSCMCatalogProvider: BitbucketCloudSCMCatalogProvider
 
-    @Test
+    @TestOnBitbucketCloud
     fun `Getting the list of entries`() {
         // Deleting all configurations
         deleteAllConfigs()
