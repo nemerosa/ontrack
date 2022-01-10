@@ -1,11 +1,8 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.property
 
-import net.nemerosa.ontrack.extension.bitbucket.cloud.AbstractBitbucketCloudTestSupport
-import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigMock
-import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigReal
-import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestEnv
+import net.nemerosa.ontrack.extension.bitbucket.cloud.*
 import net.nemerosa.ontrack.test.assertIs
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -60,7 +57,7 @@ class BitbucketCloudProjectConfigurationPropertyTypeIT : AbstractBitbucketCloudT
         }
     }
 
-    @Test
+    @TestOnBitbucketCloud
     fun `Project information in the property decorations`() {
         val expectedRepository = bitbucketCloudTestEnv.expectedRepository
         val expectedProject = bitbucketCloudTestEnv.expectedProject
