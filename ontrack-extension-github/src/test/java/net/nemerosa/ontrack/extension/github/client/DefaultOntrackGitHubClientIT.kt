@@ -7,8 +7,8 @@ import net.nemerosa.ontrack.extension.github.githubTestConfigReal
 import net.nemerosa.ontrack.extension.github.githubTestEnv
 import net.nemerosa.ontrack.extension.github.model.GitHubRepositoryPermission
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.time.Duration
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -19,7 +19,7 @@ class DefaultOntrackGitHubClientIT {
 
     private lateinit var client: OntrackGitHubClient
 
-    @Before
+    @BeforeEach
     fun init() {
         client = DefaultOntrackGitHubClient(
             configuration = githubTestConfigReal(),
