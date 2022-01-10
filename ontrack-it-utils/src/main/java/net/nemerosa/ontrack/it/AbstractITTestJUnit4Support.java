@@ -37,7 +37,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid;
 @ActiveProfiles(profiles = {RunProfile.UNIT_TEST})
 @SpringBootTest(
         classes = {
-                AbstractITTestJUnit4Support.AbstractIntegrationTestConfiguration.class
+                AbstractITTestSupport.AbstractIntegrationTestConfiguration.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.NONE
 )
@@ -68,43 +68,6 @@ public abstract class AbstractITTestJUnit4Support extends AbstractTransactionalJ
     protected @NotNull
     NamedParameterJdbcTemplate getNamedParameterJdbcTemplate() {
         return new NamedParameterJdbcTemplate(dataSource);
-    }
-
-    @Configuration
-    @Profile(RunProfile.UNIT_TEST)
-    @ComponentScan("net.nemerosa.ontrack")
-    @EnableAutoConfiguration
-    public static class AbstractIntegrationTestConfiguration {
-
-        private final Logger logger = LoggerFactory.getLogger(AbstractITTestJUnit4Support.class);
-
-        @Bean
-        public MeterRegistry meterRegistry() {
-            return new SimpleMeterRegistry();
-        }
-
-        @Bean
-        public ConverterRegistry converterRegistry() {
-            return new DefaultConversionService();
-        }
-
-        @Bean
-        @Primary
-        public DataSourceProperties dataSourceProperties() {
-            // Configuration using system properties
-            String dbURL = System.getProperty("spring.datasource.url", "jdbc:postgresql://localhost/ontrack");
-            String dbUser = System.getProperty("spring.datasource.username", "ontrack");
-            String dbPassword = System.getProperty("spring.datasource.password", "ontrack");
-            // Logging
-            logger.info("[test][jdbc] URL = " + dbURL);
-            // Properties
-            DataSourceProperties properties = new DataSourceProperties();
-            properties.setDriverClassName("org.postgresql.Driver");
-            properties.setUrl(dbURL);
-            properties.setUsername(dbUser);
-            properties.setPassword(dbPassword);
-            return properties;
-        }
     }
 
     public static NameDescription nameDescription() {
