@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ui.graphql
 
-import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
+import net.nemerosa.ontrack.extension.github.AbstractGitHubTestJUnit4Support
 import net.nemerosa.ontrack.extension.github.githubTestEnv
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.json.getTextField
@@ -11,7 +11,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class GQLRootQueryGitHubConfigurationsIT : AbstractGitHubTestSupport() {
+class GQLRootQueryGitHubConfigurationsIT : AbstractGitHubTestJUnit4Support() {
 
     @Test
     fun `Getting the list of configurations`() {

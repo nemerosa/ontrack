@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.github.indicators.compliance
 
-import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
+import net.nemerosa.ontrack.extension.github.AbstractGitHubTestJUnit4Support
 import net.nemerosa.ontrack.extension.github.catalog.GitHubSCMCatalogSettings
 import net.nemerosa.ontrack.extension.github.githubTestEnv
 import net.nemerosa.ontrack.extension.indicators.computing.*
@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class GitHubComplianceIndicatorsIT : AbstractGitHubTestSupport() {
+class GitHubComplianceIndicatorsIT : AbstractGitHubTestJUnit4Support() {
 
     @Autowired
     private lateinit var complianceIndicators: GitHubComplianceIndicators

@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.github.workflow
 
-import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
+import net.nemerosa.ontrack.extension.github.AbstractGitHubTestJUnit4Support
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class BuildGitHubWorkflowRunPropertyTypeIT : AbstractGitHubTestSupport() {
+class BuildGitHubWorkflowRunPropertyTypeIT : AbstractGitHubTestJUnit4Support() {
 
     @Test
     fun `Saving and retrieving the property`() {

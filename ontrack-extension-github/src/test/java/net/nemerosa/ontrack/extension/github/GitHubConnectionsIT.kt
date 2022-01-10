@@ -17,7 +17,7 @@ import kotlin.test.fail
 /**
  * Testings all connection modes
  */
-class GitHubConnectionsIT : AbstractGitHubTestSupport() {
+class GitHubConnectionsIT : AbstractGitHubTestJUnit4Support() {
 
     @Autowired
     private lateinit var clientFactory: OntrackGitHubClientFactory
