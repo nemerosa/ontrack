@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.ui
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStatus
@@ -12,7 +12,7 @@ import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestSupport() {
+class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestJUnit4Support() {
 
     @Test
     fun `Getting a payload by UUID`() {

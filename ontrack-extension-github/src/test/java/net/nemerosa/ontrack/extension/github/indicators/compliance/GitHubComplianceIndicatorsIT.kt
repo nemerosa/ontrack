@@ -1,18 +1,19 @@
 package net.nemerosa.ontrack.extension.github.indicators.compliance
 
-import net.nemerosa.ontrack.extension.github.AbstractGitHubTestJUnit4Support
+import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
+import net.nemerosa.ontrack.extension.github.TestOnGitHub
 import net.nemerosa.ontrack.extension.github.catalog.GitHubSCMCatalogSettings
 import net.nemerosa.ontrack.extension.github.githubTestEnv
 import net.nemerosa.ontrack.extension.indicators.computing.*
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorService
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalog
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class GitHubComplianceIndicatorsIT : AbstractGitHubTestJUnit4Support() {
+class GitHubComplianceIndicatorsIT : AbstractGitHubTestSupport() {
 
     @Autowired
     private lateinit var complianceIndicators: GitHubComplianceIndicators
@@ -68,7 +69,7 @@ class GitHubComplianceIndicatorsIT : AbstractGitHubTestJUnit4Support() {
         }
     }
 
-    @Test
+    @TestOnGitHub
     fun `Getting all configurable compliance indicators for a given repository`() {
         // Saves the compliance indicators (restoring previous values after the test)
         repositoryDefaultBranchShouldBeMain.save(enabled = true)

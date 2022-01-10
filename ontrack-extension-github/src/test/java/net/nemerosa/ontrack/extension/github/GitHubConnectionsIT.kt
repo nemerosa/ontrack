@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -17,7 +17,8 @@ import kotlin.test.fail
 /**
  * Testings all connection modes
  */
-class GitHubConnectionsIT : AbstractGitHubTestJUnit4Support() {
+@TestOnGitHub
+class GitHubConnectionsIT : AbstractGitHubTestSupport() {
 
     @Autowired
     private lateinit var clientFactory: OntrackGitHubClientFactory

@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.github.ingestion
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.time.withTimeout
-import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
+import net.nemerosa.ontrack.extension.github.AbstractGitHubTestJUnit4Support
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStatus
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
@@ -17,7 +17,8 @@ import java.time.Duration
         "ontrack.extension.github.ingestion.processing.async=false",
     ]
 )
-abstract class AbstractIngestionTestSupport : AbstractGitHubTestSupport() {
+@Deprecated(message = "JUnit4 is deprecated", replaceWith = ReplaceWith("AbstractIngestionTestSupport"))
+abstract class AbstractIngestionTestJUnit4Support : AbstractGitHubTestJUnit4Support() {
 
     @Autowired
     protected lateinit var ingestionHookPayloadStorage: IngestionHookPayloadStorage

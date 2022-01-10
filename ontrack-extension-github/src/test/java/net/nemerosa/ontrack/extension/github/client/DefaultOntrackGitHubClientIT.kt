@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.client
 
 import io.mockk.mockk
+import net.nemerosa.ontrack.extension.github.TestOnGitHub
 import net.nemerosa.ontrack.extension.github.app.DefaultGitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.app.MockGitHubAppClient
 import net.nemerosa.ontrack.extension.github.githubTestConfigReal
@@ -15,6 +16,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+@TestOnGitHub
 class DefaultOntrackGitHubClientIT {
 
     private lateinit var client: OntrackGitHubClient

@@ -1,17 +1,18 @@
 package net.nemerosa.ontrack.extension.github.ui.graphql
 
-import net.nemerosa.ontrack.extension.github.AbstractGitHubTestJUnit4Support
+import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
+import net.nemerosa.ontrack.extension.github.TestOnGitHub
 import net.nemerosa.ontrack.extension.github.githubTestEnv
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertJsonNull
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class GQLRootQueryGitHubConfigurationsIT : AbstractGitHubTestJUnit4Support() {
+class GQLRootQueryGitHubConfigurationsIT : AbstractGitHubTestSupport() {
 
     @Test
     fun `Getting the list of configurations`() {
@@ -36,7 +37,7 @@ class GQLRootQueryGitHubConfigurationsIT : AbstractGitHubTestJUnit4Support() {
         }
     }
 
-    @Test
+    @TestOnGitHub
     fun `Getting information about a real configuration using app authentication`() {
         val config = GitHubEngineConfiguration(
             name = uid("GH"),
@@ -89,7 +90,7 @@ class GQLRootQueryGitHubConfigurationsIT : AbstractGitHubTestJUnit4Support() {
         }
     }
 
-    @Test
+    @TestOnGitHub
     fun `Getting information about a real configuration using token authentication`() {
         val config = GitHubEngineConfiguration(
             name = uid("GH"),
