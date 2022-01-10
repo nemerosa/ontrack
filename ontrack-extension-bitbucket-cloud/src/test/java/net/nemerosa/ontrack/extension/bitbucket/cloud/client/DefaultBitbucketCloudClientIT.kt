@@ -1,16 +1,18 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.client
 
+import net.nemerosa.ontrack.extension.bitbucket.cloud.TestOnBitbucketCloud
 import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestEnv
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@TestOnBitbucketCloud
 class DefaultBitbucketCloudClientIT {
 
     private lateinit var client: BitbucketCloudClient
 
-    @Before
+    @BeforeEach
     fun init() {
         val env = bitbucketCloudTestEnv
         client = DefaultBitbucketCloudClient(
