@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.extension.general.validation.CHML
 import net.nemerosa.ontrack.extension.general.validation.CHMLLevel
 import net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType
 import net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataTypeConfig
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
@@ -19,7 +19,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
-class AutoValidationStampPropertyIT : AbstractServiceTestSupport() {
+class AutoValidationStampPropertyIT : AbstractServiceTestJUnit4Support() {
 
     @Autowired
     private lateinit var predefinedValidationStampService: PredefinedValidationStampService

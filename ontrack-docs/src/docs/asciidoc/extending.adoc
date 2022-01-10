@@ -193,7 +193,7 @@ When the `ontrack-extension-plugin` is applied to your code, it makes the
 `ontrack-it-utils` module available for the compilation of your tests.
 
 In particular, this allows you to create integration tests which inherit from
-`AbstractServiceTestSupport`, to inject directly the Ontrack services you need
+`AbstractServiceTestJUnit4Support`, to inject directly the Ontrack services you need
 and to use utility methods to create a test environment.
 
 For example:

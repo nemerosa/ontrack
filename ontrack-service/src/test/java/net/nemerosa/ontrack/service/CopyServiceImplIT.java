@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty;
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType;
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Test;
@@ -18,7 +18,7 @@ import static net.nemerosa.ontrack.model.structure.Replacement.replacementFn;
 import static net.nemerosa.ontrack.test.TestUtils.uid;
 import static org.junit.Assert.*;
 
-public class CopyServiceImplIT extends AbstractServiceTestSupport {
+public class CopyServiceImplIT extends AbstractServiceTestJUnit4Support {
 
     @Autowired
     private CopyService service;

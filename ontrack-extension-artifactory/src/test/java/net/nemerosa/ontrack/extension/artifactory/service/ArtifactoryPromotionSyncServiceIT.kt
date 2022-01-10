@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
-import kotlin.streams.asSequence
 import kotlin.streams.toList
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull

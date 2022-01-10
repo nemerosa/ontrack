@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.service.job
 
 import io.micrometer.core.instrument.MeterRegistry
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
 import net.nemerosa.ontrack.job.JobCategory
 import net.nemerosa.ontrack.job.JobStatus
 import net.nemerosa.ontrack.job.Schedule
@@ -10,7 +10,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class DefaultJobListenerIT : AbstractServiceTestSupport() {
+class DefaultJobListenerIT : AbstractServiceTestJUnit4Support() {
 
     @Autowired
     private lateinit var logService: ApplicationLogService

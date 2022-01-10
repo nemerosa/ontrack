@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.sonarqube
 
 import com.nhaarman.mockitokotlin2.*
 import net.nemerosa.ontrack.common.RunProfile
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.support.TestBranchModelMatcherProvider
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayProperty
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType

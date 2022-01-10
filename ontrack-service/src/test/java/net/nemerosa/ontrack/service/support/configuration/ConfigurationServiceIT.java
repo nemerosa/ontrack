@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.extension.api.support.TestConfiguration;
 import net.nemerosa.ontrack.extension.api.support.TestConfigurationService;
 import net.nemerosa.ontrack.extension.api.support.TestProperty;
 import net.nemerosa.ontrack.extension.api.support.TestPropertyType;
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
@@ -23,7 +23,7 @@ import static net.nemerosa.ontrack.extension.api.support.TestConfiguration.confi
 import static net.nemerosa.ontrack.test.TestUtils.uid;
 import static org.junit.Assert.*;
 
-public class ConfigurationServiceIT extends AbstractServiceTestSupport {
+public class ConfigurationServiceIT extends AbstractServiceTestJUnit4Support {
 
     @Autowired
     private TestConfigurationService configurationService;

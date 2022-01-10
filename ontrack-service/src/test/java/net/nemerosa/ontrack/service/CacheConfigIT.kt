@@ -2,13 +2,13 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.extension.api.support.TestProperty
 import net.nemerosa.ontrack.extension.api.support.TestPropertyType
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
 import net.nemerosa.ontrack.repository.PropertyRepository
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertTrue
 
-class CacheConfigIT : AbstractServiceTestSupport() {
+class CacheConfigIT : AbstractServiceTestJUnit4Support() {
 
     @Autowired
     private lateinit var propertyRepository: PropertyRepository

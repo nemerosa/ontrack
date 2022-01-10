@@ -131,6 +131,6 @@ For commodity, those tests will inherit from the `AbstractITTestSupport` class,
 and more specifically:
 
 * from `AbstractRepositoryTestSupport` for JDBC repository integration tests
-* from `AbstractServiceTestSupport` for service integration tests
+* from `AbstractServiceTestJUnit4Support` for service integration tests
 
 Configuration for the integration tests is done in the `ITConfig` class.

@@ -20,8 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
 import java.util.concurrent.Callable
 
-
-abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
+@Deprecated(message = "JUnit is deprecated", replaceWith = ReplaceWith("AbstractServiceTestSupport"))
+abstract class AbstractServiceTestJUnit4Support : AbstractITTestSupport() {
 
     @Autowired
     protected lateinit var accountService: AccountService

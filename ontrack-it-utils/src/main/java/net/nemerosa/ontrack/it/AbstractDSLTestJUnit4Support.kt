@@ -22,7 +22,7 @@ import kotlin.reflect.KClass
 import kotlin.test.assertEquals
 
 @Deprecated(message = "JUnit is deprecated", replaceWith = ReplaceWith("AbstractDSLTestSupport"))
-abstract class AbstractDSLTestJUnit4Support : AbstractServiceTestSupport() {
+abstract class AbstractDSLTestJUnit4Support : AbstractServiceTestJUnit4Support() {
 
     @Autowired
     protected lateinit var ontrackConfigProperties: OntrackConfigProperties

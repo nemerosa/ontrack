@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.model.support.SettingsRepository
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class JobConfigIT extends AbstractServiceTestSupport {
+class JobConfigIT extends AbstractServiceTestJUnit4Support {
 
     public static class TestJob implements Job {
 

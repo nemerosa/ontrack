@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 
-class AutoPromotionLevelPropertyIT extends AbstractServiceTestSupport {
+class AutoPromotionLevelPropertyIT extends AbstractServiceTestJUnit4Support {
 
     @Autowired
     private PropertyService propertyService

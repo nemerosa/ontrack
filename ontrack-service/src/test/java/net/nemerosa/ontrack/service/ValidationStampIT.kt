@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.security.ValidationStampEdit
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class ValidationStampIT : AbstractServiceTestSupport() {
+class ValidationStampIT : AbstractServiceTestJUnit4Support() {
 
     @Autowired
     private lateinit var testNumberValidationDataType: TestNumberValidationDataType
