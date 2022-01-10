@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.common.RunProfile;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import org.jetbrains.annotations.NotNull;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +21,23 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 
 import static net.nemerosa.ontrack.test.TestUtils.uid;
 
+/**
+ * @deprecated JUnit is deprecated. Replace with AbstractServiceTestSupport
+ */
+@RunWith(SpringJUnit4ClassRunner.class)
 @Transactional
 @ActiveProfiles(profiles = {RunProfile.UNIT_TEST})
 @SpringBootTest(
         classes = {
-                AbstractITTestSupport.AbstractIntegrationTestConfiguration.class
+                AbstractITTestJUnit4Support.AbstractIntegrationTestConfiguration.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.NONE
 )
@@ -41,7 +48,8 @@ import static net.nemerosa.ontrack.test.TestUtils.uid;
                 "spring.rabbitmq.password=ontrack"
         }
 )
-public abstract class AbstractITTestSupport {
+@Deprecated
+public abstract class AbstractITTestJUnit4Support extends AbstractTransactionalJUnit4SpringContextTests {
 
     @Autowired
     protected DataSource dataSource;
@@ -68,7 +76,7 @@ public abstract class AbstractITTestSupport {
     @EnableAutoConfiguration
     public static class AbstractIntegrationTestConfiguration {
 
-        private final Logger logger = LoggerFactory.getLogger(AbstractITTestSupport.class);
+        private final Logger logger = LoggerFactory.getLogger(AbstractITTestJUnit4Support.class);
 
         @Bean
         public MeterRegistry meterRegistry() {

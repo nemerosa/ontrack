@@ -127,7 +127,7 @@ Unit tests do not need any application context or any database.
 Integration tests will usually load an application context and connect to a
 Postgresql database.
 
-For commodity, those tests will inherit from the `AbstractITTestSupport` class,
+For commodity, those tests will inherit from the `AbstractITTestJUnit4Support` class,
 and more specifically:
 
 * from `AbstractRepositoryTestSupport` for JDBC repository integration tests

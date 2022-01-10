@@ -21,7 +21,7 @@ import org.springframework.security.core.context.SecurityContextImpl
 import java.util.concurrent.Callable
 
 @Deprecated(message = "JUnit is deprecated", replaceWith = ReplaceWith("AbstractServiceTestSupport"))
-abstract class AbstractServiceTestJUnit4Support : AbstractITTestSupport() {
+abstract class AbstractServiceTestJUnit4Support : AbstractITTestJUnit4Support() {
 
     @Autowired
     protected lateinit var accountService: AccountService
