@@ -295,7 +295,10 @@ configure(coreProjects) p@{
         "testCompileOnly"("org.projectlombok:lombok:1.18.10")
         "testAnnotationProcessor"("org.projectlombok:lombok:1.18.10")
         // Testing
-        "testImplementation"("junit:junit")
+        "testImplementation"("org.springframework.boot:spring-boot-starter-test")
+        "testImplementation"("org.junit.vintage:junit-vintage-engine") {
+            exclude(group = "org.hamcrest", module = "hamcrest-core")
+        }
         "testImplementation"("org.mockito:mockito-core")
         "testImplementation"("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
         "testImplementation"("io.mockk:mockk:${Versions.mockkVersion}")
@@ -313,6 +316,7 @@ configure(coreProjects) p@{
 
     // Unit tests run with the `test` task
     tasks.named<Test>("test") {
+        useJUnitPlatform()
         include("**/*Test.class")
         minHeapSize = "512m"
         maxHeapSize = "4096m"
@@ -320,6 +324,7 @@ configure(coreProjects) p@{
 
     // Integration tests
     val integrationTest by tasks.registering(Test::class) {
+        useJUnitPlatform()
         mustRunAfter("test")
         include("**/*IT.class")
         minHeapSize = "128m"
