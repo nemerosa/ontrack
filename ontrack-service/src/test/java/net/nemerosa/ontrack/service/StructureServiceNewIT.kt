@@ -4,10 +4,7 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.PromotionLevelCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.structure.PromotionLevel
-import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
-import net.nemerosa.ontrack.model.structure.ValidationStamp
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -18,6 +15,24 @@ import kotlin.test.assertTrue
  * This class supersedes [StructureServiceIT], which cannot be replaced as yet.
  */
 class StructureServiceNewIT : AbstractDSLTestSupport() {
+
+    @Test
+    fun `Creating a link twice must not fail`() {
+        val target = project<Build> {
+            branch<Build> {
+                build()
+            }
+        }
+        val source = project<Build> {
+            branch<Build> {
+                build()
+            }
+        }
+        asAdmin {
+            structureService.addBuildLink(source, target) // Once
+            structureService.addBuildLink(source, target) // Twice
+        }
+    }
 
     @Test
     fun `Looking for projects using a pattern`() {
