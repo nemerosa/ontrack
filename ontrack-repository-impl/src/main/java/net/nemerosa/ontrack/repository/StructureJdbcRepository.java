@@ -293,7 +293,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     public void addBuildLink(ID fromBuildId, ID toBuildId) {
         deleteBuildLink(fromBuildId, toBuildId);
         getNamedParameterJdbcTemplate().update(
-                "INSERT INTO BUILD_LINKS(BUILDID, TARGETBUILDID) VALUES (:fromBuildId, :toBuildId)",
+                "INSERT INTO BUILD_LINKS(BUILDID, TARGETBUILDID) " +
+                        "VALUES (:fromBuildId, :toBuildId) " +
+                        "ON CONFLICT(BUILDID, TARGETBUILDID) " +
+                        "DO NOTHING",
                 params("fromBuildId", fromBuildId.get()).addValue("toBuildId", toBuildId.get())
         );
     }
