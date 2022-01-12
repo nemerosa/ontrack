@@ -180,3 +180,12 @@ publishing {
         }
     }
 }
+
+/**
+ * Publication of artifacts, mostly the one of the `graphql.json` file, depends
+ * on the integration tests having run.
+ */
+
+tasks.withType(AbstractPublishToMaven::class.java) {
+    dependsOn("integrationTest")
+}
