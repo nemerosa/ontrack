@@ -45,4 +45,6 @@ include::architecture.adoc[]
 
 include::extending.adoc[]
 
+include::operations.adoc[]
+
 // ========================================================

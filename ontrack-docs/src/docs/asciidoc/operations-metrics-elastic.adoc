@@ -1,0 +1,18 @@
+[[operations-metrics-elastic]]
+=== Elastic metrics
+
+To be enable the export of metrics into Elastic, the following environment variables must be set:
+
+|===
+| Variable | Type | Description | Default
+
+| `MANAGEMENT_METRICS_EXPORT_ELASTIC_ENABLED`
+| Boolean
+| Set to `true` to enable the export to Elastic
+| `false`
+
+| `MANAGEMENT_METRICS_EXPORT_ELASTIC_HOST`
+| URL
+| Set the Elastic host where to export metrics
+| `http://localhost:9200`
+|===

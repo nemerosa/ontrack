@@ -19,6 +19,19 @@ services:
       - "9300:9300"
     environment:
       - "discovery.type=single-node"
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:7.15.2
+#    ports:
+#      - "5601:5601"
+#    environment:
+#      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
 
   influxdb:
     image: influxdb:1.8.6
