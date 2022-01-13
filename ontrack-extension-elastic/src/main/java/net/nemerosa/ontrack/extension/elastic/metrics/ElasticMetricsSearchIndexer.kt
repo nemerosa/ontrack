@@ -42,4 +42,9 @@ class ElasticMetricsSearchIndexer(
      * Returning null since this indexer is not eligible for search.
      */
     override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? = null
+
+    /**
+     * This indexer is not eligible for indexation.
+     */
+    override val isIndexationDisabled: Boolean = true
 }
