@@ -62,7 +62,6 @@ services:
   # Rabbit MQ
   rabbit:
     image: rabbitmq:3.8.25-management
-    restart: always
     hostname: rabbit
     environment:
       RABBITMQ_DEFAULT_USER: ontrack

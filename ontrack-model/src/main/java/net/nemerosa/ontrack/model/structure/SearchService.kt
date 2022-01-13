@@ -13,9 +13,19 @@ interface SearchService {
     val searchResultTypes: List<SearchResultType>
 
     /**
-     * Paginated search entry point
+     * Paginated search entry point based on registered search indexers.
      */
     fun paginatedSearch(request: SearchRequest): SearchResults
+
+    /**
+     *
+     */
+    fun rawSearch(
+            token: String,
+            indexName: String?,
+            offset: Int = 0,
+            size: Int = 10,
+    ): SearchNodeResults
 
     /**
      * Makes sure all search indexes are initialized.

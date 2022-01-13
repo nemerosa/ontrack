@@ -17,9 +17,13 @@ class ElasticMetricsSearchIndexer(
         extensionFeature: ElasticExtensionFeature,
 ) : AbstractExtension(extensionFeature), SearchIndexer<ElasticMetricsSearchItem> {
 
+    companion object {
+        const val INDEX = "ontrack_metrics"
+    }
+
     override val indexerName: String = "Elastic metrics"
 
-    override val indexName: String = "ontrack_metrics"
+    override val indexName: String = INDEX
 
     override val indexMapping: SearchIndexMapping = indexMappings<ElasticMetricsSearchItem> {
         +ElasticMetricsSearchItem::metric to keyword()
