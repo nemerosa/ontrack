@@ -25,7 +25,7 @@ class ElasticSearchServiceImpl(
     }
 
     val indexerByResultType: Map<String, SearchIndexer<*>> by lazy {
-        searchIndexers.associateBy { it.searchResultType.id }
+        searchIndexers.filter { it.searchResultType != null }.associateBy { it.searchResultType!!.id }
     }
 
     override fun paginatedSearch(request: SearchRequest): SearchResults {
@@ -75,7 +75,7 @@ class ElasticSearchServiceImpl(
     override val searchResultTypes: List<SearchResultType>
         get() =
             indexers
-                    .map { (_, indexer) -> indexer.searchResultType }
+                    .mapNotNull { (_, indexer) -> indexer.searchResultType }
                     .sortedBy { it.name }
 
     override fun indexReset(reindex: Boolean): Ack {
