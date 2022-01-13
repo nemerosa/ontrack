@@ -33,31 +33,31 @@ services:
 #    environment:
 #      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
 
-  influxdb:
-    image: influxdb:1.8.6
-    ports:
-      - "8086:8086"
+#  influxdb:
+#    image: influxdb:1.8.6
+#    ports:
+#      - "8086:8086"
 
   # Vault
   # Non production setup
   # See https://hub.docker.com/_/vault/
-  vault:
-    image: "vault:1.3.2"
-    environment:
-      VAULT_DEV_ROOT_TOKEN_ID: "test"
-    cap_add:
-      - "IPC_LOCK"
-    ports:
-      - "8200:8200"
+#  vault:
+#    image: "vault:1.3.2"
+#    environment:
+#      VAULT_DEV_ROOT_TOKEN_ID: "test"
+#    cap_add:
+#      - "IPC_LOCK"
+#    ports:
+#      - "8200:8200"
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:12.0.4
-    environment:
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: admin
-      DB_VENDOR: h2
-    ports:
-      - 8008:8080
+#  keycloak:
+#    image: quay.io/keycloak/keycloak:12.0.4
+#    environment:
+#      KEYCLOAK_USER: admin
+#      KEYCLOAK_PASSWORD: admin
+#      DB_VENDOR: h2
+#    ports:
+#      - 8008:8080
 
   # Rabbit MQ
   rabbit:
