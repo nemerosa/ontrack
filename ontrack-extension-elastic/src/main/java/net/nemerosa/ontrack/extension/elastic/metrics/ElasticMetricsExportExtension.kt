@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.api.MetricsExportExtension
 import net.nemerosa.ontrack.extension.elastic.ElasticExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.structure.SearchIndexService
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
@@ -11,6 +12,11 @@ import java.time.LocalDateTime
  * Exports metrics to Elastic using the general Elastic Spring Boot metric management configuration.
  */
 @Component
+@ConditionalOnProperty(
+        name = ["management.metrics.export.elastic.enabled"],
+        havingValue = "true",
+        matchIfMissing = false,
+)
 class ElasticMetricsExportExtension(
         extensionFeature: ElasticExtensionFeature,
         private val indexer: ElasticMetricsSearchIndexer,

@@ -4,9 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.elastic.ElasticExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.structure.*
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
 @Component
+@ConditionalOnProperty(
+        name = ["management.metrics.export.elastic.enabled"],
+        havingValue = "true",
+        matchIfMissing = false,
+)
 class ElasticMetricsSearchIndexer(
         extensionFeature: ElasticExtensionFeature,
 ) : AbstractExtension(extensionFeature), SearchIndexer<ElasticMetricsSearchItem> {
