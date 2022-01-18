@@ -9,6 +9,8 @@ apply<OntrackExtensionPlugin>()
 dependencies {
     api(project(":ontrack-extension-support"))
 
+    implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
+
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
 
