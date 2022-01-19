@@ -15,14 +15,14 @@ class ElasticMetricsRunInfoListener(
         val runTime = runInfo.runTime
         if (runTime != null) {
             elasticMetricsClient.saveMetric(
-                metric = "run_info_${runnableEntity.runnableEntityType.name.lowercase()}",
-                data = mapOf(
-                    "tags" to runnableEntity.runMetricTags,
-                    "fields" to mapOf(
-                        "value" to runTime,
-                        "name" to runnableEntity.runMetricName,
+                ECSEntry(
+                    timestamp = runnableEntity.runTime,
+                    event = ECSEvent(
+                        category = "run_info",
+                        type = runnableEntity.runnableEntityType.name.lowercase(), // build or validation_run
+                        duration = runTime * 1_000_000_000L, // To nanoseconds
                     ),
-                    "timestamp" to runnableEntity.runTime,
+                    labels = runnableEntity.runMetricTags + ("" to runnableEntity.runMetricName),
                 )
             )
         }
