@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.elastic.metrics
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
@@ -37,10 +39,15 @@ class ElasticMetricsExportExtensionIT : AbstractDSLTestSupport() {
         // Checks the metric has been exported into ES
         val results = elasticMetricsClient.rawSearch(
             token = "development",
-            indexName = "ontrack_metric_$metric",
         )
         // Expecting only one result
         assertEquals(1, results.items.size, "One metric registered")
+        val result = results.items.first()
+        val source = result.source.asJson().parse<ECSEntry>()
+
+        assertEquals(metric, source.event.category)
+        assertEquals(tags, source.labels)
+        assertEquals(values, source.ontrack)
     }
 
 }

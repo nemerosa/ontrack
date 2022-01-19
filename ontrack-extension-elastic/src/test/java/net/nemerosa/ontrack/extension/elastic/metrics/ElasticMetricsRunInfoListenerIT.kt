@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.elastic.metrics
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.structure.RunInfoInput
 import net.nemerosa.ontrack.model.structure.RunInfoService
 import org.junit.jupiter.api.Test
@@ -32,16 +33,16 @@ class ElasticMetricsRunInfoListenerIT : AbstractDSLTestSupport() {
                     // Checks the metric has been exported into ES
                     val results = elasticMetricsClient.rawSearch(
                         token = this.name,
-                        indexName = "ontrack_metric_run_info_build",
                     )
                     // Expecting only one result
                     assertEquals(1, results.items.size, "One metric registered")
                     val result = results.items.first()
                     val source = result.source.asJson()
-                    assertEquals(50.0, source["fields"]["value"].asDouble())
-                    assertEquals(this.name, source["fields"]["name"].asText())
-                    assertEquals(this.project.name, source["tags"]["project"].asText())
-                    assertEquals(this.branch.name, source["tags"]["branch"].asText())
+                    val ecs = source.parse<ECSEntry>()
+                    assertEquals(50_000_000_000L, ecs.event.duration)
+                    assertEquals(this.name, ecs.labels?.get("name"))
+                    assertEquals(this.project.name, ecs.labels?.get("project"))
+                    assertEquals(this.branch.name, ecs.labels?.get("branch"))
                 }
             }
         }
@@ -60,18 +61,18 @@ class ElasticMetricsRunInfoListenerIT : AbstractDSLTestSupport() {
                         // Checks the metric has been exported into ES
                         val results = elasticMetricsClient.rawSearch(
                             token = this.validationStamp.name,
-                            indexName = "ontrack_metric_run_info_validation_run",
                         )
                         // Expecting only one result
                         assertEquals(1, results.items.size, "One metric registered")
                         val result = results.items.first()
                         val source = result.source.asJson()
-                        assertEquals(50.0, source["fields"]["value"].asDouble())
-                        assertEquals(this.build.name, source["fields"]["name"].asText())
-                        assertEquals(this.project.name, source["tags"]["project"].asText())
-                        assertEquals(this.validationStamp.branch.name, source["tags"]["branch"].asText())
-                        assertEquals(this.validationStamp.name, source["tags"]["validationStamp"].asText())
-                        assertEquals("PASSED", source["tags"]["status"].asText())
+                        val ecs = source.parse<ECSEntry>()
+                        assertEquals(50_000_000_000L, ecs.event.duration)
+                        assertEquals(this.build.name, ecs.labels?.get("name"))
+                        assertEquals(this.project.name, ecs.labels?.get("project"))
+                        assertEquals(this.validationStamp.branch.name, ecs.labels?.get("branch"))
+                        assertEquals(this.validationStamp.name, ecs.labels?.get("validationStamp"))
+                        assertEquals("PASSED", ecs.labels?.get("status"))
                     }
                 }
             }

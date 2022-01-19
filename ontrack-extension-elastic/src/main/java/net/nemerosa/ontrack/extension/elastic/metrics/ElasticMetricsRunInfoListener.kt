@@ -22,7 +22,7 @@ class ElasticMetricsRunInfoListener(
                         type = runnableEntity.runnableEntityType.name.lowercase(), // build or validation_run
                         duration = runTime * 1_000_000_000L, // To nanoseconds
                     ),
-                    labels = runnableEntity.runMetricTags + ("" to runnableEntity.runMetricName),
+                    labels = runnableEntity.runMetricTags + ("name" to runnableEntity.runMetricName),
                 )
             )
         }

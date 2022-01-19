@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.elastic.metrics
 
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.toJsonMap
 import net.nemerosa.ontrack.model.structure.SearchNodeResults
 import net.nemerosa.ontrack.model.structure.SearchResultNode
 import org.apache.http.HttpHost
@@ -29,8 +31,9 @@ class DefaultElasticMetricsClient(
 
     override fun saveMetric(entry: ECSEntry) {
         val indexName = elasticMetricsConfigProperties.index.name
+        val source = entry.asJson().toJsonMap()
         client.index(
-            IndexRequest(indexName).source(entry),
+            IndexRequest(indexName).source(source),
             RequestOptions.DEFAULT
         )
         // Refreshes the index if needed
