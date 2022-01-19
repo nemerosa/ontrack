@@ -41,6 +41,11 @@ class ElasticMetricsConfigProperties {
     class IndexConfigProperties {
 
         /**
+         * Name of the index to contains all Ontrack metrics
+         */
+        var name = "ontrack_metrics"
+
+        /**
          * Prefix to use for index names
          */
         var prefix = "ontrack_metric"

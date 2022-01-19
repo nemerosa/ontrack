@@ -35,16 +35,25 @@ class ElasticMetricsValidationRunMetricsExtension(
             val metrics: Map<String, *>? = dataType.getMetrics(validationRunData.data)
             if (metrics != null && metrics.isNotEmpty()) {
                 elasticMetricsClient.saveMetric(
-                    metric = "validation_data",
-                    data = mapOf(
-                        "project" to validationRun.project.name,
-                        "branch" to validationRun.validationStamp.branch.name,
-                        "build" to validationRun.build.name,
-                        "validation" to validationRun.validationStamp.name,
-                        "status" to validationRun.lastStatus.statusID.id,
-                        "type" to validationRunData.descriptor.id,
-                        "fields" to metrics,
-                        "timestamp" to validationRun.signature.time,
+                    ECSEntry(
+                        timestamp = validationRun.signature.time,
+                        event = ECSEvent(
+                            category = "validation_data",
+                            outcome = if (validationRun.lastStatus.isPassed) {
+                                ECSEventOutcome.success
+                            } else {
+                                ECSEventOutcome.failure
+                            },
+                        ),
+                        labels = mapOf(
+                            "project" to validationRun.project.name,
+                            "branch" to validationRun.validationStamp.branch.name,
+                            "build" to validationRun.build.name,
+                            "validation" to validationRun.validationStamp.name,
+                            "status" to validationRun.lastStatus.statusID.id,
+                            "type" to validationRunData.descriptor.id,
+                        ),
+                        ontrack = metrics,
                     )
                 )
             }

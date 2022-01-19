@@ -4,6 +4,9 @@ import net.nemerosa.ontrack.model.structure.SearchNodeResults
 
 interface ElasticMetricsClient {
 
+    fun saveMetric(entry: ECSEntry)
+
+    @Deprecated("Use saveMetrics for ECS")
     fun saveMetric(metric: String, data: Map<String, Any>)
 
     fun rawSearch(

@@ -27,6 +27,16 @@ class DefaultElasticMetricsClient(
     private val defaultClient: RestHighLevelClient,
 ) : ElasticMetricsClient {
 
+    override fun saveMetric(entry: ECSEntry) {
+        val indexName = elasticMetricsConfigProperties.index.name
+        client.index(
+            IndexRequest(indexName).source(entry),
+            RequestOptions.DEFAULT
+        )
+        // Refreshes the index if needed
+        immediateRefreshIfRequested(indexName)
+    }
+
     override fun saveMetric(metric: String, data: Map<String, Any>) {
         val indexName = "${elasticMetricsConfigProperties.index.prefix}_$metric"
         client.index(
