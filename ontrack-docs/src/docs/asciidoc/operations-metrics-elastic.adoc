@@ -1,18 +1,36 @@
 [[operations-metrics-elastic]]
 === Elastic metrics
 
-To be enable the export of metrics into Elastic, the following environment variables must be set:
+To enable the export of metrics into Elastic, the following environment variables must be set:
 
 |===
 | Variable | Type | Description | Default
 
-| `MANAGEMENT_METRICS_EXPORT_ELASTIC_ENABLED`
+| `ONTRACK_EXTENSION_ELASTIC_METRICS_ENABLED`
 | Boolean
-| Set to `true` to enable the export to Elastic
+| Set to `true` to enable the export of metrics to Elastic
 | `false`
 
-| `MANAGEMENT_METRICS_EXPORT_ELASTIC_HOST`
-| URL
-| Set the Elastic host where to export metrics
-| `http://localhost:9200`
+| `ONTRACK_EXTENSION_ELASTIC_METRICS_INDEX_PREFIX`
+| String
+| Prefix to apply to an index name when a metric is exported to Elastic. For example, if the metric is `run_info`, the resulting metric will be in the `ontrack_metric_run_info` index.
+| `ontrack_metric`
+
+| `ONTRACK_EXTENSION_ELASTIC_METRICS_INDEX_IMMEDIATE`
+| Boolean
+| Flag to enable immediate re-indexation after items are added into the index (used mostly for testing).
+| `false`
+
+| `ONTRACK_EXTENSION_ELASTIC_METRICS_TARGET`
+| `MAIN` or `CUSTOM`
+| Defines where the metrics must be exported. If `MAIN`, the normal (or main) Elastic server used by Ontrack for its search engine will be used. If `CUSTOM`, another Elastic server can be specified (see below).
+| `MAIN`
+
+| `ONTRACK_EXTENSION_ELASTIC_METRICS_CUSTOM_URIS`
+ `ONTRACK_EXTENSION_ELASTIC_METRICS_CUSTOM_USERNAME`
+ `ONTRACK_EXTENSION_ELASTIC_METRICS_CUSTOM_PASSWORD`
+| https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/autoconfigure/elasticsearch/ElasticsearchProperties.html[`ElasticsearchProperties`]
+| When using a custom Elastic instance, the definition for this server will be used.
+| -
+
 |===
