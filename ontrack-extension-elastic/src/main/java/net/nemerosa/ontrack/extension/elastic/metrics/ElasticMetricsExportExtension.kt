@@ -25,11 +25,13 @@ class ElasticMetricsExportExtension(
     ) {
         if (timestamp != null) {
             elasticMetricsClient.saveMetric(
-                metric = metric,
-                data = mapOf(
-                    "tags" to tags,
-                    "fields" to fields,
-                    "timestamp" to timestamp,
+                ECSEntry(
+                    timestamp = timestamp,
+                    event = ECSEvent(
+                        category = metric,
+                    ),
+                    labels = tags,
+                    ontrack = fields,
                 )
             )
         }
