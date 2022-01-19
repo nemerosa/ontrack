@@ -37,20 +37,9 @@ class DefaultElasticMetricsClient(
         immediateRefreshIfRequested(indexName)
     }
 
-    override fun saveMetric(metric: String, data: Map<String, Any>) {
-        val indexName = "${elasticMetricsConfigProperties.index.prefix}_$metric"
-        client.index(
-            IndexRequest(indexName).source(data),
-            RequestOptions.DEFAULT
-        )
-        // Refreshes the index
-        immediateRefreshIfRequested(indexName)
-    }
-
 
     override fun rawSearch(
         token: String,
-        indexName: String?,
         offset: Int,
         size: Int,
     ): SearchNodeResults {
@@ -62,11 +51,7 @@ class DefaultElasticMetricsClient(
             ).size(
                 size
             )
-        ).run {
-            indexName?.let {
-                indices(indexName)
-            } ?: this
-        }
+        ).indices(elasticMetricsConfigProperties.index.name)
 
         // Getting the result of the search
         val response = client.search(esRequest, RequestOptions.DEFAULT)
