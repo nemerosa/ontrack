@@ -62,8 +62,6 @@ class ElasticMetricsExportExtension(
         when (elasticMetricsConfigProperties.target) {
             // Using the main ES instance
             ElasticMetricsTarget.MAIN -> defaultClient
-            // Using the management ES instance
-            ElasticMetricsTarget.MGT -> TODO("Management client not supported yet")
             // Using the custom ES instance
             ElasticMetricsTarget.CUSTOM -> customClient()
         }

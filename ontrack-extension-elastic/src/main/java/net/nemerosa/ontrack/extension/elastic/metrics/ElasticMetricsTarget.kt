@@ -11,11 +11,6 @@ enum class ElasticMetricsTarget {
     MAIN,
 
     /**
-     * When this option is selected, the ES instance used by the management metrics will be used.
-     */
-    MGT,
-
-    /**
      * When this option is selected, the ES instance defined by the metrics properties will be used.
      */
     CUSTOM,
