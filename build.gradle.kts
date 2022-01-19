@@ -273,6 +273,7 @@ configure(coreProjects) p@{
             dependency("org.jgrapht:jgrapht-core:1.3.0")
             dependency("com.graphql-java:graphql-java:15.0")
             dependency("com.opencsv:opencsv:5.2")
+            dependency("org.testcontainers:testcontainers:1.16.2")
             dependency("org.jetbrains.kotlin:kotlin-test:${Versions.kotlinVersion}")
             // Overrides from Spring Boot
             dependency("org.postgresql:postgresql:9.4.1208")

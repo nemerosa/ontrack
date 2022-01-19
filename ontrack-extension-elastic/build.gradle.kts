@@ -14,6 +14,7 @@ dependencies {
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(":ontrack-extension-general"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
+    testImplementation("org.testcontainers:testcontainers")
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
