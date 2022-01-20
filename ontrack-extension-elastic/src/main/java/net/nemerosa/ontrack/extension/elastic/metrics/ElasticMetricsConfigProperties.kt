@@ -24,6 +24,11 @@ class ElasticMetricsConfigProperties {
     var enabled: Boolean = false
 
     /**
+     * Must we trace the behaviour of the export of the metrics in the logs?
+     */
+    var debug: Boolean = false
+
+    /**
      * Defines where the Elastic metrics should be sent.
      */
     var target: ElasticMetricsTarget = ElasticMetricsTarget.MAIN

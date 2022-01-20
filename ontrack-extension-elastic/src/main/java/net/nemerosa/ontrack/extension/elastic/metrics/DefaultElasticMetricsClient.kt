@@ -41,6 +41,12 @@ class DefaultElasticMetricsClient(
 
     private val logger: Logger = LoggerFactory.getLogger(DefaultElasticMetricsClient::class.java)
 
+    private fun debug(message: String) {
+        if (elasticMetricsConfigProperties.debug && logger.isDebugEnabled) {
+            logger.debug(message)
+        }
+    }
+
     /**
      * Internal in-memory queue
      */
@@ -82,7 +88,7 @@ class DefaultElasticMetricsClient(
         } else {
             runBlocking {
                 launch {
-                    logger.debug("Entry queued")
+                    debug("Entry queued")
                     queueSize.incrementAndGet()
                     queue.send(entry)
                 }
@@ -112,7 +118,7 @@ class DefaultElasticMetricsClient(
         while (true) {
             val entry = queue.receive()
             queueSize.decrementAndGet()
-            logger.debug("Entry received")
+            debug("Entry received")
             runBlocking {
                 launch(Job()) {
                     processEvent(entry)
@@ -123,10 +129,10 @@ class DefaultElasticMetricsClient(
 
     private fun processEvent(entry: ECSEntry) {
         buffer.add(entry)
-        logger.debug("Entry buffered (${buffer.size}/${elasticMetricsConfigProperties.queue.buffer})")
+        debug("Entry buffered (${buffer.size}/${elasticMetricsConfigProperties.queue.buffer})")
         if (buffer.size >= elasticMetricsConfigProperties.queue.buffer.toInt()) {
             // Flushing the buffer
-            logger.debug("Buffer flushing")
+            debug("Buffer flushing")
             flushing()
         }
     }
@@ -140,7 +146,7 @@ class DefaultElasticMetricsClient(
                 // Wait between each flushing session
                 delay(elasticMetricsConfigProperties.queue.flushing.toMillis())
                 // Flushing
-                logger.debug("Timed flushing")
+                debug("Timed flushing")
                 flushing()
             }
         }
@@ -148,7 +154,7 @@ class DefaultElasticMetricsClient(
 
     private fun flushing() {
         if (buffer.isNotEmpty()) {
-            logger.debug("Flushing all entries (${buffer.size})")
+            debug("Flushing all entries (${buffer.size})")
             // Copy of the elements
             val entries = buffer.toTypedArray()
             // Flushing the buffer
@@ -163,7 +169,7 @@ class DefaultElasticMetricsClient(
             // Bulk request execution
             client.bulk(request, RequestOptions.DEFAULT)
         } else {
-            logger.debug("Nothing to flush")
+            debug("Nothing to flush")
         }
     }
 
