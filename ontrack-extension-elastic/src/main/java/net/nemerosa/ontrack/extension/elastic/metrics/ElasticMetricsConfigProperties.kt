@@ -49,11 +49,6 @@ class ElasticMetricsConfigProperties {
         var name = "ontrack_metrics"
 
         /**
-         * Prefix to use for index names
-         */
-        var prefix = "ontrack_metric"
-
-        /**
          * Flag to enable immediate re-indexation after items are added into the index (used mostly
          * for testing).
          */
