@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.elastic.metrics
 
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.binder.MeterBinder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import net.nemerosa.ontrack.json.asJson
@@ -22,6 +24,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.atomic.AtomicLong
 
 @DelicateCoroutinesApi
 @Component
@@ -34,11 +37,35 @@ import java.util.concurrent.ConcurrentLinkedQueue
 class DefaultElasticMetricsClient(
     private val elasticMetricsConfigProperties: ElasticMetricsConfigProperties,
     private val defaultClient: RestHighLevelClient,
-) : ElasticMetricsClient {
+) : ElasticMetricsClient, MeterBinder {
 
     private val logger: Logger = LoggerFactory.getLogger(DefaultElasticMetricsClient::class.java)
 
+    /**
+     * Internal in-memory queue
+     */
     private val queue = Channel<ECSEntry>(capacity = elasticMetricsConfigProperties.queue.capacity.toInt())
+
+    /**
+     * Channels do not have a measurable size, so keeping our own count.
+     */
+    private val queueSize = AtomicLong()
+
+    /**
+     * Buffer of entries
+     */
+    private val buffer = ConcurrentLinkedQueue<ECSEntry>()
+
+    override fun bindTo(registry: MeterRegistry) {
+        // Size of the queue
+        registry.gauge("ontrack_extension_elastic_metrics_queue", this) {
+            queueSize.get().toDouble()
+        }
+        // Size of the buffer
+        registry.gauge("ontrack_extension_elastic_metrics_buffer", this) {
+            buffer.size.toDouble()
+        }
+    }
 
     override fun saveMetric(entry: ECSEntry) {
         if (elasticMetricsConfigProperties.index.immediate) {
@@ -56,6 +83,7 @@ class DefaultElasticMetricsClient(
             runBlocking {
                 launch {
                     logger.debug("Entry queued")
+                    queueSize.incrementAndGet()
                     queue.send(entry)
                 }
             }
@@ -83,6 +111,7 @@ class DefaultElasticMetricsClient(
     private suspend fun receiveEvents() {
         while (true) {
             val entry = queue.receive()
+            queueSize.decrementAndGet()
             logger.debug("Entry received")
             runBlocking {
                 launch(Job()) {
@@ -91,11 +120,6 @@ class DefaultElasticMetricsClient(
             }
         }
     }
-
-    /**
-     * Buffer of entries
-     */
-    private val buffer = ConcurrentLinkedQueue<ECSEntry>()
 
     private fun processEvent(entry: ECSEntry) {
         buffer.add(entry)

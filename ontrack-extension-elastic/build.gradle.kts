@@ -10,6 +10,7 @@ dependencies {
     api(project(":ontrack-extension-support"))
 
     implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
+    implementation("io.micrometer:micrometer-core")
 
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(":ontrack-extension-general"))
