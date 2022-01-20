@@ -204,4 +204,13 @@ ontrack.extension.elastic.metrics.queue.buffer = 512
 # Every such interval, the current buffer of metrics is flushed
 # to Elastic.
 ontrack.extension.elastic.metrics.queue.flushing = 1m
+
+# If the `target` property is set to `CUSTOM`, the following properties
+# will be used to setup the Elastic instance to use for the export
+# of the metrics.
+ontrack.extension.elastic.metrics.custom.uris = http://localhost:9200
+#ontrack.extension.elastic.metrics.custom.username =
+#ontrack.extension.elastic.metrics.custom.password =
+# Other properties are available.
+# See https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/autoconfigure/elasticsearch/ElasticsearchProperties.html
 ----
