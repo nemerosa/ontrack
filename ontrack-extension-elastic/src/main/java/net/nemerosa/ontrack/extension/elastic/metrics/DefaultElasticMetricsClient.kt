@@ -1,11 +1,14 @@
 package net.nemerosa.ontrack.extension.elastic.metrics
 
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.toJsonMap
 import net.nemerosa.ontrack.model.structure.SearchNodeResults
 import net.nemerosa.ontrack.model.structure.SearchResultNode
 import org.apache.http.HttpHost
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest
+import org.elasticsearch.action.bulk.BulkRequest
 import org.elasticsearch.action.index.IndexRequest
 import org.elasticsearch.action.search.SearchRequest
 import org.elasticsearch.client.RequestOptions
@@ -13,10 +16,14 @@ import org.elasticsearch.client.RestClient
 import org.elasticsearch.client.RestHighLevelClient
 import org.elasticsearch.index.query.MultiMatchQueryBuilder
 import org.elasticsearch.search.builder.SearchSourceBuilder
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 import java.net.URI
+import java.util.concurrent.ConcurrentLinkedQueue
 
+@DelicateCoroutinesApi
 @Component
 @ConditionalOnProperty(
     prefix = ElasticMetricsConfigProperties.ELASTIC_METRICS_PREFIX,
@@ -29,17 +36,112 @@ class DefaultElasticMetricsClient(
     private val defaultClient: RestHighLevelClient,
 ) : ElasticMetricsClient {
 
+    private val logger: Logger = LoggerFactory.getLogger(DefaultElasticMetricsClient::class.java)
+
+    private val queue = Channel<ECSEntry>(capacity = elasticMetricsConfigProperties.queue.capacity.toInt())
+
     override fun saveMetric(entry: ECSEntry) {
-        val indexName = elasticMetricsConfigProperties.index.name
-        val source = entry.asJson().toJsonMap()
-        client.index(
-            IndexRequest(indexName).source(source),
-            RequestOptions.DEFAULT
-        )
-        // Refreshes the index if needed
-        immediateRefreshIfRequested(indexName)
+        if (elasticMetricsConfigProperties.index.immediate) {
+            // Direct registration
+            val indexName = elasticMetricsConfigProperties.index.name
+            val source = entry.asJson().toJsonMap()
+            client.index(
+                IndexRequest(indexName).source(source),
+                RequestOptions.DEFAULT
+            )
+            // ... and flushing immediately
+            val refreshRequest = RefreshRequest(indexName)
+            client.indices().refresh(refreshRequest, RequestOptions.DEFAULT)
+        } else {
+            runBlocking {
+                launch {
+                    logger.debug("Entry queued")
+                    queue.send(entry)
+                }
+            }
+        }
     }
 
+    init {
+        /**
+         * Launching the queue processing at startup
+         */
+        GlobalScope.launch {
+            receiveEvents()
+        }
+        /**
+         * Launching the queue regular purging
+         */
+        GlobalScope.launch {
+            flushEvents()
+        }
+    }
+
+    /**
+     * Processing of the events
+     */
+    private suspend fun receiveEvents() {
+        while (true) {
+            val entry = queue.receive()
+            logger.debug("Entry received")
+            runBlocking {
+                launch(Job()) {
+                    processEvent(entry)
+                }
+            }
+        }
+    }
+
+    /**
+     * Buffer of entries
+     */
+    private val buffer = ConcurrentLinkedQueue<ECSEntry>()
+
+    private fun processEvent(entry: ECSEntry) {
+        buffer.add(entry)
+        logger.debug("Entry buffered (${buffer.size}/${elasticMetricsConfigProperties.queue.buffer})")
+        if (buffer.size >= elasticMetricsConfigProperties.queue.buffer.toInt()) {
+            // Flushing the buffer
+            logger.debug("Buffer flushing")
+            flushing()
+        }
+    }
+
+    /**
+     * Flushing the events regularly
+     */
+    private suspend fun flushEvents() {
+        runBlocking {
+            while (true) {
+                // Wait between each flushing session
+                delay(elasticMetricsConfigProperties.queue.flushing.toMillis())
+                // Flushing
+                logger.debug("Timed flushing")
+                flushing()
+            }
+        }
+    }
+
+    private fun flushing() {
+        if (buffer.isNotEmpty()) {
+            logger.debug("Flushing all entries (${buffer.size})")
+            // Copy of the elements
+            val entries = buffer.toTypedArray()
+            // Flushing the buffer
+            buffer.clear()
+            // Creating the bulk request
+            val indexName = elasticMetricsConfigProperties.index.name
+            val request = BulkRequest()
+            entries.forEach {
+                val source = it.asJson().toJsonMap()
+                request.add(IndexRequest(indexName).source(source))
+            }
+            // Bulk request execution
+            client.bulk(request, RequestOptions.DEFAULT)
+        } else {
+            logger.debug("Nothing to flush")
+        }
+    }
 
     override fun rawSearch(
         token: String,
@@ -83,14 +185,6 @@ class DefaultElasticMetricsClient(
                 else -> null
             }
         )
-    }
-
-
-    private fun immediateRefreshIfRequested(indexName: String) {
-        if (elasticMetricsConfigProperties.index.immediate) {
-            val refreshRequest = RefreshRequest(indexName)
-            client.indices().refresh(refreshRequest, RequestOptions.DEFAULT)
-        }
     }
 
     private val client: RestHighLevelClient by lazy {
