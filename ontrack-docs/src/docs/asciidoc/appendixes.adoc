@@ -3,20 +3,20 @@
 
 include::configuration-properties.adoc[]
 
-include::appendix-deprecations.adoc[]
+// include::appendix-deprecations.adoc[]
 
-include::appendix-roadmap.adoc[]
+// include::appendix-roadmap.adoc[]
 
-include::appendix-metrics-migration.adoc[]
+// include::appendix-metrics-migration.adoc[]
 
-include::appendix-migration-postgres.adoc[]
+// include::appendix-migration-postgres.adoc[]
 
-include::appendix-postgres-flyway.adoc[]
+// include::appendix-postgres-flyway.adoc[]
 
-include::appendix-postgres-production-data.adoc[]
+// include::appendix-postgres-production-data.adoc[]
 
-[[dsl-doc]]
-=== DSL Reference
+// [[dsl-doc]]
+// === DSL Reference
 
 // This documented in generated
-include::generated/dsl-index.adoc[]
+// include::generated/dsl-index.adoc[]

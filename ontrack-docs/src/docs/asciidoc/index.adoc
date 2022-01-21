@@ -47,4 +47,6 @@ include::extending.adoc[]
 
 include::operations.adoc[]
 
+include::appendixes.adoc[]
+
 // ========================================================
