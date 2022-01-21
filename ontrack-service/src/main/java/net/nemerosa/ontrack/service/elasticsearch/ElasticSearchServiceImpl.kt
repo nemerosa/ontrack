@@ -25,21 +25,42 @@ class ElasticSearchServiceImpl(
     }
 
     val indexerByResultType: Map<String, SearchIndexer<*>> by lazy {
-        searchIndexers.associateBy { it.searchResultType.id }
+        searchIndexers.filter { it.searchResultType != null }.associateBy { it.searchResultType!!.id }
     }
 
-    override fun paginatedSearch(request: SearchRequest): SearchResults {
+    override fun paginatedSearch(request: SearchRequest): SearchResults = rawSearch(
+            token = request.token,
+            indexName = request.type?.let { type ->
+                indexerByResultType[type]?.indexName
+            },
+            offset = request.offset,
+            size = request.size,
+    ).run {
+        SearchResults(
+                items = items.mapNotNull { toResult(it) },
+                offset = offset,
+                total = total,
+                message = message,
+        )
+    }
+
+    override fun rawSearch(
+            token: String,
+            indexName: String?,
+            offset: Int,
+            size: Int,
+    ): SearchNodeResults {
         val esRequest = ESSearchRequest().source(
                 SearchSourceBuilder().query(
-                        MultiMatchQueryBuilder(request.token).type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
+                        MultiMatchQueryBuilder(token).type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
                 ).from(
-                        request.offset
+                        offset
                 ).size(
-                        request.size
+                        size
                 )
         ).run {
-            request.type?.let { type ->
-                indexerByResultType[type]?.let { indexer -> indices(indexer.indexName) }
+            indexName?.let {
+                indices(indexName)
             } ?: this
         }
 
@@ -52,7 +73,7 @@ class ElasticSearchServiceImpl(
 
         // Hits as JSON nodes
         val hits = responseHits.hits.map {
-            HitNode(
+            SearchResultNode(
                     it.index,
                     it.id,
                     it.score.toDouble(),
@@ -61,9 +82,9 @@ class ElasticSearchServiceImpl(
         }
 
         // Transforming into search results
-        return SearchResults(
-                items = hits.mapNotNull { toResult(it) },
-                offset = request.offset,
+        return SearchNodeResults(
+                items = hits,
+                offset = offset,
                 total = totalHits.toInt(),
                 message = when {
                     totalHits <= 0 -> "The number of total matches is not known and pagination is not possible."
@@ -75,7 +96,7 @@ class ElasticSearchServiceImpl(
     override val searchResultTypes: List<SearchResultType>
         get() =
             indexers
-                    .map { (_, indexer) -> indexer.searchResultType }
+                    .mapNotNull { (_, indexer) -> indexer.searchResultType }
                     .sortedBy { it.name }
 
     override fun indexReset(reindex: Boolean): Ack {
@@ -89,14 +110,14 @@ class ElasticSearchServiceImpl(
         indexers.forEach { (_, indexer) -> searchIndexService.initIndex(indexer) }
     }
 
-    private fun toResult(hitNode: HitNode): SearchResult? {
+    private fun toResult(hitNode: SearchResultNode): SearchResult? {
         // Gets the indexer
         val indexer = indexers[hitNode.index]
         // Transformation
         return indexer?.let { toResult(hitNode, it) }
     }
 
-    private fun <T : SearchItem> toResult(hitNode: HitNode, indexer: SearchIndexer<T>): SearchResult? =
+    private fun <T : SearchItem> toResult(hitNode: SearchResultNode, indexer: SearchIndexer<T>): SearchResult? =
             indexer.toSearchResult(
                     hitNode.id,
                     hitNode.score,

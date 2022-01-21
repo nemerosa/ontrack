@@ -27,20 +27,7 @@ http://projects.spring.io/spring-boot/[Spring Boot 2].
 See <<appendix-metrics-migration>> for information about the migration.
 ====
 
-By default, Ontrack supports two external registries for metrics:
-
-* InfluxDB
-* Prometheus
-
-The export to those engine is _disabled_ by default and must be enabled
-explicitely.
-
-For example, for Prometheus, you can use the
-`management.metrics.export.prometheus.enabled` property or
-the `MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED` environment variable.
-
-For the rest of the configuration, you have to consult the
-Spring Boot or Micrometer documentation.
+See <<operations-metrics>> for the different options for the metrics backends.
 
 [[monitoring-metrics-list]]
 ===== List of metrics

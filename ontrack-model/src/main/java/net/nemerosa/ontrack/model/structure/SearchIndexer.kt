@@ -59,9 +59,11 @@ interface SearchIndexer<T : SearchItem> {
     fun indexAll(processor: (T) -> Unit)
 
     /**
-     * Search result type
+     * Search result type.
+     *
+     * Returns `null` if the index is not eligible for search.
      */
-    val searchResultType: SearchResultType
+    val searchResultType: SearchResultType?
 
     /**
      * Given some raw search results, transform them into a [SearchResult] for display.

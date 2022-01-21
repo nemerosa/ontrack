@@ -40,6 +40,12 @@ management:
   # Default settings for the metrics
   metrics:
     export:
+      # Need an explicit enablement
+      defaults:
+        enabled: false
+      # ElasticSearch disabled by default
+      elastic:
+        enabled: false
       # InfluxDB disabled by default
       influx:
         enabled: false

@@ -36,6 +36,7 @@ dependencies {
     // Metric runtimes
     runtimeOnly("io.micrometer:micrometer-registry-influx")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+    runtimeOnly("io.micrometer:micrometer-registry-elastic")
 
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
     testImplementation(project(":ontrack-test-utils"))
@@ -66,6 +67,7 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-sonarqube"))
     runtimeOnly(project(":ontrack-extension-indicators"))
     runtimeOnly(project(":ontrack-extension-casc"))
+    runtimeOnly(project(":ontrack-extension-elastic"))
 }
 
 /**

@@ -1,6 +1,6 @@
-package net.nemerosa.ontrack.service.elasticsearch
+package net.nemerosa.ontrack.model.structure
 
-internal class HitNode(
+class SearchResultNode(
         val index: String,
         val id: String,
         val score: Double,

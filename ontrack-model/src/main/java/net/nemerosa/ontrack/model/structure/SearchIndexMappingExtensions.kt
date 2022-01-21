@@ -25,6 +25,8 @@ class SearchIndexMappingBuilder<T : SearchItem> {
     fun id(typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = type("long", typeInit)
     fun keyword(typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = type("keyword", typeInit)
     fun nested(typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = type("nested", typeInit)
+    fun `object`(typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = type("object", typeInit)
+    fun timestamp(typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = type("date", typeInit)
     fun text(typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = type("text", typeInit)
 
     fun createMapping() = SearchIndexMapping(

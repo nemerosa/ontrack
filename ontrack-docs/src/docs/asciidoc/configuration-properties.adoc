@@ -1,9 +1,8 @@
 [[configuration-properties]]
 === Configuration properties
 
-Ontrack uses the Spring Boot mechanism for its configuration. See
-the <<configuration,documentation>> on how to set those properties
-in your Ontrack installation.
+Ontrack uses the Spring Boot mechanism for its configuration.
+See the <<configuration,documentation>> on how to set those properties in your Ontrack installation.
 
 All http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#common-application-properties[Spring Boot properties]
 are available for configuration.
@@ -11,15 +10,14 @@ are available for configuration.
 Additionally, Ontrack defines the following ones.
 
 TIP: The names of the configuration properties are given for a `.properties`
-     file format but you can configure them in YAML of course. They can also
-     be provided as system properties or environment variables. See the
-     http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-properties-and-configuration[Spring Boot documentation]
-     for more details.
+file format but you can configure them in YAML of course.
+They can also be provided as system properties or environment variables.
+See the
+http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-properties-and-configuration[Spring Boot documentation]
+for more details.
 
-
-WARNING: This sample file is meant as a guide only. Do *not* copy/paste the
-         entire content into your application; rather pick only the properties
-         that you need.
+WARNING: This sample file is meant as a guide only.
+Do *not* copy/paste the entire content into your application; rather pick only the properties that you need.
 
 TIP: When applicable, the default value is mentioned.
 
@@ -111,11 +109,13 @@ ontrack.config.search.index.logging = false
 # Note: if set to `true` this generates an awful lot if information
 # at DEBUG level.
 ontrack.config.search.index.tracing = false
+----
 
-#################################
-# Git configuration properties
-#################################
+[[configuration-properties-git]]
+==== Git Configuration properties
 
+[source,properties]
+----
 # Timeout in seconds for remote operations (like fetch & clone)
 # Leave 0 to use the default system value. Set to 60 seconds by default.
 ontrack.config.extension.git.remote.timeout = 60s
@@ -145,11 +145,13 @@ ontrack.config.extension.git.pull-requests.cleanup.disabling = 1
 
 # Days before deleting
 ontrack.config.extension.git.pull-requests.cleanup.deleting = 7
+----
 
-#################################
-# GitHub configuration properties
-#################################
+[[configuration-properties-github]]
+==== GitHub Configuration properties
 
+[source,properties]
+----
 # Set to `true` to disable the signature checks (OK for testing, NOT for production)
 ontrack.extension.github.ingestion.hook.signature.disabled = false
 
@@ -162,4 +164,56 @@ ontrack.extension.github.ingestion.processing.async = true
 # ontrack.extension.github.ingestion.processing.repositories.very-active.owner=
 # Regex for the repository name, null for match all
 # ontrack.extension.github.ingestion.processing.repositories.very-active.repository = very-active-repository
+----
+
+[[configuration-properties-elastic]]
+==== Elastic Configuration properties
+
+[source,properties]
+----
+# Is the export of metrics to Elastic enabled?
+ontrack.extension.elastic.metrics.enabled = false
+
+# Must we trace the behaviour of the export of the metrics in the logs?
+ontrack.extension.elastic.metrics.debug = false
+
+# Defines where the Elastic metrics should be sent.
+# Possible values are
+# MAIN - When this option is selected, the ES instance used
+# by Ontrack for the regular search will be used.
+# CUSTOM -When this option is selected, the ES instance defined
+# by the metrics properties will be used.
+ontrack.extension.elastic.metrics.target = MAIN
+
+# Name of the index to contains all Ontrack metrics
+ontrack.extension.elastic.metrics.index.name = ontrack_metrics
+
+# Flag to enable immediate re-indexation after items are added
+# into the index (used mostly for testing. It should not be
+# used in production.
+# If set to true, this overrides the asynchronous processing
+# of the metrics
+ontrack.extension.elastic.metrics.index.immediate = false
+
+# Maximum capacity for the queue.
+# If the queue exceeds this capacity, new events will be on hold
+ontrack.extension.elastic.metrics.queue.capacity = 1024
+
+# Bulk update capacity.
+# When the number of metrics reaches this amount, the metrics
+# are sent to Elastic.
+ontrack.extension.elastic.metrics.queue.buffer = 512
+
+# Every such interval, the current buffer of metrics is flushed
+# to Elastic.
+ontrack.extension.elastic.metrics.queue.flushing = 1m
+
+# If the `target` property is set to `CUSTOM`, the following properties
+# will be used to setup the Elastic instance to use for the export
+# of the metrics.
+ontrack.extension.elastic.metrics.custom.uris = http://localhost:9200
+#ontrack.extension.elastic.metrics.custom.username =
+#ontrack.extension.elastic.metrics.custom.password =
+# Other properties are available.
+# See https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/autoconfigure/elasticsearch/ElasticsearchProperties.html
 ----
