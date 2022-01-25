@@ -62,6 +62,7 @@ This sets up:
 
 * a Postgres database
 * an ElasticSearch (single node)
+* a RabbitMQ message broker
 * Ontrack running on port 8080
 
 Go to http://localhost:8080 and start using Ontrack.
@@ -74,8 +75,7 @@ Full documentation available in the
 [Ontrack web site](https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html) or as
 [PDF](https://static.nemerosa.net/ontrack/release/latest/docs/index.pdf).
 
-> The latest version of the documentation is also generated from the `develop` branch and is available at 
-https://static.nemerosa.net/ontrack/release/develop/docs/doc/index.html
+Check also the blog articles at https://nemerosa.ghost.io/
 
 ## Contributions
 
