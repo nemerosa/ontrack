@@ -1,19 +1,18 @@
 package net.nemerosa.ontrack.extension.artifactory.service
 
-import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClientFactory
-import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfigurationService
 import net.nemerosa.ontrack.extension.artifactory.ArtifactoryConfProperties
-import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
-import net.nemerosa.ontrack.model.support.ConfigurationServiceListener
+import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClient
+import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClientFactory
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration
+import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfigurationService
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncProperty
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType
-import net.nemerosa.ontrack.model.support.AbstractBranchJob
-import java.lang.IllegalStateException
-import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClient
 import net.nemerosa.ontrack.job.*
+import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.AbstractBranchJob
+import net.nemerosa.ontrack.model.support.ConfigurationServiceListener
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -44,19 +43,19 @@ class ArtifactoryPromotionSyncServiceImpl(
             Stream.empty()
         } else {
             securityService.asAdmin {
-                // For all projects...
-                structureService.projectList
-                    // ... and their branches
-                    .flatMap { project: Project ->
-                        structureService.getBranchesForProject(project.id)
+                val jobs = mutableListOf<JobRegistration>()
+                // Getting all branches having the sync property
+                propertyService.forEachEntityWithProperty(ArtifactoryPromotionSyncPropertyType::class) { projectEntityID: ProjectEntityID, _ ->
+                    if (projectEntityID.type == ProjectEntityType.BRANCH) {
+                        val branch = structureService.getBranch(ID.of(projectEntityID.id))
+                        if (!branch.isDisabled) {
+                            jobs += scheduleArtifactoryBuildSync(branch)
+                        }
                     }
-                    // ... gets those with the sync. property
-                    .filter { branch: Branch ->
-                        propertyService.hasProperty(branch, ArtifactoryPromotionSyncPropertyType::class.java)
-                    }
-                    // ... creates the job
-                    .map { branch: Branch -> scheduleArtifactoryBuildSync(branch) }
-            }.stream()
+                }
+                // As a stream
+                jobs.stream()
+            }
         }
     }
 
