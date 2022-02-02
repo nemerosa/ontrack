@@ -11,12 +11,12 @@ import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfi
 import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncProperty
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
 import net.nemerosa.ontrack.test.assertIs
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
@@ -28,7 +28,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestJUnit4Support() {
+class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var service: ArtifactoryPromotionSyncService
@@ -58,7 +58,7 @@ class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestJUnit4Support() {
 
     }
 
-    @Before
+    @BeforeEach
     fun setup() {
         // Existing promotions
         whenever(artifactoryClient.getStatuses(ArgumentMatchers.any())).thenReturn(listOf(
@@ -129,7 +129,7 @@ class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestJUnit4Support() {
                         j.job.key.type.category.key == "artifactory" &&
                                 j.job.key.type.key == "build-sync" &&
                                 j.job.key.id == unconfiguredBranch.id.toString()
-                    }, "No job when branch is not configrued")
+                    }, "No job when branch is not configured")
                     // Configured branch
                     val job = jobs.find { j ->
                         j.job.key.type.category.key == "artifactory" &&
