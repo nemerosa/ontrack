@@ -1,13 +1,19 @@
-package net.nemerosa.ontrack.extension.artifactory.service;
+package net.nemerosa.ontrack.extension.artifactory.service
 
-import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClient;
-import net.nemerosa.ontrack.job.JobRunListener;
-import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClient
+import net.nemerosa.ontrack.job.JobRunListener
+import net.nemerosa.ontrack.model.structure.Branch
 
-public interface ArtifactoryPromotionSyncService {
+interface ArtifactoryPromotionSyncService {
 
-    void sync(Branch branch, JobRunListener listener);
+    fun sync(branch: Branch, listener: JobRunListener)
 
-    void syncBuild(Branch branch, String artifactoryBuildName, String buildName, ArtifactoryClient client, JobRunListener listener);
+    fun syncBuild(
+        branch: Branch,
+        artifactoryBuildName: String,
+        buildName: String,
+        client: ArtifactoryClient,
+        listener: JobRunListener,
+    )
 
 }

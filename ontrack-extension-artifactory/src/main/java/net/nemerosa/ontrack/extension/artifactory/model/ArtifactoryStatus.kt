@@ -1,14 +1,9 @@
-package net.nemerosa.ontrack.extension.artifactory.model;
+package net.nemerosa.ontrack.extension.artifactory.model
 
-import lombok.Data;
+import java.time.LocalDateTime
 
-import java.time.LocalDateTime;
-
-@Data
-public class ArtifactoryStatus {
-
-    private final String name;
-    private final String user;
-    private final LocalDateTime timestamp;
-
-}
+data class ArtifactoryStatus(
+    val name: String,
+    val user: String,
+    val timestamp: LocalDateTime,
+)

@@ -1,30 +1,27 @@
-package net.nemerosa.ontrack.extension.artifactory.property;
+package net.nemerosa.ontrack.extension.artifactory.property
 
-import lombok.Data;
-import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration;
-import net.nemerosa.ontrack.model.support.ConfigurationProperty;
+import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration
+import net.nemerosa.ontrack.model.support.ConfigurationProperty
 
-@Data
-public class ArtifactoryPromotionSyncProperty implements ConfigurationProperty<ArtifactoryConfiguration> {
-
+data class ArtifactoryPromotionSyncProperty(
     /**
      * Reference to the Artifactory configuration.
      */
-    private final ArtifactoryConfiguration configuration;
+    override val configuration: ArtifactoryConfiguration,
 
     /**
      * Artifactory build name
      */
-    private final String buildName;
+    val buildName: String,
 
     /**
      * Artifactory build name filter
      */
-    private final String buildNameFilter;
+    val buildNameFilter: String,
 
     /**
      * Interval between each synchronisation in minutes.
      */
-    private final int interval;
+    val interval: Int,
 
-}
+    ) : ConfigurationProperty<ArtifactoryConfiguration>
