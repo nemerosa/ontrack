@@ -25,9 +25,9 @@ class ArtifactoryPromotionSyncServiceImpl(
     private val structureService: StructureService,
     private val propertyService: PropertyService,
     private val artifactoryClientFactory: ArtifactoryClientFactory,
-    configurationService: ArtifactoryConfigurationService,
+    private val configurationService: ArtifactoryConfigurationService,
     private val artifactoryConfProperties: ArtifactoryConfProperties,
-    private val securityService: SecurityService
+    private val securityService: SecurityService,
 ) : ArtifactoryPromotionSyncService, JobOrchestratorSupplier, ConfigurationServiceListener<ArtifactoryConfiguration> {
 
     private val logger = LoggerFactory.getLogger(ArtifactoryPromotionSyncServiceImpl::class.java)
@@ -38,6 +38,9 @@ class ArtifactoryPromotionSyncServiceImpl(
 
     override fun collectJobRegistrations(): Stream<JobRegistration> {
         return if (artifactoryConfProperties.buildSyncDisabled) {
+            Stream.empty()
+        } else if (configurationService.configurations.isEmpty()) {
+            // No Artifactory configuration is created, so it's not even needed to look for configured branches
             Stream.empty()
         } else {
             securityService.asAdmin {
@@ -78,7 +81,7 @@ class ArtifactoryPromotionSyncServiceImpl(
                         JobRun { runListener: JobRunListener -> sync(branch, runListener) }
 
                     override fun getDescription(): String =
-                            "Synchronisation of promotions with Artifactory for branch ${branch.project.name}/${branch.name}"
+                        "Synchronisation of promotions with Artifactory for branch ${branch.project.name}/${branch.name}"
 
                     override fun isValid(): Boolean =
                         super.isValid() &&
@@ -95,7 +98,8 @@ class ArtifactoryPromotionSyncServiceImpl(
         val buildName = syncProperty.value.buildName
         val buildNameFilter = syncProperty.value.buildNameFilter
         val configuration: ArtifactoryConfiguration = syncProperty.value.configuration
-        val log = "Sync branch ${branch.project.name}/${branch.name} with Artifactory build $buildName ($buildNameFilter)"
+        val log =
+            "Sync branch ${branch.project.name}/${branch.name} with Artifactory build $buildName ($buildNameFilter)"
         logger.info("[artifactory-sync] {}", log)
         listener.message(log)
         // Build name filter
@@ -119,7 +123,7 @@ class ArtifactoryPromotionSyncServiceImpl(
         artifactoryBuildName: String,
         buildName: String,
         client: ArtifactoryClient,
-        listener: JobRunListener
+        listener: JobRunListener,
     ) {
         // Looks for the build
         val buildOpt = structureService.findBuildByName(

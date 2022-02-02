@@ -4,6 +4,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.extension.artifactory.ArtifactoryConfProperties
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClient
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClientFactory
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration
@@ -36,6 +37,9 @@ class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
     @Autowired
     private lateinit var configurationService: ArtifactoryConfigurationService
 
+    @Autowired
+    private lateinit var artifactoryConfProperties: ArtifactoryConfProperties
+
     @Autowired // Mock
     private lateinit var artifactoryClient: ArtifactoryClient
 
@@ -62,11 +66,11 @@ class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
     fun setup() {
         // Existing promotions
         whenever(artifactoryClient.getStatuses(ArgumentMatchers.any())).thenReturn(listOf(
-                ArtifactoryStatus(
-                        "COPPER",
-                        "x",
-                        Time.now()
-                )
+            ArtifactoryStatus(
+                "COPPER",
+                "x",
+                Time.now()
+            )
         ))
     }
 
@@ -81,7 +85,8 @@ class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
                 // Sync with Artifactory
                 service.syncBuild(this, "1.0.0", "1.0.0", artifactoryClient, JobRunListener.out())
                 // Checks that a new promotion has NOT been created because one exists already
-                val promotions = structureService.getPromotionRunsForBuild(build.id).filter { it.promotionLevel.id() == copper.id() }.size
+                val promotions = structureService.getPromotionRunsForBuild(build.id)
+                    .filter { it.promotionLevel.id() == copper.id() }.size
                 assertEquals(1, promotions, "No new promotion has been created")
             }
         }
@@ -97,7 +102,8 @@ class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
                 // Sync with Artifactory
                 service.syncBuild(this, "1.0.0", "1.0.0", artifactoryClient, JobRunListener.out())
                 // Checks that a promotion has been created
-                val promotions = structureService.getPromotionRunsForBuild(build.id).filter { it.promotionLevel.id() == copper.id() }.size
+                val promotions = structureService.getPromotionRunsForBuild(build.id)
+                    .filter { it.promotionLevel.id() == copper.id() }.size
                 assertEquals(1, promotions, "A promotion has been created")
             }
         }
@@ -116,10 +122,10 @@ class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
             // Configured branch
             branch branch@{
                 setProperty(this, ArtifactoryPromotionSyncPropertyType::class.java, ArtifactoryPromotionSyncProperty(
-                        configuration,
-                        "project",
-                        "1.0.*",
-                        30
+                    configuration,
+                    "project",
+                    "1.0.*",
+                    30
                 ))
                 // Gets the list of jobs
                 assertIs<JobOrchestratorSupplier>(service) {
@@ -137,6 +143,74 @@ class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
                                 j.job.key.id == this@branch.id.toString()
                     }
                     assertNotNull(job)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `No sync job when disabled`() {
+        val configuration = ArtifactoryConfiguration("test", "https://artifactory", "user", "password")
+        asAdmin {
+            configurationService.newConfiguration(configuration)
+        }
+        project {
+            // Unconfigured branch
+            val unconfiguredBranch = branch()
+
+            // Configured branch
+            branch branch@{
+                setProperty(this, ArtifactoryPromotionSyncPropertyType::class.java, ArtifactoryPromotionSyncProperty(
+                    configuration,
+                    "project",
+                    "1.0.*",
+                    30
+                ))
+                // Gets the list of jobs
+                assertIs<JobOrchestratorSupplier>(service) {
+                    val oldState = artifactoryConfProperties.buildSyncDisabled
+                    try {
+                        artifactoryConfProperties.buildSyncDisabled = true
+                        val jobs = it.collectJobRegistrations().toList()
+                        // No job at all
+                        assertTrue(jobs.isEmpty(), "No job is created")
+                    } finally {
+                        artifactoryConfProperties.buildSyncDisabled = oldState
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `No sync job when no configuration`() {
+        val configuration = ArtifactoryConfiguration("test", "https://artifactory", "user", "password")
+        asAdmin {
+            configurationService.newConfiguration(configuration)
+        }
+        project {
+            // Unconfigured branch
+            val unconfiguredBranch = branch()
+
+            // Configured branch
+            branch branch@{
+                setProperty(this, ArtifactoryPromotionSyncPropertyType::class.java, ArtifactoryPromotionSyncProperty(
+                    configuration,
+                    "project",
+                    "1.0.*",
+                    30
+                ))
+                // Gets the list of jobs
+                assertIs<JobOrchestratorSupplier>(service) {
+                    // Deleting all configurations before checking
+                    asAdmin {
+                        configurationService.configurations.forEach { conf ->
+                            configurationService.deleteConfiguration(conf.name)
+                        }
+                    }
+                    val jobs = it.collectJobRegistrations().toList()
+                    // No job at all
+                    assertTrue(jobs.isEmpty(), "No job is created")
                 }
             }
         }
