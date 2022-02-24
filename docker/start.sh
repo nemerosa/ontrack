@@ -10,6 +10,7 @@ rm -rf /opt/ontrack/config \
 echo "[START] EXTENSIONS_DIR = ${EXTENSIONS_DIR}"
 echo "[START] JAVA_OPTIONS   = ${JAVA_OPTIONS}"
 echo "[START] ONTRACK_ARGS   = ${ONTRACK_ARGS}"
+echo "[START] PROFILE        = ${PROFILE}"
 
 # Launching the application
 exec java \
@@ -18,5 +19,4 @@ exec java \
     -jar /opt/ontrack/ontrack.jar \
     "--spring.profiles.active=${PROFILE}" \
     "--ontrack.config.applicationWorkingDir=/var/ontrack/data" \
-    "--logging.file=/var/ontrack/data/log/ontrack.log" \
     ${ONTRACK_ARGS}

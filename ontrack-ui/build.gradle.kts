@@ -38,6 +38,9 @@ dependencies {
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
     runtimeOnly("io.micrometer:micrometer-registry-elastic")
 
+    // Logging extensions
+    runtimeOnly("net.logstash.logback:logstash-logback-encoder:7.0.1")
+
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
     testImplementation(project(":ontrack-test-utils"))
     testImplementation(project(":ontrack-it-utils"))

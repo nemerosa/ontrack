@@ -5,9 +5,24 @@
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
 
-    <!-- Console logging: default -->
+    <!-- Console logging -->
 
-    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <springProfile name="logging-json">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <fieldNames>
+                    <timestamp>timestamp</timestamp>
+                    <version>[ignore]</version>
+                    <levelValue>[ignore]</levelValue>
+                </fieldNames>
+            </encoder>
+        </springProfile>
+        <springProfile name="!logging-json">
+            <encoder>
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            </encoder>
+        </springProfile>
+    </appender>
 
     <!-- Root level -->
 
