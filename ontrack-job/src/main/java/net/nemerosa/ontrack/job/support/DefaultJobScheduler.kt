@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.job.*
 import org.apache.commons.lang3.Validate
 import org.slf4j.LoggerFactory
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -28,7 +29,8 @@ constructor(
         private val jobPoolProvider: BiFunction<ExecutorService, Job, ExecutorService>,
         private val scattering: Boolean,
         private val scatteringRatio: Double,
-        private val meterRegistry: MeterRegistry? = null
+        private val meterRegistry: MeterRegistry? = null,
+        private val timeout: Duration? = null,
 ) : JobScheduler {
 
     private val logger = LoggerFactory.getLogger(JobScheduler::class.java)
@@ -46,7 +48,8 @@ constructor(
             initiallyPaused: Boolean,
             scattering: Boolean,
             scatteringRatio: Double,
-            meterRegistry: MeterRegistry? = null
+            meterRegistry: MeterRegistry? = null,
+            timeout: Duration? = null,
     ) : this(
             jobDecorator,
             schedulerPool,
@@ -55,7 +58,8 @@ constructor(
             BiFunction { executorService, _ -> executorService },
             scattering,
             scatteringRatio,
-            meterRegistry
+            meterRegistry,
+            timeout,
     )
 
     private fun MeterRegistry.statusGauge(
@@ -64,12 +68,11 @@ constructor(
     ) {
         gauge(
                 "ontrack_job_${name}_total",
-                services,
-                {
-                    it.filter { (_, service) -> statusFilterFn(service.jobStatus) }
-                            .size.toDouble()
-                }
-        )
+                services
+        ) {
+            it.filter { (_, service) -> statusFilterFn(service.jobStatus) }
+                .size.toDouble()
+        }
     }
 
     init {
@@ -90,11 +93,10 @@ constructor(
             meterRegistry.statusGauge("invalid") { !it.isValid }
             meterRegistry.gauge(
                     "ontrack_job_error_count_total",
-                    services,
-                    { schedulerMap ->
-                        schedulerMap.values.map { it.jobStatus.lastErrorCount }.sum().toDouble()
-                    }
-            )
+                    services
+            ) { schedulerMap ->
+                schedulerMap.values.map { it.jobStatus.lastErrorCount }.sum().toDouble()
+            }
         }
     }
 
