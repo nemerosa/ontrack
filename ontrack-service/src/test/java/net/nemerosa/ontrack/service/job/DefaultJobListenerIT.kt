@@ -34,6 +34,7 @@ class DefaultJobListenerIT : AbstractServiceTestJUnit4Support() {
                 isValid = true,
                 lastError = null,
                 lastErrorCount = 0,
+                lastTimeoutCount = 0,
                 lastRunDate = null,
                 lastRunDurationMs = 0,
                 nextRunDate = null,

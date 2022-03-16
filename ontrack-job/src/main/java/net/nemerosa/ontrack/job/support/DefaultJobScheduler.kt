@@ -22,15 +22,16 @@ import kotlin.math.abs
 class DefaultJobScheduler
 @JvmOverloads
 constructor(
-        private val jobDecorator: JobDecorator,
-        private val schedulerPool: ScheduledExecutorService,
-        private val jobListener: JobListener,
-        initiallyPaused: Boolean,
-        private val jobPoolProvider: BiFunction<ExecutorService, Job, ExecutorService>,
-        private val scattering: Boolean,
-        private val scatteringRatio: Double,
-        private val meterRegistry: MeterRegistry? = null,
-        private val timeout: Duration? = null,
+    private val jobDecorator: JobDecorator,
+    private val schedulerPool: ScheduledExecutorService,
+    private val jobListener: JobListener,
+    initiallyPaused: Boolean,
+    private val jobPoolProvider: BiFunction<ExecutorService, Job, ExecutorService>,
+    private val scattering: Boolean,
+    private val scatteringRatio: Double,
+    private val meterRegistry: MeterRegistry? = null,
+    private val timeout: Duration? = null,
+    private val timeoutControllerInterval: Duration? = null,
 ) : JobScheduler {
 
     private val logger = LoggerFactory.getLogger(JobScheduler::class.java)
@@ -42,33 +43,35 @@ constructor(
 
     @JvmOverloads
     constructor(
-            jobDecorator: JobDecorator,
-            schedulerPool: ScheduledExecutorService,
-            jobListener: JobListener,
-            initiallyPaused: Boolean,
-            scattering: Boolean,
-            scatteringRatio: Double,
-            meterRegistry: MeterRegistry? = null,
-            timeout: Duration? = null,
+        jobDecorator: JobDecorator,
+        schedulerPool: ScheduledExecutorService,
+        jobListener: JobListener,
+        initiallyPaused: Boolean,
+        scattering: Boolean,
+        scatteringRatio: Double,
+        meterRegistry: MeterRegistry? = null,
+        timeout: Duration? = null,
+        timeoutControllerInterval: Duration? = null,
     ) : this(
-            jobDecorator,
-            schedulerPool,
-            jobListener,
-            initiallyPaused,
-            BiFunction { executorService, _ -> executorService },
-            scattering,
-            scatteringRatio,
-            meterRegistry,
-            timeout,
+        jobDecorator,
+        schedulerPool,
+        jobListener,
+        initiallyPaused,
+        BiFunction { executorService, _ -> executorService },
+        scattering,
+        scatteringRatio,
+        meterRegistry,
+        timeout,
+        timeoutControllerInterval
     )
 
     private fun MeterRegistry.statusGauge(
-            name: String,
-            statusFilterFn: (JobStatus) -> Boolean
+        name: String,
+        statusFilterFn: (JobStatus) -> Boolean,
     ) {
         gauge(
-                "ontrack_job_${name}_total",
-                services
+            "ontrack_job_${name}_total",
+            services
         ) {
             it.filter { (_, service) -> statusFilterFn(service.jobStatus) }
                 .size.toDouble()
@@ -82,22 +85,47 @@ constructor(
         if (meterRegistry != null) {
             // count
             meterRegistry.gaugeMapSize(
-                    "ontrack_job_count_total",
-                    emptyList(),
-                    services
+                "ontrack_job_count_total",
+                emptyList(),
+                services
             )
             meterRegistry.statusGauge("running") { it.isRunning }
             meterRegistry.statusGauge("disabled") { it.isDisabled }
             meterRegistry.statusGauge("paused") { it.isPaused }
             meterRegistry.statusGauge("error") { it.isError }
+            meterRegistry.statusGauge("timeout") { it.isTimeout }
             meterRegistry.statusGauge("invalid") { !it.isValid }
             meterRegistry.gauge(
-                    "ontrack_job_error_count_total",
-                    services
+                "ontrack_job_error_count_total",
+                services
             ) { schedulerMap ->
-                schedulerMap.values.map { it.jobStatus.lastErrorCount }.sum().toDouble()
+                schedulerMap.values.sumOf { it.jobStatus.lastErrorCount }.toDouble()
+            }
+            meterRegistry.gauge(
+                "ontrack_job_timeout_count_total",
+                services
+            ) { schedulerMap ->
+                schedulerMap.values.sumOf { it.jobStatus.lastTimeoutCount }.toDouble()
             }
         }
+        // Scheduling the timeout controller job
+        if (timeoutControllerInterval != null) {
+            schedulerPool.scheduleAtFixedRate(
+                createTimeoutControllerJob(),
+                timeoutControllerInterval.toMillis(),
+                timeoutControllerInterval.toMillis(),
+                TimeUnit.MILLISECONDS
+            )
+        }
+    }
+
+    private fun createTimeoutControllerJob() = Runnable {
+        // Loop over all jobs
+        val stopped = services.values.count { jobScheduledService ->
+            // And checks them for timeout
+            jobScheduledService.checkForTimeout()
+        }
+        logger.debug("[scheduler] $stopped job(s) have been stopped because of timeout")
     }
 
     override fun schedule(job: Job, schedule: Schedule) {
@@ -107,8 +135,8 @@ constructor(
         if (existingService != null) {
             logger.debug("[scheduler][job]{} Modifying existing schedule", job.key)
             existingService.update(
-                    job,
-                    schedule
+                job,
+                schedule
             )
         }
         // Creates and starts the scheduled service
@@ -116,10 +144,10 @@ constructor(
             logger.debug("[scheduler][job]{} Starting scheduled service", job.key)
             // Copy stats from old schedule
             val jobScheduledService = JobScheduledService(
-                    job,
-                    schedule,
-                    schedulerPool,
-                    jobListener.isPausedAtStartup(job.key)
+                job,
+                schedule,
+                schedulerPool,
+                jobListener.isPausedAtStartup(job.key)
             )
             // Registration
             services[job.key] = jobScheduledService
@@ -185,9 +213,9 @@ constructor(
 
     override fun getJobKey(id: Long): Optional<JobKey> {
         return services.values.stream()
-                .filter { service -> service.id == id }
-                .map { it.jobKey }
-                .findFirst()
+            .filter { service -> service.id == id }
+            .map { it.jobKey }
+            .findFirst()
     }
 
     override fun stop(key: JobKey): Boolean {
@@ -201,21 +229,21 @@ constructor(
 
     override fun getJobKeysOfType(type: JobType): Collection<JobKey> {
         return allJobKeys
-                .filter { key -> key.sameType(type) }
-                .toSet()
+            .filter { key -> key.sameType(type) }
+            .toSet()
     }
 
     override fun getJobKeysOfCategory(category: JobCategory): Collection<JobKey> {
         return allJobKeys
-                .filter { key -> key.sameCategory(category) }
-                .toSet()
+            .filter { key -> key.sameCategory(category) }
+            .toSet()
     }
 
     override fun getJobStatuses(): Collection<JobStatus> {
         return services.values
-                .map { it.jobStatus }
-                .sortedBy { it.id }
-                .toList()
+            .map { it.jobStatus }
+            .sortedBy { it.id }
+            .toList()
     }
 
     override fun fireImmediately(jobKey: JobKey): Optional<CompletableFuture<*>> {
@@ -230,10 +258,10 @@ constructor(
     }
 
     private inner class JobScheduledService(
-            initialJob: Job,
-            initialSchedule: Schedule,
-            private val scheduledExecutorService: ScheduledExecutorService,
-            pausedAtStartup: Boolean
+        initialJob: Job,
+        initialSchedule: Schedule,
+        private val scheduledExecutorService: ScheduledExecutorService,
+        pausedAtStartup: Boolean,
     ) : Runnable {
 
         private var job = initialJob
@@ -248,9 +276,11 @@ constructor(
         private val currentExecution = AtomicReference<Future<*>>()
         private val runProgress = AtomicReference<JobRunProgress>()
         private val runCount = AtomicLong()
+        private val startTime = AtomicLong()
         private val lastRunDate = AtomicReference<LocalDateTime>()
         private val lastRunDurationMs = AtomicLong()
         private val lastErrorCount = AtomicLong()
+        private val lastTimeoutCount = AtomicLong()
         private val lastError = AtomicReference<String>(null)
 
         init {
@@ -282,17 +312,17 @@ constructor(
             }
             // Actual schedule
             actualSchedule = Schedule(
-                    initialPeriod,
-                    period,
-                    TimeUnit.MILLISECONDS
+                initialPeriod,
+                period,
+                TimeUnit.MILLISECONDS
             )
             // Scheduling now
             scheduledFuture = if (schedule.period > 0) {
                 scheduledExecutorService.scheduleWithFixedDelay(
-                        this,
-                        initialPeriod,
-                        period,
-                        TimeUnit.MILLISECONDS
+                    this,
+                    initialPeriod,
+                    period,
+                    TimeUnit.MILLISECONDS
                 )
             } else {
                 logger.debug("[job]{} Job not scheduled since period = 0", job.key)
@@ -304,8 +334,8 @@ constructor(
          * Updates (if needed) the service to use the new job.
          */
         fun update(
-                newJob: Job,
-                newSchedule: Schedule
+            newJob: Job,
+            newSchedule: Schedule,
         ) {
             // Checks the key of the job
             if (job.key != newJob.key) {
@@ -343,6 +373,7 @@ constructor(
                     override fun onStart() {
                         logger.debug("[job][task]{} On start", job.key)
                         lastRunDate.set(Time.now())
+                        startTime.set(System.currentTimeMillis())
                         runCount.incrementAndGet()
                         jobListener.onJobStart(job.key)
                     }
@@ -353,11 +384,13 @@ constructor(
                         jobListener.onJobEnd(job.key, duration)
                         lastErrorCount.set(0)
                         lastError.set(null)
+                        lastTimeoutCount.set(0)
                     }
 
                     override fun onFailure(ex: Exception) {
                         lastErrorCount.incrementAndGet()
                         lastError.set(ex.message)
+                        lastTimeoutCount.set(0)
                         logger.debug("[job][task]{} Failure: {}", job.key, ex.message)
                         try {
                             jobListener.onJobError(jobStatus, ex)
@@ -369,6 +402,7 @@ constructor(
 
                     override fun onCompletion() {
                         runProgress.set(null)
+                        startTime.set(0)
                         logger.debug("[job][task]{} Job completed.", job.key)
                         jobListener.onJobComplete(job.key)
                     }
@@ -380,22 +414,23 @@ constructor(
             get() {
                 val valid = job.isValid
                 return JobStatus(
-                        id,
-                        job.key,
-                        schedule,
-                        actualSchedule,
-                        job.description,
-                        currentExecution.get() != null,
-                        valid,
-                        paused.get(),
-                        job.isDisabled,
-                        runProgress.get(),
-                        runCount.get(),
-                        lastRunDate.get(),
-                        lastRunDurationMs.get(),
-                        getNextRunDate(valid),
-                        lastErrorCount.get(),
-                        lastError.get()
+                    id = id,
+                    key = job.key,
+                    schedule = schedule,
+                    actualSchedule = actualSchedule,
+                    description = job.description,
+                    isRunning = currentExecution.get() != null,
+                    isValid = valid,
+                    isPaused = paused.get(),
+                    isDisabled = job.isDisabled,
+                    progress = runProgress.get(),
+                    runCount = runCount.get(),
+                    lastRunDate = lastRunDate.get(),
+                    lastRunDurationMs = lastRunDurationMs.get(),
+                    nextRunDate = getNextRunDate(valid),
+                    lastErrorCount = lastErrorCount.get(),
+                    lastTimeoutCount = lastTimeoutCount.get(),
+                    lastError = lastError.get()
                 )
             }
 
@@ -435,6 +470,50 @@ constructor(
             }
         }
 
+        /**
+         * Checks if the job is in timeout and if yes, [stops][stop] it.
+         *
+         * @return True if the job _was_ in timeout and had to be stopped.
+         */
+        fun checkForTimeout(): Boolean {
+            val timeout = job.timeout ?: this@DefaultJobScheduler.timeout
+            return if (timeout != null) {
+                // Is this job running?
+                if (currentExecution.get() != null) {
+                    // We take the actual start date of the run
+                    val start = startTime.get()
+                    if (start != 0L) {
+                        // Current execution time of this job
+                        val executionTime = System.currentTimeMillis() - start
+                        // If this time exceeds the timeout
+                        if (executionTime >= timeout.toMillis()) {
+                            // We stop the job
+                            stop()
+                            // Metrics for this job
+                            lastTimeoutCount.incrementAndGet()
+                            // We assume it's been stopped
+                            true
+                        }
+                        // Still under the timeout, we keep running
+                        else {
+                            false
+                        }
+                    } else {
+                        // Not started yet, won't be stopped
+                        false
+                    }
+                }
+                // Job is not running, won't be stopped
+                else {
+                    false
+                }
+            }
+            // No timeout, so won't be stopped
+            else {
+                false
+            }
+        }
+
         fun stop(): Boolean {
             logger.debug("[job]{} Stopping job", job.key)
             return currentExecution.updateAndGet { current ->
@@ -454,8 +533,8 @@ constructor(
         private fun getNextRunDate(valid: Boolean): LocalDateTime? {
             return if (valid) {
                 scheduledFuture
-                        ?.getDelay(TimeUnit.SECONDS)
-                        ?.let { Time.now().plus(it, ChronoUnit.SECONDS) }
+                    ?.getDelay(TimeUnit.SECONDS)
+                    ?.let { Time.now().plus(it, ChronoUnit.SECONDS) }
             } else {
                 null
             }
@@ -480,8 +559,8 @@ constructor(
             override fun progress(progress: JobRunProgress) {
                 jobListener.onJobProgress(job.key, progress)
                 logger.debug("[job][progress]{} {}",
-                        job.key,
-                        progress.text
+                    job.key,
+                    progress.text
                 )
                 runProgress.set(progress)
             }

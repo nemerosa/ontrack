@@ -36,5 +36,10 @@ class JobConfigProperties {
      */
     @DurationUnit(ChronoUnit.HOURS)
     var timeout: Duration = Duration.ofHours(4)
+    /**
+     * Amount of time to wait between two controls of the job timeouts
+     */
+    @DurationUnit(ChronoUnit.MINUTES)
+    var timeoutControllerInterval: Duration = Duration.ofMinutes(15)
 
 }

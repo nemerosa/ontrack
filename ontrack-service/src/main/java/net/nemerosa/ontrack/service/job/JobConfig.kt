@@ -50,6 +50,7 @@ class JobConfig(
             scatteringRatio = jobConfigProperties.scatteringRatio,
             meterRegistry = meterRegistry,
             timeout = jobConfigProperties.timeout,
+            timeoutControllerInterval = jobConfigProperties.timeoutControllerInterval,
         )
     }
 }

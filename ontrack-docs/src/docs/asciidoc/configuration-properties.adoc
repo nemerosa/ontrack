@@ -76,6 +76,9 @@ ontrack.config.jobs.scattering-ratio = 1.0
 # It defaults to 4 hours
 ontrack.config.jobs.timeout = 4h
 
+# Amount of time to wait between two controls of the job timeouts
+ontrack.config.jobs.timeout-controller-interval = 15m
+
 # Confidential store for the encryption keys
 ontrack.config.key-store = file
 

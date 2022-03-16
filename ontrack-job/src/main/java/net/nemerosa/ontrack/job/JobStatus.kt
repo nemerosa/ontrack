@@ -18,6 +18,7 @@ open class JobStatus(
         val lastRunDurationMs: Long,
         val nextRunDate: LocalDateTime?,
         val lastErrorCount: Long,
+        val lastTimeoutCount: Long,
         val lastError: String?
 ) {
     val state: JobState
@@ -35,6 +36,9 @@ open class JobStatus(
 
     val isError: Boolean
         get() = lastErrorCount > 0
+
+    val isTimeout: Boolean
+        get() = lastTimeoutCount > 0
 
     val progressText: String
         get() = progress?.text ?: ""
