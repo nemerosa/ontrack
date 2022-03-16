@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.job;
 
+import org.jetbrains.annotations.Nullable;
+
+import java.time.Duration;
+
 public interface Job {
 
     /**
@@ -21,6 +25,16 @@ public interface Job {
      * Is the job disabled for the next run?
      */
     boolean isDisabled();
+
+    /**
+     * Optional timeout for running this job.
+     * <p>
+     * If null (the default), no timeout is defined by the job but general settings may apply.
+     */
+    default @Nullable
+    Duration getTimeout() {
+        return null;
+    }
 
     /**
      * This method is called to see if the job is still valid. It is called prior any execution
