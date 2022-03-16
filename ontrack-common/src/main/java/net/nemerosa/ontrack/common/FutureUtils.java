@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.common;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Optional;
 import java.util.concurrent.*;
 
@@ -13,11 +15,11 @@ public abstract class FutureUtils {
         }
     }
 
-    public static <T> T wait(String message, Future<T> task) {
+    public static <T> T wait(String message, @NotNull Future<T> task) {
         return wait(message, task, 300);
     }
 
-    public static <T> T wait(String message, Future<T> task, long seconds) {
+    public static <T> T wait(String message, @NotNull Future<T> task, long seconds) {
         try {
             return task.get(seconds, TimeUnit.SECONDS);
         } catch (InterruptedException e) {

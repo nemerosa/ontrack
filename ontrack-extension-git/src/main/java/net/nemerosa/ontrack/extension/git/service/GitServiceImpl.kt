@@ -192,7 +192,13 @@ class GitServiceImpl(
     }
 
     protected fun syncAndWait(gitConfiguration: GitConfiguration): Any? {
-        return FutureUtils.wait("Synchronisation for " + gitConfiguration.name, sync(gitConfiguration, GitSynchronisationRequest.SYNC))
+        // Gets the sync job (might be null)
+        val sync = sync(gitConfiguration, GitSynchronisationRequest.SYNC)
+        return if (sync != null) {
+            FutureUtils.wait("Synchronisation for " + gitConfiguration.name, sync)
+        } else {
+            null
+        }
     }
 
     protected fun getRequiredProjectConfiguration(project: Project): GitConfiguration {
@@ -959,7 +965,7 @@ class GitServiceImpl(
         }
         // Going on
         false
-    }
+    } ?: false
 
     private fun <T> logTime(key: String, tags: List<Pair<String, *>> = emptyList(), code: () -> T): T {
         val start = System.currentTimeMillis()
