@@ -24,6 +24,22 @@ class GitConfigProperties {
     var pullRequests = GitPullRequestConfigProperties()
 
     /**
+     * Indexation configuration
+     */
+    var indexation = GitIndexationConfigProperties()
+
+    /**
+     * Indexation properties
+     */
+    class GitIndexationConfigProperties {
+        /**
+         * Timeout for the Git indexations
+         */
+        @DurationUnit(ChronoUnit.MINUTES)
+        var timeout: Duration = Duration.ofMinutes(30)
+    }
+
+    /**
      * General sync properties
      */
     class GitRemoteConfigProperties {

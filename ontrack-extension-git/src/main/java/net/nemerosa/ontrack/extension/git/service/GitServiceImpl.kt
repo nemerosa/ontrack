@@ -39,6 +39,7 @@ import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
 import java.lang.String.format
+import java.time.Duration
 import java.util.*
 import java.util.concurrent.Future
 import java.util.function.BiConsumer
@@ -818,6 +819,8 @@ class GitServiceImpl(
             override fun isDisabled(): Boolean {
                 return false
             }
+
+            override fun getTimeout() = gitConfigProperties.indexation.timeout
         }
     }
 

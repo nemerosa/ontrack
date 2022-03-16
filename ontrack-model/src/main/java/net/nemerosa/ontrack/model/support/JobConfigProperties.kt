@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.model.support
 
+import org.springframework.boot.convert.DurationUnit
+import java.time.Duration
+import java.time.temporal.ChronoUnit
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 
@@ -28,4 +31,10 @@ class JobConfigProperties {
     @Min(1)
     @Max(1)
     var scatteringRatio = 1.0
+    /**
+     * Global timeout for all the jobs.
+     */
+    @DurationUnit(ChronoUnit.HOURS)
+    var timeout: Duration = Duration.ofHours(4)
+
 }

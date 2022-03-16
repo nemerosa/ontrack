@@ -71,6 +71,11 @@ ontrack.config.jobs.scattering = false
 # the period of the job. Setting 0 would actually disable the scattering altogether.
 ontrack.config.jobs.scattering-ratio = 1.0
 
+# Global timeout for all jobs
+# Any job running longer than this time will be forcibly stopped
+# It defaults to 4 hours
+ontrack.config.jobs.timeout = 4h
+
 # Confidential store for the encryption keys
 ontrack.config.key-store = file
 
@@ -145,6 +150,9 @@ ontrack.config.extension.git.pull-requests.cleanup.disabling = 1
 
 # Days before deleting
 ontrack.config.extension.git.pull-requests.cleanup.deleting = 7
+
+# Timeout for the Git indexations
+ontrack.config.extension.git.indexation.timeout = 30m
 ----
 
 [[configuration-properties-github]]
