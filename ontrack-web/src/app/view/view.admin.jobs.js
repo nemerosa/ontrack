@@ -10,7 +10,7 @@ angular.module('ot.view.admin.jobs', [
             controller: 'AdminJobsCtrl'
         });
     })
-    .controller('AdminJobsCtrl', function ($scope, $http, ot, otAlertService, otTaskService, otNotificationService) {
+    .controller('AdminJobsCtrl', function ($scope, $http, $location, ot, otAlertService, otTaskService, otNotificationService) {
         const view = ot.view();
         view.title = "System jobs";
         view.description = "Tools for the management of system background jobs";
@@ -46,6 +46,7 @@ angular.module('ot.view.admin.jobs', [
                 errorOnly: false,
                 timeoutOnly: false,
             };
+            $location.hash('');
             loadJobs();
         };
 
@@ -79,17 +80,53 @@ angular.module('ot.view.admin.jobs', [
             }
         };
 
+        // Search button
+        $scope.filterJobs = () => {
+            // Filter in the page hash
+            const filter = {};
+            if ($scope.jobFilter.state) filter.state = $scope.jobFilter.state.name;
+            if ($scope.jobFilter.category) filter.category = $scope.jobFilter.category.name;
+            if ($scope.jobFilter.type) filter.type = $scope.jobFilter.type.name;
+            if ($scope.jobFilter.description) filter.category = $scope.jobFilter.description;
+            if ($scope.jobFilter.errorOnly) filter.errorOnly = $scope.jobFilter.errorOnly;
+            if ($scope.jobFilter.timeoutOnly) filter.timeoutOnly = $scope.jobFilter.timeoutOnly;
+            $location.hash(JSON.stringify(filter));
+            // Loading the jobs
+            loadJobs();
+        };
+
         // Loads the jobs
         $scope.loadJobs = () => {
             $scope.page = {};
             loadJobs();
         };
 
+        let hashFilterLoaded = false;
+
         function loadJobs() {
             $scope.loadingJobs = true;
             ot.pageCall($http.get('rest/admin/jobs/filter'))
                 .then(jobFilterResources => {
                     $scope.jobFilterResources = jobFilterResources;
+
+                    // Preloads the filter from the hash
+                    if (!hashFilterLoaded) {
+                        hashFilterLoaded = true;
+                        const hashFilter = $location.hash();
+                        if (hashFilter) {
+                            const filter = JSON.parse(hashFilter);
+                            if (filter) {
+                                $scope.jobFilter.state = jobFilterResources.states.find(state => state.name === filter.state);
+                                $scope.jobFilter.category = jobFilterResources.categories.find(category => category.name === filter.category);
+                                if ($scope.jobFilter.category) {
+                                    $scope.jobFilter.type = jobFilterResources.types[$scope.jobFilter.category.name].find(type => type.name === filter.type);
+                                }
+                                $scope.jobFilter.errorOnly = filter.errorOnly === true;
+                                $scope.jobFilter.timeoutOnly = filter.timeoutOnly === true;
+                            }
+                        }
+                    }
+
                     // Parameters
                     const params = {};
                     params.state = $scope.jobFilter.state ? $scope.jobFilter.state.name : undefined;
