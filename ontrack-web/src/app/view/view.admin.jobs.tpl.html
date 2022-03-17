@@ -225,6 +225,7 @@
                     <th>Run count</th>
                     <th>Last duration</th>
                     <th>Error(s)</th>
+                    <th>Timeout(s)</th>
                     <th>Last run</th>
                     <th>Next run</th>
                 </tr>
@@ -298,6 +299,13 @@
                         <span ng-if="job.lastErrorCount > 0" title="{{job.lastError}}">
                             <span class="fa fa-times text-danger"></span>
                             {{job.lastErrorCount}}
+                        </span>
+                    </td>
+                    <td>
+                        <span ng-if="job.lastTimeoutCount == 0">-</span>
+                        <span ng-if="job.lastTimeoutCount > 0">
+                            <span class="fa fa-warning text-warning"></span>
+                            {{job.lastTimeoutCount}}
                         </span>
                     </td>
                     <td>
