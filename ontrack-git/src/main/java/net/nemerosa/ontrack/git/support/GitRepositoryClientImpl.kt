@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.git.support
 
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.Utils
 import net.nemerosa.ontrack.git.GitRepository
@@ -65,7 +67,11 @@ class GitRepositoryClientImpl(
         setTimeout(timeout.toSeconds().toInt())
         // Runs with retries
         return GitConnectionRetry.retry(message, retries, interval) {
-            call()
+            runBlocking {
+                withTimeout(timeout.toMillis()) {
+                    call()
+                }
+            }
         }
     }
 
@@ -262,7 +268,7 @@ class GitRepositoryClientImpl(
         branch: String,
         commit: String,
         include: Boolean,
-        code: (RevCommit) -> T?
+        code: (RevCommit) -> T?,
     ): T? {
         try {
             val gitRepository = git.repository
