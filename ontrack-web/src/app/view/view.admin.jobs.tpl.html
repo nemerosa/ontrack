@@ -88,6 +88,24 @@
                         </ul>
                     </div>
 
+                    <!-- Timeout filter -->
+                    <div class="form-group dropdown">
+                        <button type="button" class="btn dropdown-toggle" data-toggle="dropdown"
+                                ng-class="{
+                                    'btn-info': jobFilter.timeoutOnly,
+                                    'btn-default': !jobFilter.timeoutOnly
+                                    }">
+                            {{jobFilter.timeoutOnly ? "Jobs in timeout" : "Any timeout status"}}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a class="ot-action" ng-click="jobFilter.timeoutOnly = false;">Any timeout status</a>
+                                <a class="ot-action" ng-click="jobFilter.timeoutOnly = true;">Jobs in timeout</a>
+                            </li>
+                        </ul>
+                    </div>
+
                     <!-- Description filter (text box) -->
                     <div class="form-group">
                         <input class="form-control col-md-4" type="text" ng-model="jobFilter.description"

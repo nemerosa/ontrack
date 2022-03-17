@@ -9,7 +9,8 @@ class JobFilter(
         var category: String? = null,
         var type: String? = null,
         var description: String? = null,
-        var errorOnly: Boolean? = null
+        var errorOnly: Boolean? = null,
+        var timeoutOnly: Boolean? = null,
 ) {
     fun filter(statuses: Collection<JobStatus>) =
             statuses.filter {
@@ -17,7 +18,8 @@ class JobFilter(
                         (category == null || category == it.key.type.category.key) &&
                         (type == null || type == it.key.type.key) &&
                         (description == null || StringUtils.containsIgnoreCase(it.description, description)) &&
-                        (errorOnly == null || !errorOnly!! || it.isError)
+                        (errorOnly == null || !errorOnly!! || it.isError) &&
+                        (timeoutOnly == null || !timeoutOnly!! || it.isTimeout)
             }
 
 }

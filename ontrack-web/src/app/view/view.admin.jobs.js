@@ -21,7 +21,8 @@ angular.module('ot.view.admin.jobs', [
             category: undefined,
             type: undefined,
             description: '',
-            errorOnly: false
+            errorOnly: false,
+            timeoutOnly: false,
         };
 
         // Current page
@@ -42,7 +43,8 @@ angular.module('ot.view.admin.jobs', [
                 category: undefined,
                 type: undefined,
                 description: '',
-                errorOnly: false
+                errorOnly: false,
+                timeoutOnly: false,
             };
             loadJobs();
         };
@@ -95,6 +97,7 @@ angular.module('ot.view.admin.jobs', [
                     params.type = $scope.jobFilter.type ? $scope.jobFilter.type.name : undefined;
                     params.description = $scope.jobFilter.description ? $scope.jobFilter.description : undefined;
                     params.errorOnly = $scope.jobFilter.errorOnly ? $scope.jobFilter.errorOnly : undefined;
+                    params.timeoutOnly = $scope.jobFilter.timeoutOnly ? $scope.jobFilter.timeoutOnly : undefined;
                     params.offset = $scope.page.offset ? $scope.page.offset : 0;
                     params.count = $scope.page.count ? $scope.page.count : 30;
                     // Call
