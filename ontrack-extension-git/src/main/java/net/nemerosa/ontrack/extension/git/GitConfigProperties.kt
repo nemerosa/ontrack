@@ -44,12 +44,21 @@ class GitConfigProperties {
      */
     class GitRemoteConfigProperties {
         /**
-         * Timeout (by default in seconds) for a given remote operation (like fetch & clone)
+         * Timeout (by default in seconds) for a given remote operation to start (like fetch & clone)
          *
          * Leave 0 to use the default system value. Set to 60 seconds by default.
+         *
+         * This timeout is used for the _connection_ part, not the total duration of the operation.
          */
         @DurationUnit(ChronoUnit.SECONDS)
         var timeout: Duration = Duration.ofSeconds(60)
+        /**
+         * Timeout (by default in minutes) for a given remote operation to _complete_ (like fetch & clone)
+         *
+         * Set to 10 minutes by default.
+         */
+        @DurationUnit(ChronoUnit.SECONDS)
+        var operationTimeout: Duration = Duration.ofMinutes(10)
 
         /**
          * Number of retries to run when there is a timeout.

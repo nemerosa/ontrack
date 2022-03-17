@@ -15,6 +15,7 @@ class GitRepositoryClientFactoryImpl(
     private val root: File,
     private val cacheManager: CacheManager,
     private val timeout: Duration = Duration.ofSeconds(60),
+    private val operationTimeout: Duration = Duration.ofMinutes(10),
     private val retries: UInt = 3u,
     private val interval: Duration = Duration.ofSeconds(30),
 ) : GitRepositoryClientFactory {
@@ -61,7 +62,14 @@ class GitRepositoryClientFactoryImpl(
         }
 
         // Creates the client
-        return GitRepositoryClientImpl(repositoryDir, repository, timeout, retries, interval)
+        return GitRepositoryClientImpl(
+            repositoryDir = repositoryDir,
+            repository = repository,
+            timeout = timeout,
+            operationTimeout = operationTimeout,
+            retries = retries,
+            interval = interval
+        )
     }
 
 }

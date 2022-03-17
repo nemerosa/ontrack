@@ -21,6 +21,7 @@ class GitConfig(
             root = repositories,
             cacheManager = cacheManager,
             timeout = gitConfigProperties.remote.timeout,
+            operationTimeout = gitConfigProperties.remote.operationTimeout,
             retries = gitConfigProperties.remote.retries,
             interval = gitConfigProperties.remote.interval,
         )
