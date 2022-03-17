@@ -31,7 +31,7 @@ constructor(
     private val scatteringRatio: Double,
     private val meterRegistry: MeterRegistry? = null,
     private val timeout: Duration? = null,
-    private val timeoutControllerInterval: Duration? = null,
+    timeoutControllerInterval: Duration? = null,
 ) : JobScheduler {
 
     private val logger = LoggerFactory.getLogger(JobScheduler::class.java)
@@ -120,12 +120,13 @@ constructor(
     }
 
     private fun createTimeoutControllerJob() = Runnable {
-        // Loop over all jobs
-        val stopped = services.values.count { jobScheduledService ->
-            // And checks them for timeout
-            jobScheduledService.checkForTimeout()
-        }
+        val stopped = checkForTimeouts()
         logger.debug("[scheduler] $stopped job(s) have been stopped because of timeout")
+    }
+
+    override fun checkForTimeouts(): Int = services.values.count { jobScheduledService ->
+        // And checks them for timeout
+        jobScheduledService.checkForTimeout()
     }
 
     override fun schedule(job: Job, schedule: Schedule) {
@@ -484,9 +485,16 @@ constructor(
                     val start = startTime.get()
                     if (start != 0L) {
                         // Current execution time of this job
-                        val executionTime = System.currentTimeMillis() - start
+                        val now = System.currentTimeMillis()
+                        val elapsed = now - start
+                        // logger.debug("[job][timeout]{} Timeout - start:   {}", job.key, start)
+                        // logger.debug("[job][timeout]{} Timeout - now:     {}", job.key, now)
+                        // logger.debug("[job][timeout]{} Timeout - elasped: {}", job.key, elapsed)
+                        // logger.debug("[job][timeout]{} Timeout - timeout: {}", job.key, timeout.toMillis())
                         // If this time exceeds the timeout
-                        if (executionTime >= timeout.toMillis()) {
+                        if (elapsed >= timeout.toMillis()) {
+                            // Logging
+                            logger.info("[job][timeout]{} Timeout - stopping the job", job.key)
                             // We stop the job
                             stop()
                             // Metrics for this job
@@ -496,20 +504,24 @@ constructor(
                         }
                         // Still under the timeout, we keep running
                         else {
+                            logger.debug("[job][timeout]{} Timeout - still OK", job.key)
                             false
                         }
                     } else {
                         // Not started yet, won't be stopped
+                        logger.debug("[job][timeout]{} Timeout - not started", job.key)
                         false
                     }
                 }
                 // Job is not running, won't be stopped
                 else {
+                    logger.debug("[job][timeout]{} Timeout - not running", job.key)
                     false
                 }
             }
             // No timeout, so won't be stopped
             else {
+                logger.debug("[job][timeout]{} Timeout - not configured for timeout", job.key)
                 false
             }
         }

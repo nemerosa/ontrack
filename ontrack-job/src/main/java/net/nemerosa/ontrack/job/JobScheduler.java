@@ -123,4 +123,11 @@ public interface JobScheduler {
      * @return <code>true</code> if the scheduler is paused.
      */
     boolean isPaused();
+
+    /**
+     * Checks for the timeouts
+     *
+     * @return Number of jobs which were stopped because of a timeout
+     */
+    int checkForTimeouts();
 }
