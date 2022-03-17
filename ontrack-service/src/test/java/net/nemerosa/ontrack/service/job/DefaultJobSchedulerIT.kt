@@ -7,7 +7,9 @@ import net.nemerosa.ontrack.job.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.Duration
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class DefaultJobSchedulerIT : AbstractServiceTestSupport() {
@@ -52,6 +54,13 @@ class DefaultJobSchedulerIT : AbstractServiceTestSupport() {
         assertTrue(count > 0, "At least some tasks had started to run")
         assertFalse(completed, "The job was interrupted")
         assertTrue(stopped > 0, "At least one job was stopped")
+
+        // Gets the statuses and controls that the timeout counter has increased for this job
+        val status = jobScheduler.jobStatuses.find { it.key == longRunningJob.key }
+        assertNotNull(status, "Getting the status of the job") {
+            assertEquals(1, it.lastTimeoutCount, "One timeout event")
+            assertTrue(it.isTimeout, "Marked as in timeout")
+        }
 
     }
 
