@@ -18,6 +18,37 @@ class DefaultJobSchedulerIT : AbstractServiceTestSupport() {
     private lateinit var jobScheduler: JobScheduler
 
     @Test
+    fun `Job cron schedule`() {
+        var count = 0
+        val task = object : Job {
+            override fun getKey(): JobKey = JobCategory.of("test").getType("jobs").getKey("cron")
+
+            override fun getTask() = JobRun {
+                println("Cron (${++count})")
+            }
+
+            override fun getDescription(): String = "Cron job"
+
+            override fun isDisabled(): Boolean = false
+        }
+        jobScheduler.schedule(task, Schedule.cron("* * * * * *")) // Every second
+        runBlocking {
+            delay(3_000) // Waiting 3 seconds
+        }
+        // Checks that the job has run
+        val stopCount = count
+        assertTrue(stopCount >= 2, "The job has run at least twice")
+        // Unscheduling the job
+        jobScheduler.unschedule(task.key)
+        // Waiting a bit
+        runBlocking {
+            delay(1_500) // Waiting 1.5 seconds
+        }
+        // Check the count has not changed
+        assertEquals(stopCount, count, "The job has stopped running")
+    }
+
+    @Test
     fun `Job timeout`() {
         var count = 0
         var completed = false
