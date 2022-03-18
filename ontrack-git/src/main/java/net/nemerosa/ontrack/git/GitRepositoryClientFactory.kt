@@ -7,4 +7,9 @@ interface GitRepositoryClientFactory {
      */
     fun getClient(repository: GitRepository): GitRepositoryClient
 
+    /**
+     * Resets all repositories, forcing them to be closed again.
+     */
+    fun reset()
+
 }

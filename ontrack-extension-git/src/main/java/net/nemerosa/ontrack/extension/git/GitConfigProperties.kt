@@ -37,6 +37,26 @@ class GitConfigProperties {
          */
         @DurationUnit(ChronoUnit.MINUTES)
         var timeout: Duration = Duration.ofMinutes(30)
+
+        /**
+         * Cleanup job configuration
+         */
+        var cleanup = GitIndexationCleanupConfigProperties()
+    }
+
+    /**
+     * Git indexation cleanup configuration properties
+     */
+    class GitIndexationCleanupConfigProperties {
+        /**
+         * Is the cleanup job enabled?
+         */
+        var enabled = true
+
+        /**
+         * Cron for the job (empty to let it run manually)
+         */
+        var cron: String = ""
     }
 
     /**
@@ -52,6 +72,7 @@ class GitConfigProperties {
          */
         @DurationUnit(ChronoUnit.SECONDS)
         var timeout: Duration = Duration.ofSeconds(60)
+
         /**
          * Timeout (by default in minutes) for a given remote operation to _complete_ (like fetch & clone)
          *

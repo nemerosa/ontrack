@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.git.exceptions.GitRepositoryDirException
 import org.apache.commons.io.FileUtils
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import java.io.File
 import java.io.IOException
@@ -24,7 +26,29 @@ class GitRepositoryClientFactoryImpl(
         const val CACHE_GIT_REPOSITORY_CLIENT = "gitRepositoryClient"
     }
 
+    private val logger: Logger = LoggerFactory.getLogger(GitRepositoryClientFactoryImpl::class.java)
+
     private val lock = ReentrantLock()
+
+    override fun reset() {
+        lock.lock()
+        try {
+            // Removing all directories
+            root.listFiles()?.forEach { f ->
+                if (f.isDirectory) {
+                    val name = f.name
+                    try {
+                        FileUtils.deleteDirectory(f)
+                        logger.debug("Deleted $name")
+                    } catch (any: Exception) {
+                        logger.error("Cannot delete $name", any)
+                    }
+                }
+            }
+        } finally {
+            lock.unlock()
+        }
+    }
 
     override fun getClient(repository: GitRepository): GitRepositoryClient {
         val remote = repository.remote
