@@ -1,12 +1,13 @@
 package net.nemerosa.ontrack.job.support
 
-import io.mockk.mockk
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.test.assertPresent
 import org.junit.After
 import org.junit.Before
+import java.time.Duration
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
 abstract class AbstractJobTest {
@@ -18,7 +19,24 @@ abstract class AbstractJobTest {
     @Before
     fun before() {
         schedulerPool = SynchronousScheduledExecutorService()
-        scheduler = mockk()
+        scheduler = object : TaskExecutor {
+
+            override fun scheduleAtFixedDelay(
+                task: Runnable,
+                initialDelay: Duration,
+                delay: Duration,
+            ): ScheduledFuture<*> =
+                schedulerPool.scheduleWithFixedDelay(
+                    task,
+                    initialDelay.toMillis(),
+                    delay.toMillis(),
+                    TimeUnit.MILLISECONDS
+                )
+
+            override fun scheduleCron(task: Runnable, cron: String): ScheduledFuture<*>? {
+                error("Cron scheduling not implemented for tests.")
+            }
+        }
         jobPool = SynchronousScheduledExecutorService()
     }
 
