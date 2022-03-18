@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.job.*
 import org.apache.commons.lang3.Validate
 import org.slf4j.LoggerFactory
-import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.support.CronTrigger
 import java.time.Duration
 import java.time.LocalDateTime
@@ -25,7 +24,7 @@ class DefaultJobScheduler
 @JvmOverloads
 constructor(
     private val jobDecorator: JobDecorator,
-    private val scheduler: TaskScheduler,
+    private val scheduler: TaskExecutor,
     private val jobListener: JobListener,
     initiallyPaused: Boolean,
     private val jobExecutorService: Executor,
@@ -88,9 +87,9 @@ constructor(
         }
         // Scheduling the timeout controller job
         if (timeoutControllerInterval != null) {
-            scheduler.scheduleAtFixedRate(
+            scheduler.scheduleAtFixedDelay(
                 createTimeoutControllerJob(),
-                Time.now().plus(timeoutControllerInterval).toInstant(ZoneOffset.UTC),
+                timeoutControllerInterval,
                 timeoutControllerInterval
             )
         }
@@ -292,9 +291,9 @@ constructor(
                 )
                 // Scheduling now
                 scheduledFuture = if (schedule.period > 0) {
-                    scheduler.scheduleWithFixedDelay(
+                    scheduler.scheduleAtFixedDelay(
                         this,
-                        Time.now().plus(initialPeriod, ChronoUnit.MILLIS).toInstant(ZoneOffset.UTC),
+                        Duration.ofMillis(initialPeriod),
                         Duration.ofMillis(period)
                     )
                 } else {
@@ -302,7 +301,7 @@ constructor(
                     null
                 }
             } else {
-                scheduledFuture = scheduler.schedule(this, CronTrigger(cron))
+                scheduledFuture = scheduler.scheduleCron(this, cron)
             }
         }
 

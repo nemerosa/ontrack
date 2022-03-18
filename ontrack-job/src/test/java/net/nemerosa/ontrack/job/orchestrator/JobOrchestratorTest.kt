@@ -3,13 +3,13 @@ package net.nemerosa.ontrack.job.orchestrator
 import io.mockk.mockk
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.job.orchestrator.TestJob.Companion.getKey
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.Executors
 import net.nemerosa.ontrack.job.support.DefaultJobScheduler
-import java.lang.RuntimeException
+import net.nemerosa.ontrack.job.support.TaskExecutor
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 import java.util.function.Supplier
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -18,11 +18,13 @@ import kotlin.test.assertTrue
 
 class JobOrchestratorTest {
 
+    private lateinit var taskExecutor: TaskExecutor
     private lateinit var scheduledExecutorService: ScheduledExecutorService
 
     @Before
     fun before() {
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
+        taskExecutor = mockk()
     }
 
     @After
@@ -31,9 +33,10 @@ class JobOrchestratorTest {
     }
 
     private fun createJobScheduler(): JobScheduler = DefaultJobScheduler(
-        NOPJobDecorator.INSTANCE,
-        scheduledExecutorService,
-        OutputJobListener { x: String? -> println(x) },
+        jobDecorator = NOPJobDecorator.INSTANCE,
+        scheduler = taskExecutor,
+        jobExecutorService = scheduledExecutorService,
+        jobListener = OutputJobListener { x: String? -> println(x) },
         initiallyPaused = false,
         scattering = false,
         scatteringRatio = 1.0

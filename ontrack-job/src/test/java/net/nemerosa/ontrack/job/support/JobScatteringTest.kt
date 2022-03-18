@@ -7,7 +7,9 @@ import net.nemerosa.ontrack.job.Schedule.Companion.everyMinutes
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
+import org.junit.Before
 import org.junit.Test
+import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 import kotlin.test.assertEquals
@@ -16,13 +18,23 @@ import kotlin.test.assertTrue
 
 class JobScatteringTest {
 
+    private lateinit var taskExecutor: TaskExecutor
+    private lateinit var jobExecutorService: Executor
+
+    @Before
+    fun init() {
+        taskExecutor = mockk()
+        jobExecutorService = mockk()
+    }
+
     @Test
     fun scatteredScheduleDisabled() {
         val scheduler = DefaultJobScheduler(
             NOPJobDecorator.INSTANCE,
-            SynchronousScheduledExecutorService(),
+            taskExecutor,
             NOPJobListener.INSTANCE,
             initiallyPaused = false,
+            jobExecutorService = jobExecutorService,
             scattering = false,
             scatteringRatio = 1.0
         )
@@ -44,8 +56,9 @@ class JobScatteringTest {
     fun scatteredScheduleEnabled() {
         val scheduler = DefaultJobScheduler(
             NOPJobDecorator.INSTANCE,
-            SynchronousScheduledExecutorService(),
-            NOPJobListener.INSTANCE,
+            scheduler = taskExecutor,
+            jobExecutorService = jobExecutorService,
+            jobListener = NOPJobListener.INSTANCE,
             initiallyPaused = false,
             scattering = true,
             scatteringRatio = 0.5
@@ -70,8 +83,9 @@ class JobScatteringTest {
     fun scatteredScheduleEnabledWithInitialDelay() {
         val scheduler = DefaultJobScheduler(
             NOPJobDecorator.INSTANCE,
-            SynchronousScheduledExecutorService(),
-            NOPJobListener.INSTANCE,
+            scheduler = taskExecutor,
+            jobExecutorService = jobExecutorService,
+            jobListener = NOPJobListener.INSTANCE,
             initiallyPaused = false,
             scattering = true,
             scatteringRatio = 0.5
@@ -96,8 +110,9 @@ class JobScatteringTest {
     fun scatteredScheduleEnabledWithNoSchedule() {
         val scheduler = DefaultJobScheduler(
             NOPJobDecorator.INSTANCE,
-            SynchronousScheduledExecutorService(),
-            NOPJobListener.INSTANCE,
+            scheduler = taskExecutor,
+            jobExecutorService = jobExecutorService,
+            jobListener = NOPJobListener.INSTANCE,
             initiallyPaused = false,
             scattering = true,
             scatteringRatio = 0.5
@@ -121,8 +136,9 @@ class JobScatteringTest {
         // Scheduler
         val scheduler = DefaultJobScheduler(
             NOPJobDecorator.INSTANCE,
-            SynchronousScheduledExecutorService(),
-            NOPJobListener.INSTANCE,
+            scheduler = taskExecutor,
+            jobExecutorService = jobExecutorService,
+            jobListener = NOPJobListener.INSTANCE,
             initiallyPaused = false,
             scattering = true,
             scatteringRatio = 1.0

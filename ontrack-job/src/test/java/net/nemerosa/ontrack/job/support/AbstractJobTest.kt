@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.job.support
 
+import io.mockk.mockk
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.test.assertPresent
 import org.junit.After
@@ -7,16 +8,17 @@ import org.junit.Before
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
-import java.util.function.BiFunction
 
 abstract class AbstractJobTest {
 
+    protected lateinit var scheduler: TaskExecutor
     protected lateinit var schedulerPool: SynchronousScheduledExecutorService
     protected lateinit var jobPool: SynchronousScheduledExecutorService
 
     @Before
     fun before() {
         schedulerPool = SynchronousScheduledExecutorService()
+        scheduler = mockk()
         jobPool = SynchronousScheduledExecutorService()
     }
 
@@ -43,18 +45,18 @@ abstract class AbstractJobTest {
 
     private fun createJobScheduler(initiallyPaused: Boolean): JobScheduler {
         return DefaultJobScheduler(
-                NOPJobDecorator.INSTANCE,
-                schedulerPool,
-                NOPJobListener.INSTANCE,
-                initiallyPaused,
-                BiFunction { _, _ -> jobPool },
-                false,
-                1.0
+            jobDecorator = NOPJobDecorator.INSTANCE,
+            scheduler = scheduler,
+            jobListener = NOPJobListener.INSTANCE,
+            initiallyPaused = initiallyPaused,
+            jobExecutorService = jobPool,
+            scattering = false,
+            scatteringRatio = 1.0
         )
     }
 
     inner class JobSchedulerContext(
-            val scheduler: JobScheduler
+        val scheduler: JobScheduler,
     ) {
         fun job(schedule: Schedule): ConfigurableJob {
             val job = ConfigurableJob()
