@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.job.*
 import org.apache.commons.lang3.Validate
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.TaskScheduler
+import org.springframework.scheduling.support.CronTrigger
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -264,39 +265,44 @@ constructor(
         }
 
         private fun createSchedule() {
-            // Converting all units to milliseconds
-            var initialPeriod = TimeUnit.MILLISECONDS.convert(schedule.initialPeriod, schedule.unit)
-            val period = TimeUnit.MILLISECONDS.convert(schedule.period, schedule.unit)
-            // Scattering
-            if (scattering) {
-                // Computes the hash for the job key
-                val hash = abs(job.key.toString().hashCode()) % 10000
-                // Period to consider
-                val scatteringMax = (period * scatteringRatio).toLong()
-                if (scatteringMax > 0) {
-                    // Modulo on the period
-                    val delay = hash * scatteringMax / 10000
-                    logger.debug("[job]{} Scattering enabled - additional delay: {} ms", job.key, delay)
-                    // Adding to the initial delay
-                    initialPeriod += delay
+            val cron = schedule.cron
+            if (cron == null || cron.isBlank()) {
+                // Converting all units to milliseconds
+                var initialPeriod = TimeUnit.MILLISECONDS.convert(schedule.initialPeriod, schedule.unit)
+                val period = TimeUnit.MILLISECONDS.convert(schedule.period, schedule.unit)
+                // Scattering
+                if (scattering) {
+                    // Computes the hash for the job key
+                    val hash = abs(job.key.toString().hashCode()) % 10000
+                    // Period to consider
+                    val scatteringMax = (period * scatteringRatio).toLong()
+                    if (scatteringMax > 0) {
+                        // Modulo on the period
+                        val delay = hash * scatteringMax / 10000
+                        logger.debug("[job]{} Scattering enabled - additional delay: {} ms", job.key, delay)
+                        // Adding to the initial delay
+                        initialPeriod += delay
+                    }
                 }
-            }
-            // Actual schedule
-            actualSchedule = Schedule(
-                initialPeriod,
-                period,
-                TimeUnit.MILLISECONDS
-            )
-            // Scheduling now
-            scheduledFuture = if (schedule.period > 0) {
-                scheduler.scheduleWithFixedDelay(
-                    this,
-                    Time.now().plus(initialPeriod, ChronoUnit.MILLIS).toInstant(ZoneOffset.UTC),
-                    Duration.ofMillis(period)
+                // Actual schedule
+                actualSchedule = Schedule(
+                    initialPeriod,
+                    period,
+                    TimeUnit.MILLISECONDS
                 )
+                // Scheduling now
+                scheduledFuture = if (schedule.period > 0) {
+                    scheduler.scheduleWithFixedDelay(
+                        this,
+                        Time.now().plus(initialPeriod, ChronoUnit.MILLIS).toInstant(ZoneOffset.UTC),
+                        Duration.ofMillis(period)
+                    )
+                } else {
+                    logger.debug("[job]{} Job not scheduled since period = 0", job.key)
+                    null
+                }
             } else {
-                logger.debug("[job]{} Job not scheduled since period = 0", job.key)
-                null
+                scheduledFuture = scheduler.schedule(this, CronTrigger(cron))
             }
         }
 
