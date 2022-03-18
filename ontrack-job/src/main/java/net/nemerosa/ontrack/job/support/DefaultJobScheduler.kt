@@ -5,15 +5,16 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.job.*
 import org.apache.commons.lang3.Validate
 import org.slf4j.LoggerFactory
+import org.springframework.scheduling.TaskScheduler
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
-import java.util.function.BiFunction
 import kotlin.math.abs
 
 /**
@@ -23,10 +24,10 @@ class DefaultJobScheduler
 @JvmOverloads
 constructor(
     private val jobDecorator: JobDecorator,
-    private val schedulerPool: ScheduledExecutorService,
+    private val scheduler: TaskScheduler,
     private val jobListener: JobListener,
     initiallyPaused: Boolean,
-    private val jobPoolProvider: BiFunction<ExecutorService, Job, ExecutorService>,
+    private val jobExecutorService: Executor,
     private val scattering: Boolean,
     private val scatteringRatio: Double,
     private val meterRegistry: MeterRegistry? = null,
@@ -40,30 +41,6 @@ constructor(
     private val schedulerPaused: AtomicBoolean
 
     private val idGenerator = AtomicLong()
-
-    @JvmOverloads
-    constructor(
-        jobDecorator: JobDecorator,
-        schedulerPool: ScheduledExecutorService,
-        jobListener: JobListener,
-        initiallyPaused: Boolean,
-        scattering: Boolean,
-        scatteringRatio: Double,
-        meterRegistry: MeterRegistry? = null,
-        timeout: Duration? = null,
-        timeoutControllerInterval: Duration? = null,
-    ) : this(
-        jobDecorator,
-        schedulerPool,
-        jobListener,
-        initiallyPaused,
-        BiFunction { executorService, _ -> executorService },
-        scattering,
-        scatteringRatio,
-        meterRegistry,
-        timeout,
-        timeoutControllerInterval
-    )
 
     private fun MeterRegistry.statusGauge(
         name: String,
@@ -110,11 +87,10 @@ constructor(
         }
         // Scheduling the timeout controller job
         if (timeoutControllerInterval != null) {
-            schedulerPool.scheduleAtFixedRate(
+            scheduler.scheduleAtFixedRate(
                 createTimeoutControllerJob(),
-                timeoutControllerInterval.toMillis(),
-                timeoutControllerInterval.toMillis(),
-                TimeUnit.MILLISECONDS
+                Time.now().plus(timeoutControllerInterval).toInstant(ZoneOffset.UTC),
+                timeoutControllerInterval
             )
         }
     }
@@ -145,10 +121,9 @@ constructor(
             logger.debug("[scheduler][job]{} Starting scheduled service", job.key)
             // Copy stats from old schedule
             val jobScheduledService = JobScheduledService(
-                job,
-                schedule,
-                schedulerPool,
-                jobListener.isPausedAtStartup(job.key)
+                initialJob = job,
+                initialSchedule = schedule,
+                pausedAtStartup = jobListener.isPausedAtStartup(job.key)
             )
             // Registration
             services[job.key] = jobScheduledService
@@ -254,14 +229,9 @@ constructor(
         return jobScheduledService.doRun(true)
     }
 
-    private fun getExecutorService(job: Job): ExecutorService {
-        return jobPoolProvider.apply(schedulerPool, job)
-    }
-
     private inner class JobScheduledService(
         initialJob: Job,
         initialSchedule: Schedule,
-        private val scheduledExecutorService: ScheduledExecutorService,
         pausedAtStartup: Boolean,
     ) : Runnable {
 
@@ -319,11 +289,10 @@ constructor(
             )
             // Scheduling now
             scheduledFuture = if (schedule.period > 0) {
-                scheduledExecutorService.scheduleWithFixedDelay(
+                scheduler.scheduleWithFixedDelay(
                     this,
-                    initialPeriod,
-                    period,
-                    TimeUnit.MILLISECONDS
+                    Time.now().plus(initialPeriod, ChronoUnit.MILLIS).toInstant(ZoneOffset.UTC),
+                    Duration.ofMillis(period)
                 )
             } else {
                 logger.debug("[job]{} Job not scheduled since period = 0", job.key)
@@ -456,11 +425,9 @@ constructor(
                 } else {
                     // Task to run
                     val taskRun = run
-                    // Gets the executor for this job
-                    val executor = getExecutorService(job)
                     // Scheduling
                     logger.debug("[job][run]{} Job task submitted asynchronously", job.key)
-                    val execution = CompletableFuture.runAsync(taskRun, executor)
+                    val execution = CompletableFuture.runAsync(taskRun, jobExecutorService)
                     currentExecution.set(execution)
                     return Optional.of(execution)
                 }
