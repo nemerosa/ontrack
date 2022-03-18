@@ -42,6 +42,7 @@ class JobConfig(
                 .namingPattern("job-%s")
                 .build()
         )
+        initialize()
     }
 
     @Bean
