@@ -6,10 +6,12 @@ import java.util.concurrent.TimeUnit
 data class Schedule(
         val initialPeriod: Long = 0,
         val period: Long,
-        val unit: TimeUnit
+        val unit: TimeUnit,
+        val cron: String? = null,
 ) {
     val periodText: String
         get() = when {
+            cron != null && cron.isNotBlank() -> cron
             period <= 0 -> "Manually"
             period == 1L -> "Every " + StringUtils.substringBeforeLast(unit.name.lowercase(), "s")
             else -> "Every " + period + " " + unit.name.lowercase()
@@ -18,6 +20,7 @@ data class Schedule(
     fun toMiliseconds(): Long = TimeUnit.MILLISECONDS.convert(period, unit)
 
     fun after(initial: Int): Schedule {
+        check(cron == null || cron.isBlank()) { "Setting an initial delay is not supported for cron schedules." }
         return Schedule(
                 initial.toLong(),
                 period,
@@ -26,6 +29,13 @@ data class Schedule(
     }
 
     companion object {
+
+        fun cron(expression: String) = Schedule(
+            initialPeriod = 0,
+            period = 0,
+            unit = TimeUnit.MILLISECONDS,
+            cron = expression,
+        )
 
         @JvmStatic
         fun everySeconds(seconds: Long): Schedule {
