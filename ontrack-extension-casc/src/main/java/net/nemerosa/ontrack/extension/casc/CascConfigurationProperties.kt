@@ -20,4 +20,24 @@ class CascConfigurationProperties {
      */
     var locations: List<String> = emptyList()
 
+    /**
+     * Reloading configuration
+     */
+    var reloading = CascReloadingConfigurationProperties()
+
+    /**
+     * Reloading configuration
+     */
+    class CascReloadingConfigurationProperties {
+        /**
+         * Enables the creation of a job to reload the CasC.
+         */
+        var enabled = false;
+
+        /**
+         * Cron schedule for the reloading. Leave blank or empty to disable the automated reloading.
+         */
+        var cron = ""
+    }
+
 }
