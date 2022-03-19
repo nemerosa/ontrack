@@ -49,7 +49,11 @@ class CascLoadingServiceImpl(
         if (resource.isFile) {
             val file = resource.file
             if (file.exists() && file.isDirectory) {
-                return file.listFiles()?.map {
+                logger.info("CasC resource directory: $file")
+                return file.listFiles()?.filter {
+                    it.isFile && it.canRead() && it.extension in setOf("yml", "yaml")
+                }?.map {
+                    logger.info("CasC resource file: $it")
                     it.readText()
                 } ?: emptyList()
             }
