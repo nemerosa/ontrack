@@ -25,9 +25,8 @@ class CascStartup(
     override fun start() {
         logger.info("CasC startup")
         if (cascConfigurationProperties.enabled) {
-            val locations = cascConfigurationProperties.locations
             securityService.asAdmin {
-                cascLoadingService.load(locations)
+                cascLoadingService.load()
             }
         } else {
             logger.info("CasC is disabled")
