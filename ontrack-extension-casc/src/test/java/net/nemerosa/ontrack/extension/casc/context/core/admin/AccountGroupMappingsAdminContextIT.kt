@@ -91,10 +91,11 @@ class AccountGroupMappingsAdminContextIT : AbstractCascTestSupport() {
     }
 
     @Test
-    fun `Creation of mappings after the groups`() {
+    fun `Creation of mappings before the groups fails`() {
         asAdmin {
             val name = uid("g")
-            casc("""
+            assertFailsWith<IllegalStateException> {
+                casc("""
                 ontrack:
                     admin:
                         group-mappings:
@@ -106,14 +107,6 @@ class AccountGroupMappingsAdminContextIT : AbstractCascTestSupport() {
                             - name: $name
                               description: My group
             """.trimIndent())
-            val mapping = accountService.findAccountGroupByName(name)?.let {
-                accountGroupMappingService.getMappingsForGroup(it)
-            }?.firstOrNull()
-            assertNotNull(mapping, "Mapping created") {
-                assertEquals("test", it.authenticationSource.provider)
-                assertEquals("", it.authenticationSource.key)
-                assertEquals("test-group", it.name)
-                assertEquals(name, it.group.name)
             }
         }
     }
