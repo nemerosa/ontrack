@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
+import net.nemerosa.ontrack.extension.casc.AbstractCascTestJUnit4Support
 import org.junit.Test
 import kotlin.test.assertTrue
 
-class PreviousPromotionConditionSettingsContextIT : AbstractCascTestSupport() {
+class PreviousPromotionConditionSettingsContextIT : AbstractCascTestJUnit4Support() {
 
     @Test
     fun `Previous promotion condition settings as CasC`() {

@@ -1,12 +1,13 @@
 package net.nemerosa.ontrack.extension.casc
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import org.springframework.beans.factory.annotation.Autowired
 
 /**
  * Support for testing CasC
  */
-abstract class AbstractCascTestSupport : AbstractDSLTestSupport() {
+@Deprecated(message = "JUnit is deprecated", replaceWith = ReplaceWith("AbstractCascTestSupport"))
+abstract class AbstractCascTestJUnit4Support : AbstractDSLTestJUnit4Support() {
 
     @Autowired
     private lateinit var cascService: CascService

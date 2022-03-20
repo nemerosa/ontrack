@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.sonarqube.casc
 
-import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
+import net.nemerosa.ontrack.extension.casc.AbstractCascTestJUnit4Support
 import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresSettings
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class SonarQubeMeasuresSettingsContextIT : AbstractCascTestSupport() {
+class SonarQubeMeasuresSettingsContextIT : AbstractCascTestJUnit4Support() {
 
     @Test
     fun `Minimal parameters`() {

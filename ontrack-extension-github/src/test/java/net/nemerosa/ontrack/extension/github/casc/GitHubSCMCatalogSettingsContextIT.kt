@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.github.casc
 
-import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
+import net.nemerosa.ontrack.extension.casc.AbstractCascTestJUnit4Support
 import net.nemerosa.ontrack.extension.github.catalog.GitHubSCMCatalogSettings
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class GitHubSCMCatalogSettingsContextIT : AbstractCascTestSupport() {
+class GitHubSCMCatalogSettingsContextIT : AbstractCascTestJUnit4Support() {
 
     @Test
     fun `GitHub SCM Catalog settings as CasC`() {

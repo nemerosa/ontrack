@@ -22,12 +22,12 @@ import java.util.stream.Collectors
 @Service
 @Transactional
 class AccountServiceImpl(
-        private val roleRepository: RoleRepository,
-        private val rolesService: RolesService,
-        private val accountRepository: AccountRepository,
-        private val accountGroupRepository: AccountGroupRepository,
-        private val securityService: SecurityService,
-        private val accountGroupContributors: List<AccountGroupContributor>
+    private val roleRepository: RoleRepository,
+    private val rolesService: RolesService,
+    private val accountRepository: AccountRepository,
+    private val accountGroupRepository: AccountGroupRepository,
+    private val securityService: SecurityService,
+    private val accountGroupContributors: List<AccountGroupContributor>,
 ) : AccountService {
 
     private val passwordEncoder: PasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder()
@@ -37,30 +37,34 @@ class AccountServiceImpl(
         val account = accountRepository.getAccount(ID.of(raw.accountId))
         // Direct account authorisations
         val authorisations = Authorisations()
-                .withProjectFunctions(securityService.autoProjectFunctions)
-                .withGlobalRole(roleRepository.findGlobalRoleByAccount(raw.accountId).getOrNull()?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() })
-                .withProjectRoles(roleRepository.findProjectRoleAssociationsByAccount(raw.accountId) { project: Int, roleId: String -> rolesService.getProjectRoleAssociation(project, roleId) })
+            .withProjectFunctions(securityService.autoProjectFunctions)
+            .withGlobalRole(roleRepository.findGlobalRoleByAccount(raw.accountId).getOrNull()
+                ?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() })
+            .withProjectRoles(roleRepository.findProjectRoleAssociationsByAccount(raw.accountId) { project: Int, roleId: String ->
+                rolesService.getProjectRoleAssociation(project,
+                    roleId)
+            })
         // List of authenticated groups
         val groups = mutableListOf<AuthorizedGroup>()
         // Authorisations from groups
         groups.addAll(
-                accountGroupRepository.findByAccount(raw.accountId).map {
-                    AuthorizedGroup(
-                            group = it,
-                            authorisations = getGroupACL(it)
-                    )
-                }
+            accountGroupRepository.findByAccount(raw.accountId).map {
+                AuthorizedGroup(
+                    group = it,
+                    authorisations = getGroupACL(it)
+                )
+            }
         )
         // Authorisations from groups contributors
         groups.addAll(
-                accountGroupContributors.flatMap { contributor ->
-                    contributor.collectGroups(account)
-                }.map { group ->
-                    AuthorizedGroup(
-                            group = group,
-                            authorisations = getGroupACL(group)
-                    )
-                }
+            accountGroupContributors.flatMap { contributor ->
+                contributor.collectGroups(account)
+            }.map { group ->
+                AuthorizedGroup(
+                    group = group,
+                    authorisations = getGroupACL(group)
+                )
+            }
         )
         // OK
         return DefaultOntrackAuthenticatedUser(raw, AuthorizedAccount(account, authorisations), groups.toList())
@@ -81,13 +85,13 @@ class AccountServiceImpl(
         securityService.checkGlobalFunction(AccountManagement::class.java)
         // Creates the account
         var account = Account.of(
-                input.name,
-                input.fullName,
-                input.email,
-                SecurityRole.USER,
-                authenticationSource,
-                disabled = input.disabled,
-                locked = input.locked,
+            input.name,
+            input.fullName,
+            input.email,
+            SecurityRole.USER,
+            authenticationSource,
+            disabled = input.disabled,
+            locked = input.locked,
         )
         // Saves it
         account = accountRepository.newAccount(account)
@@ -161,11 +165,11 @@ class AccountServiceImpl(
 
     override fun getAccountGroupsForSelection(accountId: ID): List<AccountGroupSelection> { // Account groups or none
         val accountGroupIds: Set<Int> = (accountId.ifSet { accountGroupRepository.findByAccount(it) } ?: emptyList())
-                .map { obj: Entity -> obj.id() }
-                .toSet()
+            .map { obj: Entity -> obj.id() }
+            .toSet()
         // Collection of groups with the selection
         return accountGroups
-                .map { group: AccountGroup -> AccountGroupSelection(group, accountGroupIds.contains(group.id())) }
+            .map { group: AccountGroup -> AccountGroupSelection(group, accountGroupIds.contains(group.id())) }
     }
 
     override fun searchPermissionTargets(token: String): Collection<PermissionTarget> {
@@ -173,11 +177,11 @@ class AccountServiceImpl(
         val targets: MutableList<PermissionTarget> = ArrayList()
         // Users first
         targets.addAll(
-                accountRepository.findByNameToken(token).map { it.asPermissionTarget() }
+            accountRepository.findByNameToken(token).map { it.asPermissionTarget() }
         )
         // ... then groups
         targets.addAll(
-                accountGroupRepository.findByNameToken(token).map { it.asPermissionTarget() }
+            accountGroupRepository.findByNameToken(token).map { it.asPermissionTarget() }
         )
         // OK
         return targets
@@ -201,11 +205,11 @@ class AccountServiceImpl(
         val permissions: MutableCollection<GlobalPermission> = ArrayList()
         // Users first
         permissions.addAll(
-                accountRepository.findAll().mapNotNull { getGlobalPermission(it) }
+            accountRepository.findAll().mapNotNull { getGlobalPermission(it) }
         )
         // ... then groups
         permissions.addAll(
-                accountGroupRepository.findAll().mapNotNull { group: AccountGroup -> getGroupGlobalPermission(group) }
+            accountGroupRepository.findAll().mapNotNull { group: AccountGroup -> getGroupGlobalPermission(group) }
         )
         // OK
         return permissions
@@ -230,17 +234,22 @@ class AccountServiceImpl(
         val permissions: MutableCollection<ProjectPermission> = ArrayList()
         // Users first
         permissions.addAll(
-                accountRepository.findAll().mapNotNull { getProjectPermission(projectId, it) }
+            accountRepository.findAll().mapNotNull { getProjectPermission(projectId, it) }
         )
         // ... then groups
         permissions.addAll(
-                accountGroupRepository.findAll().mapNotNull { getGroupProjectPermission(projectId, it) }
+            accountGroupRepository.findAll().mapNotNull { getGroupProjectPermission(projectId, it) }
         )
         // OK
         return permissions
     }
 
-    override fun saveProjectPermission(projectId: ID, type: PermissionTargetType, id: Int, input: PermissionInput): Ack {
+    override fun saveProjectPermission(
+        projectId: ID,
+        type: PermissionTargetType,
+        id: Int,
+        input: PermissionInput,
+    ): Ack {
         securityService.checkProjectFunction(projectId.value, ProjectAuthorisationMgt::class.java)
         return when (type) {
             PermissionTargetType.ACCOUNT -> roleRepository.saveProjectRoleForAccount(projectId.value, id, input.role)
@@ -260,20 +269,23 @@ class AccountServiceImpl(
 
     override fun getProjectPermissionsForAccount(account: Account): Collection<ProjectRoleAssociation> {
         return roleRepository.findProjectRoleAssociationsByAccount(
-                account.id()) { project: Int?, roleId: String? -> rolesService.getProjectRoleAssociation(project!!, roleId!!) }
-                .stream() // Filter by authorisation
-                .filter { projectRoleAssociation: ProjectRoleAssociation ->
-                    securityService.isProjectFunctionGranted(
-                            projectRoleAssociation.projectId,
-                            ProjectAuthorisationMgt::class.java
-                    )
-                } // OK
-                .collect(Collectors.toList())
+            account.id()) { project: Int?, roleId: String? ->
+            rolesService.getProjectRoleAssociation(project!!,
+                roleId!!)
+        }
+            .stream() // Filter by authorisation
+            .filter { projectRoleAssociation: ProjectRoleAssociation ->
+                securityService.isProjectFunctionGranted(
+                    projectRoleAssociation.projectId,
+                    ProjectAuthorisationMgt::class.java
+                )
+            } // OK
+            .collect(Collectors.toList())
     }
 
     override fun getGlobalRoleForAccount(account: Account): Optional<GlobalRole> {
         return roleRepository.findGlobalRoleByAccount(account.id())
-                .flatMap { id: String? -> rolesService.getGlobalRole(id!!) }
+            .flatMap { id: String? -> rolesService.getGlobalRole(id!!) }
     }
 
     override fun getAccountsForGroup(accountGroup: AccountGroup): List<Account> {
@@ -282,20 +294,23 @@ class AccountServiceImpl(
 
     override fun getGlobalRoleForAccountGroup(group: AccountGroup): Optional<GlobalRole> {
         return roleRepository.findGlobalRoleByGroup(group.id())
-                .flatMap { id: String? -> rolesService.getGlobalRole(id!!) }
+            .flatMap { id: String? -> rolesService.getGlobalRole(id!!) }
     }
 
     override fun getProjectPermissionsForAccountGroup(group: AccountGroup): Collection<ProjectRoleAssociation> {
         return roleRepository.findProjectRoleAssociationsByGroup(
-                group.id()) { project: Int?, roleId: String? -> rolesService.getProjectRoleAssociation(project!!, roleId!!) }
-                .stream() // Filter by authorisation
-                .filter { projectRoleAssociation: ProjectRoleAssociation ->
-                    securityService.isProjectFunctionGranted(
-                            projectRoleAssociation.projectId,
-                            ProjectAuthorisationMgt::class.java
-                    )
-                } // OK
-                .collect(Collectors.toList())
+            group.id()) { project: Int?, roleId: String? ->
+            rolesService.getProjectRoleAssociation(project!!,
+                roleId!!)
+        }
+            .stream() // Filter by authorisation
+            .filter { projectRoleAssociation: ProjectRoleAssociation ->
+                securityService.isProjectFunctionGranted(
+                    projectRoleAssociation.projectId,
+                    ProjectAuthorisationMgt::class.java
+                )
+            } // OK
+            .collect(Collectors.toList())
     }
 
     override fun findAccountGroupsByGlobalRole(globalRole: GlobalRole): Collection<AccountGroup> {
@@ -307,7 +322,9 @@ class AccountServiceImpl(
     }
 
     override fun findAccountGroupsByProjectRole(project: Project, projectRole: ProjectRole): Collection<AccountGroup> {
-        return roleRepository.findAccountGroupsByProjectRole(project, projectRole) { groupId: ID -> getAccountGroup(groupId) }
+        return roleRepository.findAccountGroupsByProjectRole(project, projectRole) { groupId: ID ->
+            getAccountGroup(groupId)
+        }
     }
 
     override fun findAccountsByProjectRole(project: Project, projectRole: ProjectRole): Collection<Account> {
@@ -316,13 +333,13 @@ class AccountServiceImpl(
 
     private fun getGroupProjectPermission(projectId: ID, accountGroup: AccountGroup): ProjectPermission? {
         val roleAssociationOptional = roleRepository.findProjectRoleAssociationsByGroup(
-                accountGroup.id(),
-                projectId.value) { project: Int, roleId: String -> rolesService.getProjectRoleAssociation(project, roleId) }
+            accountGroup.id(),
+            projectId.value) { project: Int, roleId: String -> rolesService.getProjectRoleAssociation(project, roleId) }
         return if (roleAssociationOptional.isPresent) {
             ProjectPermission(
-                    projectId,
-                    accountGroup.asPermissionTarget(),
-                    roleAssociationOptional.get().projectRole
+                projectId,
+                accountGroup.asPermissionTarget(),
+                roleAssociationOptional.get().projectRole
             )
         } else {
             null
@@ -331,14 +348,14 @@ class AccountServiceImpl(
 
     private fun getProjectPermission(projectId: ID, account: Account): ProjectPermission? {
         val roleAssociationOptional = roleRepository.findProjectRoleAssociationsByAccount(
-                account.id(),
-                projectId.value
+            account.id(),
+            projectId.value
         ) { project: Int, roleId: String -> rolesService.getProjectRoleAssociation(project, roleId) }
         return if (roleAssociationOptional.isPresent) {
             ProjectPermission(
-                    projectId,
-                    account.asPermissionTarget(),
-                    roleAssociationOptional.get().projectRole
+                projectId,
+                account.asPermissionTarget(),
+                roleAssociationOptional.get().projectRole
             )
         } else {
             null
@@ -351,8 +368,8 @@ class AccountServiceImpl(
             val globalRole = rolesService.getGlobalRole(roleId.get())
             if (globalRole.isPresent) {
                 return GlobalPermission(
-                        group.asPermissionTarget(),
-                        globalRole.get()
+                    group.asPermissionTarget(),
+                    globalRole.get()
                 )
             }
         }
@@ -365,8 +382,8 @@ class AccountServiceImpl(
             val globalRole = rolesService.getGlobalRole(roleId.get())
             if (globalRole.isPresent) {
                 return GlobalPermission(
-                        account.asPermissionTarget(),
-                        globalRole.get()
+                    account.asPermissionTarget(),
+                    globalRole.get()
                 )
             }
         }
@@ -386,6 +403,11 @@ class AccountServiceImpl(
     override fun findAccountByName(username: String): Account? {
         securityService.checkGlobalFunction(AccountManagement::class.java)
         return accountRepository.findAccountByName(username)
+    }
+
+    override fun findAccountGroupByName(name: String): AccountGroup? {
+        securityService.checkGlobalFunction(AccountManagement::class.java)
+        return accountGroupRepository.findAccountGroupByName(name)
     }
 
     override fun doesAccountIdExist(id: ID): Boolean {
@@ -409,13 +431,17 @@ class AccountServiceImpl(
     }
 
     private fun getGroupACL(group: AccountGroup): Authorisations =
-            Authorisations()
-                    // Global role
-                    .withGlobalRole(
-                            roleRepository.findGlobalRoleByGroup(group.id()).getOrNull()?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() }
-                    ) // Project roles
-                    .withProjectRoles(
-                            roleRepository.findProjectRoleAssociationsByGroup(group.id()) { project: Int?, roleId: String? -> rolesService.getProjectRoleAssociation(project!!, roleId!!) }
-                    )
+        Authorisations()
+            // Global role
+            .withGlobalRole(
+                roleRepository.findGlobalRoleByGroup(group.id()).getOrNull()
+                    ?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() }
+            ) // Project roles
+            .withProjectRoles(
+                roleRepository.findProjectRoleAssociationsByGroup(group.id()) { project: Int?, roleId: String? ->
+                    rolesService.getProjectRoleAssociation(project!!,
+                        roleId!!)
+                }
+            )
 
 }

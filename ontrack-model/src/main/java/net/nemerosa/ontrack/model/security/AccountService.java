@@ -229,6 +229,15 @@ public interface AccountService {
     Account findAccountByName(@NotNull String username);
 
     /**
+     * Finds an account group using its name.
+     *
+     * @param name Name to look for
+     * @return Account group or null if not found
+     */
+    @Nullable
+    AccountGroup findAccountGroupByName(@NotNull String name);
+
+    /**
      * Checks if an account ID exists
      */
     boolean doesAccountIdExist(@NotNull ID id);

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.oidc.casc
 
-import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
+import net.nemerosa.ontrack.extension.casc.AbstractCascTestJUnit4Support
 import net.nemerosa.ontrack.extension.oidc.settings.OIDCSettingsService
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class OIDCConfigurationAsCodeIT : AbstractCascTestSupport() {
+class OIDCConfigurationAsCodeIT : AbstractCascTestJUnit4Support() {
 
     @Autowired
     private lateinit var oidcSettingsService: OIDCSettingsService

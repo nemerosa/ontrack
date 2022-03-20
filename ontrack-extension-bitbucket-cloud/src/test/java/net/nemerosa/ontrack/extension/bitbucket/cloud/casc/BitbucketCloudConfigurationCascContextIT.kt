@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.bitbucket.cloud.casc
 
 import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigMock
 import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketCloudConfigurationService
-import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
+import net.nemerosa.ontrack.extension.casc.AbstractCascTestJUnit4Support
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertNotPresent
 import org.junit.Before
@@ -10,7 +10,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class BitbucketCloudConfigurationCascContextIT : AbstractCascTestSupport() {
+class BitbucketCloudConfigurationCascContextIT : AbstractCascTestJUnit4Support() {
 
     @Autowired
     private lateinit var bitbucketCloudConfigurationService: BitbucketCloudConfigurationService

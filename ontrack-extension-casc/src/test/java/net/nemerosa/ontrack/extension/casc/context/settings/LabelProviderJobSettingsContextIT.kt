@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.casc.context.settings
 
-import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
+import net.nemerosa.ontrack.extension.casc.AbstractCascTestJUnit4Support
 import net.nemerosa.ontrack.model.settings.LabelProviderJobSettings
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class LabelProviderJobSettingsContextIT : AbstractCascTestSupport() {
+class LabelProviderJobSettingsContextIT : AbstractCascTestJUnit4Support() {
 
     @Test
     fun `Label provider job settings as CasC`() {

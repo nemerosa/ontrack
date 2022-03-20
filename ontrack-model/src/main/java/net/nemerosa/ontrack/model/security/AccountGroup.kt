@@ -8,30 +8,30 @@ import java.io.Serializable
  * Group of accounts.
  */
 data class AccountGroup(
-        override val id: ID,
-        val name: String,
-        val description: String?
+    override val id: ID,
+    val name: String,
+    val description: String?,
 ) : Entity, Serializable {
 
     fun withId(id: ID): AccountGroup {
         return AccountGroup(
-                id,
-                name,
-                description
+            id,
+            name,
+            description
         )
     }
 
     fun update(input: AccountGroupInput) = AccountGroup(
-            id = id,
-            name = input.name,
-            description = input.description
+        id = id,
+        name = input.name,
+        description = input.description
     )
 
     fun asPermissionTarget() =
-            PermissionTarget(
-                    PermissionTargetType.GROUP,
-                    id(),
-                    name,
-                    description
-            )
+        PermissionTarget(
+            PermissionTargetType.GROUP,
+            id(),
+            name,
+            description
+        )
 }

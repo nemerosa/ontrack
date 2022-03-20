@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.github.ingestion.settings
 
-import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
+import net.nemerosa.ontrack.extension.casc.AbstractCascTestJUnit4Support
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class GitHubIngestionSettingsCascIT : AbstractCascTestSupport() {
+class GitHubIngestionSettingsCascIT : AbstractCascTestJUnit4Support() {
 
     @Test
     fun `Minimal parameters`() {

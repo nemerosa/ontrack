@@ -7,6 +7,8 @@ import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -68,6 +70,16 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
         return getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM ACCOUNT_GROUPS WHERE LOWER(NAME) LIKE :filter ORDER BY NAME",
                 params("filter", String.format("%%%s%%", StringUtils.lowerCase(token))),
+                (rs, num) -> toAccountGroup(rs)
+        );
+    }
+
+    @Nullable
+    @Override
+    public AccountGroup findAccountGroupByName(@NotNull String name) {
+        return getFirstItem(
+                "SELECT * FROM ACCOUNT_GROUPS WHERE NAME = :name",
+                params("name", name),
                 (rs, num) -> toAccountGroup(rs)
         );
     }

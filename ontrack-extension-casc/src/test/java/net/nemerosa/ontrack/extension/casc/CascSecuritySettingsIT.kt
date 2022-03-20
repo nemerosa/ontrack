@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class CascSecuritySettingsIT : AbstractCascTestSupport() {
+class CascSecuritySettingsIT : AbstractCascTestJUnit4Support() {
 
     @Autowired
     private lateinit var securitySettingsContext: SecuritySettingsContext

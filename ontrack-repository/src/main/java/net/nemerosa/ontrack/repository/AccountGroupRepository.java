@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.repository;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.structure.ID;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -25,4 +26,10 @@ public interface AccountGroupRepository {
     void linkAccountToGroups(int accountId, @Nullable Collection<Integer> groupIds);
 
     List<AccountGroup> findByNameToken(String token);
+
+    /**
+     * Finds an account group using its name only.
+     */
+    @Nullable
+    AccountGroup findAccountGroupByName(@NotNull String name);
 }

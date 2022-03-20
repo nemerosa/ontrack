@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.ldap.casc
 
-import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
+import net.nemerosa.ontrack.extension.casc.AbstractCascTestJUnit4Support
 import net.nemerosa.ontrack.extension.ldap.LDAPSettings
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class LDAPSettingsContextIT: AbstractCascTestSupport() {
+class LDAPSettingsContextIT: AbstractCascTestJUnit4Support() {
 
     @Test
     fun `LDAP as CasC`() {
