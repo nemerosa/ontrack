@@ -63,14 +63,15 @@ class CascSecuritySettingsIT : AbstractCascTestSupport() {
     fun `Disabling the built-in authentication`() {
         // We cannot use the `admin` user since built-in authentication will be disabled
         securityService.asAdmin {
-            settingsManagerService.saveSettings(
-                SecuritySettings(
-                    isGrantProjectViewToAll = true,
-                    isGrantProjectParticipationToAll = true,
-                    builtInAuthenticationEnabled = true,
-                )
-            )
+            val old = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
             try {
+                settingsManagerService.saveSettings(
+                    SecuritySettings(
+                        isGrantProjectViewToAll = true,
+                        isGrantProjectParticipationToAll = true,
+                        builtInAuthenticationEnabled = true,
+                    )
+                )
                 casc("""
                     ontrack:
                         config:
@@ -88,13 +89,7 @@ class CascSecuritySettingsIT : AbstractCascTestSupport() {
             }
             // Restoring the old settings
             finally {
-                settingsManagerService.saveSettings(
-                    SecuritySettings(
-                        isGrantProjectViewToAll = true,
-                        isGrantProjectParticipationToAll = true,
-                        builtInAuthenticationEnabled = true,
-                    )
-                )
+                settingsManagerService.saveSettings(old)
             }
         }
     }
