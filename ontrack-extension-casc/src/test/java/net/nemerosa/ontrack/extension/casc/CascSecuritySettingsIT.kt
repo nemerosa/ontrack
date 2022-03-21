@@ -76,15 +76,13 @@ class CascSecuritySettingsIT : AbstractCascTestSupport() {
                         config:
                             settings:
                                 security:
-                                    grantProjectViewToAll: true
-                                    grantProjectParticipationToAll: true
                                     builtInAuthenticationEnabled: false
                 """.trimIndent())
 
                 // Checks the new settings
                 val settings = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
-                assertTrue(settings.isGrantProjectViewToAll)
-                assertTrue(settings.isGrantProjectParticipationToAll)
+                assertFalse(settings.isGrantProjectViewToAll)
+                assertFalse(settings.isGrantProjectParticipationToAll)
                 assertFalse(settings.builtInAuthenticationEnabled)
 
             }
