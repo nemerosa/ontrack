@@ -20,6 +20,7 @@ import kotlin.test.*
 
 class TokenAsPasswordAuthenticationProviderTest {
 
+    private lateinit var source: AuthenticationSource
     private lateinit var tokensService: TokensService
     private lateinit var accountService: AccountService
     private val ontrackConfigProperties = OntrackConfigProperties()
@@ -30,9 +31,16 @@ class TokenAsPasswordAuthenticationProviderTest {
         tokensService = mock()
         accountService = mock()
         provider = TokenAsPasswordAuthenticationProvider(
-                tokensService,
-                accountService,
-                ontrackConfigProperties
+            tokensService,
+            accountService,
+            ontrackConfigProperties
+        )
+        source = AuthenticationSource(
+            provider = BuiltinAuthenticationSourceProvider.ID,
+            key = "",
+            name = "Built-in",
+            isEnabled = true,
+            isAllowingPasswordChange = true
         )
     }
 
@@ -71,21 +79,21 @@ class TokenAsPasswordAuthenticationProviderTest {
     fun `Token found but name mismatch`() {
         val auth = UsernamePasswordAuthenticationToken("user", "xxx")
         val tokenAccount = TokenAccount(
-                account = Account(
-                        ID.of(1),
-                        "other-user",
-                        "Other user",
-                        "other-user@test.com",
-                        BuiltinAuthenticationSourceProvider.SOURCE,
-                        SecurityRole.USER,
-                        disabled = false,
-                        locked = false,
-                ),
-                token = Token(
-                        "xxx",
-                        Time.now(),
-                        null
-                )
+            account = Account(
+                ID.of(1),
+                "other-user",
+                "Other user",
+                "other-user@test.com",
+                source,
+                SecurityRole.USER,
+                disabled = false,
+                locked = false,
+            ),
+            token = Token(
+                "xxx",
+                Time.now(),
+                null
+            )
         )
         whenever(tokensService.findAccountByToken("xxx")).thenReturn(tokenAccount)
         assertFailsWith<TokenNameMismatchException> {
@@ -97,21 +105,21 @@ class TokenAsPasswordAuthenticationProviderTest {
     fun `Token found but invalid`() {
         val auth = UsernamePasswordAuthenticationToken("user", "xxx")
         val tokenAccount = TokenAccount(
-                account = Account(
-                        ID.of(1),
-                        "user",
-                        "User",
-                        "user@test.com",
-                        BuiltinAuthenticationSourceProvider.SOURCE,
-                        SecurityRole.USER,
-                        disabled = false,
-                        locked = false,
-                ),
-                token = Token(
-                        "xxx",
-                        Time.now() - Duration.ofHours(24),
-                        Time.now() - Duration.ofHours(12) // Stopped being valid 12 hours ago
-                )
+            account = Account(
+                ID.of(1),
+                "user",
+                "User",
+                "user@test.com",
+                source,
+                SecurityRole.USER,
+                disabled = false,
+                locked = false,
+            ),
+            token = Token(
+                "xxx",
+                Time.now() - Duration.ofHours(24),
+                Time.now() - Duration.ofHours(12) // Stopped being valid 12 hours ago
+            )
         )
         whenever(tokensService.findAccountByToken("xxx")).thenReturn(tokenAccount)
         assertFailsWith<CredentialsExpiredException> {
@@ -123,21 +131,21 @@ class TokenAsPasswordAuthenticationProviderTest {
     fun `Token found`() {
         val auth = UsernamePasswordAuthenticationToken("user", "xxx")
         val tokenAccount = TokenAccount(
-                account = Account(
-                        ID.of(1),
-                        "user",
-                        "User",
-                        "user@test.com",
-                        BuiltinAuthenticationSourceProvider.SOURCE,
-                        SecurityRole.USER,
-                        disabled = false,
-                        locked = false,
-                ),
-                token = Token(
-                        "xxx",
-                        Time.now(),
-                        null
-                )
+            account = Account(
+                ID.of(1),
+                "user",
+                "User",
+                "user@test.com",
+                source,
+                SecurityRole.USER,
+                disabled = false,
+                locked = false,
+            ),
+            token = Token(
+                "xxx",
+                Time.now(),
+                null
+            )
         )
         whenever(tokensService.findAccountByToken("xxx")).thenReturn(tokenAccount)
         val user = mock<OntrackAuthenticatedUser>()

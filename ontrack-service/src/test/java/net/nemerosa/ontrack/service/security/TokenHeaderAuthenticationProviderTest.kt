@@ -22,6 +22,7 @@ class TokenHeaderAuthenticationProviderTest {
     private lateinit var tokensService: TokensService
     private lateinit var accountService: AccountService
     private lateinit var provider: TokenHeaderAuthenticationProvider
+    private lateinit var source: AuthenticationSource
 
     @Before
     fun before() {
@@ -30,6 +31,13 @@ class TokenHeaderAuthenticationProviderTest {
         provider = TokenHeaderAuthenticationProvider(
                 tokensService,
                 accountService
+        )
+        source = AuthenticationSource(
+            provider = BuiltinAuthenticationSourceProvider.ID,
+            key = "",
+            name = "Built-in",
+            isEnabled = true,
+            isAllowingPasswordChange = true
         )
     }
 
@@ -60,7 +68,7 @@ class TokenHeaderAuthenticationProviderTest {
                         "user",
                         "User",
                         "user@test.com",
-                        BuiltinAuthenticationSourceProvider.SOURCE,
+                        source,
                         SecurityRole.USER,
                         disabled = false,
                         locked = false,
@@ -86,7 +94,7 @@ class TokenHeaderAuthenticationProviderTest {
                         "user",
                         "User",
                         "user@test.com",
-                        BuiltinAuthenticationSourceProvider.SOURCE,
+                        source,
                         SecurityRole.USER,
                         disabled = false,
                         locked = false,

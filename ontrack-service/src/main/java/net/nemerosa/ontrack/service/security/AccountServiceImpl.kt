@@ -28,6 +28,7 @@ class AccountServiceImpl(
     private val accountGroupRepository: AccountGroupRepository,
     private val securityService: SecurityService,
     private val accountGroupContributors: List<AccountGroupContributor>,
+    private val builtinAuthenticationSourceProvider: BuiltinAuthenticationSourceProvider,
 ) : AccountService {
 
     private val passwordEncoder: PasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder()
@@ -76,7 +77,7 @@ class AccountServiceImpl(
     }
 
     override fun create(input: AccountInput): Account {
-        val account = create(input, BuiltinAuthenticationSourceProvider.SOURCE)
+        val account = create(input, builtinAuthenticationSourceProvider.source)
         accountRepository.setPassword(account.id(), passwordEncoder.encode(input.password))
         return account
     }

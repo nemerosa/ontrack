@@ -14,7 +14,8 @@ class SecuritySettingsProvider(
      */
     override fun getSettings(): SecuritySettings = SecuritySettings(
             settingsRepository.getBoolean(SecuritySettings::class.java, "grantProjectViewToAll", true),
-            settingsRepository.getBoolean(SecuritySettings::class.java, "grantProjectParticipationToAll", true)
+            settingsRepository.getBoolean(SecuritySettings::class.java, "grantProjectParticipationToAll", true),
+            settingsRepository.getBoolean(SecuritySettings::class.java, SecuritySettings::builtInAuthenticationEnabled.name, SecuritySettings.DEFAULT_BUILTIN_AUTHENTICATION_ENABLED),
     )
 
     override fun getSettingsClass(): Class<SecuritySettings> = SecuritySettings::class.java

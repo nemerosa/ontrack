@@ -11,24 +11,36 @@ import net.nemerosa.ontrack.model.form.YesNo
  * @property isGrantProjectParticipationToAll `true` when all authenticated users have a participant access to all projects.
  */
 class SecuritySettings(
-        @get:JsonProperty("grantProjectViewToAll")
-        val isGrantProjectViewToAll: Boolean,
-        @get:JsonProperty("grantProjectParticipationToAll")
-        val isGrantProjectParticipationToAll: Boolean
+    @get:JsonProperty("grantProjectViewToAll")
+    val isGrantProjectViewToAll: Boolean,
+    @get:JsonProperty("grantProjectParticipationToAll")
+    val isGrantProjectParticipationToAll: Boolean,
+    val builtInAuthenticationEnabled: Boolean = DEFAULT_BUILTIN_AUTHENTICATION_ENABLED,
 ) {
+
+    companion object {
+        const val DEFAULT_BUILTIN_AUTHENTICATION_ENABLED = true
+    }
+
     fun form(): Form =
-            Form.create()
-                    .with(
-                            YesNo.of("grantProjectViewToAll")
-                                    .label("Grants project view to all")
-                                    .help("Allows all authenticated users to have read-only access to all project.")
-                                    .value(isGrantProjectViewToAll)
-                    )
-                    .with(
-                            YesNo.of("grantProjectParticipationToAll")
-                                    .visibleIf("grantProjectViewToAll")
-                                    .label("Grants project participation to all")
-                                    .help("Allows all authenticated users to have participation access to all projects. They can add comments to the validation runs.")
-                                    .value(isGrantProjectParticipationToAll)
-                    )
+        Form.create()
+            .with(
+                YesNo.of("grantProjectViewToAll")
+                    .label("Grants project view to all")
+                    .help("Allows all authenticated users to have read-only access to all project.")
+                    .value(isGrantProjectViewToAll)
+            )
+            .with(
+                YesNo.of("grantProjectParticipationToAll")
+                    .visibleIf("grantProjectViewToAll")
+                    .label("Grants project participation to all")
+                    .help("Allows all authenticated users to have participation access to all projects. They can add comments to the validation runs.")
+                    .value(isGrantProjectParticipationToAll)
+            )
+            .with(
+                YesNo.of(SecuritySettings::builtInAuthenticationEnabled.name)
+                    .label("Built-in authentication")
+                    .help("Enabling the built-in authentication")
+                    .value(builtInAuthenticationEnabled)
+            )
 }

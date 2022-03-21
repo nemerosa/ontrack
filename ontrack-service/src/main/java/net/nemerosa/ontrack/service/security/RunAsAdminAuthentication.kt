@@ -51,7 +51,7 @@ class RunAsAdminAuthentication(
                     "Run-as Admin",
                     "",
                     SecurityRole.ADMINISTRATOR,
-                    BuiltinAuthenticationSourceProvider.SOURCE,
+                    BuiltinAuthenticationSourceProvider.runAsSource,
                     disabled = false,
                     locked = false,
             ).withId(ID.of(1))
