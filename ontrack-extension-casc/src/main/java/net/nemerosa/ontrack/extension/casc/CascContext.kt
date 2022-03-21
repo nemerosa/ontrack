@@ -14,4 +14,11 @@ interface CascContext {
      */
     fun render(): JsonNode
 
+    /**
+     * Priority of this context compared to all its siblings.
+     *
+     * Higher numbers have the higher priority.
+     */
+    val priority: Int get() = 0
+
 }

@@ -91,22 +91,29 @@ class AccountGroupMappingsAdminContextIT : AbstractCascTestSupport() {
     }
 
     @Test
-    fun `Creation of mappings before the groups fails`() {
+    fun `Creation of mappings before the groups works OK before of ordering`() {
         asAdmin {
             val name = uid("g")
-            assertFailsWith<IllegalStateException> {
-                casc("""
-                ontrack:
-                    admin:
-                        group-mappings:
-                            - provider: test
-                              providerKey: ""
-                              providerGroup: "test-group"
-                              group: $name
-                        groups:
-                            - name: $name
-                              description: My group
-            """.trimIndent())
+            casc("""
+                    ontrack:
+                        admin:
+                            group-mappings:
+                                - provider: test
+                                  providerKey: ""
+                                  providerGroup: "test-group"
+                                  group: $name
+                            groups:
+                                - name: $name
+                                  description: My group
+                """.trimIndent())
+            val mapping = accountService.findAccountGroupByName(name)?.let {
+                accountGroupMappingService.getMappingsForGroup(it)
+            }?.firstOrNull()
+            assertNotNull(mapping, "Mapping created") {
+                assertEquals("test", it.authenticationSource.provider)
+                assertEquals("", it.authenticationSource.key)
+                assertEquals("test-group", it.name)
+                assertEquals(name, it.group.name)
             }
         }
     }

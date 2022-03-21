@@ -8,6 +8,14 @@ class ConfigContext(
 ) : AbstractHolderContext<SubConfigContext>(
     subContexts,
     "List of configurations"
-)
+) {
+
+    companion object {
+        const val PRIORITY: Int = 10
+    }
+
+    override val priority: Int = PRIORITY
+
+}
 
 interface SubConfigContext : SubCascContext

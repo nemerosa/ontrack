@@ -29,6 +29,11 @@ class AccountGroupMappingsAdminContext(
 
     override val field: String = "group-mappings"
 
+    /**
+     * Group mappings must be processed _after_ the creation of the groups
+     */
+    override val priority: Int = AccountGroupsAdminContext.PRIORITY - 5
+
     override val type: CascType
         get() = cascArray(
             "List of group mappings",

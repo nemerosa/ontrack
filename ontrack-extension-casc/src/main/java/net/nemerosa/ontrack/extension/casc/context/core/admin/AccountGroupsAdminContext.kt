@@ -23,9 +23,15 @@ class AccountGroupsAdminContext(
     private val accountService: AccountService,
 ) : AbstractCascContext(), SubAdminContext {
 
+    companion object {
+        const val PRIORITY = 10
+    }
+
     private val logger: Logger = LoggerFactory.getLogger(AccountGroupsAdminContext::class.java)
 
     override val field: String = "groups"
+
+    override val priority: Int = PRIORITY
 
     override val type: CascType
         get() = cascArray(

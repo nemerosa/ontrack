@@ -8,8 +8,6 @@ import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import kotlin.reflect.KProperty
-import kotlin.reflect.KProperty0
-import kotlin.reflect.KProperty1
 
 abstract class AbstractCascContext : CascContext {
 
@@ -55,13 +53,35 @@ abstract class AbstractCascContext : CascContext {
         paths: List<String>,
         mapping: Map<String, CascContext>,
     ) {
+
+        class FieldContext(
+            val name: String,
+            val value: JsonNode,
+            val context: CascContext,
+        )
+
+        // We need to respect the order of contexts set by [CascContext.priority]
+        // Map each JSON field to its corresponding context and order them by decreasing priority
+        val fieldContexts = mutableListOf<FieldContext>()
         fields().forEach { (name, value) ->
             val context = mapping[name]
             if (context != null) {
-                context.run(value, paths + name)
+                fieldContexts += FieldContext(
+                    name = name,
+                    value = value,
+                    context = context,
+                )
             } else {
                 error("No CasC context is defined for ${path(paths + name)}")
             }
+        }
+
+        // Order fields by decreasing priority
+        fieldContexts.sortByDescending { it.context.priority }
+
+        // Processes the fields in order
+        fieldContexts.forEach { f ->
+            f.context.run(f.value, paths + f.name)
         }
     }
 
