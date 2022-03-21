@@ -3,12 +3,13 @@ package net.nemerosa.ontrack.extension.casc
 import net.nemerosa.ontrack.extension.casc.context.settings.SecuritySettingsContext
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.settings.SecuritySettings
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class CascSecuritySettingsIT : AbstractCascTestJUnit4Support() {
+class CascSecuritySettingsIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var securitySettingsContext: SecuritySettingsContext
@@ -30,6 +31,7 @@ class CascSecuritySettingsIT : AbstractCascTestJUnit4Support() {
                 val settings = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
                 assertTrue(settings.isGrantProjectViewToAll)
                 assertTrue(settings.isGrantProjectParticipationToAll)
+                assertTrue(settings.builtInAuthenticationEnabled)
             }
         }
     }
@@ -49,8 +51,51 @@ class CascSecuritySettingsIT : AbstractCascTestJUnit4Support() {
                     mapOf(
                         "grantProjectViewToAll" to true,
                         "grantProjectParticipationToAll" to true,
+                        "builtInAuthenticationEnabled" to true,
                     ).asJson(),
                     json
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Disabling the built-in authentication`() {
+        // We cannot use the `admin` user since built-in authentication will be disabled
+        securityService.asAdmin {
+            settingsManagerService.saveSettings(
+                SecuritySettings(
+                    isGrantProjectViewToAll = true,
+                    isGrantProjectParticipationToAll = true,
+                    builtInAuthenticationEnabled = true,
+                )
+            )
+            try {
+                casc("""
+                    ontrack:
+                        config:
+                            settings:
+                                security:
+                                    grantProjectViewToAll: true
+                                    grantProjectParticipationToAll: true
+                                    builtInAuthenticationEnabled: false
+                """.trimIndent())
+
+                // Checks the new settings
+                val settings = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
+                assertTrue(settings.isGrantProjectViewToAll)
+                assertTrue(settings.isGrantProjectParticipationToAll)
+                assertFalse(settings.builtInAuthenticationEnabled)
+
+            }
+            // Restoring the old settings
+            finally {
+                settingsManagerService.saveSettings(
+                    SecuritySettings(
+                        isGrantProjectViewToAll = true,
+                        isGrantProjectParticipationToAll = true,
+                        builtInAuthenticationEnabled = true,
+                    )
                 )
             }
         }
