@@ -17,6 +17,8 @@ include::integration-sonarqube.adoc[]
 
 include::integration-jenkins.adoc[]
 
+include::integration-slack.adoc[]
+
 include::integration-metrics.adoc[]
 
 // TODO include::integration-graphql.adoc[]

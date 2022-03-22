@@ -1,0 +1,21 @@
+[[slack]]
+=== Integration with Slack
+
+Ontrack can be configured to send notifications to Slack.
+
+Slack settings are available in _Settings > Slack settings_:
+
+* _Enabled_ - if Slack integration is enabled or not
+* _Token_ - Slack token
+
+This configuration can be set as <<casc,code>>:
+
+[source,yaml]
+----
+ontrack:
+   config:
+      settings:
+         slack:
+            enabled: true
+            token: some-secret-token
+----
