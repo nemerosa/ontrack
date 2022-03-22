@@ -27,6 +27,9 @@ TIP: When applicable, the default value is mentioned.
 # Ontrack properties
 # ======================================================
 
+# Root URL for this Ontrack installation, used for notifications
+ontrack.config.url = http://localhost:8080
+
 # Maximum number of days to keep the log entries
 ontrack.config.application-log-retention-days = 7
 
