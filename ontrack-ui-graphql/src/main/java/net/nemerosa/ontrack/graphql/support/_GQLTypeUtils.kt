@@ -112,6 +112,7 @@ fun getDescription(type: KClass<*>, description: String? = null): String =
         ?: type.findAnnotation<APIDescription>()?.value
         ?: type.java.simpleName
 
+@Deprecated("Use net.nemerosa.ontrack.model.annotations.APIUtilsKt.getDescription instead")
 fun getDescription(property: KProperty<*>, defaultDescription: String? = null): String =
     defaultDescription
         ?: property.findAnnotation<APIDescription>()?.value
