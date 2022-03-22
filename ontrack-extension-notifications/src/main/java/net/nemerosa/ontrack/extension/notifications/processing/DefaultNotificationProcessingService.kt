@@ -4,8 +4,10 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.extension.notifications.queue.NotificationQueueItem
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional
 class DefaultNotificationProcessingService(
     private val notificationChannelRegistry: NotificationChannelRegistry,
 ) : NotificationProcessingService {
