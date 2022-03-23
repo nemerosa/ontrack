@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public interface EntityDataStore {
 
@@ -167,6 +168,13 @@ public interface EntityDataStore {
      * Note that the {@link EntityDataStoreFilter#getEntity()} parameter is required.
      */
     List<EntityDataStoreRecord> getByFilter(EntityDataStoreFilter entityDataStoreFilter);
+
+    /**
+     * Loops over a list of records based on a filter
+     * <p>
+     * Note that the {@link EntityDataStoreFilter#getEntity()} parameter is required.
+     */
+    void forEachByFilter(EntityDataStoreFilter entityDataStoreFilter, Consumer<EntityDataStoreRecord> consumer);
 
     /**
      * Gets a count of records based on a filter

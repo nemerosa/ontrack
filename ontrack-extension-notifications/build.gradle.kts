@@ -10,7 +10,9 @@ dependencies {
     api(project(":ontrack-extension-support"))
     api(project(":ontrack-ui-support"))
 
+    implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-extension-casc"))
+    implementation(project(":ontrack-repository-support"))
     implementation("org.slf4j:slf4j-api")
 
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
