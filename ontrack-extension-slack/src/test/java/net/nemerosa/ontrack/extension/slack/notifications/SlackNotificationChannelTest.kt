@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.extension.slack.SlackSettings
 import net.nemerosa.ontrack.extension.slack.service.SlackService
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
-import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -25,7 +24,6 @@ class SlackNotificationChannelTest {
     private lateinit var project: Project
     private lateinit var event: Event
 
-    private lateinit var eventRenderer: EventRenderer
     private lateinit var cachedSettingsService: CachedSettingsService
     private lateinit var slackService: SlackService
     private lateinit var channel: SlackNotificationChannel
@@ -34,11 +32,9 @@ class SlackNotificationChannelTest {
     fun before() {
         slackService = mockk()
         cachedSettingsService = mockk()
-        eventRenderer = mockk()
         channel = SlackNotificationChannel(
             slackService,
             cachedSettingsService,
-            eventRenderer,
         )
 
         project = Project.of(NameDescription.nd("project", "Test project")).withId(ID.of(1))
@@ -50,13 +46,9 @@ class SlackNotificationChannelTest {
         every { cachedSettingsService.getCachedSettings(SlackSettings::class.java) } returns SlackSettings(
             enabled = true
         )
-        every { eventRenderer.render(project, event) } returns project.name
         every { slackService.sendNotification(any(), any()) } returns true
         val config = SlackNotificationChannelConfig(channel = "#test")
         val result = channel.publish(config, event)
-        verify {
-            eventRenderer.render(project, event)
-        }
         verify {
             slackService.sendNotification("#test", "Project project has been disabled.", null)
         }
@@ -69,7 +61,6 @@ class SlackNotificationChannelTest {
         every { cachedSettingsService.getCachedSettings(SlackSettings::class.java) } returns SlackSettings(
             enabled = true
         )
-        every { eventRenderer.render(project, event) } returns project.name
         every { slackService.sendNotification(any(), any()) } returns false // <== returning an error
         val config = SlackNotificationChannelConfig(channel = "#test")
         val result = channel.publish(config, event)

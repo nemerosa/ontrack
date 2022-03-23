@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.slack.SlackSettings
 import net.nemerosa.ontrack.extension.slack.service.SlackService
 import net.nemerosa.ontrack.model.events.Event
-import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
 
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component
 class SlackNotificationChannel(
     private val slackService: SlackService,
     private val cachedSettingsService: CachedSettingsService,
-    private val eventRenderer: EventRenderer,
 ) : AbstractNotificationChannel<SlackNotificationChannelConfig>(SlackNotificationChannelConfig::class) {
 
     override fun publish(config: SlackNotificationChannelConfig, event: Event): NotificationResult {
@@ -30,7 +28,7 @@ class SlackNotificationChannel(
         }
     }
 
-    private fun format(event: Event): String = event.render(eventRenderer)
+    private fun format(event: Event): String = event.renderText()
 
     override val type: String = "slack"
 
