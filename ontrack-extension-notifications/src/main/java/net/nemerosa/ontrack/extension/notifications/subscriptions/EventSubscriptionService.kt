@@ -8,6 +8,11 @@ import net.nemerosa.ontrack.model.events.Event
 interface EventSubscriptionService {
 
     /**
+     * Registering a subscription
+     */
+    fun subscribe(subscription: EventSubscription): SavedEventSubscription
+
+    /**
      * Looping over all matching subscriptions for a given event.
      *
      * @param event Event to match

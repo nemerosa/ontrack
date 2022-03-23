@@ -4,12 +4,14 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
 
 @Component
 class WebhookNotificationChannel(
     private val webhookAdminService: WebhookAdminService,
     private val webhookExecutionService: WebhookExecutionService,
+    private val cachedSettingsService: CachedSettingsService,
 ) : AbstractNotificationChannel<WebhookNotificationChannelConfig>(WebhookNotificationChannelConfig::class) {
 
     override fun publish(config: WebhookNotificationChannelConfig, event: Event): NotificationResult {
@@ -34,5 +36,5 @@ class WebhookNotificationChannel(
 
     override val type: String = "webhook"
 
-    override val enabled: Boolean = TODO("Use the global webhook settings")
+    override val enabled: Boolean = cachedSettingsService.getCachedSettings(WebhookSettings::class.java).enabled
 }
