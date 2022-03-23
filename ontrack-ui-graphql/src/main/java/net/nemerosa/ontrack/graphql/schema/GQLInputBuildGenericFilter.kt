@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import graphql.Scalars
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInputType
+import graphql.schema.GraphQLType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData
@@ -21,7 +22,7 @@ class GQLInputBuildGenericFilter(
 
     override fun getTypeRef() = GraphQLTypeReference(GENERIC_BUILD_FILTER)
 
-    override fun createInputType(): GraphQLInputType {
+    override fun createInputType(dictionary: MutableSet<GraphQLType>): GraphQLInputType {
         return GraphQLInputObjectType.newInputObject()
                 .name(GENERIC_BUILD_FILTER)
                 .field {

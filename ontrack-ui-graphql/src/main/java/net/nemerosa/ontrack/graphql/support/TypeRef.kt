@@ -6,4 +6,9 @@ package net.nemerosa.ontrack.graphql.support
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)
 @MustBeDocumented
-annotation class TypeRef
+annotation class TypeRef(
+    /**
+     * If [embedded] is true, then the corresponding type will be created and added into the directory.
+     */
+    val embedded: Boolean = false,
+)

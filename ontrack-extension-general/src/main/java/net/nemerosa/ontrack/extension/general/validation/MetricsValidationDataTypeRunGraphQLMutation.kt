@@ -61,7 +61,7 @@ class MetricsValidationDataTypeRunGraphQLMutation(
 @Component
 class GQLInputMetricsEntry : GQLInputType<MetricsEntryInput> {
 
-    override fun createInputType(): GraphQLInputType = GraphQLInputObjectType.newInputObject()
+    override fun createInputType(dictionary: MutableSet<GraphQLType>): GraphQLInputType = GraphQLInputObjectType.newInputObject()
         .name(MetricsEntryInput::class.java.simpleName)
         .description("One metric: a name and a value")
         .field(

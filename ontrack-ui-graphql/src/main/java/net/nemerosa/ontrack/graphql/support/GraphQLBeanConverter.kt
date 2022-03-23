@@ -27,7 +27,7 @@ object GraphQLBeanConverter {
         "class"
     )
 
-    fun asInputFields(type: KClass<*>): List<GraphQLInputObjectField> {
+    fun asInputFields(type: KClass<*>, dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> {
         val fields = mutableListOf<GraphQLInputObjectField>()
         // Gets the properties for the type
         type.memberProperties.forEach { property ->
@@ -45,13 +45,30 @@ object GraphQLBeanConverter {
                     .description(description)
                     .type(actualType)
                     .build()
+            } else if (property.returnType.javaType is Class<*> && (property.returnType.javaType as Class<*>).isEnum) {
+                // For an Enum, we assume this has been declared elsewhere as a GraphQL type
+                // with its name equal to the simple Java type name
+                val enumType = GraphQLTypeReference((property.returnType.javaType as Class<*>).simpleName)
+                val actualType = nullableInputType(enumType, property.returnType.isMarkedNullable)
+                fields += GraphQLInputObjectField.newInputObjectField()
+                    .name(name)
+                    .description(description)
+                    .type(actualType)
+                    .build()
             } else {
                 val typeRef = property.findAnnotation<TypeRef>()
                 if (typeRef != null) {
                     val javaType = property.returnType.javaType
                     if (javaType is Class<*>) {
-                        val rootType = GraphQLTypeReference(javaType.simpleName)
-                        val actualType: GraphQLInputType = if (property.returnType.isMarkedNullable) {
+                        val rootType: GraphQLInputType = if (typeRef.embedded) {
+                            val kotlinClass = Reflection.createKotlinClass(javaType)
+                            val gqlType = asInputType(kotlinClass, dictionary) as GraphQLInputObjectType
+                            dictionary.add(gqlType)
+                            GraphQLTypeReference(gqlType.name)
+                        } else {
+                            GraphQLTypeReference(javaType.simpleName)
+                        }
+                        val actualType = if (property.returnType.isMarkedNullable) {
                             rootType
                         } else {
                             GraphQLNonNull(rootType)
@@ -84,7 +101,7 @@ object GraphQLBeanConverter {
                             throw IllegalStateException("List is supported only if it has a type")
                         }
                     } else {
-                        throw IllegalStateException("Cannot create an input field out of $property since its type is not scalar and the property is not annotated with @TypeRef")
+                        throw IllegalStateException("Cannot create an input field out of $property since its type is not scalar and the property is not annotated with @TypeRef or @ListRef")
                     }
                 }
             }
@@ -93,9 +110,9 @@ object GraphQLBeanConverter {
         return fields
     }
 
-    fun asInputType(type: KClass<*>): GraphQLInputType = GraphQLInputObjectType.newInputObject()
+    fun asInputType(type: KClass<*>, dictionary: MutableSet<GraphQLType>): GraphQLInputType = GraphQLInputObjectType.newInputObject()
         .name(type.simpleName)
-        .fields(asInputFields(type))
+        .fields(asInputFields(type, dictionary))
         .build()
 
     fun asObjectType(type: KClass<*>, cache: GQLTypeCache): GraphQLObjectType =

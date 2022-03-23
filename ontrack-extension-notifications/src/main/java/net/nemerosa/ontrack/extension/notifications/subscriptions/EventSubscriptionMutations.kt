@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import net.nemerosa.ontrack.graphql.schema.Mutation
+import net.nemerosa.ontrack.graphql.support.ListRef
+import net.nemerosa.ontrack.graphql.support.TypeRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.ID
@@ -45,10 +47,13 @@ class EventSubscriptionMutations(
 @APIDescription("Subscription to events")
 data class SubscribeToEventsInput(
     @APIDescription("Target project entity (null for global events)")
+    @TypeRef
     val projectEntity: EventSubscriptionEntityInput?,
     @APIDescription("Channels to send this event to")
+    @ListRef
     val channels: List<EventSubscriptionChannel>,
     @APIDescription("List of events types to subscribe to")
+    @ListRef
     val events: List<String>,
 )
 

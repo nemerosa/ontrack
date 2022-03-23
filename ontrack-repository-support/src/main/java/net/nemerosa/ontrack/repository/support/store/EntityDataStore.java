@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.repository.support.store;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.Signature;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDateTime;
@@ -174,7 +175,7 @@ public interface EntityDataStore {
      * <p>
      * Note that the {@link EntityDataStoreFilter#getEntity()} parameter is required.
      */
-    void forEachByFilter(EntityDataStoreFilter entityDataStoreFilter, Consumer<EntityDataStoreRecord> consumer);
+    void forEachByFilter(@NotNull EntityDataStoreFilter entityDataStoreFilter, @NotNull Consumer<EntityDataStoreRecord> consumer);
 
     /**
      * Gets a count of records based on a filter

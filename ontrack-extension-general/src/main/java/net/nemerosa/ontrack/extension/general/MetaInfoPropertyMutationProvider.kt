@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.extension.general
 
 import graphql.Scalars.GraphQLBoolean
-import graphql.schema.GraphQLInputObjectField
-import graphql.schema.GraphQLInputObjectType
-import graphql.schema.GraphQLInputType
-import graphql.schema.GraphQLTypeReference
+import graphql.schema.*
 import net.nemerosa.ontrack.graphql.schema.*
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
@@ -70,7 +67,7 @@ class MetaInfoPropertyMutationProvider(
 @Component
 class GQLInputMetaInfoPropertyItem : GQLInputType<MetaInfoPropertyItem> {
 
-    override fun createInputType(): GraphQLInputType = GraphQLInputObjectType.newInputObject()
+    override fun createInputType(dictionary: MutableSet<GraphQLType>): GraphQLInputType = GraphQLInputObjectType.newInputObject()
         .name(NAME)
         .description("Meta information property")
         .field(stringInputField(MetaInfoPropertyItem::name))

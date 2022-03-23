@@ -21,6 +21,39 @@ class GraphQLBeanConverterTest {
     }
 
     @Test
+    fun `Recursive creation of input types`() {
+        val dictionary = mutableSetOf<GraphQLType>()
+        val entityRef = GraphQLBeanConverter.asInputType(EntityRef::class, dictionary)
+        assertIs<GraphQLInputObjectType>(entityRef) { entityRefInput ->
+            assertIs<GraphQLNonNull>(entityRefInput.getField("entity").type) { entityNotNull ->
+                assertIs<GraphQLTypeReference>(entityNotNull.wrappedType) { entity ->
+                    assertEquals("Entity", entity.name)
+                }
+            }
+        }
+        assertEquals(1, dictionary.size)
+        val type = dictionary.first()
+        assertIs<GraphQLInputObjectType>(type) {
+            assertEquals("Entity", it.name)
+        }
+    }
+
+    @Test
+    fun `Enum type for an input`() {
+        val fields = GraphQLBeanConverter.asInputFields(Entity::class, mutableSetOf())
+        val indexedFields = fields.associate {
+            it.name to typeName(it.type)
+        }
+        assertEquals(
+            mapOf(
+                "type" to "EntityType!",
+                "id" to "Int!",
+            ),
+            indexedFields
+        )
+    }
+
+    @Test
     fun `Scalar types`() {
         assertNotNull(GraphQLBeanConverter.getScalarType(String::class.java)) {
             assertEquals("String", it.name)
@@ -52,7 +85,7 @@ class GraphQLBeanConverterTest {
 
     @Test
     fun `Simple input type`() {
-        val fields = GraphQLBeanConverter.asInputFields(Person::class)
+        val fields = GraphQLBeanConverter.asInputFields(Person::class, mutableSetOf())
         val indexedFields = fields.associate {
             it.name to typeName(it.type)
         }
@@ -127,7 +160,8 @@ class GraphQLBeanConverterTest {
 
     @Test
     fun `Input fields for NameDescriptionState`() {
-        val fields = GraphQLBeanConverter.asInputFields(NameDescriptionState::class).associateBy { it.name }
+        val fields =
+            GraphQLBeanConverter.asInputFields(NameDescriptionState::class, mutableSetOf()).associateBy { it.name }
         assertNotNull(fields["name"]) {
             assertEquals("String!", typeName(it.type))
             assertEquals("name field", it.description)
@@ -144,7 +178,8 @@ class GraphQLBeanConverterTest {
 
     @Test
     fun `Input fields for UpdateProjectInput`() {
-        val fields = GraphQLBeanConverter.asInputFields(UpdateProjectInput::class).associateBy { it.name }
+        val fields =
+            GraphQLBeanConverter.asInputFields(UpdateProjectInput::class, mutableSetOf()).associateBy { it.name }
         assertNotNull(fields["id"]) {
             assertEquals("Int!", typeName(it.type))
             assertEquals("Project ID", it.description)
@@ -165,7 +200,7 @@ class GraphQLBeanConverterTest {
 
     @Test
     fun `Input list fields`() {
-        val type = GraphQLBeanConverter.asInputType(Group::class) as GraphQLInputObjectType
+        val type = GraphQLBeanConverter.asInputType(Group::class, mutableSetOf()) as GraphQLInputObjectType
         val accounts = type.getField("accounts") ?: fail("Cannot find account field")
         assertIs<GraphQLNonNull>(accounts.type) { root ->
             assertIs<GraphQLList>(root.wrappedType) { listType ->

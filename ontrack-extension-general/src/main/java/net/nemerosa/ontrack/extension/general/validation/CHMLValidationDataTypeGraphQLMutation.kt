@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.extension.general.validation
 
-import graphql.schema.GraphQLInputObjectField
-import graphql.schema.GraphQLInputObjectType
-import graphql.schema.GraphQLInputType
-import graphql.schema.GraphQLTypeReference
+import graphql.schema.*
 import net.nemerosa.ontrack.graphql.schema.*
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
@@ -56,7 +53,7 @@ class GQLInputCHMLLevel(
     private val gqlEnumCHML: GQLEnumCHML
 ) : GQLInputType<CHMLLevel> {
 
-    override fun createInputType(): GraphQLInputType = GraphQLInputObjectType.newInputObject()
+    override fun createInputType(dictionary: MutableSet<GraphQLType>): GraphQLInputType = GraphQLInputObjectType.newInputObject()
         .name(INPUT_NAME)
         .description("CHML level, associated a given CHML type and a value")
         .field(

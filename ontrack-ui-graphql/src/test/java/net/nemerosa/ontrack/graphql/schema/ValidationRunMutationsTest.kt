@@ -10,7 +10,7 @@ class ValidationRunMutationsTest {
 
     @Test
     fun `Run info must be a field in the validation run input`() {
-        val fields = GraphQLBeanConverter.asInputFields(CreateValidationRunByIdInput::class)
+        val fields = GraphQLBeanConverter.asInputFields(CreateValidationRunByIdInput::class, mutableSetOf())
         val runInfo = fields.find { it.name == "runInfo" }
         assertNotNull(runInfo, "`runInfo` field is available") {
             assertEquals("RunInfoInput", typeName(it.type))
