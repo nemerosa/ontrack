@@ -4,6 +4,9 @@ import com.slack.api.Slack
 import com.slack.api.methods.MethodsClient
 import net.nemerosa.ontrack.extension.slack.SlackSettings
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.support.ApplicationLogEntry
+import net.nemerosa.ontrack.model.support.ApplicationLogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -11,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class DefaultSlackService(
     private val cachedSettingsService: CachedSettingsService,
+    private val applicationLogService: ApplicationLogService,
 ) : SlackService {
 
     override fun sendNotification(channel: String, message: String, iconEmoji: String?): Boolean {
@@ -19,8 +23,8 @@ class DefaultSlackService(
             // Gets the client
             val client = getSlackClient(settings.token, null)
             // Sending the message
-            val response = try {
-                client.chatPostMessage {
+            return try {
+                val response = client.chatPostMessage {
                     it.channel(channel).text(message).run {
                         if (iconEmoji.isNullOrBlank()) {
                             this
@@ -29,18 +33,22 @@ class DefaultSlackService(
                         }
                     }
                 }
+                if (response.isOk) {
+                    true
+                } else {
+                    throw SlackServiceException("Slack message could not be sent (no additional detail).")
+                }
             } catch (ex: Exception) {
-                // TODO Logs the error
+                // Logs the error
+                applicationLogService.log(
+                    ApplicationLogEntry.error(
+                        ex,
+                        NameDescription.nd("slack-error", "Slack notification error"),
+                        "Cannot send Slack message: ${ex.message}"
+                    ).withDetail("channel", channel)
+                )
                 // OK
                 return false
-            }
-            // Result
-            if (!response.isOk) {
-                // TODO Logs the error
-                // OK
-                false
-            } else {
-                true
             }
         } else {
             false
