@@ -13,7 +13,7 @@ class DefaultSlackService(
     private val cachedSettingsService: CachedSettingsService,
 ) : SlackService {
 
-    override fun sendNotification(channel: String, message: String): Boolean {
+    override fun sendNotification(channel: String, message: String, iconEmoji: String?): Boolean {
         val settings = cachedSettingsService.getCachedSettings(SlackSettings::class.java)
         return if (settings.enabled) {
             // Gets the client
@@ -21,7 +21,13 @@ class DefaultSlackService(
             // Sending the message
             val response = try {
                 client.chatPostMessage {
-                    it.channel(channel).text(message) // TODO .iconEmoji(":ontrack:")
+                    it.channel(channel).text(message).run {
+                        if (iconEmoji.isNullOrBlank()) {
+                            this
+                        } else {
+                            iconEmoji(iconEmoji)
+                        }
+                    }
                 }
             } catch (ex: Exception) {
                 // TODO Logs the error

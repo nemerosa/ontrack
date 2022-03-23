@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.slack.SlackSettings
 import net.nemerosa.ontrack.extension.slack.service.SlackService
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
 
@@ -12,13 +13,15 @@ import org.springframework.stereotype.Component
 class SlackNotificationChannel(
     private val slackService: SlackService,
     private val cachedSettingsService: CachedSettingsService,
+    private val eventRenderer: EventRenderer,
 ) : AbstractNotificationChannel<SlackNotificationChannelConfig>(SlackNotificationChannelConfig::class) {
 
     override fun publish(config: SlackNotificationChannelConfig, event: Event): NotificationResult {
         // Formatting the message
         val message = format(event)
         // Sending the message
-        val sent = slackService.sendNotification(config.channel, message)
+        // TODO Icon emoji from the settings
+        val sent = slackService.sendNotification(config.channel, message, iconEmoji = null)
         // Result
         return if (sent) {
             NotificationResult.ok()
@@ -27,9 +30,7 @@ class SlackNotificationChannel(
         }
     }
 
-    private fun format(event: Event): String {
-        TODO("Not yet implemented")
-    }
+    private fun format(event: Event): String = event.render(eventRenderer)
 
     override val type: String = "slack"
 
