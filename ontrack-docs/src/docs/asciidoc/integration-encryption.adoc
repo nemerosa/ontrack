@@ -32,6 +32,49 @@ A `master.key` file is used to encrypt the individual keys themselves, so two fi
 * `master.key`
 * `net.nemerosa.ontrack.security.EncryptionServiceImpl.encryption`
 
+[[integration-encryption-secret]]
+==== Secret confidential store
+
+[NOTE]
+====
+The `secret` confidential store is particularly well suited for a Kubernetes
+deployment of Ontrack, where a K8S secret is mapped to a volume mounted in
+the Ontrack pod.
+
+See the https://github.com/nemerosa/ontrack-chart[Ontrack chart] for more details.
+====
+
+This store is _read-only_ and provides a unique key.
+
+The configuration of this store looks like:
+
+[source,properties]
+----
+ontrack.config.key-store = secret
+ontrack.config.file-key-store.directory = <path>
+----
+
+[NOTE]
+====
+Alternatively, the following environment variables can be set:
+
+`ONTRACK_CONFIG_KEY_STORE = secret`
+`ONTRACK_CONFIG_FILE_KEY_STORE_DIRECTORY = <path>`
+====
+
+`<path>` is the path to a directory which:
+
+* must exist
+* must contain the `net.nemerosa.ontrack.security.EncryptionServiceImpl.encryption` file
+* this file must exist and must be readable
+
+The content of this file is the key used for the encryption of the credentials in Ontrack. It can be generated using:
+
+[source,bash]
+----
+openssl rand 256 > net.nemerosa.ontrack.security.EncryptionServiceImpl.encryption
+----
+
 [[integration-encryption-jdbc]]
 ==== JDBC confidential store
 
