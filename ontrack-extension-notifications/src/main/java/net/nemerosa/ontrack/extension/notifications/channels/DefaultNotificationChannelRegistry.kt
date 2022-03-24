@@ -4,8 +4,10 @@ import org.springframework.stereotype.Component
 
 @Component
 class DefaultNotificationChannelRegistry(
+    channels: List<NotificationChannel<*>>,
 ) : NotificationChannelRegistry {
-    override fun findChannel(type: String): NotificationChannel<*>? {
-        TODO("Not yet implemented")
-    }
+
+    private val index = channels.associateBy { it.type }
+
+    override fun findChannel(type: String): NotificationChannel<*>? = index[type]
 }
