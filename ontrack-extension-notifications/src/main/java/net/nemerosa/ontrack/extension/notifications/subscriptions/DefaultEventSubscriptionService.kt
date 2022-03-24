@@ -73,9 +73,11 @@ class DefaultEventSubscriptionService(
                 val filter = EntityDataStoreFilter(
                     entity = projectEntity,
                     category = ENTITY_DATA_STORE_CATEGORY,
-                    // TODO Filter on event type
-                    // left join jsonb_array_elements_text(json::jsonb->'events') as events on true
-                    // events = 'NEW_PROMOTION_RUN'
+                    jsonContext = "left join jsonb_array_elements_text(json::jsonb->'events') as events on true",
+                    jsonFilter = "events = :event",
+                    jsonFilterCriterias = mapOf(
+                        "event" to event.eventType.id
+                    )
                 )
                 entityDataStore.forEachByFilter(filter) { storeRecord ->
                     val record = storeRecord.data.parseOrNull<SubscriptionRecord>()
