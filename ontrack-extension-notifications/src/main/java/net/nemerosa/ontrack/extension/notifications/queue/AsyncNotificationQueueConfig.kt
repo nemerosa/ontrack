@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.queue
 
 import net.nemerosa.ontrack.extension.notifications.NotificationsConfigProperties
+import net.nemerosa.ontrack.extension.notifications.model.Notification
 import org.springframework.amqp.core.*
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -46,7 +47,7 @@ class AsyncNotificationQueueConfig(
          */
         fun getRoutingKey(
             notificationsConfigProperties: NotificationsConfigProperties,
-            item: NotificationQueueItem,
+            item: Notification,
         ): String =
             DEFAULT
 

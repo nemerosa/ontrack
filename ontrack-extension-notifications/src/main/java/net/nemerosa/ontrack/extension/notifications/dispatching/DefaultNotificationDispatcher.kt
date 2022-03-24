@@ -2,8 +2,8 @@ package net.nemerosa.ontrack.extension.notifications.dispatching
 
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
+import net.nemerosa.ontrack.extension.notifications.model.Notification
 import net.nemerosa.ontrack.extension.notifications.queue.NotificationQueue
-import net.nemerosa.ontrack.extension.notifications.queue.NotificationQueueItem
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscription
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionChannel
 import net.nemerosa.ontrack.model.events.Event
@@ -50,8 +50,7 @@ class DefaultNotificationDispatcher(
     ): Boolean {
         val channelConfig = channel.validate(eventSubscriptionChannel.channelConfig)
         return if (channelConfig.isOk()) {
-            // Serialization of the event
-            val item = NotificationQueueItem(
+            val item = Notification(
                 channel = eventSubscriptionChannel.channel,
                 channelConfig = eventSubscriptionChannel.channelConfig,
                 event = event,

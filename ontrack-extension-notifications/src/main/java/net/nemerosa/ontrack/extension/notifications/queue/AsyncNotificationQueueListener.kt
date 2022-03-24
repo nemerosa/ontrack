@@ -20,6 +20,7 @@ class AsyncNotificationQueueListener(
     private val securityService: SecurityService,
     private val notificationProcessingService: NotificationProcessingService,
     private val applicationLogService: ApplicationLogService,
+    private val notificationQueueItemConverter: NotificationQueueItemConverter,
 ) : RabbitListenerConfigurer {
 
     override fun configureRabbitListeners(registrar: RabbitListenerEndpointRegistrar) {
@@ -51,15 +52,16 @@ class AsyncNotificationQueueListener(
         try {
             val body = message.body.toString(Charsets.UTF_8)
             val payload = body.parseAsJson().parse<NotificationQueueItem>()
+            securityService.asAdmin {
+                val notification = notificationQueueItemConverter.convertFromQueue(payload)
 //           val queue = message.messageProperties.consumerQueue
 //          TODO  meterRegistry.increment(
 //                payload,
 //                IngestionMetrics.Queue.consumedCount,
 //                INGESTION_METRIC_QUEUE_TAG to queue
 //            )
-            securityService.asAdmin {
                 // TODO ingestionHookPayloadStorage.queue(payload, queue)
-                notificationProcessingService.process(payload)
+                notificationProcessingService.process(notification)
             }
         } catch (any: Throwable) {
             applicationLogService.log(

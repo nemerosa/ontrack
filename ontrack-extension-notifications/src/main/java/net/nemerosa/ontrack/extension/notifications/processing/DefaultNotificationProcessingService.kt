@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.notifications.processing
 
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
-import net.nemerosa.ontrack.extension.notifications.queue.NotificationQueueItem
+import net.nemerosa.ontrack.extension.notifications.model.Notification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -14,14 +14,14 @@ class DefaultNotificationProcessingService(
 
     // TODO Notifications processing metrics
 
-    override fun process(item: NotificationQueueItem) {
+    override fun process(item: Notification) {
         val channel = notificationChannelRegistry.findChannel(item.channel)
         if (channel != null) {
             process(channel, item)
         }
     }
 
-    private fun <C> process(channel: NotificationChannel<C>, item: NotificationQueueItem) {
+    private fun <C> process(channel: NotificationChannel<C>, item: Notification) {
         val validatedConfig = channel.validate(item.channelConfig)
         if (validatedConfig.config != null) {
             val result = channel.publish(validatedConfig.config, item.event)
