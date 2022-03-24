@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.model.security.AbstractConfidentialStore
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 import java.io.File
@@ -22,6 +23,9 @@ class SecretFileConfidentialStore(
 
     init {
         val path = ontrackConfigProperties.fileKeyStore.directory
+        LoggerFactory.getLogger(SecretFileConfidentialStore::class.java).info(
+            "[key-store] Using Secret based key store (directory = $path)"
+        )
         if (path.isBlank()) {
             throw SecretFileConfidentialStoreNoDirectoryException()
         } else {
