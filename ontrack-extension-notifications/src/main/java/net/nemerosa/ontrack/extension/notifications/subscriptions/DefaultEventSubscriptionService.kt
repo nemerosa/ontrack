@@ -74,6 +74,8 @@ class DefaultEventSubscriptionService(
                     entity = projectEntity,
                     category = ENTITY_DATA_STORE_CATEGORY,
                     // TODO Filter on event type
+                    // left join jsonb_array_elements_text(json::jsonb->'events') as events on true
+                    // events = 'NEW_PROMOTION_RUN'
                 )
                 entityDataStore.forEachByFilter(filter) { storeRecord ->
                     val record = storeRecord.data.parseOrNull<SubscriptionRecord>()

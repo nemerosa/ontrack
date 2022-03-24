@@ -384,14 +384,16 @@ class EntityDataStoreJdbcRepository(
         // Checks the entity
         requireNotNull(entityDataStoreFilter.entity) { "The filter `entity` parameter is required." }
         // SQL criterias
+        val context = StringBuilder()
         val critera = StringBuilder()
         val params = MapSqlParameterSource()
-        buildCriteria(entityDataStoreFilter, critera, params)
+        buildCriteria(entityDataStoreFilter, context, critera, params)
         // Runs the query
         return namedParameterJdbcTemplate!!.query(
             """
                     SELECT * 
                     FROM ENTITY_DATA_STORE 
+                    $context
                     WHERE 1 = 1  
                     $critera 
                     ORDER BY CREATION DESC, ID DESC 
@@ -409,14 +411,16 @@ class EntityDataStoreJdbcRepository(
         // Checks the entity
         requireNotNull(entityDataStoreFilter.entity) { "The filter `entity` parameter is required." }
         // SQL criterias
+        val context = StringBuilder()
         val critera = StringBuilder()
         val params = MapSqlParameterSource()
-        buildCriteria(entityDataStoreFilter, critera, params)
+        buildCriteria(entityDataStoreFilter, context, critera, params)
         // Runs the query
         namedParameterJdbcTemplate!!.query(
             """
                     SELECT * 
                     FROM ENTITY_DATA_STORE 
+                    $context
                     WHERE 1 = 1  
                     $critera 
                     ORDER BY CREATION DESC, ID DESC 
@@ -430,13 +434,16 @@ class EntityDataStoreJdbcRepository(
         }
     }
 
-    override fun getCountByFilter(entityDataStoreFilter: EntityDataStoreFilter): Int { // SQL criterias
+    override fun getCountByFilter(entityDataStoreFilter: EntityDataStoreFilter): Int {
+        // SQL criterias
+        val context = StringBuilder()
         val critera = StringBuilder()
         val params = MapSqlParameterSource()
-        buildCriteria(entityDataStoreFilter, critera, params)
+        buildCriteria(entityDataStoreFilter, context, critera, params)
         // Runs the query
         return namedParameterJdbcTemplate!!.queryForObject(String.format(
             "SELECT COUNT(*) FROM ENTITY_DATA_STORE " +
+                    "$context " +
                     "WHERE 1 = 1 " +
                     " %s " +
                     "LIMIT :page OFFSET :offset",
@@ -450,26 +457,29 @@ class EntityDataStoreJdbcRepository(
     }
 
     override fun deleteByFilter(entityDataStoreFilter: EntityDataStoreFilter): Int { // SQL criterias
+        val context = StringBuilder()
         val critera = StringBuilder()
         val params = MapSqlParameterSource()
-        buildCriteria(entityDataStoreFilter, critera, params)
+        buildCriteria(entityDataStoreFilter, context, critera, params)
         // Runs the query
         return namedParameterJdbcTemplate!!.update(
-            "DELETE FROM ENTITY_DATA_STORE WHERE 1 = 1 $critera",
+            "DELETE FROM ENTITY_DATA_STORE $context WHERE 1 = 1 $critera",
             params
         )
     }
 
     override fun deleteRangeByFilter(entityDataStoreFilter: EntityDataStoreFilter): Int { // SQL criterias
         val critera = StringBuilder()
+        val context = StringBuilder()
         val params = MapSqlParameterSource()
-        buildCriteria(entityDataStoreFilter, critera, params)
+        buildCriteria(entityDataStoreFilter, context, critera, params)
         // Runs the query
         return namedParameterJdbcTemplate!!.update("""
                 DELETE FROM ENTITY_DATA_STORE
                 WHERE ctid IN (
                     SELECT ctid
                     FROM ENTITY_DATA_STORE
+                    $context
                     WHERE 1 = 1
                     $critera
                     ORDER BY ID DESC
@@ -484,6 +494,7 @@ class EntityDataStoreJdbcRepository(
 
     private fun buildCriteria(
         filter: EntityDataStoreFilter,
+        context: StringBuilder,
         criteria: StringBuilder,
         params: MapSqlParameterSource,
     ) { // Entity
@@ -511,13 +522,15 @@ class EntityDataStoreJdbcRepository(
             criteria.append(" AND CREATION <= :beforeTime")
             params.addValue("beforeTime", dateTimeForDB(filter.beforeTime))
         }
+        // JSON context
+        if (!filter.jsonContext.isNullOrBlank()) {
+            context.append(filter.jsonContext)
+        }
         // JSON filter
         if (!filter.jsonFilter.isNullOrBlank()) {
             criteria.append(" AND ${filter.jsonFilter}")
-            filter.jsonFilterCriterias?.apply {
-                forEach { (name, value) ->
-                    params.addValue(name, value)
-                }
+            filter.jsonFilterCriterias?.onEach { (name, value) ->
+                params.addValue(name, value)
             }
         }
     }

@@ -1,6 +1,10 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
+import graphql.schema.GraphQLObjectType
+import net.nemerosa.ontrack.graphql.schema.GQLType
+import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.Mutation
+import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter
 import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypeRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
@@ -74,3 +78,12 @@ data class EventSubscriptionPayload(
     @APIDescription("List of events types to subscribe to")
     val events: List<String>,
 )
+
+@Component
+class GQLTypeEventSubscriptionPayload : GQLType {
+    override fun getTypeName(): String = EventSubscriptionPayload::class.java.simpleName
+
+    override fun createType(cache: GQLTypeCache): GraphQLObjectType =
+        GraphQLBeanConverter.asObjectType(EventSubscriptionPayload::class, cache)
+
+}
