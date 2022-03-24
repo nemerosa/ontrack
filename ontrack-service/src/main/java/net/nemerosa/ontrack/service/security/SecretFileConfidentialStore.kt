@@ -14,7 +14,7 @@ import java.io.File
  * mounted as volumes for example).
  */
 @Component
-@ConditionalOnProperty(name = [OntrackConfigProperties.KEY_STORE], havingValue = "secret", matchIfMissing = true)
+@ConditionalOnProperty(name = [OntrackConfigProperties.KEY_STORE], havingValue = "secret", matchIfMissing = false)
 class SecretFileConfidentialStore(
     ontrackConfigProperties: OntrackConfigProperties,
 ) : AbstractConfidentialStore() {
