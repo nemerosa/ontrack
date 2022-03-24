@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.extension.notifications.queue
 
+import net.nemerosa.ontrack.extension.notifications.NotificationsConfigProperties
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.format
+import org.springframework.amqp.core.AmqpTemplate
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
@@ -10,8 +14,22 @@ import org.springframework.stereotype.Component
     havingValue = "true",
     matchIfMissing = true,
 )
-class AsyncNotificationQueue : NotificationQueue {
+class AsyncNotificationQueue(
+    private val amqpTemplate: AmqpTemplate,
+    private val notificationsConfigProperties: NotificationsConfigProperties,
+) : NotificationQueue {
 
-    override fun publish(item: NotificationQueueItem): Boolean = TODO("Implement the async queue for the events")
+    override fun publish(item: NotificationQueueItem): Boolean {
+        val routingKey = AsyncNotificationQueueConfig.getRoutingKey(notificationsConfigProperties, item)
+        // TODO Notification storage
+        // TODO Metrics
+        val message = item.asJson().format()
+        amqpTemplate.convertAndSend(
+            AsyncNotificationQueueConfig.TOPIC,
+            routingKey,
+            message,
+        )
+        return true
+    }
 
 }
