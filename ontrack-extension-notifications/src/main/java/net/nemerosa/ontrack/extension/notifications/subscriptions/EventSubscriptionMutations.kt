@@ -47,10 +47,10 @@ class EventSubscriptionMutations(
 @APIDescription("Subscription to events")
 data class SubscribeToEventsInput(
     @APIDescription("Target project entity (null for global events)")
-    @TypeRef
+    @TypeRef(embedded = true)
     val projectEntity: EventSubscriptionEntityInput?,
     @APIDescription("Channels to send this event to")
-    @ListRef
+    @ListRef(embedded = true, suffix = "Input")
     val channels: List<EventSubscriptionChannel>,
     @APIDescription("List of events types to subscribe to")
     @ListRef

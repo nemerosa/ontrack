@@ -61,10 +61,7 @@ object GraphQLBeanConverter {
                     val javaType = property.returnType.javaType
                     if (javaType is Class<*>) {
                         val rootType: GraphQLInputType = if (typeRef.embedded) {
-                            val kotlinClass = Reflection.createKotlinClass(javaType)
-                            val gqlType = asInputType(kotlinClass, dictionary) as GraphQLInputObjectType
-                            dictionary.add(gqlType)
-                            GraphQLTypeReference(gqlType.name)
+                            getOrCreateEmbeddedInputType(javaType, typeRef.suffix, dictionary)
                         } else {
                             GraphQLTypeReference(javaType.simpleName)
                         }
@@ -88,7 +85,12 @@ object GraphQLBeanConverter {
                         if (listArguments.size == 1) {
                             val elementType = listArguments.first().type?.javaType
                             if (elementType is Class<*>) {
-                                val rootType = GraphQLTypeReference(elementType.simpleName)
+                                val rootType = getScalarType(elementType)
+                                    ?: if (listRef.embedded) {
+                                        getOrCreateEmbeddedInputType(elementType, listRef.suffix, dictionary)
+                                    } else {
+                                        GraphQLTypeReference(elementType.simpleName)
+                                    }
                                 fields += GraphQLInputObjectField.newInputObjectField()
                                     .name(name)
                                     .description(description)
@@ -110,10 +112,31 @@ object GraphQLBeanConverter {
         return fields
     }
 
-    fun asInputType(type: KClass<*>, dictionary: MutableSet<GraphQLType>): GraphQLInputType = GraphQLInputObjectType.newInputObject()
-        .name(type.simpleName)
-        .fields(asInputFields(type, dictionary))
-        .build()
+    private fun getOrCreateEmbeddedInputType(
+        type: Class<*>,
+        suffix: String,
+        dictionary: MutableSet<GraphQLType>,
+    ): GraphQLInputType {
+        val typeName = type.simpleName + suffix
+        val existingType = dictionary.find { it is GraphQLInputObjectType && it.name == typeName }
+        return if (existingType != null) {
+            GraphQLTypeReference(typeName)
+        } else {
+            val kotlinClass = Reflection.createKotlinClass(type)
+            val gqlType = asInputType(kotlinClass, suffix, dictionary) as GraphQLInputObjectType
+            dictionary.add(gqlType)
+            GraphQLTypeReference(gqlType.name)
+        }
+    }
+
+    fun asInputType(type: KClass<*>, dictionary: MutableSet<GraphQLType>): GraphQLInputType =
+        asInputType(type, "", dictionary)
+
+    fun asInputType(type: KClass<*>, suffix: String, dictionary: MutableSet<GraphQLType>): GraphQLInputType =
+        GraphQLInputObjectType.newInputObject()
+            .name(type.simpleName + suffix)
+            .fields(asInputFields(type, dictionary))
+            .build()
 
     fun asObjectType(type: KClass<*>, cache: GQLTypeCache): GraphQLObjectType =
         asObjectTypeBuilder(type, cache).build()
