@@ -82,6 +82,10 @@ ontrack.config.jobs.timeout-controller-interval = 15m
 # Confidential store for the encryption keys
 ontrack.config.key-store = file
 
+# Directory to use for the `file` confidential store
+# Optional. If not filled in, will use a subdirectory of the working directory
+# ontrack.config.file-key-store.directory =
+
 # Cache configuration
 # Caffeine spec strings per cache type
 # See http://static.javadoc.io/com.github.ben-manes.caffeine/caffeine/2.6.0/com/github/benmanes/caffeine/cache/CaffeineSpec.html

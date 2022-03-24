@@ -81,6 +81,11 @@ class OntrackConfigProperties {
      */
     var documents = DocumentProperties()
 
+    /**
+     * Key store settings
+     */
+    var fileKeyStore = FileKeyStoreProperties()
+
     @PostConstruct
     fun log() {
         if (!configurationTest) {
@@ -93,6 +98,18 @@ class OntrackConfigProperties {
         logger.info("[search] Index batch tracing = ${search.index.tracing}")
         logger.info("[search] Index creation error ignoring = ${search.index.ignoreExisting}")
         logger.info("[document] Documents engine = ${documents.engine}")
+    }
+
+    /**
+     * File key store settings
+     */
+    class FileKeyStoreProperties {
+        /**
+         * Directory where to store the secret files.
+         *
+         * If empty, the [applicationWorkingDir] will be used as a root instead.
+         */
+        var directory: String = ""
     }
 
     /**
@@ -118,6 +135,7 @@ class OntrackConfigProperties {
              * JDBC based
              */
             const val JDBC = "jdbc"
+
             /**
              * Default value
              */
@@ -148,10 +166,12 @@ class OntrackConfigProperties {
          */
         @DurationUnit(ChronoUnit.DAYS)
         var validity: Duration = Duration.ofDays(0)
+
         /**
          * Allows the token to be used as passwords.
          */
         var password: Boolean = true
+
         /**
          * Cache properties
          */
@@ -166,11 +186,13 @@ class OntrackConfigProperties {
          * Is caching of the tokens enabled?
          */
         var enabled = true
+
         /**
          * Cache validity period
          */
         @DurationUnit(ChronoUnit.MINUTES)
         var validity: Duration = Duration.ofDays(30)
+
         /**
          * Maximum number of items in the cache. Should be aligned with the
          * number of sessions. Note that the objects stored in the cache are tiny.

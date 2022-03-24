@@ -28,7 +28,7 @@ import javax.crypto.SecretKey
 @Component
 @ConditionalOnProperty(name = [OntrackConfigProperties.KEY_STORE], havingValue = "file", matchIfMissing = true)
 class FileConfidentialStore(
-        private val rootDir: File
+    internal val rootDir: File,
 ) : AbstractConfidentialStore() {
 
     /**
@@ -42,7 +42,10 @@ class FileConfidentialStore(
     private val masterKey: SecretKey
 
     @Autowired
-    constructor(envService: EnvService) : this(envService.getWorkingDir("security", "secrets"))
+    constructor(
+        envService: EnvService,
+        ontrackConfigProperties: OntrackConfigProperties,
+    ) : this(getFileStoreRoot(envService, ontrackConfigProperties))
 
     /**
      * Persists the payload of a key to the disk.
@@ -105,12 +108,21 @@ class FileConfidentialStore(
     companion object {
         private const val ENCODING = "UTF-8"
         private val MAGIC = "::::MAGIC::::".toByteArray()
+
+        private fun getFileStoreRoot(envService: EnvService, ontrackConfigProperties: OntrackConfigProperties): File {
+            val directory = ontrackConfigProperties.fileKeyStore.directory
+            return if (directory.isNotBlank()) {
+                File(directory)
+            } else {
+                envService.getWorkingDir("security", "secrets")
+            }
+        }
     }
 
     init {
         LoggerFactory.getLogger(FileConfidentialStore::class.java).info(
-                "[key-store] Using file based key store at {}",
-                rootDir.absolutePath
+            "[key-store] Using file based key store at {}",
+            rootDir.absolutePath
         )
         val masterSecret = File(rootDir, "master.key")
         if (!masterSecret.exists()) {
