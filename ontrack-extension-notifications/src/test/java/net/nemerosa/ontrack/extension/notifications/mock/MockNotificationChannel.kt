@@ -15,7 +15,7 @@ class MockNotificationChannel :
     val messages = mutableMapOf<String, MutableList<String>>()
 
     override fun publish(config: MockNotificationChannelConfig, event: Event): NotificationResult {
-        messages.getOrElse(config.target) { mutableListOf() }.add(event.renderText())
+        messages.getOrPut(config.target) { mutableListOf() }.add(event.renderText())
         return NotificationResult.ok()
     }
 

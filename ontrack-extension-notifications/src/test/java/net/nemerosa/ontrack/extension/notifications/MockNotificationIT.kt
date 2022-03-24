@@ -9,12 +9,18 @@ import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.context.TestPropertySource
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 /**
  * Notification integration test using a mock channel.
  */
+@TestPropertySource(
+    properties = [
+        "ontrack.extension.notifications.queue.async=false",
+    ]
+)
 class MockNotificationIT : AbstractDSLTestSupport() {
 
     @Autowired
@@ -39,7 +45,7 @@ class MockNotificationIT : AbstractDSLTestSupport() {
             // Checking we got a message on the mock channel
             assertNotNull(mockNotificationChannel.messages[target]) { messages ->
                 assertEquals(1, messages.size)
-                assertEquals("", messages.first())
+                assertEquals("New branch my-branch for project $name.", messages.first())
             }
         }
     }
