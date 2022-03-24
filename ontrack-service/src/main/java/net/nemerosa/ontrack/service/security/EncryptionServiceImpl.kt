@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.service.security.EncryptionServiceKeys.ENCRYPTION_KEY
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContextHolder
@@ -16,10 +17,10 @@ class EncryptionServiceImpl(private val key: ConfidentialKey) : EncryptionServic
     @Autowired
     @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     constructor(confidentialStore: ConfidentialStore) : this(
-            CryptoConfidentialKey(
-                    confidentialStore,
-                    "net.nemerosa.ontrack.security.EncryptionServiceImpl.encryption"
-            )
+        CryptoConfidentialKey(
+            confidentialStore,
+            ENCRYPTION_KEY
+        )
     )
 
     override fun encrypt(plain: String?): String? = plain?.let { key.encrypt(it) }
@@ -48,18 +49,19 @@ class EncryptionServiceImpl(private val key: ConfidentialKey) : EncryptionServic
         val authorised: Boolean
         val context = SecurityContextHolder.getContext()
         val authentication = context.authentication
-        authorised = if (authentication != null && authentication.isAuthenticated && authentication.principal is OntrackAuthenticatedUser) {
-            val user = authentication.principal as OntrackAuthenticatedUser
-            user.isGranted(ApplicationManagement::class.java) &&
-                    user.isGranted(GlobalSettings::class.java)
-        } else {
-            false
-        }
+        authorised =
+            if (authentication != null && authentication.isAuthenticated && authentication.principal is OntrackAuthenticatedUser) {
+                val user = authentication.principal as OntrackAuthenticatedUser
+                user.isGranted(ApplicationManagement::class.java) &&
+                        user.isGranted(GlobalSettings::class.java)
+            } else {
+                false
+            }
         // NOT GRANTED
         if (!authorised) {
             throw AccessDeniedException(
-                    "The current used has attempted to import/export keys without being authorised: " +
-                            if (authentication != null) authentication.name else "anonymous"
+                "The current used has attempted to import/export keys without being authorised: " +
+                        if (authentication != null) authentication.name else "anonymous"
             )
         }
     }
