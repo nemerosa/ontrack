@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
-import net.nemerosa.ontrack.service.events.EventFactoryImpl
+import net.nemerosa.ontrack.model.events.EventFactoryImpl
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 

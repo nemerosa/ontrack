@@ -1,6 +1,7 @@
-package net.nemerosa.ontrack.service.events;
+package net.nemerosa.ontrack.model.events;
 
 import net.nemerosa.ontrack.model.events.EventFactory;
+import net.nemerosa.ontrack.model.events.EventFactoryImpl;
 import net.nemerosa.ontrack.model.events.EventType;
 import net.nemerosa.ontrack.model.events.SimpleEventType;
 import org.junit.Test;

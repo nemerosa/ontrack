@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.service.events;
+package net.nemerosa.ontrack.model.events;
 
 import net.nemerosa.ontrack.model.events.Event;
 import net.nemerosa.ontrack.model.events.EventFactory;

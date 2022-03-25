@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.support.NameValue
-import net.nemerosa.ontrack.service.events.EventFactoryImpl
+import net.nemerosa.ontrack.model.events.EventFactoryImpl
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
