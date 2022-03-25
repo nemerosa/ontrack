@@ -18,6 +18,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api")
 
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
 
