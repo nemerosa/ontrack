@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-repository-support"))
     implementation(project(":ontrack-rabbitmq"))
+    implementation("org.springframework:spring-context")
     implementation("org.slf4j:slf4j-api")
 
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))

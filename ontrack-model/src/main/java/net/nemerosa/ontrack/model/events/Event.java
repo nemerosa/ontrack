@@ -11,8 +11,6 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static net.nemerosa.ontrack.model.events.PlainEventRenderer.INSTANCE;
-
 /**
  * Definition of an event
  */
@@ -64,7 +62,7 @@ public final class Event {
     }
 
     public String renderText() {
-        return render(INSTANCE);
+        return render(PlainEventRenderer.INSTANCE);
     }
 
     public String render(EventRenderer eventRenderer) {

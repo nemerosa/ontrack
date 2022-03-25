@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component
 class SlackNotificationChannel(
     private val slackService: SlackService,
     private val cachedSettingsService: CachedSettingsService,
+    private val slackNotificationEventRenderer: SlackNotificationEventRenderer,
 ) : AbstractNotificationChannel<SlackNotificationChannelConfig>(SlackNotificationChannelConfig::class) {
 
     override fun publish(config: SlackNotificationChannelConfig, event: Event): NotificationResult {
@@ -28,7 +29,7 @@ class SlackNotificationChannel(
         }
     }
 
-    private fun format(event: Event): String = event.renderText()
+    private fun format(event: Event): String = event.render(slackNotificationEventRenderer)
 
     override val type: String = "slack"
 
