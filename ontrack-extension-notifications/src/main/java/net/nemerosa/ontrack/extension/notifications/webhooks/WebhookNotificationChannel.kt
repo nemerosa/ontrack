@@ -36,5 +36,5 @@ class WebhookNotificationChannel(
 
     override val type: String = "webhook"
 
-    override val enabled: Boolean = cachedSettingsService.getCachedSettings(WebhookSettings::class.java).enabled
+    override val enabled: Boolean get() = cachedSettingsService.getCachedSettings(WebhookSettings::class.java).enabled
 }
