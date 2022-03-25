@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.notifications
 
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionService
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.events.EventFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
@@ -15,7 +15,7 @@ import org.springframework.test.context.TestPropertySource
         "ontrack.extension.notifications.queue.async=false",
     ]
 )
-abstract class AbstractNotificationTestSupport : AbstractDSLTestSupport() {
+abstract class AbstractNotificationTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
     protected lateinit var eventSubscriptionService: EventSubscriptionService

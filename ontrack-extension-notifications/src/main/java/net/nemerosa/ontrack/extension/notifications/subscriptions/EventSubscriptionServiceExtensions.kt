@@ -30,3 +30,15 @@ fun <C> EventSubscriptionService.subscribe(
         events = eventTypes.map { it.id }.toSet()
     )
 )
+
+/**
+ * Gets a required subscription using its ID
+ *
+ * @param projectEntity Entity to look for
+ * @param id ID of the subscription
+ * @return Subscription
+ * @throws EventSubscriptionIdNotFoundException If the ID cannot be found
+ */
+fun EventSubscriptionService.getSubscriptionById(projectEntity: ProjectEntity?, id: String) =
+    findSubscriptionById(projectEntity, id)
+        ?: throw EventSubscriptionIdNotFoundException(projectEntity, id)
