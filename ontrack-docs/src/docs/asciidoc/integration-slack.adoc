@@ -8,7 +8,7 @@ Slack settings are available in _Settings > Slack settings_:
 * _Enabled_ - if Slack integration is enabled or not
 * _Token_ - Slack token
 
-This configuration can be set as <<casc,code>>:
+This configuration can also be set as <<casc,code>>:
 
 [source,yaml]
 ----
@@ -18,4 +18,23 @@ ontrack:
          slack:
             enabled: true
             token: some-secret-token
+----
+
+[[slack-setup]]
+==== Slack setup
+
+This section explains how to setup your workspace for Ontrack to be able to send messages in some channels.
+
+First, you need to create a Slack app by following the instructions at https://api.slack.com/authentication/basics:
+
+* create the Slack App
+* the `chat:write` scope is enough for Ontrack
+* add also `chat:write.public` if you want to allow all public channels to be writable by Ontrack
+* install the App into your workspace and copy the Bot token value for the <<slack,setup above>>
+
+For public channels, unless the `chat:write.public` scope has been granted, and for private channels, you need to invite the App into the channel:
+
+[source]
+----
+/invite @<App>
 ----
