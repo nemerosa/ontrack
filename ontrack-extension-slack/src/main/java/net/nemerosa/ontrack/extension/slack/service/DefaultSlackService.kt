@@ -25,7 +25,7 @@ class DefaultSlackService(
             // Sending the message
             return try {
                 val response = client.chatPostMessage {
-                    it.channel(channel).text(message).run {
+                    it.channel(channel).text(message).mrkdwn(true).run {
                         if (iconEmoji.isNullOrBlank()) {
                             this
                         } else {
@@ -36,7 +36,7 @@ class DefaultSlackService(
                 if (response.isOk) {
                     true
                 } else {
-                    throw SlackServiceException("Slack message could not be sent (no additional detail).")
+                    throw SlackServiceException(response.error?.takeIf { it.isNotBlank() }?.let { "Slack message could not be sent: $it" } ?: "Slack message could not be sent (no additional detail).")
                 }
             } catch (ex: Exception) {
                 // Logs the error

@@ -16,7 +16,7 @@ class SlackNotificationEventRenderer(
 
     override fun render(projectEntity: ProjectEntity, event: Event): String {
         val pageUrl = getUrl(ProjectEntityPageBuilder.getEntityPageRelativeURI(projectEntity))
-        return "[${getProjectEntityName(projectEntity)}](${pageUrl})"
+        return "<$pageUrl|${getProjectEntityName(projectEntity)}>"
     }
 
     override fun render(valueKey: String, value: NameValue, event: Event): String = "_${value.value}_"

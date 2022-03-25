@@ -25,7 +25,7 @@ internal class SlackNotificationEventRendererTest {
         val event = eventFactory.newProject(project)
         val text = event.render(htmlNotificationEventRenderer)
         assertEquals(
-            """New project [PRJ](https://ontrack.nemerosa.net/#/project/1).""",
+            """New project <https://ontrack.nemerosa.net/#/project/1|PRJ>.""",
             text
         )
     }
@@ -47,7 +47,7 @@ internal class SlackNotificationEventRendererTest {
         val event = eventFactory.newBranch(branch)
         val text = event.render(htmlNotificationEventRenderer)
         assertEquals(
-            """New branch [main](https://ontrack.nemerosa.net/#/branch/10) for project [PRJ](https://ontrack.nemerosa.net/#/project/1).""",
+            """New branch <https://ontrack.nemerosa.net/#/branch/10|main> for project <https://ontrack.nemerosa.net/#/project/1|PRJ>.""",
             text
         )
     }
@@ -58,7 +58,7 @@ internal class SlackNotificationEventRendererTest {
         val event = eventFactory.newPromotionRun(promotionRun)
         val text = event.render(htmlNotificationEventRenderer)
         assertEquals(
-            """Build [1](https://ontrack.nemerosa.net/#/build/100) has been promoted to [PL](https://ontrack.nemerosa.net/#/promotionLevel/200) for branch [main](https://ontrack.nemerosa.net/#/branch/10) in [PRJ](https://ontrack.nemerosa.net/#/project/1).""",
+            """Build <https://ontrack.nemerosa.net/#/build/100|1> has been promoted to <https://ontrack.nemerosa.net/#/promotionLevel/200|PL> for branch <https://ontrack.nemerosa.net/#/branch/10|main> in <https://ontrack.nemerosa.net/#/project/1|PRJ>.""",
             text
         )
     }
@@ -71,7 +71,7 @@ internal class SlackNotificationEventRendererTest {
         )
         val text = event.render(htmlNotificationEventRenderer)
         assertEquals(
-            """_Simple value_ property has changed for _project_ [PRJ](https://ontrack.nemerosa.net/#/project/1).""",
+            """_Simple value_ property has changed for _project_ <https://ontrack.nemerosa.net/#/project/1|PRJ>.""",
             text
         )
     }
