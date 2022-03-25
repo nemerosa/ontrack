@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -35,6 +36,7 @@ class SlackNotificationChannelTest {
         channel = SlackNotificationChannel(
             slackService,
             cachedSettingsService,
+            SlackNotificationEventRenderer(OntrackConfigProperties())
         )
 
         project = Project.of(NameDescription.nd("project", "Test project")).withId(ID.of(1))
@@ -50,7 +52,7 @@ class SlackNotificationChannelTest {
         val config = SlackNotificationChannelConfig(channel = "#test")
         val result = channel.publish(config, event)
         verify {
-            slackService.sendNotification("#test", "Project project has been disabled.", null)
+            slackService.sendNotification("#test", "Project [project](http://localhost:8080/#/project/1) has been disabled.", null)
         }
         assertEquals(NotificationResultType.OK, result.type)
         assertNull(result.message)

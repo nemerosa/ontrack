@@ -16,6 +16,7 @@ dependencies {
     implementation("com.slack.api:slack-api-client:1.20.2")
 
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
 
