@@ -1,33 +1,17 @@
 package net.nemerosa.ontrack.extension.notifications
 
-import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
-import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionService
 import net.nemerosa.ontrack.extension.notifications.subscriptions.subscribe
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.TestPropertySource
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 /**
  * Notification integration test using a mock channel.
  */
-@TestPropertySource(
-    properties = [
-        "ontrack.extension.notifications.queue.async=false",
-    ]
-)
-class MockNotificationIT : AbstractDSLTestSupport() {
-
-    @Autowired
-    private lateinit var eventSubscriptionService: EventSubscriptionService
-
-    @Autowired
-    private lateinit var mockNotificationChannel: MockNotificationChannel
+class MockNotificationIT : AbstractNotificationTestSupport() {
 
     @Test
     fun `Notification for a branch being created`() {

@@ -36,7 +36,7 @@ public final class TestUtils {
         return l;
     }
 
-    public static String uid(String prefix) {
+    public static @NotNull String uid(String prefix) {
         return prefix + new SimpleDateFormat("mmssSSS").format(new Date()) + counter.incrementAndGet();
     }
 
