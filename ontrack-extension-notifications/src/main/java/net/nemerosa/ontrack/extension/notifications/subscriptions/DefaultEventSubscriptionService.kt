@@ -155,6 +155,11 @@ class DefaultEventSubscriptionService(
                     }
                 }
 
+                // Filter: created before
+                if (filter.createdBefore != null) {
+                    storeFilter = storeFilter.withBeforeTime(filter.createdBefore)
+                }
+
                 // Json context
                 val jsonContextList = mutableListOf<String>()
                 if (jsonContextChannels) {

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.ProjectEntityID
+import java.time.LocalDateTime
 
 /**
  * Filter for event subscriptions.
@@ -19,4 +20,6 @@ data class EventSubscriptionFilter(
     val channel: String? = null,
     @APIDescription("Filter against the channel configuration (channel is required)")
     val channelConfig: String? = null,
+    @APIDescription("Subscriptions created before or on this date")
+    val createdBefore: LocalDateTime? = null,
 )

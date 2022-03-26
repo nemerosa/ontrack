@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
 import net.nemerosa.ontrack.json.asJson
@@ -224,6 +227,42 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             // Looking for all subscriptions on this promotion, and recursively
             val page = eventSubscriptionService.filterSubscriptions(
                 EventSubscriptionFilter(entity = toProjectEntityID(), channel = "mock", channelConfig = "#one")
+            )
+            assertEquals(1, page.pageInfo.totalSize)
+            assertEquals(1, page.pageItems.size)
+            assertEquals(
+                "mock",
+                page.pageItems.first().data.channels.first().channel
+            )
+            assertEquals(
+                "#one",
+                page.pageItems.first().data.channels.first().channelConfig.getRequiredTextField("target")
+            )
+        }
+    }
+
+    @Test
+    fun `Filtering the subscriptions for an entity using creation date`() {
+        project {
+            // Subscribe for events on this project for the two different dates
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#one"),
+                projectEntity = this,
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            runBlocking {
+                delay(2_000L)
+            }
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#two"),
+                projectEntity = this,
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            // Looking for all subscriptions on this promotion, and recursively
+            val page = eventSubscriptionService.filterSubscriptions(
+                EventSubscriptionFilter(entity = toProjectEntityID(), createdBefore = Time.now().minusSeconds(1))
             )
             assertEquals(1, page.pageInfo.totalSize)
             assertEquals(1, page.pageItems.size)
