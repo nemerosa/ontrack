@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications
 
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannel
+import net.nemerosa.ontrack.extension.notifications.mock.OtherMockNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionService
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.events.EventFactory
@@ -23,6 +24,9 @@ abstract class AbstractNotificationTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
     protected lateinit var mockNotificationChannel: MockNotificationChannel
+
+    @Autowired
+    protected lateinit var otherMockNotificationChannel: OtherMockNotificationChannel
 
     @Autowired
     protected lateinit var eventFactory: EventFactory

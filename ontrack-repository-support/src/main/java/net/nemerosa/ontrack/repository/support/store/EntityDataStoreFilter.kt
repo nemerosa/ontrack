@@ -108,6 +108,19 @@ constructor(
             count
     )
 
+    fun withJsonContext(jsonContext: String) = EntityDataStoreFilter(
+            entity,
+            category,
+            name,
+            group,
+            beforeTime,
+            jsonContext,
+            jsonFilter,
+            jsonFilterCriterias,
+            offset,
+            count
+    )
+
     fun withJsonFilter(jsonFilter: String, vararg criterias: Pair<String, String>) = EntityDataStoreFilter(
             entity,
             category,

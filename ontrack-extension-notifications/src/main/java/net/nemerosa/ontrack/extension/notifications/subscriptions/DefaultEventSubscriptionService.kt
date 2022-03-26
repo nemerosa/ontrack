@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.asJsonString
+import net.nemerosa.ontrack.json.format
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.pagination.PaginatedList
@@ -114,6 +115,7 @@ class DefaultEventSubscriptionService(
         val result = mutableListOf<SavedEventSubscription>()
 
         // For each entity in the chain
+        // TODO Use an utility method to paginate over several collection providers
         chain.forEach { entity ->
             // While the list size does not exceed the page size
             if (slidingOffset >= 0 && result.size < filter.size) {
@@ -122,13 +124,44 @@ class DefaultEventSubscriptionService(
                 // Sliding the offset
                 slidingOffset = maxOf(0, slidingOffset - total)
                 // Creating the store filter
-                val storeFilter = EntityDataStoreFilter(
+                var storeFilter = EntityDataStoreFilter(
                     entity = entity,
                     category = ENTITY_DATA_STORE_CATEGORY,
                     offset = slidingOffset,
                     count = leftOver,
                 )
-                // TODO Completing the filter
+
+                // All JSON context
+                var jsonContextChannels = false
+                // var jsonContextEvents = false
+                val jsonFilters = mutableListOf<String>()
+                val jsonCriteria = mutableMapOf<String, String>()
+
+                // Filter: channel
+                if (!filter.channel.isNullOrBlank()) {
+                    jsonContextChannels = true
+                    val json = mapOf("channel" to filter.channel).asJson().format()
+                    jsonFilters += """channels::jsonb @> '$json'::jsonb"""
+                }
+
+                // Json context
+                val jsonContextList = mutableListOf<String>()
+                if (jsonContextChannels) {
+                    jsonContextList += "left join jsonb_array_elements_text(json::jsonb->'channels') as channels on true"
+                }
+                // if (jsonContextEvents) {
+                //     jsonContextList += "left join jsonb_array_elements_text(json::jsonb->'events') as events on true"
+                // }
+                if (jsonContextList.isNotEmpty()) {
+                    storeFilter = storeFilter.withJsonContext(jsonContextList.joinToString(" "))
+                }
+
+                // Json filter
+                storeFilter = storeFilter.withJsonFilter(
+                    jsonFilters.joinToString(" AND ") { "( $it )" },
+                    *jsonCriteria.toList().toTypedArray()
+                )
+
                 // Total count for THIS entity
                 val count = entityDataStore.getCountByFilter(storeFilter)
                 // Completing the total
