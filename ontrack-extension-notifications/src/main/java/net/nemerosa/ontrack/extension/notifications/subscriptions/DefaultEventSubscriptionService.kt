@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.asJsonString
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.support.StorageService
@@ -46,8 +47,11 @@ class DefaultEventSubscriptionService(
             // One existing record
             if (records.size == 1) {
                 // Just returns the existing record
+                val existingRecord = records.first()
                 return SavedEventSubscription(
-                    records.first().name, subscription
+                    id = existingRecord.name,
+                    signature = existingRecord.signature,
+                    data = subscription,
                 )
             } else {
                 // If more than 1 record, this is abnormal, we remove the old records
@@ -55,7 +59,7 @@ class DefaultEventSubscriptionService(
                 // New ID
                 val id = UUID.randomUUID().toString()
                 // Saves the subscription
-                entityDataStore.replaceOrAddObject(
+                val newRecord = entityDataStore.replaceOrAddObject(
                     subscription.projectEntity,
                     ENTITY_DATA_STORE_CATEGORY,
                     id,
@@ -64,7 +68,7 @@ class DefaultEventSubscriptionService(
                     record
                 )
                 // OK
-                return SavedEventSubscription(id, subscription)
+                return SavedEventSubscription(id, newRecord.signature, subscription)
             }
         } else {
             TODO("Global registration not implemented yet")
@@ -80,6 +84,10 @@ class DefaultEventSubscriptionService(
         } else {
             TODO("Checks also for global listeners")
         }
+
+    override fun filterSubscriptions(filter: EventSubscriptionFilter): PaginatedList<SavedEventSubscription> {
+        TODO("Not yet implemented")
+    }
 
     override fun forEveryMatchingSubscription(event: Event, code: (subscription: EventSubscription) -> Unit) {
         if (event.entities.isNotEmpty()) {

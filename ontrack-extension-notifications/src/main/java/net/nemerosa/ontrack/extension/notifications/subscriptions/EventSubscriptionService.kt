@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 
 /**
@@ -21,6 +22,19 @@ interface EventSubscriptionService {
      * @return Subscription or null if not found
      */
     fun findSubscriptionById(projectEntity: ProjectEntity?, id: String): EventSubscription?
+
+    /**
+     * Getting a paginated list of subscriptions which match against the given [filter].
+     *
+     * Subscriptions are ordered in the following way:
+     *
+     * * global filters first, entity-scoped subscriptions next
+     * * creation date (most the most recent to the oldest)
+     *
+     * @param filter Subscritption filter
+     * @return Paginated list of subscriptions
+     */
+    fun filterSubscriptions(filter: EventSubscriptionFilter): PaginatedList<SavedEventSubscription>
 
     /**
      * Looping over all matching subscriptions for a given event.
