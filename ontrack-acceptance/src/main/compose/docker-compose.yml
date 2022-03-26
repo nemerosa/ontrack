@@ -32,9 +32,8 @@ services:
          DB_VENDOR: h2
 
    # Rabbit MQ
-   rabbit:
+   rabbitmq:
       image: rabbitmq:3.8.25-management
-      restart: always
       hostname: rabbit
       environment:
          RABBITMQ_DEFAULT_USER: ontrack
@@ -66,6 +65,10 @@ services:
          ONTRACK_CONFIG_SEARCH_ENGINE: "elasticsearch"
          ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
          SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
+         # RabbitMQ
+         SPRING_RABBITMQ_HOST: rabbitmq
+         SPRING_RABBITMQ_USERNAME: ontrack
+         SPRING_RABBITMQ_PASSWORD: ontrack
    selenium:
       image: "selenium/standalone-chrome:91.0"
       shm_size: 2g
