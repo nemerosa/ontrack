@@ -52,6 +52,8 @@ data class Project(
 
     override val entityDisplayName: String get() = "Project $name"
 
+    override val parent: ProjectEntity? = null
+
     override val projectEntityType: ProjectEntityType = ProjectEntityType.PROJECT
 
 

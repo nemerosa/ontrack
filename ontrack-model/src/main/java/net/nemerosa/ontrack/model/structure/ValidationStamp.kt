@@ -50,6 +50,8 @@ data class ValidationStamp(
     override val project: Project
         get() = branch.project
 
+    override val parent: ProjectEntity? get() = branch
+
     override val projectEntityType: ProjectEntityType = ProjectEntityType.VALIDATION_STAMP
 
     override val entityDisplayName: String

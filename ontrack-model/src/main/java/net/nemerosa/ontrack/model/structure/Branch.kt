@@ -62,6 +62,8 @@ data class Branch(
                 )
     }
 
+    override val parent: ProjectEntity? get() = project
+
     override val projectEntityType: ProjectEntityType = ProjectEntityType.BRANCH
 
     override val entityDisplayName: String

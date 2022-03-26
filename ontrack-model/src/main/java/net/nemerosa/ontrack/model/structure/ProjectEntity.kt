@@ -20,6 +20,14 @@ interface ProjectEntity : Entity {
     val project: Project
 
     /**
+     * Returns the parent of this entity (ie. the branch for a build, etc.).
+     *
+     * For a project, null is returned.
+     */
+    @get:JsonIgnore
+    val parent: ProjectEntity?
+
+    /**
      * Returns the ID of the project that contains this entity. This method won't return `null`
      * but the ID could be [undefined][ID.NONE].
      */

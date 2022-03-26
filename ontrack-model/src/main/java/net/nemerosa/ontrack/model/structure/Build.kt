@@ -35,6 +35,8 @@ data class Build(
     override val project: Project
         get() = branch.project
 
+    override val parent: ProjectEntity? get() = branch
+
     override val projectEntityType: ProjectEntityType = ProjectEntityType.BUILD
 
     override val entityDisplayName: String

@@ -39,6 +39,8 @@ data class PromotionLevel(
     override val project: Project
         get() = branch.project
 
+    override val parent: ProjectEntity? get() = branch
+
     override val projectEntityType: ProjectEntityType = ProjectEntityType.PROMOTION_LEVEL
 
     override val entityDisplayName: String
