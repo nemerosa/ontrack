@@ -1,27 +1,22 @@
-package net.nemerosa.ontrack.extension.notifications.queue
+package net.nemerosa.ontrack.extension.notifications.listener
 
-import net.nemerosa.ontrack.extension.notifications.NotificationsConfigProperties
-import net.nemerosa.ontrack.extension.notifications.model.Notification
 import org.springframework.amqp.core.*
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 /**
- * Configuration of the queue(s) for the async processing of event notifications.
+ * Configuration of the queue(s) for the async processing of event dispatching.
  */
 @Configuration
-class AsyncNotificationQueueConfig(
-    // private val notificationsConfigProperties: NotificationsConfigProperties,
-) {
+class AsyncEventListeningQueueConfig {
 
     @Bean
-    fun notificationsProcessingTopicBindings(): Declarables {
+    fun notificationsDispatchingTopicBindings(): Declarables {
         val declarables = mutableListOf<Declarable>()
         // Topic exchange for the notifications
         val exchange = DirectExchange(TOPIC).apply {
             declarables += this
         }
-        // TODO Channel-specific queues
         // Default queue (catch-all)
         val defaultQueue = Queue(
             "$QUEUE_PREFIX.$DEFAULT",
@@ -41,20 +36,9 @@ class AsyncNotificationQueueConfig(
     companion object {
 
         /**
-         * Getting the routing key for a given payload
-         *
-         * TODO Channel-specific queues
-         */
-        fun getRoutingKey(
-            notificationsConfigProperties: NotificationsConfigProperties,
-            item: Notification,
-        ): String =
-            DEFAULT
-
-        /**
          * Topic exchange name
          */
-        const val TOPIC = "notifications.processing"
+        const val TOPIC = "notifications.dispatching"
 
         /**
          * Prefix for the queue names
@@ -65,5 +49,10 @@ class AsyncNotificationQueueConfig(
          * Default queuing
          */
         const val DEFAULT = "default"
+
+        /**
+         * Getting the routing key for a given payload
+         */
+        const val ROUTING_KEY = DEFAULT
     }
 }

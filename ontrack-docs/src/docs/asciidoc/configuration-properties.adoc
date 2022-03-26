@@ -146,6 +146,20 @@ ontrack.config.search.index.tracing = false
 ----
 # Are the notifications enabled?
 ontrack.config.extension.notifications.enabled = true
+
+# Dispatching configuration
+
+# Dispatching queuing configuration
+
+# Asynchronous dispatching
+ontrack.config.extension.notifications.dispatching.queue.async = true
+
+# Processing configuration
+
+# Processing queuing configuration
+
+# Asynchronous processing
+ontrack.config.extension.notifications.processing.queue.async = true
 ----
 
 [[configuration-properties-git]]

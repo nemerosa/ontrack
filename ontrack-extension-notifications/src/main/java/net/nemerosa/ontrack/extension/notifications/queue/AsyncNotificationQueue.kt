@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 
 @Component
 @ConditionalOnProperty(
-    prefix = "ontrack.extension.notifications.queue",
+    prefix = "ontrack.config.extension.notifications.processing.queue",
     name = ["async"],
     havingValue = "true",
     matchIfMissing = true,

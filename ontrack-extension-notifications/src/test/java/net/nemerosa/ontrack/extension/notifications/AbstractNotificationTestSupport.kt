@@ -12,7 +12,8 @@ import org.springframework.test.context.TestPropertySource
  */
 @TestPropertySource(
     properties = [
-        "ontrack.extension.notifications.queue.async=false",
+        "ontrack.config.extension.notifications.dispatching.queue.async=false",
+        "ontrack.config.extension.notifications.processing.queue.async=false",
     ]
 )
 abstract class AbstractNotificationTestSupport : AbstractQLKTITSupport() {
