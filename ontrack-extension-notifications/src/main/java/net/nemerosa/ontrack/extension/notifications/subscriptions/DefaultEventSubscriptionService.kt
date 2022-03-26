@@ -166,7 +166,7 @@ class DefaultEventSubscriptionService(
                 }
             }
         } else {
-            TODO("Global registration not implemented yet")
+            // TODO Global registration not implemented yet
         }
     }
 
