@@ -12,7 +12,7 @@ data class EventSubscriptionFilter(
     @APIDescription("Number of items to return")
     val size: Int = 20,
     @APIDescription("Scope of the search")
-    val scope: EventSubscriptionFilterScope = EventSubscriptionFilterScope.MIXED,
+    val scope: EventSubscriptionFilterScope = EventSubscriptionFilterScope.ALL,
     @APIDescription("Entity subscribed to. Required if scope = ENTITY.")
     val entity: ProjectEntityID? = null,
     @APIDescription("Filter against the channel type (exact match)")

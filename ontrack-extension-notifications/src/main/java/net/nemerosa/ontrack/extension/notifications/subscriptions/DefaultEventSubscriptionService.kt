@@ -7,7 +7,9 @@ import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.ProjectEntity
+import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.StorageService
 import net.nemerosa.ontrack.repository.support.store.EntityDataStore
 import net.nemerosa.ontrack.repository.support.store.EntityDataStoreFilter
@@ -20,6 +22,7 @@ class DefaultEventSubscriptionService(
     val storageService: StorageService,
     val entityDataStore: EntityDataStore,
     val securityService: SecurityService,
+    val structureService: StructureService,
 ) : EventSubscriptionService {
 
     companion object {
@@ -79,14 +82,44 @@ class DefaultEventSubscriptionService(
         if (projectEntity != null) {
             entityDataStore.findLastByCategoryAndName(projectEntity, ENTITY_DATA_STORE_CATEGORY, id, null).getOrNull()
                 ?.let { record ->
-                    fromRecord(projectEntity, record)
+                    fromRecord(projectEntity, record)?.data
                 }
         } else {
             TODO("Checks also for global listeners")
         }
 
-    override fun filterSubscriptions(filter: EventSubscriptionFilter): PaginatedList<SavedEventSubscription> {
-        TODO("Not yet implemented")
+    override fun filterSubscriptions(filter: EventSubscriptionFilter): PaginatedList<SavedEventSubscription> =
+        when (filter.scope) {
+            EventSubscriptionFilterScope.GLOBAL -> TODO("Global subscriptions only")
+            EventSubscriptionFilterScope.ENTITY -> filterEntitySubscriptions(filter)
+            EventSubscriptionFilterScope.ALL -> TODO("All subscriptions")
+        }
+
+    private fun filterEntitySubscriptions(filter: EventSubscriptionFilter): PaginatedList<SavedEventSubscription> =
+        if (filter.entity == null) {
+            throw EventSubscriptionFilterEntityRequired()
+        } else {
+            // Loads the target entity
+            val projectEntity = filter.entity.type.getEntityFn(structureService).apply(ID.of(filter.entity.id))
+            // Creating the store filter
+            val storeFilter = EntityDataStoreFilter(
+                entity = projectEntity,
+                category = ENTITY_DATA_STORE_CATEGORY,
+            )
+            // TODO Completing the filter
+            // Count
+            val count = entityDataStore.getCountByFilter(storeFilter)
+            // Loading & converting the records
+            val records = entityDataStore.getByFilter(storeFilter).mapNotNull { record ->
+                fromRecord(projectEntity, record)
+            }
+            // Returning the page
+            PaginatedList.create(records, filter.offset, filter.size, count)
+        }
+
+    private fun filterGlobalSubscriptions(filter: EventSubscriptionFilter): List<SavedEventSubscription> {
+        // TODO Management of global subscriptions
+        return emptyList()
     }
 
     override fun forEveryMatchingSubscription(event: Event, code: (subscription: EventSubscription) -> Unit) {
@@ -104,7 +137,7 @@ class DefaultEventSubscriptionService(
                 entityDataStore.forEachByFilter(filter) { storeRecord ->
                     val subscription = fromRecord(projectEntity, storeRecord)
                     if (subscription != null) {
-                        code(subscription)
+                        code(subscription.data)
                     }
                 }
             }
@@ -117,10 +150,14 @@ class DefaultEventSubscriptionService(
         projectEntity: ProjectEntity?,
         record: EntityDataStoreRecord,
     ) = record.data.parseOrNull<SubscriptionRecord>()?.let {
-        EventSubscription(
-            it.channels,
-            projectEntity,
-            it.events,
+        SavedEventSubscription(
+            id = record.name,
+            signature = record.signature,
+            data = EventSubscription(
+                it.channels,
+                projectEntity,
+                it.events,
+            )
         )
     }
 

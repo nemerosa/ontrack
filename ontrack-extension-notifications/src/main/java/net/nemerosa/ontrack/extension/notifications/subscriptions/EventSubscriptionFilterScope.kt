@@ -16,8 +16,8 @@ enum class EventSubscriptionFilterScope {
     ENTITY,
 
     /**
-     * Mix of the two
+     * Global & all entities
      */
-    MIXED
+    ALL
 
 }
