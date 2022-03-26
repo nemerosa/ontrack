@@ -17,4 +17,6 @@ data class EventSubscriptionFilter(
     val recursive: Boolean = true,
     @APIDescription("Filter against the channel type (exact match)")
     val channel: String? = null,
+    @APIDescription("Filter against the channel configuration (channel is required)")
+    val channelConfig: String? = null,
 )

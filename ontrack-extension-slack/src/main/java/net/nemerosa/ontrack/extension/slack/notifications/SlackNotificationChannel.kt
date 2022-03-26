@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.extension.slack.notifications
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.slack.SlackSettings
 import net.nemerosa.ontrack.extension.slack.service.SlackService
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
@@ -30,6 +32,9 @@ class SlackNotificationChannel(
     }
 
     private fun format(event: Event): String = event.render(slackNotificationEventRenderer)
+
+    override fun toSearchCriteria(text: String): JsonNode =
+        mapOf(SlackNotificationChannelConfig::channel.name to text).asJson()
 
     override val type: String = "slack"
 

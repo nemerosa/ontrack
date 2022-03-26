@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.json.asJson
@@ -33,6 +34,9 @@ class WebhookNotificationChannel(
             NotificationResult.error("Webhook failed: ${ex.message}")
         }
     }
+
+    override fun toSearchCriteria(text: String): JsonNode =
+        mapOf(WebhookNotificationChannelConfig::name.name to text).asJson()
 
     override val type: String = "webhook"
 

@@ -15,6 +15,11 @@ interface NotificationChannel<C> {
     fun publish(config: C, event: Event): NotificationResult
 
     /**
+     * Given a search token, returns a configuration which would match a JSON.
+     */
+    fun toSearchCriteria(text: String): JsonNode
+
+    /**
      * Type of the channel, used as an identifier for the serialization of the subscriptions.
      */
     val type: String

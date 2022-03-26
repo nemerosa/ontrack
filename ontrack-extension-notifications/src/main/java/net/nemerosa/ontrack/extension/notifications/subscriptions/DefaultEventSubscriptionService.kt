@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
+import net.nemerosa.ontrack.extension.notifications.channels.getChannel
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.asJsonString
 import net.nemerosa.ontrack.json.format
@@ -22,6 +24,7 @@ class DefaultEventSubscriptionService(
     val entityDataStore: EntityDataStore,
     val securityService: SecurityService,
     val structureService: StructureService,
+    val notificationChannelRegistry: NotificationChannelRegistry,
 ) : EventSubscriptionService {
 
     companion object {
@@ -142,6 +145,14 @@ class DefaultEventSubscriptionService(
                     jsonContextChannels = true
                     val json = mapOf("channel" to filter.channel).asJson().format()
                     jsonFilters += """channels::jsonb @> '$json'::jsonb"""
+
+                    // Filter: channel config
+                    if (!filter.channelConfig.isNullOrBlank()) {
+                        val channel = notificationChannelRegistry.getChannel(filter.channel)
+                        val criteria = channel.toSearchCriteria(filter.channelConfig)
+                        val jsonConfig = mapOf("channelConfig" to criteria).asJson().format()
+                        jsonFilters += """channels::jsonb @> '$jsonConfig'::jsonb"""
+                    }
                 }
 
                 // Json context
