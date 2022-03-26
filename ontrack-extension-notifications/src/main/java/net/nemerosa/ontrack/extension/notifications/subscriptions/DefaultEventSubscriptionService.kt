@@ -7,9 +7,7 @@ import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.StorageService
 import net.nemerosa.ontrack.repository.support.store.EntityDataStore
 import net.nemerosa.ontrack.repository.support.store.EntityDataStoreFilter
@@ -89,37 +87,63 @@ class DefaultEventSubscriptionService(
         }
 
     override fun filterSubscriptions(filter: EventSubscriptionFilter): PaginatedList<SavedEventSubscription> =
-        when (filter.scope) {
-            EventSubscriptionFilterScope.GLOBAL -> TODO("Global subscriptions only")
-            EventSubscriptionFilterScope.ENTITY -> filterEntitySubscriptions(filter)
-            EventSubscriptionFilterScope.ALL -> TODO("All subscriptions")
-        }
-
-    private fun filterEntitySubscriptions(filter: EventSubscriptionFilter): PaginatedList<SavedEventSubscription> =
         if (filter.entity == null) {
-            throw EventSubscriptionFilterEntityRequired()
+            TODO("Global subscriptions only")
         } else {
-            // Loads the target entity
-            val projectEntity = filter.entity.type.getEntityFn(structureService).apply(ID.of(filter.entity.id))
-            // Creating the store filter
-            val storeFilter = EntityDataStoreFilter(
-                entity = projectEntity,
-                category = ENTITY_DATA_STORE_CATEGORY,
-            )
-            // TODO Completing the filter
-            // Count
-            val count = entityDataStore.getCountByFilter(storeFilter)
-            // Loading & converting the records
-            val records = entityDataStore.getByFilter(storeFilter).mapNotNull { record ->
-                fromRecord(projectEntity, record)
-            }
-            // Returning the page
-            PaginatedList.create(records, filter.offset, filter.size, count)
+            filterEntitySubscriptions(filter.entity, filter)
         }
 
-    private fun filterGlobalSubscriptions(filter: EventSubscriptionFilter): List<SavedEventSubscription> {
-        // TODO Management of global subscriptions
-        return emptyList()
+    private fun filterEntitySubscriptions(
+        projectEntityID: ProjectEntityID,
+        filter: EventSubscriptionFilter,
+    ): PaginatedList<SavedEventSubscription> {
+        // Loads the target entity
+        val projectEntity = projectEntityID.type.getEntityFn(structureService).apply(ID.of(projectEntityID.id))
+        // Gets the list of recursive parents to consider
+        val chain = if (filter.recursive) {
+            projectEntity.parents()
+        } else {
+            listOf(projectEntity)
+        }
+
+        // Total count collected so far
+        var total = 0
+        // Sliding offset
+        var slidingOffset = filter.offset
+        // Total list
+        val result = mutableListOf<SavedEventSubscription>()
+
+        // For each entity in the chain
+        chain.forEach { entity ->
+            // While the list size does not exceed the page size
+            if (slidingOffset >= 0 && result.size < filter.size) {
+                // How much do we need to collect still?
+                val leftOver = filter.size - result.size
+                // Sliding the offset
+                slidingOffset = maxOf(0, slidingOffset - total)
+                // Creating the store filter
+                val storeFilter = EntityDataStoreFilter(
+                    entity = entity,
+                    category = ENTITY_DATA_STORE_CATEGORY,
+                    offset = slidingOffset,
+                    count = leftOver,
+                )
+                // TODO Completing the filter
+                // Total count for THIS entity
+                val count = entityDataStore.getCountByFilter(storeFilter)
+                // Completing the total
+                total += count
+                // Loading & converting the records
+                val items = entityDataStore.getByFilter(storeFilter).mapNotNull { record ->
+                    fromRecord(entity, record)
+                }
+                // Completing the collection
+                result += items
+            }
+        }
+
+        // Getting the final page
+        return PaginatedList.create(result, filter.offset, filter.size, total)
     }
 
     override fun forEveryMatchingSubscription(event: Event, code: (subscription: EventSubscription) -> Unit) {

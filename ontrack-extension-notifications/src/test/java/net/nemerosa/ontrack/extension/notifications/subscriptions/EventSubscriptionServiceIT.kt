@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -76,5 +77,56 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             }
         }
     }
+
+    @Test
+    fun `Filtering the subscriptions for an entity`() {
+        val targetPromotionLevel = uid("PL")
+        val targetBranch = uid("B")
+        val targetProject = uid("P")
+        project {
+            // Subscribe for events on this project
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig(targetProject),
+                projectEntity = this,
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            branch {
+                // Subscribe for events on this branch
+                eventSubscriptionService.subscribe(
+                    channel = mockNotificationChannel,
+                    channelConfig = MockNotificationChannelConfig(targetBranch),
+                    projectEntity = this,
+                    EventFactory.NEW_PROMOTION_RUN
+                )
+                promotionLevel {
+                    // Subscribe for events on this promotion
+                    eventSubscriptionService.subscribe(
+                        channel = mockNotificationChannel,
+                        channelConfig = MockNotificationChannelConfig(targetPromotionLevel),
+                        projectEntity = this,
+                        EventFactory.NEW_PROMOTION_RUN
+                    )
+                    // Looking for all subscriptions on this promotion, and recursively
+                    val page = eventSubscriptionService.filterSubscriptions(
+                        EventSubscriptionFilter(entity = toProjectEntityID(), recursive = true)
+                    )
+                    assertEquals(3, page.pageInfo.totalSize)
+                    assertEquals(3, page.pageItems.size)
+                    val targets =
+                        page.pageItems.map { it.data.channels.first().channelConfig.getRequiredTextField("target") }
+                    assertEquals(
+                        setOf(
+                            targetProject,
+                            targetBranch,
+                            targetPromotionLevel,
+                        ),
+                        targets.toSet()
+                    )
+                }
+            }
+        }
+    }
+
 
 }

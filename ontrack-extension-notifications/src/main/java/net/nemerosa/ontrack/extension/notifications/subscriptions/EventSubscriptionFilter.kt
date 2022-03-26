@@ -11,10 +11,10 @@ data class EventSubscriptionFilter(
     val offset: Int = 0,
     @APIDescription("Number of items to return")
     val size: Int = 20,
-    @APIDescription("Scope of the search")
-    val scope: EventSubscriptionFilterScope = EventSubscriptionFilterScope.ALL,
-    @APIDescription("Entity subscribed to. Required if scope = ENTITY.")
+    @APIDescription("Entity subscribed to.")
     val entity: ProjectEntityID? = null,
+    @APIDescription("Scope of the search (if true, includes the entity and the levels above.")
+    val recursive: Boolean = true,
     @APIDescription("Filter against the channel type (exact match)")
     val channel: String? = null,
 )

@@ -156,6 +156,15 @@ fun ProjectEntityType.loadByNames(structureService: StructureService, names: Map
     }
 }
 
+/**
+ * Given a project entity, returns the list of all the parents
+ */
+fun ProjectEntity?.parents(): List<ProjectEntity> = if (this == null) {
+    emptyList()
+} else {
+    listOf(this) + parent.parents()
+}
+
 private fun Map<String, String>.require(name: String) =
     get(name) ?: throw ProjectEntityNameMissingException(name)
 
