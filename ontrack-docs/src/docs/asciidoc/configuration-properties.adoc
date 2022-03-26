@@ -139,6 +139,15 @@ ontrack.config.search.index.logging = false
 ontrack.config.search.index.tracing = false
 ----
 
+[[configuration-properties-notifications]]
+==== Notifications Configuration properties
+
+[source,properties]
+----
+# Are the notifications enabled?
+ontrack.config.extension.notifications.enabled = true
+----
+
 [[configuration-properties-git]]
 ==== Git Configuration properties
 

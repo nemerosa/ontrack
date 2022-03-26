@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.listener
 
+import net.nemerosa.ontrack.extension.notifications.NotificationsConfigProperties
 import net.nemerosa.ontrack.extension.notifications.dispatching.NotificationDispatcher
 import net.nemerosa.ontrack.extension.notifications.dispatching.NotificationDispatchingResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionService
@@ -15,9 +16,12 @@ import org.springframework.stereotype.Component
 class EventSubscriptionsListener(
     private val eventSubscriptionService: EventSubscriptionService,
     private val notificationDispatcher: NotificationDispatcher,
+    private val notificationsConfigProperties: NotificationsConfigProperties,
 ) : EventListener {
 
     override fun onEvent(event: Event) {
+        // Checks if notifications are enabled
+        if (!notificationsConfigProperties.enabled) return
         // Gets the subscriptions matching this event
         var result = NotificationDispatchingResult.ZERO
         eventSubscriptionService.forEveryMatchingSubscription(event) { subscription ->
