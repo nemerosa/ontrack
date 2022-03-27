@@ -8,8 +8,14 @@ package net.nemerosa.ontrack.model.pagination
  */
 class PaginatedList<T>(
     val pageInfo: PageInfo,
-    val pageItems: List<T>
+    val pageItems: List<T>,
 ) {
+
+    fun <S> map(fn: (T) -> S) = PaginatedList<S>(
+        pageInfo = pageInfo,
+        pageItems = pageItems.map(fn)
+    )
+
     companion object {
 
         fun <T> ofOne(item: T) = PaginatedList(
@@ -38,7 +44,7 @@ class PaginatedList<T>(
         fun <T> create(
             items: List<T>,
             offset: Int,
-            pageSize: Int
+            pageSize: Int,
         ) = create(
             items.subList(
                 maxOf(offset, 0),
@@ -53,7 +59,7 @@ class PaginatedList<T>(
             items: List<T>,
             offset: Int,
             pageSize: Int,
-            total: Int
+            total: Int,
         ): PaginatedList<T> {
             return PaginatedList(
                 pageInfo = PageInfo(

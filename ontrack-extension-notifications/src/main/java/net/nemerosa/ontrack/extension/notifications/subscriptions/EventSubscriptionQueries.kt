@@ -5,6 +5,8 @@ import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import org.springframework.stereotype.Component
 
 @Component
@@ -15,7 +17,7 @@ class GQLRootQueryEventSubscriptions(
     private val eventSubscriptionService: EventSubscriptionService,
 ) : GQLRootQuery {
     override fun getFieldDefinition(): GraphQLFieldDefinition =
-        gqlPaginatedListFactory.createPaginatedField<Any?, SavedEventSubscription>(
+        gqlPaginatedListFactory.createPaginatedField<Any?, EventSubscriptionPayload>(
             cache = GQLTypeCache(),
             fieldName = "eventSubscriptions",
             fieldDescription = "List of event subscriptions",
@@ -28,13 +30,18 @@ class GQLRootQueryEventSubscriptions(
                     .build()
             ),
             itemPaginatedListProvider = { env, _, offset, size ->
-                // Creating the filter
-                val filter = EventSubscriptionFilter(
-                    offset = offset,
-                    size = size,
-                )
+                // Parsing of the filter
+                val filter = env.getArgument<Any>("filter").asJson().parse<EventSubscriptionFilter>()
+                    // Pagination from the root arguments
+                    .withPage(offset, size)
                 // Getting the list
-                eventSubscriptionService.filterSubscriptions(filter)
+                eventSubscriptionService.filterSubscriptions(filter).map {
+                    EventSubscriptionPayload(
+                        id = it.id,
+                        channels = it.data.channels.toList(),
+                        events = it.data.events.toList()
+                    )
+                }
             }
         )
 

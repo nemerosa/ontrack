@@ -20,7 +20,7 @@ data class EventSubscriptionFilter(
     @TypeRef(suffix = "Input")
     val entity: ProjectEntityID? = null,
     @APIDescription("Scope of the search (if true, includes the entity and the levels above.")
-    val recursive: Boolean = true,
+    val recursive: Boolean? = true,
     @APIDescription("Filter against the channel type (exact match)")
     val channel: String? = null,
     @APIDescription("Filter against the channel configuration (channel is required)")
@@ -31,4 +31,16 @@ data class EventSubscriptionFilter(
     val creator: String? = null,
     @APIDescription("Event type")
     val eventType: String? = null,
-)
+) {
+    fun withPage(offset: Int, size: Int) = EventSubscriptionFilter(
+        offset,
+        size,
+        entity,
+        recursive,
+        channel,
+        channelConfig,
+        createdBefore,
+        creator,
+        eventType
+    )
+}

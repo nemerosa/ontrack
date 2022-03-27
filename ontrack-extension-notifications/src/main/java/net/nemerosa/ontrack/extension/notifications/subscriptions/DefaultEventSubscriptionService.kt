@@ -105,7 +105,7 @@ class DefaultEventSubscriptionService(
         // Loads the target entity
         val projectEntity = projectEntityID.type.getEntityFn(structureService).apply(ID.of(projectEntityID.id))
         // Gets the list of recursive parents to consider
-        val chain = if (filter.recursive) {
+        val chain = if (filter.recursive == true) {
             projectEntity.parents()
         } else {
             listOf(projectEntity)

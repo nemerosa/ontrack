@@ -29,8 +29,8 @@ internal class EventSubscriptionMutationsTest {
             }
         }
 
-        assertNotNull(dictionary.find { it is GraphQLInputObjectType && it.name == "EventSubscriptionEntityInput" },
-            "EventSubscriptionEntityInput input type has been created")
+        assertNotNull(dictionary.find { it is GraphQLInputObjectType && it.name == "ProjectEntityIDInput" },
+            "ProjectEntityIDInput input type has been created")
         assertNotNull(dictionary.find { it is GraphQLInputObjectType && it.name == "EventSubscriptionChannelInput" },
             "EventSubscriptionChannelInput input type has been created")
     }
