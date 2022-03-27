@@ -31,79 +31,82 @@ object GraphQLBeanConverter {
         val fields = mutableListOf<GraphQLInputObjectField>()
         // Gets the properties for the type
         type.memberProperties.forEach { property ->
-            val name = getPropertyName(property)
-            val description = getPropertyDescription(property)
-            val scalarType = getScalarType(property.returnType)
-            if (scalarType != null) {
-                val actualType: GraphQLInputType = if (property.returnType.isMarkedNullable) {
-                    scalarType
-                } else {
-                    GraphQLNonNull(scalarType)
-                }
-                fields += GraphQLInputObjectField.newInputObjectField()
-                    .name(name)
-                    .description(description)
-                    .type(actualType)
-                    .build()
-            } else if (property.returnType.javaType is Class<*> && (property.returnType.javaType as Class<*>).isEnum) {
-                // For an Enum, we assume this has been declared elsewhere as a GraphQL type
-                // with its name equal to the simple Java type name
-                val enumType = GraphQLTypeReference((property.returnType.javaType as Class<*>).simpleName)
-                val actualType = nullableInputType(enumType, property.returnType.isMarkedNullable)
-                fields += GraphQLInputObjectField.newInputObjectField()
-                    .name(name)
-                    .description(description)
-                    .type(actualType)
-                    .build()
-            } else {
-                val typeRef = property.findAnnotation<TypeRef>()
-                if (typeRef != null) {
-                    val javaType = property.returnType.javaType
-                    if (javaType is Class<*>) {
-                        val rootType: GraphQLInputType = if (typeRef.embedded) {
-                            getOrCreateEmbeddedInputType(javaType, typeRef.suffix, dictionary)
-                        } else {
-                            GraphQLTypeReference(javaType.simpleName)
-                        }
-                        val actualType = if (property.returnType.isMarkedNullable) {
-                            rootType
-                        } else {
-                            GraphQLNonNull(rootType)
-                        }
-                        fields += GraphQLInputObjectField.newInputObjectField()
-                            .name(name)
-                            .description(description)
-                            .type(actualType)
-                            .build()
+            val ignoreRef = property.findAnnotation<IgnoreRef>()
+            if (ignoreRef == null) {
+                val name = getPropertyName(property)
+                val description = getPropertyDescription(property)
+                val scalarType = getScalarType(property.returnType)
+                if (scalarType != null) {
+                    val actualType: GraphQLInputType = if (property.returnType.isMarkedNullable) {
+                        scalarType
                     } else {
-                        throw IllegalStateException("Unsupported type for input type: $property")
+                        GraphQLNonNull(scalarType)
                     }
+                    fields += GraphQLInputObjectField.newInputObjectField()
+                        .name(name)
+                        .description(description)
+                        .type(actualType)
+                        .build()
+                } else if (property.returnType.javaType is Class<*> && (property.returnType.javaType as Class<*>).isEnum) {
+                    // For an Enum, we assume this has been declared elsewhere as a GraphQL type
+                    // with its name equal to the simple Java type name
+                    val enumType = GraphQLTypeReference((property.returnType.javaType as Class<*>).simpleName)
+                    val actualType = nullableInputType(enumType, property.returnType.isMarkedNullable)
+                    fields += GraphQLInputObjectField.newInputObjectField()
+                        .name(name)
+                        .description(description)
+                        .type(actualType)
+                        .build()
                 } else {
-                    val listRef = property.findAnnotation<ListRef>()
-                    if (listRef != null) {
-                        val listArguments = property.returnType.arguments
-                        if (listArguments.size == 1) {
-                            val elementType = listArguments.first().type?.javaType
-                            if (elementType is Class<*>) {
-                                val rootType = getScalarType(elementType)
-                                    ?: if (listRef.embedded) {
-                                        getOrCreateEmbeddedInputType(elementType, listRef.suffix, dictionary)
-                                    } else {
-                                        GraphQLTypeReference(elementType.simpleName)
-                                    }
-                                fields += GraphQLInputObjectField.newInputObjectField()
-                                    .name(name)
-                                    .description(description)
-                                    .type(listInputType(rootType))
-                                    .build()
+                    val typeRef = property.findAnnotation<TypeRef>()
+                    if (typeRef != null) {
+                        val javaType = property.returnType.javaType
+                        if (javaType is Class<*>) {
+                            val rootType: GraphQLInputType = if (typeRef.embedded) {
+                                getOrCreateEmbeddedInputType(javaType, typeRef.suffix, dictionary)
                             } else {
-                                throw IllegalStateException("Only list elements being Java classes are supported")
+                                GraphQLTypeReference(javaType.simpleName + typeRef.suffix)
+                            }
+                            val actualType = if (property.returnType.isMarkedNullable) {
+                                rootType
+                            } else {
+                                GraphQLNonNull(rootType)
+                            }
+                            fields += GraphQLInputObjectField.newInputObjectField()
+                                .name(name)
+                                .description(description)
+                                .type(actualType)
+                                .build()
+                        } else {
+                            throw IllegalStateException("Unsupported type for input type: $property")
+                        }
+                    } else {
+                        val listRef = property.findAnnotation<ListRef>()
+                        if (listRef != null) {
+                            val listArguments = property.returnType.arguments
+                            if (listArguments.size == 1) {
+                                val elementType = listArguments.first().type?.javaType
+                                if (elementType is Class<*>) {
+                                    val rootType = getScalarType(elementType)
+                                        ?: if (listRef.embedded) {
+                                            getOrCreateEmbeddedInputType(elementType, listRef.suffix, dictionary)
+                                        } else {
+                                            GraphQLTypeReference(elementType.simpleName)
+                                        }
+                                    fields += GraphQLInputObjectField.newInputObjectField()
+                                        .name(name)
+                                        .description(description)
+                                        .type(listInputType(rootType))
+                                        .build()
+                                } else {
+                                    throw IllegalStateException("Only list elements being Java classes are supported")
+                                }
+                            } else {
+                                throw IllegalStateException("List is supported only if it has a type")
                             }
                         } else {
-                            throw IllegalStateException("List is supported only if it has a type")
+                            throw IllegalStateException("Cannot create an input field out of $property since its type is not scalar and the property is not annotated with @TypeRef or @ListRef")
                         }
-                    } else {
-                        throw IllegalStateException("Cannot create an input field out of $property since its type is not scalar and the property is not annotated with @TypeRef or @ListRef")
                     }
                 }
             }

@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.graphql.support.TypeRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.structure.ProjectEntityID
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
@@ -51,22 +52,14 @@ class EventSubscriptionMutations(
 @APIDescription("Subscription to events")
 data class SubscribeToEventsInput(
     @APIDescription("Target project entity (null for global events)")
-    @TypeRef(embedded = true)
-    val projectEntity: EventSubscriptionEntityInput?,
+    @TypeRef(embedded = true, suffix = "Input")
+    val projectEntity: ProjectEntityID?,
     @APIDescription("Channels to send this event to")
     @ListRef(embedded = true, suffix = "Input")
     val channels: List<EventSubscriptionChannel>,
     @APIDescription("List of events types to subscribe to")
     @ListRef
     val events: List<String>,
-)
-
-@APIDescription("Target entity for a subscription")
-data class EventSubscriptionEntityInput(
-    @APIDescription("Project entity type")
-    val type: ProjectEntityType,
-    @APIDescription("Project entity ID")
-    val id: Int,
 )
 
 @APIDescription("Event subscription record")

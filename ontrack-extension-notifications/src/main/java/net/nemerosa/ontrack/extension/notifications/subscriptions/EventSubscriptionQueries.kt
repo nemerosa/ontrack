@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
+import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component
 class GQLRootQueryEventSubscriptions(
     private val gqlPaginatedListFactory: GQLPaginatedListFactory,
     private val gqlTypeEventSubscriptionPayload: GQLTypeEventSubscriptionPayload,
+    private val gqlInputEventSubscriptionFilter: GQLInputEventSubscriptionFilter,
     private val eventSubscriptionService: EventSubscriptionService,
 ) : GQLRootQuery {
     override fun getFieldDefinition(): GraphQLFieldDefinition =
@@ -19,7 +21,11 @@ class GQLRootQueryEventSubscriptions(
             fieldDescription = "List of event subscriptions",
             itemType = gqlTypeEventSubscriptionPayload,
             arguments = listOf(
-                // TODO Filtering
+                GraphQLArgument.newArgument()
+                    .name("filter")
+                    .description("Filter for the subscriptions")
+                    .type(gqlInputEventSubscriptionFilter.typeRef)
+                    .build()
             ),
             itemPaginatedListProvider = { env, _, offset, size ->
                 // Creating the filter

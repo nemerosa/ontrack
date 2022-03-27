@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import graphql.schema.*
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter
+import net.nemerosa.ontrack.model.structure.ProjectEntityID
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -35,8 +36,8 @@ internal class EventSubscriptionMutationsTest {
     }
 
     @Test
-    fun `EventSubscriptionEntityInput input type`() {
-        val type = GraphQLBeanConverter.asInputType(EventSubscriptionEntityInput::class, mutableSetOf())
+    fun `ProjectEntityID input type`() {
+        val type = GraphQLBeanConverter.asInputType(ProjectEntityID::class, mutableSetOf())
         assertIs<GraphQLInputObjectType>(type) { input ->
             assertNotNull(input.getField("type")) { typeField ->
                 assertIs<GraphQLNonNull>(typeField.type) { typeNotNullType ->
