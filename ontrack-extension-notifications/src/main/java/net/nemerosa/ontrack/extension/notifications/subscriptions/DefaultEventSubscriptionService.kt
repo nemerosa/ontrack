@@ -125,7 +125,7 @@ class DefaultEventSubscriptionService(
                     )
                     // All JSON context
                     var jsonContextChannels = false
-                    // var jsonContextEvents = false
+                    var jsonContextEvents = false
                     val jsonFilters = mutableListOf<String>()
                     val jsonCriteria = mutableMapOf<String, String>()
                     // Filter: channel
@@ -142,6 +142,12 @@ class DefaultEventSubscriptionService(
                             jsonFilters += """channels::jsonb @> '$jsonConfig'::jsonb"""
                         }
                     }
+                    // Filter: event type
+                    if (!filter.eventType.isNullOrBlank()) {
+                        jsonContextEvents = true
+                        jsonFilters += """events = :eventType"""
+                        jsonCriteria["eventType"] = filter.eventType
+                    }
                     // Filter: created before
                     if (filter.createdBefore != null) {
                         storeFilter = storeFilter.withBeforeTime(filter.createdBefore)
@@ -155,9 +161,9 @@ class DefaultEventSubscriptionService(
                     if (jsonContextChannels) {
                         jsonContextList += "left join jsonb_array_elements_text(json::jsonb->'channels') as channels on true"
                     }
-                    // if (jsonContextEvents) {
-                    //     jsonContextList += "left join jsonb_array_elements_text(json::jsonb->'events') as events on true"
-                    // }
+                    if (jsonContextEvents) {
+                        jsonContextList += "left join jsonb_array_elements_text(json::jsonb->'events') as events on true"
+                    }
                     if (jsonContextList.isNotEmpty()) {
                         storeFilter = storeFilter.withJsonContext(jsonContextList.joinToString(" "))
                     }

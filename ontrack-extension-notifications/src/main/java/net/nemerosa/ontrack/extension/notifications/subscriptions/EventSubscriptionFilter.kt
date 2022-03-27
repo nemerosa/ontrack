@@ -24,4 +24,6 @@ data class EventSubscriptionFilter(
     val createdBefore: LocalDateTime? = null,
     @APIDescription("Name of the user who created this subscription")
     val creator: String? = null,
+    @APIDescription("Event type")
+    val eventType: String? = null,
 )

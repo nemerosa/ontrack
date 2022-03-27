@@ -324,5 +324,44 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
         }
     }
 
+    @Test
+    fun `Filtering the subscriptions for an entity using event type`() {
+        project {
+            // Subscribe for events on this project for the two different event types
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#one"),
+                projectEntity = this,
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#two"),
+                projectEntity = this,
+                EventFactory.NEW_VALIDATION_RUN
+            )
+            //
+            val page = eventSubscriptionService.filterSubscriptions(
+                EventSubscriptionFilter(entity = toProjectEntityID(), eventType = "new_promotion_run")
+            )
+            assertEquals(1, page.pageInfo.totalSize)
+            assertEquals(1, page.pageItems.size)
+            val subscription = page.pageItems.first()
+            val channel = subscription.data.channels.first()
+            assertEquals(
+                "mock",
+                channel.channel
+            )
+            assertEquals(
+                "#one",
+                channel.channelConfig.getRequiredTextField("target")
+            )
+            assertEquals(
+                setOf("new_promotion_run"),
+                subscription.data.events
+            )
+        }
+    }
+
 
 }
