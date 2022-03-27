@@ -282,7 +282,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
     fun `Filtering the subscriptions for an entity using creator`() {
         project {
             // Subscribe for events on this project for the two different creators
-            val user1 = asUser {
+            val user1 = asUser().with(this, ProjectSubscriptionsWrite::class.java).call {
                 eventSubscriptionService.subscribe(
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig("#one"),
@@ -291,7 +291,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 )
                 securityService.currentSignature
             }
-            val user2 = asUser {
+            val user2 = asUser().with(this, ProjectSubscriptionsWrite::class.java).call {
                 eventSubscriptionService.subscribe(
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig("#two"),

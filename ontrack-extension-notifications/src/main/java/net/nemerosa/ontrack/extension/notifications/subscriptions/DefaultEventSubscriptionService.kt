@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.pagination.spanningPaginatedList
+import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.StorageService
@@ -33,13 +34,14 @@ class DefaultEventSubscriptionService(
     }
 
     override fun subscribe(subscription: EventSubscription): SavedEventSubscription {
-        // TODO Checks the underlying entity is authorized
         // Record to save
         val record = SubscriptionRecord(
             subscription.channels,
             subscription.events,
         )
         if (subscription.projectEntity != null) {
+            // Checking the ACL
+            securityService.checkProjectFunction(subscription.projectEntity, ProjectSubscriptionsWrite::class.java)
             // Tries to find any matching subscription
             val filter = EntityDataStoreFilter(
                 entity = subscription.projectEntity,
@@ -83,10 +85,18 @@ class DefaultEventSubscriptionService(
 
     override fun findSubscriptionById(projectEntity: ProjectEntity?, id: String): EventSubscription? =
         if (projectEntity != null) {
-            entityDataStore.findLastByCategoryAndName(projectEntity, ENTITY_DATA_STORE_CATEGORY, id, null).getOrNull()
-                ?.let { record ->
-                    fromRecord(projectEntity, record)?.data
-                }
+            if (securityService.isProjectFunctionGranted(projectEntity,
+                    ProjectView::class.java) && securityService.isProjectFunctionGranted(projectEntity,
+                    ProjectSubscriptionsRead::class.java)
+            ) {
+                entityDataStore.findLastByCategoryAndName(projectEntity, ENTITY_DATA_STORE_CATEGORY, id, null)
+                    .getOrNull()
+                    ?.let { record ->
+                        fromRecord(projectEntity, record)?.data
+                    }
+            } else {
+                null
+            }
         } else {
             TODO("Checks also for global listeners")
         }
@@ -104,6 +114,9 @@ class DefaultEventSubscriptionService(
     ): PaginatedList<SavedEventSubscription> {
         // Loads the target entity
         val projectEntity = projectEntityID.type.getEntityFn(structureService).apply(ID.of(projectEntityID.id))
+        // Checking the rights
+        securityService.checkProjectFunction(projectEntity, ProjectView::class.java)
+        securityService.checkProjectFunction(projectEntity, ProjectSubscriptionsRead::class.java)
         // Gets the list of recursive parents to consider
         val chain = if (filter.recursive == true) {
             projectEntity.parents()
