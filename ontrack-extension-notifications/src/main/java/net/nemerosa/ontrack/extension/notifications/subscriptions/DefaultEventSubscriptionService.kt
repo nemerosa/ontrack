@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.json.format
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.pagination.PaginatedList
+import net.nemerosa.ontrack.model.pagination.spanningPaginatedList
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.StorageService
@@ -110,94 +111,72 @@ class DefaultEventSubscriptionService(
             listOf(projectEntity)
         }
 
-        // Total count collected so far
-        var total = 0
-        // Sliding offset
-        var slidingOffset = filter.offset
-        // Total list
-        val result = mutableListOf<SavedEventSubscription>()
+        return spanningPaginatedList(
+            offset = filter.offset,
+            size = filter.size,
+            seeds = chain.map { entity ->
+                { offset, size ->
+                    // Creating the store filter
+                    var storeFilter = EntityDataStoreFilter(
+                        entity = entity,
+                        category = ENTITY_DATA_STORE_CATEGORY,
+                        offset = offset,
+                        count = size,
+                    )
+                    // All JSON context
+                    var jsonContextChannels = false
+                    // var jsonContextEvents = false
+                    val jsonFilters = mutableListOf<String>()
+                    val jsonCriteria = mutableMapOf<String, String>()
+                    // Filter: channel
+                    if (!filter.channel.isNullOrBlank()) {
+                        jsonContextChannels = true
+                        val json = mapOf("channel" to filter.channel).asJson().format()
+                        jsonFilters += """channels::jsonb @> '$json'::jsonb"""
 
-        // For each entity in the chain
-        // TODO Use an utility method to paginate over several collection providers
-        chain.forEach { entity ->
-            // While the list size does not exceed the page size
-            if (slidingOffset >= 0 && result.size < filter.size) {
-                // How much do we need to collect still?
-                val leftOver = filter.size - result.size
-                // Sliding the offset
-                slidingOffset = maxOf(0, slidingOffset - total)
-                // Creating the store filter
-                var storeFilter = EntityDataStoreFilter(
-                    entity = entity,
-                    category = ENTITY_DATA_STORE_CATEGORY,
-                    offset = slidingOffset,
-                    count = leftOver,
-                )
-
-                // All JSON context
-                var jsonContextChannels = false
-                // var jsonContextEvents = false
-                val jsonFilters = mutableListOf<String>()
-                val jsonCriteria = mutableMapOf<String, String>()
-
-                // Filter: channel
-                if (!filter.channel.isNullOrBlank()) {
-                    jsonContextChannels = true
-                    val json = mapOf("channel" to filter.channel).asJson().format()
-                    jsonFilters += """channels::jsonb @> '$json'::jsonb"""
-
-                    // Filter: channel config
-                    if (!filter.channelConfig.isNullOrBlank()) {
-                        val channel = notificationChannelRegistry.getChannel(filter.channel)
-                        val criteria = channel.toSearchCriteria(filter.channelConfig)
-                        val jsonConfig = mapOf("channelConfig" to criteria).asJson().format()
-                        jsonFilters += """channels::jsonb @> '$jsonConfig'::jsonb"""
+                        // Filter: channel config
+                        if (!filter.channelConfig.isNullOrBlank()) {
+                            val channel = notificationChannelRegistry.getChannel(filter.channel)
+                            val criteria = channel.toSearchCriteria(filter.channelConfig)
+                            val jsonConfig = mapOf("channelConfig" to criteria).asJson().format()
+                            jsonFilters += """channels::jsonb @> '$jsonConfig'::jsonb"""
+                        }
                     }
+                    // Filter: created before
+                    if (filter.createdBefore != null) {
+                        storeFilter = storeFilter.withBeforeTime(filter.createdBefore)
+                    }
+                    // Filter: creator
+                    if (!filter.creator.isNullOrBlank()) {
+                        storeFilter = storeFilter.withCreator(filter.creator)
+                    }
+                    // Json context
+                    val jsonContextList = mutableListOf<String>()
+                    if (jsonContextChannels) {
+                        jsonContextList += "left join jsonb_array_elements_text(json::jsonb->'channels') as channels on true"
+                    }
+                    // if (jsonContextEvents) {
+                    //     jsonContextList += "left join jsonb_array_elements_text(json::jsonb->'events') as events on true"
+                    // }
+                    if (jsonContextList.isNotEmpty()) {
+                        storeFilter = storeFilter.withJsonContext(jsonContextList.joinToString(" "))
+                    }
+                    // Json filter
+                    storeFilter = storeFilter.withJsonFilter(
+                        jsonFilters.joinToString(" AND ") { "( $it )" },
+                        *jsonCriteria.toList().toTypedArray()
+                    )
+                    // Total count for THIS entity
+                    val count = entityDataStore.getCountByFilter(storeFilter)
+                    // Loading & converting the records
+                    val items = entityDataStore.getByFilter(storeFilter).mapNotNull { record ->
+                        fromRecord(entity, record)
+                    }
+                    // OK
+                    count to items
                 }
-
-                // Filter: created before
-                if (filter.createdBefore != null) {
-                    storeFilter = storeFilter.withBeforeTime(filter.createdBefore)
-                }
-
-                // Filter: creator
-                if (!filter.creator.isNullOrBlank()) {
-                    storeFilter = storeFilter.withCreator(filter.creator)
-                }
-
-                // Json context
-                val jsonContextList = mutableListOf<String>()
-                if (jsonContextChannels) {
-                    jsonContextList += "left join jsonb_array_elements_text(json::jsonb->'channels') as channels on true"
-                }
-                // if (jsonContextEvents) {
-                //     jsonContextList += "left join jsonb_array_elements_text(json::jsonb->'events') as events on true"
-                // }
-                if (jsonContextList.isNotEmpty()) {
-                    storeFilter = storeFilter.withJsonContext(jsonContextList.joinToString(" "))
-                }
-
-                // Json filter
-                storeFilter = storeFilter.withJsonFilter(
-                    jsonFilters.joinToString(" AND ") { "( $it )" },
-                    *jsonCriteria.toList().toTypedArray()
-                )
-
-                // Total count for THIS entity
-                val count = entityDataStore.getCountByFilter(storeFilter)
-                // Completing the total
-                total += count
-                // Loading & converting the records
-                val items = entityDataStore.getByFilter(storeFilter).mapNotNull { record ->
-                    fromRecord(entity, record)
-                }
-                // Completing the collection
-                result += items
             }
-        }
-
-        // Getting the final page
-        return PaginatedList.create(result, filter.offset, filter.size, total)
+        )
     }
 
     override fun forEveryMatchingSubscription(event: Event, code: (subscription: EventSubscription) -> Unit) {
