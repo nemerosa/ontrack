@@ -522,6 +522,12 @@ class EntityDataStoreJdbcRepository(
             criteria.append(" AND CREATION <= :beforeTime")
             params.addValue("beforeTime", dateTimeForDB(filter.beforeTime))
         }
+        // Creator
+        val creator = filter.creator
+        if (!creator.isNullOrBlank()) {
+            criteria.append(" AND CREATOR = :creator")
+            params.addValue("creator", creator)
+        }
         // JSON context
         if (!filter.jsonContext.isNullOrBlank()) {
             context.append(filter.jsonContext)

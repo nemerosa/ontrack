@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
 
@@ -273,6 +274,52 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(
                 "#one",
                 page.pageItems.first().data.channels.first().channelConfig.getRequiredTextField("target")
+            )
+        }
+    }
+
+    @Test
+    fun `Filtering the subscriptions for an entity using creator`() {
+        project {
+            // Subscribe for events on this project for the two different creators
+            val user1 = asUser {
+                eventSubscriptionService.subscribe(
+                    channel = mockNotificationChannel,
+                    channelConfig = MockNotificationChannelConfig("#one"),
+                    projectEntity = this,
+                    EventFactory.NEW_PROMOTION_RUN
+                )
+                securityService.currentSignature
+            }
+            val user2 = asUser {
+                eventSubscriptionService.subscribe(
+                    channel = mockNotificationChannel,
+                    channelConfig = MockNotificationChannelConfig("#two"),
+                    projectEntity = this,
+                    EventFactory.NEW_PROMOTION_RUN
+                )
+                securityService.currentSignature
+            }
+            assertTrue(user1.user.name != user2.user.name, "Two different users")
+            //
+            val page = eventSubscriptionService.filterSubscriptions(
+                EventSubscriptionFilter(entity = toProjectEntityID(), creator = user1.user.name)
+            )
+            assertEquals(1, page.pageInfo.totalSize)
+            assertEquals(1, page.pageItems.size)
+            val subscription = page.pageItems.first()
+            val channel = subscription.data.channels.first()
+            assertEquals(
+                "mock",
+                channel.channel
+            )
+            assertEquals(
+                "#one",
+                channel.channelConfig.getRequiredTextField("target")
+            )
+            assertEquals(
+                user1.user.name,
+                subscription.signature.user.name
             )
         }
     }
