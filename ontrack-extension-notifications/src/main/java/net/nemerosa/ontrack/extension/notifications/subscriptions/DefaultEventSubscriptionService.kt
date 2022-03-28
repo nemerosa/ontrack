@@ -204,7 +204,13 @@ class DefaultEventSubscriptionService(
             val json = mapOf("channel" to filter.channel).asJson().format()
             contextList += "left join jsonb_array_elements_text(data::jsonb->'channels') as channels on true"
             jsonFilters += """channels::jsonb @> '$json'::jsonb"""
-            // TODO Filter: channel config
+            // Filter: channel config
+            if (!filter.channelConfig.isNullOrBlank()) {
+                val channel = notificationChannelRegistry.getChannel(filter.channel)
+                val criteria = channel.toSearchCriteria(filter.channelConfig)
+                val jsonConfig = mapOf("channelConfig" to criteria).asJson().format()
+                jsonFilters += """channels::jsonb @> '$jsonConfig'::jsonb"""
+            }
         }
 
         // TODO Filter: event type

@@ -224,6 +224,38 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
     }
 
     @Test
+    fun `Filtering the global subscriptions using a channel config`() {
+        asAdmin {
+            eventSubscriptionService.removeAllGlobal()
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#main"),
+                projectEntity = null,
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#test"),
+                projectEntity = null,
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            val page = eventSubscriptionService.filterSubscriptions(
+                EventSubscriptionFilter(channel = "mock", channelConfig = "#main")
+            )
+            assertEquals(1, page.pageInfo.totalSize)
+            assertEquals(1, page.pageItems.size)
+            assertEquals(
+                "mock",
+                page.pageItems.first().data.channels.first().channel
+            )
+            assertEquals(
+                "#main",
+                page.pageItems.first().data.channels.first().channelConfig.getRequiredTextField("target")
+            )
+        }
+    }
+
+    @Test
     fun `Filtering the subscriptions for an entity without recursivity`() {
         val targetPromotionLevel = uid("PL")
         val targetBranch = uid("B")
