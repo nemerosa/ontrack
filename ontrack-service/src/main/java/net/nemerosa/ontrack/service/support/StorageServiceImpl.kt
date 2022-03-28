@@ -56,8 +56,8 @@ class StorageServiceImpl(
         }
     }
 
-    override fun count(store: String, query: String?, queryVariables: Map<String, *>?): Int =
-        repository.count(store, query, queryVariables)
+    override fun count(store: String, context: String, query: String?, queryVariables: Map<String, *>?): Int =
+        repository.count(store, context, query, queryVariables)
 
     override fun <T : Any> filter(
         store: String,

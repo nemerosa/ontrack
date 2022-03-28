@@ -57,9 +57,9 @@ class StorageJdbcRepository(
         )
     }
 
-    override fun count(store: String, query: String?, queryVariables: Map<String, *>?): Int {
-        var sql = "SELECT COUNT(*) FROM STORAGE WHERE STORE = :store"
-        if (query != null) sql += " AND $query"
+    override fun count(store: String, context: String, query: String?, queryVariables: Map<String, *>?): Int {
+        var sql = "SELECT COUNT(*) FROM STORAGE $context WHERE STORE = :store"
+        if (query != null && query.isNotBlank()) sql += " AND $query"
 
         val params = params("store", store)
 
@@ -91,8 +91,8 @@ class StorageJdbcRepository(
         orderQuery: String?,
     ): Map<String, JsonNode> {
         var sql = "SELECT NAME, DATA FROM STORAGE $context WHERE STORE = :store"
-        if (query != null) sql += " AND $query"
-        if (orderQuery != null) sql += " $orderQuery"
+        if (query != null && query.isNotBlank()) sql += " AND $query"
+        if (orderQuery != null && orderQuery.isNotBlank()) sql += " $orderQuery"
         sql += " OFFSET :offset LIMIT :size"
 
         val params = params("store", store)

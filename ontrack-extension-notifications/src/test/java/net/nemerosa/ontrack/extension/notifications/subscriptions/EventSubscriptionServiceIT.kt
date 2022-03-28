@@ -7,12 +7,14 @@ import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupp
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredTextField
+import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
@@ -145,6 +147,79 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     )
                 }
             }
+        }
+    }
+
+    @Test
+    fun `Getting the global subscriptions`() {
+        asAdmin {
+            val target = uid("t")
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig(target),
+                projectEntity = null,
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            val subscriptions = eventSubscriptionService.filterSubscriptions(
+                EventSubscriptionFilter(size = 1000)
+            ).pageItems
+            assertNotNull(subscriptions.find { it.data.channels.firstOrNull()?.channelConfig?.getTextField("target") == target },
+                "Finding the global subscription")
+        }
+    }
+
+    @Test
+    fun `Getting the global subscriptions with recursivity`() {
+        asAdmin {
+            val target = uid("t")
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig(target),
+                projectEntity = null,
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            val project = project {
+                eventSubscriptionService.subscribe(
+                    channel = mockNotificationChannel,
+                    channelConfig = MockNotificationChannelConfig(target),
+                    projectEntity = this,
+                    EventFactory.NEW_PROMOTION_RUN
+                )
+            }
+            val subscriptions = eventSubscriptionService.filterSubscriptions(
+                EventSubscriptionFilter(size = 1000, entity = project.toProjectEntityID())
+            ).pageItems
+            assertEquals(2, subscriptions.size)
+            assertEquals(project, subscriptions[0].data.projectEntity)
+            assertNull(subscriptions[1].data.projectEntity)
+        }
+    }
+
+    @Test
+    fun `Filtering the global subscriptions using a channel`() {
+        asAdmin {
+            eventSubscriptionService.removeAllGlobal()
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#mock"),
+                projectEntity = null,
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            eventSubscriptionService.subscribe(
+                channel = otherMockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#other"),
+                projectEntity = null,
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            val page = eventSubscriptionService.filterSubscriptions(
+                EventSubscriptionFilter(channel = "other-mock")
+            )
+            assertEquals(1, page.pageInfo.totalSize)
+            assertEquals(1, page.pageItems.size)
+            assertEquals(
+                "other-mock",
+                page.pageItems.first().data.channels.first().channel
+            )
         }
     }
 

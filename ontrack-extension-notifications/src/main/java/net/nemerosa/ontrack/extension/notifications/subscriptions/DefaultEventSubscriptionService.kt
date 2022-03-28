@@ -148,10 +148,18 @@ class DefaultEventSubscriptionService(
 
     override fun filterSubscriptions(filter: EventSubscriptionFilter): PaginatedList<SavedEventSubscription> =
         if (filter.entity == null) {
-            TODO("Global subscriptions only")
+            filterGlobalSubscriptions(filter)
         } else {
             filterEntitySubscriptions(filter.entity, filter)
         }
+
+    private fun filterGlobalSubscriptions(
+        filter: EventSubscriptionFilter,
+    ): PaginatedList<SavedEventSubscription> {
+        securityService.checkGlobalFunction(GlobalSubscriptionsManage::class.java)
+        val (total, items) = filterGlobal(filter)(filter.offset, filter.size)
+        return PaginatedList.create(items, filter.offset, filter.size, total)
+    }
 
     private fun filterEntitySubscriptions(
         projectEntityID: ProjectEntityID,
@@ -162,85 +170,144 @@ class DefaultEventSubscriptionService(
         // Checking the rights
         securityService.checkProjectFunction(projectEntity, ProjectView::class.java)
         securityService.checkProjectFunction(projectEntity, ProjectSubscriptionsRead::class.java)
-        // Gets the list of recursive parents to consider
-        val chain = if (filter.recursive == true) {
-            projectEntity.parents()
+
+        // Gets the list of recursive parents & global scope to consider
+        val seeds = if (filter.recursive == true) {
+            val entitySeeds = projectEntity.parents().map { entity -> filterEntity(entity, filter) }
+            if (securityService.isGlobalFunctionGranted(GlobalSubscriptionsManage::class.java)) {
+                entitySeeds + filterGlobal(filter)
+            } else {
+                entitySeeds
+            }
         } else {
-            listOf(projectEntity)
+            listOf(
+                filterEntity(projectEntity, filter)
+            )
         }
 
         return spanningPaginatedList(
             offset = filter.offset,
             size = filter.size,
-            seeds = chain.map { entity ->
-                { offset, size ->
-                    // Creating the store filter
-                    var storeFilter = EntityDataStoreFilter(
-                        entity = entity,
-                        category = ENTITY_STORE,
-                        offset = offset,
-                        count = size,
-                    )
-                    // All JSON context
-                    var jsonContextChannels = false
-                    var jsonContextEvents = false
-                    val jsonFilters = mutableListOf<String>()
-                    val jsonCriteria = mutableMapOf<String, String>()
-                    // Filter: channel
-                    if (!filter.channel.isNullOrBlank()) {
-                        jsonContextChannels = true
-                        val json = mapOf("channel" to filter.channel).asJson().format()
-                        jsonFilters += """channels::jsonb @> '$json'::jsonb"""
-
-                        // Filter: channel config
-                        if (!filter.channelConfig.isNullOrBlank()) {
-                            val channel = notificationChannelRegistry.getChannel(filter.channel)
-                            val criteria = channel.toSearchCriteria(filter.channelConfig)
-                            val jsonConfig = mapOf("channelConfig" to criteria).asJson().format()
-                            jsonFilters += """channels::jsonb @> '$jsonConfig'::jsonb"""
-                        }
-                    }
-                    // Filter: event type
-                    if (!filter.eventType.isNullOrBlank()) {
-                        jsonContextEvents = true
-                        jsonFilters += """events = :eventType"""
-                        jsonCriteria["eventType"] = filter.eventType
-                    }
-                    // Filter: created before
-                    if (filter.createdBefore != null) {
-                        storeFilter = storeFilter.withBeforeTime(filter.createdBefore)
-                    }
-                    // Filter: creator
-                    if (!filter.creator.isNullOrBlank()) {
-                        storeFilter = storeFilter.withCreator(filter.creator)
-                    }
-                    // Json context
-                    val jsonContextList = mutableListOf<String>()
-                    if (jsonContextChannels) {
-                        jsonContextList += "left join jsonb_array_elements_text(json::jsonb->'channels') as channels on true"
-                    }
-                    if (jsonContextEvents) {
-                        jsonContextList += "left join jsonb_array_elements_text(json::jsonb->'events') as events on true"
-                    }
-                    if (jsonContextList.isNotEmpty()) {
-                        storeFilter = storeFilter.withJsonContext(jsonContextList.joinToString(" "))
-                    }
-                    // Json filter
-                    storeFilter = storeFilter.withJsonFilter(
-                        jsonFilters.joinToString(" AND ") { "( $it )" },
-                        *jsonCriteria.toList().toTypedArray()
-                    )
-                    // Total count for THIS entity
-                    val count = entityDataStore.getCountByFilter(storeFilter)
-                    // Loading & converting the records
-                    val items = entityDataStore.getByFilter(storeFilter).mapNotNull { record ->
-                        fromRecord(entity, record)
-                    }
-                    // OK
-                    count to items
-                }
-            }
+            seeds = seeds,
         )
+    }
+
+    private fun filterGlobal(
+        filter: EventSubscriptionFilter,
+    ): (Int, Int) -> Pair<Int, List<SavedEventSubscription>> = { offset: Int, size: Int ->
+        // Query contexts & criteria
+        val contextList = mutableListOf<String>()
+        val jsonFilters = mutableListOf<String>()
+
+        // Filter: channel
+        if (!filter.channel.isNullOrBlank()) {
+            val json = mapOf("channel" to filter.channel).asJson().format()
+            contextList += "left join jsonb_array_elements_text(data::jsonb->'channels') as channels on true"
+            jsonFilters += """channels::jsonb @> '$json'::jsonb"""
+            // TODO Filter: channel config
+        }
+
+        // TODO Filter: event type
+        // TODO Filter: created before
+        // TODO Filter: creator
+
+        // Final context & criteria
+        val context = contextList.joinToString(" ")
+        val jsonFilter = jsonFilters.joinToString(" AND ") { "( $it )" }
+
+        // Counts the total
+        val total = storageService.count(
+            store = GLOBAL_STORE,
+            context = context,
+            query = jsonFilter,
+        )
+        // Gets the items
+        val items = storageService.filterRecords(
+            store = GLOBAL_STORE,
+            type = SignedSubscriptionRecord::class,
+            context = context,
+            query = jsonFilter,
+            offset = offset,
+            size = size,
+        ).map { (id, record) ->
+            SavedEventSubscription(
+                id = id,
+                signature = record.signature,
+                data = EventSubscription(record.channels, null, record.events)
+            )
+        }
+        // OK
+        total to items
+    }
+
+    private fun filterEntity(
+        entity: ProjectEntity,
+        filter: EventSubscriptionFilter,
+    ): (Int, Int) -> Pair<Int, List<SavedEventSubscription>> = { offset: Int, size: Int ->
+        // Creating the store filter
+        var storeFilter = EntityDataStoreFilter(
+            entity = entity,
+            category = ENTITY_STORE,
+            offset = offset,
+            count = size,
+        )
+        // All JSON context
+        var jsonContextChannels = false
+        var jsonContextEvents = false
+        val jsonFilters = mutableListOf<String>()
+        val jsonCriteria = mutableMapOf<String, String>()
+        // Filter: channel
+        if (!filter.channel.isNullOrBlank()) {
+            jsonContextChannels = true
+            val json = mapOf("channel" to filter.channel).asJson().format()
+            jsonFilters += """channels::jsonb @> '$json'::jsonb"""
+
+            // Filter: channel config
+            if (!filter.channelConfig.isNullOrBlank()) {
+                val channel = notificationChannelRegistry.getChannel(filter.channel)
+                val criteria = channel.toSearchCriteria(filter.channelConfig)
+                val jsonConfig = mapOf("channelConfig" to criteria).asJson().format()
+                jsonFilters += """channels::jsonb @> '$jsonConfig'::jsonb"""
+            }
+        }
+        // Filter: event type
+        if (!filter.eventType.isNullOrBlank()) {
+            jsonContextEvents = true
+            jsonFilters += """events = :eventType"""
+            jsonCriteria["eventType"] = filter.eventType
+        }
+        // Filter: created before
+        if (filter.createdBefore != null) {
+            storeFilter = storeFilter.withBeforeTime(filter.createdBefore)
+        }
+        // Filter: creator
+        if (!filter.creator.isNullOrBlank()) {
+            storeFilter = storeFilter.withCreator(filter.creator)
+        }
+        // Json context
+        val jsonContextList = mutableListOf<String>()
+        if (jsonContextChannels) {
+            jsonContextList += "left join jsonb_array_elements_text(json::jsonb->'channels') as channels on true"
+        }
+        if (jsonContextEvents) {
+            jsonContextList += "left join jsonb_array_elements_text(json::jsonb->'events') as events on true"
+        }
+        if (jsonContextList.isNotEmpty()) {
+            storeFilter = storeFilter.withJsonContext(jsonContextList.joinToString(" "))
+        }
+        // Json filter
+        storeFilter = storeFilter.withJsonFilter(
+            jsonFilters.joinToString(" AND ") { "( $it )" },
+            *jsonCriteria.toList().toTypedArray()
+        )
+        // Total count for THIS entity
+        val count = entityDataStore.getCountByFilter(storeFilter)
+        // Loading & converting the records
+        val items = entityDataStore.getByFilter(storeFilter).mapNotNull { record ->
+            fromRecord(entity, record)
+        }
+        // OK
+        count to items
     }
 
     override fun forEveryMatchingSubscription(event: Event, code: (subscription: EventSubscription) -> Unit) {
@@ -265,6 +332,11 @@ class DefaultEventSubscriptionService(
         } else {
             // TODO Global registration not implemented yet
         }
+    }
+
+    override fun removeAllGlobal() {
+        securityService.checkGlobalFunction(GlobalSubscriptionsManage::class.java)
+        storageService.deleteWithFilter(GLOBAL_STORE)
     }
 
     private fun fromRecord(

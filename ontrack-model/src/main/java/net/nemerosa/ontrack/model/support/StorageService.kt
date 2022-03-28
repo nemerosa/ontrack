@@ -126,6 +126,7 @@ interface StorageService {
      */
     fun count(
         store: String,
+        context: String = "",
         query: String? = null,
         queryVariables: Map<String, *>? = null,
     ): Int

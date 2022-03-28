@@ -44,4 +44,9 @@ interface EventSubscriptionService {
      */
     fun forEveryMatchingSubscription(event: Event, code: (subscription: EventSubscription) -> Unit)
 
+    /**
+     * Removes all global subscriptions
+     */
+    fun removeAllGlobal()
+
 }
