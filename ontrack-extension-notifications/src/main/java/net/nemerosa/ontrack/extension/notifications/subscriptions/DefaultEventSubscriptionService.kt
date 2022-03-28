@@ -134,8 +134,16 @@ class DefaultEventSubscriptionService(
             } else {
                 null
             }
+        } else if (!securityService.isGlobalFunctionGranted(GlobalSubscriptionsManage::class.java)) {
+            null
         } else {
-            TODO("Checks also for global listeners")
+            storageService.find(GLOBAL_STORE, id, SignedSubscriptionRecord::class)?.run {
+                EventSubscription(
+                    channels = channels,
+                    projectEntity = null,
+                    events = events,
+                )
+            }
         }
 
     override fun filterSubscriptions(filter: EventSubscriptionFilter): PaginatedList<SavedEventSubscription> =

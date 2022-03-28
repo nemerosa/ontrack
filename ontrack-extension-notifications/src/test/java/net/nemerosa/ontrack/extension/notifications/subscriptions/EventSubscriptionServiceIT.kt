@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
@@ -78,6 +79,21 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     ), subscription.channels)
                     assertEquals(setOf("new_promotion_run"), subscription.events)
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Saving a global subscription`() {
+        asAdmin {
+            val record = eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#target"),
+                projectEntity = null,
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            assertNotNull(eventSubscriptionService.findSubscriptionById(null, record.id)) {
+                assertEquals(record.data, it)
             }
         }
     }

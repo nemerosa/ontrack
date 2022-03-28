@@ -16,7 +16,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 fun <C> EventSubscriptionService.subscribe(
     channel: NotificationChannel<C>,
     channelConfig: C,
-    projectEntity: ProjectEntity,
+    projectEntity: ProjectEntity?,
     vararg eventTypes: EventType,
 ) = subscribe(
     EventSubscription(
