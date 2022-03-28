@@ -101,10 +101,13 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
     }
 
     @Test
-    fun `Filtering the subscriptions for an entity`() {
+    fun `Filtering the subscriptions for an entity with recursivity`() {
         val targetPromotionLevel = uid("PL")
         val targetBranch = uid("B")
         val targetProject = uid("P")
+        asAdmin {
+            eventSubscriptionService.removeAllGlobal()
+        }
         project {
             // Subscribe for events on this project
             eventSubscriptionService.subscribe(
@@ -171,6 +174,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
     @Test
     fun `Getting the global subscriptions with recursivity`() {
         asAdmin {
+            eventSubscriptionService.removeAllGlobal()
             val target = uid("t")
             eventSubscriptionService.subscribe(
                 channel = mockNotificationChannel,
