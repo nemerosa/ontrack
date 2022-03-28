@@ -118,7 +118,7 @@ interface StorageService {
         store: String,
         query: String,
         variables: Map<String, *>,
-        type: Class<T>
+        type: Class<T>,
     ): List<T>
 
     /**
@@ -138,10 +138,25 @@ interface StorageService {
         type: KClass<T>,
         offset: Int = 0,
         size: Int = 40,
+        context: String = "",
         query: String? = null,
         queryVariables: Map<String, *>? = null,
         orderQuery: String? = null,
     ): List<T>
+
+    /**
+     * Gets items in a store matching some criteria.
+     */
+    fun <T : Any> filterRecords(
+        store: String,
+        type: KClass<T>,
+        offset: Int = 0,
+        size: Int = 40,
+        context: String = "",
+        query: String? = null,
+        queryVariables: Map<String, *>? = null,
+        orderQuery: String? = null,
+    ): Map<String, T>
 
     /**
      * Deletes items in a store matching some criteria.

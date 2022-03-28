@@ -1,12 +1,28 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
-import net.nemerosa.ontrack.model.security.ProjectFunction
-import net.nemerosa.ontrack.model.security.RoleContributor
-import net.nemerosa.ontrack.model.security.Roles
+import net.nemerosa.ontrack.model.security.*
 import org.springframework.stereotype.Component
 
 @Component
 class SubscriptionsRoleContributor : RoleContributor {
+
+    companion object {
+        const val GLOBAL_SUBSCRIPTIONS_MANAGER = "GLOBAL_SUBSCRIPTIONS_MANAGER"
+    }
+
+    override fun getGlobalRoles() = listOf(
+        RoleDefinition(
+            id = GLOBAL_SUBSCRIPTIONS_MANAGER,
+            name = "Global subscriptions manager",
+            description = "Right to manage subscriptions at global level",
+        )
+    )
+
+    override fun getGlobalFunctionContributionsForGlobalRoles(): Map<String, List<Class<out GlobalFunction>>> = mapOf(
+        GLOBAL_SUBSCRIPTIONS_MANAGER to listOf(
+            GlobalSubscriptionsManage::class.java
+        )
+    )
 
     override fun getProjectFunctionContributionsForGlobalRoles(): Map<String, List<Class<out ProjectFunction>>> =
         mapOf(

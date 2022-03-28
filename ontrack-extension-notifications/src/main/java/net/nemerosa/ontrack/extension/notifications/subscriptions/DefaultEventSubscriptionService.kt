@@ -30,7 +30,8 @@ class DefaultEventSubscriptionService(
 ) : EventSubscriptionService {
 
     companion object {
-        private val ENTITY_DATA_STORE_CATEGORY = EventSubscription::class.java.name
+        private val ENTITY_STORE = EventSubscription::class.java.name
+        private val GLOBAL_STORE = EventSubscription::class.java.name
     }
 
     override fun subscribe(subscription: EventSubscription): SavedEventSubscription {
@@ -39,13 +40,13 @@ class DefaultEventSubscriptionService(
             subscription.channels,
             subscription.events,
         )
-        if (subscription.projectEntity != null) {
+        return if (subscription.projectEntity != null) {
             // Checking the ACL
             securityService.checkProjectFunction(subscription.projectEntity, ProjectSubscriptionsWrite::class.java)
             // Tries to find any matching subscription
             val filter = EntityDataStoreFilter(
                 entity = subscription.projectEntity,
-                category = ENTITY_DATA_STORE_CATEGORY,
+                category = ENTITY_STORE,
                 jsonFilter = "json::jsonb = CAST(:json AS JSONB)",
                 jsonFilterCriterias = mapOf("json" to record.asJson().asJsonString()),
             )
@@ -56,7 +57,7 @@ class DefaultEventSubscriptionService(
             if (records.size == 1) {
                 // Just returns the existing record
                 val existingRecord = records.first()
-                return SavedEventSubscription(
+                SavedEventSubscription(
                     id = existingRecord.name,
                     signature = existingRecord.signature,
                     data = subscription,
@@ -69,17 +70,53 @@ class DefaultEventSubscriptionService(
                 // Saves the subscription
                 val newRecord = entityDataStore.replaceOrAddObject(
                     subscription.projectEntity,
-                    ENTITY_DATA_STORE_CATEGORY,
+                    ENTITY_STORE,
                     id,
                     securityService.currentSignature,
                     null,
                     record
                 )
                 // OK
-                return SavedEventSubscription(id, newRecord.signature, subscription)
+                SavedEventSubscription(id, newRecord.signature, subscription)
             }
         } else {
-            TODO("Global registration not implemented yet")
+            securityService.checkGlobalFunction(GlobalSubscriptionsManage::class.java)
+            // Gets any existing subscription
+            val existingRecordJson = record.asJson().format()
+            val existingRecords = storageService.filterRecords(
+                store = GLOBAL_STORE,
+                type = SignedSubscriptionRecord::class,
+                query = """data::jsonb @> '$existingRecordJson'"""
+            )
+            // One existing record, we just return it
+            if (existingRecords.size == 1) {
+                val (id, existingRecord) = existingRecords.toList().first()
+                SavedEventSubscription(
+                    id = id,
+                    signature = existingRecord.signature,
+                    data = subscription,
+                )
+            } else {
+                // If more than 1 record, this is abnormal, we remove the old records
+                existingRecords.forEach { (id, _) ->
+                    storageService.delete(GLOBAL_STORE, id)
+                }
+                // New ID
+                val id = UUID.randomUUID().toString()
+                // Saves the subscription
+                val storedRecord = SignedSubscriptionRecord(
+                    signature = securityService.currentSignature,
+                    channels = subscription.channels,
+                    events = subscription.events,
+                )
+                storageService.store(
+                    GLOBAL_STORE,
+                    id,
+                    storedRecord
+                )
+                // OK
+                SavedEventSubscription(id, storedRecord.signature, subscription)
+            }
         }
     }
 
@@ -89,7 +126,7 @@ class DefaultEventSubscriptionService(
                     ProjectView::class.java) && securityService.isProjectFunctionGranted(projectEntity,
                     ProjectSubscriptionsRead::class.java)
             ) {
-                entityDataStore.findLastByCategoryAndName(projectEntity, ENTITY_DATA_STORE_CATEGORY, id, null)
+                entityDataStore.findLastByCategoryAndName(projectEntity, ENTITY_STORE, id, null)
                     .getOrNull()
                     ?.let { record ->
                         fromRecord(projectEntity, record)?.data
@@ -132,7 +169,7 @@ class DefaultEventSubscriptionService(
                     // Creating the store filter
                     var storeFilter = EntityDataStoreFilter(
                         entity = entity,
-                        category = ENTITY_DATA_STORE_CATEGORY,
+                        category = ENTITY_STORE,
                         offset = offset,
                         count = size,
                     )
@@ -203,7 +240,7 @@ class DefaultEventSubscriptionService(
             event.entities.values.forEach { projectEntity ->
                 val filter = EntityDataStoreFilter(
                     entity = projectEntity,
-                    category = ENTITY_DATA_STORE_CATEGORY,
+                    category = ENTITY_STORE,
                     jsonContext = "left join jsonb_array_elements_text(json::jsonb->'events') as events on true",
                     jsonFilter = "events = :event",
                     jsonFilterCriterias = mapOf(
@@ -244,5 +281,16 @@ class DefaultEventSubscriptionService(
         val channels: Set<EventSubscriptionChannel>,
         val events: Set<String>,
     )
+
+    /**
+     * Signed subscription record (for global storage)
+     */
+    data class SignedSubscriptionRecord(
+        val signature: Signature,
+        val channels: Set<EventSubscriptionChannel>,
+        val events: Set<String>,
+    ) {
+        fun toSubscriptionRecord() = SubscriptionRecord(channels, events)
+    }
 
 }

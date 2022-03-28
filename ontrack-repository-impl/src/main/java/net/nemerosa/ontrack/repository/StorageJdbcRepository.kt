@@ -74,11 +74,23 @@ class StorageJdbcRepository(
         store: String,
         offset: Int,
         size: Int,
+        context: String,
         query: String?,
         queryVariables: Map<String, *>?,
         orderQuery: String?
-    ): List<JsonNode> {
-        var sql = "SELECT DATA FROM STORAGE WHERE STORE = :store"
+    ): List<JsonNode> =
+        filterRecords(store, offset, size, context, query, queryVariables, orderQuery).values.toList()
+
+    override fun filterRecords(
+        store: String,
+        offset: Int,
+        size: Int,
+        context: String,
+        query: String?,
+        queryVariables: Map<String, *>?,
+        orderQuery: String?,
+    ): Map<String, JsonNode> {
+        var sql = "SELECT NAME, DATA FROM STORAGE $context WHERE STORE = :store"
         if (query != null) sql += " AND $query"
         if (orderQuery != null) sql += " $orderQuery"
         sql += " OFFSET :offset LIMIT :size"
@@ -92,8 +104,8 @@ class StorageJdbcRepository(
         }
 
         return namedParameterJdbcTemplate!!.query(sql, params) { rs, _ ->
-            readJson(rs, "DATA")
-        }
+            rs.getString("NAME") to readJson(rs, "DATA")
+        }.toMap()
     }
 
     override fun clear(store: String) {

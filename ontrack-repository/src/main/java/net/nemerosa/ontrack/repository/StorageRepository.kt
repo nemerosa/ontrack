@@ -23,10 +23,24 @@ interface StorageRepository {
         store: String,
         offset: Int = 0,
         size: Int = 40,
+        context: String = "",
         query: String? = null,
         queryVariables: Map<String, *>? = null,
         orderQuery: String? = null,
     ): List<JsonNode>
+
+    /**
+     * Gets items in a store matching some criteria.
+     */
+    fun filterRecords(
+        store: String,
+        offset: Int = 0,
+        size: Int = 40,
+        context: String = "",
+        query: String? = null,
+        queryVariables: Map<String, *>? = null,
+        orderQuery: String? = null,
+    ): Map<String, JsonNode>
 
     /**
      * Deletes items in a store matching some criteria.
