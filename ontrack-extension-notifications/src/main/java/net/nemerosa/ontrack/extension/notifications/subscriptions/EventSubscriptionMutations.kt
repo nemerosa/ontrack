@@ -22,6 +22,7 @@ class EventSubscriptionMutations(
 ) : TypedMutationProvider() {
 
     override val mutations: List<Mutation> = listOf(
+
         simpleMutation(
             name = "subscribeToEvents",
             description = "Creates a subscription to a list of events",
@@ -45,9 +46,28 @@ class EventSubscriptionMutations(
                 channels = record.data.channels.toList(),
                 events = record.data.events.toList(),
             )
-        }
+        },
+
+        unitMutation<DeleteSubscriptionInput>(
+            name = "deleteSubscription",
+            description = "Deletes an existing subscription using its ID",
+        ) { input ->
+            val projectEntity = input.projectEntity?.run {
+                type.getEntityFn(structureService).apply(ID.of(id))
+            }
+            eventSubscriptionService.deleteSubscriptionById(projectEntity, input.id)
+        },
     )
 }
+
+@APIDescription("Subscription deletion")
+data class DeleteSubscriptionInput(
+    @APIDescription("Target project entity (null for global events)")
+    @TypeRef(embedded = true, suffix = "Input")
+    val projectEntity: ProjectEntityID?,
+    @APIDescription("ID of the subscription to delete")
+    val id: String,
+)
 
 @APIDescription("Subscription to events")
 data class SubscribeToEventsInput(

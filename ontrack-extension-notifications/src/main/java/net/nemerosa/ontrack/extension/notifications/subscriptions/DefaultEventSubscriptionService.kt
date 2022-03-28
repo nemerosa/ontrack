@@ -147,6 +147,17 @@ class DefaultEventSubscriptionService(
             }
         }
 
+    override fun deleteSubscriptionById(projectEntity: ProjectEntity?, id: String) {
+        if (projectEntity != null) {
+            securityService.checkProjectFunction(projectEntity, ProjectView::class.java)
+            securityService.checkProjectFunction(projectEntity, ProjectSubscriptionsWrite::class.java)
+            entityDataStore.deleteByName(projectEntity, ENTITY_STORE, id)
+        } else {
+            securityService.checkGlobalFunction(GlobalSubscriptionsManage::class.java)
+            storageService.delete(GLOBAL_STORE, id)
+        }
+    }
+
     override fun filterSubscriptions(filter: EventSubscriptionFilter): PaginatedList<SavedEventSubscription> =
         if (filter.entity == null) {
             filterGlobalSubscriptions(filter)

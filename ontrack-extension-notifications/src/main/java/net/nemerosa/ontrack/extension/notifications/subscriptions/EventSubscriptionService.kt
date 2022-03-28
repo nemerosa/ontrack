@@ -24,6 +24,14 @@ interface EventSubscriptionService {
     fun findSubscriptionById(projectEntity: ProjectEntity?, id: String): EventSubscription?
 
     /**
+     * Deleting a subscription using its ID
+     *
+     * @param projectEntity Entity to look for
+     * @param id ID of the subscription
+     */
+    fun deleteSubscriptionById(projectEntity: ProjectEntity?, id: String)
+
+    /**
      * Getting a paginated list of subscriptions which match against the given [filter].
      *
      * Subscriptions are ordered in the following way:
