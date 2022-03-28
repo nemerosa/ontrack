@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.extension.notifications.channels.getChannel
@@ -220,11 +221,11 @@ class DefaultEventSubscriptionService(
             jsonFilters += """events = :eventType"""
             jsonCriteria["eventType"] = filter.eventType
         }
-        // TODO Filter: created before
-        // if (filter.createdBefore != null) {
-        //     jsonFilters += """data::jsonb->'signature'->>'time' <= :time"""
-        //     jsonCriteria["time"] = filter.createdBefore.toString()
-        // }
+        // Filter: created before
+        if (filter.createdBefore != null) {
+            jsonFilters += """data::jsonb->'signature'->>'time' <= :time"""
+            jsonCriteria["time"] = Time.store(filter.createdBefore)
+        }
         // Filter: creator
         if (filter.creator != null) {
             jsonFilters += """data::jsonb->'signature'->'user'->>'name' = :creator"""

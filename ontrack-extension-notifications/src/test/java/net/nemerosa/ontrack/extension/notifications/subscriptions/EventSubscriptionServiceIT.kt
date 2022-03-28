@@ -295,6 +295,41 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
     }
 
     @Test
+    fun `Filtering the global subscriptions using creation date`() {
+        asAdmin {
+            eventSubscriptionService.removeAllGlobal()
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#one"),
+                projectEntity = null,
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            runBlocking {
+                delay(2_000L)
+            }
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#two"),
+                projectEntity = null,
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            val page = eventSubscriptionService.filterSubscriptions(
+                EventSubscriptionFilter(createdBefore = Time.now().minusSeconds(1))
+            )
+            assertEquals(1, page.pageInfo.totalSize)
+            assertEquals(1, page.pageItems.size)
+            assertEquals(
+                "mock",
+                page.pageItems.first().data.channels.first().channel
+            )
+            assertEquals(
+                "#one",
+                page.pageItems.first().data.channels.first().channelConfig.getRequiredTextField("target")
+            )
+        }
+    }
+
+    @Test
     fun `Filtering the global subscriptions using creator`() {
         asAdmin {
             eventSubscriptionService.removeAllGlobal()
