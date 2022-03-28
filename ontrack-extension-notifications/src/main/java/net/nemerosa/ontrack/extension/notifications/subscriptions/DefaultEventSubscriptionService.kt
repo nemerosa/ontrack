@@ -198,6 +198,7 @@ class DefaultEventSubscriptionService(
         // Query contexts & criteria
         val contextList = mutableListOf<String>()
         val jsonFilters = mutableListOf<String>()
+        val jsonCriteria = mutableMapOf<String, String>()
 
         // Filter: channel
         if (!filter.channel.isNullOrBlank()) {
@@ -213,9 +214,22 @@ class DefaultEventSubscriptionService(
             }
         }
 
-        // TODO Filter: event type
+        // Filter: event type
+        if (!filter.eventType.isNullOrBlank()) {
+            contextList += "left join jsonb_array_elements_text(data::jsonb->'events') as events on true"
+            jsonFilters += """events = :eventType"""
+            jsonCriteria["eventType"] = filter.eventType
+        }
         // TODO Filter: created before
-        // TODO Filter: creator
+        // if (filter.createdBefore != null) {
+        //     jsonFilters += """data::jsonb->'signature'->>'time' <= :time"""
+        //     jsonCriteria["time"] = filter.createdBefore.toString()
+        // }
+        // Filter: creator
+        if (filter.creator != null) {
+            jsonFilters += """data::jsonb->'signature'->'user'->>'name' = :creator"""
+            jsonCriteria["creator"] = filter.creator
+        }
 
         // Final context & criteria
         val context = contextList.joinToString(" ")
@@ -226,6 +240,7 @@ class DefaultEventSubscriptionService(
             store = GLOBAL_STORE,
             context = context,
             query = jsonFilter,
+            queryVariables = jsonCriteria,
         )
         // Gets the items
         val items = storageService.filterRecords(
@@ -233,6 +248,7 @@ class DefaultEventSubscriptionService(
             type = SignedSubscriptionRecord::class,
             context = context,
             query = jsonFilter,
+            queryVariables = jsonCriteria,
             offset = offset,
             size = size,
         ).map { (id, record) ->

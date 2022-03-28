@@ -20,7 +20,7 @@ data class EventSubscriptionFilter(
     @TypeRef(suffix = "Input")
     val entity: ProjectEntityID? = null,
     @APIDescription("Scope of the search (if true, includes the entity and the levels above.")
-    val recursive: Boolean? = true,
+    val recursive: Boolean? = false,
     @APIDescription("Filter against the channel type (exact match)")
     val channel: String? = null,
     @APIDescription("Filter against the channel configuration (channel is required)")

@@ -187,7 +187,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 )
             }
             val subscriptions = eventSubscriptionService.filterSubscriptions(
-                EventSubscriptionFilter(size = 1000, entity = project.toProjectEntityID())
+                EventSubscriptionFilter(size = 1000, entity = project.toProjectEntityID(), recursive = true)
             ).pageItems
             assertEquals(2, subscriptions.size)
             assertEquals(project, subscriptions[0].data.projectEntity)
@@ -251,6 +251,45 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(
                 "#main",
                 page.pageItems.first().data.channels.first().channelConfig.getRequiredTextField("target")
+            )
+        }
+    }
+
+    @Test
+    fun `Filtering the global subscriptions using event type`() {
+        asAdmin {
+            eventSubscriptionService.removeAllGlobal()
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#one"),
+                projectEntity = null,
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#two"),
+                projectEntity = null,
+                EventFactory.NEW_VALIDATION_RUN
+            )
+            //
+            val page = eventSubscriptionService.filterSubscriptions(
+                EventSubscriptionFilter(eventType = "new_promotion_run")
+            )
+            assertEquals(1, page.pageInfo.totalSize)
+            assertEquals(1, page.pageItems.size)
+            val subscription = page.pageItems.first()
+            val channel = subscription.data.channels.first()
+            assertEquals(
+                "mock",
+                channel.channel
+            )
+            assertEquals(
+                "#one",
+                channel.channelConfig.getRequiredTextField("target")
+            )
+            assertEquals(
+                setOf("new_promotion_run"),
+                subscription.data.events
             )
         }
     }
