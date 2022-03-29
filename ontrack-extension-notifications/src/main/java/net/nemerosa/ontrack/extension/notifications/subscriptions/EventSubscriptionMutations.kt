@@ -11,7 +11,6 @@ import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.ProjectEntityID
-import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 
@@ -39,7 +38,7 @@ class EventSubscriptionMutations(
                     channels = input.channels.toSet(),
                     events = input.events.toSet(),
                     projectEntity = projectEntity,
-                    eventFilter = input.eventFilter,
+                    keywords = input.keywords,
                 )
             )
             EventSubscriptionPayload(
@@ -82,7 +81,7 @@ data class SubscribeToEventsInput(
     @ListRef
     val events: List<String>,
     @APIDescription("Optional space-separated list of tokens to look for in the events")
-    val eventFilter: String?,
+    val keywords: String?,
 )
 
 @APIDescription("Event subscription record")

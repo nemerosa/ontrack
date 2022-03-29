@@ -29,7 +29,7 @@ fun <C> EventSubscriptionService.subscribe(
         ),
         projectEntity = projectEntity,
         events = eventTypes.map { it.id }.toSet(),
-        eventFilter = eventFilter,
+        keywords = eventFilter,
     )
 )
 
