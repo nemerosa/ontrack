@@ -49,6 +49,16 @@ angular.module('ontrack.extension.notifications', [
                     }
                 }
             }
+            eventSubscriptions(filter: {
+                entity: {
+                    type: $type,
+                    id: $id
+                }
+            }) {
+                pageItems {
+                    id
+                }
+            }
         }`;
 
         $scope.loadingSubscriptions = false;
