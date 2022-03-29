@@ -87,6 +87,7 @@ angular.module('ot.view.promotionLevel', [
                     _runs
                     _properties
                     _events
+                    _actions
                 }
             }
         }`;
@@ -199,6 +200,7 @@ angular.module('ot.view.promotionLevel', [
                                 }).then(loadPromotionLevel);
                             }
                         },
+                        ot.viewActionsCommand($scope.promotionLevel.links._actions),
                         ot.viewCloseCommand('/branch/' + $scope.promotionLevel.branch.id)
                     ];
                     viewInitialized = true;

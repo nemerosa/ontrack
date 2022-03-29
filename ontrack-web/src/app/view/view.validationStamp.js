@@ -77,6 +77,7 @@ angular.module('ot.view.validationStamp', [
                       _delete
                       _properties
                       _events
+                      _actions
                     }
                     validationRunsPaginated(offset: $offset, size: $size) {
                       pageInfo {
@@ -207,6 +208,7 @@ angular.module('ot.view.validationStamp', [
                                 }).then(loadValidationStamp);
                             }
                         },
+                        ot.viewActionsCommand($scope.validationStamp.links._actions),
                         ot.viewCloseCommand('/branch/' + $scope.validationStamp.branch.id)
                     ];
                     // View OK now
