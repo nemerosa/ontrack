@@ -17,12 +17,14 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = this,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#two"),
                 projectEntity = this,
+                eventFilter = null,
                 EventFactory.NEW_VALIDATION_RUN
             )
             // Query
@@ -80,12 +82,14 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = null,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#two"),
                 projectEntity = null,
+                eventFilter = null,
                 EventFactory.NEW_VALIDATION_RUN
             )
             // Query

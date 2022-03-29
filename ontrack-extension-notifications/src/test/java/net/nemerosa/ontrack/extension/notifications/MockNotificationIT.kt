@@ -22,6 +22,7 @@ class MockNotificationIT : AbstractNotificationTestSupport() {
                 mockNotificationChannel,
                 MockNotificationChannelConfig(target),
                 this,
+                null,
                 EventFactory.NEW_BRANCH,
             )
             // Creating a branch

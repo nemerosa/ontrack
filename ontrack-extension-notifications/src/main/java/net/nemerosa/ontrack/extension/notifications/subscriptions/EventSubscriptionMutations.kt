@@ -39,6 +39,7 @@ class EventSubscriptionMutations(
                     channels = input.channels.toSet(),
                     events = input.events.toSet(),
                     projectEntity = projectEntity,
+                    eventFilter = input.eventFilter,
                 )
             )
             EventSubscriptionPayload(
@@ -80,6 +81,8 @@ data class SubscribeToEventsInput(
     @APIDescription("List of events types to subscribe to")
     @ListRef
     val events: List<String>,
+    @APIDescription("Optional space-separated list of tokens to look for in the events")
+    val eventFilter: String?,
 )
 
 @APIDescription("Event subscription record")

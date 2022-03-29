@@ -40,6 +40,7 @@ class DefaultEventSubscriptionService(
         val record = SubscriptionRecord(
             subscription.channels,
             subscription.events,
+            subscription.eventFilter,
         )
         return if (subscription.projectEntity != null) {
             // Checking the ACL
@@ -109,6 +110,7 @@ class DefaultEventSubscriptionService(
                     signature = securityService.currentSignature,
                     channels = subscription.channels,
                     events = subscription.events,
+                    eventFilter = subscription.eventFilter,
                 )
                 storageService.store(
                     GLOBAL_STORE,
@@ -143,6 +145,7 @@ class DefaultEventSubscriptionService(
                     channels = channels,
                     projectEntity = null,
                     events = events,
+                    eventFilter = eventFilter,
                 )
             }
         }
@@ -267,7 +270,12 @@ class DefaultEventSubscriptionService(
             SavedEventSubscription(
                 id = id,
                 signature = record.signature,
-                data = EventSubscription(record.channels, null, record.events)
+                data = EventSubscription(
+                    channels = record.channels,
+                    projectEntity = null,
+                    events = record.events,
+                    eventFilter = record.eventFilter,
+                )
             )
         }
         // OK
@@ -381,9 +389,10 @@ class DefaultEventSubscriptionService(
             id = record.name,
             signature = record.signature,
             data = EventSubscription(
-                it.channels,
-                projectEntity,
-                it.events,
+                channels = it.channels,
+                projectEntity = projectEntity,
+                events = it.events,
+                eventFilter = it.eventFilter,
             )
         )
     }
@@ -394,6 +403,7 @@ class DefaultEventSubscriptionService(
     data class SubscriptionRecord(
         val channels: Set<EventSubscriptionChannel>,
         val events: Set<String>,
+        val eventFilter: String?,
     )
 
     /**
@@ -403,8 +413,9 @@ class DefaultEventSubscriptionService(
         val signature: Signature,
         val channels: Set<EventSubscriptionChannel>,
         val events: Set<String>,
+        val eventFilter: String?,
     ) {
-        fun toSubscriptionRecord() = SubscriptionRecord(channels, events)
+        fun toSubscriptionRecord() = SubscriptionRecord(channels, events, eventFilter)
     }
 
 }

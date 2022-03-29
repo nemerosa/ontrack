@@ -30,6 +30,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig(targetBranch),
                     projectEntity = this, // Branch
+                    eventFilter = null,
                     EventFactory.NEW_PROMOTION_RUN
                 )
                 // Subscription at project level
@@ -37,6 +38,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig(targetProject),
                     projectEntity = project,
+                    eventFilter = null,
                     EventFactory.NEW_PROMOTION_RUN
                 )
                 // Gettings the subscriptions for this project & the new promotion run event
@@ -92,6 +94,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#target"),
                 projectEntity = null,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             assertNotNull(eventSubscriptionService.findSubscriptionById(null, record.id)) {
@@ -114,6 +117,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig(targetProject),
                 projectEntity = this,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             branch {
@@ -122,6 +126,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig(targetBranch),
                     projectEntity = this,
+                    eventFilter = null,
                     EventFactory.NEW_PROMOTION_RUN
                 )
                 promotionLevel {
@@ -130,6 +135,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                         channel = mockNotificationChannel,
                         channelConfig = MockNotificationChannelConfig(targetPromotionLevel),
                         projectEntity = this,
+                        eventFilter = null,
                         EventFactory.NEW_PROMOTION_RUN
                     )
                     // Looking for all subscriptions on this promotion, and recursively
@@ -161,6 +167,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig(target),
                 projectEntity = null,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             val subscriptions = eventSubscriptionService.filterSubscriptions(
@@ -180,6 +187,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig(target),
                 projectEntity = null,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             val project = project {
@@ -187,6 +195,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig(target),
                     projectEntity = this,
+                    eventFilter = null,
                     EventFactory.NEW_PROMOTION_RUN
                 )
             }
@@ -207,12 +216,14 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#mock"),
                 projectEntity = null,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
                 channel = otherMockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#other"),
                 projectEntity = null,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             val page = eventSubscriptionService.filterSubscriptions(
@@ -235,12 +246,14 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#main"),
                 projectEntity = null,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#test"),
                 projectEntity = null,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             val page = eventSubscriptionService.filterSubscriptions(
@@ -267,12 +280,14 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = null,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#two"),
                 projectEntity = null,
+                eventFilter = null,
                 EventFactory.NEW_VALIDATION_RUN
             )
             //
@@ -306,6 +321,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = null,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             runBlocking {
@@ -315,6 +331,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#two"),
                 projectEntity = null,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             val page = eventSubscriptionService.filterSubscriptions(
@@ -342,6 +359,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig("#one"),
                     projectEntity = null,
+                    eventFilter = null,
                     EventFactory.NEW_PROMOTION_RUN
                 )
                 securityService.currentSignature
@@ -351,6 +369,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig("#two"),
                     projectEntity = null,
+                    eventFilter = null,
                     EventFactory.NEW_VALIDATION_RUN
                 )
             }
@@ -388,6 +407,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig(targetProject),
                 projectEntity = this,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             branch {
@@ -396,6 +416,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig(targetBranch),
                     projectEntity = this,
+                    eventFilter = null,
                     EventFactory.NEW_PROMOTION_RUN
                 )
                 promotionLevel {
@@ -404,6 +425,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                         channel = mockNotificationChannel,
                         channelConfig = MockNotificationChannelConfig(targetPromotionLevel),
                         projectEntity = this,
+                        eventFilter = null,
                         EventFactory.NEW_PROMOTION_RUN
                     )
                     // Looking for all subscriptions on this promotion, and recursively
@@ -433,12 +455,14 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#mock"),
                 projectEntity = this,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
                 channel = otherMockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#other"),
                 projectEntity = this,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             // Looking for all subscriptions on this promotion, and recursively
@@ -462,12 +486,14 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = this,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#two"),
                 projectEntity = this,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             // Looking for all subscriptions on this promotion, and recursively
@@ -495,6 +521,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = this,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             runBlocking {
@@ -504,6 +531,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#two"),
                 projectEntity = this,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             // Looking for all subscriptions on this promotion, and recursively
@@ -532,6 +560,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig("#one"),
                     projectEntity = this,
+                    eventFilter = null,
                     EventFactory.NEW_PROMOTION_RUN
                 )
                 securityService.currentSignature
@@ -541,6 +570,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig("#two"),
                     projectEntity = this,
+                    eventFilter = null,
                     EventFactory.NEW_PROMOTION_RUN
                 )
                 securityService.currentSignature
@@ -577,12 +607,14 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = this,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#two"),
                 projectEntity = this,
+                eventFilter = null,
                 EventFactory.NEW_VALIDATION_RUN
             )
             //

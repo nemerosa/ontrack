@@ -78,6 +78,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#main"),
                 projectEntity = null,
+                eventFilter = null,
                 EventFactory.NEW_PROMOTION_RUN,
             )
             run("""
@@ -104,6 +105,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig("#main"),
                     projectEntity = this,
+                    eventFilter = null,
                     EventFactory.NEW_PROMOTION_RUN,
                 )
                 run("""

@@ -17,6 +17,7 @@ fun <C> EventSubscriptionService.subscribe(
     channel: NotificationChannel<C>,
     channelConfig: C,
     projectEntity: ProjectEntity?,
+    eventFilter: String?,
     vararg eventTypes: EventType,
 ) = subscribe(
     EventSubscription(
@@ -27,7 +28,8 @@ fun <C> EventSubscriptionService.subscribe(
             ),
         ),
         projectEntity = projectEntity,
-        events = eventTypes.map { it.id }.toSet()
+        events = eventTypes.map { it.id }.toSet(),
+        eventFilter = eventFilter,
     )
 )
 
