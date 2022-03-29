@@ -44,6 +44,18 @@ interface StorageRepository {
     ): Map<String, JsonNode>
 
     /**
+     * Loops over items in a store matching some criteria.
+     */
+    fun forEach(
+        store: String,
+        context: String = "",
+        query: String? = null,
+        queryVariables: Map<String, *>? = null,
+        orderQuery: String? = null,
+        code: (key: String, node: JsonNode) -> Unit
+    )
+
+    /**
      * Deletes items in a store matching some criteria.
      *
      * @return Number of items having been deleted

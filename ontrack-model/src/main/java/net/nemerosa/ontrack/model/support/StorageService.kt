@@ -146,6 +146,19 @@ interface StorageService {
     ): List<T>
 
     /**
+     * Looping over items in a store matching some criteria.
+     */
+    fun <T : Any> forEach(
+        store: String,
+        type: KClass<T>,
+        context: String = "",
+        query: String? = null,
+        queryVariables: Map<String, *>? = null,
+        orderQuery: String? = null,
+        code: (key: String, item: T) -> Unit
+    )
+
+    /**
      * Gets items in a store matching some criteria.
      */
     fun <T : Any> filterRecords(

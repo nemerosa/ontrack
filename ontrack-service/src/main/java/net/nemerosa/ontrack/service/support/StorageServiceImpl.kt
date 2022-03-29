@@ -96,6 +96,21 @@ class StorageServiceImpl(
                 data.parseInto(type)
             }
 
+    override fun <T : Any> forEach(
+        store: String,
+        type: KClass<T>,
+        context: String,
+        query: String?,
+        queryVariables: Map<String, *>?,
+        orderQuery: String?,
+        code: (key: String, item: T) -> Unit,
+    ) {
+        repository.forEach(store, context, query, queryVariables, orderQuery) { key, node ->
+            val item = node.parseInto(type)
+            code(key, item)
+        }
+    }
+
     override fun deleteWithFilter(store: String, query: String?, queryVariables: Map<String, *>?): Int =
         repository.deleteWithFilter(store, query, queryVariables)
 }

@@ -371,8 +371,28 @@ class DefaultEventSubscriptionService(
                     }
                 }
             }
-        } else {
-            // TODO Global registration not implemented yet
+        }
+        // Getting the global subscriptions
+        storageService.forEach(
+            store = GLOBAL_STORE,
+            type = SignedSubscriptionRecord::class,
+            context = "left join jsonb_array_elements_text(data::jsonb->'events') as events on true",
+            query = "events = :event",
+            queryVariables = mapOf("event" to event.eventType.id)
+        ) { key, record ->
+            val subscription = SavedEventSubscription(
+                id = key,
+                signature = record.signature,
+                data = EventSubscription(
+                    channels = record.channels,
+                    projectEntity = null,
+                    events = record.events,
+                    keywords = record.keywords,
+                )
+            )
+            if (event.matchesKeywords(subscription.data.keywords)) {
+                code(subscription.data)
+            }
         }
     }
 
