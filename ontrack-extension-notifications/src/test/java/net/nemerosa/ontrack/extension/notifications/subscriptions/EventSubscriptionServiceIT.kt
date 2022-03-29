@@ -88,6 +88,73 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
     }
 
     @Test
+    fun `Getting the subscriptions for an event based on an event filter`() {
+        val target = uid("t")
+        project {
+            branch {
+                val silver = promotionLevel("SILVER")
+                val gold = promotionLevel("GOLD")
+                // Registering a subscription for new promotion runs at project level
+                // but only for GOLD promotions
+                eventSubscriptionService.subscribe(
+                    channel = mockNotificationChannel,
+                    channelConfig = MockNotificationChannelConfig(target),
+                    projectEntity = project,
+                    eventFilter = "GOLD",
+                    EventFactory.NEW_PROMOTION_RUN,
+                )
+                // Build to promote
+                build {
+                    // Creates a SILVER promotion, checks it's not notified
+                    promote(silver)
+                    assertNull(mockNotificationChannel.messages[target],
+                        "No notification received for the the silver promotion")
+                    // Creates a GOLD promotion, checks it's notified
+                    promote(gold)
+                    assertNotNull(mockNotificationChannel.messages[target]) {
+                        assertEquals("Build $name has been promoted to GOLD for branch ${branch.name} in ${project.name}.",
+                            it.first())
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting the subscriptions for an event based on an event filter on several tokens`() {
+        val target = uid("t")
+        project {
+            val main = branch("main")
+            val other = branch("other")
+            // Registering a subscription for new promotion runs at project level
+            // but only for GOLD promotions on the main branch
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig(target),
+                projectEntity = this,
+                eventFilter = "GOLD main",
+                EventFactory.NEW_PROMOTION_RUN,
+            )
+            // Promotion on the other branch ==> no notification
+            val otherPromotion = other.promotionLevel("GOLD")
+            other.build {
+                promote(otherPromotion)
+                assertNull(mockNotificationChannel.messages[target],
+                    "No notification received for the the gold promotion on the other branch")
+            }
+            // Promotion on the main branch ==> notification
+            val mainPromotion = main.promotionLevel("GOLD")
+            main.build {
+                promote(mainPromotion)
+                assertNotNull(mockNotificationChannel.messages[target]) {
+                    assertEquals("Build $name has been promoted to GOLD for branch ${branch.name} in ${project.name}.",
+                        it.first())
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Saving a global subscription`() {
         asAdmin {
             val record = eventSubscriptionService.subscribe(

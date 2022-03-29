@@ -366,7 +366,7 @@ class DefaultEventSubscriptionService(
                 )
                 entityDataStore.forEachByFilter(filter) { storeRecord ->
                     val subscription = fromRecord(projectEntity, storeRecord)
-                    if (subscription != null) {
+                    if (subscription != null && event.matchesFilter(subscription.data.eventFilter)) {
                         code(subscription.data)
                     }
                 }
