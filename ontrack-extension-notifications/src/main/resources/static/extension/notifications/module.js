@@ -1,5 +1,6 @@
 angular.module('ontrack.extension.notifications', [
-    'ot.service.core'
+    'ot.service.core',
+    'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('entity-subscriptions', {
@@ -8,14 +9,69 @@ angular.module('ontrack.extension.notifications', [
             controller: 'EntitySubscriptionsCtrl'
         });
     })
-    .controller('EntitySubscriptionsCtrl', function ($scope, $http, ot) {
+    .controller('EntitySubscriptionsCtrl', function ($scope, $stateParams, $http, ot, otGraphqlService) {
         const view = ot.view();
-        view.title = "Subscriptions";
-        // TODO Breadcrumbs to the entity
-        view.breadcrumbs = ot.homeBreadcrumbs();
-        // TODO Close command to the entity
-        view.commands = [
-            ot.viewCloseCommand('/home')
-        ];
+        const type = $stateParams.type;
+        const id = $stateParams.id;
+
+        let viewInitialized = false;
+
+        const queryVariables = {
+            type: type,
+            id: id
+        };
+        const query = `query(
+            $type: ProjectEntityType!,
+            $id: Int!,
+        ) {
+            entity(type: $type, id: $id) {
+                entityName
+                entity {
+                    ... on Project {
+                        links {
+                            _page
+                        }
+                    }
+                    ... on Branch {
+                        links {
+                            _page
+                        }
+                    }
+                    ... on PromotionLevel {
+                        links {
+                            _page
+                        }
+                    }
+                    ... on ValidationStamp {
+                        links {
+                            _page
+                        }
+                    }
+                }
+            }
+        }`;
+
+        $scope.loadingSubscriptions = false;
+        const loadSubscriptions = () => {
+            $scope.loadingSubscriptions = true;
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
+                $scope.entityInfo = data.entity;
+                if (!viewInitialized) {
+                    view.title = `Subscriptions for ${data.entity.entityName}`;
+                    // TODO Breadcrumbs to the entity
+                    // view.breadcrumbs = ot.homeBreadcrumbs();
+                    // Close command to the entity
+                    view.commands = [
+                        ot.viewCloseCommand(`/${type.toLowerCase()}/${id}`)
+                    ];
+                    viewInitialized = true;
+                }
+            }).finally(() => {
+                $scope.loadingSubscriptions = false;
+            });
+        };
+
+        loadSubscriptions();
+
     })
 ;
