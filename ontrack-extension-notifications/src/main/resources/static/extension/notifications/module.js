@@ -58,8 +58,10 @@ angular.module('ontrack.extension.notifications', [
                 $scope.entityInfo = data.entity;
                 if (!viewInitialized) {
                     view.title = `Subscriptions for ${data.entity.entityName}`;
-                    // TODO Breadcrumbs to the entity
-                    // view.breadcrumbs = ot.homeBreadcrumbs();
+                    // Breadcrumbs to the entity
+                    let bc = ot.homeBreadcrumbs();
+                    bc.push([data.entity.entityName, data.entity.entity.links._page]);
+                    view.breadcrumbs = bc;
                     // Close command to the entity
                     view.commands = [
                         ot.viewCloseCommand(`/${type.toLowerCase()}/${id}`)
