@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql.support
 
+import graphql.Scalars.GraphQLInt
 import graphql.Scalars.GraphQLString
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLArgument
@@ -20,6 +21,21 @@ fun stringArgument(
     .type(GraphQLString)
     .build()
 
+/**
+ * Creates a `Int` GraphQL argument.
+ *
+ * @param name Name of the argument
+ * @param description Description of the argument
+ */
+fun intArgument(
+    name: String,
+    description: String,
+    nullable: Boolean = true,
+): GraphQLArgument = GraphQLArgument.newArgument()
+    .name(name)
+    .description(description)
+    .type(nullableInputType(GraphQLInt, nullable))
+    .build()
 
 /**
  * Creates a date/time GraphQL argument.

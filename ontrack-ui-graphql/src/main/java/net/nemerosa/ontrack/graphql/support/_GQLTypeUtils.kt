@@ -44,7 +44,7 @@ fun TypeBuilder.booleanField(property: KProperty<Boolean>, description: String? 
 fun <T> TypeBuilder.field(
     property: KProperty<T?>,
     type: GQLType,
-    description: String? = null
+    description: String? = null,
 ): GraphQLObjectType.Builder =
     field {
         val outputType: GraphQLOutputType = if (property.returnType.isMarkedNullable) {
@@ -60,14 +60,14 @@ fun <T> TypeBuilder.field(
 fun <T> TypeBuilder.field(
     property: KProperty<T?>,
     typeName: String,
-    description: String? = null
+    description: String? = null,
 ): GraphQLObjectType.Builder =
     field(property, GraphQLTypeReference(typeName), description)
 
 fun <T> TypeBuilder.field(
     property: KProperty<T?>,
     ref: GraphQLTypeReference,
-    description: String? = null
+    description: String? = null,
 ): GraphQLObjectType.Builder =
     field {
         val outputType: GraphQLOutputType = if (property.returnType.isMarkedNullable) {
@@ -88,6 +88,17 @@ fun <E : Enum<E>> TypeBuilder.enumAsStringField(
         it.name(property.name)
             .description(getPropertyDescription(property, description))
             .type(GraphQLString)
+    }
+
+inline fun <reified E : Enum<E>> TypeBuilder.enumField(
+    property: KProperty<E?>,
+    description: String? = null,
+): GraphQLObjectType.Builder =
+    field {
+        it.name(property.name)
+            .description(getPropertyDescription(property, description))
+            .type(nullableOutputType(GraphQLTypeReference(E::class.java.simpleName),
+                property.returnType.isMarkedNullable))
     }
 
 fun TypeBuilder.stringField(property: KProperty<String?>, description: String? = null): GraphQLObjectType.Builder =

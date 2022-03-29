@@ -3,10 +3,10 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLInterfaceType
 import graphql.schema.GraphQLTypeReference
-import graphql.schema.TypeResolverProxy
 import net.nemerosa.ontrack.graphql.support.descriptionField
 import net.nemerosa.ontrack.graphql.support.idField
 import net.nemerosa.ontrack.graphql.support.nameField
+import net.nemerosa.ontrack.model.structure.ProjectEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -18,13 +18,17 @@ constructor(private val creation: GQLTypeCreation) : GQLInterface {
 
     override fun createInterface(): GraphQLInterfaceType {
         return GraphQLInterfaceType.newInterface()
-                .name(PROJECT_ENTITY)
-                // Common fields
-                .fields(baseProjectEntityInterfaceFields())
-                // TODO Type resolver not set, but it should
-                .typeResolver(TypeResolverProxy())
-                // OK
-                .build()
+            .name(PROJECT_ENTITY)
+            // Common fields
+            .fields(baseProjectEntityInterfaceFields())
+            // Resolving the interface
+            .typeResolver { env ->
+                val entity = env.getObject<ProjectEntity>()
+                val entityTypeName = entity::class.java.simpleName
+                env.schema.getObjectType(entityTypeName)
+            }
+            // OK
+            .build()
     }
 
     private fun baseProjectEntityInterfaceFields(): List<GraphQLFieldDefinition> = listOf(
