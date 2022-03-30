@@ -4,7 +4,9 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.graphql.support.getPropertyDescription
 import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.MultiStrings
 import net.nemerosa.ontrack.model.form.ServiceConfigurator
+import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -55,7 +57,14 @@ class EventSubscriptionController(
 
     private fun form(subscription: EventSubscription?): Form = Form.create()
         // TODO events
-        // TODO keywords
+        // keywords
+        .with(
+            Text.of(EventSubscription::keywords.name)
+                .label("Keywords")
+                .help(getPropertyDescription(EventSubscription::keywords))
+                .optional()
+                .value(subscription?.keywords)
+        )
         // channel
         .with(
             ServiceConfigurator.of(EventSubscription::channel.name)
