@@ -20,6 +20,11 @@ interface NotificationChannel<C> {
     fun toSearchCriteria(text: String): JsonNode
 
     /**
+     * Given a configuration, returns a display text for it
+     */
+    fun toText(config: C): String
+
+    /**
      * Type of the channel, used as an identifier for the serialization of the subscriptions.
      */
     val type: String

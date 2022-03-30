@@ -36,6 +36,8 @@ class SlackNotificationChannel(
     override fun toSearchCriteria(text: String): JsonNode =
         mapOf(SlackNotificationChannelConfig::channel.name to text).asJson()
 
+    override fun toText(config: SlackNotificationChannelConfig): String = config.channel
+
     override val type: String = "slack"
 
     override val enabled: Boolean

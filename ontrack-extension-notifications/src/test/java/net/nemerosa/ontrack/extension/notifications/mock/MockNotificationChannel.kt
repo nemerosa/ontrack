@@ -24,6 +24,8 @@ class MockNotificationChannel :
     override fun toSearchCriteria(text: String): JsonNode =
         mapOf(MockNotificationChannelConfig::target.name to text).asJson()
 
+    override fun toText(config: MockNotificationChannelConfig): String = config.target
+
     override val type: String = "mock"
     override val enabled: Boolean = true
 }

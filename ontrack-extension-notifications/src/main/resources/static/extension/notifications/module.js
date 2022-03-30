@@ -59,6 +59,7 @@ angular.module('ontrack.extension.notifications', [
                     id
                     channel
                     channelConfig
+                    channelConfigText
                     events
                     keywords
                 }

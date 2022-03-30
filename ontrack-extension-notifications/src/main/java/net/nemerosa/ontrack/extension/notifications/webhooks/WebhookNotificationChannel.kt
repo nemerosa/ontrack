@@ -38,6 +38,8 @@ class WebhookNotificationChannel(
     override fun toSearchCriteria(text: String): JsonNode =
         mapOf(WebhookNotificationChannelConfig::name.name to text).asJson()
 
+    override fun toText(config: WebhookNotificationChannelConfig): String = config.name
+
     override val type: String = "webhook"
 
     override val enabled: Boolean get() = cachedSettingsService.getCachedSettings(WebhookSettings::class.java).enabled
