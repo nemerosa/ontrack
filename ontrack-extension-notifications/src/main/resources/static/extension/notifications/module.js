@@ -57,10 +57,8 @@ angular.module('ontrack.extension.notifications', [
             }) {
                 pageItems {
                     id
-                    channels {
-                        channel
-                        channelConfig
-                    }
+                    channel
+                    channelConfig
                     events
                     keywords
                 }
