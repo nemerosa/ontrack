@@ -38,8 +38,10 @@ class GQLRootQueryEventSubscriptions(
                 eventSubscriptionService.filterSubscriptions(filter).map {
                     EventSubscriptionPayload(
                         id = it.id,
-                        channels = it.data.channels.toList(),
-                        events = it.data.events.toList()
+                        channel = it.data.channel,
+                        channelConfig = it.data.channelConfig,
+                        events = it.data.events.toList(),
+                        keywords = it.data.keywords,
                     )
                 }
             }

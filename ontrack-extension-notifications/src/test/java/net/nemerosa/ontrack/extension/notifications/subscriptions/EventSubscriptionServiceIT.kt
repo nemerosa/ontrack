@@ -100,28 +100,32 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 // Checks the subscriptions
                 // We expect one for the branch and one for the project
                 // Sorting per target
-                subscriptions.sortBy { it.channels.first().channelConfig["target"].asText() }
+                subscriptions.sortBy { it.channelConfig["target"].asText() }
                 assertEquals(2, subscriptions.size)
                 // Branch first (tb)
                 subscriptions[0].let { subscription ->
                     assertEquals(this, subscription.projectEntity)
-                    assertEquals(setOf(
-                        EventSubscriptionChannel(
-                            channel = "mock",
-                            channelConfig = mapOf("target" to targetBranch).asJson()
-                        )
-                    ), subscription.channels)
+                    assertEquals(
+                        "mock",
+                        subscription.channel
+                    )
+                    assertEquals(
+                        mapOf("target" to targetBranch).asJson(),
+                        subscription.channelConfig
+                    )
                     assertEquals(setOf("new_promotion_run"), subscription.events)
                 }
                 // Project second (tp)
                 subscriptions[1].let { subscription ->
                     assertEquals(project, subscription.projectEntity)
-                    assertEquals(setOf(
-                        EventSubscriptionChannel(
-                            channel = "mock",
-                            channelConfig = mapOf("target" to targetProject).asJson()
-                        )
-                    ), subscription.channels)
+                    assertEquals(
+                        "mock",
+                        subscription.channel
+                    )
+                    assertEquals(
+                        mapOf("target" to targetProject).asJson(),
+                        subscription.channelConfig
+                    )
                     assertEquals(setOf("new_promotion_run"), subscription.events)
                 }
             }
@@ -253,7 +257,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     assertEquals(3, page.pageInfo.totalSize)
                     assertEquals(3, page.pageItems.size)
                     val targets =
-                        page.pageItems.map { it.data.channels.first().channelConfig.getRequiredTextField("target") }
+                        page.pageItems.map { it.data.channelConfig.getRequiredTextField("target") }
                     assertEquals(
                         setOf(
                             targetProject,
@@ -281,7 +285,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             val subscriptions = eventSubscriptionService.filterSubscriptions(
                 EventSubscriptionFilter(size = 1000)
             ).pageItems
-            assertNotNull(subscriptions.find { it.data.channels.firstOrNull()?.channelConfig?.getTextField("target") == target },
+            assertNotNull(subscriptions.find { it.data.channelConfig.getTextField("target") == target },
                 "Finding the global subscription")
         }
     }
@@ -341,7 +345,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(1, page.pageItems.size)
             assertEquals(
                 "other-mock",
-                page.pageItems.first().data.channels.first().channel
+                page.pageItems.first().data.channel
             )
         }
     }
@@ -371,11 +375,11 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(1, page.pageItems.size)
             assertEquals(
                 "mock",
-                page.pageItems.first().data.channels.first().channel
+                page.pageItems.first().data.channel
             )
             assertEquals(
                 "#main",
-                page.pageItems.first().data.channels.first().channelConfig.getRequiredTextField("target")
+                page.pageItems.first().data.channelConfig.getRequiredTextField("target")
             )
         }
     }
@@ -405,14 +409,13 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(1, page.pageInfo.totalSize)
             assertEquals(1, page.pageItems.size)
             val subscription = page.pageItems.first()
-            val channel = subscription.data.channels.first()
             assertEquals(
                 "mock",
-                channel.channel
+                subscription.data.channel
             )
             assertEquals(
                 "#one",
-                channel.channelConfig.getRequiredTextField("target")
+                subscription.data.channelConfig.getRequiredTextField("target")
             )
             assertEquals(
                 setOf("new_promotion_run"),
@@ -449,11 +452,11 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(1, page.pageItems.size)
             assertEquals(
                 "mock",
-                page.pageItems.first().data.channels.first().channel
+                page.pageItems.first().data.channel
             )
             assertEquals(
                 "#one",
-                page.pageItems.first().data.channels.first().channelConfig.getRequiredTextField("target")
+                page.pageItems.first().data.channelConfig.getRequiredTextField("target")
             )
         }
     }
@@ -488,14 +491,13 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(1, page.pageInfo.totalSize)
             assertEquals(1, page.pageItems.size)
             val subscription = page.pageItems.first()
-            val channel = subscription.data.channels.first()
             assertEquals(
                 "mock",
-                channel.channel
+                subscription.data.channel
             )
             assertEquals(
                 "#one",
-                channel.channelConfig.getRequiredTextField("target")
+                subscription.data.channelConfig.getRequiredTextField("target")
             )
             assertEquals(
                 setOf("new_promotion_run"),
@@ -543,7 +545,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     assertEquals(1, page.pageInfo.totalSize)
                     assertEquals(1, page.pageItems.size)
                     val targets =
-                        page.pageItems.map { it.data.channels.first().channelConfig.getRequiredTextField("target") }
+                        page.pageItems.map { it.data.channelConfig.getRequiredTextField("target") }
                     assertEquals(
                         setOf(
                             targetPromotionLevel,
@@ -581,7 +583,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(1, page.pageItems.size)
             assertEquals(
                 "other-mock",
-                page.pageItems.first().data.channels.first().channel
+                page.pageItems.first().data.channel
             )
         }
     }
@@ -612,11 +614,11 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(1, page.pageItems.size)
             assertEquals(
                 "mock",
-                page.pageItems.first().data.channels.first().channel
+                page.pageItems.first().data.channel
             )
             assertEquals(
                 "#one",
-                page.pageItems.first().data.channels.first().channelConfig.getRequiredTextField("target")
+                page.pageItems.first().data.channelConfig.getRequiredTextField("target")
             )
         }
     }
@@ -650,11 +652,11 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(1, page.pageItems.size)
             assertEquals(
                 "mock",
-                page.pageItems.first().data.channels.first().channel
+                page.pageItems.first().data.channel
             )
             assertEquals(
                 "#one",
-                page.pageItems.first().data.channels.first().channelConfig.getRequiredTextField("target")
+                page.pageItems.first().data.channelConfig.getRequiredTextField("target")
             )
         }
     }
@@ -691,14 +693,13 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(1, page.pageInfo.totalSize)
             assertEquals(1, page.pageItems.size)
             val subscription = page.pageItems.first()
-            val channel = subscription.data.channels.first()
             assertEquals(
                 "mock",
-                channel.channel
+                subscription.data.channel
             )
             assertEquals(
                 "#one",
-                channel.channelConfig.getRequiredTextField("target")
+                subscription.data.channelConfig.getRequiredTextField("target")
             )
             assertEquals(
                 user1.user.name,
@@ -732,14 +733,13 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(1, page.pageInfo.totalSize)
             assertEquals(1, page.pageItems.size)
             val subscription = page.pageItems.first()
-            val channel = subscription.data.channels.first()
             assertEquals(
                 "mock",
-                channel.channel
+                subscription.data.channel
             )
             assertEquals(
                 "#one",
-                channel.channelConfig.getRequiredTextField("target")
+                subscription.data.channelConfig.getRequiredTextField("target")
             )
             assertEquals(
                 setOf("new_promotion_run"),

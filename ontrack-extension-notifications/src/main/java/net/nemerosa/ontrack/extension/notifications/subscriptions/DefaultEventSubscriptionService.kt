@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
@@ -38,7 +39,8 @@ class DefaultEventSubscriptionService(
     override fun subscribe(subscription: EventSubscription): SavedEventSubscription {
         // Record to save
         val record = SubscriptionRecord(
-            subscription.channels,
+            subscription.channel,
+            subscription.channelConfig,
             subscription.events,
             subscription.keywords,
         )
@@ -108,7 +110,8 @@ class DefaultEventSubscriptionService(
                 // Saves the subscription
                 val storedRecord = SignedSubscriptionRecord(
                     signature = securityService.currentSignature,
-                    channels = subscription.channels,
+                    channel = subscription.channel,
+                    channelConfig = subscription.channelConfig,
                     events = subscription.events,
                     keywords = subscription.keywords,
                 )
@@ -142,7 +145,8 @@ class DefaultEventSubscriptionService(
         } else {
             storageService.find(GLOBAL_STORE, id, SignedSubscriptionRecord::class)?.run {
                 EventSubscription(
-                    channels = channels,
+                    channel = channel,
+                    channelConfig = channelConfig,
                     projectEntity = null,
                     events = events,
                     keywords = keywords,
@@ -217,15 +221,13 @@ class DefaultEventSubscriptionService(
 
         // Filter: channel
         if (!filter.channel.isNullOrBlank()) {
-            val json = mapOf("channel" to filter.channel).asJson().format()
-            contextList += "left join jsonb_array_elements_text(data::jsonb->'channels') as channels on true"
-            jsonFilters += """channels::jsonb @> '$json'::jsonb"""
+            jsonFilters += """data::jsonb->>'channel' = :channel"""
+            jsonCriteria["channel"] = filter.channel
             // Filter: channel config
             if (!filter.channelConfig.isNullOrBlank()) {
                 val channel = notificationChannelRegistry.getChannel(filter.channel)
-                val criteria = channel.toSearchCriteria(filter.channelConfig)
-                val jsonConfig = mapOf("channelConfig" to criteria).asJson().format()
-                jsonFilters += """channels::jsonb @> '$jsonConfig'::jsonb"""
+                val criteria = channel.toSearchCriteria(filter.channelConfig).format()
+                jsonFilters += """data::jsonb->'channelConfig' @> '$criteria'"""
             }
         }
 
@@ -271,7 +273,8 @@ class DefaultEventSubscriptionService(
                 id = id,
                 signature = record.signature,
                 data = EventSubscription(
-                    channels = record.channels,
+                    channel = record.channel,
+                    channelConfig = record.channelConfig,
                     projectEntity = null,
                     events = record.events,
                     keywords = record.keywords,
@@ -294,22 +297,18 @@ class DefaultEventSubscriptionService(
             count = size,
         )
         // All JSON context
-        var jsonContextChannels = false
         var jsonContextEvents = false
         val jsonFilters = mutableListOf<String>()
         val jsonCriteria = mutableMapOf<String, String>()
         // Filter: channel
         if (!filter.channel.isNullOrBlank()) {
-            jsonContextChannels = true
-            val json = mapOf("channel" to filter.channel).asJson().format()
-            jsonFilters += """channels::jsonb @> '$json'::jsonb"""
-
+            jsonFilters += """json::jsonb->>'channel' = :channel"""
+            jsonCriteria["channel"] = filter.channel
             // Filter: channel config
             if (!filter.channelConfig.isNullOrBlank()) {
                 val channel = notificationChannelRegistry.getChannel(filter.channel)
-                val criteria = channel.toSearchCriteria(filter.channelConfig)
-                val jsonConfig = mapOf("channelConfig" to criteria).asJson().format()
-                jsonFilters += """channels::jsonb @> '$jsonConfig'::jsonb"""
+                val criteria = channel.toSearchCriteria(filter.channelConfig).format()
+                jsonFilters += """json::jsonb->'channelConfig' @> '$criteria'::jsonb"""
             }
         }
         // Filter: event type
@@ -328,9 +327,6 @@ class DefaultEventSubscriptionService(
         }
         // Json context
         val jsonContextList = mutableListOf<String>()
-        if (jsonContextChannels) {
-            jsonContextList += "left join jsonb_array_elements_text(json::jsonb->'channels') as channels on true"
-        }
         if (jsonContextEvents) {
             jsonContextList += "left join jsonb_array_elements_text(json::jsonb->'events') as events on true"
         }
@@ -384,7 +380,8 @@ class DefaultEventSubscriptionService(
                 id = key,
                 signature = record.signature,
                 data = EventSubscription(
-                    channels = record.channels,
+                    channel = record.channel,
+                    channelConfig = record.channelConfig,
                     projectEntity = null,
                     events = record.events,
                     keywords = record.keywords,
@@ -409,7 +406,8 @@ class DefaultEventSubscriptionService(
             id = record.name,
             signature = record.signature,
             data = EventSubscription(
-                channels = it.channels,
+                channel = it.channel,
+                channelConfig = it.channelConfig,
                 projectEntity = projectEntity,
                 events = it.events,
                 keywords = it.keywords,
@@ -421,7 +419,8 @@ class DefaultEventSubscriptionService(
      * Subscription record
      */
     data class SubscriptionRecord(
-        val channels: Set<EventSubscriptionChannel>,
+        val channel: String,
+        val channelConfig: JsonNode,
         val events: Set<String>,
         val keywords: String?,
     )
@@ -431,11 +430,12 @@ class DefaultEventSubscriptionService(
      */
     data class SignedSubscriptionRecord(
         val signature: Signature,
-        val channels: Set<EventSubscriptionChannel>,
+        val channel: String,
+        val channelConfig: JsonNode,
         val events: Set<String>,
         val keywords: String?,
     ) {
-        fun toSubscriptionRecord() = SubscriptionRecord(channels, events, keywords)
+        fun toSubscriptionRecord() = SubscriptionRecord(channel, channelConfig, events, keywords)
     }
 
 }

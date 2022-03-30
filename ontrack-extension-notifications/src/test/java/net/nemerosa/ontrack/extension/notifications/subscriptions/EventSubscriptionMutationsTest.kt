@@ -4,7 +4,7 @@ import graphql.schema.*
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter
 import net.nemerosa.ontrack.model.structure.ProjectEntityID
 import net.nemerosa.ontrack.test.assertIs
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -31,8 +31,6 @@ internal class EventSubscriptionMutationsTest {
 
         assertNotNull(dictionary.find { it is GraphQLInputObjectType && it.name == "ProjectEntityIDInput" },
             "ProjectEntityIDInput input type has been created")
-        assertNotNull(dictionary.find { it is GraphQLInputObjectType && it.name == "EventSubscriptionChannelInput" },
-            "EventSubscriptionChannelInput input type has been created")
     }
 
     @Test

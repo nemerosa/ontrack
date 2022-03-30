@@ -57,6 +57,12 @@ angular.module('ontrack.extension.notifications', [
             }) {
                 pageItems {
                     id
+                    channels {
+                        channel
+                        channelConfig
+                    }
+                    events
+                    keywords
                 }
             }
         }`;
@@ -66,6 +72,7 @@ angular.module('ontrack.extension.notifications', [
             $scope.loadingSubscriptions = true;
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.entityInfo = data.entity;
+                $scope.subscriptions = data.eventSubscriptions.pageItems;
                 if (!viewInitialized) {
                     view.title = `Subscriptions for ${data.entity.entityName}`;
                     const page = data.entity.entity.links._page

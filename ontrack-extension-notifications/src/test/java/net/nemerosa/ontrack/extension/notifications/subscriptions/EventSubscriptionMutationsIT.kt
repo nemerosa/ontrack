@@ -22,14 +22,10 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                             type: PROJECT,
                             id: $id
                         },
-                        channels: [
-                            {
-                                channel: "mock",
-                                channelConfig: {
-                                    target: "#test"
-                                }
-                            }
-                        ],
+                        channel: "mock",
+                        channelConfig: {
+                            target: "#test"
+                        },
                         events: [
                             "new_branch",
                             "delete_branch",
@@ -58,13 +54,12 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                     )
                     assertEquals(this, subscription.projectEntity)
                     assertEquals(
-                        setOf(
-                            EventSubscriptionChannel(
-                                "mock",
-                                mapOf("target" to "#test").asJson()
-                            )
-                        ),
-                        subscription.channels
+                        "mock",
+                        subscription.channel
+                    )
+                    assertEquals(
+                        mapOf("target" to "#test").asJson(),
+                        subscription.channelConfig
                     )
                 }
             }

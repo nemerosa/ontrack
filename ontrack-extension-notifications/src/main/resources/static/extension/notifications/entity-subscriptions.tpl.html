@@ -1,3 +1,44 @@
 <ot-view>
-    TBD
+
+    <div class="row" ng-show="loadingSubscriptions">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the subscriptions...
+            </div>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Events</th>
+            <th>Keywords</th>
+            <th>Channels</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-if="!subscriptions">
+            <td class="info" colspan="4">
+                No subscription has been created yet.
+            </td>
+        </tr>
+        <tr ng-repeat="subscription in subscriptions">
+            <td>
+                {{ subscription.events }}
+            </td>
+            <td>
+                {{ subscription.keywords }}
+            </td>
+            <td>
+                {{ subscription.channels }}
+            </td>
+            <td>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
 </ot-view>

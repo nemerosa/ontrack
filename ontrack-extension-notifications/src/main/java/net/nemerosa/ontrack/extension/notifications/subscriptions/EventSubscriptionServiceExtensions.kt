@@ -21,12 +21,8 @@ fun <C> EventSubscriptionService.subscribe(
     vararg eventTypes: EventType,
 ) = subscribe(
     EventSubscription(
-        channels = setOf(
-            EventSubscriptionChannel(
-                channel = channel.type,
-                channelConfig = channelConfig.asJson(),
-            ),
-        ),
+        channel = channel.type,
+        channelConfig = channelConfig.asJson(),
         projectEntity = projectEntity,
         events = eventTypes.map { it.id }.toSet(),
         keywords = keywords,

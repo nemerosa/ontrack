@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
+import com.fasterxml.jackson.databind.JsonNode
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
@@ -35,7 +36,8 @@ class EventSubscriptionMutations(
             }
             val record = eventSubscriptionService.subscribe(
                 EventSubscription(
-                    channels = input.channels.toSet(),
+                    channel = input.channel,
+                    channelConfig = input.channelConfig,
                     events = input.events.toSet(),
                     projectEntity = projectEntity,
                     keywords = input.keywords,
@@ -43,8 +45,10 @@ class EventSubscriptionMutations(
             )
             EventSubscriptionPayload(
                 id = record.id,
-                channels = record.data.channels.toList(),
+                channel = record.data.channel,
+                channelConfig = record.data.channelConfig,
                 events = record.data.events.toList(),
+                keywords = record.data.keywords,
             )
         },
 
@@ -74,9 +78,10 @@ data class SubscribeToEventsInput(
     @APIDescription("Target project entity (null for global events)")
     @TypeRef(embedded = true, suffix = "Input")
     val projectEntity: ProjectEntityID?,
-    @APIDescription("Channels to send this event to")
-    @ListRef(embedded = true, suffix = "Input")
-    val channels: List<EventSubscriptionChannel>,
+    @APIDescription("Channel to send this event to")
+    val channel: String,
+    @APIDescription("Channel configuration")
+    val channelConfig: JsonNode,
     @APIDescription("List of events types to subscribe to")
     @ListRef
     val events: List<String>,
@@ -88,10 +93,14 @@ data class SubscribeToEventsInput(
 data class EventSubscriptionPayload(
     @APIDescription("Unique ID for this subscription")
     val id: String,
-    @APIDescription("Channels to send this event to")
-    val channels: List<EventSubscriptionChannel>,
+    @APIDescription("Channel to send this event to")
+    val channel: String,
+    @APIDescription("Channel configuration")
+    val channelConfig: JsonNode,
     @APIDescription("List of events types to subscribe to")
     val events: List<String>,
+    @APIDescription("Optional space-separated list of tokens to look for in the events")
+    val keywords: String?,
 )
 
 @Component

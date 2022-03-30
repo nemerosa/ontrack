@@ -38,10 +38,8 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                             eventType: "new_promotion_run"
                         }) {
                             pageItems {
-                                channels {
-                                    channel
-                                    channelConfig
-                                }
+                                channel
+                                channelConfig
                                 events
                             }
                         }
@@ -52,13 +50,9 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                         "eventSubscriptions" to mapOf(
                             "pageItems" to listOf(
                                 mapOf(
-                                    "channels" to listOf(
-                                        mapOf(
-                                            "channel" to "mock",
-                                            "channelConfig" to mapOf(
-                                                "target" to "#one"
-                                            )
-                                        )
+                                    "channel" to "mock",
+                                    "channelConfig" to mapOf(
+                                        "target" to "#one"
                                     ),
                                     "events" to listOf(
                                         "new_promotion_run"
@@ -99,10 +93,8 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                             eventType: "new_promotion_run"
                         }) {
                             pageItems {
-                                channels {
-                                    channel
-                                    channelConfig
-                                }
+                                channel
+                                channelConfig
                                 events
                             }
                         }
@@ -113,13 +105,9 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                         "eventSubscriptions" to mapOf(
                             "pageItems" to listOf(
                                 mapOf(
-                                    "channels" to listOf(
-                                        mapOf(
-                                            "channel" to "mock",
-                                            "channelConfig" to mapOf(
-                                                "target" to "#one"
-                                            )
-                                        )
+                                    "channel" to "mock",
+                                    "channelConfig" to mapOf(
+                                        "target" to "#one"
                                     ),
                                     "events" to listOf(
                                         "new_promotion_run"
