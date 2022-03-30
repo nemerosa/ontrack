@@ -15,6 +15,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
  */
 data class EventSubscription(
     val projectEntity: ProjectEntity?,
+    @APIDescription("List of events types to subscribe to")
     val events: Set<String>,
     @APIDescription("Optional space-separated list of tokens to look for in the events")
     val keywords: String?,

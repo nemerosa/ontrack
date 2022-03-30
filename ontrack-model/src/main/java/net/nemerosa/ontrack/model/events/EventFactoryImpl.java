@@ -1,14 +1,12 @@
 package net.nemerosa.ontrack.model.events;
 
-import net.nemerosa.ontrack.model.events.Event;
-import net.nemerosa.ontrack.model.events.EventFactory;
-import net.nemerosa.ontrack.model.events.EventType;
-import net.nemerosa.ontrack.model.events.EventTypeNotFoundException;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.Configuration;
 import net.nemerosa.ontrack.model.support.NameValue;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -68,6 +66,12 @@ public class EventFactoryImpl implements EventFactory {
         } else {
             types.put(eventType.getId(), eventType);
         }
+    }
+
+    @Override
+    public @NotNull
+    Collection<EventType> getEventTypes() {
+        return types.values();
     }
 
     @Override

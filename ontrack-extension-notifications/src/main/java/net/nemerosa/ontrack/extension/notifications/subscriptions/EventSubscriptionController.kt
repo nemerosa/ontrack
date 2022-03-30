@@ -3,11 +3,13 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.graphql.support.getPropertyDescription
+import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.MultiStrings
+import net.nemerosa.ontrack.model.form.MultiSelection
 import net.nemerosa.ontrack.model.form.ServiceConfigurator
 import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.SelectableItem
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -22,6 +24,7 @@ class EventSubscriptionController(
     private val structureService: StructureService,
     private val eventSubscriptionService: EventSubscriptionService,
     private val notificationChannelRegistry: NotificationChannelRegistry,
+    private val eventFactory: EventFactory,
 ) {
 
     /**
@@ -56,7 +59,23 @@ class EventSubscriptionController(
         }
 
     private fun form(subscription: EventSubscription?): Form = Form.create()
-        // TODO events
+        // events
+        .with(
+            MultiSelection.of(EventSubscription::events.name)
+                .label("Events")
+                .help(getPropertyDescription(EventSubscription::events))
+                .items(
+                    eventFactory.eventTypes
+                        .sortedBy { it.id }
+                        .map { eventType ->
+                            SelectableItem(
+                                subscription != null && eventType.id in subscription.events,
+                                eventType.id,
+                                eventType.id,
+                            )
+                        }
+                )
+        )
         // keywords
         .with(
             Text.of(EventSubscription::keywords.name)

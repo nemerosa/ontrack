@@ -2,6 +2,9 @@ package net.nemerosa.ontrack.model.events;
 
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.Configuration;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 
 /**
  * Factory for events.
@@ -131,4 +134,9 @@ public interface EventFactory {
     <T extends Configuration<T>> Event updateConfiguration(T configuration);
 
     <T extends Configuration<T>> Event deleteConfiguration(T configuration);
+
+    // Getting the list of all possible event types
+
+    @NotNull
+    Collection<EventType> getEventTypes();
 }
