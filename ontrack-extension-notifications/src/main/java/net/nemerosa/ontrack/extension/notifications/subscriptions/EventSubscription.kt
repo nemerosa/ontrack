@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 
 /**
@@ -16,6 +17,7 @@ data class EventSubscription(
     val projectEntity: ProjectEntity?,
     val events: Set<String>,
     val keywords: String?,
+    @APIDescription("Type of channel to send the event to")
     val channel: String,
     val channelConfig: JsonNode,
 )
