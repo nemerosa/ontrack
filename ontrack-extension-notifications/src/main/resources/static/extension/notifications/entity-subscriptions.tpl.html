@@ -27,7 +27,9 @@
         </tr>
         <tr ng-repeat="subscription in subscriptions">
             <td>
-                {{ subscription.events }}
+                <span class="ot-label-suite">
+                    <span class="label label-info" ng-repeat="event in subscription.events">{{ event }}</span>
+                </span>
             </td>
             <td>
                 {{ subscription.keywords }}
