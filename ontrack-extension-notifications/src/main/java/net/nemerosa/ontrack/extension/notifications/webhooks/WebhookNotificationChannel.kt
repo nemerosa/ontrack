@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
 
@@ -39,6 +40,9 @@ class WebhookNotificationChannel(
         mapOf(WebhookNotificationChannelConfig::name.name to text).asJson()
 
     override fun toText(config: WebhookNotificationChannelConfig): String = config.name
+
+    // TODO Webhook form
+    override fun getForm(c: WebhookNotificationChannelConfig?): Form = Form.create()
 
     override val type: String = "webhook"
 

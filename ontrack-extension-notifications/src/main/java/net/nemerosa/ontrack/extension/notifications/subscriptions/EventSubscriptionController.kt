@@ -1,13 +1,11 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
+import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.graphql.support.getPropertyDescription
 import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Selection
-import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import net.nemerosa.ontrack.model.structure.StructureService
-import net.nemerosa.ontrack.model.support.NameValue
+import net.nemerosa.ontrack.model.form.ServiceConfigurator
+import net.nemerosa.ontrack.model.structure.*
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -60,27 +58,35 @@ class EventSubscriptionController(
         // TODO keywords
         // channel
         .with(
-            Selection.of(EventSubscription::channel.name)
+            ServiceConfigurator.of(EventSubscription::channel.name)
                 .label("Channel")
                 .help(getPropertyDescription(EventSubscription::channel))
-                .items(
+                .sources(
                     notificationChannelRegistry.channels
-                        .map {
-                            NameValue(
-                                it.type,
-                                if (it.enabled) {
-                                    it.type
+                        .map { channel ->
+                            ServiceConfigurationSource(
+                                channel.type,
+                                if (channel.enabled) {
+                                    channel.type
                                 } else {
-                                    "${it.type} (disabled)"
-                                }
+                                    "${channel.type} (disabled)"
+                                },
+                                channelConfigForm(channel)
                             )
                         }
                 )
-                .itemId(NameValue::name.name)
-                .itemName(NameValue::value.name)
-                .value(subscription?.channel)
+                .value(
+                    subscription?.run {
+                        ServiceConfiguration(
+                            id = subscription.channel,
+                            data = subscription.channelConfig,
+                        )
+                    }
+                )
         )
-    // TODO channelConfig
+
+    private fun <C> channelConfigForm(channel: NotificationChannel<C>): Form =
+        channel.getForm(null)
 
 
 }

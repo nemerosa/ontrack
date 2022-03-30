@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.Text
 import org.springframework.stereotype.Component
 
 @Component
@@ -25,6 +27,14 @@ class MockNotificationChannel :
         mapOf(MockNotificationChannelConfig::target.name to text).asJson()
 
     override fun toText(config: MockNotificationChannelConfig): String = config.target
+
+    override fun getForm(c: MockNotificationChannelConfig?): Form = Form.create()
+        .with(
+            Text.of(MockNotificationChannelConfig::target.name)
+                .label("Target")
+                .help("Test target")
+                .value(c?.target)
+        )
 
     override val type: String = "mock"
     override val enabled: Boolean = true

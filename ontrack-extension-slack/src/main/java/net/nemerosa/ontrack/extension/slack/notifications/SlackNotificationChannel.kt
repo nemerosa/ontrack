@@ -7,6 +7,8 @@ import net.nemerosa.ontrack.extension.slack.SlackSettings
 import net.nemerosa.ontrack.extension.slack.service.SlackService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
 
@@ -37,6 +39,14 @@ class SlackNotificationChannel(
         mapOf(SlackNotificationChannelConfig::channel.name to text).asJson()
 
     override fun toText(config: SlackNotificationChannelConfig): String = config.channel
+
+    override fun getForm(c: SlackNotificationChannelConfig?): Form = Form.create()
+        .with(
+            Text.of(SlackNotificationChannelConfig::channel.name)
+                .label("Channel")
+                .help("Slack channel")
+                .value(c?.channel)
+        )
 
     override val type: String = "slack"
 
