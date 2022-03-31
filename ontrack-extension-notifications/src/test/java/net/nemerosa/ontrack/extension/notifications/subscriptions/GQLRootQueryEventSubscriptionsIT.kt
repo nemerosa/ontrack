@@ -34,12 +34,12 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                                 id: $id
                             }
                         }) {
-                            createSubscriptionGranted
+                            writeSubscriptionGranted
                         }
                     }
                 """) { data ->
                     assertFalse(data.getRequiredJsonField("eventSubscriptions")
-                        .getRequiredBooleanField("createSubscriptionGranted"))
+                        .getRequiredBooleanField("writeSubscriptionGranted"))
                 }
             }
             // Query
@@ -53,12 +53,12 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                                 id: $id
                             }
                         }) {
-                            createSubscriptionGranted
+                            writeSubscriptionGranted
                         }
                     }
                 """) { data ->
                         assertTrue(data.getRequiredJsonField("eventSubscriptions")
-                            .getRequiredBooleanField("createSubscriptionGranted"))
+                            .getRequiredBooleanField("writeSubscriptionGranted"))
                     }
                 }
         }

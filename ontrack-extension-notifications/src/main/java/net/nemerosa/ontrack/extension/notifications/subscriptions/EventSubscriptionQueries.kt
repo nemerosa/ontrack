@@ -40,7 +40,7 @@ class GQLRootQueryEventSubscriptions(
             ),
             additionalFields = listOf(
                 GraphQLFieldDefinition.newFieldDefinition()
-                    .name("createSubscriptionGranted")
+                    .name("writeSubscriptionGranted")
                     .description("Can the user create subscriptions in the current context")
                     .type(GraphQLBoolean.toNotNull())
                     .dataFetcher { env ->

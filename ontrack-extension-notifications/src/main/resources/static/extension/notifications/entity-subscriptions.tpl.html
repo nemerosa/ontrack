@@ -39,7 +39,9 @@
                 {{ subscription.channelConfigText }}
             </td>
             <td>
-
+                <span ng-if="writeSubscriptionGranted" class="ot-command" ng-click="deleteSubscription(subscription)">
+                    <span class="fa fa-trash"></span> Delete
+                </span>
             </td>
         </tr>
         </tbody>

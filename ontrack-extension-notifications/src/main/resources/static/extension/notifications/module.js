@@ -10,7 +10,7 @@ angular.module('ontrack.extension.notifications', [
             controller: 'EntitySubscriptionsCtrl'
         });
     })
-    .controller('EntitySubscriptionsCtrl', function ($q, $scope, $stateParams, $http, ot, otFormService, otGraphqlService) {
+    .controller('EntitySubscriptionsCtrl', function ($q, $scope, $stateParams, $http, ot, otAlertService, otFormService, otGraphqlService) {
         const view = ot.view();
         const type = $stateParams.type;
         const id = $stateParams.id;
@@ -56,7 +56,7 @@ angular.module('ontrack.extension.notifications', [
                     id: $id
                 }
             }) {
-                createSubscriptionGranted
+                writeSubscriptionGranted
                 pageItems {
                     id
                     channel
@@ -67,6 +67,26 @@ angular.module('ontrack.extension.notifications', [
                 }
             }
         }`;
+
+        const deleteSubscriptionQuery = `
+            mutation(
+                $entityType: ProjectEntityType!,
+                $entityId: Int!,
+                $id: String!,
+            ) {
+                deleteSubscription(input: {
+                    projectEntity: {
+                        type: $entityType,
+                        id: $entityId
+                    },
+                    id: $id
+                }) {
+                    errors {
+                        message
+                    }
+                }
+            }
+        `;
 
         const newSubscriptionQuery = `
             mutation(
@@ -101,6 +121,19 @@ angular.module('ontrack.extension.notifications', [
               }
             }
         `;
+
+        $scope.deleteSubscription = (subscription) => {
+            otAlertService.confirm({
+                title: "Subscription deletion",
+                message: "Do you really want to delete this subscription?"
+            }).then(() => {
+                otGraphqlService.pageGraphQLCallWithPayloadErrors(deleteSubscriptionQuery, {
+                    entityType: type,
+                    entityId: id,
+                    id: subscription.id
+                }, "deleteSubscription").finally(loadSubscriptions);
+            });
+        };
 
         const newSubscription = (form) => {
             const newSubscriptionQueryVariables = {
@@ -141,6 +174,7 @@ angular.module('ontrack.extension.notifications', [
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.entityInfo = data.entity;
                 $scope.subscriptions = data.eventSubscriptions.pageItems;
+                $scope.writeSubscriptionGranted = data.eventSubscriptions.writeSubscriptionGranted;
                 if (!viewInitialized) {
                     view.title = `Subscriptions for ${data.entity.entityName}`;
                     const page = data.entity.entity.links._page
@@ -150,7 +184,7 @@ angular.module('ontrack.extension.notifications', [
                     view.breadcrumbs = bc;
                     // Close command to the entity
                     view.commands = [];
-                    if (data.eventSubscriptions.createSubscriptionGranted) {
+                    if ($scope.writeSubscriptionGranted) {
                         view.commands.push({
                             id: 'notifications-subscription-create',
                             name: "New subscription",
