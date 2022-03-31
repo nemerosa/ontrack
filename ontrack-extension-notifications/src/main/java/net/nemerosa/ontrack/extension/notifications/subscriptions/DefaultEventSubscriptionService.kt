@@ -24,11 +24,11 @@ import java.util.*
 
 @Service
 class DefaultEventSubscriptionService(
-    val storageService: StorageService,
-    val entityDataStore: EntityDataStore,
-    val securityService: SecurityService,
-    val structureService: StructureService,
-    val notificationChannelRegistry: NotificationChannelRegistry,
+    private val storageService: StorageService,
+    private val entityDataStore: EntityDataStore,
+    private val securityService: SecurityService,
+    private val structureService: StructureService,
+    private val notificationChannelRegistry: NotificationChannelRegistry,
 ) : EventSubscriptionService {
 
     companion object {

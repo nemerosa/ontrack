@@ -3,11 +3,66 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.getRequiredBooleanField
+import net.nemerosa.ontrack.json.getRequiredJsonField
 import net.nemerosa.ontrack.model.events.EventFactory
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSupport() {
+
+    @Test
+    fun `Filtering the project subscriptions and getting the access rights`() {
+        project {
+            // Subscribe for events on this project for the two different event types
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#one"),
+                projectEntity = this,
+                keywords = null,
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            // Query
+            asUser().with(this, ProjectSubscriptionsRead::class.java).call {
+                run("""
+                    query {
+                        eventSubscriptions(filter: {
+                            entity: {
+                                type: PROJECT,
+                                id: $id
+                            }
+                        }) {
+                            createSubscriptionGranted
+                        }
+                    }
+                """) { data ->
+                    assertFalse(data.getRequiredJsonField("eventSubscriptions")
+                        .getRequiredBooleanField("createSubscriptionGranted"))
+                }
+            }
+            // Query
+            asUser().with(this, ProjectSubscriptionsRead::class.java).with(this, ProjectSubscriptionsWrite::class.java)
+                .call {
+                    run("""
+                    query {
+                        eventSubscriptions(filter: {
+                            entity: {
+                                type: PROJECT,
+                                id: $id
+                            }
+                        }) {
+                            createSubscriptionGranted
+                        }
+                    }
+                """) { data ->
+                        assertTrue(data.getRequiredJsonField("eventSubscriptions")
+                            .getRequiredBooleanField("createSubscriptionGranted"))
+                    }
+                }
+        }
+    }
 
     @Test
     fun `Filtering the subscriptions for an entity using event type`() {

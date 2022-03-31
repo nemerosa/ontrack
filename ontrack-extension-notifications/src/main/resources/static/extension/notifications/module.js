@@ -55,6 +55,7 @@ angular.module('ontrack.extension.notifications', [
                     id: $id
                 }
             }) {
+                createSubscriptionGranted
                 pageItems {
                     id
                     channel
@@ -65,6 +66,10 @@ angular.module('ontrack.extension.notifications', [
                 }
             }
         }`;
+
+        const newSubscription = () => {
+
+        };
 
         $scope.loadingSubscriptions = false;
         const loadSubscriptions = () => {
@@ -80,9 +85,16 @@ angular.module('ontrack.extension.notifications', [
                     bc.push([data.entity.entityName, data.entity.entity.links._page]);
                     view.breadcrumbs = bc;
                     // Close command to the entity
-                    view.commands = [
-                        ot.viewCloseCommand(page.substring(2))
-                    ];
+                    view.commands = [];
+                    if (data.eventSubscriptions.createSubscriptionGranted) {
+                        view.commands.push({
+                            id: 'notifications-subscription-create',
+                            name: "New subscription",
+                            cls: 'ot-command-new',
+                            action: newSubscription
+                        });
+                    }
+                    view.commands.push(ot.viewCloseCommand(page.substring(2)));
                     viewInitialized = true;
                 }
             }).finally(() => {
