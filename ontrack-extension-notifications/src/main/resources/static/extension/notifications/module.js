@@ -64,6 +64,7 @@ angular.module('ontrack.extension.notifications', [
                     channelConfigText
                     events
                     keywords
+                    disabled
                 }
             }
         }`;
@@ -117,6 +118,7 @@ angular.module('ontrack.extension.notifications', [
                   channelConfigText
                   events
                   keywords
+                  disabled
                 }
               }
             }

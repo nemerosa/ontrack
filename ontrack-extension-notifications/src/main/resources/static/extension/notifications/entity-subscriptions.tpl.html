@@ -15,6 +15,7 @@
             <th>Events</th>
             <th>Keywords</th>
             <th>Channel</th>
+            <th>State</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
@@ -37,6 +38,26 @@
                 {{ subscription.channel }}
                 <span class="fa fa-arrow-right"></span>
                 {{ subscription.channelConfigText }}
+            </td>
+            <td ng-if="writeSubscriptionGranted">
+                <span ng-if="subscription.disabled" class="text-muted ot-action" title="Click to disable" ng-click="enableSubscription()">
+                    <span class="fa fa-ban"></span>
+                    Disabled
+                </span>
+                <span ng-if="!subscription.disabled" class="ot-action" title="Click to disable" ng-click="disableSubscription()">
+                    <span class="fa fa-play"></span>
+                    Enabled
+                </span>
+            </td>
+            <td ng-if="!writeSubscriptionGranted">
+                <span ng-if="subscription.disabled" class="text-muted">
+                    <span class="fa fa-ban"></span>
+                    Disabled
+                </span>
+                <span ng-if="!subscription.disabled">
+                    <span class="fa fa-play"></span>
+                    Enabled
+                </span>
             </td>
             <td>
                 <span ng-if="writeSubscriptionGranted" class="ot-command" ng-click="deleteSubscription(subscription)">
