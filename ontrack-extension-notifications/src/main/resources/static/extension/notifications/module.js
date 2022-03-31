@@ -1,5 +1,6 @@
 angular.module('ontrack.extension.notifications', [
     'ot.service.core',
+    'ot.service.form',
     'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
@@ -9,7 +10,7 @@ angular.module('ontrack.extension.notifications', [
             controller: 'EntitySubscriptionsCtrl'
         });
     })
-    .controller('EntitySubscriptionsCtrl', function ($scope, $stateParams, $http, ot, otGraphqlService) {
+    .controller('EntitySubscriptionsCtrl', function ($scope, $stateParams, $http, ot, otFormService, otGraphqlService) {
         const view = ot.view();
         const type = $stateParams.type;
         const id = $stateParams.id;
@@ -68,7 +69,14 @@ angular.module('ontrack.extension.notifications', [
         }`;
 
         const newSubscription = () => {
-
+            otFormService.display({
+                uri: '/extension/notifications/subscription/create',
+                title: "New subscription",
+                submit: (data) => {
+                    console.log("data = ", data);
+                    return true;
+                }
+            });
         };
 
         $scope.loadingSubscriptions = false;
