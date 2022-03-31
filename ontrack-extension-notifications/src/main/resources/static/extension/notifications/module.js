@@ -78,6 +78,10 @@ angular.module('ontrack.extension.notifications', [
                 $keywords: String,
             ) {
               subscribeToEvents(input: {
+                projectEntity: {
+                    type: $type,
+                    id: $id
+                },
                 channel: $channel,
                 channelConfig: $channelConfig,
                 events: $events,
