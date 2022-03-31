@@ -10,7 +10,7 @@ angular.module('ontrack.extension.notifications', [
             controller: 'EntitySubscriptionsCtrl'
         });
     })
-    .controller('EntitySubscriptionsCtrl', function ($scope, $stateParams, $http, ot, otFormService, otGraphqlService) {
+    .controller('EntitySubscriptionsCtrl', function ($q, $scope, $stateParams, $http, ot, otFormService, otGraphqlService) {
         const view = ot.view();
         const type = $stateParams.type;
         const id = $stateParams.id;
@@ -68,13 +68,65 @@ angular.module('ontrack.extension.notifications', [
             }
         }`;
 
-        const newSubscription = () => {
+        const newSubscriptionQuery = `
+            mutation(
+                $type: ProjectEntityType!,
+                $id: Int!,
+                $channel: String!,
+                $channelConfig: JSON!,
+                $events: [String!]!,
+                $keywords: String,
+            ) {
+              subscribeToEvents(input: {
+                channel: $channel,
+                channelConfig: $channelConfig,
+                events: $events,
+                keywords: $keywords, 
+              }) {
+                errors {
+                  message
+                }
+                subscription {
+                  id
+                  channel
+                  channelConfig
+                  channelConfigText
+                  events
+                  keywords
+                }
+              }
+            }
+        `;
+
+        const newSubscription = (form) => {
+            const newSubscriptionQueryVariables = {
+                type: type,
+                id: id,
+                channel: form.channel.id,
+                channelConfig: form.channel.data,
+                events: form.events,
+                keywords: form.keywords
+            };
+            const d = $q.defer();
+            otGraphqlService.graphQLCall(newSubscriptionQuery, newSubscriptionQueryVariables).then(data => {
+                if (data.subscribeToEvents.errors && data.subscribeToEvents.errors.messages) {
+                    d.reject(messages[0]);
+                } else {
+                    $scope.subscriptions.splice(0, 0, data.subscribeToEvents.subscription);
+                    d.resolve(true);
+                }
+            }, messages => {
+                d.reject(messages[0]);
+            });
+            return d.promise;
+        };
+
+        const newSubscriptionDialog = () => {
             otFormService.display({
                 uri: '/extension/notifications/subscription/create',
                 title: "New subscription",
                 submit: (data) => {
-                    console.log("data = ", data);
-                    return true;
+                    return newSubscription(data);
                 }
             });
         };
@@ -99,7 +151,7 @@ angular.module('ontrack.extension.notifications', [
                             id: 'notifications-subscription-create',
                             name: "New subscription",
                             cls: 'ot-command-new',
-                            action: newSubscription
+                            action: newSubscriptionDialog
                         });
                     }
                     view.commands.push(ot.viewCloseCommand(page.substring(2)));
