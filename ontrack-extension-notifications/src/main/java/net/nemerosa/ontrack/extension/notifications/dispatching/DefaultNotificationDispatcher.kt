@@ -15,6 +15,10 @@ class DefaultNotificationDispatcher(
 ) : NotificationDispatcher {
 
     override fun dispatchEvent(event: Event, eventSubscription: EventSubscription): NotificationDispatchingResult {
+        // If the subscription is disabled, not doing anything
+        if (eventSubscription.disabled) {
+            return NotificationDispatchingResult.IGNORED
+        }
         // Gets the corresponding channel
         val channel = notificationChannelRegistry.findChannel(eventSubscription.channel)
         return if (channel != null && channel.enabled) {

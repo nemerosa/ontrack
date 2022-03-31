@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
  * @property keywords Optional space-separated list of tokens to look for in the events
  * @property channel Type of channel to send the event to
  * @property channelConfig Specific configuration of the channel
+ * @property disabled If the subscription is disabled
  */
 data class EventSubscription(
     val projectEntity: ProjectEntity?,
@@ -22,4 +23,8 @@ data class EventSubscription(
     @APIDescription("Type of channel to send the event to")
     val channel: String,
     val channelConfig: JsonNode,
-)
+    @APIDescription("If the subscription is disabled")
+    val disabled: Boolean,
+) {
+    fun disabled(disabled: Boolean) = EventSubscription(projectEntity, events, keywords, channel, channelConfig, disabled)
+}

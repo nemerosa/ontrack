@@ -15,4 +15,6 @@ data class EventSubscriptionPayload(
     val events: List<String>,
     @APIDescription("Optional space-separated list of tokens to look for in the events")
     val keywords: String?,
+    @APIDescription("If this subscription is disabled")
+    val disabled: Boolean,
 )

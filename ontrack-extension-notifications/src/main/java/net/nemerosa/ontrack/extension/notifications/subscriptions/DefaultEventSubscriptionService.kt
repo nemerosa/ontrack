@@ -5,10 +5,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.extension.notifications.channels.getChannel
-import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.asJsonString
-import net.nemerosa.ontrack.json.format
-import net.nemerosa.ontrack.json.parseOrNull
+import net.nemerosa.ontrack.json.*
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.pagination.spanningPaginatedList
@@ -38,12 +35,7 @@ class DefaultEventSubscriptionService(
 
     override fun subscribe(subscription: EventSubscription): SavedEventSubscription {
         // Record to save
-        val record = SubscriptionRecord(
-            subscription.channel,
-            subscription.channelConfig,
-            subscription.events,
-            subscription.keywords,
-        )
+        val record = subscription.toSubscriptionRecord()
         return if (subscription.projectEntity != null) {
             // Checking the ACL
             securityService.checkProjectFunction(subscription.projectEntity, ProjectSubscriptionsWrite::class.java)
@@ -114,6 +106,7 @@ class DefaultEventSubscriptionService(
                     channelConfig = subscription.channelConfig,
                     events = subscription.events,
                     keywords = subscription.keywords,
+                    disabled = subscription.disabled,
                 )
                 storageService.store(
                     GLOBAL_STORE,
@@ -125,6 +118,14 @@ class DefaultEventSubscriptionService(
             }
         }
     }
+
+    private fun EventSubscription.toSubscriptionRecord() = SubscriptionRecord(
+        channel,
+        channelConfig,
+        events,
+        keywords,
+        disabled,
+    )
 
     override fun findSubscriptionById(projectEntity: ProjectEntity?, id: String): EventSubscription? =
         if (projectEntity != null) {
@@ -143,16 +144,17 @@ class DefaultEventSubscriptionService(
         } else if (!securityService.isGlobalFunctionGranted(GlobalSubscriptionsManage::class.java)) {
             null
         } else {
-            storageService.find(GLOBAL_STORE, id, SignedSubscriptionRecord::class)?.run {
-                EventSubscription(
-                    channel = channel,
-                    channelConfig = channelConfig,
-                    projectEntity = null,
-                    events = events,
-                    keywords = keywords,
-                )
-            }
+            storageService.find(GLOBAL_STORE, id, SignedSubscriptionRecord::class)?.toEventSubscription()
         }
+
+    private fun SignedSubscriptionRecord.toEventSubscription() = EventSubscription(
+        channel = channel,
+        channelConfig = channelConfig,
+        projectEntity = null,
+        events = events.toSet(),
+        keywords = keywords,
+        disabled = disabled,
+    )
 
     override fun deleteSubscriptionById(projectEntity: ProjectEntity?, id: String) {
         if (projectEntity != null) {
@@ -164,6 +166,50 @@ class DefaultEventSubscriptionService(
             storageService.delete(GLOBAL_STORE, id)
         }
     }
+
+    override fun disableSubscriptionById(projectEntity: ProjectEntity?, id: String): SavedEventSubscription =
+        disableSubscriptionById(projectEntity, id, disabled = true)
+
+    override fun enableSubscriptionById(projectEntity: ProjectEntity?, id: String): SavedEventSubscription =
+        disableSubscriptionById(projectEntity, id, disabled = false)
+
+    private fun disableSubscriptionById(
+        projectEntity: ProjectEntity?,
+        id: String,
+        disabled: Boolean,
+    ): SavedEventSubscription =
+        if (projectEntity != null) {
+            securityService.checkProjectFunction(projectEntity, ProjectView::class.java)
+            securityService.checkProjectFunction(projectEntity, ProjectSubscriptionsWrite::class.java)
+            val record = findSubscriptionById(projectEntity, id)
+                ?.disabled(disabled)
+                ?: throw EventSubscriptionIdNotFoundException(null, id)
+            val signature = securityService.currentSignature
+            entityDataStore.replaceOrAddObject(
+                projectEntity,
+                ENTITY_STORE,
+                id,
+                signature,
+                null,
+                record.toSubscriptionRecord()
+            )
+            SavedEventSubscription(
+                id,
+                signature,
+                record
+            )
+        } else {
+            securityService.checkGlobalFunction(GlobalSubscriptionsManage::class.java)
+            val record = storageService.find(GLOBAL_STORE, id, SignedSubscriptionRecord::class)
+                ?.disabled(disabled)
+                ?: throw EventSubscriptionIdNotFoundException(null, id)
+            storageService.store(GLOBAL_STORE, id, record)
+            SavedEventSubscription(
+                id,
+                record.signature,
+                record.toEventSubscription()
+            )
+        }
 
     override fun filterSubscriptions(filter: EventSubscriptionFilter): PaginatedList<SavedEventSubscription> =
         if (filter.entity == null) {
@@ -276,8 +322,9 @@ class DefaultEventSubscriptionService(
                     channel = record.channel,
                     channelConfig = record.channelConfig,
                     projectEntity = null,
-                    events = record.events,
+                    events = record.events.toSet(),
                     keywords = record.keywords,
+                    disabled = record.disabled,
                 )
             )
         }
@@ -383,8 +430,9 @@ class DefaultEventSubscriptionService(
                     channel = record.channel,
                     channelConfig = record.channelConfig,
                     projectEntity = null,
-                    events = record.events,
+                    events = record.events.toSet(),
                     keywords = record.keywords,
+                    disabled = record.disabled,
                 )
             )
             if (event.matchesKeywords(subscription.data.keywords)) {
@@ -409,8 +457,9 @@ class DefaultEventSubscriptionService(
                 channel = it.channel,
                 channelConfig = it.channelConfig,
                 projectEntity = projectEntity,
-                events = it.events,
+                events = it.events.toSet(),
                 keywords = it.keywords,
+                disabled = it.disabled,
             )
         )
     }
@@ -423,6 +472,7 @@ class DefaultEventSubscriptionService(
         val channelConfig: JsonNode,
         val events: Set<String>,
         val keywords: String?,
+        val disabled: Boolean,
     )
 
     /**
@@ -434,8 +484,11 @@ class DefaultEventSubscriptionService(
         val channelConfig: JsonNode,
         val events: Set<String>,
         val keywords: String?,
+        val disabled: Boolean,
     ) {
-        fun toSubscriptionRecord() = SubscriptionRecord(channel, channelConfig, events, keywords)
+        fun toSubscriptionRecord() = SubscriptionRecord(channel, channelConfig, events, keywords, disabled)
+        fun disabled(disabled: Boolean) =
+            SignedSubscriptionRecord(signature, channel, channelConfig, events, keywords, disabled)
     }
 
 }

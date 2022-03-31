@@ -26,6 +26,7 @@ fun <C> EventSubscriptionService.subscribe(
         projectEntity = projectEntity,
         events = eventTypes.map { it.id }.toSet(),
         keywords = keywords,
+        disabled = false,
     )
 )
 

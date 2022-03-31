@@ -60,7 +60,7 @@ class GQLRootQueryEventSubscriptions(
                     // Pagination from the root arguments
                     .withPage(offset, size)
                 // Setting the context
-                env.getContext<GraphQLContext>().put(CONTEXT_PROJECT_ENTITY, getProjectEntity(filter))
+                getProjectEntity(filter)?.let { env.getContext<GraphQLContext>().put(CONTEXT_PROJECT_ENTITY, it) }
                 // Getting the list
                 eventSubscriptionService.filterSubscriptions(filter).map {
                     EventSubscriptionPayload(
@@ -69,6 +69,7 @@ class GQLRootQueryEventSubscriptions(
                         channelConfig = it.data.channelConfig,
                         events = it.data.events.toList(),
                         keywords = it.data.keywords,
+                        disabled = it.data.disabled,
                     )
                 }
             }

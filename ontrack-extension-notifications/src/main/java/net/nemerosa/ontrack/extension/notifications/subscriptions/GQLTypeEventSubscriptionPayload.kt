@@ -44,6 +44,7 @@ class GQLTypeEventSubscriptionPayload(
                 .type(listType(GraphQLString))
         }
         .stringField(EventSubscriptionPayload::keywords)
+        .booleanField(EventSubscriptionPayload::disabled)
         .build()
 
     private fun <C> channelConfigText(channel: NotificationChannel<C>, channelConfig: JsonNode): String {

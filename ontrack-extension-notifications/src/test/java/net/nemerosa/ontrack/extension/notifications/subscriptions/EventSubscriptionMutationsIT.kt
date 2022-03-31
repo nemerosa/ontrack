@@ -3,14 +3,147 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.getRequiredBooleanField
 import net.nemerosa.ontrack.json.getRequiredJsonField
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.model.events.EventFactory
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.*
 
 class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
+
+    @Test
+    fun `Disabling and enabling a subscription for an entity`() {
+        asAdmin {
+            project {
+                val record = eventSubscriptionService.subscribe(
+                    channel = mockNotificationChannel,
+                    channelConfig = MockNotificationChannelConfig("#target"),
+                    projectEntity = this,
+                    keywords = null,
+                    EventFactory.NEW_PROMOTION_RUN,
+                )
+                // Disabling
+                run("""
+                    mutation {
+                        disableSubscription(input: {
+                            projectEntity: {
+                                type: PROJECT,
+                                id: $id
+                            },
+                            id: "${record.id}"
+                        }) {
+                            errors {
+                                message
+                            }
+                            subscription {
+                                id
+                                disabled
+                            }
+                        }
+                    }
+                """) { data ->
+                    checkGraphQLUserErrors(data, "disableSubscription") { payload ->
+                        assertEquals(record.id, payload.path("subscription").getRequiredTextField("id"))
+                        assertEquals(true, payload.path("subscription").getRequiredBooleanField("disabled"))
+                        assertNotNull(eventSubscriptionService.findSubscriptionById(this, record.id)) {
+                            assertTrue(it.disabled, "Subscription is disabled")
+                        }
+                    }
+                }
+                // Enabling
+                run("""
+                    mutation {
+                        enableSubscription(input: {
+                            projectEntity: {
+                                type: PROJECT,
+                                id: $id
+                            },
+                            id: "${record.id}"
+                        }) {
+                            errors {
+                                message
+                            }
+                            subscription {
+                                id
+                                disabled
+                            }
+                        }
+                    }
+                """) { data ->
+                    checkGraphQLUserErrors(data, "enableSubscription") { payload ->
+                        assertEquals(record.id, payload.path("subscription").getRequiredTextField("id"))
+                        assertEquals(false, payload.path("subscription").getRequiredBooleanField("disabled"))
+                        assertNotNull(eventSubscriptionService.findSubscriptionById(this, record.id)) {
+                            assertFalse(it.disabled, "Subscription is enabled")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Disabling and enabling a global subscription`() {
+        asAdmin {
+            eventSubscriptionService.removeAllGlobal()
+            val record = eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#target"),
+                projectEntity = null,
+                keywords = null,
+                EventFactory.NEW_PROMOTION_RUN,
+            )
+            // Disabling
+            run("""
+                    mutation {
+                        disableSubscription(input: {
+                            id: "${record.id}"
+                        }) {
+                            errors {
+                                message
+                            }
+                            subscription {
+                                id
+                                disabled
+                            }
+                        }
+                    }
+                """) { data ->
+                checkGraphQLUserErrors(data, "disableSubscription") { payload ->
+                    assertEquals(record.id, payload.path("subscription").getRequiredTextField("id"))
+                    assertEquals(true, payload.path("subscription").getRequiredBooleanField("disabled"))
+                    assertNotNull(eventSubscriptionService.findSubscriptionById(null, record.id)) {
+                        assertTrue(it.disabled, "Subscription is disabled")
+                    }
+                }
+            }
+            // Enabling
+            run("""
+                    mutation {
+                        enableSubscription(input: {
+                            id: "${record.id}"
+                        }) {
+                            errors {
+                                message
+                            }
+                            subscription {
+                                id
+                                disabled
+                            }
+                        }
+                    }
+                """) { data ->
+                checkGraphQLUserErrors(data, "enableSubscription") { payload ->
+                    assertEquals(record.id, payload.path("subscription").getRequiredTextField("id"))
+                    assertEquals(false, payload.path("subscription").getRequiredBooleanField("disabled"))
+                    assertNotNull(eventSubscriptionService.findSubscriptionById(null, record.id)) {
+                        assertFalse(it.disabled, "Subscription is enabled")
+                    }
+                }
+            }
+        }
+    }
 
     @Test
     fun `Creating a subscription`() {

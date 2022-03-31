@@ -37,6 +37,7 @@ class EventSubscriptionMutations(
                     events = input.events.toSet(),
                     projectEntity = projectEntity,
                     keywords = input.keywords,
+                    disabled = false,
                 )
             )
             EventSubscriptionPayload(
@@ -45,6 +46,7 @@ class EventSubscriptionMutations(
                 channelConfig = record.data.channelConfig,
                 events = record.data.events.toList(),
                 keywords = record.data.keywords,
+                disabled = record.data.disabled,
             )
         },
 
@@ -57,6 +59,50 @@ class EventSubscriptionMutations(
             }
             eventSubscriptionService.deleteSubscriptionById(projectEntity, input.id)
         },
+
+        simpleMutation(
+            name = "disableSubscription",
+            description = "Disables an existing subscription",
+            input = DisableSubscriptionInput::class,
+            outputName = "subscription",
+            outputDescription = "Saved subscription",
+            outputType = EventSubscriptionPayload::class,
+        ) { input ->
+            val projectEntity = input.projectEntity?.run {
+                type.getEntityFn(structureService).apply(ID.of(id))
+            }
+            val record = eventSubscriptionService.disableSubscriptionById(projectEntity, input.id)
+            EventSubscriptionPayload(
+                id = record.id,
+                channel = record.data.channel,
+                channelConfig = record.data.channelConfig,
+                events = record.data.events.toList(),
+                keywords = record.data.keywords,
+                disabled = record.data.disabled,
+            )
+        },
+
+        simpleMutation(
+            name = "enableSubscription",
+            description = "Enables an existing subscription",
+            input = EnableSubscriptionInput::class,
+            outputName = "subscription",
+            outputDescription = "Saved subscription",
+            outputType = EventSubscriptionPayload::class,
+        ) { input ->
+            val projectEntity = input.projectEntity?.run {
+                type.getEntityFn(structureService).apply(ID.of(id))
+            }
+            val record = eventSubscriptionService.enableSubscriptionById(projectEntity, input.id)
+            EventSubscriptionPayload(
+                id = record.id,
+                channel = record.data.channel,
+                channelConfig = record.data.channelConfig,
+                events = record.data.events.toList(),
+                keywords = record.data.keywords,
+                disabled = record.data.disabled,
+            )
+        },
     )
 }
 
@@ -66,6 +112,24 @@ data class DeleteSubscriptionInput(
     @TypeRef(embedded = true, suffix = "Input")
     val projectEntity: ProjectEntityID?,
     @APIDescription("ID of the subscription to delete")
+    val id: String,
+)
+
+@APIDescription("Subscription disabling")
+data class DisableSubscriptionInput(
+    @APIDescription("Target project entity (null for global events)")
+    @TypeRef(embedded = true, suffix = "Input")
+    val projectEntity: ProjectEntityID?,
+    @APIDescription("ID of the subscription to disable")
+    val id: String,
+)
+
+@APIDescription("Subscription enabling")
+data class EnableSubscriptionInput(
+    @APIDescription("Target project entity (null for global events)")
+    @TypeRef(embedded = true, suffix = "Input")
+    val projectEntity: ProjectEntityID?,
+    @APIDescription("ID of the subscription to enable")
     val id: String,
 )
 
