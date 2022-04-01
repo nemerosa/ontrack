@@ -32,12 +32,12 @@ class ACCDSLNotifications : AbstractACCDSLTestSupport() {
                 promotion("SILVER")
                 promotion("GOLD")
                 build {
-                    //         // Promotion
-                    //         promote("SILVER")
+                    // Promotion
+                    promote("SILVER")
                     //         // Checks that NO notification was received
                     //         assertTrue(ontrack.notifications.inMemory.group(group).isEmpty(), "No notification")
-                    //         // Promotion
-                    //         promote("GOLD")
+                    // Promotion
+                    promote("GOLD")
                     //         // Checks that NO notification was received (branch name is not matching)
                     //         assertTrue(ontrack.notifications.inMemory.group(group).isEmpty(), "No notification")
                 }
@@ -48,12 +48,12 @@ class ACCDSLNotifications : AbstractACCDSLTestSupport() {
                 promotion("SILVER")
                 promotion("GOLD")
                 build {
-                    //         // Promotion
-                    //         promote("SILVER")
+                    // Promotion
+                    promote("SILVER")
                     //         // Checks that NO notification was received
                     //         assertTrue(ontrack.notifications.inMemory.group(group).isEmpty(), "No notification")
-                    //         // Promotion
-                    //         promote("GOLD")
+                    // Promotion
+                    promote("GOLD")
                     //         // Checks that a notification was received
                     //         assertNotNull(ontrack.notifications.inMemory.group(group).firstOrNull(), "Received notification") { message ->
                     //             assertEquals("", message)

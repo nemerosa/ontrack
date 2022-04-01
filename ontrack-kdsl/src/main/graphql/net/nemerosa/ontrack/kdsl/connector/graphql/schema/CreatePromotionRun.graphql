@@ -1,0 +1,16 @@
+mutation CreatePromotionRun(
+    $buildId: Int!,
+    $promotion: String!,
+    $description: String!,
+) {
+    createPromotionRunById(input: {
+        buildId: $buildId,
+        promotion: $promotion,
+        description: $description,
+    }) {
+        promotionRun {
+            ...PromotionRunFragment
+        }
+        ...PayloadUserErrors
+    }
+}

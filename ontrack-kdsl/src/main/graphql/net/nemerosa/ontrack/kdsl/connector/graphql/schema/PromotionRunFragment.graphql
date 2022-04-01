@@ -1,0 +1,8 @@
+fragment PromotionRunFragment on PromotionRun {
+    id
+    description
+    creation {
+        user
+        time
+    }
+}
