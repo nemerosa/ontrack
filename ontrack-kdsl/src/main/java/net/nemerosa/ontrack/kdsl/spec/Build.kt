@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.kdsl.spec
 
 import net.nemerosa.ontrack.kdsl.connector.Connector
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
 
 /**
  * Representation of a build.
@@ -15,4 +16,4 @@ class Build(
     id: UInt,
     val name: String,
     val description: String?,
-) : ProjectEntity(connector, id)
+) : ProjectEntity(connector, ProjectEntityType.BUILD, id)

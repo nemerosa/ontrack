@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.kdsl.spec
 
 import net.nemerosa.ontrack.kdsl.connector.Connector
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
 
 /**
  * Representation of a branch.
@@ -17,4 +18,4 @@ class Branch(
     val name: String,
     val description: String?,
     val disabled: Boolean,
-) : ProjectEntity(connector, id)
+) : ProjectEntity(connector, ProjectEntityType.BRANCH, id)

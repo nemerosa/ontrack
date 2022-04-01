@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.kdsl.spec
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.DeleteProjectByIdMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
 /**
@@ -17,7 +18,7 @@ class Project(
     id: UInt,
     val name: String,
     val description: String?,
-) : ProjectEntity(connector, id) {
+) : ProjectEntity(connector, ProjectEntityType.PROJECT, id) {
     /**
      * Deletes this project
      */

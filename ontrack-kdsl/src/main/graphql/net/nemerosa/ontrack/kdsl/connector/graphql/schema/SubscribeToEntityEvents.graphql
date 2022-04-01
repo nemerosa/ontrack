@@ -1,0 +1,21 @@
+mutation SubscribeToEntityEvents(
+    $entityType: ProjectEntityType!,
+    $entityId: Int!,
+    $channel: String!,
+    $channelConfig: JSON!,
+    $keywords: String,
+    $events: [String!]!,
+) {
+    subscribeToEvents(input: {
+        projectEntity: {
+            type: $entityType,
+            id: $entityId
+        },
+        channel: $channel,
+        channelConfig: $channelConfig,
+        keywords: $keywords,
+        events: $events,
+    }) {
+        ...PayloadUserErrors
+    }
+}

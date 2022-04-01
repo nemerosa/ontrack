@@ -986,8 +986,8 @@
               "deprecationReason": null
             },
             {
-              "name": "gitBranchConfigurationProperty",
-              "description": "Git branch",
+              "name": "jenkinsJobProperty",
+              "description": "Link to a Jenkins Job",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -998,8 +998,8 @@
               "deprecationReason": null
             },
             {
-              "name": "jenkinsJobProperty",
-              "description": "Link to a Jenkins Job",
+              "name": "gitBranchConfigurationProperty",
+              "description": "Git branch",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -2275,6 +2275,18 @@
               "deprecationReason": null
             },
             {
+              "name": "buildGitHubWorkflowRunProperty",
+              "description": "Link to the GitHub Workflow Run which created this build.",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Property",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "linkProperty",
               "description": "List of links.",
               "args": [],
@@ -2323,8 +2335,8 @@
               "deprecationReason": null
             },
             {
-              "name": "buildGitHubWorkflowRunProperty",
-              "description": "Link to the GitHub Workflow Run which created this build.",
+              "name": "jenkinsBuildProperty",
+              "description": "Link to a Jenkins Build",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -2337,18 +2349,6 @@
             {
               "name": "gitCommitProperty",
               "description": "Git commit",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "Property",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "jenkinsBuildProperty",
-              "description": "Link to a Jenkins Build",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -3169,6 +3169,18 @@
               "deprecationReason": null
             },
             {
+              "name": "_collectSonarQube",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "_changeLog",
               "description": null,
               "args": [],
@@ -3182,18 +3194,6 @@
             },
             {
               "name": "_changeLogPage",
-              "description": null,
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "_collectSonarQube",
               "description": null,
               "args": [],
               "type": {
@@ -8530,6 +8530,74 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "DeleteSubscriptionInput",
+          "description": "Input type for the deleteSubscription mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "ID of the subscription to delete",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "projectEntity",
+              "description": "Target project entity (null for global events)",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ProjectEntityIDInput",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "DeleteSubscriptionPayload",
+          "description": "Output type for the deleteSubscription mutation.",
+          "fields": [
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "DeleteValidationRunMessagePropertyByIdInput",
           "description": "Input type for the deleteValidationRunMessagePropertyById mutation.",
           "fields": null,
@@ -9398,6 +9466,86 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "DisableSubscriptionInput",
+          "description": "Input type for the disableSubscription mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "ID of the subscription to disable",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "projectEntity",
+              "description": "Target project entity (null for global events)",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ProjectEntityIDInput",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "DisableSubscriptionPayload",
+          "description": "Output type for the disableSubscription mutation.",
+          "fields": [
+            {
+              "name": "subscription",
+              "description": "Saved subscription",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "EventSubscriptionPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "EnableAccountInput",
           "description": "Input type for the enableAccount mutation.",
           "fields": null,
@@ -9537,6 +9685,86 @@
           "possibleTypes": null
         },
         {
+          "kind": "INPUT_OBJECT",
+          "name": "EnableSubscriptionInput",
+          "description": "Input type for the enableSubscription mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "ID of the subscription to enable",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "projectEntity",
+              "description": "Target project entity (null for global events)",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ProjectEntityIDInput",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "EnableSubscriptionPayload",
+          "description": "Output type for the enableSubscription mutation.",
+          "fields": [
+            {
+              "name": "subscription",
+              "description": "Saved subscription",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "EventSubscriptionPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "OBJECT",
           "name": "EntityCounts",
           "description": "Representation of the entity counts",
@@ -9551,6 +9779,271 @@
                 "ofType": {
                   "kind": "SCALAR",
                   "name": "Int",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "EventSubscriptionFilter",
+          "description": null,
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "channel",
+              "description": "Filter against the channel type (exact match)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "channelConfig",
+              "description": "Filter against the channel configuration (channel is required)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "createdBefore",
+              "description": "Subscriptions created before or on this date",
+              "type": {
+                "kind": "SCALAR",
+                "name": "LocalDateTime",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "creator",
+              "description": "Name of the user who created this subscription",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "entity",
+              "description": "Entity subscribed to.",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ProjectEntityIDInput",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "eventType",
+              "description": "Event type",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "recursive",
+              "description": "Scope of the search (if true, includes the entity and the levels above.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "EventSubscriptionPayload",
+          "description": "Event subscription record",
+          "fields": [
+            {
+              "name": "id",
+              "description": "Unique ID for this subscription",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "channel",
+              "description": "Channel to send this event to",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "channelConfig",
+              "description": "Channel configuration",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "JSON",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "channelConfigText",
+              "description": "Textual description of the channel configuration",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "events",
+              "description": "List of events types to subscribe to",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "keywords",
+              "description": "Optional space-separated list of tokens to look for in the events",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "disabled",
+              "description": "If this subscription is disabled",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "EventSubscriptionPayloadPaginated",
+          "description": null,
+          "fields": [
+            {
+              "name": "pageInfo",
+              "description": "Information about the current page",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PageInfo",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "pageItems",
+              "description": "Items in the current page",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "EventSubscriptionPayload"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "writeSubscriptionGranted",
+              "description": "Can the user create subscriptions in the current context",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
                   "ofType": null
                 }
               },
@@ -10248,6 +10741,45 @@
               "deprecationReason": null
             },
             {
+              "name": "promotions",
+              "description": "Auto promotion configuration",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "GitHubIngestionPromotionConfig"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "runs",
+              "description": "Run validations",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "GitHubIngestionConfigRun",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "steps",
               "description": "List of specific step configurations",
               "args": [],
@@ -10307,6 +10839,57 @@
                 "ofType": {
                   "kind": "SCALAR",
                   "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "validationJobPrefix",
+              "description": "Must we use the job name as a prefix to the validation stamp?",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GitHubIngestionConfigRun",
+          "description": "Settings for the workflow run level",
+          "fields": [
+            {
+              "name": "enabled",
+              "description": "Should we consider the runs to create a validation run?",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "filter",
+              "description": "Filter on the run names",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "GitHubIngestionFilterConfig",
                   "ofType": null
                 }
               },
@@ -10663,6 +11246,127 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "validationJobPrefix",
+              "description": "Must we use the job name as a prefix to the validation stamp?",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GitHubIngestionPromotionConfig",
+          "description": "PromotionConfig",
+          "fields": [
+            {
+              "name": "description",
+              "description": "Optional description",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "exclude",
+              "description": "Regular expression to exclude validation stamps by name",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "include",
+              "description": "Regular expression to include validation stamps by name",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "name",
+              "description": "Unique name for the promotion in the branch",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "promotions",
+              "description": "List of promotions triggering this promotion",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "validations",
+              "description": "List of validations triggering this promotion. Important: these names are the names of the validations after step name resolution.",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -10720,13 +11424,9 @@
               "description": "Must we use the job name as a prefix to the validation stamp?",
               "args": [],
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "Boolean",
-                  "ofType": null
-                }
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -14078,6 +14778,29 @@
               "deprecationReason": null
             },
             {
+              "name": "setPreferences",
+              "description": "Setting the preferences of the current user",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "SetPreferencesInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SetPreferencesPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "createProject",
               "description": "Creates a new project",
               "args": [
@@ -14647,6 +15370,98 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "SetValidationRunPropertyPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "setProjectGitHubConfigurationPropertyById",
+              "description": "Set the gitHub configuration property on a project.",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "SetProjectGitHubConfigurationPropertyByIdInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SetProjectGitHubConfigurationPropertyByIdPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "setProjectGitHubConfigurationProperty",
+              "description": "Set the gitHub configuration property on a project identified by name.",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "SetProjectGitHubConfigurationPropertyInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SetProjectGitHubConfigurationPropertyPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "deleteProjectGitHubConfigurationPropertyById",
+              "description": "Deletes the gitHub configuration property on a project.",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeleteProjectGitHubConfigurationPropertyByIdInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DeleteProjectGitHubConfigurationPropertyByIdPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "deleteProjectGitHubConfigurationProperty",
+              "description": "Deletes the gitHub configuration property on a project identified by name.",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeleteProjectGitHubConfigurationPropertyInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DeleteProjectGitHubConfigurationPropertyPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -16309,98 +17124,6 @@
               "deprecationReason": null
             },
             {
-              "name": "setProjectGitHubConfigurationPropertyById",
-              "description": "Set the gitHub configuration property on a project.",
-              "args": [
-                {
-                  "name": "input",
-                  "description": "Input for the mutation",
-                  "type": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "SetProjectGitHubConfigurationPropertyByIdInput",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
-              "type": {
-                "kind": "OBJECT",
-                "name": "SetProjectGitHubConfigurationPropertyByIdPayload",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "setProjectGitHubConfigurationProperty",
-              "description": "Set the gitHub configuration property on a project identified by name.",
-              "args": [
-                {
-                  "name": "input",
-                  "description": "Input for the mutation",
-                  "type": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "SetProjectGitHubConfigurationPropertyInput",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
-              "type": {
-                "kind": "OBJECT",
-                "name": "SetProjectGitHubConfigurationPropertyPayload",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "deleteProjectGitHubConfigurationPropertyById",
-              "description": "Deletes the gitHub configuration property on a project.",
-              "args": [
-                {
-                  "name": "input",
-                  "description": "Input for the mutation",
-                  "type": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "DeleteProjectGitHubConfigurationPropertyByIdInput",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
-              "type": {
-                "kind": "OBJECT",
-                "name": "DeleteProjectGitHubConfigurationPropertyByIdPayload",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "deleteProjectGitHubConfigurationProperty",
-              "description": "Deletes the gitHub configuration property on a project identified by name.",
-              "args": [
-                {
-                  "name": "input",
-                  "description": "Input for the mutation",
-                  "type": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "DeleteProjectGitHubConfigurationPropertyInput",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
-              "type": {
-                "kind": "OBJECT",
-                "name": "DeleteProjectGitHubConfigurationPropertyPayload",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "setProjectGitLabConfigurationPropertyById",
               "description": "Set the gitLab configuration property on a project.",
               "args": [
@@ -17114,6 +17837,29 @@
               "deprecationReason": null
             },
             {
+              "name": "createGitHubConfiguration",
+              "description": "Creates a new GitHub configuration.",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "CreateGitHubConfigurationInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "CreateGitHubConfigurationPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "setupCHMLValidationStamp",
               "description": "Creates or updates a CHML validation stamp",
               "args": [
@@ -17390,15 +18136,15 @@
               "deprecationReason": null
             },
             {
-              "name": "createGitHubConfiguration",
-              "description": "Creates a new GitHub configuration.",
+              "name": "subscribeToEvents",
+              "description": "Creates a subscription to a list of events",
               "args": [
                 {
                   "name": "input",
                   "description": "Input for the mutation",
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "CreateGitHubConfigurationInput",
+                    "name": "SubscribeToEventsInput",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -17406,7 +18152,76 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "CreateGitHubConfigurationPayload",
+                "name": "SubscribeToEventsPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "deleteSubscription",
+              "description": "Deletes an existing subscription using its ID",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeleteSubscriptionInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DeleteSubscriptionPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "disableSubscription",
+              "description": "Disables an existing subscription",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DisableSubscriptionInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DisableSubscriptionPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "enableSubscription",
+              "description": "Enables an existing subscription",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "EnableSubscriptionInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "EnableSubscriptionPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -17962,6 +18777,11 @@
             },
             {
               "kind": "OBJECT",
+              "name": "DeleteSubscriptionPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "DeleteValidationRunMessagePropertyByIdPayload",
               "ofType": null
             },
@@ -18012,12 +18832,22 @@
             },
             {
               "kind": "OBJECT",
+              "name": "DisableSubscriptionPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "EnableAccountPayload",
               "ofType": null
             },
             {
               "kind": "OBJECT",
               "name": "EnableProjectPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "EnableSubscriptionPayload",
               "ofType": null
             },
             {
@@ -18138,6 +18968,11 @@
             {
               "kind": "OBJECT",
               "name": "SetBuildReleasePropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetPreferencesPayload",
               "ofType": null
             },
             {
@@ -18402,6 +19237,11 @@
             },
             {
               "kind": "OBJECT",
+              "name": "SubscribeToEventsPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "UnfavouriteProjectPayload",
               "ofType": null
             },
@@ -18456,6 +19296,49 @@
               "ofType": null
             }
           ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "Preferences",
+          "description": "Preferences of a user",
+          "fields": [
+            {
+              "name": "branchViewVsGroups",
+              "description": "Branch view VS groups",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "branchViewVsNames",
+              "description": "Branch view VS names",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
         },
         {
           "kind": "OBJECT",
@@ -18595,6 +19478,18 @@
               "deprecationReason": null
             },
             {
+              "name": "gitHubProjectConfigurationProperty",
+              "description": "Associates the project with a GitHub repository",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Property",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "autoPromotionLevelProperty",
               "description": "If set, this property allows promotion levels to be created automatically from predefined promotion levels",
               "args": [],
@@ -18691,8 +19586,20 @@
               "deprecationReason": null
             },
             {
-              "name": "gitHubProjectConfigurationProperty",
-              "description": "Associates the project with a GitHub repository",
+              "name": "jenkinsJobProperty",
+              "description": "Link to a Jenkins Job",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Property",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "sonarQubeProperty",
+              "description": "Association with a SonarQube project.",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -18765,30 +19672,6 @@
             {
               "name": "staleProperty",
               "description": "Allows to disable or delete stale branches",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "Property",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "jenkinsJobProperty",
-              "description": "Link to a Jenkins Job",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "Property",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "sonarQubeProperty",
-              "description": "Association with a SonarQube project.",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -19830,6 +20713,132 @@
               "ofType": null
             }
           ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ProjectEntityIDInput",
+          "description": null,
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "Project entity ID",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "type",
+              "description": "Project entity type",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "ProjectEntityType",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ProjectEntityInformation",
+          "description": "Information about a project entity",
+          "fields": [
+            {
+              "name": "type",
+              "description": "Type of the project entity",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "ProjectEntityType",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": "ID of the project entity",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "name",
+              "description": "Name of the project entity",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "entityName",
+              "description": "Full name of the project entity",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "entity",
+              "description": "Project entity",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INTERFACE",
+                  "name": "ProjectEntity",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
         },
         {
           "kind": "ENUM",
@@ -21431,6 +22440,18 @@
               "deprecationReason": null
             },
             {
+              "name": "_actions",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "_bulkUpdate",
               "description": null,
               "args": [],
@@ -22376,6 +23397,43 @@
               "deprecationReason": null
             },
             {
+              "name": "entity",
+              "description": "Getting a project entity using its type and ID.",
+              "args": [
+                {
+                  "name": "type",
+                  "description": "Type of the entity",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "ProjectEntityType",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": "ID of the entity",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ProjectEntityInformation",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "entityCounts",
               "description": "Collection of entity counts",
               "args": [],
@@ -22748,6 +23806,29 @@
                 "kind": "OBJECT",
                 "name": "User",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "validationRunStatusIDList",
+              "description": "List of validation run statuses",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "ValidationRunStatusID"
+                    }
+                  }
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -23346,6 +24427,49 @@
                   "name": "IndicatorsManagement",
                   "ofType": null
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "eventSubscriptions",
+              "description": "List of event subscriptions",
+              "args": [
+                {
+                  "name": "offset",
+                  "description": "Offset for the page",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": "0"
+                },
+                {
+                  "name": "size",
+                  "description": "Size of the page",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": "20"
+                },
+                {
+                  "name": "filter",
+                  "description": "Filter for the subscriptions",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "EventSubscriptionFilter",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "EventSubscriptionPayloadPaginated",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -26345,6 +27469,82 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "Build",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "SetPreferencesInput",
+          "description": "Input type for the setPreferences mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "branchViewVsGroups",
+              "description": "branchViewVsGroups field",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "branchViewVsNames",
+              "description": "branchViewVsNames field",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SetPreferencesPayload",
+          "description": "Output type for the setPreferences mutation.",
+          "fields": [
+            {
+              "name": "preferences",
+              "description": "Saved preferences",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Preferences",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -32616,6 +33816,131 @@
           "possibleTypes": null
         },
         {
+          "kind": "INPUT_OBJECT",
+          "name": "SubscribeToEventsInput",
+          "description": "Input type for the subscribeToEvents mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "channel",
+              "description": "Channel to send this event to",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "channelConfig",
+              "description": "Channel configuration",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "JSON",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "events",
+              "description": "List of events types to subscribe to",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String"
+                    }
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "keywords",
+              "description": "Optional space-separated list of tokens to look for in the events",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "projectEntity",
+              "description": "Target project entity (null for global events)",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ProjectEntityIDInput",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SubscribeToEventsPayload",
+          "description": "Output type for the subscribeToEvents mutation.",
+          "fields": [
+            {
+              "name": "subscription",
+              "description": "Saved subscription",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "EventSubscriptionPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "OBJECT",
           "name": "Token",
           "description": "Authentication token",
@@ -34633,6 +35958,18 @@
               "deprecationReason": null
             },
             {
+              "name": "validationRunGitHubWorkflowJobProperty",
+              "description": "Link to the GitHub Workflow Job which created this validation run.",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Property",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "linkProperty",
               "description": "List of links.",
               "args": [],
@@ -34659,18 +35996,6 @@
             {
               "name": "metaInfoProperty",
               "description": "List of meta information properties",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "Property",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "validationRunGitHubWorkflowJobProperty",
-              "description": "Link to the GitHub Workflow Job which created this validation run.",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -35792,6 +37117,18 @@
             },
             {
               "name": "_events",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "_actions",
               "description": null,
               "args": [],
               "type": {
