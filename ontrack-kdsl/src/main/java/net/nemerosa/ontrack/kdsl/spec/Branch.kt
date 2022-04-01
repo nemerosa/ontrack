@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLMissingDataException
 import net.nemerosa.ontrack.kdsl.connector.graphql.checkData
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateBuildMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreatePromotionLevelMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
@@ -48,5 +49,29 @@ class Branch(
             ?.checkData { it.createPromotionLevelById()?.promotionLevel() }
             ?.fragments()?.promotionLevelFragment()?.toPromotionLevel(this)
             ?: throw GraphQLMissingDataException("Did not get back the created promotion level")
+
+    /**
+     * Create a build inside this branch.
+     *
+     * @param name Name of the build to create
+     * @param description Description of the build
+     * @return Created build
+     */
+    fun createBuild(
+        name: String,
+        description: String,
+    ): Build =
+        graphqlConnector.mutate(
+            CreateBuildMutation(
+                id.toInt(),
+                name,
+                description
+            )
+        ) {
+            it?.createBuild()?.fragments()?.payloadUserErrors()?.convert()
+        }
+            ?.checkData { it.createBuild()?.build() }
+            ?.fragments()?.buildFragment()?.toBuild(this)
+            ?: throw GraphQLMissingDataException("Did not get back the created build")
 
 }

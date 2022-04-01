@@ -1,0 +1,16 @@
+mutation CreateBuild(
+    $branchId: Int!,
+    $name: String!,
+    $description: String!,
+) {
+    createBuild(input: {
+        branchId: $branchId,
+        name: $name,
+        description: $description,
+    }) {
+        build {
+            ...BuildFragment
+        }
+        ...PayloadUserErrors
+    }
+}

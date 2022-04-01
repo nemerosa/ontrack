@@ -31,34 +31,34 @@ class ACCDSLNotifications : AbstractACCDSLTestSupport() {
             branch("release-1.1") {
                 promotion("SILVER")
                 promotion("GOLD")
-                //     build {
-                //         // Promotion
-                //         promote("SILVER")
-                //         // Checks that NO notification was received
-                //         assertTrue(ontrack.notifications.inMemory.group(group).isEmpty(), "No notification")
-                //         // Promotion
-                //         promote("GOLD")
-                //         // Checks that NO notification was received (branch name is not matching)
-                //         assertTrue(ontrack.notifications.inMemory.group(group).isEmpty(), "No notification")
-                //     }
+                build {
+                    //         // Promotion
+                    //         promote("SILVER")
+                    //         // Checks that NO notification was received
+                    //         assertTrue(ontrack.notifications.inMemory.group(group).isEmpty(), "No notification")
+                    //         // Promotion
+                    //         promote("GOLD")
+                    //         // Checks that NO notification was received (branch name is not matching)
+                    //         assertTrue(ontrack.notifications.inMemory.group(group).isEmpty(), "No notification")
+                }
             }
 
             // For matching branches
             branch("main") {
                 promotion("SILVER")
                 promotion("GOLD")
-                //     build {
-                //         // Promotion
-                //         promote("SILVER")
-                //         // Checks that NO notification was received
-                //         assertTrue(ontrack.notifications.inMemory.group(group).isEmpty(), "No notification")
-                //         // Promotion
-                //         promote("GOLD")
-                //         // Checks that a notification was received
-                //         assertNotNull(ontrack.notifications.inMemory.group(group).firstOrNull(), "Received notification") { message ->
-                //             assertEquals("", message)
-                //         }
-                //     }
+                build {
+                    //         // Promotion
+                    //         promote("SILVER")
+                    //         // Checks that NO notification was received
+                    //         assertTrue(ontrack.notifications.inMemory.group(group).isEmpty(), "No notification")
+                    //         // Promotion
+                    //         promote("GOLD")
+                    //         // Checks that a notification was received
+                    //         assertNotNull(ontrack.notifications.inMemory.group(group).firstOrNull(), "Received notification") { message ->
+                    //             assertEquals("", message)
+                    //         }
+                }
             }
         }
     }
