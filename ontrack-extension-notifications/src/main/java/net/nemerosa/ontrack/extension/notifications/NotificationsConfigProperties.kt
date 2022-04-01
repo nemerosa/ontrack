@@ -12,6 +12,11 @@ class NotificationsConfigProperties {
     var enabled: Boolean = true
 
     /**
+     * In-memory channel?
+     */
+    var inMemory = InMemoryChannelProperties()
+
+    /**
      * Dispatching configuration
      */
     var dispatching: DispatchingProperties = DispatchingProperties()
@@ -20,6 +25,16 @@ class NotificationsConfigProperties {
      * Processing configuration
      */
     var processing: ProcessingProperties = ProcessingProperties()
+
+    /**
+     * In-memory channel configuration
+     */
+    class InMemoryChannelProperties {
+        /**
+         * Enabled?
+         */
+        var enabled = false
+    }
 
     /**
      * Dispatching configuration
