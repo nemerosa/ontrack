@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
+import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecordingAccess
 import net.nemerosa.ontrack.model.security.*
 import org.springframework.stereotype.Component
 
@@ -20,7 +21,8 @@ class SubscriptionsRoleContributor : RoleContributor {
 
     override fun getGlobalFunctionContributionsForGlobalRoles(): Map<String, List<Class<out GlobalFunction>>> = mapOf(
         GLOBAL_SUBSCRIPTIONS_MANAGER to listOf(
-            GlobalSubscriptionsManage::class.java
+            GlobalSubscriptionsManage::class.java,
+            NotificationRecordingAccess::class.java,
         )
     )
 
