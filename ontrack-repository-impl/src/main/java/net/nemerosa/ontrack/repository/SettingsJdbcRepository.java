@@ -62,7 +62,22 @@ public class SettingsJdbcRepository extends AbstractJdbcRepository implements Se
     }
 
     @Override
+    public long getLong(Class<?> category, String name, long defaultValue) {
+        return getValue(
+                category,
+                name,
+                s -> Long.parseLong(s, 10),
+                defaultValue
+        );
+    }
+
+    @Override
     public void setInt(Class<?> category, String name, int value) {
+        setValue(category, name, String.valueOf(value));
+    }
+
+    @Override
+    public void setLong(Class<?> category, String name, long value) {
         setValue(category, name, String.valueOf(value));
     }
 

@@ -18,6 +18,12 @@ inline fun <reified T> SettingsRepository.getInt(property: KProperty1<T, Int?>, 
 /**
  * Type safe access to settings.
  */
+inline fun <reified T> SettingsRepository.getLong(property: KProperty1<T, Long?>, defaultValue: Long): Long =
+        getLong(T::class.java, property.name, defaultValue)
+
+/**
+ * Type safe access to settings.
+ */
 inline fun <reified T> SettingsRepository.getBoolean(property: KProperty1<T, Boolean?>, defaultValue: Boolean): Boolean =
         getBoolean(T::class.java, property.name, defaultValue)
 
@@ -49,4 +55,11 @@ inline fun <reified T> SettingsRepository.setBoolean(property: KProperty0<Boolea
  */
 inline fun <reified T> SettingsRepository.setInt(property: KProperty0<Int>) {
     setInt(T::class.java, property.name, property.get())
+}
+
+/**
+ * Type safe setter of settings
+ */
+inline fun <reified T> SettingsRepository.setLong(property: KProperty0<Long>) {
+    setLong(T::class.java, property.name, property.get())
 }
