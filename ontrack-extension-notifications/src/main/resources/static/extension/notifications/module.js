@@ -89,6 +89,46 @@ angular.module('ontrack.extension.notifications', [
             }
         `;
 
+        const enableSubscriptionQuery = `
+            mutation(
+                $entityType: ProjectEntityType!,
+                $entityId: Int!,
+                $id: String!,
+            ) {
+                enableSubscription(input: {
+                    projectEntity: {
+                        type: $entityType,
+                        id: $entityId
+                    },
+                    id: $id
+                }) {
+                    errors {
+                        message
+                    }
+                }
+            }
+        `;
+
+        const disableSubscriptionQuery = `
+            mutation(
+                $entityType: ProjectEntityType!,
+                $entityId: Int!,
+                $id: String!,
+            ) {
+                disableSubscription(input: {
+                    projectEntity: {
+                        type: $entityType,
+                        id: $entityId
+                    },
+                    id: $id
+                }) {
+                    errors {
+                        message
+                    }
+                }
+            }
+        `;
+
         const newSubscriptionQuery = `
             mutation(
                 $type: ProjectEntityType!,
@@ -135,6 +175,22 @@ angular.module('ontrack.extension.notifications', [
                     id: subscription.id
                 }, "deleteSubscription").finally(loadSubscriptions);
             });
+        };
+
+        $scope.enableSubscription = (subscription) => {
+            otGraphqlService.pageGraphQLCallWithPayloadErrors(enableSubscriptionQuery, {
+                entityType: type,
+                entityId: id,
+                id: subscription.id
+            }, "enableSubscription").finally(loadSubscriptions);
+        };
+
+        $scope.disableSubscription = (subscription) => {
+            otGraphqlService.pageGraphQLCallWithPayloadErrors(disableSubscriptionQuery, {
+                entityType: type,
+                entityId: id,
+                id: subscription.id
+            }, "disableSubscription").finally(loadSubscriptions);
         };
 
         const newSubscription = (form) => {

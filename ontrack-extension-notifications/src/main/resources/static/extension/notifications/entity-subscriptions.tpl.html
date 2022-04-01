@@ -40,11 +40,11 @@
                 {{ subscription.channelConfigText }}
             </td>
             <td ng-if="writeSubscriptionGranted">
-                <span ng-if="subscription.disabled" class="text-muted ot-action" title="Click to disable" ng-click="enableSubscription()">
+                <span ng-if="subscription.disabled" class="text-muted ot-action" title="Click to disable" ng-click="enableSubscription(subscription)">
                     <span class="fa fa-ban"></span>
                     Disabled
                 </span>
-                <span ng-if="!subscription.disabled" class="ot-action" title="Click to disable" ng-click="disableSubscription()">
+                <span ng-if="!subscription.disabled" class="ot-action" title="Click to disable" ng-click="disableSubscription(subscription)">
                     <span class="fa fa-play"></span>
                     Enabled
                 </span>
