@@ -6,6 +6,9 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.spec.ProjectEntity
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 @AcceptanceTestSuite
 class ACCDSLNotifications : AbstractACCDSLTestSupport() {
@@ -34,12 +37,12 @@ class ACCDSLNotifications : AbstractACCDSLTestSupport() {
                 build {
                     // Promotion
                     promote("SILVER")
-                    //         // Checks that NO notification was received
-                    //         assertTrue(ontrack.notifications.inMemory.group(group).isEmpty(), "No notification")
+                    // Checks that NO notification was received
+                    assertTrue(ontrack.notifications.inMemory.group(group).isEmpty(), "No notification")
                     // Promotion
                     promote("GOLD")
-                    //         // Checks that NO notification was received (branch name is not matching)
-                    //         assertTrue(ontrack.notifications.inMemory.group(group).isEmpty(), "No notification")
+                    // Checks that NO notification was received (branch name is not matching)
+                    assertTrue(ontrack.notifications.inMemory.group(group).isEmpty(), "No notification")
                 }
             }
 
@@ -50,14 +53,15 @@ class ACCDSLNotifications : AbstractACCDSLTestSupport() {
                 build {
                     // Promotion
                     promote("SILVER")
-                    //         // Checks that NO notification was received
-                    //         assertTrue(ontrack.notifications.inMemory.group(group).isEmpty(), "No notification")
+                    // Checks that NO notification was received
+                    assertTrue(ontrack.notifications.inMemory.group(group).isEmpty(), "No notification")
                     // Promotion
                     promote("GOLD")
-                    //         // Checks that a notification was received
-                    //         assertNotNull(ontrack.notifications.inMemory.group(group).firstOrNull(), "Received notification") { message ->
-                    //             assertEquals("", message)
-                    //         }
+                    // Checks that a notification was received
+                    assertNotNull(ontrack.notifications.inMemory.group(group).firstOrNull(),
+                        "Received notification") { message ->
+                        assertEquals("", message)
+                    }
                 }
             }
         }

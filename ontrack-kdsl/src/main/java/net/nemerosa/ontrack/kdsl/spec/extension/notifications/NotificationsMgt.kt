@@ -48,5 +48,12 @@ class NotificationsMgt(connector: Connector) : Connected(connector) {
         }
     }
 
+    /**
+     * Access to the in-memory notification channel.
+     */
+    val inMemory: InMemoryMgt by lazy {
+        InMemoryMgt(connector)
+    }
+
 
 }
