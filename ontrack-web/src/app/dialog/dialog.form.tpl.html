@@ -9,11 +9,11 @@
     </div>
     <div class="modal-footer">
 
-        <div class="ot-alert-{{message.type}} alert-dismissable ot-dialog-alert" ng-show="message && message.content">
+        <div class="ot-alert-{{message.type}} alert-dismissable ot-dialog-alert" ng-if="message && message.content">
             <span>{{message.content}}</span>
         </div>
 
-        <div class="ot-alert-error alert-dismissable ot-dialog-alert" ng-show="message && !message.content">
+        <div class="ot-alert-error alert-dismissable ot-dialog-alert" ng-if="message && !message.content">
             <span>{{message}}</span>
         </div>
 
