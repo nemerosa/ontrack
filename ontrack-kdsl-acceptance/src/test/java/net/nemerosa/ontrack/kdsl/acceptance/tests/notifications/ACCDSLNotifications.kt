@@ -3,11 +3,10 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.notifications
 import net.nemerosa.ontrack.kdsl.acceptance.annotations.AcceptanceTestSuite
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
+import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.ProjectEntity
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @AcceptanceTestSuite
@@ -18,7 +17,7 @@ class ACCDSLNotifications : AbstractACCDSLTestSupport() {
         // Group of messages
         val group = uid("g")
         // Creates a project
-        project {
+        project project@{
             // Creates a subscription for this project
             // For new promotion runs
             // For GOLD & main only
@@ -47,7 +46,7 @@ class ACCDSLNotifications : AbstractACCDSLTestSupport() {
             }
 
             // For matching branches
-            branch("main") {
+            branch("main") branch@{
                 promotion("SILVER")
                 promotion("GOLD")
                 build {
@@ -58,9 +57,12 @@ class ACCDSLNotifications : AbstractACCDSLTestSupport() {
                     // Promotion
                     promote("GOLD")
                     // Checks that a notification was received
-                    assertNotNull(ontrack.notifications.inMemory.group(group).firstOrNull(),
-                        "Received notification") { message ->
-                        assertEquals("", message)
+                    waitUntil(
+                        timeout = 30_000,
+                        interval = 500L,
+                    ) {
+                        ontrack.notifications.inMemory.group(group).firstOrNull() ==
+                                "Build $name has been promoted to GOLD for branch ${this@branch.name} in ${this@project.name}."
                     }
                 }
             }
