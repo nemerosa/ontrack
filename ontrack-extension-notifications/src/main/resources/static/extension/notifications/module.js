@@ -235,7 +235,7 @@ angular.module('ontrack.extension.notifications', [
                 $scope.writeSubscriptionGranted = data.eventSubscriptions.writeSubscriptionGranted;
                 if (!viewInitialized) {
                     view.title = `Subscriptions for ${data.entity.entityName}`;
-                    const page = data.entity.entity.links._page
+                    const page = data.entity.entity.links._page;
                     // Breadcrumbs to the entity
                     let bc = ot.homeBreadcrumbs();
                     bc.push([data.entity.entityName, data.entity.entity.links._page]);
