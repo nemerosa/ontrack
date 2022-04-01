@@ -4639,6 +4639,104 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "CreatePromotionLevelByIdInput",
+          "description": "Input type for the createPromotionLevelById mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "branchId",
+              "description": "Branch ID",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "description",
+              "description": "Promotion level description",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Promotion level name",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "CreatePromotionLevelByIdPayload",
+          "description": "Output type for the createPromotionLevelById mutation.",
+          "fields": [
+            {
+              "name": "promotionLevel",
+              "description": "Created promotion level",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PromotionLevel",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "CreatePromotionRunByIdInput",
           "description": "Input type for the createPromotionRunById mutation.",
           "fields": null,
@@ -15008,6 +15106,29 @@
               "deprecationReason": null
             },
             {
+              "name": "createPromotionLevelById",
+              "description": "Creates a new promotion level from a branch ID",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "CreatePromotionLevelByIdInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "CreatePromotionLevelByIdPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "createPromotionRun",
               "description": "Creating a promotion run for a build identified by its name",
               "args": [
@@ -18538,6 +18659,11 @@
             {
               "kind": "OBJECT",
               "name": "CreateProjectPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "CreatePromotionLevelByIdPayload",
               "ofType": null
             },
             {

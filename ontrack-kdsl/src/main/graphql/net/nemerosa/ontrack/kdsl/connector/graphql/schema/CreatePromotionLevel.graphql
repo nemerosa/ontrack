@@ -1,0 +1,16 @@
+mutation CreatePromotionLevel(
+    $branchId: Int!,
+    $name: String!,
+    $description: String!,
+) {
+    createPromotionLevelById(input: {
+        branchId: $branchId,
+        name: $name,
+        description: $description,
+    }) {
+        promotionLevel {
+            ...PromotionLevelFragment
+        }
+        ...PayloadUserErrors
+    }
+}

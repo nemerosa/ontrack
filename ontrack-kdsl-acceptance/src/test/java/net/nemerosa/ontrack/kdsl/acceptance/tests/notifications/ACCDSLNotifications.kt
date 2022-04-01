@@ -29,8 +29,8 @@ class ACCDSLNotifications : AbstractACCDSLTestSupport() {
             )
             // For non-matching branches
             branch("release-1.1") {
-                //     promotion("SILVER")
-                //     promotion("GOLD")
+                promotion("SILVER")
+                promotion("GOLD")
                 //     build {
                 //         // Promotion
                 //         promote("SILVER")
@@ -45,8 +45,8 @@ class ACCDSLNotifications : AbstractACCDSLTestSupport() {
 
             // For matching branches
             branch("main") {
-                //     promotion("SILVER")
-                //     promotion("GOLD")
+                promotion("SILVER")
+                promotion("GOLD")
                 //     build {
                 //         // Promotion
                 //         promote("SILVER")
