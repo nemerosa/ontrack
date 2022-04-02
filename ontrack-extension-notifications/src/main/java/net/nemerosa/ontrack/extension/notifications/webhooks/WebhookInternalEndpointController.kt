@@ -23,14 +23,14 @@ class WebhookInternalEndpointController {
     /**
      * Storing the payloads in memory
      */
-    private val payloads = mutableMapOf<UUID, JsonWebhookPayload>()
+    private val payloads = mutableListOf<JsonWebhookPayload>()
 
     /**
      * The endpoint.
      */
     @PostMapping("")
     fun post(@RequestBody payload: JsonWebhookPayload): String {
-        payloads[payload.uuid] = payload
+        payloads += payload
         return "OK"
     }
 
@@ -38,7 +38,7 @@ class WebhookInternalEndpointController {
      * Gets the list of payloads
      */
     @GetMapping("payloads")
-    fun payloads() = payloads.toMap()
+    fun payloads() = payloads.toList()
 
     /**
      * Json payload

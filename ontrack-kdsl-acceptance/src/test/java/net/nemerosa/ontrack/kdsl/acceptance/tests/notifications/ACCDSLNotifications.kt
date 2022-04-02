@@ -1,16 +1,14 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.notifications
 
 import net.nemerosa.ontrack.kdsl.acceptance.annotations.AcceptanceTestSuite
-import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
-import net.nemerosa.ontrack.kdsl.spec.ProjectEntity
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
 @AcceptanceTestSuite
-class ACCDSLNotifications : AbstractACCDSLTestSupport() {
+class ACCDSLNotifications : AbstractACCDSLNotificationsTestSupport() {
 
     @Test
     fun `Notifications for a project for new promotions with a keyword filter on promotion and branch`() {
@@ -67,24 +65,6 @@ class ACCDSLNotifications : AbstractACCDSLTestSupport() {
                 }
             }
         }
-    }
-
-    /**
-     * Subscription for a project entity.
-     */
-    fun ProjectEntity.subscribe(
-        channel: String,
-        channelConfig: Any,
-        keywords: String?,
-        events: List<String>,
-    ) {
-        ontrack.notifications.subscribe(
-            channel,
-            channelConfig,
-            keywords,
-            events,
-            projectEntity = this,
-        )
     }
 
 }

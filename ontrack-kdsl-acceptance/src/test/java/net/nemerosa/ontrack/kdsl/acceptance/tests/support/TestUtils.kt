@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.json.parseAsJson
 import org.apache.commons.io.IOUtils
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
+import java.time.Duration
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
@@ -38,6 +39,11 @@ fun waitUntil(
         }
     }
 }
+
+/**
+ * Seconds to millis
+ */
+val Int.seconds get() = Duration.ofSeconds(toLong()).toMillis()
 
 /**
  * Reads a resource from the classpath as JSON
