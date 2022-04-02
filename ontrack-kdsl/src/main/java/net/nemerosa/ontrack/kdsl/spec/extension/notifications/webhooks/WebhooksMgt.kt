@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.kdsl.spec.extension.notifications.webhooks
 
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
@@ -19,19 +20,25 @@ class WebhooksMgt(connector: Connector) : Connected(connector) {
      * @param enabled If the webhook is enabled
      * @param url Endpoint URL for the webhook
      * @param timeout Timeout for the webhook execution
+     * @param authenticationType Authentication type
+     * @param authenticationConfig Authentication configuration
      */
     fun createWebhook(
         name: String,
         enabled: Boolean,
         url: String,
         timeout: Duration,
+        authenticationType: String,
+        authenticationConfig: Any,
     ) {
         graphqlConnector.mutate(
             CreateWebhookMutation(
                 name,
                 enabled,
                 url,
-                timeout.toSeconds()
+                timeout.toSeconds(),
+                authenticationType,
+                authenticationConfig.asJson(),
             )
         ) {
             it?.createWebhook()?.fragments()?.payloadUserErrors()?.convert()

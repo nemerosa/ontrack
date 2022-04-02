@@ -3,4 +3,5 @@ fragment WebhookFragment on Webhook {
     enabled
     url
     timeoutSeconds
+    authenticationType
 }

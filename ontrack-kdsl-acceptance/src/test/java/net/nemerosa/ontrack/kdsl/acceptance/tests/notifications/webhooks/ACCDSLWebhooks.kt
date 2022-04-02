@@ -23,8 +23,13 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
             ontrack.notifications.webhooks.createWebhook(
                 name = webhookName,
                 enabled = true,
-                url = "${rawConnector().url}/extension/notifications/webhooks/internal",
+                url = "${ontractConnectionProperties.url}/extension/notifications/webhooks/internal",
                 timeout = Duration.ofMinutes(1),
+                authenticationType = "header",
+                authenticationConfig = mapOf(
+                    "name" to "X-Ontrack-Token",
+                    "value" to ontractConnectionProperties.token,
+                )
             )
             // For a project
             project {
