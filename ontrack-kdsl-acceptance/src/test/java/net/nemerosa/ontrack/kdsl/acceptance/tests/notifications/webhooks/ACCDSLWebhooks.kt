@@ -50,7 +50,8 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
                     ontrack.notifications.webhooks.internalEndpoint.payloads.any {
                         it.type == "event" &&
                                 it.data.path("eventType").path("id").asText() == "new_branch"
-                        // TODO Checks the exact event
+                                && it.data.path("entities").path("PROJECT").path("name").asText() == name
+                                && it.data.path("entities").path("BRANCH").path("name").asText() == branch.name
                     }
                 }
             }
