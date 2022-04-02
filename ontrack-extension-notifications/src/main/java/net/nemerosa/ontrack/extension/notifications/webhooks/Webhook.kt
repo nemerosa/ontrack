@@ -13,4 +13,6 @@ data class Webhook(
     val url: String,
     @APIDescription("Webhook execution timeout (in seconds)")
     val timeout: Duration,
+    @APIDescription("Webhook authentication")
+    val authentication: WebhookAuthentication,
 )

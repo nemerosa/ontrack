@@ -11,6 +11,7 @@ import java.time.Duration
 @Service
 class DefaultWebhookExecutionService(
     private val webhookPayloadRenderer: WebhookPayloadRenderer,
+    private val webhookAuthenticatorRegistry: WebhookAuthenticatorRegistry,
 ) : WebhookExecutionService {
 
     override fun send(webhook: Webhook, payload: WebhookPayload<*>) {
@@ -46,7 +47,18 @@ class DefaultWebhookExecutionService(
     }
 
     private fun authenticate(webhook: Webhook, builder: HttpRequest.Builder) {
-        TODO("Authentication")
+        val authenticator = webhookAuthenticatorRegistry.findWebhookAuthenticator(webhook.authentication.type)
+            ?: throw WebhookAuthenticatorNotFoundException(webhook.authentication.type)
+        authenticate(webhook, authenticator, builder)
+    }
+
+    private fun <C> authenticate(
+        webhook: Webhook,
+        authenticator: WebhookAuthenticator<C>,
+        builder: HttpRequest.Builder,
+    ) {
+        val config = authenticator.validateConfig(webhook.authentication.config)
+        authenticator.authenticate(config, builder)
     }
 
 }
