@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.json.asJson
 import org.springframework.stereotype.Service
 import java.net.URI
 import java.net.http.HttpClient
@@ -14,7 +15,7 @@ import java.time.Duration
 @Service
 class DefaultWebhookExecutionService : WebhookExecutionService {
 
-    override fun send(webhook: Webhook, payload: JsonNode) {
+    override fun send(webhook: Webhook, payload: WebhookPayload<*>) {
         val client: HttpClient = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_1_1)
             .followRedirects(HttpClient.Redirect.NORMAL)
@@ -32,7 +33,7 @@ class DefaultWebhookExecutionService : WebhookExecutionService {
                     authenticate(webhook, this)
                 }
                 // Payload
-                .POST(BodyPublishers.ofString(payload.toPrettyString()))
+                .POST(BodyPublishers.ofString(payload.asJson().toPrettyString()))
                 // OK
                 .build()
 

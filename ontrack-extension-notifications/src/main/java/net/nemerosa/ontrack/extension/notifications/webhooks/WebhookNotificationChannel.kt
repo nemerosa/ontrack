@@ -25,8 +25,7 @@ class WebhookNotificationChannel(
             return NotificationResult.disabled("${webhook.name} webhook is disabled")
         }
         // Computes the payload for the event
-        // TODO Use a proper message converter, see net.nemerosa.ontrack.boot.support.ResourceHttpMessageConverter
-        val payload = event.asJson()
+        val payload = WebhookPayload("event", event)
         // Runs the webhook
         return try {
             webhookExecutionService.send(webhook, payload)
