@@ -25,7 +25,7 @@ class WebhookNotificationChannel(
             return NotificationResult.disabled("${webhook.name} webhook is disabled")
         }
         // Computes the payload for the event
-        val payload = WebhookPayload("event", event)
+        val payload = WebhookPayload(type = "event", data = event)
         // Runs the webhook
         return try {
             webhookExecutionService.send(webhook, payload)

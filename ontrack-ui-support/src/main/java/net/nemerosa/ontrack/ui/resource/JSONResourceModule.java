@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.ui.resource;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import java.util.Collection;
+
 public class JSONResourceModule extends SimpleModule {
 
     private final ResourceModule resourceModule;
@@ -17,13 +19,16 @@ public class JSONResourceModule extends SimpleModule {
     public void setupModule(SetupContext context) {
         super.setupModule(context);
         // Registration
-        for (ResourceDecorator<?> resourceDecorator : resourceModule.decorators()) {
-            context.addBeanSerializerModifier(
-                    new ResourceSerializerModifier<>(
-                            resourceContext,
-                            resourceDecorator
-                    )
-            );
+        Collection<ResourceDecorator<?>> decorators = resourceModule.decorators();
+        if (decorators != null) {
+            for (ResourceDecorator<?> resourceDecorator : decorators) {
+                context.addBeanSerializerModifier(
+                        new ResourceSerializerModifier<>(
+                                resourceContext,
+                                resourceDecorator
+                        )
+                );
+            }
         }
     }
 
