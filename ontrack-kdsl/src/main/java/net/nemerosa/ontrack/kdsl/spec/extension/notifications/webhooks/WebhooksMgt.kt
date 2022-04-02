@@ -2,6 +2,9 @@ package net.nemerosa.ontrack.kdsl.spec.extension.notifications.webhooks
 
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
+import net.nemerosa.ontrack.kdsl.connector.graphql.convert
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateWebhookMutation
+import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import java.time.Duration
 
 /**
@@ -23,7 +26,16 @@ class WebhooksMgt(connector: Connector) : Connected(connector) {
         url: String,
         timeout: Duration,
     ) {
-        TODO("Not yet implemented")
+        graphqlConnector.mutate(
+            CreateWebhookMutation(
+                name,
+                enabled,
+                url,
+                timeout.toSeconds()
+            )
+        ) {
+            it?.createWebhook()?.fragments()?.payloadUserErrors()?.convert()
+        }
     }
 
     /**

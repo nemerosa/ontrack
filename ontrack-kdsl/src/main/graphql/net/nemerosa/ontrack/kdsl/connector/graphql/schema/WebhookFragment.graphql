@@ -1,0 +1,6 @@
+fragment WebhookFragment on Webhook {
+    name
+    enabled
+    url
+    timeoutSeconds
+}
