@@ -22,8 +22,6 @@ public interface LinksBuilder {
 
     LinksBuilder link(String name, Object methodInvocation, boolean test);
 
-    LinksBuilder entityURI(String name, ProjectEntity projectEntity, boolean allowed);
-
     LinksBuilder link(String name, Object methodInvocation, Class<? extends GlobalFunction> fn);
 
     LinksBuilder link(String name, Object methodInvocation, Class<? extends ProjectFunction> fn, int projectId);

@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.git
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.asMap
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.support.AbstractExtension
