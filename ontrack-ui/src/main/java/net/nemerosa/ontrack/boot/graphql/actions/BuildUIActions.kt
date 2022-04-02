@@ -7,13 +7,13 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.isProjectFunctionGranted
 import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 
 @Component
 class BuildUIActions(
-    uriBuilder: URIBuilder,
+    uriBuilder: EntityURIBuilder,
     private val securityService: SecurityService
 ) : SimpleUIActionsProvider<Build>(Build::class, uriBuilder) {
     override val actions: List<UIAction<Build>> = listOf(

@@ -7,7 +7,7 @@ import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import net.nemerosa.ontrack.ui.resource.DefaultResourceContext
 import net.nemerosa.ontrack.ui.resource.ResourceContext
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator
@@ -17,9 +17,9 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class GQLLinksContributorImpl(
-        private val uriBuilder: URIBuilder,
-        private val securityService: SecurityService,
-        private val decorators: List<ResourceDecorator<*>>
+    private val uriBuilder: EntityURIBuilder,
+    private val securityService: SecurityService,
+    private val decorators: List<ResourceDecorator<*>>
 ) : GQLFieldContributor {
 
     override fun getFields(type: Class<*>): List<GraphQLFieldDefinition> {

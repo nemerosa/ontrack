@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-import net.nemerosa.ontrack.ui.controller.URIBuilder;
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder;
 import org.apache.commons.text.CaseUtils;
 
 import java.net.URI;
@@ -10,7 +10,7 @@ import java.net.URI;
 import static java.lang.String.format;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-public abstract class AbstractURIBuilder implements URIBuilder {
+public abstract class AbstractURIBuilder implements EntityURIBuilder {
 
     String pagePath(String path, Object... arguments) {
         return format(

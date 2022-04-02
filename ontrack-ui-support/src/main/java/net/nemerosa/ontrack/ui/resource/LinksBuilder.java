@@ -3,12 +3,13 @@ package net.nemerosa.ontrack.ui.resource;
 import net.nemerosa.ontrack.model.security.GlobalFunction;
 import net.nemerosa.ontrack.model.security.ProjectFunction;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder;
 
 import java.net.URI;
 import java.util.List;
 
 /**
- * @see net.nemerosa.ontrack.ui.controller.URIBuilder
+ * @see EntityURIBuilder
  */
 public interface LinksBuilder {
 

@@ -3,13 +3,14 @@ package net.nemerosa.ontrack.ui.resource;
 import net.nemerosa.ontrack.model.security.GlobalFunction;
 import net.nemerosa.ontrack.model.security.ProjectFunction;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder;
 
 import java.net.URI;
 
 public interface ResourceContext {
 
     /**
-     * @see net.nemerosa.ontrack.ui.controller.URIBuilder#build(Object)
+     * @see EntityURIBuilder#build(Object)
      */
     URI uri(Object methodInvocation);
 

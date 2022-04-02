@@ -6,15 +6,15 @@ import net.nemerosa.ontrack.graphql.schema.actions.UIAction
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ProjectFavouriteService
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @Component
 class ProjectUIActions(
-        uriBuilder: URIBuilder,
-        private val securityService: SecurityService,
-        private val projectFavouriteService: ProjectFavouriteService
+    uriBuilder: EntityURIBuilder,
+    private val securityService: SecurityService,
+    private val projectFavouriteService: ProjectFavouriteService
 ) : SimpleUIActionsProvider<Project>(Project::class, uriBuilder) {
 
     override val actions: List<UIAction<Project>> = listOf(

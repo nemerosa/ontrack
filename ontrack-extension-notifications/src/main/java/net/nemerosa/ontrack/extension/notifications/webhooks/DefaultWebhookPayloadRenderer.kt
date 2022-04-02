@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.notifications.webhooks
 
 import net.nemerosa.ontrack.json.ObjectMapperFactory
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import net.nemerosa.ontrack.ui.resource.DefaultResourceContext
 import net.nemerosa.ontrack.ui.resource.ResourceModule
 import net.nemerosa.ontrack.ui.resource.ResourceObjectMapper
@@ -12,7 +12,7 @@ import java.io.ByteArrayOutputStream
 
 @Component
 class DefaultWebhookPayloadRenderer(
-    uriBuilder: URIBuilder,
+    uriBuilder: EntityURIBuilder,
     securityService: SecurityService,
     resourceModules: List<ResourceModule>,
 ) : WebhookPayloadRenderer {

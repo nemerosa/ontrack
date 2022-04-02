@@ -10,16 +10,16 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.PropertyService
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
 import java.net.URI
 
 @Component
 class GitPullRequestInformationExtension(
-        extensionFeature: GitExtensionFeature,
-        private val propertyService: PropertyService,
-        private val uriBuilder: URIBuilder,
-        private val gitService: GitService
+    extensionFeature: GitExtensionFeature,
+    private val propertyService: PropertyService,
+    private val uriBuilder: EntityURIBuilder,
+    private val gitService: GitService
 ) : AbstractExtension(extensionFeature), EntityInformationExtension {
 
     override fun getInformation(entity: ProjectEntity): EntityInformation? =

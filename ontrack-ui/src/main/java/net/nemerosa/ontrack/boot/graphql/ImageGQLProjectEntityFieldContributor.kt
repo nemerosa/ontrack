@@ -10,14 +10,14 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.model.structure.ValidationStamp
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 import java.net.URI
 
 @Component
 class ImageGQLProjectEntityFieldContributor(
-    private val uriBuilder: URIBuilder
+    private val uriBuilder: EntityURIBuilder
 ) : GQLProjectEntityFieldContributor {
 
 

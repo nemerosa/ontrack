@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -16,7 +16,7 @@ class GQLBranchDiffActionsFieldContributor
 @Autowired
 constructor(
     private val extensionManager: ExtensionManager,
-    private val uriBuilder: URIBuilder,
+    private val uriBuilder: EntityURIBuilder,
     private val gqlTypeAction: GQLTypeAction
 ) : GQLProjectEntityFieldContributor {
     override fun getFields(
