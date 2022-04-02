@@ -4,6 +4,11 @@ import java.time.Duration
 
 interface WebhookAdminService {
 
+    /**
+     * Gets the list of all webhooks
+     */
+    val webhooks: List<Webhook>
+
     fun findWebhookByName(name: String): Webhook?
 
     fun createWebhook(

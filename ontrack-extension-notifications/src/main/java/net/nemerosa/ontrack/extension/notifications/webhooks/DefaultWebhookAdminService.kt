@@ -13,6 +13,12 @@ class DefaultWebhookAdminService(
     private val securityService: SecurityService,
 ) : WebhookAdminService {
 
+    override val webhooks: List<Webhook>
+        get() {
+            securityService.checkGlobalFunction(WebhookManagement::class.java)
+            return storageService.getData(STORE, Webhook::class.java).values.sortedBy { it.name }
+        }
+
     override fun createWebhook(name: String, enabled: Boolean, url: String, timeout: Duration): Webhook {
         securityService.checkGlobalFunction(WebhookManagement::class.java)
         val existing = findWebhookByName(name)
