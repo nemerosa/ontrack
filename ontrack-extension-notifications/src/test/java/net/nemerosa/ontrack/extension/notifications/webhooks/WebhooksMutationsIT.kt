@@ -27,7 +27,12 @@ internal class WebhooksMutationsIT : AbstractNotificationTestSupport() {
                         name: "$name",
                         enabled: true,
                         url: "uri:test",
-                        timeoutSeconds: 30
+                        timeoutSeconds: 30,
+                        authenticationType: "header",
+                        authenticationConfig: {
+                            name: "X-Ontrack-Token",
+                            value: "xxxx",
+                        }
                     }) {
                         errors {
                             message
@@ -37,6 +42,7 @@ internal class WebhooksMutationsIT : AbstractNotificationTestSupport() {
                             enabled
                             url
                             timeoutSeconds
+                            authenticationType
                         }
                     }
                 }

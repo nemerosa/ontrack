@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import org.springframework.stereotype.Component
@@ -23,6 +24,10 @@ class WebhooksMutations(
                 enabled = input.enabled,
                 url = input.url,
                 timeout = Duration.ofSeconds(input.timeoutSeconds),
+                authentication = WebhookAuthentication(
+                    type = input.authenticationType,
+                    config = input.authenticationConfig,
+                )
             )
         }
     )
@@ -33,4 +38,6 @@ data class CreateWebhookInput(
     val enabled: Boolean,
     val url: String,
     val timeoutSeconds: Long,
+    val authenticationType: String,
+    val authenticationConfig: JsonNode,
 )

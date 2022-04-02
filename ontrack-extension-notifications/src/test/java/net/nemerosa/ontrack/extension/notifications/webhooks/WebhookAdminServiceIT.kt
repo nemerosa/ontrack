@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,9 +24,40 @@ internal class WebhookAdminServiceIT : AbstractNotificationTestSupport() {
                 enabled = true,
                 url = "uri:test",
                 timeout = Duration.ofMinutes(1),
+                authentication = WebhookFixtures.webhookAuthentication(),
             )
             assertNotNull(webhookAdminService.findWebhookByName(name)) {
                 assertEquals(wh, it)
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a webhook with basic authentication`() {
+        val name = uid("wh")
+        asAdmin {
+            webhookAdminService.createWebhook(
+                name = name,
+                enabled = true,
+                url = "uri:test",
+                timeout = Duration.ofMinutes(1),
+                authentication = WebhookAuthentication(
+                    type = "basic",
+                    config = mapOf(
+                        "username" to "user",
+                        "password" to "xxxx"
+                    ).asJson()
+                )
+            )
+            assertNotNull(webhookAdminService.findWebhookByName(name)) {
+                assertEquals("basic", it.authentication.type)
+                assertEquals(
+                    mapOf(
+                        "username" to "user",
+                        "password" to "xxxx"
+                    ).asJson(),
+                    it.authentication.config
+                )
             }
         }
     }
@@ -39,6 +71,7 @@ internal class WebhookAdminServiceIT : AbstractNotificationTestSupport() {
                 enabled = true,
                 url = "uri:test",
                 timeout = Duration.ofMinutes(1),
+                authentication = WebhookFixtures.webhookAuthentication(),
             )
             // Creating a webhook with the same name
             assertFailsWith<WebhookAlreadyExistsException> {
@@ -47,6 +80,7 @@ internal class WebhookAdminServiceIT : AbstractNotificationTestSupport() {
                     enabled = true,
                     url = "uri:other",
                     timeout = Duration.ofMinutes(1),
+                    authentication = WebhookFixtures.webhookAuthentication(),
                 )
             }
         }

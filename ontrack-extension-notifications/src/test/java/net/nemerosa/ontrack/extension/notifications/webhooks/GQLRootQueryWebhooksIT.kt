@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredBooleanField
 import net.nemerosa.ontrack.json.getRequiredIntField
 import net.nemerosa.ontrack.json.getRequiredTextField
@@ -25,6 +26,7 @@ internal class GQLRootQueryWebhooksIT : AbstractNotificationTestSupport() {
                 enabled = true,
                 url = "uri:test",
                 timeout = Duration.ofMinutes(1),
+                authentication = WebhookFixtures.webhookAuthentication(),
             )
             run("""{
                 webhooks {
@@ -32,6 +34,7 @@ internal class GQLRootQueryWebhooksIT : AbstractNotificationTestSupport() {
                     enabled
                     url
                     timeoutSeconds
+                    authenticationType
                 }
             }""") { data ->
                 val webhook = data.path("webhooks").find {

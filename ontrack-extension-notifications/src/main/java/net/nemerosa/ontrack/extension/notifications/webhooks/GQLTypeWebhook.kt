@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
 import graphql.Scalars.GraphQLInt
+import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
@@ -29,6 +30,15 @@ class GQLTypeWebhook : GQLType {
                     .dataFetcher { env ->
                         val webhook: Webhook = env.getSource()
                         webhook.timeout.toSeconds()
+                    }
+            }
+            .field {
+                it.name("authenticationType")
+                    .description("Webhook authentication")
+                    .type(GraphQLString)
+                    .dataFetcher { env ->
+                        val webhook: Webhook = env.getSource()
+                        webhook.authentication.type
                     }
             }
             .build()

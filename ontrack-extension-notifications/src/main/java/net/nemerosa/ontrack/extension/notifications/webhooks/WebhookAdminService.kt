@@ -16,6 +16,7 @@ interface WebhookAdminService {
         enabled: Boolean,
         url: String,
         timeout: Duration,
+        authentication: WebhookAuthentication,
     ): Webhook
 
 }
