@@ -27,6 +27,33 @@ class NotificationsConfigProperties {
     var processing: ProcessingProperties = ProcessingProperties()
 
     /**
+     * Webhook channel configuration
+     */
+    var webhook = WebhookChannelProperties()
+
+    /**
+     * Webhook channel configuration
+     */
+    class WebhookChannelProperties {
+        /**
+         * Internal webhoook
+         */
+        var internal = WebhookInternalEndpointProperties()
+    }
+
+    /**
+     * Webhook internal channel configuration.
+     *
+     * To be used for test only.
+     */
+    class WebhookInternalEndpointProperties {
+        /**
+         * Enabled?
+         */
+        var enabled = false
+    }
+
+    /**
      * In-memory channel configuration
      */
     class InMemoryChannelProperties {
