@@ -13,7 +13,7 @@ import java.net.URI;
 @Component
 @Profile({RunProfile.DEV, RunProfile.ACC, RunProfile.PROD})
 @ConditionalOnProperty(prefix = "ontrack.config", name = "uri", havingValue = "absolute")
-public class DefaultURIBuilder extends AbstractURIBuilder {
+public class DefaultURIBuilder extends AbstractEntityURIBuilder {
     @Override
     public URI build(Object methodInvocation) {
 

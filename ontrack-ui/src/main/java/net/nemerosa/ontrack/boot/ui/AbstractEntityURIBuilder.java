@@ -2,22 +2,14 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.ui.controller.AbstractURIBuilder;
 import net.nemerosa.ontrack.ui.controller.EntityURIBuilder;
-import org.apache.commons.text.CaseUtils;
 
 import java.net.URI;
 
-import static java.lang.String.format;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-public abstract class AbstractURIBuilder implements EntityURIBuilder {
-
-    String pagePath(String path, Object... arguments) {
-        return format(
-                "/#/%s",
-                format(path, arguments)
-        );
-    }
+public abstract class AbstractEntityURIBuilder extends AbstractURIBuilder implements EntityURIBuilder {
 
     @Override
     public URI getEntityURI(ProjectEntity entity) {
@@ -42,20 +34,4 @@ public abstract class AbstractURIBuilder implements EntityURIBuilder {
         }
     }
 
-    String getEntityPageName(ProjectEntityType projectEntityType) {
-        return CaseUtils.toCamelCase(
-                projectEntityType.name().toLowerCase(),
-                false,
-                '_'
-        );
-    }
-
-    @Override
-    public URI getEntityPage(ProjectEntity entity) {
-        return page(
-                "%s/%d",
-                getEntityPageName(entity.getProjectEntityType()),
-                entity.id()
-        );
-    }
 }
