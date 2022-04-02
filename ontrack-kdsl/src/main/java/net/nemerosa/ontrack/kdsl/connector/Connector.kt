@@ -32,4 +32,13 @@ interface Connector {
         body: Any? = null,
     ): ConnectorResponse
 
+    /**
+     * Puts a payload to a relative URL.
+     */
+    fun put(
+        path: String,
+        headers: Map<String, String> = emptyMap(),
+        body: Any? = null,
+    )
+
 }
