@@ -1,8 +1,12 @@
 package net.nemerosa.ontrack.extension.notifications.listener
 
+import io.micrometer.core.instrument.MeterRegistry
+import net.nemerosa.ontrack.extension.notifications.metrics.NotificationsMetrics
+import net.nemerosa.ontrack.extension.notifications.metrics.incrementForEvent
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.events.EventFactory
+import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -23,6 +27,7 @@ class AsyncEventListeningQueueListener(
     private val securityService: SecurityService,
     private val eventListeningService: EventListeningService,
     private val applicationLogService: ApplicationLogService,
+    private val meterRegistry: MeterRegistry,
 ) : RabbitListenerConfigurer {
 
     override fun configureRabbitListeners(registrar: RabbitListenerEndpointRegistrar) {
@@ -52,11 +57,18 @@ class AsyncEventListeningQueueListener(
         try {
             val body = message.body.toString(Charsets.UTF_8)
             val payload = body.parseAsJson().parse<AsyncEventListeningQueueEvent>()
-            securityService.asAdmin {
+            securityService.asAdmin(Runnable {
                 val event = payload.toEvent(eventFactory, structureService)
+                meterRegistry.incrementForEvent(
+                    NotificationsMetrics.event_listening_dequeued,
+                    event
+                )
                 eventListeningService.onEvent(event)
-            }
+            })
         } catch (any: Throwable) {
+            meterRegistry.increment(
+                NotificationsMetrics.event_listening_dequeued_error
+            )
             applicationLogService.log(
                 ApplicationLogEntry.error(
                     any,

@@ -17,6 +17,7 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
+    implementation("io.micrometer:micrometer-core")
 
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))

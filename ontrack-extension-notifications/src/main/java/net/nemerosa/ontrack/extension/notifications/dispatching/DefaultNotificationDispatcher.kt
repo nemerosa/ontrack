@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.dispatching
 
+import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.extension.notifications.model.Notification
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component
 class DefaultNotificationDispatcher(
     private val notificationChannelRegistry: NotificationChannelRegistry,
     private val notificationQueue: NotificationQueue,
+    private val meterRegistry: MeterRegistry,
 ) : NotificationDispatcher {
 
     override fun dispatchEvent(event: Event, eventSubscription: EventSubscription): NotificationDispatchingResult {
