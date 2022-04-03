@@ -6,4 +6,6 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 data class WebhookSettings(
     @APIDescription("Are webhooks enabled?")
     val enabled: Boolean = false,
+    @APIDescription("Global timeout (in minutes) for all webhooks")
+    val timeoutMinutes: Int = 5,
 )

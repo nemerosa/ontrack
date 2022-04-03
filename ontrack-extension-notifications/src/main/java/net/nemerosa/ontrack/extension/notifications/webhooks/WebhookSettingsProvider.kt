@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.notifications.webhooks
 import net.nemerosa.ontrack.model.settings.SettingsProvider
 import net.nemerosa.ontrack.model.support.SettingsRepository
 import net.nemerosa.ontrack.model.support.getBoolean
+import net.nemerosa.ontrack.model.support.getInt
 import org.springframework.stereotype.Component
 
 /**
@@ -15,6 +16,7 @@ class WebhookSettingsProvider(
 
     override fun getSettings() = WebhookSettings(
         enabled = settingsRepository.getBoolean(WebhookSettings::enabled, false),
+        timeoutMinutes = settingsRepository.getInt(WebhookSettings::timeoutMinutes, 5),
     )
 
     override fun getSettingsClass(): Class<WebhookSettings> = WebhookSettings::class.java

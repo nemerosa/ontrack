@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Service
 import java.net.URI
 import java.net.http.HttpClient
@@ -12,6 +13,7 @@ import java.time.Duration
 class DefaultWebhookExecutionService(
     private val webhookPayloadRenderer: WebhookPayloadRenderer,
     private val webhookAuthenticatorRegistry: WebhookAuthenticatorRegistry,
+    private val cachedSettingsService: CachedSettingsService,
 ) : WebhookExecutionService {
 
     override fun send(webhook: Webhook, payload: WebhookPayload<*>) {
@@ -21,11 +23,15 @@ class DefaultWebhookExecutionService(
             .connectTimeout(Duration.ofSeconds(20))
             .build()
 
+        // Gets the maximum timeout between the webhook one and the general settings
+        val settings = cachedSettingsService.getCachedSettings(WebhookSettings::class.java)
+        val settingsTimeout = Duration.ofMinutes(settings.timeoutMinutes.toLong())
+        val timeout = maxOf(settingsTimeout, webhook.timeout)
+
         val request: HttpRequest =
             HttpRequest.newBuilder()
                 .uri(URI.create(webhook.url))
-                // TODO Gets the maximum timeout between the webhook one and the general settings
-                .timeout(webhook.timeout)
+                .timeout(timeout)
                 .header("Content-Type", "application/json")
                 // Authentication
                 .apply {

@@ -22,6 +22,15 @@ fun <T> Form.yesNoField(property: KProperty1<T, Boolean?>, value: Boolean?): For
             .value(value)
     )
 
+fun <T> Form.intField(property: KProperty1<T, kotlin.Int?>, value: kotlin.Int?): Form =
+    with(
+        Int.of(property.name)
+            .label(getPropertyLabel(property))
+            .help(getPropertyDescription(property))
+            .optional(property.returnType.isMarkedNullable)
+            .value(value)
+    )
+
 fun <T> Form.longField(property: KProperty1<T, Long>, value: Long?): Form =
     with(
         Int.of(property.name)
