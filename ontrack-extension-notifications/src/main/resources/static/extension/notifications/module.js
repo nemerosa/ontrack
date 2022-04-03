@@ -268,7 +268,7 @@ angular.module('ontrack.extension.notifications', [
             controller: 'NotificationRecordingsCtrl'
         });
     })
-    .controller('NotificationRecordingsCtrl', function ($scope, ot, otGraphqlService) {
+    .controller('NotificationRecordingsCtrl', function ($scope, ot, otAlertService, otGraphqlService) {
         const view = ot.view();
         view.title = "Notification recordings";
         view.breadcrumbs = ot.homeBreadcrumbs();
@@ -317,6 +317,16 @@ angular.module('ontrack.extension.notifications', [
             size: pageSize
         };
 
+        const clearRecordsQuery = `
+            mutation {
+                deleteNotificationRecords(input: {}) {
+                    errors {
+                        message
+                    }
+                }
+            }
+        `;
+
         $scope.loadingRecords = false;
         const loadRecords = () => {
             $scope.loadingRecords = true;
@@ -330,10 +340,21 @@ angular.module('ontrack.extension.notifications', [
 
         loadRecords();
 
+        $scope.refresh = loadRecords;
+
         $scope.switchPage = (pageRequest) => {
             queryVars.offset = pageRequest.offset;
             queryVars.size = pageSize;
             loadRecords();
+        };
+
+        $scope.deleteRecords = () => {
+              otAlertService.confirm({
+                  title: "Record deletion",
+                  message: "Are you sure to delete ALL notification records?"
+              }).then(() => {
+                    otGraphqlService.pageGraphQLCall(clearRecordsQuery)
+              }).then(loadRecords);
         };
     })
 ;

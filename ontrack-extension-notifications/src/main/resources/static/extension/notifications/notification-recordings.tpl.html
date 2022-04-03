@@ -60,6 +60,14 @@
                     Older records
                 </button>
                 {{ navigation.totalSize }} records
+                <button class="btn btn-info" ng-click="refresh()">
+                    <span class="fa fa-refresh"></span>
+                    Refresh
+                </button>
+                <button class="btn btn-danger" ng-click="deleteRecords()">
+                    <span class="fa fa-trash"></span>
+                    Delete ALL records
+                </button>
             </td>
         </tr>
         </tfoot>
