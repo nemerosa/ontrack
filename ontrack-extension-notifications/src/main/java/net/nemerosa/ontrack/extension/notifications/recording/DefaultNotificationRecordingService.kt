@@ -14,6 +14,11 @@ class DefaultNotificationRecordingService(
     private val securityService: SecurityService,
 ) : NotificationRecordingService {
 
+    override fun clearAll() {
+        securityService.checkGlobalFunction(NotificationRecordingAccess::class.java)
+        storageService.deleteWithFilter(STORE)
+    }
+
     override fun filter(filter: NotificationRecordFilter): PaginatedList<NotificationRecord> {
         securityService.checkGlobalFunction(NotificationRecordingAccess::class.java)
 
@@ -31,13 +36,14 @@ class DefaultNotificationRecordingService(
         return PaginatedList.create(records, filter.offset, filter.size, total)
     }
 
-    override fun record(record: NotificationRecord) {
+    override fun record(record: NotificationRecord): String {
         val id = UUID.randomUUID().toString()
         storageService.store(
             STORE,
             id,
             record,
         )
+        return id
     }
 
     companion object {

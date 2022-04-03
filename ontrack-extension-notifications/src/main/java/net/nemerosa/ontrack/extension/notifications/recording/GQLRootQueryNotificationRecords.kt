@@ -13,7 +13,7 @@ class GQLRootQueryNotificationRecords(
     private val gqlTypeNotificationRecord: GQLTypeNotificationRecord,
 ) : GQLRootQuery {
     override fun getFieldDefinition(): GraphQLFieldDefinition =
-        gqlPaginatedListFactory.createPaginatedField<Any, NotificationRecord>(
+        gqlPaginatedListFactory.createPaginatedField<Any?, NotificationRecord>(
             cache = GQLTypeCache(),
             fieldName = "notificationRecords",
             fieldDescription = "Access to the notification recordings",

@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.model.Notification
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecord
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecordingService
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.springframework.stereotype.Service
@@ -33,14 +34,14 @@ class DefaultNotificationProcessingService(
         if (validatedConfig.config != null) {
             try {
                 val result = channel.publish(validatedConfig.config, item.event)
-                notificationRecordingService.record(
+                record(
                     channel = channel.type,
                     channelConfig = validatedConfig.config,
                     event = item.event,
                     result = result,
                 )
             } catch (any: Exception) {
-                notificationRecordingService.record(
+                record(
                     channel = channel.type,
                     channelConfig = validatedConfig.config,
                     event = item.event,
@@ -48,7 +49,7 @@ class DefaultNotificationProcessingService(
                 )
             }
         } else {
-            notificationRecordingService.record(
+            record(
                 channel = channel.type,
                 invalidChannelConfig = item.channelConfig,
                 event = item.event,
@@ -56,7 +57,7 @@ class DefaultNotificationProcessingService(
         }
     }
 
-    private fun NotificationRecordingService.record(
+    private fun record(
         channel: String,
         channelConfig: Any,
         event: Event,
@@ -65,14 +66,14 @@ class DefaultNotificationProcessingService(
         notificationRecordingService.record(
             NotificationRecord(
                 channel = channel,
-                channelConfig = channelConfig,
-                event = event,
+                channelConfig = channelConfig.asJson(),
+                event = event.asJson(),
                 result = result,
             )
         )
     }
 
-    private fun NotificationRecordingService.record(
+    private fun record(
         channel: String,
         channelConfig: Any,
         event: Event,
@@ -81,23 +82,25 @@ class DefaultNotificationProcessingService(
         notificationRecordingService.record(
             NotificationRecord(
                 channel = channel,
-                channelConfig = channelConfig,
-                event = event,
+                channelConfig = channelConfig.asJson(),
+                event = event.asJson(),
                 result = NotificationResult.error(ExceptionUtils.getStackTrace(error)),
             )
         )
     }
 
-    private fun NotificationRecordingService.record(
+    private fun record(
         channel: String,
         invalidChannelConfig: JsonNode,
         event: Event,
     ) {
-        NotificationRecord(
-            channel = channel,
-            channelConfig = invalidChannelConfig,
-            event = event,
-            result = NotificationResult.invalidConfiguration(),
+        notificationRecordingService.record(
+            NotificationRecord(
+                channel = channel,
+                channelConfig = invalidChannelConfig,
+                event = event.asJson(),
+                result = NotificationResult.invalidConfiguration(),
+            )
         )
     }
 

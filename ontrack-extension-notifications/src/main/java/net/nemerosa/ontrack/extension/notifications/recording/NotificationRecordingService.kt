@@ -7,7 +7,9 @@ import net.nemerosa.ontrack.model.pagination.PaginatedList
  */
 interface NotificationRecordingService {
 
-    fun record(record: NotificationRecord)
+    fun clearAll()
+
+    fun record(record: NotificationRecord): String
 
     fun filter(filter: NotificationRecordFilter): PaginatedList<NotificationRecord>
 
