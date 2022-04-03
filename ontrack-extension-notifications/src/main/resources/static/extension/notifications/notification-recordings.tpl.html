@@ -51,6 +51,10 @@
         <tfoot>
         <tr>
             <td colspan="4">
+                <select class="form-control col-md-2" ng-model="filter.notificationResultType" ng-change="refresh()" ng-options="type as type for type in notificationResultTypeValues">
+                    <option value="">All types</option>
+                </select>
+                &nbsp;
                 <button class="btn btn-default" ng-disabled="!navigation.previousPage" ng-click="switchPage(navigation.previousPage)">
                     <span class="fa fa-step-backward"></span>
                     Newer records

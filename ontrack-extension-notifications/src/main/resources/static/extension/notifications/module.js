@@ -280,10 +280,17 @@ angular.module('ontrack.extension.notifications', [
             query NotificationRecordings(
                 $offset: Int!,
                 $size: Int!,
+                $resultType: NotificationResultType,
             ) {
+                notificationResultType: __type(name: "NotificationResultType") {
+                  enumValues {
+                    name
+                  }
+                }
                 notificationRecords(
                     offset: $offset,
                     size: $size,
+                    resultType: $resultType,
                 ) {
                     pageInfo {
                       totalSize
@@ -314,7 +321,8 @@ angular.module('ontrack.extension.notifications', [
         const pageSize = 10;
         const queryVars = {
             offset: 0,
-            size: pageSize
+            size: pageSize,
+            resultType: null,
         };
 
         const clearRecordsQuery = `
@@ -327,12 +335,28 @@ angular.module('ontrack.extension.notifications', [
             }
         `;
 
+        $scope.notificationResultTypeValues = [];
+
+        $scope.filter = {
+            notificationResultType: null
+        };
+
         $scope.loadingRecords = false;
         const loadRecords = () => {
             $scope.loadingRecords = true;
+            if ($scope.filter.notificationResultType) {
+                queryVars.resultType = $scope.filter.notificationResultType;
+            } else {
+                queryVars.resultType = null;
+            }
             otGraphqlService.pageGraphQLCall(query, queryVars).then(data => {
                 $scope.navigation = data.notificationRecords.pageInfo;
                 $scope.records = data.notificationRecords.pageItems;
+                if ($scope.notificationResultTypeValues.length === 0) {
+                    data.notificationResultType.enumValues.forEach(value => {
+                        $scope.notificationResultTypeValues.push(value.name);
+                    });
+                }
             }).finally(() => {
                 $scope.loadingRecords = false;
             });
