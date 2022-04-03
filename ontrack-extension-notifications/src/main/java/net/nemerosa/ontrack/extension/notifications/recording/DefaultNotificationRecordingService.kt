@@ -45,6 +45,7 @@ class DefaultNotificationRecordingService(
             queryVariables = queryVariables,
             offset = filter.offset,
             size = filter.size,
+            orderQuery = "ORDER BY data::jsonb->>'timestamp' DESC"
         )
 
         return PaginatedList.create(records, filter.offset, filter.size, total)
