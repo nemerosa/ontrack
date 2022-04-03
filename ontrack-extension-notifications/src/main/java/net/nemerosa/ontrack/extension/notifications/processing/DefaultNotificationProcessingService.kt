@@ -1,10 +1,13 @@
 package net.nemerosa.ontrack.extension.notifications.processing
 
 import com.fasterxml.jackson.databind.JsonNode
+import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
+import net.nemerosa.ontrack.extension.notifications.metrics.NotificationsMetrics
+import net.nemerosa.ontrack.extension.notifications.metrics.incrementForProcessing
 import net.nemerosa.ontrack.extension.notifications.model.Notification
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecord
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecordingService
@@ -19,14 +22,17 @@ import org.springframework.transaction.annotation.Transactional
 class DefaultNotificationProcessingService(
     private val notificationChannelRegistry: NotificationChannelRegistry,
     private val notificationRecordingService: NotificationRecordingService,
+    private val meterRegistry: MeterRegistry,
 ) : NotificationProcessingService {
 
-    // TODO Notifications processing metrics
-
     override fun process(item: Notification) {
+        meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_started, item)
         val channel = notificationChannelRegistry.findChannel(item.channel)
         if (channel != null) {
+            meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_started, item)
             process(channel, item)
+        } else {
+            meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_unknown, item)
         }
     }
 
@@ -34,7 +40,9 @@ class DefaultNotificationProcessingService(
         val validatedConfig = channel.validate(item.channelConfig)
         if (validatedConfig.config != null) {
             try {
+                meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_publishing, item)
                 val result = channel.publish(validatedConfig.config, item.event)
+                meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_result, item, result)
                 record(
                     channel = channel.type,
                     channelConfig = validatedConfig.config,
@@ -42,6 +50,7 @@ class DefaultNotificationProcessingService(
                     result = result,
                 )
             } catch (any: Exception) {
+                meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_error, item)
                 record(
                     channel = channel.type,
                     channelConfig = validatedConfig.config,
@@ -50,6 +59,7 @@ class DefaultNotificationProcessingService(
                 )
             }
         } else {
+            meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_invalid, item)
             record(
                 channel = channel.type,
                 invalidChannelConfig = item.channelConfig,

@@ -20,4 +20,12 @@ object NotificationsMetrics {
     const val event_dispatching_dequeued = "${prefix}_event_dispatching_dequeued"
     const val event_dispatching_result = "${prefix}_event_dispatching_result"
 
+    const val event_processing_started = "${prefix}_event_processing_started"
+    const val event_processing_channel_started = "${prefix}_event_processing_channel_started"
+    const val event_processing_channel_unknown = "${prefix}_event_processing_channel_unknown"
+    const val event_processing_channel_invalid = "${prefix}_event_processing_channel_invalid"
+    const val event_processing_channel_publishing = "${prefix}_event_processing_channel_publishing"
+    const val event_processing_channel_result = "${prefix}_event_processing_channel_result"
+    const val event_processing_channel_error = "${prefix}_event_processing_channel_error"
+
 }
