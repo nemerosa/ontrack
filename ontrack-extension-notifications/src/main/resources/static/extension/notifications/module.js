@@ -377,7 +377,7 @@ angular.module('ontrack.extension.notifications', [
                   title: "Record deletion",
                   message: "Are you sure to delete ALL notification records?"
               }).then(() => {
-                    otGraphqlService.pageGraphQLCall(clearRecordsQuery)
+                    otGraphqlService.pageGraphQLCall(clearRecordsQuery);
               }).then(loadRecords);
         };
     })
