@@ -19,11 +19,33 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="record in records">
-            <td>{{ record.timestamp }}</td>
+        <tr ng-repeat-start="record in records">
+            <td>
+                <span class="fa fa-eye ot-command" ng-hide="record.details" title="Show more details" ng-click="record.details = true;"></span>
+                <span class="fa fa-eye-slash ot-command" ng-show="record.details" title="Hide the details" ng-click="record.details = false;"></span>
+                {{ record.timestamp }}
+            </td>
             <td><code>{{ record.channel }}</code></td>
             <td><code>{{ record.result.type }}</code></td>
             <td><code ng-if="record.result.id">{{ record.result.id }}</code></td>
+        </tr>
+        <tr ng-repeat-end ng-if="record.details">
+            <td colspan="4">
+                <dl>
+                    <dt>Channel config</dt>
+                    <dd>
+                        <code>{{ record.channelConfig }}</code>
+                    </dd>
+                    <dt>Event</dt>
+                    <dd>
+                        <code>{{ record.event }}</code>
+                    </dd>
+                    <dt ng-if="record.result.message">Message</dt>
+                    <dd ng-if="record.result.message">
+                        <code>{{ record.result.message }}</code>
+                    </dd>
+                </dl>
+            </td>
         </tr>
         </tbody>
         <tfoot>
