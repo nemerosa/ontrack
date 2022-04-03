@@ -261,4 +261,48 @@ angular.module('ontrack.extension.notifications', [
         loadSubscriptions();
 
     })
+    .config(function ($stateProvider) {
+        $stateProvider.state('notification-recordings', {
+            url: '/extension/notifications/notification-recordings',
+            templateUrl: 'extension/notifications/notification-recordings.tpl.html',
+            controller: 'NotificationRecordingsCtrl'
+        });
+    })
+    .controller('NotificationRecordingsCtrl', function ($scope, ot, otGraphqlService) {
+        const view = ot.view();
+        view.title = "Notification recordings";
+        view.breadcrumbs = ot.homeBreadcrumbs();
+        view.commands = [
+            ot.viewCloseCommand('/home')
+        ];
+
+        const query = `
+            query NotificationRecordings {
+                notificationRecords {
+                    pageItems {
+                        channel
+                        channelConfig
+                        event
+                        result {
+                            type
+                            id
+                            message
+                        }
+                    }
+                }
+            }
+        `;
+
+        $scope.loadingRecords = false;
+        const loadRecords = () => {
+            $scope.loadingRecords = true;
+            otGraphqlService.pageGraphQLCall(query).then(data => {
+                $scope.records = data.notificationRecords.pageItems;
+            }).finally(() => {
+                $scope.loadingRecords = false;
+            });
+        };
+
+        loadRecords();
+    })
 ;

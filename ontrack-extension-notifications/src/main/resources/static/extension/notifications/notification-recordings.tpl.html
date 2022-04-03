@@ -1,0 +1,29 @@
+<ot-view>
+
+    <div class="row" ng-show="loadingRecords">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the notification recordings...
+            </div>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Channel</th>
+            <th>Result</th>
+            <th>Channel ID</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="record in records">
+            <td><code>{{ record.channel }}</code></td>
+            <td><code>{{ record.result.type }}</code></td>
+            <td><code ng-if="record.result.id">{{ record.result.id }}</code></td>
+        </tr>
+        </tbody>
+    </table>
+
+</ot-view>
