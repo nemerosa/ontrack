@@ -1,10 +1,13 @@
 package net.nemerosa.ontrack.extension.notifications.recording
 
+import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Duration
 import java.util.*
 
 @Service
@@ -17,6 +20,18 @@ class DefaultNotificationRecordingService(
     override fun clearAll() {
         securityService.checkGlobalFunction(NotificationRecordingAccess::class.java)
         storageService.deleteWithFilter(STORE)
+    }
+
+    override fun clear(retentionSeconds: Long) {
+        securityService.checkGlobalFunction(NotificationRecordingAccess::class.java)
+        val ref = Time.now() - Duration.ofSeconds(retentionSeconds)
+        storageService.deleteWithFilter(
+            store = STORE,
+            query = "data::jsonb->>'timestamp' <= :timestamp",
+            queryVariables = mapOf(
+                "timestamp" to Time.store(ref)
+            )
+        )
     }
 
     override fun filter(filter: NotificationRecordFilter): PaginatedList<NotificationRecord> {

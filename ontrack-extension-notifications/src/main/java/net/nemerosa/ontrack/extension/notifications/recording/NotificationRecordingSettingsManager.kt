@@ -25,14 +25,12 @@ class NotificationRecordingSettingsManager(
     override fun doSaveSettings(settings: NotificationRecordingSettings) {
         settingsRepository.setBoolean<NotificationRecordingSettings>(settings::enabled)
         settingsRepository.setLong<NotificationRecordingSettings>(settings::retentionSeconds)
-        settingsRepository.setLong<NotificationRecordingSettings>(settings::retentionCount)
         settingsRepository.setLong<NotificationRecordingSettings>(settings::cleanupIntervalSeconds)
     }
 
     override fun getSettingsForm(settings: NotificationRecordingSettings): Form = Form.create()
         .yesNoField(NotificationRecordingSettings::enabled, settings.enabled)
         .longField(NotificationRecordingSettings::retentionSeconds, settings.retentionSeconds)
-        .longField(NotificationRecordingSettings::retentionCount, settings.retentionCount)
         .longField(NotificationRecordingSettings::cleanupIntervalSeconds, settings.cleanupIntervalSeconds)
 
     override fun getId(): String = "notification-recordings"

@@ -20,10 +20,6 @@ class NotificationRecordingSettingsProvider(
             NotificationRecordingSettings::retentionSeconds,
             NotificationRecordingSettings.DEFAULT_RETENTION_SECONDS
         ),
-        retentionCount = settingsRepository.getLong(
-            NotificationRecordingSettings::retentionCount,
-            NotificationRecordingSettings.DEFAULT_RETENTION_COUNT
-        ),
         cleanupIntervalSeconds = settingsRepository.getLong(
             NotificationRecordingSettings::cleanupIntervalSeconds,
             NotificationRecordingSettings.DEFAULT_CLEANUP_INTERVAL_SECONDS

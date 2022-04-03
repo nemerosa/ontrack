@@ -13,4 +13,6 @@ interface NotificationRecordingService {
 
     fun filter(filter: NotificationRecordFilter): PaginatedList<NotificationRecord>
 
+    fun clear(retentionSeconds: Long)
+
 }
