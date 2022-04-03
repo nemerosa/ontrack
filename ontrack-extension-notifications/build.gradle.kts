@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":ontrack-repository-support"))
     implementation(project(":ontrack-rabbitmq"))
     implementation("org.springframework:spring-context")
+    implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
 
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))

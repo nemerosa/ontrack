@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 @Component
 class DefaultWebhookPayloadRenderer : WebhookPayloadRenderer {
 
-    override fun render(payload: WebhookPayload<*>): ByteArray {
-        return payload.asJson().toPrettyString().toByteArray()
+    override fun render(payload: WebhookPayload<*>): String {
+        return payload.asJson().toPrettyString()
     }
 }

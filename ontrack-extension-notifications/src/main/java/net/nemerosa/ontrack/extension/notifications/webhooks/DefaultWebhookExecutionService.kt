@@ -1,19 +1,24 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
+import org.apache.commons.lang3.exception.ExceptionUtils
 import org.springframework.stereotype.Service
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpRequest.BodyPublishers
+import java.net.http.HttpResponse
 import java.net.http.HttpResponse.BodyHandlers
 import java.time.Duration
+import java.time.LocalDateTime
 
 @Service
 class DefaultWebhookExecutionService(
     private val webhookPayloadRenderer: WebhookPayloadRenderer,
     private val webhookAuthenticatorRegistry: WebhookAuthenticatorRegistry,
     private val cachedSettingsService: CachedSettingsService,
+    private val webhookExchangeService: WebhookExchangeService,
 ) : WebhookExecutionService {
 
     override fun send(webhook: Webhook, payload: WebhookPayload<*>) {
@@ -28,6 +33,8 @@ class DefaultWebhookExecutionService(
         val settingsTimeout = Duration.ofMinutes(settings.timeoutMinutes.toLong())
         val timeout = maxOf(settingsTimeout, webhook.timeout)
 
+        val payloadString = webhookPayloadRenderer.render(payload)
+
         val request: HttpRequest =
             HttpRequest.newBuilder()
                 .uri(URI.create(webhook.url))
@@ -38,18 +45,69 @@ class DefaultWebhookExecutionService(
                     authenticate(webhook, this)
                 }
                 // Payload
-                .POST(BodyPublishers.ofByteArray(webhookPayloadRenderer.render(payload)))
+                .POST(BodyPublishers.ofString(payloadString))
                 // OK
                 .build()
 
-        client.sendAsync(request, BodyHandlers.ofString())
-            .thenApply { response ->
-                // TODO Do we need to check the status code here?
-                response.body()
-            }
-            .thenAccept { response ->
-                TODO("Logs the response and other meta information")
-            }
+        val start = Time.now()
+
+        try {
+            client
+                .sendAsync(request, BodyHandlers.ofString())
+                .thenAccept { response ->
+                    store(webhook, payload, payloadString, start, response)
+                }
+        } catch (any: Exception) {
+            store(webhook, payload, payloadString, start, any)
+        }
+    }
+
+    private fun store(
+        webhook: Webhook,
+        payload: WebhookPayload<*>,
+        payloadString: String,
+        start: LocalDateTime,
+        any: Exception,
+    ) {
+        webhookExchangeService.store(
+            WebhookExchange(
+                uuid = payload.uuid,
+                webhook = webhook.name,
+                request = WebhookRequest(
+                    timestamp = start,
+                    type = payload.type,
+                    payload = payloadString,
+                ),
+                response = null,
+                stack = ExceptionUtils.getStackTrace(any),
+            )
+        )
+    }
+
+    private fun store(
+        webhook: Webhook,
+        payload: WebhookPayload<*>,
+        payloadString: String,
+        start: LocalDateTime,
+        response: HttpResponse<String>,
+    ) {
+        webhookExchangeService.store(
+            WebhookExchange(
+                uuid = payload.uuid,
+                webhook = webhook.name,
+                request = WebhookRequest(
+                    timestamp = start,
+                    type = payload.type,
+                    payload = payloadString,
+                ),
+                response = WebhookResponse(
+                    timestamp = Time.now(),
+                    code = response.statusCode(),
+                    payload = response.body() ?: "",
+                ),
+                stack = null,
+            )
+        )
     }
 
     private fun authenticate(webhook: Webhook, builder: HttpRequest.Builder) {

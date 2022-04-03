@@ -5,6 +5,6 @@ package net.nemerosa.ontrack.extension.notifications.webhooks
  */
 interface WebhookPayloadRenderer {
 
-    fun render(payload: WebhookPayload<*>): ByteArray
+    fun render(payload: WebhookPayload<*>): String
 
 }
