@@ -29,9 +29,9 @@ class WebhookNotificationChannel(
         // Runs the webhook
         return try {
             webhookExecutionService.send(webhook, payload)
-            NotificationResult.ok()
+            NotificationResult.ok(payload.uuid.toString())
         } catch (ex: Exception) {
-            NotificationResult.error("Webhook failed: ${ex.message}")
+            NotificationResult.error("Webhook failed: ${ex.message}", id = payload.uuid.toString())
         }
     }
 
