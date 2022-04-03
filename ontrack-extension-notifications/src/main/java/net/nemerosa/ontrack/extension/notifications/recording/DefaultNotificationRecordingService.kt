@@ -22,13 +22,27 @@ class DefaultNotificationRecordingService(
     override fun filter(filter: NotificationRecordFilter): PaginatedList<NotificationRecord> {
         securityService.checkGlobalFunction(NotificationRecordingAccess::class.java)
 
+        val queries = mutableListOf<String>()
+        val queryVariables = mutableMapOf<String, String>()
+
+        if (filter.resultType != null) {
+            queries += "data::jsonb->'result'->>'type' = :resultType"
+            queryVariables["resultType"] = filter.resultType.name
+        }
+
+        val query = queries.joinToString(" AND ") { "( $it )" }
+
         val total = storageService.count(
             store = STORE,
+            query = query,
+            queryVariables = queryVariables,
         )
 
         val records = storageService.filter(
             store = STORE,
             type = NotificationRecord::class,
+            query = query,
+            queryVariables = queryVariables,
             offset = filter.offset,
             size = filter.size,
         )

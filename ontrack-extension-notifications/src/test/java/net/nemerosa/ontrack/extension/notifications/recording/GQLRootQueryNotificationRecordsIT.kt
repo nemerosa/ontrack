@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannel
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredIntField
 import net.nemerosa.ontrack.json.getRequiredTextField
+import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.test.assertJsonNotNull
 import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.jupiter.api.Test
@@ -55,6 +56,60 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
                     assertEquals("OK", path("result").getRequiredTextField("type"))
                     assertJsonNull(path("result").path("id"))
                     assertJsonNull(path("result").path("message"))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting the list of notifications filtered by result type`() {
+        asAdmin {
+            notificationRecordingService.clearAll()
+            // One event
+            val project = project {}
+            val event = eventFactory.newProject(project)
+            // Records a OK notification
+            notificationRecordingService.record(
+                NotificationRecord(
+                    channel = "mock",
+                    channelConfig = MockNotificationChannelConfig("#target").asJson(),
+                    event = event.asJson(),
+                    result = NotificationResult.ok(),
+                )
+            )
+            // Records a misconfigured notification
+            notificationRecordingService.record(
+                NotificationRecord(
+                    channel = "mock",
+                    channelConfig = MockNotificationChannelConfig("not-valid").asJson(),
+                    event = event.asJson(),
+                    result = NotificationResult.invalidConfiguration()
+                )
+            )
+            // Getting this notification
+            run("""{
+                notificationRecords(
+                    resultType: INVALID_CONFIGURATION
+                ) {
+                    pageItems {
+                        channel
+                        channelConfig
+                        event
+                        result {
+                            type
+                            id
+                            message
+                        }
+                    }
+                }
+            }""") { data ->
+                assertJsonNotNull(data.path("notificationRecords").path("pageItems").path(0)) {
+                    assertEquals("mock", getRequiredTextField("channel"))
+                    assertEquals("not-valid", path("channelConfig").getRequiredTextField("target"))
+                    assertEquals(project.id(), path("event").path("entities").path("PROJECT").getRequiredIntField("id"))
+                    assertEquals("INVALID_CONFIGURATION", path("result").getRequiredTextField("type"))
+                    assertJsonNull(path("result").path("id"))
+                    assertEquals("Invalid configuration", path("result").getTextField("message"))
                 }
             }
         }
