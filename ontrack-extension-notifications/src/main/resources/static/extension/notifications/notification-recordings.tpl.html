@@ -12,6 +12,7 @@
     <table class="table">
         <thead>
         <tr>
+            <th>Timestamp</th>
             <th>Channel</th>
             <th>Result</th>
             <th>Channel ID</th>
@@ -19,6 +20,7 @@
         </thead>
         <tbody>
         <tr ng-repeat="record in records">
+            <td>{{ record.timestamp }}</td>
             <td><code>{{ record.channel }}</code></td>
             <td><code>{{ record.result.type }}</code></td>
             <td><code ng-if="record.result.id">{{ record.result.id }}</code></td>

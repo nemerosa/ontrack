@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.notifications.channels.GQLTypeNotification
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
+import net.nemerosa.ontrack.graphql.support.dateField
 import net.nemerosa.ontrack.graphql.support.stringField
 import net.nemerosa.ontrack.graphql.support.toNotNull
 import net.nemerosa.ontrack.json.asJson
@@ -22,6 +23,10 @@ class GQLTypeNotificationRecord(
         GraphQLObjectType.newObject()
             .name(typeName)
             .description("Notification record")
+            .dateField(
+                NotificationRecord::timestamp.name,
+                getPropertyDescription(NotificationRecord::timestamp)
+            )
             .stringField(NotificationRecord::channel)
             .field {
                 it.name(NotificationRecord::channelConfig.name)

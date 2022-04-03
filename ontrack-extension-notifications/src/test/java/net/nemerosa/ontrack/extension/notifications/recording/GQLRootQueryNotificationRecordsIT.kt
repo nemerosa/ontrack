@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.recording
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
@@ -28,6 +29,7 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
             // Records a notification
             notificationRecordingService.record(
                 NotificationRecord(
+                    timestamp = Time.now(),
                     channel = "mock",
                     channelConfig = MockNotificationChannelConfig("#target").asJson(),
                     event = event.asJson(),
@@ -38,6 +40,7 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
             run("""{
                 notificationRecords {
                     pageItems {
+                        timestamp
                         channel
                         channelConfig
                         event
@@ -71,6 +74,7 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
             // Records a OK notification
             notificationRecordingService.record(
                 NotificationRecord(
+                    timestamp = Time.now(),
                     channel = "mock",
                     channelConfig = MockNotificationChannelConfig("#target").asJson(),
                     event = event.asJson(),
@@ -80,6 +84,7 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
             // Records a misconfigured notification
             notificationRecordingService.record(
                 NotificationRecord(
+                    timestamp = Time.now(),
                     channel = "mock",
                     channelConfig = MockNotificationChannelConfig("not-valid").asJson(),
                     event = event.asJson(),
@@ -92,6 +97,7 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
                     resultType: INVALID_CONFIGURATION
                 ) {
                     pageItems {
+                        timestamp
                         channel
                         channelConfig
                         event

@@ -280,6 +280,7 @@ angular.module('ontrack.extension.notifications', [
             query NotificationRecordings {
                 notificationRecords {
                     pageItems {
+                        timestamp
                         channel
                         channelConfig
                         event

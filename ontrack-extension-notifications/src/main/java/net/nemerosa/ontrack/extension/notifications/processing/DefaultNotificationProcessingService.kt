@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.processing
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
@@ -65,6 +66,7 @@ class DefaultNotificationProcessingService(
     ) {
         notificationRecordingService.record(
             NotificationRecord(
+                timestamp = Time.now(),
                 channel = channel,
                 channelConfig = channelConfig.asJson(),
                 event = event.asJson(),
@@ -81,6 +83,7 @@ class DefaultNotificationProcessingService(
     ) {
         notificationRecordingService.record(
             NotificationRecord(
+                timestamp = Time.now(),
                 channel = channel,
                 channelConfig = channelConfig.asJson(),
                 event = event.asJson(),
@@ -96,6 +99,7 @@ class DefaultNotificationProcessingService(
     ) {
         notificationRecordingService.record(
             NotificationRecord(
+                timestamp = Time.now(),
                 channel = channel,
                 channelConfig = invalidChannelConfig,
                 event = event.asJson(),
