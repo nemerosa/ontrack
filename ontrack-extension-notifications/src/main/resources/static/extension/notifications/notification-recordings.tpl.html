@@ -26,6 +26,21 @@
             <td><code ng-if="record.result.id">{{ record.result.id }}</code></td>
         </tr>
         </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="4">
+                <button class="btn btn-default" ng-disabled="!navigation.previousPage" ng-click="switchPage(navigation.previousPage)">
+                    <span class="fa fa-step-backward"></span>
+                    Newer records
+                </button>
+                <button class="btn btn-default" ng-disabled="!navigation.nextPage" ng-click="switchPage(navigation.nextPage)">
+                    <span class="fa fa-step-forward"></span>
+                    Older records
+                </button>
+                {{ navigation.totalSize }} records
+            </td>
+        </tr>
+        </tfoot>
     </table>
 
 </ot-view>

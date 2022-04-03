@@ -277,8 +277,25 @@ angular.module('ontrack.extension.notifications', [
         ];
 
         const query = `
-            query NotificationRecordings {
-                notificationRecords {
+            query NotificationRecordings(
+                $offset: Int!,
+                $size: Int!,
+            ) {
+                notificationRecords(
+                    offset: $offset,
+                    size: $size,
+                ) {
+                    pageInfo {
+                      totalSize
+                      nextPage {
+                        offset
+                        size
+                      }
+                      previousPage {
+                        offset
+                        size
+                      }
+                    }
                     pageItems {
                         timestamp
                         channel
@@ -294,10 +311,17 @@ angular.module('ontrack.extension.notifications', [
             }
         `;
 
+        const pageSize = 10;
+        const queryVars = {
+            offset: 0,
+            size: pageSize
+        };
+
         $scope.loadingRecords = false;
         const loadRecords = () => {
             $scope.loadingRecords = true;
-            otGraphqlService.pageGraphQLCall(query).then(data => {
+            otGraphqlService.pageGraphQLCall(query, queryVars).then(data => {
+                $scope.navigation = data.notificationRecords.pageInfo;
                 $scope.records = data.notificationRecords.pageItems;
             }).finally(() => {
                 $scope.loadingRecords = false;
@@ -305,5 +329,11 @@ angular.module('ontrack.extension.notifications', [
         };
 
         loadRecords();
+
+        $scope.switchPage = (pageRequest) => {
+            queryVars.offset = pageRequest.offset;
+            queryVars.size = pageSize;
+            loadRecords();
+        };
     })
 ;
