@@ -1,11 +1,16 @@
 package net.nemerosa.ontrack.extension.notifications.channels
 
+import net.nemerosa.ontrack.model.annotations.APIDescription
+
 /**
  * @param id ID returned by the channel
  */
 data class NotificationResult(
+    @APIDescription("Type of result")
     val type: NotificationResultType,
+    @APIDescription("Optional ID for the message into the channel")
     val id: String?,
+    @APIDescription("Result message")
     val message: String?,
 ) {
     companion object {

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql.support
 
+import com.fasterxml.jackson.databind.JsonNode
 import graphql.Scalars.*
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
@@ -104,7 +105,7 @@ inline fun <reified E : Enum<E>> TypeBuilder.enumField(
 fun TypeBuilder.stringField(property: KProperty<String?>, description: String? = null): GraphQLObjectType.Builder =
     field {
         it.name(property.name)
-            .description(getDescription(property, description))
+            .description(getPropertyDescription(property, description))
             .type(nullableOutputType(GraphQLString, property.returnType.isMarkedNullable))
     }
 
