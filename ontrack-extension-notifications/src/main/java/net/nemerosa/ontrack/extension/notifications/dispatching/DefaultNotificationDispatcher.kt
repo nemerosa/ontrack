@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.notifications.dispatching
 
-import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.extension.notifications.model.Notification
@@ -13,27 +12,26 @@ import org.springframework.stereotype.Component
 class DefaultNotificationDispatcher(
     private val notificationChannelRegistry: NotificationChannelRegistry,
     private val notificationQueue: NotificationQueue,
-    private val meterRegistry: MeterRegistry,
 ) : NotificationDispatcher {
 
     override fun dispatchEvent(event: Event, eventSubscription: EventSubscription): NotificationDispatchingResult {
         // If the subscription is disabled, not doing anything
         if (eventSubscription.disabled) {
-            return NotificationDispatchingResult.IGNORED
+            return NotificationDispatchingResult.SUBSCRIPTION_DISABLED
         }
         // Gets the corresponding channel
         val channel = notificationChannelRegistry.findChannel(eventSubscription.channel)
-        return if (channel != null && channel.enabled) {
+        return if (channel == null) {
+            NotificationDispatchingResult.CHANNEL_UNKNOWN
+        } else if (channel.enabled) {
             // Dispatching
             if (dispatchEventToChannel(event, eventSubscription, channel)) {
                 NotificationDispatchingResult.SENT
             } else {
-                NotificationDispatchingResult.IGNORED
+                NotificationDispatchingResult.UNSENT
             }
-        }
-        // Channel has been ignored
-        else {
-            NotificationDispatchingResult.IGNORED
+        } else {
+            NotificationDispatchingResult.CHANNEL_DISABLED
         }
     }
 

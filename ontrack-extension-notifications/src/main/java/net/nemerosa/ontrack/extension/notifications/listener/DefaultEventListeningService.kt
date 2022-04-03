@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.notifications.listener
 import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.notifications.dispatching.NotificationDispatcher
 import net.nemerosa.ontrack.extension.notifications.metrics.NotificationsMetrics
+import net.nemerosa.ontrack.extension.notifications.metrics.incrementForDispatching
 import net.nemerosa.ontrack.extension.notifications.metrics.incrementForEvent
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionService
 import net.nemerosa.ontrack.model.events.Event
@@ -25,8 +26,14 @@ class DefaultEventListeningService(
         eventSubscriptionService.forEveryMatchingSubscription(event) { subscription ->
             // Sends the match to the dispatcher
             val result = notificationDispatcher.dispatchEvent(event, subscription)
+            // Result metrics for the dispatching
+            meterRegistry.incrementForDispatching(
+                NotificationsMetrics.event_dispatching_result,
+                event,
+                subscription,
+                result
+            )
         }
-        // TODO Sending metrics about the event dispatching
     }
 
 }

@@ -1,8 +1,11 @@
 package net.nemerosa.ontrack.extension.notifications.queue
 
+import io.micrometer.core.instrument.MeterRegistry
+import net.nemerosa.ontrack.extension.notifications.metrics.NotificationsMetrics
 import net.nemerosa.ontrack.extension.notifications.processing.NotificationProcessingService
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
@@ -21,6 +24,7 @@ class AsyncNotificationQueueListener(
     private val notificationProcessingService: NotificationProcessingService,
     private val applicationLogService: ApplicationLogService,
     private val notificationQueueItemConverter: NotificationQueueItemConverter,
+    private val meterRegistry: MeterRegistry,
 ) : RabbitListenerConfigurer {
 
     override fun configureRabbitListeners(registrar: RabbitListenerEndpointRegistrar) {
@@ -55,13 +59,13 @@ class AsyncNotificationQueueListener(
             val payload = body.parseAsJson().parse<NotificationQueueItem>()
             securityService.asAdmin {
                 val notification = notificationQueueItemConverter.convertFromQueue(payload)
-//           val queue = message.messageProperties.consumerQueue
-//          TODO  meterRegistry.increment(
-//                payload,
-//                IngestionMetrics.Queue.consumedCount,
-//                INGESTION_METRIC_QUEUE_TAG to queue
-//            )
-                // TODO ingestionHookPayloadStorage.queue(payload, queue)
+                val queue = message.messageProperties.consumerQueue
+                meterRegistry.increment(
+                    NotificationsMetrics.event_dispatching_dequeued,
+                    "event" to notification.event.eventType.id,
+                    "channel" to notification.channel,
+                    "queue" to queue,
+                )
                 notificationProcessingService.process(notification)
             }
         } catch (any: Throwable) {
