@@ -68,6 +68,11 @@ class DefaultWebhookAdminService(
         )
     }
 
+    override fun deleteWebhook(name: String) {
+        securityService.checkGlobalFunction(WebhookManagement::class.java)
+        storageService.delete(STORE, name)
+    }
+
     override fun findWebhookByName(name: String): Webhook? =
         storageService.find(
             STORE,

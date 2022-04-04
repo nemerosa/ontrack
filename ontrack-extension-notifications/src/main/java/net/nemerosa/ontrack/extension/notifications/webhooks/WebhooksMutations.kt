@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.notifications.webhooks
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.springframework.stereotype.Component
 import java.time.Duration
 
@@ -29,6 +30,12 @@ class WebhooksMutations(
                     config = input.authenticationConfig,
                 )
             )
+        },
+        unitMutation<DeleteWebhookInput>(
+            name = "deleteWebhook",
+            description = "Deleting an existing webhook"
+        ) { input ->
+            webhookAdminService.deleteWebhook(input.name)
         }
     )
 }
@@ -40,4 +47,10 @@ data class CreateWebhookInput(
     val timeoutSeconds: Long,
     val authenticationType: String,
     val authenticationConfig: JsonNode,
+)
+
+
+data class DeleteWebhookInput(
+    @APIDescription("Name of the webhook to delete")
+    val name: String,
 )

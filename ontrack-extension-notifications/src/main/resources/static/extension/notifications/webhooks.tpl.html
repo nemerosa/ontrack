@@ -34,6 +34,11 @@
             <td>{{ webhook.url }}</td>
             <td>{{ webhook.timeoutSeconds }}s</td>
             <td>{{ webhook.authenticationType }}</td>
+            <td>
+                <span class="ot-command" ng-click="deleteWebhook(webhook)">
+                    <span class="fa fa-trash"></span> Delete
+                </span>
+            </td>
         </tr>
         </tbody>
     </table>

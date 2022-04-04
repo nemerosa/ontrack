@@ -618,6 +618,20 @@ angular.module('ontrack.extension.notifications', [
             }
         `;
 
+        const deleteWebhookQuery = `
+            mutation DeleteWebhook(
+                $name: String!,
+            ) {
+                deleteWebhook(input: {
+                    name: $name,
+                }) {
+                    errors {
+                        message
+                    }
+                }
+            }
+        `;
+
         const newWebhook = (form) => {
             const newWebhookQueryVariables = {
                 name: form.name,
@@ -672,5 +686,14 @@ angular.module('ontrack.extension.notifications', [
         };
 
         loadWebhooks();
+
+        $scope.deleteWebhook = (webhook) => {
+            otAlertService.confirm({
+                title: "Webhook deletion",
+                message: `Are you sure to delete the [${webhook.name}] webhook?`
+            }).then(() =>
+                otGraphqlService.pageGraphQLCall(deleteWebhookQuery, {name: webhook.name})
+            ).then(loadWebhooks);
+        };
     })
 ;
