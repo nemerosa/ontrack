@@ -555,12 +555,12 @@ angular.module('ontrack.extension.notifications', [
         };
 
         $scope.deleteRecords = () => {
-              otAlertService.confirm({
-                  title: "Record deletion",
-                  message: "Are you sure to delete ALL notification records?"
-              }).then(() => {
-                    otGraphqlService.pageGraphQLCall(clearRecordsQuery);
-              }).then(loadRecords);
+            otAlertService.confirm({
+                title: "Record deletion",
+                message: "Are you sure to delete ALL notification records?"
+            }).then(() => {
+                otGraphqlService.pageGraphQLCall(clearRecordsQuery);
+            }).then(loadRecords);
         };
     })
     .config(function ($stateProvider) {
@@ -577,5 +577,29 @@ angular.module('ontrack.extension.notifications', [
         view.commands = [
             ot.viewCloseCommand('/home')
         ];
+
+        const query = `
+            query Webhooks {
+                webhooks {
+                    name
+                    enabled
+                    url
+                    timeoutSeconds
+                    authenticationType
+                }
+            }
+        `;
+
+        $scope.loadingWebhooks = false;
+        const loadWebhooks = () => {
+            $scope.loadingWebhooks = true;
+            otGraphqlService.pageGraphQLCall(query).then(data => {
+                $scope.webhooks = data.webhooks;
+            }).finally(() => {
+                $scope.loadingWebhooks = false;
+            });
+        };
+
+        loadWebhooks();
     })
 ;
