@@ -570,13 +570,10 @@ angular.module('ontrack.extension.notifications', [
             controller: 'WebhooksCtrl'
         });
     })
-    .controller('WebhooksCtrl', function ($scope, $http, ot, otAlertService, otFormService, otGraphqlService) {
+    .controller('WebhooksCtrl', function ($q, $scope, $http, ot, otAlertService, otFormService, otGraphqlService) {
         const view = ot.view();
         view.title = "Webhooks";
         view.breadcrumbs = ot.homeBreadcrumbs();
-        view.commands = [
-            ot.viewCloseCommand('/home')
-        ];
 
         const query = `
             query Webhooks {
@@ -589,6 +586,80 @@ angular.module('ontrack.extension.notifications', [
                 }
             }
         `;
+
+        const newWebhookQuery = `
+            mutation CreateWebhook(
+                $name: String!,
+                $enabled: Boolean!,
+                $url: String!,
+                $timeoutSeconds: Long!,
+                $authenticationType: String!,
+                $authenticationConfig: JSON!,
+            ) {
+                createWebhook(input: {
+                    name: $name,
+                    enabled: $enabled,
+                    url: $url,
+                    timeoutSeconds: $timeoutSeconds,
+                    authenticationType: $authenticationType,
+                    authenticationConfig: $authenticationConfig,
+                }) {
+                    webhook {
+                        name
+                        enabled
+                        url
+                        timeoutSeconds
+                        authenticationType
+                    }
+                    errors {
+                        message
+                    }
+                }
+            }
+        `;
+
+        const newWebhook = (form) => {
+            const newWebhookQueryVariables = {
+                name: form.name,
+                enabled: form.enabled,
+                url: form.url,
+                timeoutSeconds: form.timeoutSeconds,
+                authenticationType: form.authentication.id,
+                authenticationConfig: form.authentication.data
+            };
+            const d = $q.defer();
+            otGraphqlService.graphQLCall(newWebhookQuery, newWebhookQueryVariables).then(data => {
+                if (data.createWebhook.errors && data.createWebhook.errors.messages) {
+                    d.reject(messages[0]);
+                } else {
+                    $scope.webhooks.splice(0, 0, data.createWebhook.webhook);
+                    d.resolve(true);
+                }
+            }, messages => {
+                d.reject(messages[0]);
+            });
+            return d.promise;
+        };
+
+        const newWebhookDialog = () => {
+            otFormService.display({
+                uri: '/extension/notifications/webhook/create',
+                title: "New webhook",
+                submit: (data) => {
+                    return newWebhook(data);
+                }
+            });
+        };
+
+        view.commands = [
+            {
+                id: 'webhook-create',
+                name: "New webhook",
+                cls: 'ot-command-new',
+                action: newWebhookDialog
+            },
+            ot.viewCloseCommand('/home')
+        ];
 
         $scope.loadingWebhooks = false;
         const loadWebhooks = () => {
