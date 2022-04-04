@@ -130,6 +130,7 @@ fun getDescription(property: KProperty<*>, defaultDescription: String? = null): 
         ?: property.findAnnotation<APIDescription>()?.value
         ?: "${property.name} property"
 
+@Deprecated("Use net.nemerosa.ontrack.model.annotations.APIUtilsKt.getPropertyName")
 fun getName(property: KProperty<*>): String =
     property.findAnnotation<APIName>()?.value
         ?: property.name
