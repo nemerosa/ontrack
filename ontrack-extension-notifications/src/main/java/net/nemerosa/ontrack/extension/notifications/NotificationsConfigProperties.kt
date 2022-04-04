@@ -101,7 +101,12 @@ class NotificationsConfigProperties {
     /**
      * Configuration for processing queuing
      */
-    class ProcessingQueuingProperties : AbstractQueuingProperties()
+    class ProcessingQueuingProperties(
+        /**
+         * Maximum parallel processing of queues
+         */
+        var concurrency: Int = 10
+    ) : AbstractQueuingProperties()
 
     companion object {
         /**

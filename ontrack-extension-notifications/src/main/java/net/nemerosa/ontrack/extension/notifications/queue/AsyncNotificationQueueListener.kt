@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.queue
 
 import io.micrometer.core.instrument.MeterRegistry
+import net.nemerosa.ontrack.extension.notifications.NotificationsConfigProperties
 import net.nemerosa.ontrack.extension.notifications.metrics.NotificationsMetrics
 import net.nemerosa.ontrack.extension.notifications.processing.NotificationProcessingService
 import net.nemerosa.ontrack.json.parse
@@ -25,6 +26,7 @@ class AsyncNotificationQueueListener(
     private val applicationLogService: ApplicationLogService,
     private val notificationQueueItemConverter: NotificationQueueItemConverter,
     private val meterRegistry: MeterRegistry,
+    private val notificationsConfigProperties: NotificationsConfigProperties,
 ) : RabbitListenerConfigurer {
 
     override fun configureRabbitListeners(registrar: RabbitListenerEndpointRegistrar) {
@@ -47,8 +49,7 @@ class AsyncNotificationQueueListener(
     ): SimpleRabbitListenerEndpoint {
         id = queue
         setQueueNames(queue)
-        // TODO Make the concurrent configurable
-        concurrency = "1-10"
+        concurrency = "1-${notificationsConfigProperties.processing.queue.concurrency}"
         messageListener = listener
         return this
     }
