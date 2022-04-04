@@ -106,8 +106,8 @@ class EventSubscriptionController(
                 .value(
                     subscription?.run {
                         ServiceConfiguration(
-                            id = subscription.channel,
-                            data = subscription.channelConfig,
+                            id = channel,
+                            data = channelConfig,
                         )
                     }
                 )
