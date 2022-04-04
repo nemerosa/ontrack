@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.github.ingestion.settings
 
-import net.nemerosa.ontrack.graphql.support.getName
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.annotations.getPropertyLabel
 import net.nemerosa.ontrack.model.form.*
