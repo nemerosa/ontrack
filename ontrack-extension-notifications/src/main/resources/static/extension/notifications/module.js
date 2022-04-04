@@ -262,6 +262,188 @@ angular.module('ontrack.extension.notifications', [
 
     })
     .config(function ($stateProvider) {
+        $stateProvider.state('global-subscriptions', {
+            url: '/extension/notifications/global-subscriptions',
+            templateUrl: 'extension/notifications/entity-subscriptions.tpl.html',
+            controller: 'GlobalSubscriptionsCtrl'
+        });
+    })
+    .controller('GlobalSubscriptionsCtrl', function ($q, $scope, $http, ot, otAlertService, otFormService, otGraphqlService) {
+        const view = ot.view();
+        view.title = "Global subscriptions";
+        view.breadcrumbs = ot.homeBreadcrumbs();
+        view.commands = [
+            ot.viewCloseCommand('/home')
+        ];
+        let viewInitialized = false;
+
+        const queryVariables = {};
+        const query = `query GlobalSubscriptions {
+            eventSubscriptions(filter: {}) {
+                writeSubscriptionGranted
+                pageItems {
+                    id
+                    channel
+                    channelConfig
+                    channelConfigText
+                    events
+                    keywords
+                    disabled
+                }
+            }
+        }`;
+
+        const deleteSubscriptionQuery = `
+            mutation(
+                $id: String!,
+            ) {
+                deleteSubscription(input: {
+                    id: $id
+                }) {
+                    errors {
+                        message
+                    }
+                }
+            }
+        `;
+
+        const enableSubscriptionQuery = `
+            mutation(
+                $id: String!,
+            ) {
+                enableSubscription(input: {
+                    id: $id
+                }) {
+                    errors {
+                        message
+                    }
+                }
+            }
+        `;
+
+        const disableSubscriptionQuery = `
+            mutation(
+                $id: String!,
+            ) {
+                disableSubscription(input: {
+                    id: $id
+                }) {
+                    errors {
+                        message
+                    }
+                }
+            }
+        `;
+
+        const newSubscriptionQuery = `
+            mutation(
+                $channel: String!,
+                $channelConfig: JSON!,
+                $events: [String!]!,
+                $keywords: String,
+            ) {
+              subscribeToEvents(input: {
+                channel: $channel,
+                channelConfig: $channelConfig,
+                events: $events,
+                keywords: $keywords, 
+              }) {
+                errors {
+                  message
+                }
+                subscription {
+                  id
+                  channel
+                  channelConfig
+                  channelConfigText
+                  events
+                  keywords
+                  disabled
+                }
+              }
+            }
+        `;
+
+        $scope.deleteSubscription = (subscription) => {
+            otAlertService.confirm({
+                title: "Subscription deletion",
+                message: "Do you really want to delete this subscription?"
+            }).then(() => {
+                otGraphqlService.pageGraphQLCallWithPayloadErrors(deleteSubscriptionQuery, {
+                    id: subscription.id
+                }, "deleteSubscription").finally(loadSubscriptions);
+            });
+        };
+
+        $scope.enableSubscription = (subscription) => {
+            otGraphqlService.pageGraphQLCallWithPayloadErrors(enableSubscriptionQuery, {
+                id: subscription.id
+            }, "enableSubscription").finally(loadSubscriptions);
+        };
+
+        $scope.disableSubscription = (subscription) => {
+            otGraphqlService.pageGraphQLCallWithPayloadErrors(disableSubscriptionQuery, {
+                id: subscription.id
+            }, "disableSubscription").finally(loadSubscriptions);
+        };
+
+        const newSubscription = (form) => {
+            const newSubscriptionQueryVariables = {
+                channel: form.channel.id,
+                channelConfig: form.channel.data,
+                events: form.events,
+                keywords: form.keywords
+            };
+            const d = $q.defer();
+            otGraphqlService.graphQLCall(newSubscriptionQuery, newSubscriptionQueryVariables).then(data => {
+                if (data.subscribeToEvents.errors && data.subscribeToEvents.errors.messages) {
+                    d.reject(messages[0]);
+                } else {
+                    $scope.subscriptions.splice(0, 0, data.subscribeToEvents.subscription);
+                    d.resolve(true);
+                }
+            }, messages => {
+                d.reject(messages[0]);
+            });
+            return d.promise;
+        };
+
+        const newSubscriptionDialog = () => {
+            otFormService.display({
+                uri: '/extension/notifications/subscription/create',
+                title: "New subscription",
+                submit: (data) => {
+                    return newSubscription(data);
+                }
+            });
+        };
+
+        $scope.loadingSubscriptions = false;
+        const loadSubscriptions = () => {
+            $scope.loadingSubscriptions = true;
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
+                $scope.subscriptions = data.eventSubscriptions.pageItems;
+                $scope.writeSubscriptionGranted = data.eventSubscriptions.writeSubscriptionGranted;
+                if (!viewInitialized) {
+                    if ($scope.writeSubscriptionGranted) {
+                        view.commands.splice(0, 0, {
+                            id: 'notifications-subscription-create',
+                            name: "New subscription",
+                            cls: 'ot-command-new',
+                            action: newSubscriptionDialog
+                        });
+                    }
+                    viewInitialized = true;
+                }
+            }).finally(() => {
+                $scope.loadingSubscriptions = false;
+            });
+        };
+
+        loadSubscriptions();
+
+    })
+    .config(function ($stateProvider) {
         $stateProvider.state('notification-recordings', {
             url: '/extension/notifications/notification-recordings',
             templateUrl: 'extension/notifications/notification-recordings.tpl.html',
