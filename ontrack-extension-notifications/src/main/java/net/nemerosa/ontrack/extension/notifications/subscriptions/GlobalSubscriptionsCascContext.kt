@@ -78,7 +78,7 @@ class GlobalSubscriptionsCascContext(
         @APIDescription("Channel to send notifications to")
         val channel: String,
         @APIDescription("Configuration of the channel")
-        @JsonProperty("channel-config")
+        @get:JsonProperty("channel-config")
         val channelConfig: JsonNode,
         @APIDescription("Is this channel disabled?")
         val disabled: Boolean? = null,
