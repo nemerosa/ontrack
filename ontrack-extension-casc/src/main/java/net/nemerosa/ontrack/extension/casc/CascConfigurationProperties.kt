@@ -26,6 +26,11 @@ class CascConfigurationProperties {
     var reloading = CascReloadingConfigurationProperties()
 
     /**
+     * Secrets configurations
+     */
+    var secrets = CascSecretConfigurationProperties()
+
+    /**
      * Reloading configuration
      */
     class CascReloadingConfigurationProperties {
@@ -38,6 +43,22 @@ class CascConfigurationProperties {
          * Cron schedule for the reloading. Leave blank or empty to disable the automated reloading.
          */
         var cron = ""
+    }
+
+    /**
+     * Secrets configurations
+     */
+    class CascSecretConfigurationProperties {
+        /**
+         * Source for the secrets.
+         *
+         * Either "env" (default) or "file"
+         */
+        var type: String = "env"
+        /**
+         * Directory used to store the secret files (used only when type == "file"
+         */
+        var directory = ""
     }
 
 }
