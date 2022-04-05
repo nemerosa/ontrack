@@ -20,6 +20,41 @@ All YAML resources defined by those locations are merged together according to t
 
 The list of locations can contain path to folders on a file system. In this case, Ontrack will use all the files in this folder.
 
+[[casc-secrets]]
+==== [experimental] Casc secrets
+
+Secrets can be injected into Casc file using this syntax:
+
+[source]
+----
+{{ secret.<base>.<name> }}
+----
+
+For example:
+
+[source,yaml]
+----
+some-secret-field: {{ secret.my-secret.my-property }}
+----
+
+By default, this is interpolated and evaluated using the `SECRET_<BASE>_<NAME>` environment variable,  `SECRET_MY_SECRET_MY_PROPERTY` for the example above. If this environment variable value is `my-password`, the final Casc file will be:
+
+[source,yaml]
+----
+some-secret-field: my-password
+----
+
+Alternatively, the secrets can be mapped to files by settings the `ontrack.config.casc.secrets.type` configuration property to `file` and the `ontrack.config.casc.secrets.directory` one to a valid directory.
+
+Ontrack will then look for the secrets in files called `<base>/<name>`.
+
+In the example above, the value of the `{{ secret.my-secret.my-property }}` expression will be looked for in the `<directory>/my-secret/my-property` file.
+
+[NOTE]
+====
+The `file` secret mapping is particularly well suited for Kubernetes deployments. See the https://github.com/nemerosa/ontrack-chart[`ontrack-chart`] for more information.
+====
+
 [[casc-schema]]
 ==== Casc schema
 
