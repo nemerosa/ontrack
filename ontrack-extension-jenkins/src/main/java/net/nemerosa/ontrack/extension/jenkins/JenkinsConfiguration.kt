@@ -18,7 +18,7 @@ open class JenkinsConfiguration(
         other is JenkinsConfiguration &&
                 other.name == name &&
                 other.url == url &&
-                other.name == name &&
+                other.user == user &&
                 other.password == password
 
     override fun obfuscate(): JenkinsConfiguration {
