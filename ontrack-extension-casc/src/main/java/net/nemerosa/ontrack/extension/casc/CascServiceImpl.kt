@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 class CascServiceImpl(
     private val ontrackContext: OntrackContext,
     private val securityService: SecurityService,
+    private val preprocessors: List<CascPreprocessor>,
 ) : CascService {
 
     private val mapper = ObjectMapper(YAMLFactory())
@@ -61,7 +62,10 @@ class CascServiceImpl(
     }
 
     private fun String.parse(): JsonNode =
-        mapper.readTree(this)
+        mapper.readTree(preprocess())
+
+    private fun String.preprocess(): String =
+        preprocessors.fold(this) { acc, preprocessor -> preprocessor.process(acc) }
 
     companion object {
         const val ROOT = "ontrack"
