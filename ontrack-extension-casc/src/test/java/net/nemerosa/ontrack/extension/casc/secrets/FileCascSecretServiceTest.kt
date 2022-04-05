@@ -19,7 +19,7 @@ internal class FileCascSecretServiceTest {
                 CascConfigurationProperties().apply {
                     secrets.directory = ""
                 }
-            )
+            ).getValue("any.ref")
         }
     }
 
@@ -30,7 +30,7 @@ internal class FileCascSecretServiceTest {
                 CascConfigurationProperties().apply {
                     secrets.directory = "/a/not/existing/path"
                 }
-            )
+            ).getValue("any.ref")
         }
     }
 
