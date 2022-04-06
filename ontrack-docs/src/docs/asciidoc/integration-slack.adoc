@@ -8,6 +8,7 @@ Slack settings are available in _Settings > Slack settings_:
 * _Enabled_ - if Slack integration is enabled or not
 * _Token_ - Slack token
 * _Emoji_ - optional, a string like `:ontrack:` to set as icon for the Slack messages sent by Ontrack
+* _Endpoint_ - optional, a URL for the Slack API (if custom)
 
 [NOTE]
 ====

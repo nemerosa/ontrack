@@ -21,6 +21,7 @@ class SlackSettingsProvider(
         enabled = settingsRepository.getBoolean(SlackSettings::enabled, false),
         token = settingsRepository.getPassword(SlackSettings::token, "", encryptionService::decrypt),
         emoji = settingsRepository.getString(SlackSettings::emoji, ""),
+        endpoint = settingsRepository.getString(SlackSettings::endpoint, ""),
     )
 
     override fun getSettingsClass(): Class<SlackSettings> = SlackSettings::class.java

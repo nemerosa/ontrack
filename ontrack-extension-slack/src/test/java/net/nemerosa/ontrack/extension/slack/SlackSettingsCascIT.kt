@@ -23,10 +23,12 @@ class SlackSettingsCascIT : AbstractCascTestSupport() {
                             slack:
                                 enabled: true
                                 token: some-token
+                                emoji: ":ontrack:"
             """.trimIndent())
             val settings = settingsService.getCachedSettings(SlackSettings::class.java)
             assertTrue(settings.enabled)
             assertEquals("some-token", settings.token)
+            assertEquals(":ontrack:", settings.emoji)
         }
     }
 

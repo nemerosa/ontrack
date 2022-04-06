@@ -33,12 +33,14 @@ class SlackSettingsManager(
             true
         ) { encryptionService.encrypt(it) }
         settingsRepository.setString<SlackSettings>(settings::emoji)
+        settingsRepository.setString<SlackSettings>(settings::endpoint)
     }
 
     override fun getSettingsForm(settings: SlackSettings): Form = Form.create()
         .yesNoField(SlackSettings::enabled, settings.enabled)
         .passwordField(SlackSettings::token)
         .textField(SlackSettings::emoji, settings.emoji)
+        .textField(SlackSettings::endpoint, settings.endpoint)
 
     override fun getId(): String = "slack"
 

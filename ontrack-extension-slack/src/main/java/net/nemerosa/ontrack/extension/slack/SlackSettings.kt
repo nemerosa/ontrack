@@ -13,5 +13,8 @@ class SlackSettings(
     val token: String = "",
     @APILabel("Emoji")
     @APIDescription("Emoji (like :ontrack:) to use for the message")
-    val emoji: String = "",
+    val emoji: String? = "",
+    @APILabel("Endpoint")
+    @APIDescription("Slack API endpoint (leave blank for default)")
+    val endpoint: String? = "",
 )
