@@ -23,8 +23,7 @@ class SlackNotificationChannel(
         // Formatting the message
         val message = format(event)
         // Sending the message
-        // TODO Icon emoji from the settings
-        val sent = slackService.sendNotification(config.channel, message, iconEmoji = null)
+        val sent = slackService.sendNotification(config.channel, message)
         // Result
         return if (sent) {
             NotificationResult.ok()

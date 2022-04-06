@@ -52,7 +52,7 @@ class SlackNotificationChannelTest {
         val config = SlackNotificationChannelConfig(channel = "#test")
         val result = channel.publish(config, event)
         verify {
-            slackService.sendNotification("#test", "Project <http://localhost:8080/#/project/1|project> has been disabled.", null)
+            slackService.sendNotification("#test", "Project <http://localhost:8080/#/project/1|project> has been disabled.")
         }
         assertEquals(NotificationResultType.OK, result.type)
         assertNull(result.message)

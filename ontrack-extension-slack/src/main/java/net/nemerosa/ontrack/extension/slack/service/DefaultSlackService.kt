@@ -17,8 +17,9 @@ class DefaultSlackService(
     private val applicationLogService: ApplicationLogService,
 ) : SlackService {
 
-    override fun sendNotification(channel: String, message: String, iconEmoji: String?): Boolean {
+    override fun sendNotification(channel: String, message: String): Boolean {
         val settings = cachedSettingsService.getCachedSettings(SlackSettings::class.java)
+        val iconEmoji = settings.emoji.takeIf { it.isNotBlank() }
         return if (settings.enabled) {
             // Gets the client
             val client = getSlackClient(settings.token, null)

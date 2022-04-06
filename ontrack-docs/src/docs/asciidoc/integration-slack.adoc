@@ -7,6 +7,12 @@ Slack settings are available in _Settings > Slack settings_:
 
 * _Enabled_ - if Slack integration is enabled or not
 * _Token_ - Slack token
+* _Emoji_ - optional, a string like `:ontrack:` to set as icon for the Slack messages sent by Ontrack
+
+[NOTE]
+====
+The logo from Ontrack can be find in the source code at https://github.com/nemerosa/ontrack/blob/master/ontrack-web/src/assets/logo-128.png (other sizes are available).
+====
 
 This configuration can also be set as <<casc,code>>:
 
@@ -18,6 +24,7 @@ ontrack:
          slack:
             enabled: true
             token: some-secret-token
+            emoji: ":ontrack:"
 ----
 
 [[slack-setup]]
