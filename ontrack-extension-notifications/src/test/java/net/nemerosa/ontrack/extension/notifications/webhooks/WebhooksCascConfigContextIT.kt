@@ -5,8 +5,10 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.Duration
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 internal class WebhooksCascConfigContextIT : AbstractCascTestSupport() {
 
@@ -54,7 +56,35 @@ internal class WebhooksCascConfigContextIT : AbstractCascTestSupport() {
 
     @Test
     fun `Deleting a webhook using CasC`() {
-        TODO()
+        val oldName = uid("wh")
+        val newName = uid("wh")
+        asAdmin {
+            webhookAdminService.createWebhook(
+                name = oldName,
+                enabled = true,
+                url = "https://old-webhook.example.com",
+                timeout = Duration.ofSeconds(30),
+                authentication = WebhookAuthentication(
+                    type = "bearer",
+                    config = mapOf("token" to "xxx").asJson(),
+                )
+            )
+            casc("""
+                ontrack:
+                    config:
+                        webhooks:
+                            - name: "$newName"
+                              url: "https://webhook.example.com"
+                              timeout-seconds: 30
+                              authentication:
+                                type: basic
+                                config:
+                                    username: my-user
+                                    password: my-pass
+            """.trimIndent())
+            assertNotNull(webhookAdminService.findWebhookByName(newName), "New webhook is available")
+            assertNull(webhookAdminService.findWebhookByName(oldName), "Old webhook is no longer available")
+        }
     }
 
 }
