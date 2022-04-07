@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.annotations.getPropertyName
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.jvmErasure
 
@@ -147,10 +148,16 @@ fun cascFieldName(property: KProperty<*>): String =
     getPropertyName(property)
 
 internal fun cascFieldType(property: KProperty<*>): CascType =
-    when (property.returnType.jvmErasure) {
-        String::class -> cascString
-        Boolean::class -> cascBoolean
-        Int::class -> cascInt
-        JsonNode::class -> cascJson
-        else -> error("Cannot get CasC type for $property")
+    when {
+        property.hasAnnotation<Nested>() -> cascNestedType(property)
+        else -> when (property.returnType.jvmErasure) {
+            String::class -> cascString
+            Boolean::class -> cascBoolean
+            Int::class -> cascInt
+            JsonNode::class -> cascJson
+            else -> error("Cannot get CasC type for $property")
+        }
     }
+
+private fun cascNestedType(property: KProperty<*>): CascType =
+    cascObject(property.returnType.jvmErasure)
