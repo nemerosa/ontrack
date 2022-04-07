@@ -59,6 +59,20 @@ internal class WebhookExchangeServiceIT : AbstractNotificationTestSupport() {
         }
     }
 
+    @Test
+    fun `Getting exchanges - filter on response code`() {
+        asAdmin {
+            val webhook = uid("wh")
+            val x = store(webhook, responseCode = 500)
+            val y = store(webhook, responseCode = 200)
+            val page = webhookExchangeService.exchanges(
+                WebhookExchangeFilter(webhook = x.webhook, responseCode = 500)
+            )
+            assertNotNull(page.pageItems.find { it.uuid == x.uuid }, "Webhook X with response code = 500 returned")
+            assertNull(page.pageItems.find { it.uuid == y.uuid }, "Webhook Y with response code = 200 not returned")
+        }
+    }
+
     private fun store(
         webhook: String = uid("wh"),
         requestTime: LocalDateTime = Time.now(),

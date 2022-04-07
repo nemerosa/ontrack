@@ -37,6 +37,12 @@ class DefaultWebhookExchangeService(
             jsonQueryVariables["payloadType"] = filter.payloadType
         }
 
+        // Filter: response code
+        if (filter.responseCode != null) {
+            jsonQueries += "data::jsonb->'response'->>'code' = :responseCode"
+            jsonQueryVariables["responseCode"] = filter.responseCode.toString()
+        }
+
         // JSON queries & variables
         val jsonQuery = jsonQueries.joinToString(" AND ") { "( $it )" }
 
