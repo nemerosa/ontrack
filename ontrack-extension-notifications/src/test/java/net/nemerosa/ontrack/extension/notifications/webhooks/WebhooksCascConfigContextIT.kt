@@ -51,7 +51,46 @@ internal class WebhooksCascConfigContextIT : AbstractCascTestSupport() {
 
     @Test
     fun `Updating a webhook using CasC`() {
-        TODO()
+        val name = uid("wh")
+        asAdmin {
+            webhookAdminService.createWebhook(
+                name = name,
+                enabled = true,
+                url = "https://webhook.example.com",
+                timeout = Duration.ofSeconds(30),
+                authentication = WebhookAuthentication(
+                    type = "bearer",
+                    config = mapOf("token" to "xxx").asJson(),
+                )
+            )
+            casc("""
+                ontrack:
+                    config:
+                        webhooks:
+                            - name: "$name"
+                              url: "https://webhook.example.com"
+                              timeout-seconds: 120
+                              authentication:
+                                type: basic
+                                config:
+                                    username: my-user
+                                    password: my-pass
+            """.trimIndent())
+            assertNotNull(webhookAdminService.findWebhookByName(name), "Webhook has been created") {
+                assertEquals(name, it.name)
+                assertEquals(true, it.enabled)
+                assertEquals("https://webhook.example.com", it.url)
+                assertEquals(120L, it.timeout.toSeconds())
+                assertEquals("basic", it.authentication.type)
+                assertEquals(
+                    mapOf(
+                        "username" to "my-user",
+                        "password" to "my-pass",
+                    ).asJson(),
+                    it.authentication.config
+                )
+            }
+        }
     }
 
     @Test

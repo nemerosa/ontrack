@@ -59,13 +59,45 @@ class DefaultWebhookAdminService(
             name,
             webhook
         )
-        return Webhook(
-            name,
-            enabled,
-            url,
-            timeout,
-            authentication
+        return webhook.toWebhook()
+    }
+
+    override fun updateWebhook(
+        name: String,
+        enabled: Boolean?,
+        url: String?,
+        timeout: Duration?,
+        authentication: WebhookAuthentication?,
+    ): Webhook {
+        securityService.checkGlobalFunction(WebhookManagement::class.java)
+        val existing = findWebhookByName(name) ?: throw WebhookNotFoundException(name)
+
+        // Controlling the authentication
+        if (authentication != null) {
+            val authenticator = webhookAuthenticatorRegistry.findWebhookAuthenticator(authentication.type)
+                ?: throw WebhookAuthenticatorNotFoundException(authentication.type)
+            authenticator.validateConfig(authentication.config)
+        }
+
+        // New record
+        val webhook = StoredWebhook(
+            name = name,
+            enabled = enabled ?: existing.enabled,
+            url = url ?: existing.url,
+            timeoutSeconds = timeout?.toSeconds() ?: existing.timeout.toSeconds(),
+            authenticationType = authentication?.type ?: existing.authentication.type,
+            authenticationEncryptedConfig = encryptionService.encrypt(
+                authentication?.config?.format()
+                    ?: existing.authentication.config.format()
+            ) ?: ""
         )
+        storageService.store(
+            STORE,
+            name,
+            webhook
+        )
+
+        return webhook.toWebhook()
     }
 
     override fun deleteWebhook(name: String) {

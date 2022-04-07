@@ -19,6 +19,14 @@ interface WebhookAdminService {
         authentication: WebhookAuthentication,
     ): Webhook
 
+    fun updateWebhook(
+        name: String,
+        enabled: Boolean? = null,
+        url: String? = null,
+        timeout: Duration? = null,
+        authentication: WebhookAuthentication? = null,
+    ): Webhook
+
     fun deleteWebhook(name: String)
 
 }

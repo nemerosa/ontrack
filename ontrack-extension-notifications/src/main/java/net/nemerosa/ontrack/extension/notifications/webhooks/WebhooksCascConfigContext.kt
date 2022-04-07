@@ -68,7 +68,16 @@ class WebhooksCascConfigContext(
             }
             onModification { item, _ ->
                 logger.info("Updating webhook: ${item.name}")
-                TODO("Webhook updates")
+                webhookAdminService.updateWebhook(
+                    name = item.name,
+                    enabled = item.enabled,
+                    url = item.url,
+                    timeout = Duration.ofSeconds(item.timeoutSeconds.toLong()),
+                    authentication = WebhookAuthentication(
+                        type = item.authentication.type,
+                        config = item.authentication.config,
+                    )
+                )
             }
             onDeletion { existing ->
                 logger.info("Deleting webhook: ${existing.name}")
