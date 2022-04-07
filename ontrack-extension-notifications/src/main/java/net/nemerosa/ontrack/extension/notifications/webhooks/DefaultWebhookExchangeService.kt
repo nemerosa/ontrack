@@ -31,6 +31,12 @@ class DefaultWebhookExchangeService(
             jsonQueryVariables["webhook"] = filter.webhook
         }
 
+        // Filter: request type
+        if (!filter.payloadType.isNullOrBlank()) {
+            jsonQueries += "data::jsonb->'request'->>'type' = :payloadType"
+            jsonQueryVariables["payloadType"] = filter.payloadType
+        }
+
         // JSON queries & variables
         val jsonQuery = jsonQueries.joinToString(" AND ") { "( $it )" }
 

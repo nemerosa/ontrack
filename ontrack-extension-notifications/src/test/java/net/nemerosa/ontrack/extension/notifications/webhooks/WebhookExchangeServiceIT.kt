@@ -33,7 +33,7 @@ internal class WebhookExchangeServiceIT : AbstractNotificationTestSupport() {
     }
 
     @Test
-    fun `Getting exchanges - no filter on webhook`() {
+    fun `Getting exchanges - filter on webhook`() {
         asAdmin {
             val x = store()
             val y = store()
@@ -42,6 +42,20 @@ internal class WebhookExchangeServiceIT : AbstractNotificationTestSupport() {
             )
             assertNotNull(page.pageItems.find { it.uuid == x.uuid }, "Webhook X returned")
             assertNull(page.pageItems.find { it.uuid == y.uuid }, "Webhook Y not returned")
+        }
+    }
+
+    @Test
+    fun `Getting exchanges - filter on request type`() {
+        asAdmin {
+            val webhook = uid("wh")
+            val x = store(webhook, requestType = "other")
+            val y = store(webhook, requestType = "event")
+            val page = webhookExchangeService.exchanges(
+                WebhookExchangeFilter(webhook = x.webhook, payloadType = "other")
+            )
+            assertNotNull(page.pageItems.find { it.uuid == x.uuid }, "Webhook X with type = other returned")
+            assertNull(page.pageItems.find { it.uuid == y.uuid }, "Webhook Y with type = event not returned")
         }
     }
 
