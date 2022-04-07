@@ -25,6 +25,12 @@ class DefaultWebhookExchangeService(
         val jsonQueries = mutableListOf<String>()
         val jsonQueryVariables = mutableMapOf<String, String>()
 
+        // Filter: webhook
+        if (!filter.webhook.isNullOrBlank()) {
+            jsonQueries += "data::jsonb->>'webhook' = :webhook"
+            jsonQueryVariables["webhook"] = filter.webhook
+        }
+
         // JSON queries & variables
         val jsonQuery = jsonQueries.joinToString(" AND ") { "( $it )" }
 

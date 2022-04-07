@@ -12,6 +12,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 internal class WebhookExchangeServiceIT : AbstractNotificationTestSupport() {
 
@@ -28,6 +29,19 @@ internal class WebhookExchangeServiceIT : AbstractNotificationTestSupport() {
             )
             assertNotNull(page.pageItems.find { it.uuid == x.uuid }, "Webhook X returned")
             assertNotNull(page.pageItems.find { it.uuid == y.uuid }, "Webhook Y returned")
+        }
+    }
+
+    @Test
+    fun `Getting exchanges - no filter on webhook`() {
+        asAdmin {
+            val x = store()
+            val y = store()
+            val page = webhookExchangeService.exchanges(
+                WebhookExchangeFilter(webhook = x.webhook)
+            )
+            assertNotNull(page.pageItems.find { it.uuid == x.uuid }, "Webhook X returned")
+            assertNull(page.pageItems.find { it.uuid == y.uuid }, "Webhook Y not returned")
         }
     }
 
