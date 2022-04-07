@@ -1,8 +1,9 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
-import net.nemerosa.ontrack.extension.casc.schema.Nested
+import com.fasterxml.jackson.annotation.JsonProperty
+import net.nemerosa.ontrack.extension.casc.schema.CascNested
+import net.nemerosa.ontrack.extension.casc.schema.CascPropertyType
 import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.annotations.APIName
 import java.time.Duration
 
 @APIDescription("Webhook registration")
@@ -14,8 +15,10 @@ data class Webhook(
     @APIDescription("Webhook endpoint")
     val url: String,
     @APIDescription("Webhook execution timeout (in seconds)")
+    @JsonProperty("timeout-seconds")
+    @CascPropertyType("int")
     val timeout: Duration,
     @APIDescription("Webhook authentication")
-    @Nested
+    @CascNested
     val authentication: WebhookAuthentication,
 )

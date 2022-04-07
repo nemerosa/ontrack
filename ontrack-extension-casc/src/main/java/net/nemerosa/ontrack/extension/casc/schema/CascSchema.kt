@@ -56,6 +56,13 @@ val cascInt = CascInt()
 val cascBoolean = CascBoolean()
 val cascJson = CascJson()
 
+private val builtinTypes = listOf(
+    cascString,
+    cascInt,
+    cascBoolean,
+    cascJson,
+).associateBy { it.__type }
+
 // ====================================================================================
 // ====================================================================================
 // ====================================================================================
@@ -149,7 +156,8 @@ fun cascFieldName(property: KProperty<*>): String =
 
 internal fun cascFieldType(property: KProperty<*>): CascType =
     when {
-        property.hasAnnotation<Nested>() -> cascNestedType(property)
+        property.hasAnnotation<CascPropertyType>() -> cascPropertyType(property)
+        property.hasAnnotation<CascNested>() -> cascNestedType(property)
         else -> when (property.returnType.jvmErasure) {
             String::class -> cascString
             Boolean::class -> cascBoolean
@@ -158,6 +166,15 @@ internal fun cascFieldType(property: KProperty<*>): CascType =
             else -> error("Cannot get CasC type for $property")
         }
     }
+
+private fun cascPropertyType(property: KProperty<*>): CascType {
+    val propertyType = property.findAnnotation<CascPropertyType>()
+        ?: error("CascPropertyType annotation is expected on $property.")
+    val type = propertyType.type
+        .takeIf { it.isNotBlank() }
+        ?: propertyType.value
+    return builtinTypes[type] ?: error("Cannot find built-in type [$type] required by $property.")
+}
 
 private fun cascNestedType(property: KProperty<*>): CascType =
     cascObject(property.returnType.jvmErasure)

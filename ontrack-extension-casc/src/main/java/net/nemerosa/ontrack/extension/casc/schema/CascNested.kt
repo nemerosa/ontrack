@@ -7,4 +7,4 @@ package net.nemerosa.ontrack.extension.casc.schema
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)
 @MustBeDocumented
-annotation class Nested
+annotation class CascNested
