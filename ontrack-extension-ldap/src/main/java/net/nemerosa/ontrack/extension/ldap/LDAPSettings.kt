@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 
 @APIDescription("LDAP settings")
 data class LDAPSettings(
-        @JsonProperty("enabled")
+        @get:JsonProperty("enabled")
         @APIDescription("Is LDAP authentication enabled?")
         val isEnabled: Boolean,
         val url: String = "",

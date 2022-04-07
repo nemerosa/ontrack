@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.ldap.casc
 
-import net.nemerosa.ontrack.extension.casc.AbstractCascTestJUnit4Support
+import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.extension.ldap.LDAPSettings
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class LDAPSettingsContextIT: AbstractCascTestJUnit4Support() {
+class LDAPSettingsContextIT : AbstractCascTestSupport() {
 
     @Test
     fun `LDAP as CasC`() {
@@ -47,6 +47,34 @@ class LDAPSettingsContextIT: AbstractCascTestJUnit4Support() {
                 assertEquals("cn", settings.groupNameAttribute)
                 assertEquals("ou=groups", settings.groupSearchBase)
                 assertEquals("(uniqueMember={0})", settings.groupSearchFilter)
+            }
+        }
+    }
+
+    @Test
+    fun `LDAP disabled as CasC`() {
+        asAdmin {
+            withSettings<LDAPSettings> {
+                // Disable the LDAP
+                settingsManagerService.saveSettings(
+                    LDAPSettings(
+                        isEnabled = true,
+                        url = "ldaps://ldap.example.com:636/dc=example,dc=com",
+                        user = "cn=manager,dc=example,dc=com",
+                        password = "xxx",
+                    )
+                )
+                // Disabling the LDAP through CasC
+                casc("""
+                    ontrack:
+                        config:
+                            settings:
+                                ldap:
+                                    enabled: false
+                """.trimIndent())
+                // Checks the settings
+                val settings = cachedSettingsService.getCachedSettings(LDAPSettings::class.java)
+                assertEquals(false, settings.isEnabled)
             }
         }
     }
