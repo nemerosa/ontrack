@@ -12,7 +12,7 @@ internal class WebhooksCascConfigContextTest {
 
     @Test
     fun `Checking the Webhook Casc type`() {
-        val type = cascObject(Webhook::class)
+        val type = cascObject(WebhooksCascConfigContext.CascWebhook::class)
         assertIs<CascObject>(type) { webhook ->
             assertNotNull(webhook.fields.find { it.name == "authentication" }) { authenticationField ->
                 assertTrue(authenticationField.required, "Authentication field is required")
