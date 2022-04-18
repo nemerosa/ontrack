@@ -98,8 +98,30 @@ internal class WebhookExchangeServiceIT : AbstractNotificationTestSupport() {
             val page = webhookExchangeService.exchanges(
                 WebhookExchangeFilter(webhook = webhook, responseKeyword = keyword)
             )
-            assertNotNull(page.pageItems.find { it.uuid == x.uuid }, "Webhook X with response keyword = $keyword returned")
+            assertNotNull(page.pageItems.find { it.uuid == x.uuid },
+                "Webhook X with response keyword = $keyword returned")
             assertNull(page.pageItems.find { it.uuid == y.uuid }, "Webhook Y not returned")
+        }
+    }
+
+    @Test
+    fun `Getting exchanges - filter on request timestamp`() {
+        asAdmin {
+            val ref = Time.now()
+            val webhook = uid("wh")
+            val w = store(webhook, requestTime = ref.minusSeconds(150))
+            val x = store(webhook, requestTime = ref.minusSeconds(90))
+            val y = store(webhook, requestTime = ref.minusSeconds(30))
+            val page = webhookExchangeService.exchanges(
+                WebhookExchangeFilter(
+                    webhook = webhook,
+                    payloadAfter = ref.minusSeconds(120),
+                    payloadBefore = ref.minusSeconds(60),
+                )
+            )
+            assertNotNull(page.pageItems.find { it.uuid == x.uuid }, "Webhook X returned")
+            assertNull(page.pageItems.find { it.uuid == y.uuid }, "Webhook Y not returned")
+            assertNull(page.pageItems.find { it.uuid == y.uuid }, "Webhook W not returned")
         }
     }
 

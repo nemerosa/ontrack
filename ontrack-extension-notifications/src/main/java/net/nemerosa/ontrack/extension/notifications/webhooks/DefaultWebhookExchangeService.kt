@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
@@ -41,6 +42,18 @@ class DefaultWebhookExchangeService(
         if (!filter.payloadKeyword.isNullOrBlank()) {
             jsonQueries += "data::jsonb->'request'->>'payload' ILIKE :payloadKeyword"
             jsonQueryVariables["payloadKeyword"] = "%${filter.payloadKeyword}%"
+        }
+
+        // Filter: request timestamp after
+        if (filter.payloadAfter != null) {
+            jsonQueries += "data::jsonb->'request'->>'timestamp' >= :payloadAfter"
+            jsonQueryVariables["payloadAfter"] = filter.payloadAfter.asJson().asText()
+        }
+
+        // Filter: request timestamp before
+        if (filter.payloadBefore != null) {
+            jsonQueries += "data::jsonb->'request'->>'timestamp' <= :payloadBefore"
+            jsonQueryVariables["payloadBefore"] = filter.payloadBefore.asJson().asText()
         }
 
         // Filter: response code
