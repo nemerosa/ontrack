@@ -9,4 +9,35 @@
         </div>
     </div>
 
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>UUID</th>
+            <th>Timestamp</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="delivery in deliveries">
+            <td>
+                <code>{{ delivery.uuid }}</code>
+            </td>
+            <td>
+                {{ delivery.request.timestamp }}
+            </td>
+            <td>
+                <code>{{ delivery.request.type }}</code>
+            </td>
+            <td>
+                <code>{{ delivery.response.code }}</code>
+            </td>
+            <td>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
 </ot-view>
