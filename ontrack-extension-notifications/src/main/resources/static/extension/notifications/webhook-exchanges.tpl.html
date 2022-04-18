@@ -20,9 +20,9 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="delivery in deliveries">
+        <tr ng-repeat-start="delivery in deliveries">
             <td>
-                <code>{{ delivery.uuid }}</code>
+                <code class="ot-action" title="Show/hide details for this delivery" ng-click="toggleDeliveryDetails(delivery)">{{ delivery.uuid }}</code>
             </td>
             <td>
                 {{ delivery.request.timestamp }}
@@ -34,7 +34,31 @@
                 <code>{{ delivery.response.code }}</code>
             </td>
             <td>
-
+                <span class="fa fa-eye ot-command" title="Show/hide details for this delivery" ng-click="toggleDeliveryDetails(delivery)"></span>
+            </td>
+        </tr>
+        <tr ng-repeat-end ng-if="delivery.details">
+            <!-- Request -->
+            <td colspan="1">
+                <p>
+                    <label for="delivery-request-payload-{{ delivery.uuid }}">Request payload:</label>
+                </p>
+                <textarea style="width: 100%;" class="form-control" id="delivery-request-payload-{{ delivery.uuid }}" rows="10" readonly ng-model="delivery.request.payload"></textarea>
+            </td>
+            <!-- Response -->
+            <td colspan="4">
+                <p>
+                    <label for="delivery-response-payload-{{ delivery.uuid }}">Response payload:</label>
+                </p>
+                <textarea style="width: 100%;" class="form-control" id="delivery-response-payload-{{ delivery.uuid }}" rows="10" readonly ng-model="delivery.response.payload"></textarea>
+                <p>
+                    <label>Response timestamp:</label>
+                    {{ delivery.response.timestamp }}
+                </p>
+                <p ng-if="delivery.stack">
+                    <label for="delivery-stack-{{ delivery.uuid }}">Error stack:</label>
+                </p>
+                <textarea ng-if="delivery.stack" style="width: 100%;" class="form-control" id="delivery-stack-{{ delivery.uuid }}" rows="10" readonly ng-model="delivery.stack"></textarea>
             </td>
         </tr>
         </tbody>

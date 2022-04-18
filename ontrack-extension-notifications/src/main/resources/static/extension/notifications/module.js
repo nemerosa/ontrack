@@ -733,6 +733,7 @@ angular.module('ontrack.extension.notifications', [
                                 code
                                 payload
                             }
+                            stack
                         }
                     }
                 }
@@ -755,5 +756,9 @@ angular.module('ontrack.extension.notifications', [
         };
 
         loadDeliveries();
+
+        $scope.toggleDeliveryDetails = (delivery) => {
+            delivery.details = !delivery.details;
+        };
     })
 ;
