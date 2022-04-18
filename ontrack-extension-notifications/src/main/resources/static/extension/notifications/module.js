@@ -714,5 +714,46 @@ angular.module('ontrack.extension.notifications', [
         view.commands = [
             ot.viewCloseCommand("/extension/notifications/webhooks")
         ];
+
+        const query = `
+            query(
+                $webhook: String!,
+            ) {
+                webhooks(name: $webhook) {
+                    exchanges {
+                        pageItems {
+                            uuid
+                            request {
+                                timestamp
+                                type
+                                payload
+                            }
+                            response {
+                                timestamp
+                                code
+                                payload
+                            }
+                        }
+                    }
+                }
+            }
+        `;
+
+        const queryVariables = {
+            webhook: name
+        };
+
+        $scope.loadingDeliveries = false;
+
+        const loadDeliveries = () => {
+            $scope.loadingDeliveries = true;
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
+                $scope.deliveries = data.webhooks[0].exchanges.pageItems;
+            }).finally(() => {
+                $scope.loadingDeliveries = false;
+            });
+        };
+
+        loadDeliveries();
     })
 ;
