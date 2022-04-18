@@ -696,4 +696,23 @@ angular.module('ontrack.extension.notifications', [
             ).then(loadWebhooks);
         };
     })
+    .config(function ($stateProvider) {
+        $stateProvider.state('webhook-exchanges', {
+            url: '/extension/notifications/webhooks/{name}',
+            templateUrl: 'extension/notifications/webhook-exchanges.tpl.html',
+            controller: 'WebhookExchangesCtrl'
+        });
+    })
+    .controller('WebhookExchangesCtrl', function ($scope, $stateParams, $http, ot, otGraphqlService) {
+        const view = ot.view();
+        const name = $stateParams.name;
+
+        view.title = `Webhook deliveries for ${name}`;
+        let bc = ot.homeBreadcrumbs();
+        bc.push(["webhooks", "#/extension/notifications/webhooks"]);
+        view.breadcrumbs = bc;
+        view.commands = [
+            ot.viewCloseCommand("/extension/notifications/webhooks")
+        ];
+    })
 ;
