@@ -40,16 +40,22 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
                         "value" to ontractConnectionProperties.token,
                     )
                 )
-                // TODO Sends all kinds of notifications to the internal end point
-                ontrack.notifications.webhooks.internalEndpoint.test(
-                    TestPayloadWrapper(
-                        webhook = webhookName,
-                        payload = TestPayload(
-                            mode = TestPayloadMode.OK,
-                            content = "OK",
-                        )
+                // Sends all kinds of notifications to the internal end point
+                repeat(5) {
+                    ontrack.notifications.webhooks.internalEndpoint.testOk(webhookName,
+                        "OK $it"
                     )
-                )
+                    ontrack.notifications.webhooks.internalEndpoint.testOk(webhookName,
+                        "OK $it with delay",
+                        delayMs = 1000L * (it + 1)
+                    )
+                    ontrack.notifications.webhooks.internalEndpoint.testNotFound(webhookName,
+                        "Not found $it"
+                    )
+                    ontrack.notifications.webhooks.internalEndpoint.testError(webhookName,
+                        "Error $it"
+                    )
+                }
             }
         }
     }
