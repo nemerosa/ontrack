@@ -86,6 +86,7 @@ class DefaultWebhookExchangeService(
             size = filter.size,
             query = jsonQuery,
             queryVariables = jsonQueryVariables,
+            orderQuery = "ORDER BY data::jsonb->'request'->>'timestamp' DESC",
         )
 
         // Page
