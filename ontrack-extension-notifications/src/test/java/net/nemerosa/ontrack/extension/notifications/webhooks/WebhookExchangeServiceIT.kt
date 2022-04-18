@@ -60,6 +60,21 @@ internal class WebhookExchangeServiceIT : AbstractNotificationTestSupport() {
     }
 
     @Test
+    fun `Getting exchanges - filter on request keyword`() {
+        asAdmin {
+            val webhook = uid("wh")
+            val keyword = uid("kw")
+            val x = store(webhook, requestPayload = mapOf("name" to keyword).asJson())
+            val y = store(webhook, requestPayload = mapOf("name" to "two").asJson())
+            val page = webhookExchangeService.exchanges(
+                WebhookExchangeFilter(webhook = x.webhook, payloadKeyword = keyword)
+            )
+            assertNotNull(page.pageItems.find { it.uuid == x.uuid }, "Webhook X with keyword = $keyword returned")
+            assertNull(page.pageItems.find { it.uuid == y.uuid }, "Webhook Y not returned")
+        }
+    }
+
+    @Test
     fun `Getting exchanges - filter on response code`() {
         asAdmin {
             val webhook = uid("wh")

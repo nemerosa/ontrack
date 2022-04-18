@@ -37,6 +37,12 @@ class DefaultWebhookExchangeService(
             jsonQueryVariables["payloadType"] = filter.payloadType
         }
 
+        // Filter: request keyword
+        if (!filter.payloadKeyword.isNullOrBlank()) {
+            jsonQueries += "data::jsonb->'request'->>'payload' ILIKE :payloadKeyword"
+            jsonQueryVariables["payloadKeyword"] = "%${filter.payloadKeyword}%"
+        }
+
         // Filter: response code
         if (filter.responseCode != null) {
             jsonQueries += "data::jsonb->'response'->>'code' = :responseCode"
