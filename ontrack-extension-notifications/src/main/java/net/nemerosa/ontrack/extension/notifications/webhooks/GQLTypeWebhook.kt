@@ -64,7 +64,7 @@ class GQLTypeWebhook(
                     itemPaginatedListProvider = { env, source, offset, size ->
                         val argFilter = gqlInputWebhookExchangeFilter.convert(env.getArgument(ARG_EXCHANGES_FILTER))
                             ?: WebhookExchangeFilter()
-                        val filter = argFilter.withPagination(offset, size)
+                        val filter = argFilter.withPagination(offset, size).withWebhook(source.name)
                         webhookExchangeService.exchanges(filter)
                     }
                 )

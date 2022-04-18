@@ -15,7 +15,8 @@ import java.time.Duration
 class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
 
     companion object {
-        private const val injectionWebhookCount = 10
+        private const val injectionWebhookCount = 3
+        private const val injectionWebhookRolls = 30
     }
 
     /**
@@ -41,7 +42,7 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
                     )
                 )
                 // Sends all kinds of notifications to the internal end point
-                repeat(5) {
+                repeat(injectionWebhookRolls) {
                     ontrack.notifications.webhooks.internalEndpoint.testOk(webhookName,
                         "OK $it"
                     )

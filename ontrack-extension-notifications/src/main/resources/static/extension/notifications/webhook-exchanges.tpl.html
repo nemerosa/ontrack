@@ -13,6 +13,7 @@
         <thead>
         <tr>
             <th>UUID</th>
+            <th>Webhook</th>
             <th>Timestamp</th>
             <th>Type</th>
             <th>Status</th>
@@ -23,6 +24,9 @@
         <tr ng-repeat-start="delivery in deliveries">
             <td>
                 <code class="ot-action" title="Show/hide details for this delivery" ng-click="toggleDeliveryDetails(delivery)">{{ delivery.uuid }}</code>
+            </td>
+            <td>
+                <code>{{ delivery.webhook }}</code>
             </td>
             <td>
                 {{ delivery.request.timestamp }}
@@ -39,7 +43,7 @@
         </tr>
         <tr ng-repeat-end ng-if="delivery.details">
             <!-- Request -->
-            <td colspan="1">
+            <td colspan="2">
                 <p>
                     <label for="delivery-request-payload-{{ delivery.uuid }}">Request payload:</label>
                 </p>
@@ -62,6 +66,21 @@
             </td>
         </tr>
         </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="6">
+                <button class="btn btn-default" ng-disabled="!navigation.previousPage" ng-click="switchPage(navigation.previousPage)">
+                    <span class="fa fa-step-backward"></span>
+                    Newer deliveries
+                </button>
+                <button class="btn btn-default" ng-disabled="!navigation.nextPage" ng-click="switchPage(navigation.nextPage)">
+                    <span class="fa fa-step-forward"></span>
+                    Older deliveries
+                </button>
+                {{ navigation.totalSize }} records
+            </td>
+        </tr>
+        </tfoot>
     </table>
 
 </ot-view>

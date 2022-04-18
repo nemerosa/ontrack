@@ -48,4 +48,15 @@ data class WebhookExchangeFilter(
         responseCode,
         responseKeyword
     )
+    fun withWebhook(webhook: String?) = WebhookExchangeFilter(
+        offset,
+        size,
+        webhook,
+        payloadBefore,
+        payloadAfter,
+        payloadType,
+        payloadKeyword,
+        responseCode,
+        responseKeyword
+    )
 }

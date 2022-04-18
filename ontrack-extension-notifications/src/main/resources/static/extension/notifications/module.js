@@ -718,11 +718,28 @@ angular.module('ontrack.extension.notifications', [
         const query = `
             query(
                 $webhook: String!,
+                $offset: Int!,
+                $size: Int!,
             ) {
                 webhooks(name: $webhook) {
-                    exchanges {
+                    exchanges(
+                        offset: $offset,
+                        size: $size,
+                    ) {
+                        pageInfo {
+                          totalSize
+                          nextPage {
+                            offset
+                            size
+                          }
+                          previousPage {
+                            offset
+                            size
+                          }
+                        }
                         pageItems {
                             uuid
+                            webhook
                             request {
                                 timestamp
                                 type
@@ -740,8 +757,11 @@ angular.module('ontrack.extension.notifications', [
             }
         `;
 
+        const pageSize = 10;
         const queryVariables = {
-            webhook: name
+            webhook: name,
+            offset: 0,
+            size: pageSize,
         };
 
         $scope.loadingDeliveries = false;
@@ -749,6 +769,7 @@ angular.module('ontrack.extension.notifications', [
         const loadDeliveries = () => {
             $scope.loadingDeliveries = true;
             otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
+                $scope.navigation = data.webhooks[0].exchanges.pageInfo;
                 $scope.deliveries = data.webhooks[0].exchanges.pageItems;
             }).finally(() => {
                 $scope.loadingDeliveries = false;
@@ -759,6 +780,12 @@ angular.module('ontrack.extension.notifications', [
 
         $scope.toggleDeliveryDetails = (delivery) => {
             delivery.details = !delivery.details;
+        };
+
+        $scope.switchPage = (page) => {
+            queryVariables.offset = page.offset;
+            queryVariables.size = pageSize;
+            loadDeliveries();
         };
     })
 ;
