@@ -49,6 +49,12 @@ class DefaultWebhookExchangeService(
             jsonQueryVariables["responseCode"] = filter.responseCode.toString()
         }
 
+        // Filter: response keyword
+        if (filter.responseKeyword != null) {
+            jsonQueries += "data::jsonb->'response'->>'payload' ILIKE :responseKeyword"
+            jsonQueryVariables["responseKeyword"] = "%${filter.responseKeyword}%"
+        }
+
         // JSON queries & variables
         val jsonQuery = jsonQueries.joinToString(" AND ") { "( $it )" }
 

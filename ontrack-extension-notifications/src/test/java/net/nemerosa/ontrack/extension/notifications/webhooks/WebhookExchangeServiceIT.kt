@@ -88,6 +88,21 @@ internal class WebhookExchangeServiceIT : AbstractNotificationTestSupport() {
         }
     }
 
+    @Test
+    fun `Getting exchanges - filter on response keyword`() {
+        asAdmin {
+            val webhook = uid("wh")
+            val keyword = uid("kw")
+            val x = store(webhook, responsePayload = keyword.asJson())
+            val y = store(webhook, responsePayload = "OK".asJson())
+            val page = webhookExchangeService.exchanges(
+                WebhookExchangeFilter(webhook = webhook, responseKeyword = keyword)
+            )
+            assertNotNull(page.pageItems.find { it.uuid == x.uuid }, "Webhook X with response keyword = $keyword returned")
+            assertNull(page.pageItems.find { it.uuid == y.uuid }, "Webhook Y not returned")
+        }
+    }
+
     private fun store(
         webhook: String = uid("wh"),
         requestTime: LocalDateTime = Time.now(),
