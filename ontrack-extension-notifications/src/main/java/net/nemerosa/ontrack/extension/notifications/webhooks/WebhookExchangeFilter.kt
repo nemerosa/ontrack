@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
+import net.nemerosa.ontrack.graphql.support.IgnoreRef
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
 import java.time.LocalDateTime
@@ -9,8 +10,10 @@ import java.time.LocalDateTime
  */
 data class WebhookExchangeFilter(
     @APIDescription("Offset")
+    @IgnoreRef
     val offset: Int = 0,
     @APIDescription("Number of exchanges to return at most")
+    @IgnoreRef
     val size: Int = 10,
     @APIDescription("Name of the webhook (regular expression)")
     @APILabel("Webhook")
@@ -33,4 +36,16 @@ data class WebhookExchangeFilter(
     @APIDescription("Keyword in the response")
     @APILabel("Response keyword")
     val responseKeyword: String? = null,
-)
+) {
+    fun withPagination(offset: Int, size: Int) = WebhookExchangeFilter(
+        offset,
+        size,
+        webhook,
+        payloadBefore,
+        payloadAfter,
+        payloadType,
+        payloadKeyword,
+        responseCode,
+        responseKeyword
+    )
+}
