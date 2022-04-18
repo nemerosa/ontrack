@@ -153,57 +153,47 @@ object GraphQLBeanConverter {
     fun asObjectFields(type: KClass<*>, cache: GQLTypeCache): List<GraphQLFieldDefinition> {
         val fields = mutableListOf<GraphQLFieldDefinition>()
         type.memberProperties.forEach { property ->
-            val name = getPropertyName(property)
-            val description = getPropertyDescription(property)
-            val nullable = property.returnType.isMarkedNullable
-            val javaType = property.returnType.javaType
-            val scalarType = getScalarType(property.returnType)
-            // Field builder
-            val field = GraphQLFieldDefinition.newFieldDefinition()
-                .name(name)
-                .description(description)
-            // Deprecation
-            property.findAnnotation<Deprecated>()?.let {
-                field.deprecate(it.message)
-            }
-            // Type
-            val fieldType: GraphQLOutputType = if (scalarType != null) {
-                scalarType
-            } else {
-                val typeRef = property.findAnnotation<TypeRef>()
-                if (typeRef != null) {
-                    if (javaType is Class<*>) {
-                        GraphQLTypeReference(javaType.simpleName)
-                    } else {
-                        throw IllegalStateException("Unsupported type for output type: $property")
-                    }
+            val ignoreRef = property.findAnnotation<IgnoreRef>()
+            if (ignoreRef == null) {
+                val name = getPropertyName(property)
+                val description = getPropertyDescription(property)
+                val nullable = property.returnType.isMarkedNullable
+                val javaType = property.returnType.javaType
+                val scalarType = getScalarType(property.returnType)
+                // Field builder
+                val field = GraphQLFieldDefinition.newFieldDefinition()
+                    .name(name)
+                    .description(description)
+                // Deprecation
+                property.findAnnotation<Deprecated>()?.let {
+                    field.deprecate(it.message)
+                }
+                // Type
+                val fieldType: GraphQLOutputType = if (scalarType != null) {
+                    scalarType
                 } else {
-                    val listRef = property.findAnnotation<ListRef>()
-                    if (listRef != null) {
-                        val listArguments = property.returnType.arguments
-                        if (listArguments.size == 1) {
-                            val elementType = listArguments.first().type?.javaType
-                            if (elementType is Class<*>) {
-                                GraphQLList(GraphQLTypeReference(elementType.simpleName).toNotNull())
+                    val typeRef = property.findAnnotation<TypeRef>()
+                    if (typeRef != null) {
+                        if (javaType is Class<*>) {
+                            if (typeRef.embedded) {
+                                cache.getOrCreate(javaType.simpleName) {
+                                    val kotlinClass = Reflection.createKotlinClass(javaType)
+                                    asObjectType(kotlinClass, cache)
+                                }
                             } else {
-                                throw IllegalStateException("Only list elements being Java classes are supported")
+                                GraphQLTypeReference(javaType.simpleName)
                             }
                         } else {
-                            throw IllegalStateException("List is supported only if it has one and only one type")
+                            throw IllegalStateException("Unsupported type for output type: $property")
                         }
                     } else {
-                        if (javaType is ParameterizedType && javaType.typeName.startsWith("java.util.List<")) {
-                            val listArguments = javaType.actualTypeArguments
+                        val listRef = property.findAnnotation<ListRef>()
+                        if (listRef != null) {
+                            val listArguments = property.returnType.arguments
                             if (listArguments.size == 1) {
-                                val elementType = listArguments.first()
+                                val elementType = listArguments.first().type?.javaType
                                 if (elementType is Class<*>) {
-                                    val elementKClass = Reflection.createKotlinClass(elementType)
-                                    val elementScalarType = getScalarType(elementKClass.java)
-                                    val elementGraphQLType = elementScalarType
-                                        ?: cache.getOrCreate(
-                                            getTypeName(elementKClass)
-                                        ) { asObjectType(elementKClass, cache) }
-                                    GraphQLList(elementGraphQLType.toNotNull())
+                                    GraphQLList(GraphQLTypeReference(elementType.simpleName).toNotNull())
                                 } else {
                                     throw IllegalStateException("Only list elements being Java classes are supported")
                                 }
@@ -211,28 +201,48 @@ object GraphQLBeanConverter {
                                 throw IllegalStateException("List is supported only if it has one and only one type")
                             }
                         } else {
-                            if (javaType is Class<*>) {
-                                // Property type as Kotlin
-                                val propertyKClass = Reflection.createKotlinClass(javaType)
-                                // Tries to convert to an object type
-                                cache.getOrCreate(
-                                    getTypeName(propertyKClass)
-                                ) { asObjectType(propertyKClass, cache) }
+                            if (javaType is ParameterizedType && javaType.typeName.startsWith("java.util.List<")) {
+                                val listArguments = javaType.actualTypeArguments
+                                if (listArguments.size == 1) {
+                                    val elementType = listArguments.first()
+                                    if (elementType is Class<*>) {
+                                        val elementKClass = Reflection.createKotlinClass(elementType)
+                                        val elementScalarType = getScalarType(elementKClass.java)
+                                        val elementGraphQLType = elementScalarType
+                                            ?: cache.getOrCreate(
+                                                getTypeName(elementKClass)
+                                            ) { asObjectType(elementKClass, cache) }
+                                        GraphQLList(elementGraphQLType.toNotNull())
+                                    } else {
+                                        throw IllegalStateException("Only list elements being Java classes are supported")
+                                    }
+                                } else {
+                                    throw IllegalStateException("List is supported only if it has one and only one type")
+                                }
                             } else {
-                                throw IllegalStateException("Only Java classes are supported.")
+                                if (javaType is Class<*>) {
+                                    // Property type as Kotlin
+                                    val propertyKClass = Reflection.createKotlinClass(javaType)
+                                    // Tries to convert to an object type
+                                    cache.getOrCreate(
+                                        getTypeName(propertyKClass)
+                                    ) { asObjectType(propertyKClass, cache) }
+                                } else {
+                                    throw IllegalStateException("Only Java classes are supported.")
+                                }
                             }
                         }
                     }
                 }
+                field.type(
+                    if (nullable) {
+                        fieldType
+                    } else {
+                        fieldType.toNotNull()
+                    }
+                )
+                fields += field.build()
             }
-            field.type(
-                if (nullable) {
-                    fieldType
-                } else {
-                    fieldType.toNotNull()
-                }
-            )
-            fields += field.build()
         }
         return fields
     }
