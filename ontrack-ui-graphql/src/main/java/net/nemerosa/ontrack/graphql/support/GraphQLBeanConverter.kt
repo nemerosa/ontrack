@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.time.LocalDateTime
+import java.util.UUID
 import kotlin.jvm.internal.Reflection
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
@@ -327,6 +328,7 @@ object GraphQLBeanConverter {
             // Custom scalar types
             JsonNode::class.java.isAssignableFrom(type) -> GQLScalarJSON.INSTANCE
             LocalDateTime::class.java.isAssignableFrom(type) -> GQLScalarLocalDateTime.INSTANCE
+            UUID::class.java.isAssignableFrom(type) -> GQLScalarUUID.INSTANCE
             else -> null
         }
     }

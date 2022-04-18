@@ -39,12 +39,10 @@ internal class GQLTypeWebhookExchangeIT : AbstractWebhookExchangeTestSupport() {
                             uuid
                             webhook
                             request {
-                                timestamp
                                 type
                                 payload
                             }
                             response {
-                                timestamp
                                 code
                                 payload
                             }
@@ -63,12 +61,10 @@ internal class GQLTypeWebhookExchangeIT : AbstractWebhookExchangeTestSupport() {
                                             "uuid" to x.uuid.toString(),
                                             "webhook" to x.webhook,
                                             "request" to mapOf(
-                                                "timestamp" to x.request.timestamp.asJson().asText(),
                                                 "type" to x.request.type,
                                                 "payload" to x.request.payload,
                                             ),
                                             "response" to mapOf(
-                                                "timestamp" to x.response?.timestamp?.asJson()?.asText(),
                                                 "code" to x.response?.code,
                                                 "payload" to x.response?.payload
                                             )
