@@ -6,14 +6,53 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.support.seconds
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
-import net.nemerosa.ontrack.kdsl.spec.extension.notifications.webhooks.WebhookSettings
-import net.nemerosa.ontrack.kdsl.spec.extension.notifications.webhooks.webhooks
+import net.nemerosa.ontrack.kdsl.spec.extension.notifications.webhooks.*
 import net.nemerosa.ontrack.kdsl.spec.settings.settings
 import org.junit.jupiter.api.Test
 import java.time.Duration
 
 @AcceptanceTestSuite
 class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
+
+    companion object {
+        private const val injectionWebhookCount = 10
+    }
+
+    /**
+     * Registers several webhooks pointing to the internal webhook endpoint (IWE).
+     *
+     * Send "test" messages on the IWE which send "test" payloads to the webhook.
+     */
+    @Test
+    fun `Generating exchanges`() {
+        withWebhooksEnabled {
+            repeat(injectionWebhookCount) {
+                // Creates an internal webhook
+                val webhookName = uid("whi")
+                ontrack.notifications.webhooks.createWebhook(
+                    name = webhookName,
+                    enabled = true,
+                    url = "${ontractConnectionProperties.url}/extension/notifications/webhooks/internal",
+                    timeout = Duration.ofMinutes(1),
+                    authenticationType = "header",
+                    authenticationConfig = mapOf(
+                        "name" to "X-Ontrack-Token",
+                        "value" to ontractConnectionProperties.token,
+                    )
+                )
+                // TODO Sends all kinds of notifications to the internal end point
+                ontrack.notifications.webhooks.internalEndpoint.test(
+                    TestPayloadWrapper(
+                        webhook = webhookName,
+                        payload = TestPayload(
+                            mode = TestPayloadMode.OK,
+                            content = "OK",
+                        )
+                    )
+                )
+            }
+        }
+    }
 
     @Test
     fun `Registering and using a webhook`() {
