@@ -50,7 +50,7 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
                     )
                     ontrack.notifications.webhooks.internalEndpoint.testOk(webhookName,
                         "OK $it with delay",
-                        delayMs = 1000L * (it + 1)
+                        delayMs = 1000L,
                     )
                     ontrack.notifications.webhooks.internalEndpoint.testNotFound(webhookName,
                         "Not found $it"
