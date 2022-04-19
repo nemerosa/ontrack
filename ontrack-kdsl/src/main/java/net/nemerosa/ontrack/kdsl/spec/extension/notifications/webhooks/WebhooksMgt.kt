@@ -63,10 +63,28 @@ class WebhooksMgt(connector: Connector) : Connected(connector) {
     fun getDeliveries(
         offset: Int = 0,
         size: Int = 10,
-        webhook: String? = null,
-    ): PaginatedList<WebhookDelivery> {
+        webhook: String,
+    ): PaginatedList<WebhookDelivery> =
         TODO()
-    }
+//        graphqlConnector.query(
+//            WebhookDeliveriesQuery(
+//                Input.fromNullable(offset),
+//                Input.fromNullable(size),
+//                webhook
+//            )
+//        )?.paginate(
+//            pageInfo = { it.webhooks().firstOrNull()?.exchanges()?.pageInfo()?.fragments()?.pageInfoContent() },
+//            pageItems = { it.webhooks().firstOrNull()?.exchanges()?.pageItems() }
+//        )?.map {
+//            TODO("Missing mapping to LocalDateTime & UUID")
+//            // WebhookDelivery(
+//            //     uuid = UUID.fromString(it.uuid().toString()),
+//            //     webhook = it.webhook(),
+//            //     request = WebhookRequest(
+//            //         timestamp = it.request().timestamp()
+//            //     )
+//            // )
+//        } ?: emptyPaginatedList()
 
     /**
      * Internal endpoint
