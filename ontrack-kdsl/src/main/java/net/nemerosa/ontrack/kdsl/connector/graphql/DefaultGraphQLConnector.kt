@@ -13,12 +13,14 @@ import okhttp3.OkHttpClient
 
 class DefaultGraphQLConnector(
     connector: Connector,
-    clientConfiguration: ApolloClient.Builder.() -> Unit = {}
+    clientConfiguration: ApolloClient.Builder.() -> Unit = {},
 ) : GraphQLConnector {
 
     private val apolloClient: ApolloClient =
         ApolloClient.builder()
             .serverUrl("${connector.url}/graphql")
+            .addCustomTypeAdapter(LocalDateTimeCustomTypeAdapter.TYPE, LocalDateTimeCustomTypeAdapter())
+            .addCustomTypeAdapter(UUIDCustomTypeAdapter.TYPE, UUIDCustomTypeAdapter())
             .okHttpClient(
                 OkHttpClient.Builder()
                     .addInterceptor(
@@ -38,7 +40,7 @@ class DefaultGraphQLConnector(
 
     override fun <D : Operation.Data, T, V : Operation.Variables> mutate(
         mutation: Mutation<D, T, V>,
-        userErrors: (T?) -> UserErrors?
+        userErrors: (T?) -> UserErrors?,
     ): T? =
         runBlocking {
             val response = apolloClient.mutate(mutation).await().checkErrors()

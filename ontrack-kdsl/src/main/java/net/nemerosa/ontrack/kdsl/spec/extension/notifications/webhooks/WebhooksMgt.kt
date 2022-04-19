@@ -1,12 +1,16 @@
 package net.nemerosa.ontrack.kdsl.spec.extension.notifications.webhooks
 
+import com.apollographql.apollo.api.Input
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
+import net.nemerosa.ontrack.kdsl.connector.graphql.paginate
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateWebhookMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.WebhookDeliveriesQuery
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.connector.support.PaginatedList
+import net.nemerosa.ontrack.kdsl.connector.support.emptyPaginatedList
 import java.time.Duration
 
 /**
@@ -65,26 +69,34 @@ class WebhooksMgt(connector: Connector) : Connected(connector) {
         size: Int = 10,
         webhook: String,
     ): PaginatedList<WebhookDelivery> =
-        TODO()
-//        graphqlConnector.query(
-//            WebhookDeliveriesQuery(
-//                Input.fromNullable(offset),
-//                Input.fromNullable(size),
-//                webhook
-//            )
-//        )?.paginate(
-//            pageInfo = { it.webhooks().firstOrNull()?.exchanges()?.pageInfo()?.fragments()?.pageInfoContent() },
-//            pageItems = { it.webhooks().firstOrNull()?.exchanges()?.pageItems() }
-//        )?.map {
-//            TODO("Missing mapping to LocalDateTime & UUID")
-//            // WebhookDelivery(
-//            //     uuid = UUID.fromString(it.uuid().toString()),
-//            //     webhook = it.webhook(),
-//            //     request = WebhookRequest(
-//            //         timestamp = it.request().timestamp()
-//            //     )
-//            // )
-//        } ?: emptyPaginatedList()
+        graphqlConnector.query(
+            WebhookDeliveriesQuery(
+                Input.fromNullable(offset),
+                Input.fromNullable(size),
+                webhook
+            )
+        )?.paginate(
+            pageInfo = { it.webhooks().firstOrNull()?.exchanges()?.pageInfo()?.fragments()?.pageInfoContent() },
+            pageItems = { it.webhooks().firstOrNull()?.exchanges()?.pageItems() }
+        )?.map {
+            WebhookDelivery(
+                uuid = it.uuid(),
+                webhook = it.webhook(),
+                request = WebhookRequest(
+                    timestamp = it.request().timestamp(),
+                    type = it.request().type(),
+                    payload = it.request().payload(),
+                ),
+                response = it.response()?.run {
+                    WebhookResponse(
+                        timestamp = timestamp(),
+                        code = code(),
+                        payload = payload(),
+                    )
+                },
+                stack = it.stack(),
+            )
+        } ?: emptyPaginatedList()
 
     /**
      * Internal endpoint

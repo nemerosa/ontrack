@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.notifications.webhooks
 
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.kdsl.acceptance.annotations.AcceptanceTestSuite
 import net.nemerosa.ontrack.kdsl.acceptance.tests.notifications.AbstractACCDSLNotificationsTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.seconds
@@ -132,10 +134,15 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
             }
             // Checks that the delivery has been registered
             waitUntil(timeout = 10.seconds, interval = 500) {
-                ontrack.notifications.webhooks.getDeliveries(webhook = webhookName).items.any {
+                val items = ontrack.notifications.webhooks.getDeliveries(webhook = webhookName).items
+                items.any {
                     it.request.type == "ping"
                             && it.response?.code == 200
-                            && it.response?.payload == "Webhook $webhookName ping"
+                            && it.response?.payload?.parseAsJson() == mapOf(
+                        "ping" to mapOf(
+                            "message" to "Webhook $webhookName ping"
+                        )
+                    ).asJson()
                 }
             }
         }
