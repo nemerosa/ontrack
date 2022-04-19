@@ -716,6 +716,7 @@ angular.module('ontrack.extension.notifications', [
         ];
 
         $scope.filter = {
+            payloadKeyword: '',
             responseCode: '',
         };
 
@@ -724,6 +725,7 @@ angular.module('ontrack.extension.notifications', [
                 $webhook: String!,
                 $offset: Int!,
                 $size: Int!,
+                $payloadKeyword: String,
                 $responseCode: Int,
             ) {
                 webhooks(name: $webhook) {
@@ -731,6 +733,7 @@ angular.module('ontrack.extension.notifications', [
                         offset: $offset,
                         size: $size,
                         filter: {
+                            payloadKeyword: $payloadKeyword,
                             responseCode: $responseCode,
                         }
                     ) {
@@ -770,6 +773,7 @@ angular.module('ontrack.extension.notifications', [
             webhook: name,
             offset: 0,
             size: pageSize,
+            payloadKeyword: null,
             responseCode: null,
         };
 
@@ -782,6 +786,12 @@ angular.module('ontrack.extension.notifications', [
                 queryVariables.responseCode = $scope.filter.responseCode;
             } else {
                 queryVariables.responseCode = null;
+            }
+
+            if ($scope.filter.payloadKeyword) {
+                queryVariables.payloadKeyword = $scope.filter.payloadKeyword;
+            } else {
+                queryVariables.payloadKeyword = null;
             }
 
             otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
@@ -809,6 +819,7 @@ angular.module('ontrack.extension.notifications', [
         };
 
         $scope.resetFilter = () => {
+            $scope.filter.payloadKeyword = '';
             $scope.filter.responseCode = '';
             loadDeliveries();
         };

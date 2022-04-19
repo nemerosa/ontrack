@@ -24,6 +24,11 @@
         <tr>
             <td colspan="6">
                 <form class="form-inline" ng-submit="submitFilter()">
+                    <!-- Filter on request keyword -->
+                    <div class="form-group">
+                        <label for="filter-request-keyword">Request keyword</label>
+                        <input type="text" class="form-control" id="filter-request-keyword" ng-model="filter.payloadKeyword"/>
+                    </div>
                     <!-- Filter on HTTP response code -->
                     <div class="form-group">
                         <label for="filter-response-code">Status</label>
