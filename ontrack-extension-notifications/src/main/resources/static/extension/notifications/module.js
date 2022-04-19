@@ -715,16 +715,24 @@ angular.module('ontrack.extension.notifications', [
             ot.viewCloseCommand("/extension/notifications/webhooks")
         ];
 
+        $scope.filter = {
+            responseCode: '',
+        };
+
         const query = `
             query(
                 $webhook: String!,
                 $offset: Int!,
                 $size: Int!,
+                $responseCode: Int,
             ) {
                 webhooks(name: $webhook) {
                     exchanges(
                         offset: $offset,
                         size: $size,
+                        filter: {
+                            responseCode: $responseCode,
+                        }
                     ) {
                         pageInfo {
                           totalSize
@@ -762,12 +770,20 @@ angular.module('ontrack.extension.notifications', [
             webhook: name,
             offset: 0,
             size: pageSize,
+            responseCode: null,
         };
 
         $scope.loadingDeliveries = false;
 
         const loadDeliveries = () => {
             $scope.loadingDeliveries = true;
+
+            if ($scope.filter.responseCode) {
+                queryVariables.responseCode = $scope.filter.responseCode;
+            } else {
+                queryVariables.responseCode = null;
+            }
+
             otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
                 $scope.navigation = data.webhooks[0].exchanges.pageInfo;
                 $scope.deliveries = data.webhooks[0].exchanges.pageItems;
@@ -785,6 +801,15 @@ angular.module('ontrack.extension.notifications', [
         $scope.switchPage = (page) => {
             queryVariables.offset = page.offset;
             queryVariables.size = pageSize;
+            loadDeliveries();
+        };
+
+        $scope.submitFilter = () => {
+            loadDeliveries();
+        };
+
+        $scope.resetFilter = () => {
+            $scope.filter.responseCode = '';
             loadDeliveries();
         };
     })

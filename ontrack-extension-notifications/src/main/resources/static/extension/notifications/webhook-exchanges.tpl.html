@@ -21,6 +21,29 @@
         </tr>
         </thead>
         <tbody>
+        <tr>
+            <td colspan="6">
+                <form class="form-inline" ng-submit="submitFilter()">
+                    <!-- Filter on HTTP response code -->
+                    <div class="form-group">
+                        <label for="filter-response-code">Status</label>
+                        <input type="number" step="1" min="100" max="599" class="form-control" id="filter-response-code" ng-model="filter.responseCode"/>
+                    </div>
+                    <!-- Clearing the form -->
+                    <button type="button" class="btn btn-link" ng-click="resetFilter()" ng-disabled="loadingDeliveries">
+                        <span class="fa fa-ban"></span>
+                        Clear
+                    </button>
+                    <!-- Submitting the form -->
+                    <button type="submit" class="btn btn-info" ng-disabled="loadingDeliveries">
+                        <span class="fa fa-filter"></span>
+                        Filter
+                    </button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+        <tbody>
         <tr ng-repeat-start="delivery in deliveries">
             <td>
                 <code class="ot-action" title="Show/hide details for this delivery" ng-click="toggleDeliveryDetails(delivery)">{{ delivery.uuid }}</code>
