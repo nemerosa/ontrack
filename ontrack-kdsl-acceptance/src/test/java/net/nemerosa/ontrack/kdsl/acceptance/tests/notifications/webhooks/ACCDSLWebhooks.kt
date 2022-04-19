@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.webhooks.*
 import net.nemerosa.ontrack.kdsl.spec.settings.settings
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.Duration
 
@@ -27,6 +28,7 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
      * Send "test" messages on the IWE which send "test" payloads to the webhook.
      */
     @Test
+    @Disabled("Not really a test")
     fun `Generating exchanges`() {
         withWebhooksEnabled {
             repeat(injectionWebhookCount) {
