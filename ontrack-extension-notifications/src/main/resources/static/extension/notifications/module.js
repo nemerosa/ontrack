@@ -570,7 +570,7 @@ angular.module('ontrack.extension.notifications', [
             controller: 'WebhooksCtrl'
         });
     })
-    .controller('WebhooksCtrl', function ($q, $scope, $http, ot, otAlertService, otFormService, otGraphqlService) {
+    .controller('WebhooksCtrl', function ($q, $scope, $http, ot, otAlertService, otFormService, otGraphqlService, otNotificationService) {
         const view = ot.view();
         view.title = "Webhooks";
         view.breadcrumbs = ot.homeBreadcrumbs();
@@ -694,6 +694,12 @@ angular.module('ontrack.extension.notifications', [
             }).then(() =>
                 otGraphqlService.pageGraphQLCall(deleteWebhookQuery, {name: webhook.name})
             ).then(loadWebhooks);
+        };
+
+        $scope.pingWebhook = (webhook) => {
+            ot.pageCall($http.post(`/extension/notifications/webhook/${webhook.name}/ping`)).then(() => {
+                otNotificationService.success(`Ping payload has been sent to the "${webhook.name}" webhook. You can check its deliveries.`);
+            });
         };
     })
     .config(function ($stateProvider) {

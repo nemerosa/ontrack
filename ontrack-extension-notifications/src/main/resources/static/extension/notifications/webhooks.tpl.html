@@ -38,6 +38,9 @@
                 <a class="ot-command" href="#/extension/notifications/webhooks/{{ webhook.name }}" title="Displays the list of deliveries for this webhook">
                     <span class="fa fa-exchange"></span> Deliveries
                 </a>
+                <span class="ot-command" ng-click="pingWebhook(webhook)" title="Tests the delivery to this webhook by sending a ping payload.">
+                    <span class="fa fa-eye"></span> Test
+                </span>
                 <span class="ot-command" ng-click="deleteWebhook(webhook)">
                     <span class="fa fa-trash"></span> Delete
                 </span>
