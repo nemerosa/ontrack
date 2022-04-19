@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateWebhookMutation
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
+import net.nemerosa.ontrack.kdsl.connector.support.PaginatedList
 import java.time.Duration
 
 /**
@@ -43,6 +44,28 @@ class WebhooksMgt(connector: Connector) : Connected(connector) {
         ) {
             it?.createWebhook()?.fragments()?.payloadUserErrors()?.convert()
         }
+    }
+
+    /**
+     * Pings an existing webhook
+     */
+    fun ping(name: String) {
+        connector.post("/extension/notifications/webhook/$name/ping")
+    }
+
+    /**
+     * Gets the deliveries for the webhooks.
+     *
+     * @param offset Offset in the list
+     * @param size Size of a page
+     * @param webhook Filter on the name of the webhook
+     */
+    fun getDeliveries(
+        offset: Int = 0,
+        size: Int = 10,
+        webhook: String? = null,
+    ): PaginatedList<WebhookDelivery> {
+        TODO()
     }
 
     /**

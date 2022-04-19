@@ -104,6 +104,43 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
         }
     }
 
+    @Test
+    fun `Pinging a webhook`() {
+        withWebhooksEnabled {
+            // Creates a webhook
+            val webhookName = uid("wh")
+            ontrack.notifications.webhooks.createWebhook(
+                name = webhookName,
+                enabled = true,
+                url = "${ontractConnectionProperties.url}/extension/notifications/webhooks/internal",
+                timeout = Duration.ofMinutes(1),
+                authenticationType = "header",
+                authenticationConfig = mapOf(
+                    "name" to "X-Ontrack-Token",
+                    "value" to ontractConnectionProperties.token,
+                )
+            )
+            // Pinging the webhook
+            ontrack.notifications.webhooks.ping(webhookName)
+            // Checks that the webhook received the event
+            waitUntil(timeout = 10.seconds, interval = 500) {
+                val payloads = ontrack.notifications.webhooks.internalEndpoint.payloads
+                payloads.any {
+                    it.type == "ping"
+                            && it.data.path("message").asText() == "Webhook $webhookName ping"
+                }
+            }
+            // Checks that the delivery has been registered
+            waitUntil(timeout = 10.seconds, interval = 500) {
+                ontrack.notifications.webhooks.getDeliveries(webhook = webhookName).items.any {
+                    it.request.type == "ping"
+                            && it.response?.code == 200
+                            && it.response?.payload == "Webhook $webhookName ping"
+                }
+            }
+        }
+    }
+
     private fun withWebhooksEnabled(code: () -> Unit) {
         val old = ontrack.settings.webhooks.get()
         try {

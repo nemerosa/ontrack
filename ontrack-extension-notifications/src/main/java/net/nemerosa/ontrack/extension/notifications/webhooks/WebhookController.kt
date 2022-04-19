@@ -8,6 +8,8 @@ import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration
 import net.nemerosa.ontrack.model.structure.ServiceConfigurationSource
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -15,11 +17,20 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/extension/notifications/webhook")
 class WebhookController(
     private val webhookAdminService: WebhookAdminService,
+    private val webhookExecutionService: WebhookExecutionService,
     private val webhookAuthenticatorRegistry: WebhookAuthenticatorRegistry,
 ) {
 
     @GetMapping("create")
     fun newWebhookForm(): Form = webhookForm(null)
+
+    @PostMapping("{name}/ping")
+    fun pingWebhook(@PathVariable name: String) {
+        val webhook = webhookAdminService.findWebhookByName(name)
+            ?: throw WebhookNotFoundException(name)
+        val payload = WebhookPingPayloadData.pingPayload("Webhook $name ping")
+        webhookExecutionService.send(webhook, payload)
+    }
 
     private fun webhookForm(webhook: Webhook?): Form = Form.create()
         .textField(WebhookForm::name, webhook?.name)

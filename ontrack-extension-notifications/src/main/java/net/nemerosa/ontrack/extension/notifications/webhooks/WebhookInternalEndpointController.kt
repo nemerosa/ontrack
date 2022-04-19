@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.BaseException
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.format
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.exceptions.NotFoundException
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -74,9 +76,13 @@ class WebhookInternalEndpointController(
         payloads += payload
         return when (payload.type) {
             "test" -> test(payload) ?: "OK"
+            "ping" -> ping(payload.data)
             else -> "OK"
         }
     }
+
+    private fun ping(data: JsonNode): String =
+        mapOf("ping" to data).asJson().format()
 
     private fun test(payload: JsonWebhookPayload): String? {
         val test = payload.data.parseOrNull<TestPayload>() ?: return null
