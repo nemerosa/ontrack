@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
+import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.model.metrics.increment
+import net.nemerosa.ontrack.model.metrics.time
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.springframework.stereotype.Service
@@ -19,9 +22,17 @@ class DefaultWebhookExecutionService(
     private val webhookAuthenticatorRegistry: WebhookAuthenticatorRegistry,
     private val cachedSettingsService: CachedSettingsService,
     private val webhookExchangeService: WebhookExchangeService,
+    private val meterRegistry: MeterRegistry,
 ) : WebhookExecutionService {
 
     override fun send(webhook: Webhook, payload: WebhookPayload<*>) {
+
+        meterRegistry.increment(
+            WebhookMetrics.webhook_delivery_started,
+            "webhook" to webhook.name,
+            "type" to payload.type,
+        )
+
         val client: HttpClient = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_1_1)
             .followRedirects(HttpClient.Redirect.NORMAL)
@@ -52,12 +63,26 @@ class DefaultWebhookExecutionService(
         val start = Time.now()
 
         try {
-            client
-                .sendAsync(request, BodyHandlers.ofString())
-                .thenAccept { response ->
-                    store(webhook, payload, payloadString, start, response)
-                }
+            val response = meterRegistry.time(
+                name = WebhookMetrics.webhook_delivery_duration,
+                "webhook" to webhook.name,
+                "type" to payload.type,
+            ) {
+                client.send(request, BodyHandlers.ofString())
+            }
+            meterRegistry.increment(
+                WebhookMetrics.webhook_delivery_answered,
+                "webhook" to webhook.name,
+                "type" to payload.type,
+                "status" to response.statusCode().toString(),
+            )
+            store(webhook, payload, payloadString, start, response)
         } catch (any: Exception) {
+            meterRegistry.increment(
+                WebhookMetrics.webhook_delivery_error,
+                "webhook" to webhook.name,
+                "type" to payload.type,
+            )
             store(webhook, payload, payloadString, start, any)
         }
     }
