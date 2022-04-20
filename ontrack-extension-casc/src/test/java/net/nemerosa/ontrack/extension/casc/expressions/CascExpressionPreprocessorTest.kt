@@ -13,9 +13,25 @@ internal class CascExpressionPreprocessorTest {
         override fun evaluate(value: String): String = value.uppercase()
     }
 
+    private val multilineExpressionContext = object : CascExpressionContext {
+
+        override val name: String = "multiline"
+
+        private val expressions = mapOf(
+            "test" to """
+                A clean
+                multiline
+                string
+            """.trimIndent()
+        )
+
+        override fun evaluate(value: String): String = expressions[value] ?: error("Cannot find multiline value for $value")
+    }
+
     private val expressionPreprocessor = CascExpressionPreprocessor(
         listOf(
-            mockExpressionContext
+            mockExpressionContext,
+            multilineExpressionContext,
         )
     )
 
@@ -46,6 +62,22 @@ internal class CascExpressionPreprocessorTest {
         assertEquals(
             "value: TEST",
             expressionPreprocessor.process("value: {{ mock.test }}")
+        )
+    }
+
+    @Test
+    fun `Multiline expression`() {
+        assertEquals(
+            """
+                value: |-
+                    A clean
+                    multiline
+                    string
+            """.trimIndent(),
+            expressionPreprocessor.process("""
+                value: |-
+                    {{ multiline.test }}
+            """.trimIndent())
         )
     }
 

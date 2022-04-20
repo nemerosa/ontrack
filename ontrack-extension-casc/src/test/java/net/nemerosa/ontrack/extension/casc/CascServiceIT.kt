@@ -35,6 +35,20 @@ class CascServiceIT : AbstractCascTestSupport() {
     @BeforeEach
     fun before() {
         secretsRootDir = createTempDirectory()
+        secretsRootDir
+            .resolve("my-mock")
+            .createDirectories()
+            .resolve("password")
+            .writeText("my-password")
+        secretsRootDir
+            .resolve("my-mock")
+            .createDirectories()
+            .resolve("key")
+            .writeText("""
+                Secret
+                on multiple
+                lines
+            """.trimIndent())
         cascConfigurationProperties.secrets.directory = secretsRootDir.absolutePathString()
     }
 
@@ -76,11 +90,6 @@ class CascServiceIT : AbstractCascTestSupport() {
 
     @Test
     fun `Rendering with secrets`() {
-        secretsRootDir
-            .resolve("my-mock")
-            .createDirectories()
-            .resolve("password")
-            .writeText("my-password")
         asAdmin {
             mockAdminContext.data = null
             casc("""
@@ -92,6 +101,27 @@ class CascServiceIT : AbstractCascTestSupport() {
             """.trimIndent())
             assertEquals("my-user", mockAdminContext.data?.username)
             assertEquals("my-password", mockAdminContext.data?.password)
+        }
+    }
+
+    @Test
+    fun `Rendering with multiline secrets`() {
+        asAdmin {
+            mockAdminContext.data = null
+            casc("""
+                ontrack:
+                    admin:
+                        mock:
+                            username: my-user
+                            password: |-
+                                {{ secret.my-mock.key }}
+            """.trimIndent())
+            assertEquals("my-user", mockAdminContext.data?.username)
+            assertEquals("""
+                Secret
+                on multiple
+                lines
+            """.trimIndent(), mockAdminContext.data?.password)
         }
     }
 
