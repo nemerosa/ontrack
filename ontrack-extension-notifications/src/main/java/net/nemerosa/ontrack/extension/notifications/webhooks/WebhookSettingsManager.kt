@@ -24,11 +24,13 @@ class WebhookSettingsManager(
     override fun doSaveSettings(settings: WebhookSettings) {
         settingsRepository.setBoolean<WebhookSettings>(settings::enabled)
         settingsRepository.setInt<WebhookSettings>(settings::timeoutMinutes)
+        settingsRepository.setInt<WebhookSettings>(settings::deliveriesRetentionDays)
     }
 
     override fun getSettingsForm(settings: WebhookSettings): Form = Form.create()
         .yesNoField(WebhookSettings::enabled, settings.enabled)
         .intField(WebhookSettings::timeoutMinutes, settings.timeoutMinutes)
+        .intField(WebhookSettings::deliveriesRetentionDays, settings.deliveriesRetentionDays)
 
     override fun getId(): String = "webhooks"
 

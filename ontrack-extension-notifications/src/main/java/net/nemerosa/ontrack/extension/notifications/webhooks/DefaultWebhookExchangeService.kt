@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 @Transactional
@@ -91,6 +92,16 @@ class DefaultWebhookExchangeService(
 
         // Page
         return PaginatedList.create(items, filter.offset, filter.size, total)
+    }
+
+    override fun clearBefore(time: LocalDateTime) {
+        storageService.deleteWithFilter(
+            store = STORE,
+            query = "data::jsonb->'request'->>'timestamp' <= :time",
+            queryVariables = mapOf(
+                "time" to time.asJson().asText()
+            ),
+        )
     }
 
     companion object {

@@ -17,6 +17,7 @@ class WebhookSettingsProvider(
     override fun getSettings() = WebhookSettings(
         enabled = settingsRepository.getBoolean(WebhookSettings::enabled, false),
         timeoutMinutes = settingsRepository.getInt(WebhookSettings::timeoutMinutes, 5),
+        deliveriesRetentionDays = settingsRepository.getInt(WebhookSettings::deliveriesRetentionDays, 30),
     )
 
     override fun getSettingsClass(): Class<WebhookSettings> = WebhookSettings::class.java
