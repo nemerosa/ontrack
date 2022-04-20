@@ -19,6 +19,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api")
     implementation("io.micrometer:micrometer-core")
     implementation("jakarta.annotation:jakarta.annotation-api")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
 
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
