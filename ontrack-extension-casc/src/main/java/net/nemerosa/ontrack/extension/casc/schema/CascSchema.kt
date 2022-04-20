@@ -49,16 +49,19 @@ sealed class CascScalar(
 
 class CascString : CascScalar("string", "String type")
 class CascInt : CascScalar("int", "Int type")
+class CascLong : CascScalar("long", "Long type")
 class CascBoolean : CascScalar("boolean", "Boolean type")
 
 val cascString = CascString()
 val cascInt = CascInt()
+val cascLong = CascLong()
 val cascBoolean = CascBoolean()
 val cascJson = CascJson()
 
 private val builtinTypes = listOf(
     cascString,
     cascInt,
+    cascLong,
     cascBoolean,
     cascJson,
 ).associateBy { it.__type }
@@ -162,6 +165,7 @@ internal fun cascFieldType(property: KProperty<*>): CascType =
             String::class -> cascString
             Boolean::class -> cascBoolean
             Int::class -> cascInt
+            Long::class -> cascLong
             JsonNode::class -> cascJson
             else -> error("Cannot get CasC type for $property")
         }
