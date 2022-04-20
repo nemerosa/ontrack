@@ -27,6 +27,9 @@ dependencies {
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
 
+    testImplementation("com.icegreen:greenmail:1.6.8")
+    testImplementation("com.icegreen:greenmail-junit5:1.6.8")
+
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
 }
