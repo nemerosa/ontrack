@@ -1,39 +1,45 @@
 package net.nemerosa.ontrack.extension.notifications.mail
 
-import com.icegreen.greenmail.junit5.GreenMailExtension
-import com.icegreen.greenmail.util.ServerSetupTest
-import io.mockk.mockk
-import org.junit.jupiter.api.extension.RegisterExtension
+import com.icegreen.greenmail.spring.GreenMailBean
+import com.icegreen.greenmail.util.GreenMail
+import net.nemerosa.ontrack.common.RunProfile
+import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.JavaMailSenderImpl
 
-abstract class AbstractMailTestSupport() {
+abstract class AbstractMailTestSupport : AbstractNotificationTestSupport() {
 
-    /**
-     * Configures a [MailService] for a local mail server.
-     */
-    protected fun withMail(
-        code: (mailService: MailService, greenMail: GreenMailExtension) -> Unit,
-    ) {
-        val mailService = DefaultMailService(
-            javaMailSender = createJavaMailSender(),
-            applicationLogService = mockk(),
-        )
-        code(mailService, greenMail)
-    }
+    @Autowired
+    protected lateinit var mailService: MailService
 
-    private fun createJavaMailSender(): JavaMailSender {
-        return JavaMailSenderImpl().apply {
-            host = "localhost"
-            port = greenMail.smtp.port
-        }
-    }
+    @Autowired
+    protected lateinit var greenMail: GreenMail
+
 
     companion object {
         const val DEFAULT_ADDRESS = "to@localhost"
+    }
 
-        @RegisterExtension
-        val greenMail: GreenMailExtension = GreenMailExtension(ServerSetupTest.SMTP)
+    @Configuration
+    @Profile(RunProfile.UNIT_TEST)
+    class AbstractMailTestSupportConfiguration {
+
+        @Bean
+        fun greenMailBean(): GreenMailBean = GreenMailBean()
+
+        @Bean
+        fun greenMail(greenMailBean: GreenMailBean): GreenMail = greenMailBean.greenMail
+
+        @Bean
+        fun javaMailSender(greenMail: GreenMail): JavaMailSender = JavaMailSenderImpl().apply {
+            host = "localhost"
+            port = greenMail.smtp.port
+        }
+
     }
 
 }

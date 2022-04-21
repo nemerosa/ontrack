@@ -12,22 +12,20 @@ class MailServiceIT : AbstractMailTestSupport() {
     @Test
     fun `Sending a mail`() {
         val subject = uid("mail")
-        withMail { mailService, greenMail ->
-            val sent = mailService.sendMail(
-                to = DEFAULT_ADDRESS,
-                subject = subject,
-                body = "Mail $subject",
-            )
-            // Basic check
-            assertTrue(sent, "Mail indicated as being sent")
-            // Gets the received mails
-            val messages = greenMail.receivedMessages
-            // ... and check we retrieve the sent mail
-            assertNotNull(messages.find {
-                it.subject == subject
-            }, "Mail received") { message ->
-                assertEquals("Mail $subject", GreenMailUtil.getBody(message))
-            }
+        val sent = mailService.sendMail(
+            to = DEFAULT_ADDRESS,
+            subject = subject,
+            body = "Mail $subject",
+        )
+        // Basic check
+        assertTrue(sent, "Mail indicated as being sent")
+        // Gets the received mails
+        val messages = greenMail.receivedMessages
+        // ... and check we retrieve the sent mail
+        assertNotNull(messages.find {
+            it.subject == subject
+        }, "Mail received") { message ->
+            assertEquals("Mail $subject", GreenMailUtil.getBody(message))
         }
     }
 
