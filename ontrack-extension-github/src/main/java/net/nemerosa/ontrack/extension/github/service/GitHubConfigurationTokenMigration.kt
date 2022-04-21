@@ -20,7 +20,10 @@ class GitHubConfigurationTokenMigration(
 
     override fun getName(): String = "Encryption of GitHub OAuth2 tokens"
 
-    override fun startupOrder(): Int = StartupService.JOB_REGISTRATION
+    /**
+     * Making sure to migrate the tokens before any kind of Casc migration.
+     */
+    override fun startupOrder(): Int = StartupService.SYSTEM_REGISTRATION - 1
 
     override fun start() {
         // Gets all existing configurations in a raw form & migrate them if needed
