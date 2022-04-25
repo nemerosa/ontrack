@@ -230,7 +230,7 @@ class DefaultWorkflowJobProcessingService(
             BuildGitHubWorkflowRunPropertyType::class,
             PropertySearchArguments(
                 jsonContext = null,
-                jsonCriteria = "(pp.json->>'runId')::int = :runId",
+                jsonCriteria = "(pp.json->>'runId')::bigint = :runId",
                 criteriaParams = mapOf(
                     "runId" to runId,
                 )

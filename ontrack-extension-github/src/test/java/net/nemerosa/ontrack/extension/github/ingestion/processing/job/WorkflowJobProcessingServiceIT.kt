@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
-import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
@@ -12,8 +12,8 @@ import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProp
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobPropertyType
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.RunInfoService
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import kotlin.test.assertEquals
@@ -21,7 +21,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 @ContextConfiguration(classes = [ConfigLoaderServiceITMockConfig::class])
-class WorkflowJobProcessingServiceIT : AbstractIngestionTestJUnit4Support() {
+class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
 
     @Autowired
     private lateinit var workflowJobProcessingService: WorkflowJobProcessingService
@@ -32,7 +32,7 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestJUnit4Support() {
     @Autowired
     private lateinit var configLoaderService: ConfigLoaderService
 
-    @Before
+    @BeforeEach
     fun before() {
         onlyOneGitHubConfig()
         ConfigLoaderServiceITMockConfig.defaultIngestionConfig(configLoaderService)
@@ -44,6 +44,17 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestJUnit4Support() {
             branch {
                 build {
                     runTest()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creation of a simple validation run with a very large ID`() {
+        project {
+            branch {
+                build {
+                    runTest(runId = 2218938646L)
                 }
             }
         }
