@@ -32,6 +32,21 @@ class NotificationsConfigProperties {
     var webhook = WebhookChannelProperties()
 
     /**
+     * Mail configuration
+     */
+    var mail = MailProperties()
+
+    /**
+     * Mail configuration properties
+     */
+    class MailProperties {
+        /**
+         * From address
+         */
+        var from = "no-reply@localhost"
+    }
+
+    /**
      * Webhook channel configuration
      */
     class WebhookChannelProperties {
