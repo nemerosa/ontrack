@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
-import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderServiceITMockConfig
@@ -22,15 +22,15 @@ import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProp
 import net.nemerosa.ontrack.model.structure.RunInfoService
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import java.time.LocalDateTime
 import kotlin.test.*
 
 @ContextConfiguration(classes = [ConfigLoaderServiceITMockConfig::class])
-class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestJUnit4Support() {
+class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
 
     @Autowired
     private lateinit var processor: WorkflowRunIngestionEventProcessor
@@ -44,7 +44,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestJUnit4Support(
     @Autowired
     private lateinit var configLoaderService: ConfigLoaderService
 
-    @Before
+    @BeforeEach
     fun init() {
         ConfigLoaderServiceITMockConfig.defaultIngestionConfig(configLoaderService)
     }
@@ -399,6 +399,21 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestJUnit4Support(
                 htmlUrl = "${match.url}/nemerosa/github-ingestion-poc/actions/runs/1395528922",
                 repoUrl = "${match.url}/nemerosa/github-ingestion-poc",
             )
+        }
+    }
+
+    @Test
+    fun `Tags are not processed for the workflows`() {
+        asAdmin {
+            withGitHubIngestionSettings {
+                val payload: WorkflowRunPayload = IngestionHookFixtures.sampleWorkflowRunPayload(
+                    headBranch = "refs/tags/1.2.3"
+                )
+                assertEquals(
+                    IngestionEventPreprocessingCheck.IGNORED,
+                    processor.preProcessingCheck(payload)
+                )
+            }
         }
     }
 

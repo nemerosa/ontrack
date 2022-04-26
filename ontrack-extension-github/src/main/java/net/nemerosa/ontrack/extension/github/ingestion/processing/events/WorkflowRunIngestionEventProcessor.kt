@@ -20,6 +20,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
 import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
+import net.nemerosa.ontrack.extension.github.ingestion.support.REFS_TAGS_PREFIX
 import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
@@ -57,6 +58,8 @@ class WorkflowRunIngestionEventProcessor(
             } else {
                 IngestionEventPreprocessingCheck.IGNORED
             }
+        } else if (payload.workflowRun.headBranch.startsWith(REFS_TAGS_PREFIX)) {
+            IngestionEventPreprocessingCheck.IGNORED
         } else {
             IngestionEventPreprocessingCheck.TO_BE_PROCESSED
         }

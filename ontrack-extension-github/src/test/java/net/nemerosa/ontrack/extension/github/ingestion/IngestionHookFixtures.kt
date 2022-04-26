@@ -135,11 +135,12 @@ object IngestionHookFixtures {
      */
     fun sampleWorkflowRunPayload(
         repoName: String = sampleRepository,
+        headBranch: String = sampleBranch,
         pullRequest: WorkflowRunPullRequest? = null,
     ) = workflowRunPayload(
         action = WorkflowRunAction.requested,
         runNumber = 1,
-        headBranch = sampleBranch,
+        headBranch = headBranch,
         repoName = repoName,
         owner = sampleOwner,
         sender = "my-sender",
