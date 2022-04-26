@@ -35,3 +35,8 @@ interface IngestionModelAccessService {
         pullRequest: IPullRequest?,
     ): Branch
 }
+
+/**
+ * Prefix for the tags
+ */
+const val REFS_TAGS_PREFIX = "refs/tags/"

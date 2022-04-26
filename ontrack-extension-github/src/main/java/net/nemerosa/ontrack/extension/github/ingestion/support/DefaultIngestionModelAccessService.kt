@@ -120,6 +120,8 @@ class DefaultIngestionModelAccessService(
         val (branchName, gitBranch) = if (pullRequest != null) {
             val key = "PR-${pullRequest.number}"
             key to key
+        } else if (headBranch.startsWith(REFS_TAGS_PREFIX)) {
+            error("Creating branch from tag is not supported: $headBranch")
         } else {
             normalizeName(headBranch) to headBranch
         }

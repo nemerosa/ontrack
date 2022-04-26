@@ -123,6 +123,15 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestJUnit4Suppor
     }
 
     @Test
+    fun `Creating a branch is forbidden for tags`() {
+        project {
+            assertFailsWith<IllegalStateException> {
+                ingestionModelAccessService.getOrCreateBranch(this, "refs/tags/1.0.0", null)
+            }
+        }
+    }
+
+    @Test
     fun `Keeping a branch`() {
         project {
             branch("release-1.0") {
