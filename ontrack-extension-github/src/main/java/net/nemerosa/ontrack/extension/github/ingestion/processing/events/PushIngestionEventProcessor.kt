@@ -33,10 +33,18 @@ class PushIngestionEventProcessor(
     }
 
     override fun process(payload: PushPayload, configuration: String?): IngestionEventProcessingResult {
+        var processed = false
         pushPayloadListeners.map { listener ->
-            listener.process(payload, configuration)
+            if (listener.preProcessCheck(payload) == PushPayloadListenerCheck.TO_BE_PROCESSED) {
+                listener.process(payload, configuration)
+                processed = true
+            }
         }
-        return IngestionEventProcessingResult.PROCESSED
+        return if (processed) {
+            IngestionEventProcessingResult.PROCESSED
+        } else {
+            IngestionEventProcessingResult.IGNORED
+        }
     }
 
 }
