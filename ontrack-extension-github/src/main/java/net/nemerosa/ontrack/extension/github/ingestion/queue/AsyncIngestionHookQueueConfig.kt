@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Reposito
 import org.springframework.amqp.core.*
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import kotlin.math.abs
 
 /**
  * Configuration of the queues.
@@ -96,7 +97,7 @@ class AsyncIngestionHookQueueConfig(
             repository: Repository?,
         ): String =
             if (repository != null) {
-                val code = repository.fullName.hashCode() % ingestionConfigProperties.processing.scale
+                val code = abs(repository.fullName.hashCode()) % ingestionConfigProperties.processing.scale
                 "$DEFAULT.$code"
             } else {
                 "$DEFAULT.0"
