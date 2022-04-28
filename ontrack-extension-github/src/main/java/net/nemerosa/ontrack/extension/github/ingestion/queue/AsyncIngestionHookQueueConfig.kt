@@ -34,18 +34,31 @@ class AsyncIngestionHookQueueConfig(
             declarables += queue
             declarables += binding
         }
-        // Default queue (catch-all)
-        val defaultQueue = Queue(
-            "$QUEUE_PREFIX.$DEFAULT",
-            true, // We keep the queue alive for reprocessing
-        ).apply {
-            declarables += this
+        // Default queues
+        if (ingestionConfigProperties.processing.scale > 1) {
+            (1..ingestionConfigProperties.processing.scale).forEach { no ->
+                val index = no - 1 // Starting at 0
+                val queue = Queue("$QUEUE_PREFIX.$DEFAULT.$index", true)
+                val binding = BindingBuilder
+                    .bind(queue)
+                    .to(exchange)
+                    .with("$DEFAULT.$index")
+                declarables += queue
+                declarables += binding
+            }
+        } else {
+            val defaultQueue = Queue(
+                "$QUEUE_PREFIX.$DEFAULT",
+                true, // We keep the queue alive for reprocessing
+            ).apply {
+                declarables += this
+            }
+            // Catch-all binding
+            declarables += BindingBuilder
+                .bind(defaultQueue)
+                .to(exchange)
+                .with(DEFAULT)
         }
-        // Catch-all binding
-        declarables += BindingBuilder
-            .bind(defaultQueue)
-            .to(exchange)
-            .with(DEFAULT)
         // OK
         return Declarables(declarables)
     }
@@ -56,12 +69,37 @@ class AsyncIngestionHookQueueConfig(
          * Getting the routing key for a given payload
          */
         fun getRoutingKey(ingestionConfigProperties: IngestionConfigProperties, repository: Repository?): String =
+            getRepositorySpecificRoutingKey(ingestionConfigProperties, repository)
+                ?: if (ingestionConfigProperties.processing.scale > 1) {
+                    getRepositoryDefaultRoutingKey(ingestionConfigProperties, repository)
+                } else {
+                    DEFAULT
+                }
+
+        /**
+         * Computing the specific queue to use for a given repository name
+         */
+        private fun getRepositorySpecificRoutingKey(
+            ingestionConfigProperties: IngestionConfigProperties,
+            repository: Repository?,
+        ): String? = repository?.let {
+            ingestionConfigProperties.processing.repositories.entries.find { (name, config) ->
+                config.matches(owner = repository.owner.login, repository = repository.name)
+            }?.key
+        }
+
+        /**
+         * Computing the index of the default queue to use for a given repository name
+         */
+        private fun getRepositoryDefaultRoutingKey(
+            ingestionConfigProperties: IngestionConfigProperties,
+            repository: Repository?,
+        ): String =
             if (repository != null) {
-                ingestionConfigProperties.processing.repositories.entries.find { (name, config) ->
-                    config.matches(owner = repository.owner.login, repository = repository.name)
-                }?.key ?: DEFAULT
+                val code = repository.fullName.hashCode() % ingestionConfigProperties.processing.scale
+                "$DEFAULT.$code"
             } else {
-                DEFAULT
+                "$DEFAULT.0"
             }
 
         /**

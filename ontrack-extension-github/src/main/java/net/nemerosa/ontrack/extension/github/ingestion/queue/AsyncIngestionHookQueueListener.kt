@@ -39,10 +39,19 @@ class AsyncIngestionHookQueueListener(
         ingestionConfigProperties.processing.repositories.forEach { (name, _) ->
             createSpecificListener(registrar, name)
         }
-        // Listener for the default
-        registrar.registerEndpoint(
-            createDefaultListener(),
-        )
+        // Listener for the default queues
+        if (ingestionConfigProperties.processing.scale > 1) {
+            (1..ingestionConfigProperties.processing.scale).forEach { no ->
+                val index = no - 1
+                registrar.registerEndpoint(
+                    createDefaultListener(index)
+                )
+            }
+        } else {
+            registrar.registerEndpoint(
+                createDefaultListener(),
+            )
+        }
     }
 
     private fun createSpecificListener(
@@ -56,6 +65,11 @@ class AsyncIngestionHookQueueListener(
 
     private fun createDefaultListener(): RabbitListenerEndpoint {
         val queue = "${AsyncIngestionHookQueueConfig.QUEUE_PREFIX}.${AsyncIngestionHookQueueConfig.DEFAULT}"
+        return SimpleRabbitListenerEndpoint().configure(queue)
+    }
+
+    private fun createDefaultListener(index: Int): RabbitListenerEndpoint {
+        val queue = "${AsyncIngestionHookQueueConfig.QUEUE_PREFIX}.${AsyncIngestionHookQueueConfig.DEFAULT}.$index"
         return SimpleRabbitListenerEndpoint().configure(queue)
     }
 

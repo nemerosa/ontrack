@@ -36,10 +36,12 @@ class IngestionConfigProperties(
      * Processing configuration
      *
      * @property async Behaviour of the processing. By default, true, using a RabbitMQ engine
+     * @property scale Number of default queues to create
      * @property repositories List of specific bindings
      */
     class ProcessingConfig(
         var async: Boolean = true,
+        var scale: Int = 1,
         var repositories: Map<String, RepositoryQueueConfig> = emptyMap(),
     )
 
