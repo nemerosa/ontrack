@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.notifications.mail
 
 import com.icegreen.greenmail.spring.GreenMailBean
 import com.icegreen.greenmail.util.GreenMail
+import net.nemerosa.ontrack.extension.notifications.NotificationsConfigProperties
 import net.nemerosa.ontrack.extension.notifications.rendering.HtmlNotificationEventRenderer
 import net.nemerosa.ontrack.model.support.ApplicationLogService
 import org.springframework.context.annotation.Bean
@@ -29,6 +30,7 @@ class AbstractMailTestSupportConfiguration {
     ): MailService = DefaultMailService(
         javaMailSender,
         applicationLogService,
+        NotificationsConfigProperties(),
     )
 
     @Bean
