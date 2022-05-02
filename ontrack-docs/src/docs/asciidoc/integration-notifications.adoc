@@ -60,6 +60,8 @@ On the subscription list, you can:
 [[notifications-subscriptions-global]]
 ===== Global subscriptions
 
+The management of the global subscriptions is exactly the same as for the <<notifications-subscriptions-local,local>> ones, but for the fact that the global subscriptions are accessible through the _Global subscriptions_ menu.
+
 [[notifications-recordings]]
 ==== Recordings
 
