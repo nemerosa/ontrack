@@ -57,3 +57,29 @@ On the subscription list, you can:
 [[notifications-subscriptions-global]]
 ===== Global subscriptions
 
+[[notifications-recordings]]
+==== Recordings
+
+For audit and troubleshooting purposes, all notifications are recorded and administrators can have access to them using the _Notification recordings_ user menu:
+
+image::integration-notifications-recordings.png[Notifications recordings]
+
+Each recording has the following columns:
+
+* timestamp (UTC) - when was the notification actually sent
+* channel - which channel was used by the notification
+* result - outcome of the notification
+** OK - notification was sent successfully
+** NOT_CONFIGURED - the notification channel not configured
+** INVALID_CONFIGURATION - the notification channel is wrongly configured
+** DISABLED - the notification channel has been disabled
+** ERROR - there was an error
+
+By clicking on the eye icon left of the timestamp, you can see more details about the notification:
+
+image::integration-notifications-recording-details.png[Notification recording details]
+
+* Channel config - the JSON representation of the configuration of the notification channel
+* Event - the JSON representation of the event being sent
+
+Finally, the administrator can filter recordings on their results and the _Delete ALL records_ can be used to clear out all recordings.
