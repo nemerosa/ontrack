@@ -23,6 +23,8 @@ include::integration-slack.adoc[]
 
 include::integration-webhooks.adoc[]
 
+include::integration-email.adoc[]
+
 include::integration-metrics.adoc[]
 
 // TODO include::integration-graphql.adoc[]

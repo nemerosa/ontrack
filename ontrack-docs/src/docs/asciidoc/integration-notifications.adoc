@@ -25,7 +25,7 @@ Ontrack can send notifications to:
 
 * <<webhooks,webhooks>>
 * <<slack,Slack>>
-* email
+* <<email,Email>>
 
 [[notifications-subscriptions]]
 ==== Subscriptions
