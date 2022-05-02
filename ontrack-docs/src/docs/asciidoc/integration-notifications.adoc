@@ -14,7 +14,9 @@ For example, a notification can be:
 
 In this example, the body of the email would be a text like "Build B of branch R in project P has been promoted to P", which various links to Ontrack.
 
-Administrators of Ontrack can create and configure the different <<notifications-backends,backends>>. They can also configure the notifications at entity level to respond to some events using notification configurations (<<notifications-subscriptions,_subscriptions_>>). Subscriptions can be either <<notifications-subscriptions-local,local>> (subscribing to the events on a given branch) or <<notifications-subscriptions-global,global>> (subscribing to the events in all Ontrack, regardless of the entity).
+Administrators of Ontrack can create and configure the different <<notifications-backends,backends>>.
+They can also configure the notifications at entity level to respond to some events using notification configurations (<<notifications-subscriptions,_subscriptions_>>).
+Subscriptions can be either <<notifications-subscriptions-local,local>> (subscribing to the events on a given branch) or <<notifications-subscriptions-global,global>> (subscribing to the events in all Ontrack, regardless of the entity).
 
 [[notifications-backends]]
 ==== Notification backends
@@ -47,7 +49,8 @@ image::integration-notifications-new-subscription.png["New subscription dialog",
 
 * events - list of events to listen to
 * keywords - space-separated list of words which will be used to restrict the events being listened to
-* channel - destination for the notification. Depending on the channel being selected, additional fields are needed (for example, for a Slack notification, the Slack channel is required)
+* channel - destination for the notification.
+Depending on the channel being selected, additional fields are needed (for example, for a Slack notification, the Slack channel is required)
 
 On the subscription list, you can:
 
@@ -83,3 +86,80 @@ image::integration-notifications-recording-details.png[Notification recording de
 * Event - the JSON representation of the event being sent
 
 Finally, the administrator can filter recordings on their results and the _Delete ALL records_ can be used to clear out all recordings.
+
+[[notifications-metrics]]
+==== Metrics
+
+Following metrics are sent by Ontrack about the notifications:
+
+|===
+| Metric | Tags | Description
+
+| `ontrack_extension_notifications_event_listening_received`
+| `event`
+| Count of events being received
+
+| `ontrack_extension_notifications_event_listening_queued`
+| `event`
+| Count of events being actually queued
+
+| `ontrack_extension_notifications_event_listening_dequeued`
+| `event`
+| Count of events being removed from the queue for dispatching
+
+| `ontrack_extension_notifications_event_listening_dequeued_error`
+| None
+| Count of uncaught errors when listening to events
+
+| `ontrack_extension_notifications_event_listening`
+| `event`
+| Count of events whose dispatching starts
+
+| `ontrack_extension_notifications_event_dispatching_queued`
+| `event`, `channel`, `routing`
+| Count of events whose dispatching starts (pushed into the dispatching queue)
+
+| `ontrack_extension_notifications_event_dispatching_dequeued`
+| `event`, `channel`, `routing`
+| Count of events whose dispatching starts (pulled from the dispatching queue)
+
+| `ontrack_extension_notifications_event_dispatching_result`
+| `event`, `channel`, `result`
+| Count of events whose dispatching is finished
+
+| `ontrack_extension_notifications_event_processing_started`
+| `event`, `channel`
+| Count of events whose processing is started
+
+| `ontrack_extension_notifications_event_processing_channel_started`
+| `event`, `channel`
+| Count of events whose processing is started on an actual channel
+
+| `ontrack_extension_notifications_event_processing_channel_unknown`
+| `event`, `channel`
+| Count of events whose processing is stopped because the channel is unknown
+
+| `ontrack_extension_notifications_event_processing_channel_invalid`
+| `event`, `channel`
+| Count of events whose processing is stopped because the channel or its configuration is invalid
+
+| `ontrack_extension_notifications_event_processing_channel_publishing`
+| `event`, `channel`
+| Count of events whose publication into a channel has started
+
+| `ontrack_extension_notifications_event_processing_channel_result`
+| `event`, `channel`, `result`
+| Count of events whose publication into a channel has finished
+
+| `ontrack_extension_notifications_event_processing_channel_error`
+| `event`, `channel`
+| Count of events whose publication into a channel has failed
+
+|===
+
+The overall processing of events looks like this:
+
+[plantuml,"integration-notifications-cycle",png]
+----
+include::integration-notifications-cycle.puml[]
+----
