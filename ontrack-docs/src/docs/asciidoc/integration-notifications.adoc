@@ -62,6 +62,25 @@ On the subscription list, you can:
 
 The management of the global subscriptions is exactly the same as for the <<notifications-subscriptions-local,local>> ones, but for the fact that the global subscriptions are accessible through the _Global subscriptions_ menu.
 
+[NOTE]
+====
+Global subscriptions can be configured using <<casc,CasC>>. For example:
+
+[source,yaml]
+----
+ontrack:
+    extensions:
+        notifications:
+            global-subscriptions:
+                - events:
+                    - new_promotion_run
+                  keywords: "GOLD main"
+                  channel: slack
+                  channel-config:
+                    channel: "#my-channel"
+----
+====
+
 [[notifications-recordings]]
 ==== Recordings
 
