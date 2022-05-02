@@ -176,9 +176,28 @@ promotions:
     # include:
     # Regular expression to exclude validation stamps by name
     # exclude:
+# Configuration as code (CasC) for the project & branch
+# This feature is highly experimental for now
+casc:
+  # CasC for the project
+  project:
+    # Branches which can participate into the configuration of the project (regular expression)
+    includes: main
+    # Branches which are excluded from the configuration of the project (regular expression)
+    excludes: ""
+    # Casc configuration node (see below)
+    # casc: {}
+  # CasC for the branch
+  branch:
+    # Branches which can participate into their own configuration (regular expression)
+    includes: main
+    # Branches which are excluded from their own configuration (regular expression)
+    excludes: ""
+    # Casc configuration node (see below)
+    # casc: {}
 ----
 
-For example, if we want to associate the vaidation stamp `unit-tests` to the step `Runs unit tests` in the `build` job, we can use:
+For example, if we want to associate the validation stamp `unit-tests` to the step `Runs unit tests` in the `build` job, we can use:
 
 [source,yaml]
 ----
@@ -249,6 +268,34 @@ promotions:
     promotions:
       - BRONZE
 ----
+
+[[integration-github-ingestion-customization-casc]]
+===== Configuration as code for projects and branches
+
+The `ingestion.yml` file can be used to configure the projects and the branches.
+
+[WARNING]
+====
+The support for CasC of the projects and branches is currently experimental. While the feature would probably stay, it's possible that some syntax may change. Also, not many configuration aspects are supported at the moment.
+====
+
+Example - configuring the stale property at project level from the `main` branch:
+
+[source,yaml]
+----
+casc:
+  project:
+    properties:
+      staleProperty:
+        disablingDuration: 30
+        deletingDuration: 0
+        promotionsToKeep:
+          - GOLD
+        includes: main
+        excluded: ""
+----
+
+Whenever the `ingestion.yml` is pushed on the `main` branch, the <<branches-stale,stale property>> will be set on the project.
 
 [[integration-github-ingestion-settings]]
 ==== General settings
