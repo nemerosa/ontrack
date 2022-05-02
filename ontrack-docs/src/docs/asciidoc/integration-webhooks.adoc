@@ -61,3 +61,29 @@ The _Webhooks_ section in the global settings allows the configuration of the fo
 ====
 Webhooks are disabled by default and must be enabled explicitly.
 ====
+
+[[webhooks-deliveries]]
+==== Webhooks deliveries
+
+Additionally to the <<notifications-recordings,notification recordings>>, deliveries to the webhooks are also registered by Ontrack and accessible by an administrator.
+
+The deliveries for a given webhook are accessible through the _Deliveries_ button on the list of webhooks.
+
+image::integration-webhooks-deliveries.png[Webhook deliveries]
+
+The following columns are displayed:
+
+* unique ID for the delivery
+* name of the webhook
+* timestamp of the _request_
+* type of payload
+* HTTP status sent by the remote webhook
+
+You can get more details by clicking on the UUID or the eye icon:
+
+image::integration-webhooks-deliveries-details.png[Webhook delivery details]
+
+* request payload - the JSON actually sent to the webhook
+* response payload - the payload returned by the webhook (interpreted as text)
+* response timestamp - when the response was received
+* stack - the error stacktrace in case of error
