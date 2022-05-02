@@ -89,6 +89,11 @@ image::integration-webhooks-deliveries-details.png[Webhook delivery details]
 * response timestamp - when the response was received
 * stack - the error stacktrace in case of error
 
+[NOTE]
+====
+Webhooks deliveries are kept only a given number of days before being deleted. See <<webhooks-settings,global settings>>.
+====
+
 [[webhooks-payloads]]
 ==== Payloads
 
