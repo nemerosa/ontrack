@@ -5,9 +5,9 @@ Ontrack can be configured to send <<notifications,notifications>> to some webhoo
 
 [WARNING]
 ====
-Webhooks are disabled by default and must be enabled explicitly. See <<webhooks-settings,global settings>>.
+Webhooks are disabled by default and must be enabled explicitly.
+See <<webhooks-settings,global settings>>.
 ====
-
 
 [[webhooks-definitions]]
 ==== Definitions
@@ -20,7 +20,8 @@ A webhook is defined by the following fields:
 
 * name - a unique name for the webhook, which will be referred to when used in a subscription
 * enabled - a flag to disable or enable the webhook
-* url - a HTTP URL for the webhook. HTTPS is recommended but not required.
+* url - a HTTP URL for the webhook.
+HTTPS is recommended but not required.
 * timeout - number of seconds to wait before the connection to the webhook _url_ is abandoned (see also <<webhooks-timeouts,timeouts>> below)
 * _authentication_ - the way to authenticate to the webhook (see <<webhooks-authentication,below>>)
 
@@ -110,7 +111,8 @@ The `data` node type and content depends on the payload `type`.
 [[webhooks-payloads-events]]
 ===== `event` payload
 
-The `event` payload is sent upon a <<notifications,notification>>. A typical payload looks like:
+The `event` payload is sent upon a <<notifications,notification>>.
+A typical payload looks like:
 
 [source,json]
 ----
@@ -186,3 +188,28 @@ It's used to test a webhook and its payload looks like:
   }
 }
 ----
+
+[[webhooks-metrics]]
+==== Webhooks metrics
+
+The following metrics are emitted by Ontrack for the processing of the webhooks:
+
+|===
+|Metric |Tags |Description
+
+|`ontrack_extension_notifications_webhooks_delivery_started`
+|`webhook`, `type`
+|Webhook delivery is about to start
+
+|`ontrack_extension_notifications_webhooks_delivery_answered`
+|`webhook`, `type`, `status`
+|Webhook delivery has completed with a HTTP status
+
+|`ontrack_extension_notifications_webhooks_delivery_error`
+|`webhook`, `type`
+|Webhook delivery has completed with an error
+
+|`ontrack_extension_notifications_webhooks_delivery_duration`
+|`webhook`, `type`
+|Duration of the delivery duration
+|===
