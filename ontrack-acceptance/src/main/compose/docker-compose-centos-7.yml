@@ -20,6 +20,18 @@ services:
          memlock:
             soft: -1
             hard: -1
+
+   # Rabbit MQ
+   rabbitmq:
+      image: rabbitmq:3.8.25-management
+      hostname: rabbit
+      environment:
+         RABBITMQ_DEFAULT_USER: ontrack
+         RABBITMQ_DEFAULT_PASS: ontrack
+      ports:
+         - "15672:15672"
+         - "5672:5672"
+
    ontrack:
       build:
         context: "./os/centos/7/docker"
@@ -28,6 +40,10 @@ services:
       environment:
          SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
          SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
+         # RabbitMQ
+         SPRING_RABBITMQ_HOST: rabbitmq
+         SPRING_RABBITMQ_USERNAME: ontrack
+         SPRING_RABBITMQ_PASSWORD: ontrack
       depends_on:
          postgres:
             condition: service_started

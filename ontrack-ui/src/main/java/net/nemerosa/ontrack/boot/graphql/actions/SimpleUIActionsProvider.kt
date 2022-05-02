@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.boot.graphql.actions
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.graphql.schema.actions.*
 import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.http.HttpMethod
 import kotlin.reflect.KClass
 
@@ -12,7 +12,7 @@ import kotlin.reflect.KClass
  */
 abstract class SimpleUIActionsProvider<T : Any>(
         override val targetType: KClass<T>,
-        private val uriBuilder: URIBuilder
+        private val uriBuilder: EntityURIBuilder
 ) : UIActionsProvider<T> {
 
     /**

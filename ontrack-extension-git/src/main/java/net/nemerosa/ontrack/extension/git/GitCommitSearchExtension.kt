@@ -13,7 +13,7 @@ import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -23,14 +23,14 @@ import java.util.regex.Pattern
 
 @Component
 class GitCommitSearchExtension(
-        extensionFeature: GitExtensionFeature,
-        private val gitService: GitService,
-        private val uriBuilder: URIBuilder,
-        private val securityService: SecurityService,
-        private val structureService: StructureService,
-        gitSearchConfigProperties: GitSearchConfigProperties,
-        private val ontrackConfigProperties: OntrackConfigProperties,
-        private val gitIssueSearchExtension: GitIssueSearchExtension
+    extensionFeature: GitExtensionFeature,
+    private val gitService: GitService,
+    private val uriBuilder: EntityURIBuilder,
+    private val securityService: SecurityService,
+    private val structureService: StructureService,
+    gitSearchConfigProperties: GitSearchConfigProperties,
+    private val ontrackConfigProperties: OntrackConfigProperties,
+    private val gitIssueSearchExtension: GitIssueSearchExtension
 ) : AbstractExtension(extensionFeature), SearchIndexer<GitCommitSearchItem> {
 
     companion object {

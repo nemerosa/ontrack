@@ -5,18 +5,18 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.labels.MainBuildLinksFilterService
 import net.nemerosa.ontrack.model.labels.MainBuildLinksService
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
 class BuildLinkDecorationExtension(
-        extensionFeature: GeneralExtensionFeature,
-        private val structureService: StructureService,
-        private val uriBuilder: URIBuilder,
-        private val mainBuildLinksService: MainBuildLinksService,
-        private val mainBuildLinksFilterService: MainBuildLinksFilterService,
-        private val buildDisplayNameService: BuildDisplayNameService
+    extensionFeature: GeneralExtensionFeature,
+    private val structureService: StructureService,
+    private val uriBuilder: EntityURIBuilder,
+    private val mainBuildLinksService: MainBuildLinksService,
+    private val mainBuildLinksFilterService: MainBuildLinksFilterService,
+    private val buildDisplayNameService: BuildDisplayNameService
 ) : AbstractExtension(extensionFeature), DecorationExtension<BuildLinkDecorationList> {
 
     override fun getScope(): EnumSet<ProjectEntityType> = EnumSet.of(ProjectEntityType.BUILD)

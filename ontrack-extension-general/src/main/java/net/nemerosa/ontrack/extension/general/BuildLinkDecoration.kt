@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.PromotionRun
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import java.net.URI
 
 /**
@@ -22,7 +22,7 @@ class BuildLinkDecoration(
         val promotions: List<BuildLinkDecorationPromotion>
 )
 
-fun Build.asBuildLinkDecoration(uriBuilder: URIBuilder, promotionRuns: List<PromotionRun>, label: String) =
+fun Build.asBuildLinkDecoration(uriBuilder: EntityURIBuilder, promotionRuns: List<PromotionRun>, label: String) =
         BuildLinkDecoration(
                 this.project.name,
                 this.name,

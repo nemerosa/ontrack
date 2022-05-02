@@ -71,6 +71,8 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-indicators"))
     runtimeOnly(project(":ontrack-extension-casc"))
     runtimeOnly(project(":ontrack-extension-elastic"))
+    runtimeOnly(project(":ontrack-extension-notifications"))
+    runtimeOnly(project(":ontrack-extension-slack"))
 }
 
 /**

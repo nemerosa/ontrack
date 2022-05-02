@@ -39,6 +39,10 @@ class DefaultConnector(
         return RestTemplateConnectorResponse(response)
     }
 
+    override fun put(path: String, headers: Map<String, String>, body: Any?) {
+        restTemplate(headers).put(path, body)
+    }
+
     private fun restTemplate(
         headers: Map<String, String>,
     ): RestTemplate {

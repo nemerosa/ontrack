@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.graphql.support
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLInputObjectField
+import graphql.schema.GraphQLType
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.schema.MutationProvider
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter.asInputFields
@@ -90,7 +91,7 @@ abstract class TypedMutationProvider protected constructor(
             private val fetcher: (I) -> T?
     ) : Mutation {
 
-        override val inputFields: List<GraphQLInputObjectField> = asInputFields(input)
+        override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = asInputFields(input, dictionary)
 
         override val outputFields: List<GraphQLFieldDefinition> = listOf(
                 objectField(outputType, outputName, outputDescription)
@@ -111,7 +112,7 @@ abstract class TypedMutationProvider protected constructor(
             private val fetcher: (I) -> Unit
     ) : Mutation {
 
-        override val inputFields: List<GraphQLInputObjectField> = asInputFields(input)
+        override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = asInputFields(input, dictionary)
 
         override fun fetch(env: DataFetchingEnvironment): Any {
             val input = mutationInput(input, env)

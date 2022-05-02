@@ -1,0 +1,16 @@
+mutation CreateBranch(
+    $projectId: Int!,
+    $name: String!,
+    $description: String!,
+) {
+    createBranch(input: {
+        projectId: $projectId,
+        name: $name,
+        description: $description,
+    }) {
+        branch {
+            ...BranchFragment
+        }
+        ...PayloadUserErrors
+    }
+}

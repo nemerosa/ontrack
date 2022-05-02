@@ -28,6 +28,15 @@ public class SettingsJdbcRepository extends AbstractJdbcRepository implements Se
     }
 
     @Override
+    public void deleteAll(Class<?> category) {
+        MapSqlParameterSource params = params("category", category.getName());
+        getNamedParameterJdbcTemplate().update(
+                "DELETE FROM SETTINGS WHERE CATEGORY = :category",
+                params
+        );
+    }
+
+    @Override
     public boolean getBoolean(Class<?> category, String name, boolean defaultValue) {
         return getValue(
                 category,
@@ -53,7 +62,22 @@ public class SettingsJdbcRepository extends AbstractJdbcRepository implements Se
     }
 
     @Override
+    public long getLong(Class<?> category, String name, long defaultValue) {
+        return getValue(
+                category,
+                name,
+                s -> Long.parseLong(s, 10),
+                defaultValue
+        );
+    }
+
+    @Override
     public void setInt(Class<?> category, String name, int value) {
+        setValue(category, name, String.valueOf(value));
+    }
+
+    @Override
+    public void setLong(Class<?> category, String name, long value) {
         setValue(category, name, String.valueOf(value));
     }
 

@@ -47,6 +47,21 @@ val ProjectEntity.nameValues: Map<String, String>
     }
 
 /**
+ * Name for an entity
+ */
+val ProjectEntity.displayName: String
+    get() = when (this) {
+        is Project -> name
+        is Branch -> name
+        is Build -> name
+        is ValidationStamp -> name
+        is PromotionLevel -> name
+        is ValidationRun -> "${build.name}/${validationStamp.name}"
+        is PromotionRun -> "${build.name}/${promotionLevel.name}"
+        else -> throw IllegalStateException("Unknown project entity: $this")
+    }
+
+/**
  * List of names of this entity
  */
 val ProjectEntityType.names: List<String>
@@ -154,6 +169,15 @@ fun ProjectEntityType.loadByNames(structureService: StructureService, names: Map
             structureService.getPromotionRunsForBuildAndPromotionLevel(build, pl).firstOrNull()
         }
     }
+}
+
+/**
+ * Given a project entity, returns the list of all the parents
+ */
+fun ProjectEntity?.parents(): List<ProjectEntity> = if (this == null) {
+    emptyList()
+} else {
+    listOf(this) + parent.parents()
 }
 
 private fun Map<String, String>.require(name: String) =

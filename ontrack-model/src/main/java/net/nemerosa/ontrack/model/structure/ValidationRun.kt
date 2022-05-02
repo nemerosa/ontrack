@@ -71,6 +71,8 @@ data class ValidationRun(
     override val project: Project
         get() = build.project
 
+    override val parent: ProjectEntity? get() = validationStamp
+
     override val projectEntityType: ProjectEntityType = ProjectEntityType.VALIDATION_RUN
 
     override val entityDisplayName: String

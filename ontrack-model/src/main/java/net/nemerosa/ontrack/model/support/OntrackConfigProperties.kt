@@ -27,6 +27,11 @@ class OntrackConfigProperties {
     private val logger: Logger = LoggerFactory.getLogger(OntrackConfigProperties::class.java)
 
     /**
+     * Root URL for this Ontrack location.
+     */
+    var url: String = "http://localhost:8080"
+
+    /**
      * Maximum number of days to keep the log entries
      */
     var applicationLogRetentionDays = 7

@@ -2,11 +2,15 @@ package net.nemerosa.ontrack.graphql.schema
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
+import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
+import javax.validation.constraints.NotNull
+import javax.validation.constraints.Pattern
 
 @Component
 class PromotionLevelMutations(
@@ -26,7 +30,26 @@ class PromotionLevelMutations(
                 outputDescription = "Created or updated promotion level",
                 outputType = PromotionLevel::class,
                 fetcher = this::setupPromotionLevel
-            )
+            ),
+            /**
+             * Creating a promotion level from a branch ID
+             */
+            simpleMutation(
+                "createPromotionLevelById",
+                "Creates a new promotion level from a branch ID",
+                CreatePromotionLevelByIdInput::class,
+                "promotionLevel",
+                "Created promotion level",
+                PromotionLevel::class
+            ) { input ->
+                val branch = structureService.getBranch(ID.of(input.branchId))
+                structureService.newPromotionLevel(
+                    PromotionLevel.of(
+                        branch,
+                        NameDescription.nd(input.name, input.description)
+                    )
+                )
+            },
         )
 
     private fun setupPromotionLevel(input: SetupPromotionLevelInput): PromotionLevel {
@@ -71,4 +94,15 @@ data class SetupPromotionLevelInput(
     val branch: String,
     val promotion: String,
     val description: String?,
+)
+
+data class CreatePromotionLevelByIdInput(
+    @APIDescription("Branch ID")
+    val branchId: Int,
+    @get:NotNull(message = "The name is required.")
+    @get:Pattern(regexp = NameDescription.NAME, message = "The name ${NameDescription.NAME_MESSAGE_SUFFIX}")
+    @APIDescription("Promotion level name")
+    val name: String,
+    @APIDescription("Promotion level description")
+    val description: String,
 )

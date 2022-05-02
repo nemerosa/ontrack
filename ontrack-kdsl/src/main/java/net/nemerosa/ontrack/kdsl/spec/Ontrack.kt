@@ -1,13 +1,38 @@
 package net.nemerosa.ontrack.kdsl.spec
 
+import com.apollographql.apollo.api.Input
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
+import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLMissingDataException
+import net.nemerosa.ontrack.kdsl.connector.graphql.checkData
+import net.nemerosa.ontrack.kdsl.connector.graphql.convert
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateProjectMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.FindBranchByNameQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.FindByBuildByNameQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.FindProjectByNameQuery
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
 class Ontrack(connector: Connector) : Connected(connector) {
+
+    /**
+     * Creates a project
+     *
+     * @param name Name of the project
+     * @param description Description for the project
+     */
+    fun createProject(name: String, description: String): Project =
+        graphqlConnector.mutate(
+            CreateProjectMutation(
+                name,
+                Input.optional(description),
+            )
+        ) {
+            it?.createProject()?.fragments()?.payloadUserErrors()?.convert()
+        }?.checkData {
+            it.createProject()?.project()
+        }
+            ?.fragments()?.projectFragment()?.toProject(this)
+            ?: throw GraphQLMissingDataException("Did not get back the created project")
 
     /**
      * Getting a project using its name
@@ -18,14 +43,7 @@ class Ontrack(connector: Connector) : Connected(connector) {
     fun findProjectByName(name: String): Project? = graphqlConnector.query(
         FindProjectByNameQuery(name)
     )?.projects()?.firstOrNull()
-        ?.fragments()?.projectFragment()?.run {
-            Project(
-                connector = connector,
-                id = id().toUInt(),
-                name = name()!!,
-                description = description(),
-            )
-        }
+        ?.fragments()?.projectFragment()?.toProject(this)
 
     /**
      * Getting a branch using its name

@@ -1,0 +1,5 @@
+fragment PromotionLevelFragment on PromotionLevel {
+    id
+    name
+    description
+}

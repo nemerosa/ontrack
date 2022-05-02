@@ -1,8 +1,12 @@
 package net.nemerosa.ontrack.kdsl.spec
 
 import net.nemerosa.ontrack.kdsl.connector.Connector
+import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLMissingDataException
+import net.nemerosa.ontrack.kdsl.connector.graphql.checkData
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateBranchMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.DeleteProjectByIdMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
 /**
@@ -17,7 +21,7 @@ class Project(
     id: UInt,
     val name: String,
     val description: String?,
-) : ProjectEntity(connector, id) {
+) : ProjectEntity(connector, ProjectEntityType.PROJECT, id) {
     /**
      * Deletes this project
      */
@@ -28,5 +32,29 @@ class Project(
             it?.deleteProject()?.fragments()?.payloadUserErrors()?.convert()
         }
     }
+
+    /**
+     * Create a branch inside this project.
+     *
+     * @param name Name of the branch to create
+     * @param description Description of the branch
+     * @return Created branch
+     */
+    fun createBranch(
+        name: String,
+        description: String,
+    ): Branch =
+        graphqlConnector.mutate(
+            CreateBranchMutation(
+                id.toInt(),
+                name,
+                description
+            )
+        ) {
+            it?.createBranch()?.fragments()?.payloadUserErrors()?.convert()
+        }
+            ?.checkData { it.createBranch()?.branch() }
+            ?.fragments()?.branchFragment()?.toBranch(this)
+            ?: throw GraphQLMissingDataException("Did not get back the created branch")
 
 }

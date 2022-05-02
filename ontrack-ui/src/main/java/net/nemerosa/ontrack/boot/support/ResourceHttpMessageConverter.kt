@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.boot.support
 import com.fasterxml.jackson.databind.ObjectMapper
 import net.nemerosa.ontrack.json.ObjectMapperFactory
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import net.nemerosa.ontrack.ui.resource.DefaultResourceContext
 import net.nemerosa.ontrack.ui.resource.ResourceModule
 import net.nemerosa.ontrack.ui.resource.ResourceObjectMapper
@@ -14,7 +14,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.converter.AbstractHttpMessageConverter
 import java.nio.charset.Charset
 
-class ResourceHttpMessageConverter(uriBuilder: URIBuilder, securityService: SecurityService, resourceModules: List<ResourceModule>) : AbstractHttpMessageConverter<Any>(MediaType("application", "json", DEFAULT_CHARSET), MediaType("application", "*+json", DEFAULT_CHARSET)) {
+class ResourceHttpMessageConverter(uriBuilder: EntityURIBuilder, securityService: SecurityService, resourceModules: List<ResourceModule>) : AbstractHttpMessageConverter<Any>(MediaType("application", "json", DEFAULT_CHARSET), MediaType("application", "*+json", DEFAULT_CHARSET)) {
 
     private val resourceObjectMapper: ResourceObjectMapper
     private val mapper: ObjectMapper

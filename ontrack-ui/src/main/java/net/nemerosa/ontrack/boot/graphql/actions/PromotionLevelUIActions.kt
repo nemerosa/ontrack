@@ -3,13 +3,13 @@ package net.nemerosa.ontrack.boot.graphql.actions
 import net.nemerosa.ontrack.boot.ui.PromotionLevelController
 import net.nemerosa.ontrack.graphql.schema.actions.UIAction
 import net.nemerosa.ontrack.model.structure.PromotionLevel
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @Component
 class PromotionLevelUIActions(
-        uriBuilder: URIBuilder
+        uriBuilder: EntityURIBuilder
 ) : SimpleUIActionsProvider<PromotionLevel>(PromotionLevel::class, uriBuilder) {
     override val actions: List<UIAction<PromotionLevel>> = listOf(
             downloadUpload(

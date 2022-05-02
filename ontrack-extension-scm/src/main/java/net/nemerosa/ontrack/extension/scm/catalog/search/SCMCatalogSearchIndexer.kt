@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogEntry
 import net.nemerosa.ontrack.extension.scm.catalog.ui.SCMCatalogController
 import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 import java.net.URI
@@ -19,7 +19,7 @@ class SCMCatalogSearchIndexer(
         extensionFeature: SCMExtensionFeature,
         private val scmCatalog: SCMCatalog,
         private val catalogLinkService: CatalogLinkService,
-        private val uriBuilder: URIBuilder
+        private val uriBuilder: EntityURIBuilder
 ) : SearchIndexer<SCMCatalogSearchItem> {
 
     override val indexerName: String = "SCM Catalog"

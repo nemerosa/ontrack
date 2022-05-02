@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.git
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.asMap
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.support.AbstractExtension
@@ -10,7 +9,7 @@ import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -18,12 +17,12 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 
 @Component
 class GitIssueSearchExtension(
-        extensionFeature: GitExtensionFeature,
-        private val gitService: GitService,
-        private val uriBuilder: URIBuilder,
-        private val structureService: StructureService,
-        private val ontrackConfigProperties: OntrackConfigProperties,
-        private val searchIndexService: SearchIndexService
+    extensionFeature: GitExtensionFeature,
+    private val gitService: GitService,
+    private val uriBuilder: EntityURIBuilder,
+    private val structureService: StructureService,
+    private val ontrackConfigProperties: OntrackConfigProperties,
+    private val searchIndexService: SearchIndexService
 ) : AbstractExtension(extensionFeature), SearchIndexer<GitIssueSearchItem> {
 
     companion object {

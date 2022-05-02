@@ -10,6 +10,7 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.apache.commons:commons-text")
 
     testApi(project(":ontrack-it-utils"))
 

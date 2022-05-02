@@ -1,0 +1,52 @@
+<ot-view>
+
+    <div class="row" ng-show="loadingWebhooks">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the webhooks...
+            </div>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>State</th>
+            <th>URL</th>
+            <th>Timeout</th>
+            <th>Authentication</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="webhook in webhooks">
+            <td><code>{{ webhook.name }}</code></td>
+            <td>
+                <span ng-if="webhook.enabled">
+                    <span class="fa fa-play"></span>&nbsp;Enabled
+                </span>
+                <span ng-if="!webhook.enabled" class="text-muted">
+                    <span class="fa fa-ban"></span>&nbsp;Enabled
+                </span>
+            </td>
+            <td>{{ webhook.url }}</td>
+            <td>{{ webhook.timeoutSeconds }}s</td>
+            <td>{{ webhook.authenticationType }}</td>
+            <td>
+                <a class="ot-command" href="#/extension/notifications/webhooks/{{ webhook.name }}" title="Displays the list of deliveries for this webhook">
+                    <span class="fa fa-exchange"></span> Deliveries
+                </a>
+                <span class="ot-command" ng-click="pingWebhook(webhook)" title="Tests the delivery to this webhook by sending a ping payload.">
+                    <span class="fa fa-eye"></span> Test
+                </span>
+                <span class="ot-command" ng-click="deleteWebhook(webhook)">
+                    <span class="fa fa-trash"></span> Delete
+                </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</ot-view>

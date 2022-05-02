@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.settings
 
-import net.nemerosa.ontrack.graphql.support.getDescription
-import net.nemerosa.ontrack.graphql.support.getName
+import net.nemerosa.ontrack.model.annotations.getPropertyDescription
+import net.nemerosa.ontrack.model.annotations.getPropertyLabel
 import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.model.form.Int
 import net.nemerosa.ontrack.model.security.EncryptionService
@@ -56,8 +56,8 @@ class GitHubIngestionSettingsManager(
         Form.create()
             .with(
                 YesNo.of(GitHubIngestionSettings::enabled.name)
-                    .label(getName(GitHubIngestionSettings::enabled))
-                    .help(getDescription(GitHubIngestionSettings::enabled))
+                    .label(getPropertyLabel(GitHubIngestionSettings::enabled))
+                    .help(getPropertyDescription(GitHubIngestionSettings::enabled))
                     .value(settings?.enabled ?: GitHubIngestionSettings.DEFAULT_ENABLED)
             )
             .with(
@@ -88,59 +88,59 @@ class GitHubIngestionSettingsManager(
             )
             .with(
                 Text.of(GitHubIngestionSettings::repositoryIncludes.name)
-                    .label(getName(GitHubIngestionSettings::repositoryIncludes))
-                    .help(getDescription(GitHubIngestionSettings::repositoryIncludes))
+                    .label(getPropertyLabel(GitHubIngestionSettings::repositoryIncludes))
+                    .help(getPropertyDescription(GitHubIngestionSettings::repositoryIncludes))
                     .value(settings?.repositoryIncludes ?: GitHubIngestionSettings.DEFAULT_REPOSITORY_INCLUDES)
             )
             .with(
                 Text.of(GitHubIngestionSettings::repositoryExcludes.name)
-                    .label(getName(GitHubIngestionSettings::repositoryExcludes))
-                    .help(getDescription(GitHubIngestionSettings::repositoryExcludes))
+                    .label(getPropertyLabel(GitHubIngestionSettings::repositoryExcludes))
+                    .help(getPropertyDescription(GitHubIngestionSettings::repositoryExcludes))
                     .optional()
                     .value(settings?.repositoryExcludes ?: GitHubIngestionSettings.DEFAULT_REPOSITORY_EXCLUDES)
             )
             .with(
                 Text.of(GitHubIngestionSettings::jobIncludes.name)
-                    .label(getName(GitHubIngestionSettings::jobIncludes))
-                    .help(getDescription(GitHubIngestionSettings::jobIncludes))
+                    .label(getPropertyLabel(GitHubIngestionSettings::jobIncludes))
+                    .help(getPropertyDescription(GitHubIngestionSettings::jobIncludes))
                     .value(settings?.jobIncludes ?: GitHubIngestionSettings.DEFAULT_JOB_INCLUDES)
             )
             .with(
                 Text.of(GitHubIngestionSettings::jobExcludes.name)
-                    .label(getName(GitHubIngestionSettings::jobExcludes))
-                    .help(getDescription(GitHubIngestionSettings::jobExcludes))
+                    .label(getPropertyLabel(GitHubIngestionSettings::jobExcludes))
+                    .help(getPropertyDescription(GitHubIngestionSettings::jobExcludes))
                     .optional()
                     .value(settings?.jobExcludes ?: GitHubIngestionSettings.DEFAULT_JOB_EXCLUDES)
             )
             .with(
                 Text.of(GitHubIngestionSettings::stepIncludes.name)
-                    .label(getName(GitHubIngestionSettings::stepIncludes))
-                    .help(getDescription(GitHubIngestionSettings::stepIncludes))
+                    .label(getPropertyLabel(GitHubIngestionSettings::stepIncludes))
+                    .help(getPropertyDescription(GitHubIngestionSettings::stepIncludes))
                     .value(settings?.stepIncludes ?: GitHubIngestionSettings.DEFAULT_STEP_INCLUDES)
             )
             .with(
                 Text.of(GitHubIngestionSettings::stepExcludes.name)
-                    .label(getName(GitHubIngestionSettings::stepExcludes))
-                    .help(getDescription(GitHubIngestionSettings::stepExcludes))
+                    .label(getPropertyLabel(GitHubIngestionSettings::stepExcludes))
+                    .help(getPropertyDescription(GitHubIngestionSettings::stepExcludes))
                     .optional()
                     .value(settings?.stepExcludes ?: GitHubIngestionSettings.DEFAULT_STEP_EXCLUDES)
             )
             .with(
                 Text.of(GitHubIngestionSettings::issueServiceIdentifier.name)
-                    .label(getName(GitHubIngestionSettings::issueServiceIdentifier))
-                    .help(getDescription(GitHubIngestionSettings::issueServiceIdentifier))
+                    .label(getPropertyLabel(GitHubIngestionSettings::issueServiceIdentifier))
+                    .help(getPropertyDescription(GitHubIngestionSettings::issueServiceIdentifier))
                     .value(settings?.issueServiceIdentifier ?: GitHubIngestionSettings.DEFAULT_ISSUE_SERVICE_IDENTIFIER)
             )
             .with(
                 YesNo.of(GitHubIngestionSettings::validationJobPrefix.name)
-                    .label(getName(GitHubIngestionSettings::validationJobPrefix))
-                    .help(getDescription(GitHubIngestionSettings::validationJobPrefix))
+                    .label(getPropertyLabel(GitHubIngestionSettings::validationJobPrefix))
+                    .help(getPropertyDescription(GitHubIngestionSettings::validationJobPrefix))
                     .value(settings?.validationJobPrefix ?: GitHubIngestionSettings.DEFAULT_VALIDATION_JOB_PREFIX)
             )
             .with(
                 YesNo.of(GitHubIngestionSettings::runValidations.name)
-                    .label(getName(GitHubIngestionSettings::runValidations))
-                    .help(getDescription(GitHubIngestionSettings::runValidations))
+                    .label(getPropertyLabel(GitHubIngestionSettings::runValidations))
+                    .help(getPropertyDescription(GitHubIngestionSettings::runValidations))
                     .value(settings?.runValidations ?: GitHubIngestionSettings.DEFAULT_RUN_VALIDATION)
             )
 

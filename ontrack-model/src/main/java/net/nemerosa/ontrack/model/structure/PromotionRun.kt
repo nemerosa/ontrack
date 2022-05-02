@@ -18,6 +18,8 @@ data class PromotionRun(
     override val project: Project
         get() = build.project
 
+    override val parent: ProjectEntity? get() = promotionLevel
+
     override val projectEntityType: ProjectEntityType = ProjectEntityType.PROMOTION_RUN
 
     override val entityDisplayName: String

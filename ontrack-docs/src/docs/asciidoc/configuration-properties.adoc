@@ -27,6 +27,9 @@ TIP: When applicable, the default value is mentioned.
 # Ontrack properties
 # ======================================================
 
+# Root URL for this Ontrack installation, used for notifications
+ontrack.config.url = http://localhost:8080
+
 # Maximum number of days to keep the log entries
 ontrack.config.application-log-retention-days = 7
 
@@ -138,6 +141,36 @@ ontrack.config.search.index.logging = false
 # Note: if set to `true` this generates an awful lot if information
 # at DEBUG level.
 ontrack.config.search.index.tracing = false
+----
+
+[[configuration-properties-notifications]]
+==== Notifications Configuration properties
+
+[source,properties]
+----
+# Are the notifications enabled?
+ontrack.config.extension.notifications.enabled = true
+
+# Dispatching configuration
+
+# Dispatching queuing configuration
+
+# Asynchronous dispatching
+ontrack.config.extension.notifications.dispatching.queue.async = true
+
+# Processing configuration
+
+# Processing queuing configuration
+
+# Asynchronous processing
+ontrack.config.extension.notifications.processing.queue.async = true
+
+# Maximum parallel processing of queues
+ontrack.config.extension.notifications.processing.queue.concurrency = 10
+
+# Mail configuration
+# "Reply to" address to use
+ontrack.config.extension.notifications.mail.from = no-reply@localhost
 ----
 
 [[configuration-properties-git]]

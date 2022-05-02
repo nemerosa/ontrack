@@ -10,7 +10,7 @@ import java.net.URI;
 public abstract class AbstractResourceController {
 
     @Autowired
-    private URIBuilder uriBuilder;
+    private EntityURIBuilder uriBuilder;
 
     /**
      * @see org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder#fromMethodCall(Object)

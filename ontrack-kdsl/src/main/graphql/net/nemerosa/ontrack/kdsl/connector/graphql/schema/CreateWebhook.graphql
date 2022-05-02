@@ -1,0 +1,22 @@
+mutation CreateWebhook(
+    $name: String!,
+    $enabled: Boolean!,
+    $url: String!,
+    $timeoutSeconds: Long!,
+    $authenticationType: String!,
+    $authenticationConfig: JSON!,
+) {
+    createWebhook(input: {
+        name: $name,
+        enabled: $enabled,
+        url: $url,
+        timeoutSeconds: $timeoutSeconds,
+        authenticationType: $authenticationType,
+        authenticationConfig: $authenticationConfig,
+    }) {
+        webhook {
+            ...WebhookFragment
+        }
+        ...PayloadUserErrors
+    }
+}

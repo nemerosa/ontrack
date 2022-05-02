@@ -23,7 +23,7 @@ abstract class AbstractACCTestSupport {
     /**
      * Connection to the application
      */
-    private val ontractConnectionProperties: OntractConnectionProperties by lazy {
+    protected val ontractConnectionProperties: OntractConnectionProperties by lazy {
         OntractConnectionProperties(
             url = ACCProperties.Connection.url,
             token = ACCProperties.Connection.token,

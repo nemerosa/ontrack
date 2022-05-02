@@ -12,6 +12,14 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
 }
 
+apollo {
+    @Suppress("UnstableApiUsage")
+    customTypeMapping.set(mapOf(
+        "LocalDateTime" to "java.time.LocalDateTime",
+        "UUID" to "java.util.UUID"
+    ))
+}
+
 tasks.named("javadoc", Javadoc::class) {
     exclude("net/nemerosa/ontrack/kdsl/connector/graphql/schema/**")
 }

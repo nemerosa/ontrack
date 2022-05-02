@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import graphql.schema.GraphQLInputObjectField;
-import graphql.schema.GraphQLInputObjectType;
-import graphql.schema.GraphQLInputType;
-import graphql.schema.GraphQLTypeReference;
+import graphql.schema.*;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
@@ -12,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.Set;
 
 import static graphql.Scalars.GraphQLInt;
 import static graphql.Scalars.GraphQLString;
@@ -34,7 +32,7 @@ public class GQLInputBuildStandardFilter implements GQLInputType<BuildFilterProv
     }
 
     @Override
-    public GraphQLInputType createInputType() {
+    public GraphQLInputType createInputType(Set<GraphQLType> dictionary) {
         return GraphQLInputObjectType.newInputObject()
                 .name(STANDARD_BUILD_FILTER)
                 .field(

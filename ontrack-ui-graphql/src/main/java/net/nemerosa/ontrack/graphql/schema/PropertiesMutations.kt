@@ -51,7 +51,7 @@ class PropertiesMutations(
 
         override val description: String = "Sets a property on a ${type.displayName} identified by ID"
 
-        override val inputFields: List<GraphQLInputObjectField> = listOf(
+        override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = listOf(
             id(type),
             propertyType(),
             propertyValue()
@@ -112,7 +112,7 @@ class PropertiesMutations(
             override val description: String =
                 "Set the ${propertyType.name.decapitalize()} property on a ${type.displayName}."
 
-            override val inputFields: List<GraphQLInputObjectField> = listOf(
+            override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = listOf(
                 id(type)
             ) + provider.inputFields
 
@@ -146,7 +146,7 @@ class PropertiesMutations(
             override val description: String =
                 "Set the ${propertyType.name.decapitalize()} property on a ${type.displayName} identified by name."
 
-            override val inputFields: List<GraphQLInputObjectField> = type.names.map {
+            override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = type.names.map {
                 name(it)
             } + provider.inputFields
 
@@ -183,7 +183,7 @@ class PropertiesMutations(
             override val description: String =
                 "Deletes the ${propertyType.name.decapitalize()} property on a ${type.displayName} identified by name."
 
-            override val inputFields: List<GraphQLInputObjectField> = type.names.map {
+            override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = type.names.map {
                 name(it)
             }
 
@@ -219,7 +219,7 @@ class PropertiesMutations(
                 "Deletes the ${propertyType.name.decapitalize()} property on a ${type.displayName}."
 
             // Only the ID is needed
-            override val inputFields: List<GraphQLInputObjectField> = listOf(
+            override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = listOf(
                 id(type)
             )
 
@@ -260,7 +260,7 @@ class PropertiesMutations(
 
         override val description: String = "Sets a property on a ${type.displayName} identified by name"
 
-        override val inputFields: List<GraphQLInputObjectField> = type.names.map {
+        override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = type.names.map {
             name(it)
         } + listOf(
             propertyType(),

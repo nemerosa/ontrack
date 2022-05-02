@@ -3,12 +3,11 @@ package net.nemerosa.ontrack.json;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import com.fasterxml.jackson.module.kotlin.KotlinModule;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.YearMonth;
+import java.time.*;
 
 /**
  * Note that support for @ConstructorProperties will be available in Jackson 2.7.0
@@ -49,6 +48,9 @@ public final class ObjectMapperFactory {
         // YearMonth
         jdkTimeModule.addSerializer(YearMonth.class, new JDKYearMonthSerializer());
         jdkTimeModule.addDeserializer(YearMonth.class, new JDKYearMonthDeserializer());
+        // Support for durations
+        jdkTimeModule.addSerializer(Duration.class, DurationSerializer.INSTANCE);
+        jdkTimeModule.addDeserializer(Duration.class, DurationDeserializer.INSTANCE);
         // OK
         mapper.registerModule(jdkTimeModule);
     }

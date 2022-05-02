@@ -93,6 +93,13 @@ fun JsonNode.getJsonField(field: String): JsonNode? =
     }
 
 /**
+ * Gets a required field as a JSON node, but returns `null` if this is a null node.
+ */
+fun JsonNode.getRequiredJsonField(field: String): JsonNode =
+    getJsonField(field)
+        ?: throw JsonMissingFieldException(field)
+
+/**
  * Gets a field as [Int].
  */
 fun JsonNode.getIntField(field: String): Int? =

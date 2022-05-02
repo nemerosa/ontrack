@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.settings
 
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation
 import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.annotations.APIName
+import net.nemerosa.ontrack.model.annotations.APILabel
 
 /**
  * Settings for the ingestion of GitHub workflows.
@@ -30,34 +30,34 @@ class GitHubIngestionSettings(
     val orgProjectPrefix: Boolean = DEFAULT_ORG_PROJECT_PREFIX,
     @APIDescription("Default indexation interval when configuring the GitHub projects")
     val indexationInterval: Int = DEFAULT_INDEXATION_INTERVAL,
-    @APIName("Include repositories")
+    @APILabel("Include repositories")
     @APIDescription("Regular expression to include repositories")
     val repositoryIncludes: String = DEFAULT_REPOSITORY_INCLUDES,
-    @APIName("Exclude repositories")
+    @APILabel("Exclude repositories")
     @APIDescription("Regular expression to exclude repositories")
     val repositoryExcludes: String = DEFAULT_REPOSITORY_EXCLUDES,
-    @APIName("Include jobs")
+    @APILabel("Include jobs")
     @APIDescription("Regular expression to include jobs")
     val jobIncludes: String = DEFAULT_JOB_INCLUDES,
-    @APIName("Exclude jobs")
+    @APILabel("Exclude jobs")
     @APIDescription("Regular expression to exclude jobs")
     val jobExcludes: String = DEFAULT_JOB_EXCLUDES,
-    @APIName("Include steps")
+    @APILabel("Include steps")
     @APIDescription("Regular expression to include steps")
     val stepIncludes: String = DEFAULT_STEP_INCLUDES,
-    @APIName("Exclude steps")
+    @APILabel("Exclude steps")
     @APIDescription("Regular expression to exclude steps")
     val stepExcludes: String = DEFAULT_STEP_EXCLUDES,
-    @APIName("Default issue service identifier")
+    @APILabel("Default issue service identifier")
     @APIDescription("Identifier of the issue service to use by default. For example `self` for GitHub issues or `jira//config`.")
     val issueServiceIdentifier: String = DEFAULT_ISSUE_SERVICE_IDENTIFIER,
-    @APIName("Ingestion enabled")
+    @APILabel("Ingestion enabled")
     @APIDescription("Is the ingestion of the GitHub events enabled?")
     val enabled: Boolean = DEFAULT_ENABLED,
-    @APIName("Using job name as validation name prefix")
+    @APILabel("Using job name as validation name prefix")
     @APIDescription("Must we use the job name as a prefix to the validation stamp?")
     val validationJobPrefix: Boolean = DEFAULT_VALIDATION_JOB_PREFIX,
-    @APIName("Runs as validations")
+    @APILabel("Runs as validations")
     @APIDescription("Must workflow runs be shown at validations?")
     val runValidations: Boolean = DEFAULT_RUN_VALIDATION,
 ) {

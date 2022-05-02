@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInputType
+import graphql.schema.GraphQLType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.getDescription
 import net.nemerosa.ontrack.json.asJson
@@ -16,7 +17,7 @@ class GQLInputBuildSearchForm : GQLInputType<BuildSearchForm> {
 
     override fun getTypeRef(): GraphQLTypeReference = GraphQLTypeReference(typeName)
 
-    override fun createInputType(): GraphQLInputType = GraphQLInputObjectType.newInputObject()
+    override fun createInputType(dictionary: MutableSet<GraphQLType>): GraphQLInputType = GraphQLInputObjectType.newInputObject()
         .name(typeName)
         .description(getDescription(BuildSearchForm::class))
         .field(intInputField(BuildSearchForm::maximumCount, nullable = true))

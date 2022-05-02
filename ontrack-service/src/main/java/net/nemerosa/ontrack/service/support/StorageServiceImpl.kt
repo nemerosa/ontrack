@@ -56,21 +56,60 @@ class StorageServiceImpl(
         }
     }
 
-    override fun count(store: String, query: String?, queryVariables: Map<String, *>?): Int =
-        repository.count(store, query, queryVariables)
+    override fun count(store: String, context: String, query: String?, queryVariables: Map<String, *>?): Int =
+        repository.count(store, context, query, queryVariables)
 
     override fun <T : Any> filter(
         store: String,
         type: KClass<T>,
         offset: Int,
         size: Int,
+        context: String,
         query: String?,
         queryVariables: Map<String, *>?,
-        orderQuery: String?
+        orderQuery: String?,
     ): List<T> =
-        repository.filter(store, offset, size, query, queryVariables, orderQuery).map {
+        repository.filter(
+            store = store,
+            offset = offset,
+            size = size,
+            context = context,
+            query = query,
+            queryVariables = queryVariables,
+            orderQuery = orderQuery
+        ).map {
             it.parseInto(type)
         }
+
+    override fun <T : Any> filterRecords(
+        store: String,
+        type: KClass<T>,
+        offset: Int,
+        size: Int,
+        context: String,
+        query: String?,
+        queryVariables: Map<String, *>?,
+        orderQuery: String?,
+    ): Map<String, T> =
+        repository.filterRecords(store, offset, size, context, query, queryVariables, orderQuery)
+            .mapValues { (_, data) ->
+                data.parseInto(type)
+            }
+
+    override fun <T : Any> forEach(
+        store: String,
+        type: KClass<T>,
+        context: String,
+        query: String?,
+        queryVariables: Map<String, *>?,
+        orderQuery: String?,
+        code: (key: String, item: T) -> Unit,
+    ) {
+        repository.forEach(store, context, query, queryVariables, orderQuery) { key, node ->
+            val item = node.parseInto(type)
+            code(key, item)
+        }
+    }
 
     override fun deleteWithFilter(store: String, query: String?, queryVariables: Map<String, *>?): Int =
         repository.deleteWithFilter(store, query, queryVariables)

@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.common.asMap
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
 import java.util.function.BiConsumer
 
@@ -14,7 +14,7 @@ class GitBranchSearchIndexer(
         extensionFeature: GitExtensionFeature,
         private val gitService: GitService,
         private val structureService: StructureService,
-        private val uriBuilder: URIBuilder
+        private val uriBuilder: EntityURIBuilder
 ) : SearchIndexer<GitBranchSearchItem> {
 
     override val searchResultType = SearchResultType(

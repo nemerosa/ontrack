@@ -1,0 +1,34 @@
+query WebhookDeliveries(
+    $offset: Int = 0,
+    $size: Int = 10,
+    $webhook: String!,
+) {
+    webhooks(name: $webhook) {
+        exchanges(
+            offset: $offset,
+            size: $size,
+            filter: {
+                webhook: $webhook,
+            }
+        ) {
+            pageInfo {
+                ...PageInfoContent
+            }
+            pageItems {
+                uuid
+                webhook
+                request {
+                    timestamp
+                    type
+                    payload
+                }
+                response {
+                    timestamp
+                    code
+                    payload
+                }
+                stack
+            }
+        }
+    }
+}

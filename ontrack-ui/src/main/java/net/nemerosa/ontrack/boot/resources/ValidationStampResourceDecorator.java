@@ -79,6 +79,11 @@ public class ValidationStampResourceDecorator extends AbstractLinkResourceDecora
                         "_events",
                         validationStamp -> on(EventController.class).getEvents(validationStamp.getProjectEntityType(), validationStamp.getId(), 0, 10)
                 ),
+                // Actions
+                link(
+                        "_actions",
+                        validationStamp -> on(ProjectEntityExtensionController.class).getActions(ProjectEntityType.VALIDATION_STAMP, validationStamp.getId())
+                ),
                 // Bulk update
                 link(
                         "_bulkUpdate",

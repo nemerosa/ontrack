@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql.support
 
+import com.fasterxml.jackson.databind.JsonNode
 import graphql.Scalars.*
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
@@ -44,7 +45,7 @@ fun TypeBuilder.booleanField(property: KProperty<Boolean>, description: String? 
 fun <T> TypeBuilder.field(
     property: KProperty<T?>,
     type: GQLType,
-    description: String? = null
+    description: String? = null,
 ): GraphQLObjectType.Builder =
     field {
         val outputType: GraphQLOutputType = if (property.returnType.isMarkedNullable) {
@@ -60,14 +61,14 @@ fun <T> TypeBuilder.field(
 fun <T> TypeBuilder.field(
     property: KProperty<T?>,
     typeName: String,
-    description: String? = null
+    description: String? = null,
 ): GraphQLObjectType.Builder =
     field(property, GraphQLTypeReference(typeName), description)
 
 fun <T> TypeBuilder.field(
     property: KProperty<T?>,
     ref: GraphQLTypeReference,
-    description: String? = null
+    description: String? = null,
 ): GraphQLObjectType.Builder =
     field {
         val outputType: GraphQLOutputType = if (property.returnType.isMarkedNullable) {
@@ -90,10 +91,21 @@ fun <E : Enum<E>> TypeBuilder.enumAsStringField(
             .type(GraphQLString)
     }
 
+inline fun <reified E : Enum<E>> TypeBuilder.enumField(
+    property: KProperty<E?>,
+    description: String? = null,
+): GraphQLObjectType.Builder =
+    field {
+        it.name(property.name)
+            .description(getPropertyDescription(property, description))
+            .type(nullableOutputType(GraphQLTypeReference(E::class.java.simpleName),
+                property.returnType.isMarkedNullable))
+    }
+
 fun TypeBuilder.stringField(property: KProperty<String?>, description: String? = null): GraphQLObjectType.Builder =
     field {
         it.name(property.name)
-            .description(getDescription(property, description))
+            .description(getPropertyDescription(property, description))
             .type(nullableOutputType(GraphQLString, property.returnType.isMarkedNullable))
     }
 
@@ -112,11 +124,13 @@ fun getDescription(type: KClass<*>, description: String? = null): String =
         ?: type.findAnnotation<APIDescription>()?.value
         ?: type.java.simpleName
 
+@Deprecated("Use net.nemerosa.ontrack.model.annotations.APIUtilsKt.getDescription instead")
 fun getDescription(property: KProperty<*>, defaultDescription: String? = null): String =
     defaultDescription
         ?: property.findAnnotation<APIDescription>()?.value
         ?: "${property.name} property"
 
+@Deprecated("Use net.nemerosa.ontrack.model.annotations.APIUtilsKt.getPropertyName")
 fun getName(property: KProperty<*>): String =
     property.findAnnotation<APIName>()?.value
         ?: property.name

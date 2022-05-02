@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.graphql
 
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInputType
+import graphql.schema.GraphQLType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.graphql.schema.GQLInputType
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component
 @Component
 class IssueChangeLogExportRequestGQLInputType: GQLInputType<IssueChangeLogExportRequest> {
 
-    override fun createInputType(): GraphQLInputType =
+    override fun createInputType(dictionary: MutableSet<GraphQLType>): GraphQLInputType =
         GraphQLInputObjectType.newInputObject()
             .name(IssueChangeLogExportRequest::class.java.simpleName)
             .description("""Request for the export of a change log.

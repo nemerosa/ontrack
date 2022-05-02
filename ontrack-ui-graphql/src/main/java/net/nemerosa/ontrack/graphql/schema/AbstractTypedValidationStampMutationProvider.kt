@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import graphql.schema.DataFetchingEnvironment
-import graphql.schema.GraphQLFieldDefinition
-import graphql.schema.GraphQLInputObjectField
-import graphql.schema.GraphQLTypeReference
+import graphql.schema.*
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.graphql.support.getMutationInputField
@@ -32,7 +29,7 @@ abstract class AbstractTypedValidationStampMutationProvider<C>(
         override val name: String = "setup${mutationFragmentName}ValidationStamp"
         override val description: String = "Creates or updates a $mutationFragmentName validation stamp"
 
-        override val inputFields: List<GraphQLInputObjectField> = listOf(
+        override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = listOf(
             requiredStringInputField("project", "Name of the project"),
             requiredStringInputField("branch", "Name of the branch"),
             requiredStringInputField("validation", "Name of the validation stamp"),

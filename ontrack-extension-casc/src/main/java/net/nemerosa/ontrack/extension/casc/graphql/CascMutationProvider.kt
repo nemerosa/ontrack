@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.casc.graphql
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLInputObjectField
+import graphql.schema.GraphQLType
 import net.nemerosa.ontrack.extension.casc.CascLoadingService
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.schema.MutationProvider
@@ -18,7 +19,7 @@ class CascMutationProvider(
 
             override val name: String = "reloadCasc"
             override val description: String = "Reload the configuration from the CasC files"
-            override val inputFields: List<GraphQLInputObjectField> = emptyList()
+            override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = emptyList()
 
             override val outputFields: List<GraphQLFieldDefinition> = emptyList()
 

@@ -16,7 +16,7 @@ import java.net.URI;
 @Component
 @Profile({RunProfile.DEV, RunProfile.ACC, RunProfile.PROD})
 @ConditionalOnProperty(prefix = "ontrack.config", name = "uri", havingValue = "relative", matchIfMissing = true)
-public class RelativeURIBuilder extends AbstractURIBuilder {
+public class RelativeURIBuilder extends AbstractEntityURIBuilder {
 
     @Override
     public URI build(Object methodInvocation) {

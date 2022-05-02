@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.boot.support
 
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import net.nemerosa.ontrack.ui.resource.ResourceModule
 import org.slf4j.LoggerFactory
 import org.springframework.boot.task.TaskExecutorBuilder
@@ -20,10 +20,10 @@ import javax.servlet.DispatcherType
 
 @Configuration
 class WebConfig(
-        private val uriBuilder: URIBuilder,
-        private val securityService: SecurityService,
-        private val resourceModules: List<ResourceModule>,
-        private val taskExecutorBuilder: TaskExecutorBuilder
+    private val uriBuilder: EntityURIBuilder,
+    private val securityService: SecurityService,
+    private val resourceModules: List<ResourceModule>,
+    private val taskExecutorBuilder: TaskExecutorBuilder
 ) : WebMvcConfigurer {
 
     private val logger = LoggerFactory.getLogger(WebConfig::class.java)

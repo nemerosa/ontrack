@@ -8,7 +8,7 @@ import javax.sql.DataSource
 
 @Repository
 class StorageJdbcRepository(
-    dataSource: DataSource
+    dataSource: DataSource,
 ) : AbstractJdbcRepository(dataSource),
     StorageRepository {
 
@@ -57,9 +57,9 @@ class StorageJdbcRepository(
         )
     }
 
-    override fun count(store: String, query: String?, queryVariables: Map<String, *>?): Int {
-        var sql = "SELECT COUNT(*) FROM STORAGE WHERE STORE = :store"
-        if (query != null) sql += " AND $query"
+    override fun count(store: String, context: String, query: String?, queryVariables: Map<String, *>?): Int {
+        var sql = "SELECT COUNT(*) FROM STORAGE $context WHERE STORE = :store"
+        if (query != null && query.isNotBlank()) sql += " AND $query"
 
         val params = params("store", store)
 
@@ -74,13 +74,25 @@ class StorageJdbcRepository(
         store: String,
         offset: Int,
         size: Int,
+        context: String,
         query: String?,
         queryVariables: Map<String, *>?,
-        orderQuery: String?
-    ): List<JsonNode> {
-        var sql = "SELECT DATA FROM STORAGE WHERE STORE = :store"
-        if (query != null) sql += " AND $query"
-        if (orderQuery != null) sql += " $orderQuery"
+        orderQuery: String?,
+    ): List<JsonNode> =
+        filterRecords(store, offset, size, context, query, queryVariables, orderQuery).values.toList()
+
+    override fun filterRecords(
+        store: String,
+        offset: Int,
+        size: Int,
+        context: String,
+        query: String?,
+        queryVariables: Map<String, *>?,
+        orderQuery: String?,
+    ): Map<String, JsonNode> {
+        var sql = "SELECT NAME, DATA FROM STORAGE $context WHERE STORE = :store"
+        if (query != null && query.isNotBlank()) sql += " AND $query"
+        if (orderQuery != null && orderQuery.isNotBlank()) sql += " $orderQuery"
         sql += " OFFSET :offset LIMIT :size"
 
         val params = params("store", store)
@@ -92,7 +104,32 @@ class StorageJdbcRepository(
         }
 
         return namedParameterJdbcTemplate!!.query(sql, params) { rs, _ ->
-            readJson(rs, "DATA")
+            rs.getString("NAME") to readJson(rs, "DATA")
+        }.toMap()
+    }
+
+    override fun forEach(
+        store: String,
+        context: String,
+        query: String?,
+        queryVariables: Map<String, *>?,
+        orderQuery: String?,
+        code: (key: String, node: JsonNode) -> Unit,
+    ) {
+        var sql = "SELECT NAME, DATA FROM STORAGE $context WHERE STORE = :store"
+        if (query != null && query.isNotBlank()) sql += " AND $query"
+        if (orderQuery != null && orderQuery.isNotBlank()) sql += " $orderQuery"
+
+        val params = params("store", store)
+
+        if (queryVariables != null) {
+            params.addValues(queryVariables)
+        }
+
+        namedParameterJdbcTemplate!!.query(sql, params) { rs ->
+            val key = rs.getString("NAME")
+            val node = readJson(rs, "DATA")
+            code(key, node)
         }
     }
 

@@ -411,6 +411,7 @@ class CoreResourceModuleTest {
                         .with("_properties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getProperties:PROMOTION_LEVEL,1")
                         .with("_runs", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionRunView:1")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROMOTION_LEVEL,1,0,10")
+                    .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROMOTION_LEVEL,1")
                         .with("_page", "urn:test:#:entity:PROMOTION_LEVEL:1")
                         .end(),
                 pl,
@@ -487,6 +488,7 @@ class CoreResourceModuleTest {
                         .with("_properties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getProperties:PROMOTION_LEVEL,1")
                         .with("_runs", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionRunView:1")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROMOTION_LEVEL,1,0,10")
+                        .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROMOTION_LEVEL,1")
                         .with("_page", "urn:test:#:entity:PROMOTION_LEVEL:1")
                         .end(),
                 pl

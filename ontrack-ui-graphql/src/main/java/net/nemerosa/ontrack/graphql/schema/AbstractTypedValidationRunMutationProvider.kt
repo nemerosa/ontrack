@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLInputObjectField
+import graphql.schema.GraphQLType
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.getMutationInputField
 import net.nemerosa.ontrack.graphql.support.getRequiredMutationInputField
@@ -34,7 +35,7 @@ abstract class AbstractTypedValidationRunMutationProvider<T>(
             override val name: String = "validateBuildByIdWith${mutationFragmentName}"
             override val description: String = "Validates a build identified by id with $mutationFragmentName data"
 
-            override val inputFields: List<GraphQLInputObjectField> = commonInputFields + dataInputFields + listOf(
+            override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = commonInputFields + dataInputFields + listOf(
                 requiredIntInputField("id", "ID of the build"),
             )
 
@@ -62,7 +63,7 @@ abstract class AbstractTypedValidationRunMutationProvider<T>(
             override val name: String = "validateBuildWith${mutationFragmentName}"
             override val description: String = "Validates a build identified by name with $mutationFragmentName data"
 
-            override val inputFields: List<GraphQLInputObjectField> = commonInputFields + dataInputFields + listOf(
+            override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = commonInputFields + dataInputFields + listOf(
                 requiredStringInputField("project", "Name of the project"),
                 requiredStringInputField("branch", "Name of the branch"),
                 requiredStringInputField("build", "Name of the build"),

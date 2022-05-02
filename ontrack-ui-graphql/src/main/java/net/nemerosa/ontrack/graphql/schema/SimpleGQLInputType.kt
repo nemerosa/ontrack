@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInputType
+import graphql.schema.GraphQLType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter
 import net.nemerosa.ontrack.graphql.support.getDescription
@@ -13,11 +14,11 @@ abstract class SimpleGQLInputType<T : Any>(
     private val type: KClass<T>
 ) : GQLInputType<T> {
 
-    override fun createInputType(): GraphQLInputType =
+    override fun createInputType(dictionary: MutableSet<GraphQLType>): GraphQLInputType =
         GraphQLInputObjectType.newInputObject()
             .name(type.java.simpleName)
             .description(getDescription(type))
-            .fields(GraphQLBeanConverter.asInputFields(type))
+            .fields(GraphQLBeanConverter.asInputFields(type, dictionary))
             .build()
 
     override fun convert(argument: Any?): T? =

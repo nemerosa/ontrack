@@ -12,6 +12,7 @@ interface StorageRepository {
      */
     fun count(
         store: String,
+        context: String = "",
         query: String? = null,
         queryVariables: Map<String, *>? = null,
     ): Int
@@ -23,10 +24,36 @@ interface StorageRepository {
         store: String,
         offset: Int = 0,
         size: Int = 40,
+        context: String = "",
         query: String? = null,
         queryVariables: Map<String, *>? = null,
         orderQuery: String? = null,
     ): List<JsonNode>
+
+    /**
+     * Gets items in a store matching some criteria.
+     */
+    fun filterRecords(
+        store: String,
+        offset: Int = 0,
+        size: Int = 40,
+        context: String = "",
+        query: String? = null,
+        queryVariables: Map<String, *>? = null,
+        orderQuery: String? = null,
+    ): Map<String, JsonNode>
+
+    /**
+     * Loops over items in a store matching some criteria.
+     */
+    fun forEach(
+        store: String,
+        context: String = "",
+        query: String? = null,
+        queryVariables: Map<String, *>? = null,
+        orderQuery: String? = null,
+        code: (key: String, node: JsonNode) -> Unit
+    )
 
     /**
      * Deletes items in a store matching some criteria.

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLInputType
+import graphql.schema.GraphQLType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter.asInputType
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter.asObject
@@ -18,7 +19,7 @@ class GQLInputPropertyFilter(
 
     override fun getTypeRef(): GraphQLTypeReference = GraphQLTypeReference(PropertyFilter::class.java.simpleName)
 
-    override fun createInputType(): GraphQLInputType = asInputType(PropertyFilter::class)
+    override fun createInputType(dictionary: MutableSet<GraphQLType>): GraphQLInputType = asInputType(PropertyFilter::class, dictionary)
 
     override fun convert(argument: Any?): PropertyFilter? =
         asObject(

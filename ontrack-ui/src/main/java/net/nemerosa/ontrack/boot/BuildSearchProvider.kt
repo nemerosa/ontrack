@@ -5,14 +5,14 @@ import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventListener
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
 
 @Component
 class BuildSearchProvider(
-        private val uriBuilder: URIBuilder,
-        private val structureService: StructureService,
-        private val searchIndexService: SearchIndexService
+    private val uriBuilder: EntityURIBuilder,
+    private val structureService: StructureService,
+    private val searchIndexService: SearchIndexService
 ) : SearchIndexer<BuildSearchItem>, EventListener {
 
     override val searchResultType = SearchResultType(

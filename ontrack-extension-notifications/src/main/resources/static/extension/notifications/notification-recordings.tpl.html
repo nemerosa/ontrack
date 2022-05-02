@@ -1,0 +1,80 @@
+<ot-view>
+
+    <div class="row" ng-show="loadingRecords">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the notification recordings...
+            </div>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>Channel</th>
+            <th>Result</th>
+            <th>Channel ID</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat-start="record in records">
+            <td>
+                <span class="fa fa-eye ot-command" ng-hide="record.details" title="Show more details" ng-click="record.details = true;"></span>
+                <span class="fa fa-eye-slash ot-command" ng-show="record.details" title="Hide the details" ng-click="record.details = false;"></span>
+                {{ record.timestamp }}
+            </td>
+            <td><code>{{ record.channel }}</code></td>
+            <td><code>{{ record.result.type }}</code></td>
+            <td><code ng-if="record.result.id">{{ record.result.id }}</code></td>
+        </tr>
+        <tr ng-repeat-end ng-if="record.details">
+            <td colspan="4">
+                <dl>
+                    <dt>Channel config</dt>
+                    <dd>
+                        <code>{{ record.channelConfig }}</code>
+                    </dd>
+                    <dt>Event</dt>
+                    <dd>
+                        <code>{{ record.event }}</code>
+                    </dd>
+                    <dt ng-if="record.result.message">Message</dt>
+                    <dd ng-if="record.result.message">
+                        <code>{{ record.result.message }}</code>
+                    </dd>
+                </dl>
+            </td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="4">
+                <select class="form-control col-md-2" ng-model="filter.notificationResultType" ng-change="refresh()" ng-options="type as type for type in notificationResultTypeValues">
+                    <option value="">All types</option>
+                </select>
+                &nbsp;
+                <button class="btn btn-default" ng-disabled="!navigation.previousPage" ng-click="switchPage(navigation.previousPage)">
+                    <span class="fa fa-step-backward"></span>
+                    Newer records
+                </button>
+                <button class="btn btn-default" ng-disabled="!navigation.nextPage" ng-click="switchPage(navigation.nextPage)">
+                    <span class="fa fa-step-forward"></span>
+                    Older records
+                </button>
+                {{ navigation.totalSize }} records
+                <button class="btn btn-info" ng-click="refresh()">
+                    <span class="fa fa-refresh"></span>
+                    Refresh
+                </button>
+                <button class="btn btn-danger" ng-click="deleteRecords()">
+                    <span class="fa fa-trash"></span>
+                    Delete ALL records
+                </button>
+            </td>
+        </tr>
+        </tfoot>
+    </table>
+
+</ot-view>

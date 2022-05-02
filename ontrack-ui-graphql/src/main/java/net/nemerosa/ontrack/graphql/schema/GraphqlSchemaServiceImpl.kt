@@ -27,7 +27,7 @@ class GraphqlSchemaServiceImpl(
         dictionary.addAll(types.map { it.createType(cache) })
         dictionary.addAll(interfaces.map { it.createInterface() })
         dictionary.addAll(enums.map { it.createEnum() })
-        dictionary.addAll(inputTypes.map { it.createInputType() })
+        dictionary.addAll(inputTypes.map { it.createInputType(dictionary) })
         val mutationType = createMutationType(dictionary)
         return GraphQLSchema.newSchema()
                 .additionalTypes(dictionary)
@@ -121,7 +121,7 @@ class GraphqlSchemaServiceImpl(
             GraphQLInputObjectType.newInputObject()
                     .name("${mutation.typePrefix}Input")
                     .description("Input type for the ${mutation.name} mutation.")
-                    .fields(mutation.inputFields)
+                    .fields(mutation.inputFields(dictionary))
                     .build()
                     .apply { dictionary.add(this) }
 

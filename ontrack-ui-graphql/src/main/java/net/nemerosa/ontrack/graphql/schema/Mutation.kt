@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLInputObjectField
+import graphql.schema.GraphQLType
 
 /**
  * Defines a mutation.
@@ -28,7 +29,7 @@ interface Mutation {
     /**
      * Fields attached to the input of the mutation
      */
-    val inputFields: List<GraphQLInputObjectField>
+    fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField>
 
     /**
      * Fields attached to the output of the mutation

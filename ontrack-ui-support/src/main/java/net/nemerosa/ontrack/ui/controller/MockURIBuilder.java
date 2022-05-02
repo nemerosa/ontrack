@@ -17,7 +17,7 @@ import static java.lang.String.format;
 
 @Component
 @Profile({RunProfile.UNIT_TEST})
-public class MockURIBuilder implements URIBuilder {
+public class MockURIBuilder implements EntityURIBuilder {
     @Override
     public URI build(Object invocationInfo) {
         MvcUriComponentsBuilder.MethodInvocationInfo info = (MvcUriComponentsBuilder.MethodInvocationInfo) invocationInfo;

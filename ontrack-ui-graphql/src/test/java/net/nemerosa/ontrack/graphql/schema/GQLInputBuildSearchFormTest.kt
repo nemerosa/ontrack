@@ -11,7 +11,7 @@ class GQLInputBuildSearchFormTest {
 
     @Test
     fun `Non nullable fields`() {
-        val type = GQLInputBuildSearchForm().createInputType() as GraphQLInputObjectType
+        val type = GQLInputBuildSearchForm().createInputType(mutableSetOf()) as GraphQLInputObjectType
         val fields = type.fields.associateBy { it.name }
         assertNotNull(fields["maximumCount"]) {
             assertEquals("Int", typeName(it.type))
