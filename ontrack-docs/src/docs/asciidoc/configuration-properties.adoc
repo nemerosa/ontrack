@@ -160,6 +160,13 @@ ontrack.config.extension.notifications.dispatching.queue.async = true
 
 # Asynchronous processing
 ontrack.config.extension.notifications.processing.queue.async = true
+
+# Maximum parallel processing of queues
+ontrack.config.extension.notifications.processing.queue.concurrency = 10
+
+# Mail configuration
+# "Reply to" address to use
+ontrack.config.extension.notifications.mail.from = no-reply@localhost
 ----
 
 [[configuration-properties-git]]
