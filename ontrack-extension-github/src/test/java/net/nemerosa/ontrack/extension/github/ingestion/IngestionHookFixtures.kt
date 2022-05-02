@@ -152,14 +152,16 @@ object IngestionHookFixtures {
      * Sample push payload
      */
     fun samplePushPayload(
+        repoName: String = sampleRepository,
+        owner: String = sampleOwner,
         ref: String = "refs/heads/$sampleBranch",
         added: List<String> = emptyList(),
         modified: List<String> = emptyList(),
         removed: List<String> = emptyList(),
     ) = pushPayload(
         ref = ref,
-        repoName = sampleRepository,
-        owner = sampleOwner,
+        repoName = repoName,
+        owner = owner,
         commits = listOf(
             Commit(
                 id = "01234567ef",
