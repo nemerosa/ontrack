@@ -87,3 +87,102 @@ image::integration-webhooks-deliveries-details.png[Webhook delivery details]
 * response payload - the payload returned by the webhook (interpreted as text)
 * response timestamp - when the response was received
 * stack - the error stacktrace in case of error
+
+[[webhooks-payloads]]
+==== Payloads
+
+Several types of payloads can be sent by Ontrack but they all share the same structure:
+
+* type: `application/json`
+* schema:
+
+[source,json]
+----
+{
+  "uuid" : "<uuid>",
+  "type" : "<payload type>",
+  "data" : {}
+}
+----
+
+The `data` node type and content depends on the payload `type`.
+
+[[webhooks-payloads-events]]
+===== `event` payload
+
+The `event` payload is sent upon a <<notifications,notification>>. A typical payload looks like:
+
+[source,json]
+----
+{
+  "uuid" : "fcf07059-6158-4acc-a965-9cbf30c8bdd7",
+  "type" : "event",
+  "data" : {
+    "eventType" : {
+      "id" : "new_branch",
+      "template" : "New branch ${BRANCH} for project ${PROJECT}."
+    },
+    "signature" : null,
+    "entities" : {
+      "PROJECT" : {
+        "id" : 260,
+        "name" : "p42127192",
+        "description" : "",
+        "disabled" : false,
+        "signature" : {
+          "time" : "2022-05-02T07:42:12.751100Z",
+          "user" : {
+            "name" : "admin"
+          }
+        }
+      },
+      "BRANCH" : {
+        "id" : 154,
+        "name" : "b42128333",
+        "description" : "",
+        "disabled" : false,
+        "project" : {
+          "id" : 260,
+          "name" : "p42127192",
+          "description" : "",
+          "disabled" : false,
+          "signature" : {
+            "time" : "2022-05-02T07:42:12.751100Z",
+            "user" : {
+              "name" : "admin"
+            }
+          }
+        },
+        "signature" : {
+          "time" : "2022-05-02T07:42:12.862900Z",
+          "user" : {
+            "name" : "admin"
+          }
+        }
+      }
+    },
+    "ref" : null,
+    "values" : { }
+  }
+}
+----
+
+The `entities`, `ref` and `values` fields will vary a lot depending on the type of event.
+
+[[webhooks-payloads-pings]]
+===== `ping` payload
+
+A `ping` payload can be sent from the webhooks list by clicking on the _Test_ button.
+
+It's used to test a webhook and its payload looks like:
+
+[source,json]
+----
+{
+  "uuid" : "b438b771-e20c-4012-adf6-adb0f1aaa43b",
+  "type" : "ping",
+  "data" : {
+    "message" : "Webhook wh48546511 ping"
+  }
+}
+----
