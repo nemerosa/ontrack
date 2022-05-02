@@ -22,7 +22,20 @@ class DefaultConfigService(
     override fun loadAndSaveConfig(branch: Branch, path: String): IngestionConfig? {
         val config = configLoaderService.loadConfig(branch, path)
         return config?.apply {
+            // Storing the configuration
             store(branch)
+            // Applying Casc configuration nodes
+            casc(branch, casc)
+        }
+    }
+
+    private fun casc(branch: Branch, cascConfig: IngestionCascConfig) {
+        if (!cascConfig.project.casc.isNull) {
+            // TODO Checks the branch pattern
+            TODO("Casc for the project")
+        }
+        if (!cascConfig.branch.isNull) {
+            TODO("Casc for the branch")
         }
     }
 
