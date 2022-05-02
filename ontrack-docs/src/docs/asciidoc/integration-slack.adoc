@@ -1,7 +1,7 @@
 [[slack]]
 === Integration with Slack
 
-Ontrack can be configured to send notifications to Slack.
+Ontrack can be configured to send <<notifications,notifications>> to Slack.
 
 Slack settings are available in _Settings > Slack settings_:
 

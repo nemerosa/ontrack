@@ -1,0 +1,26 @@
+[[notifications]]
+=== Notifications
+
+Ontrack has the possibility to send send notifications to different <<notifications-backends,backends>> like some webhooks, email, Slack messages, etc.
+
+A notification is the association between an _event_ occurring on an _entity_ and sent to a given _backend_ using some _configuration_.
+
+For example, a notification can be:
+
+* event: a build has been <<model,promoted>>
+* entity: the branch the build <<model,belongs to>>
+* backend: email
+* backend configuration: the subject & the email addresses
+
+In this example, the body of the email would be a text like "Build B of branch R in project P has been promoted to P", which various links to Ontrack.
+
+Administrators of Ontrack can create and configure the different <<notifications-backends,backends>>. They can also configure the notifications at entity level to respond to some events using notification configurations (_subscriptions_). Subscriptions can be either local (subscribing to the events on a given branch) or global (subscribing to the events in all Ontrack, regardless of the entity).
+
+[[notifications-backends]]
+==== Notification backends
+
+Ontrack can send notifications to:
+
+* webhooks
+* <<slack,Slack>>
+* email
