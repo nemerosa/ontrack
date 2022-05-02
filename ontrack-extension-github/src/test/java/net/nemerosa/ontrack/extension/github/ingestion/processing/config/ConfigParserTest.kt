@@ -105,6 +105,15 @@ class ConfigParserTest {
                   filter:
                     includes: ".*"
                     excludes: ""
+                casc:
+                  project:
+                    includes: "main"
+                    excludes: ""
+                    casc: null
+                  branch:
+                    includes: "main"
+                    excludes: ""
+                    casc: null
             """.trimIndent().trim(),
             yaml.trim()
         )
