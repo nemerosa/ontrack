@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIName
 
@@ -35,6 +37,8 @@ data class IngestionConfig(
     val promotions: List<PromotionConfig> = emptyList(),
     @APIDescription("Run validations")
     val runs: IngestionRunConfig = IngestionRunConfig(),
+    @APIDescription("Casc configurations")
+    val casc: IngestionCascConfig = IngestionCascConfig(),
 )
 
 /**
@@ -138,4 +142,28 @@ data class PromotionConfig(
     val include: String? = null,
     @APIDescription("Regular expression to exclude validation stamps by name")
     val exclude: String? = null,
+)
+
+/**
+ * List of CasC nodes for the projects & branches
+ */
+@APIDescription("List of CasC nodes for the projects & branches")
+data class IngestionCascConfig(
+    @APIDescription("Casc for the project")
+    val project: IngestionCascProjectConfig = IngestionCascProjectConfig(),
+    @APIDescription("Casc for the branch")
+    val branch: JsonNode = NullNode.instance,
+)
+
+/**
+ * CasC node for the project
+ */
+@APIDescription("CasC node for the project")
+data class IngestionCascProjectConfig(
+    @APIDescription("Regular expression for the branches which can setup the project")
+    val includes: String = "main",
+    @APIDescription("Regular expression to exclude branches")
+    val excludes: String = "",
+    @APIDescription("Casc configuration for the project")
+    val casc: JsonNode = NullNode.instance,
 )
