@@ -1,0 +1,33 @@
+[[webhooks]]
+=== Webhooks
+
+Ontrack can be configured to send <<notifications,notifications>> to some webhooks using HTTP.
+
+[[webhooks-definitions]]
+==== Definitions
+
+Ontrack administrators can create webhooks using the _Webhooks_ entry in their user menu.
+
+Webhooks can be created and deleted.
+
+A webhook is defined by the following fields:
+
+* name - a unique name for the webhook, which will be referred to when used in a subscription
+* enabled - a flag to disable or enable the webhook
+* url - a HTTP URL for the webhook. HTTPS is recommended but not required.
+* timeout - number of seconds to wait before the connection to the webhook _url_ is abandoned
+* _authentication_ - the way to authenticate to the webhook (see <<webhooks-authentication,below>>)
+
+[[webhooks-authentication]]
+==== Authentication
+
+Three types of authentication are supported:
+
+* basic authentication - a username and a password must be provided
+* bearer authentication - a token must be provided and will be sent in the `Authorization` header with its value set to `Bearer <provided token>`
+* header authentication - a header name and value must be provided
+
+[NOTE]
+====
+Authentication of webhooks is required.
+====

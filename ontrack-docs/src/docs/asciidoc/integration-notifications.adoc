@@ -21,6 +21,6 @@ Administrators of Ontrack can create and configure the different <<notifications
 
 Ontrack can send notifications to:
 
-* webhooks
+* <<webhooks,webhooks>>
 * <<slack,Slack>>
 * email

@@ -21,6 +21,8 @@ include::integration-notifications.adoc[]
 
 include::integration-slack.adoc[]
 
+include::integration-webhooks.adoc[]
+
 include::integration-metrics.adoc[]
 
 // TODO include::integration-graphql.adoc[]
