@@ -150,17 +150,17 @@ data class PromotionConfig(
 @APIDescription("List of CasC nodes for the projects & branches")
 data class IngestionCascConfig(
     @APIDescription("Casc for the project")
-    val project: IngestionCascProjectConfig = IngestionCascProjectConfig(),
+    val project: IngestionCascBranchConfig = IngestionCascBranchConfig(),
     @APIDescription("Casc for the branch")
-    val branch: JsonNode = NullNode.instance,
+    val branch: IngestionCascBranchConfig = IngestionCascBranchConfig(),
 )
 
 /**
  * CasC node for the project
  */
 @APIDescription("CasC node for the project")
-data class IngestionCascProjectConfig(
-    @APIDescription("Regular expression for the branches which can setup the project")
+data class IngestionCascBranchConfig(
+    @APIDescription("Regular expression for the branches which can setup the entity")
     val includes: String = "main",
     @APIDescription("Regular expression to exclude branches")
     val excludes: String = "",

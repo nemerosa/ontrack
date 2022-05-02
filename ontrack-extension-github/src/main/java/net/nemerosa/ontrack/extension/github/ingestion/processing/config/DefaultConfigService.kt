@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
+import net.nemerosa.ontrack.extension.casc.entities.CascEntityService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.EntityDataService
 import org.springframework.stereotype.Service
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 class DefaultConfigService(
     private val entityDataService: EntityDataService,
     private val configLoaderService: ConfigLoaderService,
+    private val cascEntityService: CascEntityService,
 ) : ConfigService {
 
     override fun getOrLoadConfig(branch: Branch, path: String): IngestionConfig {
@@ -32,10 +34,11 @@ class DefaultConfigService(
     private fun casc(branch: Branch, cascConfig: IngestionCascConfig) {
         if (!cascConfig.project.casc.isNull) {
             // TODO Checks the branch pattern
-            TODO("Casc for the project")
+            cascEntityService.apply(branch.project, cascConfig.project.casc)
         }
-        if (!cascConfig.branch.isNull) {
-            TODO("Casc for the branch")
+        if (!cascConfig.branch.casc.isNull) {
+            // TODO Checks the branch pattern
+            cascEntityService.apply(branch, cascConfig.branch.casc)
         }
     }
 

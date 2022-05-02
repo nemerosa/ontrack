@@ -28,7 +28,7 @@ internal class IngestionPushPayloadListenerIT : AbstractIngestionTestSupport() {
             val repository = uid("r")
             ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
                 casc = IngestionCascConfig(
-                    project = IngestionCascProjectConfig(
+                    project = IngestionCascBranchConfig(
                         casc = mapOf(
                             "properties" to mapOf(
                                 "staleProperty" to mapOf(
