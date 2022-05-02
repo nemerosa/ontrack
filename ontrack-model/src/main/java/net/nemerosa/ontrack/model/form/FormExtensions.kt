@@ -12,6 +12,7 @@ fun <T> Form.textField(property: KProperty1<T, String?>, value: String?): Form =
             .optional(property.returnType.isMarkedNullable)
             .value(value)
     )
+
 fun <T> Form.passwordField(property: KProperty1<T, String?>): Form =
     with(
         Password.of(property.name)
@@ -53,5 +54,19 @@ fun <T> Form.longField(property: KProperty1<T, Long>, value: Long?): Form =
             .label(getPropertyLabel(property))
             .help(getPropertyDescription(property))
             .optional(property.returnType.isMarkedNullable)
+            .value(value)
+    )
+
+fun Form.selectionOfString(
+    property: KProperty1<*, String?>,
+    items: List<String>,
+    value: String?,
+): Form =
+    with(
+        Selection.of(property.name)
+            .label(getPropertyLabel(property))
+            .help(getPropertyDescription(property))
+            .optional(property.returnType.isMarkedNullable)
+            .items(items.map { IdName(it, it) })
             .value(value)
     )
