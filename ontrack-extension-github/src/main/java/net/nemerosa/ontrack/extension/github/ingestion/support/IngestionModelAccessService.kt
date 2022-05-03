@@ -43,6 +43,14 @@ interface IngestionModelAccessService {
         repository: Repository,
         runId: Long,
     ): Build?
+
+    /**
+     * Finds a build using its name.
+     */
+    fun findBuildByBuildName(
+        repository: Repository,
+        buildName: String,
+    ): Build?
 }
 
 /**

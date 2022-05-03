@@ -46,9 +46,23 @@ class GitHubIngestionValidateDataMutations(
             val build = findBuildByRunId(input, input.runId)
             build?.run { validate(this, input) }
         },
+        /**
+         * Getting the build by build name
+         */
+        simpleMutation(
+            name = "gitHubIngestionValidateDataByBuildName",
+            description = "Sets some validation data on a build identified using its name",
+            input = GitHubIngestionValidateDataByBuildNameInput::class,
+            outputName = "validationRun",
+            outputDescription = "Created validation run",
+            outputType = ValidationRun::class
+        ) { input ->
+            val build = findBuildByBuildName(input, input.buildName)
+            build?.run { validate(this, input) }
+        },
     )
 
-    private fun validate(build: Build, input: GitHubIngestionValidateDataByRunIdInput): ValidationRun {
+    private fun validate(build: Build, input: AbstractGitHubIngestionValidateDataInput): ValidationRun {
         // Gets the general ingestion settings
         val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
         // Gets the branch ingestion settings
@@ -107,6 +121,12 @@ class GitHubIngestionValidateDataMutations(
             repository = Repository.stub(input.owner, input.repository),
             runId = runId,
         )
+
+    private fun findBuildByBuildName(input: AbstractGitHubIngestionValidateDataInput, buildName: String): Build? =
+        ingestionModelAccessService.findBuildByBuildName(
+            repository = Repository.stub(input.owner, input.repository),
+            buildName = buildName,
+        )
 }
 
 /**
@@ -129,7 +149,7 @@ abstract class AbstractGitHubIngestionValidateDataInput(
 )
 
 /**
- * Input for the data validation for a build identified by ID
+ * Input for the data validation for a build identified by GHA workflow run ID
  */
 class GitHubIngestionValidateDataByRunIdInput(
     owner: String,
@@ -140,6 +160,27 @@ class GitHubIngestionValidateDataByRunIdInput(
     validationStatus: String?,
     @APIDescription("ID of the GHA workflow run")
     val runId: Long,
+) : AbstractGitHubIngestionValidateDataInput(
+    owner,
+    repository,
+    // ref,
+    validation,
+    validationData,
+    validationStatus,
+)
+
+/**
+ * Input for the data validation for a build identified by its name
+ */
+class GitHubIngestionValidateDataByBuildNameInput(
+    owner: String,
+    repository: String,
+    // ref: String,
+    validation: String,
+    validationData: GitHubIngestionValidationDataInput,
+    validationStatus: String?,
+    @APIDescription("Build name")
+    val buildName: String,
 ) : AbstractGitHubIngestionValidateDataInput(
     owner,
     repository,

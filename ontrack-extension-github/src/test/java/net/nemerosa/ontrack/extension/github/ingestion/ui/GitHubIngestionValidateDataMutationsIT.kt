@@ -87,6 +87,74 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
     }
 
     @Test
+    fun `Build by name, no prior validation run`() {
+        asAdmin {
+            withGitHubIngestionSettings {
+                project {
+                    branch {
+                        build {
+                            setProperty(this, BuildGitHubWorkflowRunPropertyType::class.java,
+                                BuildGitHubWorkflowRunProperty(
+                                    runId = 10,
+                                    url = "",
+                                    name = "some-workflow",
+                                    runNumber = 1,
+                                    running = true,
+                                ))
+                            run("""
+                                mutation {
+                                    gitHubIngestionValidateDataByBuildName(input: {
+                                        owner: "nemerosa",
+                                        repository: "${project.name}",
+                                        validation: "test",
+                                        validationData: {
+                                            type: "${TestNumberValidationDataType::class.java.name}",
+                                            data: {
+                                                value: 50
+                                            }
+                                        },
+                                        validationStatus: "PASSED",
+                                        buildName: "$name"
+                                    }) {
+                                        errors {
+                                            message
+                                            exception
+                                            location
+                                        }
+                                    }
+                                }
+                            """) { data ->
+                                checkGraphQLUserErrors(data, "gitHubIngestionValidateDataByRunId")
+                                // Checks the validation stamp has been created
+                                val vs = structureService.findValidationStampByName(
+                                    project.name,
+                                    branch.name,
+                                    "test"
+                                ).getOrNull() ?: fail("Validation stamp not created")
+                                // Checks the build has been validated
+                                val run = structureService.getValidationRunsForBuildAndValidationStamp(
+                                    buildId = id,
+                                    validationStampId = vs.id,
+                                    offset = 0,
+                                    count = 1,
+                                ).firstOrNull()
+                                assertNotNull(run, "Validation run created") {
+                                    assertEquals(
+                                        ValidationRunStatusID.PASSED,
+                                        it.lastStatusId
+                                    )
+                                    val runData = it.data?.data
+                                    assertEquals(50, runData, "Validation run data has been set")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Build by ID, no prior validation run, data validation`() {
         asAdmin {
             withGitHubIngestionSettings {

@@ -154,7 +154,7 @@ class DefaultIngestionModelAccessService(
         return branch
     }
 
-    override fun findBuildByRunId(repository: Repository, runId: Long): Build? {
+    private fun findProjectFromRepository(repository: Repository): Project? {
         // Gets the general ingestion settings
         val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
         // Gets the project name from the repository
@@ -164,8 +164,12 @@ class DefaultIngestionModelAccessService(
             orgProjectPrefix = settings.orgProjectPrefix,
         )
         // Getting the project using its name
-        val project = structureService.findProjectByName(projectName).getOrNull()
-            ?: return null
+        return structureService.findProjectByName(projectName).getOrNull()
+    }
+
+    override fun findBuildByRunId(repository: Repository, runId: Long): Build? {
+        // Gets the project
+        val project = findProjectFromRepository(repository) ?: return null
         // Getting the build using its Run ID property
         return propertyService.findByEntityTypeAndSearchArguments(
             ProjectEntityType.BUILD,
@@ -182,5 +186,18 @@ class DefaultIngestionModelAccessService(
         }.firstOrNull {
             it.project.id == project.id
         }
+    }
+
+    override fun findBuildByBuildName(repository: Repository, buildName: String): Build? {
+        // Gets the project
+        val project = findProjectFromRepository(repository) ?: return null
+        // Searching
+        return structureService.buildSearch(
+            projectId = project.id,
+            form = BuildSearchForm(
+                buildName = buildName,
+                buildExactMatch = true,
+            )
+        ).firstOrNull { it.project.id == project.id }
     }
 }
