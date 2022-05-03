@@ -51,6 +51,14 @@ interface IngestionModelAccessService {
         repository: Repository,
         buildName: String,
     ): Build?
+
+    /**
+     * Finds a build using its release property (label).
+     */
+    fun findBuildByBuildLabel(
+        repository: Repository,
+        buildLabel: String,
+    ): Build?
 }
 
 /**

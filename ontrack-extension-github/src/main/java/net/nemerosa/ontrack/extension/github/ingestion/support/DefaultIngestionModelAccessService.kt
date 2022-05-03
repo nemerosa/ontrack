@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.support
 
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
@@ -197,6 +198,19 @@ class DefaultIngestionModelAccessService(
             form = BuildSearchForm(
                 buildName = buildName,
                 buildExactMatch = true,
+            )
+        ).firstOrNull { it.project.id == project.id }
+    }
+
+    override fun findBuildByBuildLabel(repository: Repository, buildLabel: String): Build? {
+        // Gets the project
+        val project = findProjectFromRepository(repository) ?: return null
+        // Searching
+        return structureService.buildSearch(
+            projectId = project.id,
+            form = BuildSearchForm(
+                property = ReleasePropertyType::class.java.name,
+                propertyValue = buildLabel,
             )
         ).firstOrNull { it.project.id == project.id }
     }

@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.github.ingestion.ui
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
+import net.nemerosa.ontrack.extension.general.ReleaseProperty
+import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
@@ -115,6 +117,77 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                                         },
                                         validationStatus: "PASSED",
                                         buildName: "$name"
+                                    }) {
+                                        errors {
+                                            message
+                                            exception
+                                            location
+                                        }
+                                    }
+                                }
+                            """) { data ->
+                                checkGraphQLUserErrors(data, "gitHubIngestionValidateDataByRunId")
+                                // Checks the validation stamp has been created
+                                val vs = structureService.findValidationStampByName(
+                                    project.name,
+                                    branch.name,
+                                    "test"
+                                ).getOrNull() ?: fail("Validation stamp not created")
+                                // Checks the build has been validated
+                                val run = structureService.getValidationRunsForBuildAndValidationStamp(
+                                    buildId = id,
+                                    validationStampId = vs.id,
+                                    offset = 0,
+                                    count = 1,
+                                ).firstOrNull()
+                                assertNotNull(run, "Validation run created") {
+                                    assertEquals(
+                                        ValidationRunStatusID.PASSED,
+                                        it.lastStatusId
+                                    )
+                                    val runData = it.data?.data
+                                    assertEquals(50, runData, "Validation run data has been set")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Build by label, no prior validation run`() {
+        asAdmin {
+            withGitHubIngestionSettings {
+                project {
+                    branch {
+                        build {
+                            setProperty(this, BuildGitHubWorkflowRunPropertyType::class.java,
+                                BuildGitHubWorkflowRunProperty(
+                                    runId = 10,
+                                    url = "",
+                                    name = "some-workflow",
+                                    runNumber = 1,
+                                    running = true,
+                                ))
+                            setProperty(this, ReleasePropertyType::class.java,
+                                ReleaseProperty("1.0.0")
+                            )
+                            run("""
+                                mutation {
+                                    gitHubIngestionValidateDataByBuildLabel(input: {
+                                        owner: "nemerosa",
+                                        repository: "${project.name}",
+                                        validation: "test",
+                                        validationData: {
+                                            type: "${TestNumberValidationDataType::class.java.name}",
+                                            data: {
+                                                value: 50
+                                            }
+                                        },
+                                        validationStatus: "PASSED",
+                                        buildLabel: "1.0.0"
                                     }) {
                                         errors {
                                             message
