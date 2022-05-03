@@ -107,6 +107,14 @@ general:
   # Must we use the job name as a prefix to the validation stamp?
   # Default value: using the global Ontrack settings
   validationJobPrefix: null
+# Configuration of the ingestion of the workflows
+workflows:
+  # Filter on which workflows must be ingested or not
+  filter:
+    # By default, all workflows are eligible for ingestion
+    includes: ".*"
+    # By default, no workflow is excluded
+    excludes: ""
 # Configuration at workflow run level
 runs:
   # Set to true or false to enable (or not) the creation of validations for the complete workflow run

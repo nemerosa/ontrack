@@ -20,6 +20,7 @@ interface WorkflowJobProcessingService {
      * @param conclusion Conclusion of the validation
      * @param startedAt Start timestamp for the validation
      * @param completedAt Completion timestamp for the validation
+     * @return If items have been created
      */
     fun setupValidation(
         repository: Repository,
@@ -32,7 +33,7 @@ interface WorkflowJobProcessingService {
         conclusion: WorkflowJobStepConclusion?,
         startedAt: LocalDateTime?,
         completedAt: LocalDateTime?
-    )
+    ): Boolean
 
     /**
      * Generic method to create a validation run

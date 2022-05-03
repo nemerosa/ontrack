@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
+import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIName
 
@@ -37,6 +38,8 @@ data class IngestionConfig(
     val promotions: List<PromotionConfig> = emptyList(),
     @APIDescription("Run validations")
     val runs: IngestionRunConfig = IngestionRunConfig(),
+    @APIDescription("Workflows ingestion")
+    val workflows: IngestionWorkflowConfig = IngestionWorkflowConfig(),
     @APIDescription("Casc configurations")
     val casc: IngestionCascConfig = IngestionCascConfig(),
 )
@@ -69,6 +72,16 @@ data class IngestionRunConfig(
 )
 
 /**
+ * Workflow configuration
+ */
+@APIName("GitHubIngestionConfigWorkflow")
+@APIDescription("Settings for the workflows ingestion")
+data class IngestionWorkflowConfig(
+    @APIDescription("Filter on the workflow names")
+    val filter: FilterConfig = FilterConfig(),
+)
+
+/**
  * Filter rule
  *
  * @param includes Regular expression to include the items
@@ -81,7 +94,9 @@ data class FilterConfig(
     val includes: String = ".*",
     @APIDescription("Regular expression to exclude the items (empty = no exclusion)")
     val excludes: String = "",
-)
+) {
+    fun includes(name: String) = FilterHelper.includes(name, includes, excludes)
+}
 
 /**
  * Step configuration
