@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.TypeRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.exceptions.ValidationRunDataTypeNotFoundException
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
@@ -26,6 +27,7 @@ class GitHubIngestionValidateDataMutations(
     private val structureService: StructureService,
     private val workflowJobProcessingService: WorkflowJobProcessingService,
     private val validationRunStatusService: ValidationRunStatusService,
+    private val validationDataTypeService: ValidationDataTypeService,
 ) : TypedMutationProvider() {
 
     override val mutations: List<Mutation> = listOf(
@@ -45,7 +47,7 @@ class GitHubIngestionValidateDataMutations(
         },
     )
 
-    private fun validate(build: Build, input: GitHubIngestionValidateDataByRunIdInput): ValidationRun? {
+    private fun validate(build: Build, input: GitHubIngestionValidateDataByRunIdInput): ValidationRun {
         // Gets the general ingestion settings
         val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
         // Gets the branch ingestion settings
@@ -56,6 +58,10 @@ class GitHubIngestionValidateDataMutations(
             vsName = input.validation,
             vsDescription = null,
         )
+        // Parsing the data
+        val validationDataType = validationDataTypeService.getValidationDataType<Any, Any>(input.validationData.type)
+            ?: throw ValidationRunDataTypeNotFoundException(input.validationData.type)
+        val parsedData = validationDataType.fromForm(input.validationData.data)
         // Gets any existing validation run
         val run = structureService.getValidationRunsForBuildAndValidationStamp(
             buildId = build.id,
@@ -80,7 +86,7 @@ class GitHubIngestionValidateDataMutations(
                     validationStampName = input.validation,
                     validationRunStatusId = validationRunStatusId,
                     dataTypeId = input.validationData.type,
-                    data = input.validationData.data,
+                    data = parsedData,
                 )
             )
         }
