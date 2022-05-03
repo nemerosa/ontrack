@@ -43,23 +43,22 @@ class DefaultWorkflowJobProcessingService(
         conclusion: WorkflowJobStepConclusion?,
         startedAt: LocalDateTime?,
         completedAt: LocalDateTime?,
-    ) {
+    ): Boolean {
         // Settings
         val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
         // Project name
         val projectName = getProjectName(repository.owner.login, repository.name, settings.orgProjectPrefix)
-        // Gets the build
-        val build = findBuild(projectName, runId)
-            ?: throw BuildWithWorkflowRunIdNotFoundException(projectName, runId)
+        // Gets the build or does not do anything
+        val build = findBuild(projectName, runId) ?: return false
         // Gets the ingestion configuration
         val ingestionConfig = getOrLoadIngestionConfig(build.branch)
         // Skipping job or not, depending on the configuration
         if (step == null && ingestionConfig.general.skipJobs) {
-            return
+            return false
         }
         // Filtering on jobs and steps
-        if (ignoreJob(job, settings, ingestionConfig)) return
-        if (step != null && ignoreStep(step, settings, ingestionConfig)) return
+        if (ignoreJob(job, settings, ingestionConfig)) return false
+        if (step != null && ignoreStep(step, settings, ingestionConfig)) return false
         // Gets the run property
         val runProperty = propertyService.getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java).value
             ?: error("Cannot find workflow run property on build")
@@ -103,12 +102,14 @@ class DefaultWorkflowJobProcessingService(
                 )
             )
         }
+        // OK
+        return true
     }
 
     override fun setupValidationStamp(
         branch: Branch,
         vsName: String,
-        vsDescription: String?
+        vsDescription: String?,
     ): ValidationStamp {
         val existing = structureService.findValidationStampByName(branch.project.name, branch.name, vsName).getOrNull()
         return if (existing != null) {
@@ -182,7 +183,7 @@ class DefaultWorkflowJobProcessingService(
         status: WorkflowJobStepStatus,
         conclusion: WorkflowJobStepConclusion?,
         startedAt: LocalDateTime?,
-        completedAt: LocalDateTime?
+        completedAt: LocalDateTime?,
     ): ValidationRun? {
         // If not finished, does not do anything
         if (conclusion == null || startedAt == null || completedAt == null) return null
@@ -211,7 +212,7 @@ class DefaultWorkflowJobProcessingService(
 
     private fun getValidationRunStatus(
         status: WorkflowJobStepStatus,
-        conclusion: WorkflowJobStepConclusion
+        conclusion: WorkflowJobStepConclusion,
     ): ValidationRunStatusID? =
         when (status) {
             WorkflowJobStepStatus.completed -> when (conclusion) {
@@ -222,7 +223,7 @@ class DefaultWorkflowJobProcessingService(
             else -> null
         }
 
-    fun findBuild(projectName: String, runId: Long): Build? {
+    private fun findBuild(projectName: String, runId: Long): Build? {
         val project = structureService.findProjectByName(projectName).getOrNull()
             ?: return null
         return propertyService.findByEntityTypeAndSearchArguments(
@@ -242,7 +243,12 @@ class DefaultWorkflowJobProcessingService(
         }
     }
 
-    private fun getValidationStampName(settings: GitHubIngestionSettings, ingestionConfig: IngestionConfig, job: String, step: String?): String =
+    private fun getValidationStampName(
+        settings: GitHubIngestionSettings,
+        ingestionConfig: IngestionConfig,
+        job: String,
+        step: String?,
+    ): String =
         ingestionConfig.getValidationStampName(settings, job, step)
 
     private fun getValidationStampDescription(ingestionConfig: IngestionConfig, job: String, step: String?): String =

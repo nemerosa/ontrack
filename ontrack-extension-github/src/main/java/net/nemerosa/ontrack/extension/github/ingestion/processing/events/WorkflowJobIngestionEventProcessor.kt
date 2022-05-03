@@ -44,7 +44,7 @@ class WorkflowJobIngestionEventProcessor(
             onStep(step, payload)
         }
         // Processing of the job itself
-        workflowJobProcessingService.setupValidation(
+        val ok = workflowJobProcessingService.setupValidation(
             repository = payload.repository,
             runId = payload.workflowJob.runId,
             runAttempt = payload.workflowJob.runAttempt,
@@ -57,10 +57,14 @@ class WorkflowJobIngestionEventProcessor(
             completedAt = payload.workflowJob.completedAtDate,
         )
         // OK
-        return IngestionEventProcessingResult.PROCESSED
+        return if (ok) {
+            IngestionEventProcessingResult.PROCESSED
+        } else {
+            IngestionEventProcessingResult.IGNORED
+        }
     }
 
-    private fun onStep(step: WorkflowJobStep, payload: WorkflowJobPayload) {
+    private fun onStep(step: WorkflowJobStep, payload: WorkflowJobPayload) =
         workflowJobProcessingService.setupValidation(
             repository = payload.repository,
             runId = payload.workflowJob.runId,
@@ -73,7 +77,6 @@ class WorkflowJobIngestionEventProcessor(
             startedAt = step.startedAtDate,
             completedAt = step.completedAtDate,
         )
-    }
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)

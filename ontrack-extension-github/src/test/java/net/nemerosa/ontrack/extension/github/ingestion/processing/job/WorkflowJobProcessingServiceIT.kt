@@ -191,6 +191,47 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
     }
 
     @Test
+    fun `Ignoring jobs when no run ID has been assigned`() {
+        project {
+            branch {
+                asAdmin {
+                    // Git branch at branch level
+                    setProperty(
+                        this,
+                        GitBranchConfigurationPropertyType::class.java,
+                        GitBranchConfigurationProperty(
+                            branch = "main",
+                            buildCommitLink = null, // Not used
+                            isOverride = false,
+                            buildTagInterval = 0,
+                        )
+                    )
+                    // Trying to process a job & step on a branch where no build has been created
+                    workflowJobProcessingService.setupValidation(
+                        repository = Repository(
+                            name = project.name,
+                            description = null,
+                            htmlUrl = "https://github.com/nemerosa/${project.name}",
+                            owner = Owner(login = "nemerosa"),
+                        ),
+                        runId = 1000L,
+                        runAttempt = 1,
+                        job = "any-job",
+                        jobUrl = "uri:job",
+                        step = "any-step",
+                        status = WorkflowJobStepStatus.in_progress,
+                        conclusion = null,
+                        startedAt = Time.now(),
+                        completedAt = null,
+                    )
+                    // Still no build has been created
+                    assertEquals(0, structureService.getBuildCount(this))
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Creation of a simple validation run twice`() {
         project {
             branch {
