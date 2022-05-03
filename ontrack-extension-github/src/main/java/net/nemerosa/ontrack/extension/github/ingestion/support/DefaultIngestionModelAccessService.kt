@@ -14,12 +14,10 @@ import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionS
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
+import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
-import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
-import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.PropertyService
-import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.NoConfig
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -156,4 +154,33 @@ class DefaultIngestionModelAccessService(
         return branch
     }
 
+    override fun findBuildByRunId(repository: Repository, runId: Long): Build? {
+        // Gets the general ingestion settings
+        val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
+        // Gets the project name from the repository
+        val projectName = getProjectName(
+            owner = repository.owner.login,
+            repository = repository.name,
+            orgProjectPrefix = settings.orgProjectPrefix,
+        )
+        // Getting the project using its name
+        val project = structureService.findProjectByName(projectName).getOrNull()
+            ?: return null
+        // Getting the build using its Run ID property
+        return propertyService.findByEntityTypeAndSearchArguments(
+            ProjectEntityType.BUILD,
+            BuildGitHubWorkflowRunPropertyType::class,
+            PropertySearchArguments(
+                jsonContext = null,
+                jsonCriteria = "(pp.json->>'runId')::bigint = :runId",
+                criteriaParams = mapOf(
+                    "runId" to runId,
+                )
+            )
+        ).map {
+            structureService.getBuild(it)
+        }.firstOrNull {
+            it.project.id == project.id
+        }
+    }
 }

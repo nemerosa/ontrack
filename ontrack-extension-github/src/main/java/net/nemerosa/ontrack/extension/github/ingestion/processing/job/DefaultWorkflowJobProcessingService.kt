@@ -8,9 +8,9 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.getProjectName
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
 import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
+import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobProperty
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobPropertyType
@@ -30,6 +30,7 @@ class DefaultWorkflowJobProcessingService(
     private val cachedSettingsService: CachedSettingsService,
     private val runInfoService: RunInfoService,
     private val configService: ConfigService,
+    private val ingestionModelAccessService: IngestionModelAccessService,
 ) : WorkflowJobProcessingService {
 
     override fun setupValidation(
@@ -44,12 +45,10 @@ class DefaultWorkflowJobProcessingService(
         startedAt: LocalDateTime?,
         completedAt: LocalDateTime?,
     ): Boolean {
+        // Gets the build or does not do anything
+        val build = ingestionModelAccessService.findBuildByRunId(repository, runId) ?: return false
         // Settings
         val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
-        // Project name
-        val projectName = getProjectName(repository.owner.login, repository.name, settings.orgProjectPrefix)
-        // Gets the build or does not do anything
-        val build = findBuild(projectName, runId) ?: return false
         // Gets the ingestion configuration
         val ingestionConfig = getOrLoadIngestionConfig(build.branch)
         // Skipping job or not, depending on the configuration
@@ -222,26 +221,6 @@ class DefaultWorkflowJobProcessingService(
             }
             else -> null
         }
-
-    private fun findBuild(projectName: String, runId: Long): Build? {
-        val project = structureService.findProjectByName(projectName).getOrNull()
-            ?: return null
-        return propertyService.findByEntityTypeAndSearchArguments(
-            ProjectEntityType.BUILD,
-            BuildGitHubWorkflowRunPropertyType::class,
-            PropertySearchArguments(
-                jsonContext = null,
-                jsonCriteria = "(pp.json->>'runId')::bigint = :runId",
-                criteriaParams = mapOf(
-                    "runId" to runId,
-                )
-            )
-        ).map {
-            structureService.getBuild(it)
-        }.firstOrNull {
-            it.project.id == project.id
-        }
-    }
 
     private fun getValidationStampName(
         settings: GitHubIngestionSettings,

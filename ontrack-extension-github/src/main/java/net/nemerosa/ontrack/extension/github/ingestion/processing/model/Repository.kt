@@ -18,4 +18,19 @@ data class Repository(
 ) {
     @JsonIgnore
     val fullName: String = "${owner.login}/$name"
+
+    companion object {
+        /**
+         * Repository skeleton object from a owner and name
+         */
+        fun stub(owner: String, name: String) =
+            Repository(
+                name = name,
+                description = null,
+                owner = Owner(
+                    login = owner,
+                ),
+                htmlUrl = "",
+            )
+    }
 }

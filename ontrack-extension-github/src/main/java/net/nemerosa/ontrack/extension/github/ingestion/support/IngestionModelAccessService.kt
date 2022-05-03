@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.support
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.IPullRequest
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
 
 /**
@@ -34,6 +35,14 @@ interface IngestionModelAccessService {
         headBranch: String,
         pullRequest: IPullRequest?,
     ): Branch
+
+    /**
+     * Finds a build using its workflow run ID.
+     */
+    fun findBuildByRunId(
+        repository: Repository,
+        runId: Long,
+    ): Build?
 }
 
 /**
