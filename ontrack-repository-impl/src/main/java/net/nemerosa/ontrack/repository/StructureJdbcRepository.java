@@ -982,6 +982,16 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public Ack deleteValidationRun(ID validationRunId) {
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "DELETE FROM VALIDATION_RUNS WHERE ID = :id",
+                        params("id", validationRunId.getValue())
+                )
+        );
+    }
+
+    @Override
     public void reorderValidationStamps(ID branchId, Reordering reordering) {
         int order = 1;
         for (int id : reordering.getIds()) {

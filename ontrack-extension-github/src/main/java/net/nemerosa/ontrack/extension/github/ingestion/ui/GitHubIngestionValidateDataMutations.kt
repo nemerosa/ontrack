@@ -25,6 +25,7 @@ class GitHubIngestionValidateDataMutations(
     private val cachedSettingsService: CachedSettingsService,
     private val configService: ConfigService,
     private val structureService: StructureService,
+    private val runInfoService: RunInfoService,
     private val workflowJobProcessingService: WorkflowJobProcessingService,
     private val validationRunStatusService: ValidationRunStatusService,
     private val validationDataTypeService: ValidationDataTypeService,
@@ -69,27 +70,36 @@ class GitHubIngestionValidateDataMutations(
             offset = 0,
             count = 1,
         ).firstOrNull()
-        // If the run already exists, set its data
-        return if (run != null) {
-            TODO("Sets the data on an existing validation run")
-            // OK
-            run
-        } else {
-            // Validation status
-            val validationRunStatusId = input.validationStatus?.run {
-                validationRunStatusService.getValidationRunStatus(this)
-            }
-            // Creates the validation run
-            structureService.newValidationRun(
-                build = build,
-                validationRunRequest = ValidationRunRequest(
-                    validationStampName = input.validation,
-                    validationRunStatusId = validationRunStatusId,
-                    dataTypeId = input.validationData.type,
-                    data = parsedData,
-                )
+        // Any existing run info
+        var existingRunInfo: RunInfoInput? = null
+        // If the run already exists, takes its run info and remove it
+        if (run != null) {
+            existingRunInfo = runInfoService.getRunInfo(run)?.toRunInfoInput()
+            structureService.deleteValidationRun(run)
+        }
+        // Validation status
+        val validationRunStatusId = input.validationStatus?.run {
+            validationRunStatusService.getValidationRunStatus(this)
+        }
+        // Creates the validation run
+        val validationRun = structureService.newValidationRun(
+            build = build,
+            validationRunRequest = ValidationRunRequest(
+                validationStampName = input.validation,
+                validationRunStatusId = validationRunStatusId,
+                dataTypeId = input.validationData.type,
+                data = parsedData,
+            )
+        )
+        // Run info
+        if (existingRunInfo != null) {
+            runInfoService.setRunInfo(
+                validationRun,
+                existingRunInfo
             )
         }
+        // OK
+        return validationRun
     }
 
     private fun findBuildByRunId(input: AbstractGitHubIngestionValidateDataInput, runId: Long): Build? =

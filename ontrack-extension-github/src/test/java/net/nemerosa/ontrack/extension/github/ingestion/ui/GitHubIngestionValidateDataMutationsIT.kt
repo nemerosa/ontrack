@@ -151,4 +151,70 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
         }
     }
 
+    @Test
+    fun `Build by ID, existing validation run`() {
+        asAdmin {
+            withGitHubIngestionSettings {
+                project {
+                    branch {
+                        val vs = validationStamp("test")
+                        build {
+                            setProperty(this, BuildGitHubWorkflowRunPropertyType::class.java,
+                                BuildGitHubWorkflowRunProperty(
+                                    runId = 10,
+                                    url = "",
+                                    name = "some-workflow",
+                                    runNumber = 1,
+                                    running = true,
+                                ))
+                            // Existing validation (without any data)
+                            validate(vs)
+                            // Setting the data
+                            run("""
+                                mutation {
+                                    gitHubIngestionValidateDataByRunId(input: {
+                                        owner: "nemerosa",
+                                        repository: "${project.name}",
+                                        validation: "test",
+                                        validationData: {
+                                            type: "${TestNumberValidationDataType::class.java.name}",
+                                            data: {
+                                                value: 50
+                                            }
+                                        },
+                                        validationStatus: "PASSED",
+                                        runId: 10,
+                                    }) {
+                                        errors {
+                                            message
+                                            exception
+                                            location
+                                        }
+                                    }
+                                }
+                            """) { data ->
+                                checkGraphQLUserErrors(data, "gitHubIngestionValidateDataByRunId")
+                                // Checks the build has been validated
+                                val run = structureService.getValidationRunsForBuildAndValidationStamp(
+                                    buildId = id,
+                                    validationStampId = vs.id,
+                                    offset = 0,
+                                    count = 1,
+                                ).firstOrNull()
+                                assertNotNull(run, "Validation run created") {
+                                    assertEquals(
+                                        ValidationRunStatusID.PASSED,
+                                        it.lastStatusId
+                                    )
+                                    val runData = it.data?.data
+                                    assertEquals(50, runData, "Validation run data has been set")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

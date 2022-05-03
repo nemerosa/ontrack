@@ -312,6 +312,11 @@ interface StructureService {
 
     fun newValidationRun(build: Build, validationRunRequest: ValidationRunRequest): ValidationRun
 
+    /**
+     * Deletes an existing validation run
+     */
+    fun deleteValidationRun(validationRun: ValidationRun): Ack
+
     fun getValidationRun(validationRunId: ID): ValidationRun
 
     /**

@@ -1121,6 +1121,11 @@ class StructureServiceImpl(
         return newValidationRun
     }
 
+    override fun deleteValidationRun(validationRun: ValidationRun): Ack {
+        securityService.checkProjectFunction(validationRun, ProjectEdit::class.java)
+        return structureRepository.deleteValidationRun(validationRun.id)
+    }
+
     private fun publishValidationRunMetrics(validationRun: ValidationRun) {
         try {
             extensionManager.getExtensions(ValidationRunMetricsExtension::class.java).forEach { it.onValidationRun(validationRun) }

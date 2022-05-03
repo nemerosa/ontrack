@@ -261,6 +261,8 @@ public interface StructureRepository {
 
     Ack deleteValidationStamp(ID validationStampId);
 
+    Ack deleteValidationRun(ID validationRunId);
+
     void reorderValidationStamps(ID branchId, Reordering reordering);
 
     // Validation runs
