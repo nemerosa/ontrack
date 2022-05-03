@@ -24,6 +24,7 @@ object IngestionHookFixtures {
      */
     fun workflowRunPayload(
         runId: Long = 1,
+        runName: String = sampleRunName,
         action: WorkflowRunAction,
         runNumber: Int,
         headBranch: String,
@@ -39,7 +40,7 @@ object IngestionHookFixtures {
         action = action,
         workflowRun = WorkflowRun(
             id = runId,
-            name = sampleRunName,
+            name = runName,
             runNumber = runNumber,
             pullRequests = listOfNotNull(pullRequest),
             headBranch = headBranch,
@@ -134,12 +135,14 @@ object IngestionHookFixtures {
      * Sample payload
      */
     fun sampleWorkflowRunPayload(
+        runName: String = sampleRunName,
         repoName: String = sampleRepository,
         headBranch: String = sampleBranch,
         pullRequest: WorkflowRunPullRequest? = null,
     ) = workflowRunPayload(
         action = WorkflowRunAction.requested,
         runNumber = 1,
+        runName = runName,
         headBranch = headBranch,
         repoName = repoName,
         owner = sampleOwner,

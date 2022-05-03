@@ -6,10 +6,7 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderService
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderServiceITMockConfig
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfig
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionRunConfig
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunIngestionEventProcessor
@@ -413,6 +410,38 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                     IngestionEventPreprocessingCheck.IGNORED,
                     processor.preProcessingCheck(payload)
                 )
+            }
+        }
+    }
+
+    @Test
+    fun `Workflows can be ignored`() {
+        asAdmin {
+            onlyOneGitHubConfig()
+            withGitHubIngestionSettings {
+                ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
+                    workflows = IngestionWorkflowConfig(
+                        filter = FilterConfig(
+                            includes = ".*",
+                            excludes = ".*ignored.*",
+                        )
+                    )
+                ))
+                val repoName = uid("r")
+                val payload: WorkflowRunPayload = IngestionHookFixtures.sampleWorkflowRunPayload(
+                    repoName = repoName,
+                    runName = "to-be-ignored"
+                )
+                assertEquals(
+                    IngestionEventProcessingResult.IGNORED,
+                    processor.process(payload, null)
+                )
+                // Checks the project & the branch have been created
+                assertNotNull(structureService.findBranchByName(repoName, "main").getOrNull(),
+                    "Branch has been created") { branch ->
+                    // Checks that NO build has been created
+                    assertEquals(0, structureService.getBuildCount(branch), "No build has been created")
+                }
             }
         }
     }

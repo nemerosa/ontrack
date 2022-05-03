@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
+import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIName
 
@@ -93,7 +94,9 @@ data class FilterConfig(
     val includes: String = ".*",
     @APIDescription("Regular expression to exclude the items (empty = no exclusion)")
     val excludes: String = "",
-)
+) {
+    fun includes(name: String) = FilterHelper.includes(name, includes, excludes)
+}
 
 /**
  * Step configuration

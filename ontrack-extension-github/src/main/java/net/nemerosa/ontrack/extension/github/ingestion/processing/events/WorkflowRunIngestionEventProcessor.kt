@@ -65,11 +65,23 @@ class WorkflowRunIngestionEventProcessor(
         }
     }
 
-    override fun process(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResult =
-        when (payload.action) {
-            WorkflowRunAction.requested -> startBuild(payload, configuration)
-            WorkflowRunAction.completed -> endBuild(payload, configuration)
+    override fun process(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResult {
+        // Gets the branch
+        val project = getOrCreateProject(payload, configuration)
+        val branch = getOrCreateBranch(project, payload)
+        // Gets the ingestion configuration
+        val config = configService.getOrLoadConfig(branch, INGESTION_CONFIG_FILE_PATH)
+        // Filter on the workflow name
+        return if (config.workflows.filter.includes(payload.workflowRun.name)) {
+            when (payload.action) {
+                WorkflowRunAction.requested -> startBuild(payload, configuration)
+                WorkflowRunAction.completed -> endBuild(payload, configuration)
+            }
+        } else {
+            // Workflow is ignored
+            IngestionEventProcessingResult.IGNORED
         }
+    }
 
     private fun endBuild(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResult {
         // Build creation & setup
@@ -331,7 +343,7 @@ data class WorkflowRunPullRequest(
     override val number: Int,
     val head: WorkflowRunPullRequestBranch,
     val base: WorkflowRunPullRequestBranch,
-): IPullRequest {
+) : IPullRequest {
     fun sameRepo() = head.repo.url == base.repo.url
 }
 
