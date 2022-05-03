@@ -105,6 +105,10 @@ class ConfigParserTest {
                   filter:
                     includes: ".*"
                     excludes: ""
+                workflows:
+                  filter:
+                    includes: ".*"
+                    excludes: ""
                 casc:
                   project:
                     includes: "main"

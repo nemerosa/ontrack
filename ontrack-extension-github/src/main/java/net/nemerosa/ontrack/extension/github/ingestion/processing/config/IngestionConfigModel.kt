@@ -37,6 +37,8 @@ data class IngestionConfig(
     val promotions: List<PromotionConfig> = emptyList(),
     @APIDescription("Run validations")
     val runs: IngestionRunConfig = IngestionRunConfig(),
+    @APIDescription("Workflows ingestion")
+    val workflows: IngestionWorkflowConfig = IngestionWorkflowConfig(),
     @APIDescription("Casc configurations")
     val casc: IngestionCascConfig = IngestionCascConfig(),
 )
@@ -65,6 +67,16 @@ data class IngestionRunConfig(
     @APIDescription("Should we consider the runs to create a validation run?")
     val enabled: Boolean? = null,
     @APIDescription("Filter on the run names")
+    val filter: FilterConfig = FilterConfig(),
+)
+
+/**
+ * Workflow configuration
+ */
+@APIName("GitHubIngestionConfigWorkflow")
+@APIDescription("Settings for the workflows ingestion")
+data class IngestionWorkflowConfig(
+    @APIDescription("Filter on the workflow names")
     val filter: FilterConfig = FilterConfig(),
 )
 
