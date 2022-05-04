@@ -11943,6 +11943,18 @@
           "description": "Output type for the gitHubIngestionValidateDataByBuildLabel mutation.",
           "fields": [
             {
+              "name": "payload",
+              "description": "Payload being processed in the background",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GitHubIngestionValidateDataOutput",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "errors",
               "description": "List of errors",
               "args": [],
@@ -12066,6 +12078,18 @@
           "name": "GitHubIngestionValidateDataByBuildNamePayload",
           "description": "Output type for the gitHubIngestionValidateDataByBuildName mutation.",
           "fields": [
+            {
+              "name": "payload",
+              "description": "Payload being processed in the background",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GitHubIngestionValidateDataOutput",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
             {
               "name": "errors",
               "description": "List of errors",
@@ -12191,6 +12215,18 @@
           "description": "Output type for the gitHubIngestionValidateDataByRunId mutation.",
           "fields": [
             {
+              "name": "payload",
+              "description": "Payload being processed in the background",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GitHubIngestionValidateDataOutput",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "errors",
               "description": "List of errors",
               "args": [],
@@ -12215,6 +12251,33 @@
               "ofType": null
             }
           ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GitHubIngestionValidateDataOutput",
+          "description": "GitHubIngestionValidateDataOutput",
+          "fields": [
+            {
+              "name": "uuid",
+              "description": "UUID of the payload being processed in the background",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
           "enumValues": null,
           "possibleTypes": null
         },

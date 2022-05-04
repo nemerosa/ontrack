@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.IngestionHookPayl
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.connector.support.PaginatedList
 import net.nemerosa.ontrack.kdsl.connector.support.emptyPaginatedList
+import java.util.*
 
 /**
  * Management of the GitHub ingestion.
@@ -61,7 +62,7 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
         validation: String,
         validationData: GitHubIngestionValidationDataInput,
         validationStatus: String?,
-    ) {
+    ): UUID =
         graphqlConnector.mutate(
             GitHubIngestionValidateDataByRunIdMutation(
                 owner,
@@ -76,7 +77,7 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
             )
         ) {
             it?.gitHubIngestionValidateDataByRunId()?.fragments()?.payloadUserErrors()?.convert()
-        }
-    }
+        }?.gitHubIngestionValidateDataByRunId()?.payload()?.uuid()?.let { UUID.fromString(it) }
+            ?: error("Could not get the UUID of the processed request")
 
 }

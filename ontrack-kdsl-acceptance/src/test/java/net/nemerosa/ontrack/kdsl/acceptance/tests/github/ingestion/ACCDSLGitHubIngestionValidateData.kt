@@ -71,11 +71,20 @@ class ACCDSLGitHubIngestionValidateData : AbstractACCDSLGitHubTestSupport() {
             validationData = GitHubIngestionValidationDataInput(
                 type = "net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType",
                 data = mapOf(
-                    "metrics" to mapOf(
-                        "position" to 4.5,
-                        "speed" to 0.7,
-                        "acceleration" to 1.0,
-                    )
+                    "metrics" to listOf(
+                        mapOf(
+                            "name" to "position",
+                            "value" to 4.5,
+                        ),
+                        mapOf(
+                            "name" to "speed",
+                            "value" to 0.7,
+                        ),
+                        mapOf(
+                            "name" to "acceleration",
+                            "value" to 1.0,
+                        ),
+                    ),
                 ).asJson()
             ),
             validationStatus = "PASSED"
@@ -94,16 +103,9 @@ class ACCDSLGitHubIngestionValidateData : AbstractACCDSLGitHubTestSupport() {
                 assertNotNull(run.data, "Validation data has been set") { data ->
                     assertEquals("net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType",
                         data.type)
-                    assertEquals(
-                        mapOf(
-                            "metrics" to mapOf(
-                                "position" to 4.5,
-                                "speed" to 0.7,
-                                "acceleration" to 1.0,
-                            )
-                        ).asJson(),
-                        data.data
-                    )
+                    assertEquals(4.5, data.data.path("metrics").path("position").asDouble())
+                    assertEquals(0.7, data.data.path("metrics").path("speed").asDouble())
+                    assertEquals(1.0, data.data.path("metrics").path("acceleration").asDouble())
                 }
             }
         }
