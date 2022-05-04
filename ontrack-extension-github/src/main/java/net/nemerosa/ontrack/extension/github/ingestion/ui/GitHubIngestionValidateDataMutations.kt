@@ -1,13 +1,11 @@
 package net.nemerosa.ontrack.extension.github.ingestion.ui
 
-import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.github.ingestion.processing.job.WorkflowJobProcessingService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
+import net.nemerosa.ontrack.extension.github.ingestion.validation.*
 import net.nemerosa.ontrack.graphql.schema.Mutation
-import net.nemerosa.ontrack.graphql.support.TypeRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataTypeNotFoundException
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
@@ -23,6 +21,7 @@ class GitHubIngestionValidateDataMutations(
     private val workflowJobProcessingService: WorkflowJobProcessingService,
     private val validationRunStatusService: ValidationRunStatusService,
     private val validationDataTypeService: ValidationDataTypeService,
+    private val ingestionValidateDataService: IngestionValidateDataService,
 ) : TypedMutationProvider() {
 
     override val mutations: List<Mutation> = listOf(
@@ -33,8 +32,7 @@ class GitHubIngestionValidateDataMutations(
             name = "gitHubIngestionValidateDataByRunId",
             description = "Sets some validation data on a build identified using a GHA workflow run ID",
         ) { input ->
-            val build = findBuildByRunId(input, input.runId)
-            build?.run { validate(this, input) }
+            ingestionValidateDataService.ingestValidationData(input)
         },
         /**
          * Getting the build by build name
@@ -43,8 +41,7 @@ class GitHubIngestionValidateDataMutations(
             name = "gitHubIngestionValidateDataByBuildName",
             description = "Sets some validation data on a build identified using its name",
         ) { input ->
-            val build = findBuildByBuildName(input, input.buildName)
-            build?.run { validate(this, input) }
+            ingestionValidateDataService.ingestValidationData(input)
         },
         /**
          * Getting the build by build label
@@ -53,8 +50,7 @@ class GitHubIngestionValidateDataMutations(
             name = "gitHubIngestionValidateDataByBuildLabel",
             description = "Sets some validation data on a build identified using its release property (label)",
         ) { input ->
-            val build = findBuildByBuildLabel(input, input.buildLabel)
-            build?.run { validate(this, input) }
+            ingestionValidateDataService.ingestValidationData(input)
         },
     )
 
@@ -127,94 +123,3 @@ class GitHubIngestionValidateDataMutations(
         )
 }
 
-/**
- * Common data between all the inputs
- */
-abstract class AbstractGitHubIngestionValidateDataInput(
-    @APIDescription("Name of the repository owner to target")
-    val owner: String,
-    @APIDescription("Name of the repository to target")
-    val repository: String,
-    // @APIDescription("GitHub ref to target (refs/heads/...)")
-    // val ref: String,
-    @APIDescription("Name of the validation stamp to create")
-    val validation: String,
-    @APIDescription("Validation data")
-    @TypeRef(embedded = true)
-    val validationData: GitHubIngestionValidationDataInput,
-    @APIDescription("Optional validation status")
-    val validationStatus: String?,
-)
-
-/**
- * Input for the data validation for a build identified by GHA workflow run ID
- */
-class GitHubIngestionValidateDataByRunIdInput(
-    owner: String,
-    repository: String,
-    // ref: String,
-    validation: String,
-    validationData: GitHubIngestionValidationDataInput,
-    validationStatus: String?,
-    @APIDescription("ID of the GHA workflow run")
-    val runId: Long,
-) : AbstractGitHubIngestionValidateDataInput(
-    owner,
-    repository,
-    // ref,
-    validation,
-    validationData,
-    validationStatus,
-)
-
-/**
- * Input for the data validation for a build identified by its name
- */
-class GitHubIngestionValidateDataByBuildNameInput(
-    owner: String,
-    repository: String,
-    // ref: String,
-    validation: String,
-    validationData: GitHubIngestionValidationDataInput,
-    validationStatus: String?,
-    @APIDescription("Build name")
-    val buildName: String,
-) : AbstractGitHubIngestionValidateDataInput(
-    owner,
-    repository,
-    // ref,
-    validation,
-    validationData,
-    validationStatus,
-)
-
-/**
- * Input for the data validation for a build identified by its label
- */
-class GitHubIngestionValidateDataByBuildLabelInput(
-    owner: String,
-    repository: String,
-    // ref: String,
-    validation: String,
-    validationData: GitHubIngestionValidationDataInput,
-    validationStatus: String?,
-    @APIDescription("Build release property (label)")
-    val buildLabel: String,
-) : AbstractGitHubIngestionValidateDataInput(
-    owner,
-    repository,
-    // ref,
-    validation,
-    validationData,
-    validationStatus,
-)
-
-/**
- * Validation data input
- */
-data class GitHubIngestionValidationDataInput(
-    @APIDescription("FQCN of the validation data type")
-    val type: String,
-    @APIDescription("Validation data")
-    val data: JsonNode,
-)
