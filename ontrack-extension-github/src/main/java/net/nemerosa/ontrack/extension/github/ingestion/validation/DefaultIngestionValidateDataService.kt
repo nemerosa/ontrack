@@ -16,7 +16,7 @@ class DefaultIngestionValidateDataService(
         // Creates the payload
         val payload = IngestionHookPayload(
             gitHubDelivery = "",
-            gitHubEvent = "x-ontrack-validate-date",
+            gitHubEvent = IngestionValidateDateEventProcessor.EVENT,
             gitHubHookID = 0,
             gitHubHookInstallationTargetID = 0,
             gitHubHookInstallationTargetType = "",
