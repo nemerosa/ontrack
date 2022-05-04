@@ -1,0 +1,39 @@
+{
+  "action": "completed",
+  "sender": {
+    "login": "sender"
+  },
+  "repository": {
+    "name": "#repository",
+    "description": "",
+    "owner": {
+      "login": "nemerosa"
+    },
+    "html_url": "https://github.com/nemerosa/#repository"
+  },
+  "organization": {
+    "login": "nemerosa"
+  },
+  "workflow_job": {
+    "id": 62929980,
+    "url": "https://api.github.com/repos/nemerosa/ontrack/actions/jobs/62929980",
+    "name": "Build",
+    "steps": [
+      {
+        "name": "Validation to target",
+        "number": 1,
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2022-05-04T15:53:51.000Z",
+        "completed_at": "2022-05-04T15:53:53.000Z"
+      }
+    ],
+    "run_id": 2270870720,
+    "run_attempt": 1,
+    "status": "in_progress",
+    "conclusion": null,
+    "started_at": "2022-05-04T15:53:52Z",
+    "completed_at": null,
+    "html_url": "https://github.com/nemerosa/ontrack/runs/62929980?check_suite_focus=true"
+  }
+}
