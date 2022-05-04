@@ -1,24 +1,20 @@
 package net.nemerosa.ontrack.extension.github.ingestion.ui
 
 import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.common.seconds
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.extension.general.ReleaseProperty
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
-import net.nemerosa.ontrack.it.waitUntil
-import net.nemerosa.ontrack.model.structure.ValidationRun
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
-import net.nemerosa.ontrack.model.structure.ValidationStamp
 import net.nemerosa.ontrack.model.structure.config
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.Duration
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -41,7 +37,8 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                                     name = "some-workflow",
                                     runNumber = 1,
                                     running = true,
-                                ))
+                                )
+                            )
                             run("""
                                 mutation {
                                     gitHubIngestionValidateDataByRunId(input: {
@@ -135,13 +132,15 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                                 }
                             """) { data ->
                                 checkGraphQLUserErrors(data, "gitHubIngestionValidateDataByRunId")
-                                waitUntil("Checks the validation stamp has not been created", initial = 5.seconds) {
-                                    !structureService.findValidationStampByName(
+                                // Checks the validation stamp has not been created
+                                assertNull(
+                                    structureService.findValidationStampByName(
                                         project.name,
                                         branch.name,
                                         "test"
-                                    ).isPresent
-                                }
+                                    ).getOrNull(),
+                                    "Validation stamp has not been created"
+                                )
                             }
                         }
                     }
@@ -191,26 +190,18 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                             """) { data ->
                                 checkGraphQLUserErrors(data, "gitHubIngestionValidateDataByRunId")
                                 // Checks the validation stamp has been created
-                                var vs: ValidationStamp? = null
-                                waitUntil("Checks the validation stamp has been created") {
-                                    vs = structureService.findValidationStampByName(
-                                        project.name,
-                                        branch.name,
-                                        "test"
-                                    ).getOrNull()
-                                    vs != null
-                                }
+                                val vs = structureService.findValidationStampByName(
+                                    project.name,
+                                    branch.name,
+                                    "test"
+                                ).getOrNull() ?: fail("Validation stamp not created")
                                 // Checks the build has been validated
-                                var run: ValidationRun? = null
-                                waitUntil("Checks the build has been validated") {
-                                    run = structureService.getValidationRunsForBuildAndValidationStamp(
-                                        buildId = id,
-                                        validationStampId = vs!!.id,
-                                        offset = 0,
-                                        count = 1,
-                                    ).firstOrNull()
-                                    run != null
-                                }
+                                val run = structureService.getValidationRunsForBuildAndValidationStamp(
+                                    buildId = id,
+                                    validationStampId = vs.id,
+                                    offset = 0,
+                                    count = 1,
+                                ).firstOrNull()
                                 assertNotNull(run, "Validation run created") {
                                     assertEquals(
                                         ValidationRunStatusID.PASSED,
@@ -271,26 +262,18 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                             """) { data ->
                                 checkGraphQLUserErrors(data, "gitHubIngestionValidateDataByRunId")
                                 // Checks the validation stamp has been created
-                                var vs: ValidationStamp? = null
-                                waitUntil("Checks the validation stamp has been created") {
-                                    vs = structureService.findValidationStampByName(
-                                        project.name,
-                                        branch.name,
-                                        "test"
-                                    ).getOrNull()
-                                    vs != null
-                                }
+                                val vs = structureService.findValidationStampByName(
+                                    project.name,
+                                    branch.name,
+                                    "test"
+                                ).getOrNull() ?: fail("Validation stamp not created")
                                 // Checks the build has been validated
-                                var run: ValidationRun? = null
-                                waitUntil("Checks the build has been validated") {
-                                    run = structureService.getValidationRunsForBuildAndValidationStamp(
-                                        buildId = id,
-                                        validationStampId = vs!!.id,
-                                        offset = 0,
-                                        count = 1,
-                                    ).firstOrNull()
-                                    run != null
-                                }
+                                val run = structureService.getValidationRunsForBuildAndValidationStamp(
+                                    buildId = id,
+                                    validationStampId = vs.id,
+                                    offset = 0,
+                                    count = 1,
+                                ).firstOrNull()
                                 assertNotNull(run, "Validation run created") {
                                     assertEquals(
                                         ValidationRunStatusID.PASSED,
@@ -350,16 +333,12 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                             """) { data ->
                                 checkGraphQLUserErrors(data, "gitHubIngestionValidateDataByRunId")
                                 // Checks the build has been validated
-                                var run: ValidationRun? = null
-                                waitUntil("Checks the build has been validated") {
-                                    run = structureService.getValidationRunsForBuildAndValidationStamp(
-                                        buildId = id,
-                                        validationStampId = vs.id,
-                                        offset = 0,
-                                        count = 1,
-                                    ).firstOrNull()
-                                    run != null
-                                }
+                                val run = structureService.getValidationRunsForBuildAndValidationStamp(
+                                    buildId = id,
+                                    validationStampId = vs.id,
+                                    offset = 0,
+                                    count = 1,
+                                ).firstOrNull()
                                 assertNotNull(run, "Validation run created") {
                                     assertEquals(
                                         ValidationRunStatusID.FAILED,
@@ -420,16 +399,12 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                             """) { data ->
                                 checkGraphQLUserErrors(data, "gitHubIngestionValidateDataByRunId")
                                 // Checks the build has been validated
-                                var run: ValidationRun? = null
-                                waitUntil("Checks the build has been validated") {
-                                    run = structureService.getValidationRunsForBuildAndValidationStamp(
-                                        buildId = id,
-                                        validationStampId = vs.id,
-                                        offset = 0,
-                                        count = 1,
-                                    ).firstOrNull()
-                                    run != null
-                                }
+                                val run = structureService.getValidationRunsForBuildAndValidationStamp(
+                                    buildId = id,
+                                    validationStampId = vs.id,
+                                    offset = 0,
+                                    count = 1,
+                                ).firstOrNull()
                                 assertNotNull(run, "Validation run created") {
                                     assertEquals(
                                         ValidationRunStatusID.PASSED,
