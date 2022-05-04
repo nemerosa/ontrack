@@ -155,7 +155,7 @@ class DefaultIngestionModelAccessService(
         return branch
     }
 
-    private fun findProjectFromRepository(repository: Repository): Project? {
+    override fun findProjectFromRepository(repository: Repository): Project? {
         // Gets the general ingestion settings
         val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
         // Gets the project name from the repository

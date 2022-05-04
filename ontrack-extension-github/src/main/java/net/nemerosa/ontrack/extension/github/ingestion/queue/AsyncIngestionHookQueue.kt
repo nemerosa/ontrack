@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 @ConditionalOnProperty(
-    prefix = "ontrack.extension.github.ingestion.queue",
+    prefix = "ontrack.extension.github.ingestion.processing",
     name = ["async"],
     havingValue = "true",
     matchIfMissing = true,

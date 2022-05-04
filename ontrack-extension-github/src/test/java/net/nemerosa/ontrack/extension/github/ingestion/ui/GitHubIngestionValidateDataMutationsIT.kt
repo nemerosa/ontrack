@@ -15,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import kotlin.time.ExperimentalTime
 
-@ExperimentalTime
 internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSupport() {
 
     @Autowired

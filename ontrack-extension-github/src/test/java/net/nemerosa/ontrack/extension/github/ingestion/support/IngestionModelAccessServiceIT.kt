@@ -21,6 +21,19 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestJUnit4Suppor
     private lateinit var ingestionModelAccessService: IngestionModelAccessService
 
     @Test
+    fun `Find a project from a repository`() {
+        asAdmin {
+            project {
+                assertNotNull(ingestionModelAccessService.findProjectFromRepository(
+                    Repository.stub("any-owner", name)
+                )) {
+                    assertEquals(this.id, it.id)
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Setting up the project with one unique GitHub configuration`() {
         // Only one GitHub configuration
         val config = onlyOneGitHubConfig()
