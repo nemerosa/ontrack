@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLMissingDataException
 import net.nemerosa.ontrack.kdsl.connector.graphql.checkData
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.BuildValidationRunsQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreatePromotionRunMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
@@ -45,5 +46,21 @@ class Build(
         ?.checkData { it.createPromotionRunById()?.promotionRun() }
         ?.fragments()?.promotionRunFragment()?.toPromotionRun(this)
         ?: throw GraphQLMissingDataException("Did not get back the created promotion run")
+
+    /**
+     * Gets the list of validation runs for this build and a given validation stamp name (can be a regular expression).
+     *
+     * @param validationStamp Validation stamp name (can be a regular expression).
+     * @param count Maximum number of runs to return
+     */
+    fun getValidationRuns(
+        validationStamp: String,
+        count: Int = 50,
+    ): List<ValidationRun> =
+        graphqlConnector.query(
+            BuildValidationRunsQuery(id.toInt(), validationStamp, count)
+        )?.builds()?.firstOrNull()?.validationRuns()?.map {
+            it.fragments().validationRunFragment().toValidationRun(this)
+        } ?: emptyList()
 
 }

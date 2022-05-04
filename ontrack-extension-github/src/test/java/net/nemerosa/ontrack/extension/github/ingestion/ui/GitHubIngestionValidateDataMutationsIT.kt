@@ -7,14 +7,17 @@ import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
+import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.structure.config
+import net.nemerosa.ontrack.test.assertJsonNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSupport() {
 
@@ -52,6 +55,9 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                                         validationStatus: "PASSED",
                                         runId: 10,
                                     }) {
+                                        payload {
+                                            uuid
+                                        }
                                         errors {
                                             message
                                             exception
@@ -60,7 +66,10 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                                     }
                                 }
                             """) { data ->
-                                checkGraphQLUserErrors(data, "gitHubIngestionValidateDataByRunId")
+                                checkGraphQLUserErrors(data, "gitHubIngestionValidateDataByRunId") { node ->
+                                    val uuid = node.path("payload").getRequiredTextField("uuid")
+                                    assertTrue(uuid.isNotBlank(), "UUID has been returned")
+                                }
                                 // Checks the validation stamp has been created
                                 val vs = structureService.findValidationStampByName(
                                     project.name,

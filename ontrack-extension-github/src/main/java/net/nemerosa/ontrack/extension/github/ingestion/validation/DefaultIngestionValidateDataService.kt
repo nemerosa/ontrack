@@ -6,13 +6,14 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Reposito
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
 import net.nemerosa.ontrack.json.asJson
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class DefaultIngestionValidateDataService(
     private val storage: IngestionHookPayloadStorage,
     private val queue: IngestionHookQueue,
 ) : IngestionValidateDataService {
-    override fun ingestValidationData(input: AbstractGitHubIngestionValidateDataInput) {
+    override fun ingestValidationData(input: AbstractGitHubIngestionValidateDataInput): UUID {
         // Creates the payload
         val payload = IngestionHookPayload(
             gitHubDelivery = "",
@@ -30,5 +31,7 @@ class DefaultIngestionValidateDataService(
         storage.store(payload)
         // Pushes it on the queue
         queue.queue(payload)
+        // OK
+        return payload.uuid
     }
 }

@@ -1,0 +1,19 @@
+mutation GitHubIngestionValidateDataByRunId(
+    $owner: String!,
+    $repository: String!,
+    $runId: Long!,
+    $validation: String!,
+    $validationData: GitHubIngestionValidationDataInput!,
+    $validationStatus: String,
+) {
+    gitHubIngestionValidateDataByRunId(input: {
+        owner: $owner,
+        repository: $repository,
+        runId: $runId,
+        validation: $validation,
+        validationData: $validationData,
+        validationStatus: $validationStatus,
+    }) {
+        ...PayloadUserErrors
+    }
+}

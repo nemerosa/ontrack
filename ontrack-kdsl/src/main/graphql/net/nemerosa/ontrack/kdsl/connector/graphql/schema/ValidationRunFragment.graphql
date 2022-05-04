@@ -1,0 +1,25 @@
+fragment ValidationRunFragment on ValidationRun {
+    id
+    description
+    creation {
+        user
+        time
+    }
+    data {
+        descriptor {
+            id
+        }
+        data
+    }
+    validationRunStatuses {
+        statusID {
+            id
+        }
+        description
+        annotatedDescription
+        creation {
+            user
+            time
+        }
+    }
+}

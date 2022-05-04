@@ -1,0 +1,11 @@
+query BuildValidationRuns(
+    $buildId: Int!,
+    $validationStamp: String!,
+    $count: Int! = 50,
+) {
+    builds(id: $buildId) {
+        validationRuns(count: $count, validationStamp: $validationStamp) {
+            ...ValidationRunFragment
+        }
+    }
+}

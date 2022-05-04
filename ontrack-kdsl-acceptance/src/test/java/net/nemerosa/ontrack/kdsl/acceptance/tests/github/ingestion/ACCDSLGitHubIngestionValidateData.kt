@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.github.ingestion
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.kdsl.acceptance.annotations.AcceptanceTestSuite
 import net.nemerosa.ontrack.kdsl.acceptance.tests.github.AbstractACCDSLGitHubTestSupport
@@ -10,6 +11,7 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.connector.parse
 import net.nemerosa.ontrack.kdsl.spec.extension.github.GitHubConfiguration
 import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHub
+import net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion.GitHubIngestionValidationDataInput
 import net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion.ingestion
 import org.junit.Test
 import java.util.*
@@ -35,6 +37,8 @@ class ACCDSLGitHubIngestionValidateData : AbstractACCDSLGitHubTestSupport() {
 
         // A unique repository name
         val repository = uid("r")
+        // A run ID
+        val runId = 2270870720L
 
         // Configuration: create a GitHub configuration
         val gitHubConfiguration = fakeGitHubConfiguration()
@@ -44,6 +48,7 @@ class ACCDSLGitHubIngestionValidateData : AbstractACCDSLGitHubTestSupport() {
         val workflowRunRequestedPayload =
             resourceAsText("/github/ingestion/validate-data/workflow_run_started.json")
                 .replace("#repository", repository)
+                .replace("#runId", runId.toString())
                 .parseAsJson()
         val workflowRunRequestedUuid =
             sendPayloadToHook(gitHubConfiguration, "workflow_run", workflowRunRequestedPayload)
@@ -52,13 +57,56 @@ class ACCDSLGitHubIngestionValidateData : AbstractACCDSLGitHubTestSupport() {
         val workflowJobStepCompletedPayload =
             resourceAsText("/github/ingestion/validate-data/workflow_job_step_completed.json")
                 .replace("#repository", repository)
+                .replace("#runId", runId.toString())
                 .parseAsJson()
         val workflowJobStepCompletedUuid =
             sendPayloadToHook(gitHubConfiguration, "workflow_job", workflowJobStepCompletedPayload)
 
+        // Calling the API to simulate the GHA call
+        val validateDataUuid = ontrack.gitHub.ingestion.validateDataByRunId(
+            owner = "nemerosa",
+            repository = repository,
+            runId = runId,
+            validation = "validation-to-target",
+            validationData = GitHubIngestionValidationDataInput(
+                type = "net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType",
+                data = mapOf(
+                    "metrics" to mapOf(
+                        "position" to 4.5,
+                        "speed" to 0.7,
+                        "acceleration" to 1.0,
+                    )
+                ).asJson()
+            ),
+            validationStatus = "PASSED"
+        )
+
         // At the end, waits for all payloads to be processed
         waitUntilPayloadIsProcessed(workflowRunRequestedUuid)
         waitUntilPayloadIsProcessed(workflowJobStepCompletedUuid)
+        waitUntilPayloadIsProcessed(validateDataUuid)
+
+        // Checks that the run has been created & contains the right data
+        assertNotNull(ontrack.findBuildByName(repository, "main", "ci-1"), "Build has been created") { build ->
+            assertNotNull(build.getValidationRuns("validation-to-target").firstOrNull(),
+                "Validation run has been created") { run ->
+                assertEquals("PASSED", run.lastStatus.id)
+                assertNotNull(run.data, "Validation data has been set") { data ->
+                    assertEquals("net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType",
+                        data.type)
+                    assertEquals(
+                        mapOf(
+                            "metrics" to mapOf(
+                                "position" to 4.5,
+                                "speed" to 0.7,
+                                "acceleration" to 1.0,
+                            )
+                        ).asJson(),
+                        data.data
+                    )
+                }
+            }
+        }
     }
 
     private fun sendPayloadToHook(

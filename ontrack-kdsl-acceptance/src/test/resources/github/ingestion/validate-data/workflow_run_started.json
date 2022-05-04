@@ -1,7 +1,7 @@
 {
   "action": "requested",
   "workflow_run": {
-    "id": 1,
+    "id": #runId,
     "name": "CI",
     "run_number": 1,
     "pull_requests": [],

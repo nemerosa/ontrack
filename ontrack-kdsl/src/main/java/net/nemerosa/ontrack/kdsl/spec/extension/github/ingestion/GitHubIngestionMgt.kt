@@ -3,8 +3,10 @@ package net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion
 import com.apollographql.apollo.api.Input
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
+import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.paginate
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.GitHubIngestionPayloadsQuery
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.GitHubIngestionValidateDataByRunIdMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.IngestionHookPayloadStatus
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.connector.support.PaginatedList
@@ -48,5 +50,33 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
             message = it.message(),
         )
     } ?: emptyPaginatedList()
+
+    /**
+     * Sends some validation data for a repository
+     */
+    fun validateDataByRunId(
+        owner: String,
+        repository: String,
+        runId: Long,
+        validation: String,
+        validationData: GitHubIngestionValidationDataInput,
+        validationStatus: String?,
+    ) {
+        graphqlConnector.mutate(
+            GitHubIngestionValidateDataByRunIdMutation(
+                owner,
+                repository,
+                runId,
+                validation,
+                net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.GitHubIngestionValidationDataInput.builder()
+                    .data(validationData.data)
+                    .type(validationData.type)
+                    .build(),
+                Input.fromNullable(validationStatus),
+            )
+        ) {
+            it?.gitHubIngestionValidateDataByRunId()?.fragments()?.payloadUserErrors()?.convert()
+        }
+    }
 
 }

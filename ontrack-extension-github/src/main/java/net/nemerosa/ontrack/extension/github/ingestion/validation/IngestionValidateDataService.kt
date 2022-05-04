@@ -1,7 +1,14 @@
 package net.nemerosa.ontrack.extension.github.ingestion.validation
 
+import java.util.*
+
 interface IngestionValidateDataService {
 
-    fun ingestValidationData(input: AbstractGitHubIngestionValidateDataInput)
+    /**
+     * Schedules the processing of the validation data
+     *
+     * @return The UUID of the processed payload
+     */
+    fun ingestValidationData(input: AbstractGitHubIngestionValidateDataInput): UUID
 
 }
