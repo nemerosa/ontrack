@@ -9,11 +9,13 @@ import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProp
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.structure.config
+import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSupport() {
 
@@ -80,6 +82,67 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                                     val runData = it.data?.data
                                     assertEquals(50, runData, "Validation run data has been set")
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Build by ID not found`() {
+        asAdmin {
+            withGitHubIngestionSettings {
+                project {
+                    branch {
+                        build {
+                            setProperty(this, BuildGitHubWorkflowRunPropertyType::class.java,
+                                BuildGitHubWorkflowRunProperty(
+                                    runId = 11, // Will not be found
+                                    url = "",
+                                    name = "some-workflow",
+                                    runNumber = 1,
+                                    running = true,
+                                ))
+                            run("""
+                                mutation {
+                                    gitHubIngestionValidateDataByRunId(input: {
+                                        owner: "nemerosa",
+                                        repository: "${project.name}",
+                                        validation: "test",
+                                        validationData: {
+                                            type: "${TestNumberValidationDataType::class.java.name}",
+                                            data: {
+                                                value: 50
+                                            }
+                                        },
+                                        validationStatus: "PASSED",
+                                        runId: 10,
+                                    }) {
+                                        validationRun {
+                                            id
+                                        }
+                                        errors {
+                                            message
+                                            exception
+                                            location
+                                        }
+                                    }
+                                }
+                            """) { data ->
+                                checkGraphQLUserErrors(data, "gitHubIngestionValidateDataByRunId")
+                                // Checks no validation run is returned
+                                assertJsonNull(data.path("gitHubIngestionValidateDataByRunId").path("validationRun"))
+                                // Checks the validation stamp has not been created
+                                assertNull(
+                                    structureService.findValidationStampByName(
+                                        project.name,
+                                        branch.name,
+                                        "test"
+                                    ).getOrNull(),
+                                    "Validation stamp has not been created"
+                                )
                             }
                         }
                     }
