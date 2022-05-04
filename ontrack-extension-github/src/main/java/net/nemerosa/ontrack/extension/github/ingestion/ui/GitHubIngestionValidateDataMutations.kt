@@ -29,13 +29,9 @@ class GitHubIngestionValidateDataMutations(
         /**
          * Getting the build by run ID
          */
-        simpleMutation(
+        unitMutation<GitHubIngestionValidateDataByRunIdInput>(
             name = "gitHubIngestionValidateDataByRunId",
             description = "Sets some validation data on a build identified using a GHA workflow run ID",
-            input = GitHubIngestionValidateDataByRunIdInput::class,
-            outputName = "validationRun",
-            outputDescription = "Created validation run",
-            outputType = ValidationRun::class
         ) { input ->
             val build = findBuildByRunId(input, input.runId)
             build?.run { validate(this, input) }
@@ -43,13 +39,9 @@ class GitHubIngestionValidateDataMutations(
         /**
          * Getting the build by build name
          */
-        simpleMutation(
+        unitMutation<GitHubIngestionValidateDataByBuildNameInput>(
             name = "gitHubIngestionValidateDataByBuildName",
             description = "Sets some validation data on a build identified using its name",
-            input = GitHubIngestionValidateDataByBuildNameInput::class,
-            outputName = "validationRun",
-            outputDescription = "Created validation run",
-            outputType = ValidationRun::class
         ) { input ->
             val build = findBuildByBuildName(input, input.buildName)
             build?.run { validate(this, input) }
@@ -57,13 +49,9 @@ class GitHubIngestionValidateDataMutations(
         /**
          * Getting the build by build label
          */
-        simpleMutation(
+        unitMutation<GitHubIngestionValidateDataByBuildLabelInput>(
             name = "gitHubIngestionValidateDataByBuildLabel",
             description = "Sets some validation data on a build identified using its release property (label)",
-            input = GitHubIngestionValidateDataByBuildLabelInput::class,
-            outputName = "validationRun",
-            outputDescription = "Created validation run",
-            outputType = ValidationRun::class
         ) { input ->
             val build = findBuildByBuildLabel(input, input.buildLabel)
             build?.run { validate(this, input) }
