@@ -8,9 +8,9 @@ import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupp
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.json.getRequiredTextField
+import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.structure.config
-import net.nemerosa.ontrack.test.assertJsonNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,7 +25,26 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
     private lateinit var testNumberValidationDataType: TestNumberValidationDataType
 
     @Test
+    fun `Automation users can set the validation data`() {
+        basicTest { code ->
+            asAccountWithGlobalRole(Roles.GLOBAL_AUTOMATION) {
+                code()
+            }
+        }
+    }
+
+    @Test
     fun `Build by ID, no prior validation run`() {
+        basicTest { code ->
+            asAdmin {
+                code()
+            }
+        }
+    }
+
+    private fun basicTest(
+        asAuth: (code: () -> Unit) -> Unit,
+    ) {
         asAdmin {
             withGitHubIngestionSettings {
                 project {
@@ -40,56 +59,60 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                                     running = true,
                                 )
                             )
-                            run("""
-                                mutation {
-                                    gitHubIngestionValidateDataByRunId(input: {
-                                        owner: "nemerosa",
-                                        repository: "${project.name}",
-                                        validation: "test",
-                                        validationData: {
-                                            type: "${TestNumberValidationDataType::class.java.name}",
-                                            data: {
-                                                value: 50
+                            asAuth {
+                                run("""
+                                    mutation {
+                                        gitHubIngestionValidateDataByRunId(input: {
+                                            owner: "nemerosa",
+                                            repository: "${project.name}",
+                                            validation: "test",
+                                            validationData: {
+                                                type: "${TestNumberValidationDataType::class.java.name}",
+                                                data: {
+                                                    value: 50
+                                                }
+                                            },
+                                            validationStatus: "PASSED",
+                                            runId: 10,
+                                        }) {
+                                            payload {
+                                                uuid
                                             }
-                                        },
-                                        validationStatus: "PASSED",
-                                        runId: 10,
-                                    }) {
-                                        payload {
-                                            uuid
-                                        }
-                                        errors {
-                                            message
-                                            exception
-                                            location
+                                            errors {
+                                                message
+                                                exception
+                                                location
+                                            }
                                         }
                                     }
-                                }
-                            """) { data ->
-                                checkGraphQLUserErrors(data, "gitHubIngestionValidateDataByRunId") { node ->
-                                    val uuid = node.path("payload").getRequiredTextField("uuid")
-                                    assertTrue(uuid.isNotBlank(), "UUID has been returned")
-                                }
-                                // Checks the validation stamp has been created
-                                val vs = structureService.findValidationStampByName(
-                                    project.name,
-                                    branch.name,
-                                    "test"
-                                ).getOrNull() ?: fail("Validation stamp not created")
-                                // Checks the build has been validated
-                                val run = structureService.getValidationRunsForBuildAndValidationStamp(
-                                    buildId = id,
-                                    validationStampId = vs.id,
-                                    offset = 0,
-                                    count = 1,
-                                ).firstOrNull()
-                                assertNotNull(run, "Validation run created") {
-                                    assertEquals(
-                                        ValidationRunStatusID.PASSED,
-                                        it.lastStatusId
-                                    )
-                                    val runData = it.data?.data
-                                    assertEquals(50, runData, "Validation run data has been set")
+                                """) { data ->
+                                    checkGraphQLUserErrors(data, "gitHubIngestionValidateDataByRunId") { node ->
+                                        val uuid = node.path("payload").getRequiredTextField("uuid")
+                                        assertTrue(uuid.isNotBlank(), "UUID has been returned")
+                                    }
+                                    asAdmin {
+                                        // Checks the validation stamp has been created
+                                        val vs = structureService.findValidationStampByName(
+                                            project.name,
+                                            branch.name,
+                                            "test"
+                                        ).getOrNull() ?: fail("Validation stamp not created")
+                                        // Checks the build has been validated
+                                        val run = structureService.getValidationRunsForBuildAndValidationStamp(
+                                            buildId = id,
+                                            validationStampId = vs.id,
+                                            offset = 0,
+                                            count = 1,
+                                        ).firstOrNull()
+                                        assertNotNull(run, "Validation run created") {
+                                            assertEquals(
+                                                ValidationRunStatusID.PASSED,
+                                                it.lastStatusId
+                                            )
+                                            val runData = it.data?.data
+                                            assertEquals(50, runData, "Validation run data has been set")
+                                        }
+                                    }
                                 }
                             }
                         }
