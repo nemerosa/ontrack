@@ -14,7 +14,6 @@ buildscript {
    repositories {
       mavenLocal()
       mavenCentral()
-      jcenter()
    }
    dependencies {
       classpath 'net.nemerosa.ontrack:ontrack-extension-plugin:<version>'

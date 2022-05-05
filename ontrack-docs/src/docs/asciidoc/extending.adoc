@@ -31,7 +31,6 @@ NOTE: Maven might be supported in the future.
       buildscript {
          repositories {
             mavenCentral()
-            jcenter()
          }
          dependencies {
             classpath 'net.nemerosa.ontrack:ontrack-extension-plugin:{{ontrack-version}}'
@@ -43,10 +42,7 @@ NOTE: Maven might be supported in the future.
       apply plugin: 'ontrack'
 
 The `buildscript` section declares the version of Ontrack you're building your
-extension for. Both the `mavenCentral` and the `jcenter` repositories are needed
-to resolve the path for the `ontrack-extension-plugin` since the plugin is
-itself published in the Maven Central and some of its dependencies are in
-JCenter.
+extension for.
 
 NOTE: The repository declaration might be simplified in later versions.
 

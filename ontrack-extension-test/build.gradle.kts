@@ -6,7 +6,6 @@ buildscript {
     repositories {
         mavenLocal() // Important: used for testing
         mavenCentral()
-        jcenter()
         maven {
             url = uri("https://plugins.gradle.org/m2/")
         }
@@ -29,7 +28,6 @@ version = ontrackVersion
 repositories {
     mavenLocal() // Important: used for testing
     mavenCentral()
-    jcenter()
     // FIXME #762 Remove when using final version of Spring Boot
     maven { url = uri("https://repo.spring.io/milestone") }
 }
