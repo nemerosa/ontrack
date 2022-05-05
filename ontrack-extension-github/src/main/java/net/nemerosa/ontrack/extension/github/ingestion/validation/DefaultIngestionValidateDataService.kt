@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.security.ProjectConfig
+import net.nemerosa.ontrack.model.security.ProjectCreation
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -25,8 +26,11 @@ class DefaultIngestionValidateDataService(
             name = input.repository,
         )
         val project = ingestionModelAccessService.findProjectFromRepository(repository)
-            ?: throw IngestionValidateDataServiceProjectNotFoundException(repository)
-        securityService.checkProjectFunction(project, ProjectConfig::class.java)
+        if (project != null) {
+            securityService.checkProjectFunction(project, ProjectConfig::class.java)
+        } else {
+            securityService.checkGlobalFunction(ProjectCreation::class.java)
+        }
         // Creates the payload
         val payload = IngestionHookPayload(
             gitHubDelivery = "",
