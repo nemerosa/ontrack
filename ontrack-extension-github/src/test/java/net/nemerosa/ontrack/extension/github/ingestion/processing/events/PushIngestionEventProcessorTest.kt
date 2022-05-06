@@ -67,6 +67,29 @@ class PushIngestionEventProcessorTest {
     }
 
     @Test
+    fun `Payload source for a tag`() {
+        val payload = IngestionHookFixtures.samplePushPayload(
+            ref = "refs/tags/1.0.0"
+        )
+        assertEquals(
+            "1.0.0",
+            processor.getPayloadSource(payload)
+        )
+    }
+
+    @Test
+    fun `Payload source for a branch`() {
+        val payload = IngestionHookFixtures.samplePushPayload(
+            ref = "refs/heads/main",
+            id = "1234567",
+        )
+        assertEquals(
+            "main@1234567",
+            processor.getPayloadSource(payload)
+        )
+    }
+
+    @Test
     fun `Path 1 pushed`() {
         val payload = payload("path/1")
         assertEquals(

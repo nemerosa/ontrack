@@ -69,6 +69,7 @@ object IngestionHookFixtures {
         ref = ref,
         repository = sampleRepository(repoName, repoDescription, owner),
         commits = commits,
+        headCommit = commits.firstOrNull(),
     )
 
     fun sampleRepository(
@@ -87,10 +88,11 @@ object IngestionHookFixtures {
      * Sample PR for a workflow run
      */
     fun sampleWorkflowRunPR(
+        number: Int = 1,
         repoName: String,
         owner: String = sampleOwner,
     ) = WorkflowRunPullRequest(
-        number = 1,
+        number = number,
         head = WorkflowRunPullRequestBranch(
             ref = "feature/pr",
             repo = WorkflowRunPullRequestBranchRepo(
@@ -136,12 +138,13 @@ object IngestionHookFixtures {
      */
     fun sampleWorkflowRunPayload(
         runName: String = sampleRunName,
+        runNumber: Int = 1,
         repoName: String = sampleRepository,
         headBranch: String = sampleBranch,
         pullRequest: WorkflowRunPullRequest? = null,
     ) = workflowRunPayload(
         action = WorkflowRunAction.requested,
-        runNumber = 1,
+        runNumber = runNumber,
         runName = runName,
         headBranch = headBranch,
         repoName = repoName,
@@ -155,6 +158,7 @@ object IngestionHookFixtures {
      * Sample push payload
      */
     fun samplePushPayload(
+        id: String = "01234567ef",
         repoName: String = sampleRepository,
         owner: String = sampleOwner,
         ref: String = "refs/heads/$sampleBranch",
@@ -166,15 +170,27 @@ object IngestionHookFixtures {
         repoName = repoName,
         owner = owner,
         commits = listOf(
-            Commit(
-                id = "01234567ef",
-                message = "Sample commit",
-                author = sampleAuthor(),
+            sampleCommit(
+                id = id,
                 added = added,
                 removed = removed,
                 modified = modified,
             )
-        )
+        ),
+    )
+
+    fun sampleCommit(
+        id: String = "01234567ef",
+        added: List<String> = emptyList(),
+        modified: List<String> = emptyList(),
+        removed: List<String> = emptyList(),
+    ) = Commit(
+        id = id,
+        message = "Sample commit",
+        author = sampleAuthor(),
+        added = added,
+        removed = removed,
+        modified = modified,
     )
 
     fun sampleAuthor() = Author(
@@ -221,6 +237,59 @@ object IngestionHookFixtures {
         general = IngestionConfigGeneral(
             skipJobs = true,
         )
+    )
+
+    /**
+     * Sample pull request
+     */
+    fun samplePullRequest(
+        number: Int = 1,
+    ) = PullRequest(
+        number = number,
+        state = PullRequestState.open,
+        head = Branch(
+            ref = "refs/heads/main",
+            sha = "sha-main",
+            repo = BranchRepo(
+                name = "repository",
+                owner = Owner(
+                    login = "nemerosa"
+                )
+            )
+        ),
+        base = Branch(
+            ref = "refs/heads/feature/branch",
+            sha = "sha-feature",
+            repo = BranchRepo(
+                name = "repository",
+                owner = Owner(
+                    login = "nemerosa"
+                )
+            )
+        ),
+        merged = false,
+        mergeable = true,
+    )
+
+    /**
+     * Sample workflow job payload
+     */
+    fun sampleWorkflowJobPayload(
+        jobName: String = "the-job",
+    ) = WorkflowJobPayload(
+        action = WorkflowJobAction.in_progress,
+        workflowJob = WorkflowJob(
+            runId = 1,
+            runAttempt = 1,
+            status = WorkflowJobStepStatus.in_progress,
+            conclusion = null,
+            startedAtDate = Time.now(),
+            completedAtDate = null,
+            name = jobName,
+            steps = emptyList(),
+            htmlUrl = ""
+        ),
+        repository = sampleRepository()
     )
 
     /**

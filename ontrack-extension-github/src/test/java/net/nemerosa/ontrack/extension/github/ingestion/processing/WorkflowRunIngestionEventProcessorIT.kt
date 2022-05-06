@@ -47,6 +47,36 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
     }
 
     @Test
+    fun `Payload source for a PR`() {
+        val repo = uid("r")
+        val payload: WorkflowRunPayload = IngestionHookFixtures.sampleWorkflowRunPayload(
+            repoName = repo,
+            pullRequest = IngestionHookFixtures.sampleWorkflowRunPR(
+                repoName = repo,
+                number = 13,
+            ),
+            runName = "ci",
+            runNumber = 26,
+        )
+        assertEquals(
+            "ci#26@PR-13",
+            processor.getPayloadSource(payload)
+        )
+    }
+
+    @Test
+    fun `Payload source for a branch`() {
+        val payload = payload(
+            runName = "ci",
+            runNumber = 26,
+        )
+        assertEquals(
+            "ci#26@main",
+            processor.getPayloadSource(payload)
+        )
+    }
+
+    @Test
     fun `Workflow run for a PR`() {
         // Only one GitHub configuration
         val config = onlyOneGitHubConfig()
@@ -530,6 +560,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
     private fun payload(
         runId: Long = 1,
         action: WorkflowRunAction = WorkflowRunAction.completed,
+        runName: String = "CI",
         runNumber: Int = 1,
         headBranch: String = "main",
         createdAtDate: LocalDateTime = Time.now(),
@@ -547,7 +578,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
         action = action,
         workflowRun = WorkflowRun(
             id = runId,
-            name = "CI",
+            name = runName,
             runNumber = runNumber,
             pullRequests = emptyList(),
             headBranch = headBranch,
