@@ -1,14 +1,5 @@
 <ot-view>
 
-    <div class="row" ng-show="loadingPayloads">
-        <div class="col-md-12">
-            <div class="alert alert-info">
-                <span class="ot-loading-indicator"></span>
-                Loading GitHub Ingestion Hook Payloads...
-            </div>
-        </div>
-    </div>
-
     <div class="row">
         <div class="col-md-12">
             <table class="table table-bordered table-hover">
@@ -23,7 +14,8 @@
                                         'btn-default': !autoReload
                                         }"
                                         ng-click="toggleAutoReload()">
-                                    <span class="fa fa-refresh"></span>
+                                    <span class="fa fa-refresh" ng-hide="loadingPayloads"></span>
+                                    <span class="ot-loading-indicator" ng-show="loadingPayloads"></span>
                                     <span>Auto reload</span>
                                 </button>
                             </div>
