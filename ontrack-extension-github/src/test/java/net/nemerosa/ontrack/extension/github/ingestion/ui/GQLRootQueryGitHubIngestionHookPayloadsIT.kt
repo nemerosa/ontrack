@@ -20,7 +20,7 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestJUnit4Sup
             message = "Sample payload",
         )
         asAdmin {
-            ingestionHookPayloadStorage.store(payload)
+            ingestionHookPayloadStorage.store(payload, "source")
             run(
                 """
                     {
@@ -56,7 +56,7 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestJUnit4Sup
             message = "Sample payload",
         )
         asAdmin {
-            ingestionHookPayloadStorage.store(payload)
+            ingestionHookPayloadStorage.store(payload, "source")
         }
         asUser {
             assertFailsWith<AccessDeniedException> {
@@ -212,7 +212,7 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestJUnit4Sup
             )
         }
         payloads.forEach { payload ->
-            ingestionHookPayloadStorage.store(payload)
+            ingestionHookPayloadStorage.store(payload, "source")
         }
     }
 

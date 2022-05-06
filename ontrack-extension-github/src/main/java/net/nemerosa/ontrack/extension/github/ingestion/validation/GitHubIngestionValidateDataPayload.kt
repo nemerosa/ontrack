@@ -9,4 +9,14 @@ data class GitHubIngestionValidateDataPayload(
     val runId: Long? = null,
     val buildName: String? = null,
     val buildLabel: String? = null,
-)
+) {
+    fun getSource() = if (runId != null) {
+        "$validation@run=$runId"
+    } else if (buildName != null) {
+        "$validation@name=$buildName"
+    } else if (buildLabel != null) {
+        "$validation@label=$buildLabel"
+    } else {
+        validation
+    }
+}

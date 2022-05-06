@@ -47,5 +47,15 @@ class PushIngestionEventProcessor(
         }
     }
 
+    /**
+     * Tag, or branch#commit
+     */
+    override fun getPayloadSource(payload: PushPayload): String? =
+        payload.getTag()
+            ?: if (payload.headCommit != null) {
+                "${payload.branchName}@${payload.headCommit.id}"
+            } else {
+                payload.branchName
+            }
 }
 

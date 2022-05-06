@@ -16,7 +16,7 @@ class DefaultIngestionHookPayloadStorageIT : AbstractIngestionTestJUnit4Support(
     fun `Storing and retrieving`() {
         val payload = IngestionHookFixtures.sampleWorkflowRunIngestionPayload()
         asAdmin {
-            storage.store(payload)
+            storage.store(payload, "source")
             // Get it back
             assertTrue(storage.count() >= 1, "At least one item stored")
             assertNotNull(storage.list().find { it.uuid == payload.uuid }, "Item has been stored")

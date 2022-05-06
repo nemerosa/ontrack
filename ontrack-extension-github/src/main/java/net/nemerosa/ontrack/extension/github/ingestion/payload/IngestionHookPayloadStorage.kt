@@ -11,7 +11,7 @@ interface IngestionHookPayloadStorage {
     /**
      * Stores the payload for traceability
      */
-    fun store(payload: IngestionHookPayload)
+    fun store(payload: IngestionHookPayload, source: String?)
 
     /**
      * Routing information

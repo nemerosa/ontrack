@@ -32,7 +32,7 @@ class AsyncIngestionHookQueueScalableIT : AbstractGitHubTestSupport() {
         val payload = IngestionHookFixtures.sampleWorkflowRunIngestionPayload()
         val expectedQueue = abs(payload.repository!!.fullName.hashCode()) % 10
         asAdmin {
-            storage.store(payload)
+            storage.store(payload, "source")
             queue.queue(payload)
             // Waiting until the payload has been processed
             waitUntil("Waiting until the queue has been assigned") {

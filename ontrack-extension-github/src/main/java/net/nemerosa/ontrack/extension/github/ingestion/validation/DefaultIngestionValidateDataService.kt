@@ -18,6 +18,7 @@ class DefaultIngestionValidateDataService(
     private val storage: IngestionHookPayloadStorage,
     private val queue: IngestionHookQueue,
     private val securityService: SecurityService,
+    private val ingestionValidateDateEventProcessor: IngestionValidateDateEventProcessor,
 ) : IngestionValidateDataService {
     override fun ingestValidationData(input: AbstractGitHubIngestionValidateDataInput): UUID {
         // Checks the access rights on the target project
@@ -43,7 +44,7 @@ class DefaultIngestionValidateDataService(
         )
         securityService.asAdmin {
             // Stores it
-            storage.store(payload)
+            storage.store(payload, ingestionValidateDateEventProcessor.getPayloadSource(payload))
             // Pushes it on the queue
             queue.queue(payload)
         }

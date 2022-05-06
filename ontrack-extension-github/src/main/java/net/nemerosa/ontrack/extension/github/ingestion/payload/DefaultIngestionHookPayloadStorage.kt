@@ -15,8 +15,8 @@ class DefaultIngestionHookPayloadStorage(
 ) : AbstractInternalIngestionHookPayloadStorage(storageService, securityService) {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    override fun store(payload: IngestionHookPayload) {
-        super.store(payload)
+    override fun store(payload: IngestionHookPayload, source: String?) {
+        super.store(payload, source)
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

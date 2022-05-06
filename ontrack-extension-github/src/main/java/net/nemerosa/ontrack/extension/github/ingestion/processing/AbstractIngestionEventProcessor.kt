@@ -20,6 +20,15 @@ abstract class AbstractIngestionEventProcessor<T : Any> : IngestionEventProcesso
         return process(parsedPayload, payload.configuration)
     }
 
+    override fun getPayloadSource(payload: IngestionHookPayload): String? {
+        // Parsing of the payload
+        val parsedPayload = parsePayload(payload)
+        // Using the typed payload
+        return getPayloadSource(parsedPayload)
+    }
+
+    abstract fun getPayloadSource(payload: T): String?
+
     abstract fun preProcessingCheck(payload: T): IngestionEventPreprocessingCheck
 
     abstract fun process(payload: T, configuration: String?): IngestionEventProcessingResult

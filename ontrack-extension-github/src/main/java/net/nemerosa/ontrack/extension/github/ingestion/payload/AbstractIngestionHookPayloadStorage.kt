@@ -16,9 +16,29 @@ abstract class AbstractIngestionHookPayloadStorage(
     abstract fun internalStore(payload: IngestionHookPayload)
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    override fun store(payload: IngestionHookPayload) {
+    override fun store(payload: IngestionHookPayload, source: String?) {
         securityService.checkGlobalFunction(GlobalSettings::class.java)
-        internalStore(payload)
+        internalStore(
+            IngestionHookPayload(
+                uuid = payload.uuid,
+                timestamp = payload.timestamp,
+                gitHubDelivery = payload.gitHubDelivery,
+                gitHubEvent = payload.gitHubEvent,
+                gitHubHookID = payload.gitHubHookID,
+                gitHubHookInstallationTargetID = payload.gitHubHookInstallationTargetID,
+                gitHubHookInstallationTargetType = payload.gitHubHookInstallationTargetType,
+                payload = payload.payload,
+                repository = payload.repository,
+                source = source, // Source only determined at storage time
+                status = payload.status,
+                outcome = payload.outcome,
+                started = payload.started,
+                message = payload.message,
+                completion = payload.completion,
+                routing = payload.routing,
+                queue = payload.queue,
+            )
+        )
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

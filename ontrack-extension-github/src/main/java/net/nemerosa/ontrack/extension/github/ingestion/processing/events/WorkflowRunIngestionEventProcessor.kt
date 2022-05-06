@@ -50,6 +50,19 @@ class WorkflowRunIngestionEventProcessor(
 
     override val payloadType: KClass<WorkflowRunPayload> = WorkflowRunPayload::class
 
+    /**
+     * Branch or PR name, workflow name & run number.
+     */
+    override fun getPayloadSource(payload: WorkflowRunPayload): String? {
+        val pr = payload.workflowRun.pullRequests.firstOrNull()
+        val ref = if (pr != null) {
+            "PR-${pr.number}"
+        } else {
+            payload.workflowRun.headBranch
+        }
+        return "${payload.workflowRun.name}#${payload.workflowRun.runNumber}@$ref"
+    }
+
     override fun preProcessingCheck(payload: WorkflowRunPayload): IngestionEventPreprocessingCheck {
         val pr = payload.workflowRun.pullRequests.firstOrNull()
         return if (pr != null) {

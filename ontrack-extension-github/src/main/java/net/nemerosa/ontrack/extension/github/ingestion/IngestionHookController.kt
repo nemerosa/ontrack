@@ -125,7 +125,7 @@ class IngestionHookController(
                     INGESTION_METRIC_REPOSITORY_TAG to (repository?.name ?: ""),
                 )
                 // Stores it
-                storage.store(payload)
+                storage.store(payload, eventProcessor.getPayloadSource(payload))
                 // Pushes it on the queue
                 queue.queue(payload)
                 // Ok

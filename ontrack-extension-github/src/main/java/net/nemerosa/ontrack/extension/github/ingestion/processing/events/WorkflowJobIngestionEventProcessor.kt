@@ -27,6 +27,9 @@ class WorkflowJobIngestionEventProcessor(
 
     override val payloadType: KClass<WorkflowJobPayload> = WorkflowJobPayload::class
 
+    override fun getPayloadSource(payload: WorkflowJobPayload): String? =
+        payload.workflowJob.name
+
     override fun preProcessingCheck(payload: WorkflowJobPayload): IngestionEventPreprocessingCheck {
         return IngestionEventPreprocessingCheck.TO_BE_PROCESSED
     }

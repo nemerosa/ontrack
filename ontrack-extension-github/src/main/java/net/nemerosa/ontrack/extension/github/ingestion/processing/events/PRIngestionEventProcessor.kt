@@ -41,5 +41,6 @@ class PRIngestionEventProcessor(
         return IngestionEventProcessingResult.PROCESSED
     }
 
+    override fun getPayloadSource(payload: PRPayload): String? = "PR-${payload.pullRequest.number}"
 }
 

@@ -25,6 +25,8 @@ class PingIngestionEventProcessor : AbstractIngestionEventProcessor<PingPayload>
      */
     override fun preProcessingCheck(payload: PingPayload): IngestionEventPreprocessingCheck =
         IngestionEventPreprocessingCheck.IGNORED
+
+    override fun getPayloadSource(payload: PingPayload): String? = null
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -21,6 +21,10 @@ class IngestionValidateDateEventProcessor(
     private val validationDataTypeService: ValidationDataTypeService,
 ) : AbstractIngestionEventProcessor<GitHubIngestionValidateDataPayload>() {
 
+    override fun getPayloadSource(payload: GitHubIngestionValidateDataPayload): String? {
+        TODO("Not yet implemented")
+    }
+
     override fun preProcessingCheck(payload: GitHubIngestionValidateDataPayload): IngestionEventPreprocessingCheck =
         IngestionEventPreprocessingCheck.TO_BE_PROCESSED
 

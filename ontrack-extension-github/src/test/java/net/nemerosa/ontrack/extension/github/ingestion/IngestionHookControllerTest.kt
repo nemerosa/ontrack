@@ -32,6 +32,7 @@ class IngestionHookControllerTest {
 
         val ingestionEventProcessor = mockIngestionEventProcessor()
         every { ingestionEventProcessor.preProcessingCheck(any()) } returns IngestionEventPreprocessingCheck.TO_BE_PROCESSED
+        every { ingestionEventProcessor.getPayloadSource(any())} returns "test-source"
 
         val controller =
             IngestionHookController(
@@ -47,7 +48,7 @@ class IngestionHookControllerTest {
         var storedPayload: IngestionHookPayload? = null
         var queuedPayload: IngestionHookPayload? = null
 
-        every { storage.store(any()) } answers {
+        every { storage.store(any(), "test-source") } answers {
             storedPayload = this.arg(0)
         }
 
@@ -137,7 +138,7 @@ class IngestionHookControllerTest {
         var storedPayload: IngestionHookPayload? = null
         var queuedPayload: IngestionHookPayload? = null
 
-        every { storage.store(any()) } answers {
+        every { storage.store(any(), any()) } answers {
             storedPayload = this.arg(0)
         }
 
@@ -256,7 +257,7 @@ class IngestionHookControllerTest {
         var storedPayload: IngestionHookPayload? = null
         var queuedPayload: IngestionHookPayload? = null
 
-        every { storage.store(any()) } answers {
+        every { storage.store(any(), any()) } answers {
             storedPayload = this.arg(0)
         }
 

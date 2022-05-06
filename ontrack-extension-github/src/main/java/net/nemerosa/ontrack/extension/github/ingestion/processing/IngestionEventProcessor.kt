@@ -25,4 +25,9 @@ interface IngestionEventProcessor {
      */
     fun process(payload: IngestionHookPayload): IngestionEventProcessingResult
 
+    /**
+     * Computes a display string describing the payload.
+     */
+    fun getPayloadSource(payload: IngestionHookPayload): String?
+
 }

@@ -20,6 +20,7 @@ import java.util.*
  * @property gitHubHookInstallationTargetType Mapped to the `X-GitHub-Hook-Installation-Target-Type` header
  * @property payload JSON payload, raw from GitHub
  * @property repository Repository this payload refers to
+ * @property source Summary of the payload/event for display purpose
  * @property status Status of the processing
  * @property outcome Outcome of the processing
  * @property started Timestamp for the start of the processing
@@ -48,6 +49,8 @@ data class IngestionHookPayload(
     val payload: JsonNode,
     @APIDescription("Repository this payload refers to")
     val repository: Repository?,
+    @APIDescription("Source/name of the payload/event")
+    val source: String? = null,
     @APIDescription("Status of the processing")
     val status: IngestionHookPayloadStatus = IngestionHookPayloadStatus.SCHEDULED,
     @APIDescription("Outcome of the processing")

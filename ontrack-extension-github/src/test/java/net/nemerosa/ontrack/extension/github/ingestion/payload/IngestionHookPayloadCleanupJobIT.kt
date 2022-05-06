@@ -44,7 +44,8 @@ class IngestionHookPayloadCleanupJobIT : AbstractDSLTestJUnit4Support() {
                         IngestionHookFixtures.sampleWorkflowRunIngestionPayload(
                             timestamp = ref.plusDays(days.toLong()).plusMinutes(1),
                             message = "$days",
-                        )
+                        ),
+                        "source"
                     )
                 }
             }
