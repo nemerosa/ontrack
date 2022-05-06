@@ -13,11 +13,11 @@ object ConfigParser {
 
     private val mapper = ObjectMapper(yamlFactory)
 
-    fun parseYaml(yaml: String): IngestionConfig? =
+    fun parseYaml(yaml: String): IngestionConfig =
         try {
             mapper.readTree(yaml).parse()
-        } catch (_: Exception) {
-            null // Ignoring any parsing exception
+        } catch (ex: Exception) {
+            throw ConfigParsingException(ex)
         }
 
     /**
