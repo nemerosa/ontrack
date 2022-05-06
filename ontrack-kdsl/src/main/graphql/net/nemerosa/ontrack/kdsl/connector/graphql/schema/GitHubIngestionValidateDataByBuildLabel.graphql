@@ -1,0 +1,22 @@
+mutation GitHubIngestionValidateDataByBuildLabel(
+    $owner: String!,
+    $repository: String!,
+    $buildLabel: String!,
+    $validation: String!,
+    $validationData: GitHubIngestionValidationDataInput!,
+    $validationStatus: String,
+) {
+    gitHubIngestionValidateDataByBuildLabel(input: {
+        owner: $owner,
+        repository: $repository,
+        buildLabel: $buildLabel,
+        validation: $validation,
+        validationData: $validationData,
+        validationStatus: $validationStatus,
+    }) {
+        payload {
+            uuid
+        }
+        ...PayloadUserErrors
+    }
+}

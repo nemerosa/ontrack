@@ -111,6 +111,70 @@ class ACCDSLGitHubIngestionValidateData : AbstractACCDSLGitHubTestSupport() {
         }
     }
 
+    /**
+     * Tests the ingestion of validation data using a build name
+     *
+     * The scenario plays as follows:
+     *
+     * * creates a build
+     * * calling the API to set some validation data using the build name
+     */
+    @Test
+    fun `Ingestion of validation data using a build name`() {
+        // A unique repository name, acting also as a project name
+        val repository = uid("r")
+
+        // Creating a project, a branch and a build
+        val build = ontrack
+            .createProject(repository, "")
+            .createBranch("main", "")
+            .createBuild("build-15", "")
+
+        // Calling the API to simulate the GHA call
+        val validateDataUuid = ontrack.gitHub.ingestion.validateDataByBuildName(
+            owner = "nemerosa",
+            repository = repository,
+            buildName = build.name,
+            validation = "validation-to-target",
+            validationData = GitHubIngestionValidationDataInput(
+                type = "net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType",
+                data = mapOf(
+                    "metrics" to listOf(
+                        mapOf(
+                            "name" to "position",
+                            "value" to 4.5,
+                        ),
+                        mapOf(
+                            "name" to "speed",
+                            "value" to 0.7,
+                        ),
+                        mapOf(
+                            "name" to "acceleration",
+                            "value" to 1.0,
+                        ),
+                    ),
+                ).asJson()
+            ),
+            validationStatus = "PASSED"
+        )
+
+        // At the end, waits for all payloads to be processed
+        waitUntilPayloadIsProcessed(validateDataUuid)
+
+        // Checks that the run has been created & contains the right data
+        assertNotNull(build.getValidationRuns("validation-to-target").firstOrNull(),
+            "Validation run has been created") { run ->
+            assertEquals("PASSED", run.lastStatus.id)
+            assertNotNull(run.data, "Validation data has been set") { data ->
+                assertEquals("net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType",
+                    data.type)
+                assertEquals(4.5, data.data.path("metrics").path("position").asDouble())
+                assertEquals(0.7, data.data.path("metrics").path("speed").asDouble())
+                assertEquals(1.0, data.data.path("metrics").path("acceleration").asDouble())
+            }
+        }
+    }
+
     private fun sendPayloadToHook(
         gitHubConfiguration: GitHubConfiguration,
         event: String,

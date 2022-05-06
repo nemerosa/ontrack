@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.paginate
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.GitHubIngestionPayloadsQuery
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.GitHubIngestionValidateDataByBuildLabelMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.GitHubIngestionValidateDataByBuildNameMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.GitHubIngestionValidateDataByRunIdMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.IngestionHookPayloadStatus
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
@@ -78,6 +80,62 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
         ) {
             it?.gitHubIngestionValidateDataByRunId()?.fragments()?.payloadUserErrors()?.convert()
         }?.gitHubIngestionValidateDataByRunId()?.payload()?.uuid()?.let { UUID.fromString(it) }
+            ?: error("Could not get the UUID of the processed request")
+
+    /**
+     * Sends some validation data for a repository, using the build name
+     */
+    fun validateDataByBuildName(
+        owner: String,
+        repository: String,
+        buildName: String,
+        validation: String,
+        validationData: GitHubIngestionValidationDataInput,
+        validationStatus: String?,
+    ): UUID =
+        graphqlConnector.mutate(
+            GitHubIngestionValidateDataByBuildNameMutation(
+                owner,
+                repository,
+                buildName,
+                validation,
+                net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.GitHubIngestionValidationDataInput.builder()
+                    .data(validationData.data)
+                    .type(validationData.type)
+                    .build(),
+                Input.fromNullable(validationStatus),
+            )
+        ) {
+            it?.gitHubIngestionValidateDataByBuildName()?.fragments()?.payloadUserErrors()?.convert()
+        }?.gitHubIngestionValidateDataByBuildName()?.payload()?.uuid()?.let { UUID.fromString(it) }
+            ?: error("Could not get the UUID of the processed request")
+
+    /**
+     * Sends some validation data for a repository, using the build label
+     */
+    fun validateDataByBuildLabel(
+        owner: String,
+        repository: String,
+        buildLabel: String,
+        validation: String,
+        validationData: GitHubIngestionValidationDataInput,
+        validationStatus: String?,
+    ): UUID =
+        graphqlConnector.mutate(
+            GitHubIngestionValidateDataByBuildLabelMutation(
+                owner,
+                repository,
+                buildLabel,
+                validation,
+                net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.GitHubIngestionValidationDataInput.builder()
+                    .data(validationData.data)
+                    .type(validationData.type)
+                    .build(),
+                Input.fromNullable(validationStatus),
+            )
+        ) {
+            it?.gitHubIngestionValidateDataByBuildLabel()?.fragments()?.payloadUserErrors()?.convert()
+        }?.gitHubIngestionValidateDataByBuildLabel()?.payload()?.uuid()?.let { UUID.fromString(it) }
             ?: error("Could not get the UUID of the processed request")
 
 }
