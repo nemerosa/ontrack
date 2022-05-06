@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfiguration
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -48,11 +49,13 @@ class DefaultConfigLoaderServiceTest {
     }
 
     @Test
-    fun `Configuration parsing error returns null`() {
-        test(
-            incorrectConfig = true,
-            expectedConfig = false,
-        )
+    fun `Configuration parsing error returns an error`() {
+        assertFailsWith<ConfigParsingException> {
+            test(
+                incorrectConfig = true,
+                expectedConfig = false,
+            )
+        }
     }
 
     private fun test(

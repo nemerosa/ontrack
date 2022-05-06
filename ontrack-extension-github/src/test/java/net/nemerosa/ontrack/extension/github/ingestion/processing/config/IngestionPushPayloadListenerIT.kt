@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -21,6 +22,25 @@ internal class IngestionPushPayloadListenerIT : AbstractIngestionTestSupport() {
 
     @Autowired
     private lateinit var configLoaderService: ConfigLoaderService
+
+    @Test
+    fun `Configuration parsing error`() {
+        asAdmin {
+            onlyOneGitHubConfig()
+            val repository = uid("r")
+            ConfigLoaderServiceITMockConfig.failedIngestionConfig(configLoaderService)
+            assertFailsWith<ConfigParsingException> {
+                ingestionPushPayloadListener.process(
+                    payload = IngestionHookFixtures.samplePushPayload(
+                        repoName = repository,
+                        ref = "refs/heads/main",
+                        modified = listOf(".github/ontrack/ingestion.yml"),
+                    ),
+                    configuration = null
+                )
+            }
+        }
+    }
 
     @Test
     fun `Configuration of the stale property by the ingestion configuration file`() {

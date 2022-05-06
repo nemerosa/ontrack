@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
+import kotlin.test.assertFailsWith
 
 class ConfigParserTest {
 
@@ -123,12 +123,23 @@ class ConfigParserTest {
         )
     }
 
+    @Test
+    fun `Failing on parsing error`() {
+        val yaml = """
+            workflows:
+                excludes: "not-useful"
+        """.trimIndent()
+        assertFailsWith<ConfigParsingException> {
+            ConfigParser.parseYaml(yaml)
+        }
+    }
+
     fun test(
         yaml: String,
         code: (config: IngestionConfig) -> Unit,
     ) {
         val config = ConfigParser.parseYaml(yaml.trimIndent())
-        assertNotNull(config, "Configuration could be parsed", code)
+        code(config)
     }
 
 }
