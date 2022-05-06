@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.payload
 
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
 import java.time.LocalDateTime
 
 /**
@@ -34,9 +35,9 @@ interface IngestionHookPayloadStorage {
     fun start(payload: IngestionHookPayload)
 
     /**
-     * Adapt the status for a payload's processing successig
+     * Adapt the status for a payload's processing success.
      */
-    fun finished(payload: IngestionHookPayload)
+    fun finished(payload: IngestionHookPayload, outcome: IngestionEventProcessingResult)
 
     /**
      * Adapt the status for a payload's processing in error

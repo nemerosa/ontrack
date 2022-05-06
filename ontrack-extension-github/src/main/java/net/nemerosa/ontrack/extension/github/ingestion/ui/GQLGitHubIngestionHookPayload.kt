@@ -5,11 +5,13 @@ import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayl
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.*
+import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import org.springframework.stereotype.Component
 
 @Component
 class GQLGitHubIngestionHookPayload(
     private val gqlEnumIngestionHookPayloadStatus: GQLEnumIngestionHookPayloadStatus,
+    private val gqlEnumIngestionEventProcessingResult: GQLEnumIngestionEventProcessingResult,
     private val gqlGitHubRepository: GQLGitHubRepository,
 ) : GQLType {
 
@@ -20,11 +22,11 @@ class GQLGitHubIngestionHookPayload(
         .description("Payload received by the GitHub Ingestion Hook")
         .stringField(
             IngestionHookPayload::uuid.name,
-            getDescription(IngestionHookPayload::uuid),
+            getPropertyDescription(IngestionHookPayload::uuid),
         )
         .dateField(
             IngestionHookPayload::timestamp.name,
-            getDescription(IngestionHookPayload::timestamp),
+            getPropertyDescription(IngestionHookPayload::timestamp),
         )
         .stringField(IngestionHookPayload::gitHubDelivery)
         .stringField(IngestionHookPayload::gitHubEvent)
@@ -33,26 +35,31 @@ class GQLGitHubIngestionHookPayload(
         .stringField(IngestionHookPayload::gitHubHookInstallationTargetType)
         .field {
             it.name(IngestionHookPayload::payload.name)
-                .description(getDescription(IngestionHookPayload::payload))
+                .description(getPropertyDescription(IngestionHookPayload::payload))
                 .type(GQLScalarJSON.INSTANCE.toNotNull())
         }
         .field {
             it.name(IngestionHookPayload::status.name)
-                .description(getDescription(IngestionHookPayload::status))
+                .description(getPropertyDescription(IngestionHookPayload::status))
                 .type(gqlEnumIngestionHookPayloadStatus.getTypeRef().toNotNull())
+        }
+        .field {
+            it.name(IngestionHookPayload::outcome.name)
+                .description(getPropertyDescription(IngestionHookPayload::outcome))
+                .type(gqlEnumIngestionEventProcessingResult.getTypeRef())
         }
         .dateField(
             IngestionHookPayload::started.name,
-            getDescription(IngestionHookPayload::started),
+            getPropertyDescription(IngestionHookPayload::started),
         )
         .stringField(IngestionHookPayload::message)
         .dateField(
             IngestionHookPayload::completion.name,
-            getDescription(IngestionHookPayload::completion),
+            getPropertyDescription(IngestionHookPayload::completion),
         )
         .field {
             it.name(IngestionHookPayload::repository.name)
-                .description(getDescription(IngestionHookPayload::repository))
+                .description(getPropertyDescription(IngestionHookPayload::repository))
                 .type(gqlGitHubRepository.typeRef)
         }
         .stringField(IngestionHookPayload::routing)

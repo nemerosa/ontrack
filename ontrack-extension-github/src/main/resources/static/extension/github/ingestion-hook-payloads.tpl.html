@@ -14,7 +14,7 @@
             <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                    <th colspan="10">
+                    <th colspan="11">
                         <form class="form-inline" ng-submit="submitFilter()">
                             <div class="form-group">
                                 <button class="btn"
@@ -81,6 +81,7 @@
                     <th>Routing</th>
                     <th>Queue</th>
                     <th>Status</th>
+                    <th>Outcome</th>
                     <th>Completion</th>
                 </tr>
                 </thead>
@@ -122,13 +123,16 @@
                         <code>{{ payload.status }}</code>
                     </td>
                     <td>
+                        <code>{{ payload.outcome }}</code>
+                    </td>
+                    <td>
                         <span ng-if="payload.completion">
                             {{ payload.completion | date:'yyyy-MM-dd HH:mm:ssZ' }}
                         </span>
                     </td>
                 </tr>
                 <tr ng-if="payload.showDetails && !payload.loadingDetails && payload.details">
-                    <td colspan="10">
+                    <td colspan="11">
                         <p ng-if="payload.details.message">
                             {{ payload.details.message }}
                         </p>
@@ -138,7 +142,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <td colspan="10">
+                    <td colspan="11">
                         <button ng-disabled="!pageInfo.previousPage" class="btn btn-default" ng-click="topPayloads()">
                             <span class="fa fa-fast-backward"></span>
                             Newest payloads

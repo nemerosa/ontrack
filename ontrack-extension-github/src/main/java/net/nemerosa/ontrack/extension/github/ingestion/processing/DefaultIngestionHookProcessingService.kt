@@ -38,8 +38,8 @@ class DefaultIngestionHookProcessingService(
                         IngestionEventProcessingResult.IGNORED -> IngestionMetrics.Process.ignoredCount
                     }
                     meterRegistry.increment(payload, metric)
+                    ingestionHookPayloadStorage.finished(payload, outcome)
                 }
-                ingestionHookPayloadStorage.finished(payload)
             } catch (any: Throwable) {
                 meterRegistry.increment(payload, IngestionMetrics.Process.errorCount)
                 ingestionHookPayloadStorage.error(payload, any)

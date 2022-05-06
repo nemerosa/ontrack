@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.payload
 
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.apache.commons.lang3.exception.ExceptionUtils
@@ -38,6 +39,7 @@ abstract class AbstractIngestionHookPayloadStorage(
                 payload = old.payload,
                 repository = old.repository,
                 status = old.status,
+                outcome = old.outcome,
                 started = old.started,
                 message = old.message,
                 completion = old.completion,
@@ -65,6 +67,7 @@ abstract class AbstractIngestionHookPayloadStorage(
                 payload = old.payload,
                 repository = old.repository,
                 status = old.status,
+                outcome = old.outcome,
                 started = old.started,
                 message = old.message,
                 completion = old.completion,
@@ -92,6 +95,7 @@ abstract class AbstractIngestionHookPayloadStorage(
                 payload = old.payload,
                 repository = old.repository,
                 status = IngestionHookPayloadStatus.PROCESSING,
+                outcome = old.outcome,
                 started = Time.now(),
                 message = null,
                 completion = null,
@@ -102,7 +106,7 @@ abstract class AbstractIngestionHookPayloadStorage(
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    override fun finished(payload: IngestionHookPayload) {
+    override fun finished(payload: IngestionHookPayload, outcome: IngestionEventProcessingResult) {
         securityService.checkGlobalFunction(GlobalSettings::class.java)
         // Gets the old payload
         val old = getByUUID(payload.uuid)
@@ -119,6 +123,7 @@ abstract class AbstractIngestionHookPayloadStorage(
                 payload = old.payload,
                 repository = old.repository,
                 status = IngestionHookPayloadStatus.COMPLETED,
+                outcome = outcome,
                 started = old.started,
                 message = null,
                 completion = Time.now(),
@@ -146,6 +151,7 @@ abstract class AbstractIngestionHookPayloadStorage(
                 payload = old.payload,
                 repository = old.repository,
                 status = IngestionHookPayloadStatus.ERRORED,
+                outcome = old.outcome,
                 started = old.started,
                 message = ExceptionUtils.getStackTrace(any),
                 completion = Time.now(),

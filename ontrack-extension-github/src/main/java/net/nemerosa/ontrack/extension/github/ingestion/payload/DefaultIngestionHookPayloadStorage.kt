@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.payload
 
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Component
@@ -34,8 +35,8 @@ class DefaultIngestionHookPayloadStorage(
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    override fun finished(payload: IngestionHookPayload) {
-        super.finished(payload)
+    override fun finished(payload: IngestionHookPayload, outcome: IngestionEventProcessingResult) {
+        super.finished(payload, outcome)
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
