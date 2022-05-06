@@ -1,0 +1,13 @@
+mutation BuildSetProperty(
+    $id: Int!,
+    $type: String!,
+    $value: JSON!,
+) {
+    setBuildPropertyById(input: {
+        id: $id,
+        property: $type,
+        value: $value,
+    }) {
+        ...PayloadUserErrors
+    }
+}
