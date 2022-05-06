@@ -33,6 +33,14 @@
                                 </label>
                             </div>
                             <div class="form-group">
+                                <label for="filter_outcome">Outcome</label>
+                                <select id="filter_outcome"
+                                        ng-change="submitFilter()"
+                                        class="form-control" ng-options="value for value in outcomes" ng-model="filter.outcome">
+                                    <option value="">All</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <label for="filter_delivery">Delivery ID</label>
                                 <input type="text" class="form-control" id="filter_delivery" ng-model="filter.gitHubDelivery"/>
                             </div>

@@ -6,6 +6,7 @@ import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStatus
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.listInputType
@@ -18,6 +19,7 @@ class GQLRootQueryGitHubIngestionHookPayloads(
     private val gqlPaginatedListFactory: GQLPaginatedListFactory,
     private val gqlGitHubIngestionHookPayload: GQLGitHubIngestionHookPayload,
     private val gqlEnumIngestionHookPayloadStatus: GQLEnumIngestionHookPayloadStatus,
+    private val gqlEnumIngestionEventProcessingResult: GQLEnumIngestionEventProcessingResult,
     private val ingestionHookPayloadStorage: IngestionHookPayloadStorage,
 ) : GQLRootQuery {
     override fun getFieldDefinition(): GraphQLFieldDefinition =
@@ -36,6 +38,11 @@ class GQLRootQueryGitHubIngestionHookPayloads(
                             nullable = true,
                         )
                     )
+                    .build(),
+                GraphQLArgument.newArgument()
+                    .name(ARG_OUTCOME)
+                    .description("Filter on the outcome")
+                    .type(gqlEnumIngestionEventProcessingResult.getTypeRef())
                     .build(),
                 GraphQLArgument.newArgument()
                     .name(ARG_UUID)
@@ -90,11 +97,15 @@ class GQLRootQueryGitHubIngestionHookPayloads(
                     val routing: String? = env.getArgument(ARG_ROUTING)
                     val queue: String? = env.getArgument(ARG_QUEUE)
                     val statusesList: List<String>? = env.getArgument(ARG_STATUSES)
+                    val outcome = env.getArgument<String>(ARG_OUTCOME)?.let {
+                        IngestionEventProcessingResult.valueOf(it)
+                    }
                     val statuses = statusesList?.map {
                         IngestionHookPayloadStatus.valueOf(it)
                     }
                     val count = ingestionHookPayloadStorage.count(
                         statuses = statuses,
+                        outcome = outcome,
                         gitHubDelivery = delivery,
                         gitHubEvent = event,
                         repository = repository,
@@ -104,6 +115,7 @@ class GQLRootQueryGitHubIngestionHookPayloads(
                     )
                     val items = ingestionHookPayloadStorage.list(offset, size,
                         statuses = statuses,
+                        outcome = outcome,
                         gitHubDelivery = delivery,
                         gitHubEvent = event,
                         repository = repository,
@@ -124,6 +136,7 @@ class GQLRootQueryGitHubIngestionHookPayloads(
     companion object {
         private const val ARG_UUID = "uuid"
         private const val ARG_STATUSES = "statuses"
+        private const val ARG_OUTCOME = "outcome"
         private const val ARG_GITHUB_DELIVERY = "gitHubDelivery"
         private const val ARG_GITHUB_EVENT = "gitHubEvent"
         private const val ARG_REPOSITORY = "repository"

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.payload
 
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
@@ -21,6 +22,7 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
 
     override fun count(
         statuses: List<IngestionHookPayloadStatus>?,
+        outcome: IngestionEventProcessingResult?,
         gitHubDelivery: String?,
         gitHubEvent: String?,
         repository: String?,
@@ -31,8 +33,8 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
         securityService.checkGlobalFunction(GlobalSettings::class.java)
         return storageService.count(
             store = INGESTION_HOOK_PAYLOAD_STORE,
-            query = query(statuses, gitHubDelivery, gitHubEvent, repository, owner, routing, queue),
-            queryVariables = queryVariables(statuses, gitHubDelivery, gitHubEvent, repository, owner, routing, queue),
+            query = query(statuses, outcome, gitHubDelivery, gitHubEvent, repository, owner, routing, queue),
+            queryVariables = queryVariables(statuses, outcome, gitHubDelivery, gitHubEvent, repository, owner, routing, queue),
         )
     }
 
@@ -40,6 +42,7 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
         offset: Int,
         size: Int,
         statuses: List<IngestionHookPayloadStatus>?,
+        outcome: IngestionEventProcessingResult?,
         gitHubDelivery: String?,
         gitHubEvent: String?,
         repository: String?,
@@ -48,7 +51,7 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
         queue: String?,
     ): List<IngestionHookPayload> {
         securityService.checkGlobalFunction(GlobalSettings::class.java)
-        val query: String? = query(statuses, gitHubDelivery, gitHubEvent, repository, owner, routing, queue)
+        val query: String? = query(statuses, outcome, gitHubDelivery, gitHubEvent, repository, owner, routing, queue)
         return storageService.filter(
             store = INGESTION_HOOK_PAYLOAD_STORE,
             type = IngestionHookPayload::class,
@@ -56,7 +59,7 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
             size = size,
             orderQuery = "order by data->>'timestamp' desc",
             query = query,
-            queryVariables = queryVariables(statuses, gitHubDelivery, gitHubEvent, repository, owner, routing, queue),
+            queryVariables = queryVariables(statuses, outcome, gitHubDelivery, gitHubEvent, repository, owner, routing, queue),
         )
     }
 
@@ -71,6 +74,7 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
 
     private fun query(
         statuses: List<IngestionHookPayloadStatus>?,
+        outcome: IngestionEventProcessingResult?,
         gitHubDelivery: String?,
         gitHubEvent: String?,
         repository: String?,
@@ -83,6 +87,9 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
             parts += "(" + statuses.joinToString(" OR ") { status ->
                 "data->>'status' = '$status'"
             } + ")"
+        }
+        if (outcome != null) {
+            parts += "data->>'outcome' = :outcome"
         }
         if (!gitHubDelivery.isNullOrBlank()) {
             parts += "data->>'gitHubDelivery' = :gitHubDelivery"
@@ -111,6 +118,7 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
 
     private fun queryVariables(
         @Suppress("UNUSED_PARAMETER") statuses: List<IngestionHookPayloadStatus>?,
+        outcome: IngestionEventProcessingResult?,
         gitHubDelivery: String?,
         gitHubEvent: String?,
         repository: String?,
@@ -119,6 +127,9 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
         queue: String?,
     ): Map<String, *>? {
         val variables = mutableMapOf<String, Any?>()
+        if (outcome != null) {
+            variables["outcome"] = outcome.name
+        }
         if (!gitHubDelivery.isNullOrBlank()) {
             variables["gitHubDelivery"] = gitHubDelivery
         }
