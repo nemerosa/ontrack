@@ -1,18 +1,18 @@
 package net.nemerosa.ontrack.extension.github.ingestion.ui
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStatus
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.parse
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestJUnit4Support() {
+class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestSupport() {
 
     @Test
     fun `Getting a payload by UUID`() {
@@ -20,7 +20,7 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestJUnit4Sup
             message = "Sample payload",
         )
         asAdmin {
-            ingestionHookPayloadStorage.store(payload, "source")
+            ingestionHookPayloadStorage.store(payload, "sample source")
             run(
                 """
                     {
@@ -38,6 +38,7 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestJUnit4Sup
                             started
                             message
                             completion
+                            source
                         }
                      }
                     }
@@ -46,6 +47,7 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestJUnit4Sup
                 val item =
                     data.path("gitHubIngestionHookPayloads").path("pageItems").first().parse<IngestionHookPayload>()
                 assertEquals(payload.uuid, item.uuid)
+                assertEquals("sample source", item.source)
             }
         }
     }
