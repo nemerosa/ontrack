@@ -5,7 +5,7 @@
             <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                    <th colspan="11">
+                    <th colspan="12">
                         <form class="form-inline" ng-submit="submitFilter()">
                             <div class="form-group">
                                 <button class="btn"
@@ -76,6 +76,7 @@
                     <th>Timestamp</th>
                     <th>GitHub Delivery ID</th>
                     <th>Event</th>
+                    <th>Source</th>
                     <th>Repository</th>
                     <th>Owner</th>
                     <th>Routing</th>
@@ -87,7 +88,7 @@
                 </thead>
                 <tbody ng-if="payloads.length == 0">
                 <tr class="warning">
-                    <td colspan="10">
+                    <td colspan="12">
                         No payload has been received or the filter is too restrictive.
                     </td>
                 </tr>
@@ -106,6 +107,9 @@
                     </td>
                     <td>
                         <code>{{ payload.gitHubEvent }}</code>
+                    </td>
+                    <td>
+                        <code>{{ payload.source }}</code>
                     </td>
                     <td>
                         <code>{{ payload.repository.name }}</code>
@@ -132,7 +136,7 @@
                     </td>
                 </tr>
                 <tr ng-if="payload.showDetails && !payload.loadingDetails && payload.details">
-                    <td colspan="11">
+                    <td colspan="12">
                         <p ng-if="payload.details.message">
                             {{ payload.details.message }}
                         </p>
@@ -142,7 +146,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <td colspan="11">
+                    <td colspan="12">
                         <button ng-disabled="!pageInfo.previousPage" class="btn btn-default" ng-click="topPayloads()">
                             <span class="fa fa-fast-backward"></span>
                             Newest payloads

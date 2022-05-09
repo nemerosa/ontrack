@@ -74,6 +74,7 @@ angular.module('ontrack.extension.github', [
                                 login
                             }
                         }
+                        source
                     }
                 }
             }
