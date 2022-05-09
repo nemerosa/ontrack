@@ -51,6 +51,7 @@ interface IngestionHookPayloadStorage {
      * @param outcome Outcome of the processing
      * @param gitHubDelivery Filter on the GitHub Delivery ID
      * @param gitHubEvent Filter on the GitHub Event
+     * @param source Prefix of the source
      * @param repository Filter on the repository
      * @param owner Filter on the repository owner
      * @param routing Filter on the routing information
@@ -61,6 +62,7 @@ interface IngestionHookPayloadStorage {
         outcome: IngestionEventProcessingResult? = null,
         gitHubDelivery: String? = null,
         gitHubEvent: String? = null,
+        source: String? = null,
         repository: String? = null,
         owner: String? = null,
         routing: String? = null,
@@ -76,6 +78,7 @@ interface IngestionHookPayloadStorage {
      * @param outcome Outcome of the processing
      * @param gitHubDelivery Filter on the GitHub Delivery ID
      * @param gitHubEvent Filter on the GitHub Event
+     * @param source Prefix of the source
      * @param repository Filter on the repository
      * @param owner Filter on the repository owner
      * @param routing Filter on the routing information
@@ -89,6 +92,7 @@ interface IngestionHookPayloadStorage {
         outcome: IngestionEventProcessingResult? = null,
         gitHubDelivery: String? = null,
         gitHubEvent: String? = null,
+        source: String? = null,
         repository: String? = null,
         owner: String? = null,
         routing: String? = null,

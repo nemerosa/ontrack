@@ -55,6 +55,11 @@ class GQLRootQueryGitHubIngestionHookPayloads(
                     .type(GraphQLString)
                     .build(),
                 GraphQLArgument.newArgument()
+                    .name(ARG_SOURCE)
+                    .description("Filter on the source (prefix)")
+                    .type(GraphQLString)
+                    .build(),
+                GraphQLArgument.newArgument()
                     .name(ARG_GITHUB_EVENT)
                     .description("Filter on the GitHub Event")
                     .type(GraphQLString)
@@ -92,6 +97,7 @@ class GQLRootQueryGitHubIngestionHookPayloads(
                 } else {
                     val delivery: String? = env.getArgument(ARG_GITHUB_DELIVERY)
                     val event: String? = env.getArgument(ARG_GITHUB_EVENT)
+                    val source: String? = env.getArgument(ARG_SOURCE)
                     val repository: String? = env.getArgument(ARG_REPOSITORY)
                     val owner: String? = env.getArgument(ARG_OWNER)
                     val routing: String? = env.getArgument(ARG_ROUTING)
@@ -108,6 +114,7 @@ class GQLRootQueryGitHubIngestionHookPayloads(
                         outcome = outcome,
                         gitHubDelivery = delivery,
                         gitHubEvent = event,
+                        source = source,
                         repository = repository,
                         owner = owner,
                         routing = routing,
@@ -118,6 +125,7 @@ class GQLRootQueryGitHubIngestionHookPayloads(
                         outcome = outcome,
                         gitHubDelivery = delivery,
                         gitHubEvent = event,
+                        source = source,
                         repository = repository,
                         owner = owner,
                         routing = routing,
@@ -139,6 +147,7 @@ class GQLRootQueryGitHubIngestionHookPayloads(
         private const val ARG_OUTCOME = "outcome"
         private const val ARG_GITHUB_DELIVERY = "gitHubDelivery"
         private const val ARG_GITHUB_EVENT = "gitHubEvent"
+        private const val ARG_SOURCE = "source"
         private const val ARG_REPOSITORY = "repository"
         private const val ARG_OWNER = "owner"
         private const val ARG_ROUTING = "routing"

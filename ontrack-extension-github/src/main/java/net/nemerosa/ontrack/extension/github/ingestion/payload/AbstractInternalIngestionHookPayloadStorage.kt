@@ -25,6 +25,7 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
         outcome: IngestionEventProcessingResult?,
         gitHubDelivery: String?,
         gitHubEvent: String?,
+        source: String?,
         repository: String?,
         owner: String?,
         routing: String?,
@@ -33,8 +34,8 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
         securityService.checkGlobalFunction(GlobalSettings::class.java)
         return storageService.count(
             store = INGESTION_HOOK_PAYLOAD_STORE,
-            query = query(statuses, outcome, gitHubDelivery, gitHubEvent, repository, owner, routing, queue),
-            queryVariables = queryVariables(statuses, outcome, gitHubDelivery, gitHubEvent, repository, owner, routing, queue),
+            query = query(statuses, outcome, gitHubDelivery, gitHubEvent, source, repository, owner, routing, queue),
+            queryVariables = queryVariables(statuses, outcome, gitHubDelivery, gitHubEvent, source, repository, owner, routing, queue),
         )
     }
 
@@ -45,13 +46,14 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
         outcome: IngestionEventProcessingResult?,
         gitHubDelivery: String?,
         gitHubEvent: String?,
+        source: String?,
         repository: String?,
         owner: String?,
         routing: String?,
         queue: String?,
     ): List<IngestionHookPayload> {
         securityService.checkGlobalFunction(GlobalSettings::class.java)
-        val query: String? = query(statuses, outcome, gitHubDelivery, gitHubEvent, repository, owner, routing, queue)
+        val query: String? = query(statuses, outcome, gitHubDelivery, gitHubEvent, source, repository, owner, routing, queue)
         return storageService.filter(
             store = INGESTION_HOOK_PAYLOAD_STORE,
             type = IngestionHookPayload::class,
@@ -59,7 +61,7 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
             size = size,
             orderQuery = "order by data->>'timestamp' desc",
             query = query,
-            queryVariables = queryVariables(statuses, outcome, gitHubDelivery, gitHubEvent, repository, owner, routing, queue),
+            queryVariables = queryVariables(statuses, outcome, gitHubDelivery, gitHubEvent, source, repository, owner, routing, queue),
         )
     }
 
@@ -77,6 +79,7 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
         outcome: IngestionEventProcessingResult?,
         gitHubDelivery: String?,
         gitHubEvent: String?,
+        source: String?,
         repository: String?,
         owner: String?,
         routing: String?,
@@ -96,6 +99,9 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
         }
         if (!gitHubEvent.isNullOrBlank()) {
             parts += "data->>'gitHubEvent' = :gitHubEvent"
+        }
+        if (!source.isNullOrBlank()) {
+            parts += "data->>'source' ilike :source"
         }
         if (!repository.isNullOrBlank()) {
             parts += "data->'repository'->>'name' = :repository"
@@ -121,6 +127,7 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
         outcome: IngestionEventProcessingResult?,
         gitHubDelivery: String?,
         gitHubEvent: String?,
+        source: String?,
         repository: String?,
         owner: String?,
         routing: String?,
@@ -135,6 +142,9 @@ abstract class AbstractInternalIngestionHookPayloadStorage(
         }
         if (!gitHubEvent.isNullOrBlank()) {
             variables["gitHubEvent"] = gitHubEvent
+        }
+        if (!source.isNullOrBlank()) {
+            variables["source"] = "$source%"
         }
         if (!repository.isNullOrBlank()) {
             variables["repository"] = repository

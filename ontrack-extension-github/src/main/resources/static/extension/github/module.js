@@ -27,6 +27,7 @@ angular.module('ontrack.extension.github', [
                 $outcome: IngestionEventProcessingResult,
                 $gitHubDelivery: String,
                 $gitHubEvent: String,
+                $source: String,
                 $repository: String,
                 $owner: String,
                 $routing: String,
@@ -41,6 +42,7 @@ angular.module('ontrack.extension.github', [
                     outcome: $outcome,
                     gitHubDelivery: $gitHubDelivery,
                     gitHubEvent: $gitHubEvent,
+                    source: $source,
                     repository: $repository,
                     owner: $owner,
                     routing: $routing,
@@ -102,6 +104,7 @@ angular.module('ontrack.extension.github', [
             size: defaultSize,
             statuses: null,
             outcome: null,
+            source: null,
             repository: null,
             owner: null,
             routing: null,
@@ -113,6 +116,7 @@ angular.module('ontrack.extension.github', [
             gitHubDelivery: '',
             outcome: '',
             gitHubEvent: '',
+            source: '',
             repository: '',
             owner: '',
             routing: '',
@@ -153,6 +157,11 @@ angular.module('ontrack.extension.github', [
             } else {
                 variables.gitHubEvent = null;
             }
+            if ($scope.filter.source) {
+                variables.source = $scope.filter.source;
+            } else {
+                variables.source = null;
+            }
             if ($scope.filter.repository) {
                 variables.repository = $scope.filter.repository;
             } else {
@@ -181,6 +190,7 @@ angular.module('ontrack.extension.github', [
             $scope.filter.outcome = '';
             $scope.filter.gitHubDelivery = '';
             $scope.filter.gitHubEvent = '';
+            $scope.filter.source = '';
             $scope.filter.repository = '';
             $scope.filter.owner = '';
             $scope.filter.routing = '';
