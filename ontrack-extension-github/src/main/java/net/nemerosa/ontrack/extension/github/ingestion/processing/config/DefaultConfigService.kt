@@ -1,10 +1,14 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import net.nemerosa.ontrack.extension.casc.entities.CascEntityService
+import net.nemerosa.ontrack.extension.general.AutoPromotionProperty
+import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
+import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.EntityDataService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
+import net.nemerosa.ontrack.model.structure.PropertyService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -13,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional
 class DefaultConfigService(
     private val entityDataService: EntityDataService,
     private val configLoaderService: ConfigLoaderService,
+    private val ingestionModelAccessService: IngestionModelAccessService,
+    private val propertyService: PropertyService,
     private val cascEntityService: CascEntityService,
 ) : ConfigService {
 
@@ -28,8 +34,44 @@ class DefaultConfigService(
         return config?.apply {
             // Storing the configuration
             store(branch)
+            // Auto promotions
+            autoPromotions(branch, this)
             // Applying Casc configuration nodes
             casc(branch, casc)
+        }
+    }
+
+    private fun autoPromotions(branch: Branch, config: IngestionConfig) {
+        // Making sure all validations are created
+        val validations = config.promotions.flatMap { it.validations }.distinct().associateWith { validation ->
+            ingestionModelAccessService.setupValidationStamp(branch, validation, null)
+        }
+        // Creating all promotions - first pass
+        val promotions = config.promotions.associate { plConfig ->
+            plConfig.name to ingestionModelAccessService.setupPromotionLevel(
+                branch,
+                plConfig.name,
+                plConfig.description
+            )
+        }
+        // Configuring all promotions - second pass
+        config.promotions.forEach { plConfig ->
+            val promotion = promotions[plConfig.name]
+            if (promotion != null) {
+                val existingAutoPromotionProperty: AutoPromotionProperty? =
+                    propertyService.getProperty(promotion, AutoPromotionPropertyType::class.java).value
+                val autoPromotionProperty = AutoPromotionProperty(
+                    validationStamps = plConfig.validations.mapNotNull { validations[it] },
+                    promotionLevels = plConfig.promotions.mapNotNull { promotions[it] },
+                    include = plConfig.include ?: "",
+                    exclude = plConfig.exclude ?: "",
+                )
+                if (existingAutoPromotionProperty == null || existingAutoPromotionProperty != autoPromotionProperty) {
+                    propertyService.editProperty(promotion,
+                        AutoPromotionPropertyType::class.java,
+                        autoPromotionProperty)
+                }
+            }
         }
     }
 

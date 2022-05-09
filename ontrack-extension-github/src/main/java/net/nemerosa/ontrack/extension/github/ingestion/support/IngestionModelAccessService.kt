@@ -2,9 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.support
 
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.IPullRequest
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.*
 
 /**
  * Service used to access the model resources (project, branch) when dealing with
@@ -64,6 +62,32 @@ interface IngestionModelAccessService {
         repository: Repository,
         buildLabel: String,
     ): Build?
+
+    /**
+     * Gets or creates a validation stamp
+     *
+     * @param branch Parent branch
+     * @param vsName Name of the validation stamp
+     * @param vsDescription Description of the validation stamp
+     */
+    fun setupValidationStamp(
+        branch: Branch,
+        vsName: String,
+        vsDescription: String?
+    ): ValidationStamp
+
+    /**
+     * Gets or creates a promotion level
+     *
+     * @param branch Parent branch
+     * @param plName Name of the promotion level
+     * @param plDescription Description of the promotion level
+     */
+    fun setupPromotionLevel(
+        branch: Branch,
+        plName: String,
+        plDescription: String?
+    ): PromotionLevel
 }
 
 /**

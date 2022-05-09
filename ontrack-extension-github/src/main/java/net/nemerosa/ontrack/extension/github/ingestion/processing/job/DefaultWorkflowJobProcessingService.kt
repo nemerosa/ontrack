@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.job
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.model.GitBranchNotConfiguredException
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInfo
@@ -16,7 +15,6 @@ import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflo
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobPropertyType
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
@@ -65,7 +63,7 @@ class DefaultWorkflowJobProcessingService(
         val vsName = getValidationStampName(settings, ingestionConfig, job, step)
         val vsDescription = getValidationStampDescription(ingestionConfig, job, step)
         // Gets or creates a validation stamp for the branch
-        val vs = setupValidationStamp(build.branch, vsName, vsDescription)
+        val vs = ingestionModelAccessService.setupValidationStamp(build.branch, vsName, vsDescription)
         // Gets or creates the validation run based on the job number
         val run = setupValidationRun(
             build = build,
@@ -103,58 +101,6 @@ class DefaultWorkflowJobProcessingService(
         }
         // OK
         return true
-    }
-
-    override fun setupValidationStamp(
-        branch: Branch,
-        vsName: String,
-        vsDescription: String?,
-    ): ValidationStamp {
-        val existing = structureService.findValidationStampByName(branch.project.name, branch.name, vsName).getOrNull()
-        return if (existing != null) {
-            // Adapt description if need be
-            if (vsDescription != null && vsDescription != existing.description) {
-                val adapted = existing.withDescription(vsDescription)
-                structureService.saveValidationStamp(
-                    adapted
-                )
-                adapted
-            } else {
-                // Done
-                existing
-            }
-        } else {
-            structureService.newValidationStamp(
-                ValidationStamp.of(
-                    branch,
-                    nd(vsName, vsDescription)
-                )
-            )
-        }
-    }
-
-    override fun setupPromotionLevel(branch: Branch, plName: String, plDescription: String?): PromotionLevel {
-        val existing = structureService.findPromotionLevelByName(branch.project.name, branch.name, plName).getOrNull()
-        return if (existing != null) {
-            // Adapt description if need be
-            if (plDescription != null && plDescription != existing.description) {
-                val adapted = existing.withDescription(plDescription)
-                structureService.savePromotionLevel(
-                    adapted
-                )
-                adapted
-            } else {
-                // Done
-                existing
-            }
-        } else {
-            structureService.newPromotionLevel(
-                PromotionLevel.of(
-                    branch,
-                    nd(plName, plDescription)
-                )
-            )
-        }
     }
 
     private fun ignoreJob(job: String, settings: GitHubIngestionSettings, ingestionConfig: IngestionConfig): Boolean =

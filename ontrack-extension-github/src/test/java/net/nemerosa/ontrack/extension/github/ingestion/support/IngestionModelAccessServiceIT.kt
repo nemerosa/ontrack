@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.support
 
 import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.processing.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Owner
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
@@ -9,13 +9,13 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normaliz
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
-internal class IngestionModelAccessServiceIT : AbstractIngestionTestJUnit4Support() {
+internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
 
     @Autowired
     private lateinit var ingestionModelAccessService: IngestionModelAccessService
@@ -201,6 +201,94 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestJUnit4Suppor
                         assertEquals(indexationInterval, it.indexationInterval)
                         assertEquals(issueServiceIdentifier, it.issueServiceConfigurationIdentifier)
                     }
+                }
+            }
+        }
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `Setup validation stamp when non existing`() {
+        project {
+            branch {
+                asAdmin {
+                    val setup = ingestionModelAccessService.setupValidationStamp(this, "VS", "Validation stamp name")
+                    assertEquals("VS", setup.name)
+                    assertEquals("Validation stamp name", setup.description)
+                }
+            }
+        }
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `Setup validation stamp when existing with null input description`() {
+        project {
+            branch {
+                val vs = validationStamp("VS", description = "Validation stamp name")
+                asAdmin {
+                    val setup = ingestionModelAccessService.setupValidationStamp(this, "VS", null)
+                    assertEquals(vs.id, setup.id)
+                    assertEquals("VS", setup.name)
+                    assertEquals("Validation stamp name", setup.description)
+                }
+            }
+        }
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `Setup validation stamp when existing with new input description`() {
+        project {
+            branch {
+                val vs = validationStamp("VS", description = "Validation stamp name")
+                asAdmin {
+                    val setup = ingestionModelAccessService.setupValidationStamp(this, "VS", "Another description")
+                    assertEquals(vs.id, setup.id)
+                    assertEquals("VS", setup.name)
+                    assertEquals("Another description", setup.description)
+                    assertEquals(setup.description, structureService.getValidationStamp(vs.id).description)
+                }
+            }
+        }
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `Setup promotion level when non existing`() {
+        project {
+            branch {
+                asAdmin {
+                    val setup = ingestionModelAccessService.setupPromotionLevel(this, "PL", "Promotion level name")
+                    assertEquals("PL", setup.name)
+                    assertEquals("Promotion level name", setup.description)
+                }
+            }
+        }
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `Setup promotion level when existing with null input description`() {
+        project {
+            branch {
+                val pl = promotionLevel("PL", "Promotion level name")
+                asAdmin {
+                    val setup = ingestionModelAccessService.setupPromotionLevel(this, "PL", null)
+                    assertEquals(pl.id, setup.id)
+                    assertEquals("PL", setup.name)
+                    assertEquals("Promotion level name", setup.description)
+                }
+            }
+        }
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `Setup promotion level when existing with new input description`() {
+        project {
+            branch {
+                val pl = promotionLevel("PL", "Promotion level name")
+                asAdmin {
+                    val setup = ingestionModelAccessService.setupPromotionLevel(this, "PL", "Another description")
+                    assertEquals(pl.id, setup.id)
+                    assertEquals("PL", setup.name)
+                    assertEquals("Another description", setup.description)
+                    assertEquals(setup.description, structureService.getPromotionLevel(pl.id).description)
                 }
             }
         }

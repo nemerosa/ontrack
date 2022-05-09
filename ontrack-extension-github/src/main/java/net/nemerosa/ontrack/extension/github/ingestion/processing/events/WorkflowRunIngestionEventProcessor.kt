@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.extension.general.AutoPromotionProperty
-import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
@@ -120,7 +118,7 @@ class WorkflowRunIngestionEventProcessor(
         // Gets the validation name from the run name
         val validationStampName = normalizeName(workflowRun.name) + "-run"
         // Gets or creates the validation stamp
-        val vs = workflowJobProcessingService.setupValidationStamp(
+        val vs = ingestionModelAccessService.setupValidationStamp(
             build.branch, validationStampName, "${workflowRun.name} workflow"
         )
         // Creates a validation run
@@ -157,47 +155,9 @@ class WorkflowRunIngestionEventProcessor(
 
     private fun startBuild(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResult {
         // Build creation & setup
-        val build = getOrCreateBuild(payload, running = true, configuration = configuration)
-        // Auto promotion configuration
-        autoPromotionConfiguration(build)
+        getOrCreateBuild(payload, running = true, configuration = configuration)
         // OK
         return IngestionEventProcessingResult.PROCESSED
-    }
-
-    private fun autoPromotionConfiguration(build: Build) {
-        // Gets or loads the ingestion configuration
-        val config = configService.getOrLoadConfig(build.branch, INGESTION_CONFIG_FILE_PATH)
-        // Making sure all validations are created
-        val validations = config.promotions.flatMap { it.validations }.distinct().associateWith { validation ->
-            workflowJobProcessingService.setupValidationStamp(build.branch, validation, null)
-        }
-        // Creating all promotions - first pass
-        val promotions = config.promotions.associate { plConfig ->
-            plConfig.name to workflowJobProcessingService.setupPromotionLevel(
-                build.branch,
-                plConfig.name,
-                plConfig.description
-            )
-        }
-        // Configuring all promotions - second pass
-        config.promotions.forEach { plConfig ->
-            val promotion = promotions[plConfig.name]
-            if (promotion != null) {
-                val existingAutoPromotionProperty: AutoPromotionProperty? =
-                    propertyService.getProperty(promotion, AutoPromotionPropertyType::class.java).value
-                val autoPromotionProperty = AutoPromotionProperty(
-                    validationStamps = plConfig.validations.mapNotNull { validations[it] },
-                    promotionLevels = plConfig.promotions.mapNotNull { promotions[it] },
-                    include = plConfig.include ?: "",
-                    exclude = plConfig.exclude ?: "",
-                )
-                if (existingAutoPromotionProperty == null || existingAutoPromotionProperty != autoPromotionProperty) {
-                    propertyService.editProperty(promotion,
-                        AutoPromotionPropertyType::class.java,
-                        autoPromotionProperty)
-                }
-            }
-        }
     }
 
     private fun getOrCreateBuild(payload: WorkflowRunPayload, running: Boolean, configuration: String?): Build {

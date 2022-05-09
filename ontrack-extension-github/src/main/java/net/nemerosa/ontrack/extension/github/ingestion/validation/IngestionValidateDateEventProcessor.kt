@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.github.ingestion.validation
 import net.nemerosa.ontrack.extension.github.ingestion.processing.AbstractIngestionEventProcessor
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
-import net.nemerosa.ontrack.extension.github.ingestion.processing.job.WorkflowJobProcessingService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataTypeNotFoundException
@@ -16,7 +15,6 @@ class IngestionValidateDateEventProcessor(
     private val ingestionModelAccessService: IngestionModelAccessService,
     private val structureService: StructureService,
     private val runInfoService: RunInfoService,
-    private val workflowJobProcessingService: WorkflowJobProcessingService,
     private val validationRunStatusService: ValidationRunStatusService,
     private val validationDataTypeService: ValidationDataTypeService,
 ) : AbstractIngestionEventProcessor<GitHubIngestionValidateDataPayload>() {
@@ -50,7 +48,7 @@ class IngestionValidateDateEventProcessor(
 
     private fun validate(build: Build, input: GitHubIngestionValidateDataPayload): ValidationRun {
         // Setting up the validation stamp
-        val vs = workflowJobProcessingService.setupValidationStamp(
+        val vs = ingestionModelAccessService.setupValidationStamp(
             branch = build.branch,
             vsName = input.validation,
             vsDescription = null,

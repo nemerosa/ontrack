@@ -78,7 +78,6 @@ internal class IngestionValidateDateEventProcessorTest {
         ingestionModelAccessService = mockk(),
         structureService = mockk(),
         runInfoService = mockk(),
-        workflowJobProcessingService = mockk(),
         validationRunStatusService = mockk(),
         validationDataTypeService = mockk(),
     )

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
@@ -19,6 +20,7 @@ const val INGESTION_CONFIG_FILE_PATH = ".github/ontrack/ingestion.yml"
  * @param jobs List of specific job configurations
  * @param jobsFilter Filtering on the jobs
  * @param stepsFilter Filtering on the steps
+ * @param validations Validation stamps configuration
  * @param promotions Auto promotion configuration
  */
 @APIName("GitHubIngestionConfig")
@@ -34,6 +36,8 @@ data class IngestionConfig(
     val jobsFilter: FilterConfig = FilterConfig(),
     @APIDescription("Filtering on the steps")
     val stepsFilter: FilterConfig = FilterConfig(),
+    // @APIDescription("Validation stamps configuration")
+    // val validations: List<ValidationConfig> = emptyList(),
     @APIDescription("Auto promotion configuration")
     val promotions: List<PromotionConfig> = emptyList(),
     @APIDescription("Run validations")
@@ -136,6 +140,31 @@ data class JobConfig(
     val description: String? = null,
     @APIDescription("Must we use the job name as a prefix to the validation stamp?")
     val validationJobPrefix: Boolean? = null,
+)
+
+/**
+ * Validation stamp configuration.
+ */
+@APIName("GitHubIngestionValidationConfig")
+data class ValidationConfig(
+    @APIDescription("Unique name for the validation stamp in the branch")
+    val name: String,
+    @APIDescription("Optional description")
+    val description: String? = null,
+    @APIDescription("Data type")
+    @get:JsonProperty("data-type")
+    val dataType: ValidationTypeConfig? = null,
+)
+
+/**
+ * Data type for a validation.
+ */
+@APIName("GitHubIngestionValidationTypeConfig")
+data class ValidationTypeConfig(
+    @APIDescription("FQCN or shortcut for the data type")
+    val type: String,
+    @APIDescription("Data type configuration")
+    val config: JsonNode? = null,
 )
 
 /**

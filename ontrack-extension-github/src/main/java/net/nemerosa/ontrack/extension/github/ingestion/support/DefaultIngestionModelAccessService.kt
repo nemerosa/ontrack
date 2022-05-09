@@ -214,4 +214,56 @@ class DefaultIngestionModelAccessService(
             )
         ).firstOrNull { it.project.id == project.id }
     }
+
+    override fun setupValidationStamp(
+        branch: Branch,
+        vsName: String,
+        vsDescription: String?,
+    ): ValidationStamp {
+        val existing = structureService.findValidationStampByName(branch.project.name, branch.name, vsName).getOrNull()
+        return if (existing != null) {
+            // Adapt description if need be
+            if (vsDescription != null && vsDescription != existing.description) {
+                val adapted = existing.withDescription(vsDescription)
+                structureService.saveValidationStamp(
+                    adapted
+                )
+                adapted
+            } else {
+                // Done
+                existing
+            }
+        } else {
+            structureService.newValidationStamp(
+                ValidationStamp.of(
+                    branch,
+                    nd(vsName, vsDescription)
+                )
+            )
+        }
+    }
+
+    override fun setupPromotionLevel(branch: Branch, plName: String, plDescription: String?): PromotionLevel {
+        val existing = structureService.findPromotionLevelByName(branch.project.name, branch.name, plName).getOrNull()
+        return if (existing != null) {
+            // Adapt description if need be
+            if (plDescription != null && plDescription != existing.description) {
+                val adapted = existing.withDescription(plDescription)
+                structureService.savePromotionLevel(
+                    adapted
+                )
+                adapted
+            } else {
+                // Done
+                existing
+            }
+        } else {
+            structureService.newPromotionLevel(
+                PromotionLevel.of(
+                    branch,
+                    nd(plName, plDescription)
+                )
+            )
+        }
+    }
 }
