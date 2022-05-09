@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.validation
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+
 data class GitHubIngestionValidateDataPayload(
     val owner: String,
     val repository: String,
@@ -10,6 +12,7 @@ data class GitHubIngestionValidateDataPayload(
     val buildName: String? = null,
     val buildLabel: String? = null,
 ) {
+    @JsonIgnore
     fun getSource() = if (runId != null) {
         "$validation@run=$runId"
     } else if (buildName != null) {
