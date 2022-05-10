@@ -99,6 +99,7 @@ class ConfigParserTest {
                 stepsFilter:
                   includes: ".*"
                   excludes: ""
+                validations: []
                 promotions: []
                 runs:
                   enabled: null

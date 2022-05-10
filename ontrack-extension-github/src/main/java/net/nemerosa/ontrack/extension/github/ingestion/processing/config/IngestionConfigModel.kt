@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
@@ -36,8 +35,8 @@ data class IngestionConfig(
     val jobsFilter: FilterConfig = FilterConfig(),
     @APIDescription("Filtering on the steps")
     val stepsFilter: FilterConfig = FilterConfig(),
-    // @APIDescription("Validation stamps configuration")
-    // val validations: List<ValidationConfig> = emptyList(),
+    @APIDescription("Validation stamps configuration")
+    val validations: List<ValidationConfig> = emptyList(),
     @APIDescription("Auto promotion configuration")
     val promotions: List<PromotionConfig> = emptyList(),
     @APIDescription("Run validations")
@@ -152,7 +151,6 @@ data class ValidationConfig(
     @APIDescription("Optional description")
     val description: String? = null,
     @APIDescription("Data type")
-    @get:JsonProperty("data-type")
     val dataType: ValidationTypeConfig? = null,
 )
 
