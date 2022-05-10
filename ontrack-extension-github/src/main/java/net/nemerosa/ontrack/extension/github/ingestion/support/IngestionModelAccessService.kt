@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.support
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.IPullRequest
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.model.structure.*
@@ -69,11 +70,15 @@ interface IngestionModelAccessService {
      * @param branch Parent branch
      * @param vsName Name of the validation stamp
      * @param vsDescription Description of the validation stamp
+     * @param dataType FQCN or shortcut of the data type for this validation stamp
+     * @param dataTypeConfig JSON configuration for the data type
      */
     fun setupValidationStamp(
         branch: Branch,
         vsName: String,
-        vsDescription: String?
+        vsDescription: String?,
+        dataType: String? = null,
+        dataTypeConfig: JsonNode? = null,
     ): ValidationStamp
 
     /**
@@ -86,7 +91,7 @@ interface IngestionModelAccessService {
     fun setupPromotionLevel(
         branch: Branch,
         plName: String,
-        plDescription: String?
+        plDescription: String?,
     ): PromotionLevel
 }
 

@@ -1,7 +1,12 @@
 package net.nemerosa.ontrack.extension.github.ingestion.support
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
+import net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType
+import net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType
+import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
+import net.nemerosa.ontrack.extension.general.validation.ThresholdPercentageValidationDataType
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
@@ -30,6 +35,7 @@ class DefaultIngestionModelAccessService(
     private val propertyService: PropertyService,
     private val cachedSettingsService: CachedSettingsService,
     private val gitCommitPropertyCommitLink: GitCommitPropertyCommitLink,
+    private val validationDataTypeService: ValidationDataTypeService,
 ) : IngestionModelAccessService {
 
     override fun getOrCreateProject(repository: Repository, configuration: String?): Project {
@@ -219,12 +225,36 @@ class DefaultIngestionModelAccessService(
         branch: Branch,
         vsName: String,
         vsDescription: String?,
+        dataType: String?,
+        dataTypeConfig: JsonNode?,
     ): ValidationStamp {
+        // Data type
+        val actualDataTypeConfig: ValidationDataTypeConfig<Any>? = if (dataType != null && dataType.isNotBlank()) {
+            // Shortcut resolution
+            val dataTypeId: String = when (dataType) {
+                "test-summary" -> TestSummaryValidationDataType::class.java.name
+                "metrics" -> MetricsValidationDataType::class.java.name
+                "percentage" -> ThresholdPercentageValidationDataType::class.java.name
+                "chml" -> CHMLValidationDataType::class.java.name
+                else -> dataType
+            }
+            // Parsing of the configuration
+            validationDataTypeService.validateValidationDataTypeConfig(dataTypeId, dataTypeConfig)
+        } else {
+            null
+        }
+        // Getting the existing validation stamp
         val existing = structureService.findValidationStampByName(branch.project.name, branch.name, vsName).getOrNull()
         return if (existing != null) {
             // Adapt description if need be
             if (vsDescription != null && vsDescription != existing.description) {
-                val adapted = existing.withDescription(vsDescription)
+                val adapted = existing.withDescription(vsDescription).run {
+                    if (actualDataTypeConfig != null) {
+                        withDataType(actualDataTypeConfig)
+                    } else {
+                        this
+                    }
+                }
                 structureService.saveValidationStamp(
                     adapted
                 )
@@ -234,11 +264,18 @@ class DefaultIngestionModelAccessService(
                 existing
             }
         } else {
+            val vs = ValidationStamp.of(
+                branch,
+                nd(vsName, vsDescription),
+            ).run {
+                if (actualDataTypeConfig != null) {
+                    withDataType(actualDataTypeConfig)
+                } else {
+                    this
+                }
+            }
             structureService.newValidationStamp(
-                ValidationStamp.of(
-                    branch,
-                    nd(vsName, vsDescription)
-                )
+                vs
             )
         }
     }

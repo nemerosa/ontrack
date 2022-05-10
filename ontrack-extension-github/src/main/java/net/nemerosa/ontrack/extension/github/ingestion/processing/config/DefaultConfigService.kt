@@ -34,10 +34,24 @@ class DefaultConfigService(
         return config?.apply {
             // Storing the configuration
             store(branch)
+            // Validations
+            validations(branch, this)
             // Auto promotions
             autoPromotions(branch, this)
             // Applying Casc configuration nodes
             casc(branch, casc)
+        }
+    }
+
+    private fun validations(branch: Branch, config: IngestionConfig) {
+        config.validations.forEach { validationConfig ->
+            ingestionModelAccessService.setupValidationStamp(
+                branch = branch,
+                vsName = validationConfig.name,
+                vsDescription = validationConfig.description,
+                dataType = validationConfig.dataType?.type,
+                dataTypeConfig = validationConfig.dataType?.config,
+            )
         }
     }
 
