@@ -290,9 +290,10 @@ class DefaultIngestionModelAccessService(
         return saved
     }
 
-    override fun setupPromotionLevel(branch: Branch, plName: String, plDescription: String?): PromotionLevel {
+    override fun setupPromotionLevel(branch: Branch, plName: String, plDescription: String?, image: String?): PromotionLevel {
         val existing = structureService.findPromotionLevelByName(branch.project.name, branch.name, plName).getOrNull()
-        return if (existing != null) {
+        val imageDocument = image?.run { ingestionImageService.downloadImage(branch.project, this) }
+        val pl = if (existing != null) {
             // Adapt description if need be
             if (plDescription != null && plDescription != existing.description) {
                 val adapted = existing.withDescription(plDescription)
@@ -312,5 +313,11 @@ class DefaultIngestionModelAccessService(
                 )
             )
         }
+        // Image setup
+        if (imageDocument != null) {
+            structureService.setPromotionLevelImage(pl.id, imageDocument)
+        }
+        // OK
+        return pl
     }
 }

@@ -89,11 +89,13 @@ interface IngestionModelAccessService {
      * @param branch Parent branch
      * @param plName Name of the promotion level
      * @param plDescription Description of the promotion level
+     * @param image Image reference
      */
     fun setupPromotionLevel(
         branch: Branch,
         plName: String,
         plDescription: String?,
+        image: String? = null,
     ): PromotionLevel
 }
 

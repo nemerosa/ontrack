@@ -66,7 +66,8 @@ class DefaultConfigService(
             plConfig.name to ingestionModelAccessService.setupPromotionLevel(
                 branch,
                 plConfig.name,
-                plConfig.description
+                plConfig.description,
+                plConfig.image,
             )
         }
         // Configuring all promotions - second pass
