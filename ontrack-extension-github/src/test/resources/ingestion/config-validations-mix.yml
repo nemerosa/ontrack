@@ -1,0 +1,21 @@
+validations:
+  - name: unit-tests
+    description: Running all unit tests
+    dataType:
+      type: test-summary
+      config:
+        warningIfSkipped: true
+  - name: e2e-tests
+    description: All end-to-end tests
+  - name: sonarqube
+    description: Sonarqube scan
+promotions:
+  - name: IRON
+    validations:
+      - unit-tests
+      - e2e-tests
+  - name: SILVER
+    validations:
+      - sonarqube
+    promotions:
+      - IRON

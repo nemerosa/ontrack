@@ -1,0 +1,11 @@
+validations:
+  - name: unit-tests
+    description: Running all unit tests
+    dataType:
+      type: test-summary
+      config:
+        warningIfSkipped: true
+  - name: e2e-tests
+    description: All end-to-end tests
+  - name: sonarqube
+    description: Sonarqube scan
