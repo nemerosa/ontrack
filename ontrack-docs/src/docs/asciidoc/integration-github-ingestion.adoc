@@ -262,6 +262,13 @@ To configure auto-promotions:
 
 [source,yaml]
 ----
+validations:
+  - name: unit-tests
+    description: Running all unit tests
+    dataType:
+      type: test-summary
+      config:
+        warningIfSkipped: true
 promotions:
   - name: BRONZE
     description: Basic build is OK.
@@ -276,6 +283,48 @@ promotions:
     promotions:
       - BRONZE
 ----
+
+[[integration-github-ingestion-customization-validations]]
+===== Validation stamps
+
+Validation stamps can be defined using the `validations` list.
+
+Each validation stamp can be associated with a name and an optional description.
+
+Additionally, a data type can be set. The FQCN of the data type can be used but most common types have also shortcuts. Therefore, the following declarations are equivalent:
+
+[source,yaml]
+----
+validations:
+  - name: unit-tests
+    description: Running all unit tests
+    dataType:
+      type: test-summary
+      config:
+        warningIfSkipped: true
+----
+
+and
+
+[source,yaml]
+----
+validations:
+  - name: unit-tests
+    description: Running all unit tests
+    dataType:
+      type: net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
+      config:
+        warningIfSkipped: true
+----
+
+The following shortcuts are supported:
+
+* `test-summary`
+* `metrics`
+* `percentage`
+* `chml`
+
+See <<validation-runs-data>> for more information.
 
 [[integration-github-ingestion-customization-casc]]
 ===== Configuration as code for projects and branches
