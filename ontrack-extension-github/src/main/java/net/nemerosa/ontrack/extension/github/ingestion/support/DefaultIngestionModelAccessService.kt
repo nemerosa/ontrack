@@ -10,7 +10,6 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.IPullRequest
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.getProjectName
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
@@ -122,7 +121,8 @@ class DefaultIngestionModelAccessService(
         } else if (headBranch.startsWith(REFS_TAGS_PREFIX)) {
             error("Creating branch from tag is not supported: $headBranch")
         } else {
-            normalizeName(headBranch) to headBranch
+            val branchName = NameDescription.escapeName(headBranch).take(Branch.NAME_MAX_LENGTH)
+            branchName to headBranch
         }
         val branch = structureService.findBranchByName(project.name, branchName)
             .getOrNull()

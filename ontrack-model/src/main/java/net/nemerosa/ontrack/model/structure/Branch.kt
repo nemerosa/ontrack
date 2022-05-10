@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonView
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.YesNo
+import javax.validation.constraints.Size
 
 /**
  * Representation of a branch inside a [Project]. They are usually associated
@@ -12,6 +13,7 @@ import net.nemerosa.ontrack.model.form.YesNo
  */
 data class Branch(
         override val id: ID,
+        @Size(max = NAME_MAX_LENGTH)
         val name: String,
         override val description: String?,
         @JsonProperty("disabled")
@@ -35,6 +37,11 @@ data class Branch(
     fun withSignature(signature: Signature) = Branch(id, name, description, isDisabled, project, signature)
 
     companion object {
+
+        /**
+         * Maximum length for the name of a branch.
+         */
+        const val NAME_MAX_LENGTH = 120
 
         @JvmStatic
         fun of(project: Project, nameDescription: NameDescription) =

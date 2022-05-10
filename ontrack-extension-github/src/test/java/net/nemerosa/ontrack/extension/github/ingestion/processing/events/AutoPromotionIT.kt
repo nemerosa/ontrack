@@ -3,13 +3,14 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.events
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
-import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
+import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import kotlin.test.assertEquals
@@ -21,10 +22,13 @@ import kotlin.test.fail
  * Testing the auto promotion setup.
  */
 @ContextConfiguration(classes = [ConfigLoaderServiceITMockConfig::class])
-class AutoPromotionIT : AbstractIngestionTestJUnit4Support() {
+class AutoPromotionIT : AbstractIngestionTestSupport() {
 
     @Autowired
     private lateinit var configLoaderService: ConfigLoaderService
+
+    @Autowired
+    private lateinit var configService: ConfigService
 
     @Autowired
     private lateinit var workflowRunIngestionEventProcessor: WorkflowRunIngestionEventProcessor
@@ -39,6 +43,10 @@ class AutoPromotionIT : AbstractIngestionTestJUnit4Support() {
     fun `Auto promotion`() {
         // Only one GitHub configuration
         onlyOneGitHubConfig()
+        // Branch
+        val branch = project<Branch> {
+            branch()
+        }
         // Auto promotion setup to be loaded for the repository
         ConfigLoaderServiceITMockConfig.customIngestionConfig(
             configLoaderService,
@@ -58,42 +66,44 @@ class AutoPromotionIT : AbstractIngestionTestJUnit4Support() {
         )
         asAdmin {
             // Starting the run
-            startRun()
+            startRun(branch)
             // Checks that validations & promotions are created, and that auto promotion is set up
-            checkValidationStamps()
-            checkPromotionLevels()
+            checkValidationStamps(branch)
+            checkPromotionLevels(branch)
             // Job runs for the 'BRONZE' level
-            runJobs("build", "unit-test")
+            runJobs(branch, "build", "unit-test")
             // Checks that 'BRONZE' has been granted
-            checkValidations("$job-build", "$job-unit-test")
-            checkPromotion("BRONZE")
+            checkValidations(branch, "$job-build", "$job-unit-test")
+            checkPromotion(branch, "BRONZE")
             // Job runs for the 'SILVER' level
-            runJobs("integration-test")
+            runJobs(branch, "integration-test")
             // Checks that 'SILVER' has been granted
-            checkValidations("$job-integration-test")
-            checkPromotion("SILVER")
+            checkValidations(branch, "$job-integration-test")
+            checkPromotion(branch, "SILVER")
         }
     }
 
-    private fun startRun() {
+    private fun startRun(branch: Branch) {
+        configService.loadAndSaveConfig(branch, INGESTION_CONFIG_FILE_PATH)
         workflowRunIngestionEventProcessor.process(
-            IngestionHookFixtures.sampleWorkflowRunPayload(), null
+            IngestionHookFixtures.sampleWorkflowRunPayload(
+                repoName = branch.project.name,
+                headBranch = branch.name,
+            ), null
         )
     }
 
-    private fun checkValidationStamps() {
-        val build = getBuild()
+    private fun checkValidationStamps(branch: Branch) {
         listOf("build", "unit-test", "integration-test").forEach { vsName ->
             val vs =
-                structureService.findValidationStampByName(build.project.name, build.branch.name, "$job-$vsName").getOrNull()
+                structureService.findValidationStampByName(branch.project.name, branch.name, "$job-$vsName").getOrNull()
             assertNotNull(vs, "Validation stamp $job-$vsName has been created.")
         }
     }
 
-    private fun checkPromotionLevels() {
-        val build = getBuild()
+    private fun checkPromotionLevels(branch: Branch) {
         assertNotNull(
-            structureService.findPromotionLevelByName(build.project.name, build.branch.name, "BRONZE")
+            structureService.findPromotionLevelByName(branch.project.name, branch.name, "BRONZE")
                 .getOrNull()
         ) { pl ->
             assertNotNull(getProperty(pl, AutoPromotionPropertyType::class.java)) { property ->
@@ -105,7 +115,7 @@ class AutoPromotionIT : AbstractIngestionTestJUnit4Support() {
             }
         }
         assertNotNull(
-            structureService.findPromotionLevelByName(build.project.name, build.branch.name, "SILVER")
+            structureService.findPromotionLevelByName(branch.project.name, branch.name, "SILVER")
                 .getOrNull()
         ) { pl ->
             assertNotNull(getProperty(pl, AutoPromotionPropertyType::class.java)) { property ->
@@ -121,7 +131,7 @@ class AutoPromotionIT : AbstractIngestionTestJUnit4Support() {
         }
     }
 
-    private fun runJobs(vararg validations: String) {
+    private fun runJobs(branch: Branch, vararg validations: String) {
         workflowJobIngestionEventProcessor.process(
             WorkflowJobPayload(
                 action = WorkflowJobAction.in_progress,
@@ -145,16 +155,16 @@ class AutoPromotionIT : AbstractIngestionTestJUnit4Support() {
                     },
                     htmlUrl = "",
                 ),
-                repository = IngestionHookFixtures.sampleRepository(),
+                repository = IngestionHookFixtures.sampleRepository(repoName = branch.project.name),
             ),
             null
         )
     }
 
-    private fun checkValidations(vararg validations: String) {
-        val build = getBuild()
+    private fun checkValidations(branch: Branch, vararg validations: String) {
+        val build = getBuild(branch)
         validations.forEach { validation ->
-            val vs = structureService.findValidationStampByName(build.project.name, build.branch.name, validation)
+            val vs = structureService.findValidationStampByName(branch.project.name, branch.name, validation)
                 .getOrNull()
                 ?: fail("Cannot find validation $validation")
             val runs = structureService.getValidationRunsForBuildAndValidationStamp(
@@ -170,8 +180,8 @@ class AutoPromotionIT : AbstractIngestionTestJUnit4Support() {
         }
     }
 
-    private fun checkPromotion(promotion: String) {
-        val build = getBuild()
+    private fun checkPromotion(branch: Branch, promotion: String) {
+        val build = getBuild(branch)
         val pl = structureService.findPromotionLevelByName(build.project.name, build.branch.name, promotion)
             .getOrNull()
             ?: fail("Cannot find promotion $promotion")
@@ -179,12 +189,12 @@ class AutoPromotionIT : AbstractIngestionTestJUnit4Support() {
         assertTrue(runs.isNotEmpty(), "Build has been promoted to $promotion")
     }
 
-    private fun getBuild() =
+    private fun getBuild(branch: Branch) =
         structureService.findBuildByName(
-            IngestionHookFixtures.sampleRepository,
-            IngestionHookFixtures.sampleBranch,
+            branch.project.name,
+            branch.name,
             buildName
-        ).getOrNull() ?: fail("Cannot find the created build")
+        ).getOrNull() ?: fail("Cannot find the created build $buildName")
 
     private val buildName: String = "${IngestionHookFixtures.sampleRunName}-1".lowercase()
 
