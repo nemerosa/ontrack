@@ -24,6 +24,15 @@ fun <T> Optional<T>.getOrNull(): T? = orElse(null)
  * Converts a POJO as a map, using properties as index.
  */
 fun <T : Any> T.asMap(vararg properties: KCallable<Any?>): Map<String, Any?> =
-        properties.associate { property ->
-            property.name to property.call()
-        }
+    properties.associate { property ->
+        property.name to property.call()
+    }
+
+/**
+ * Runs the code if the condition is met.
+ */
+fun <T> T.runIf(condition: Boolean, code: T.() -> T) = if (condition) {
+    code(this)
+} else {
+    this
+}

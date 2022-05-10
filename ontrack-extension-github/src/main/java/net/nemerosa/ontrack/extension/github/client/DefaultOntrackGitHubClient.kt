@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.github.client
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.BaseException
+import net.nemerosa.ontrack.common.runIf
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.model.*
@@ -447,7 +448,7 @@ class DefaultOntrackGitHubClient(
         }
     }
 
-    override fun getFileContent(repository: String, branch: String, path: String): ByteArray? {
+    override fun getFileContent(repository: String, branch: String?, path: String): ByteArray? {
         // Logging
         logger.debug("[github] Getting file content {}/{}@{}", repository, path, branch)
         // Getting a client
@@ -456,8 +457,11 @@ class DefaultOntrackGitHubClient(
         val (owner, name) = getRepositoryParts(repository)
         // Gets the issue
         return try {
+            val restPath = "/repos/$owner/$name/contents/$path".runIf(branch != null) {
+                "$this?ref=$branch"
+            }
             client("Get file content $repository/$path@$branch") {
-                getForObject<JsonNode>("/repos/$owner/$name/contents/$path?ref=$branch").let {
+                getForObject<JsonNode>(restPath).let {
                     val encodedContent = it.getRequiredTextField("content")
                     Base64.decodeBase64(encodedContent)
                 }

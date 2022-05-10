@@ -36,6 +36,7 @@ class DefaultIngestionModelAccessService(
     private val cachedSettingsService: CachedSettingsService,
     private val gitCommitPropertyCommitLink: GitCommitPropertyCommitLink,
     private val validationDataTypeService: ValidationDataTypeService,
+    private val ingestionImageService: IngestionImageService,
 ) : IngestionModelAccessService {
 
     override fun getOrCreateProject(repository: Repository, configuration: String?): Project {
@@ -227,6 +228,7 @@ class DefaultIngestionModelAccessService(
         vsDescription: String?,
         dataType: String?,
         dataTypeConfig: JsonNode?,
+        image: String?,
     ): ValidationStamp {
         // Data type
         val actualDataTypeConfig: ValidationDataTypeConfig<Any>? = if (dataType != null && dataType.isNotBlank()) {
@@ -243,9 +245,11 @@ class DefaultIngestionModelAccessService(
         } else {
             null
         }
+        // Image
+        val imageDocument = image?.run { ingestionImageService.downloadImage(branch.project, this) }
         // Getting the existing validation stamp
         val existing = structureService.findValidationStampByName(branch.project.name, branch.name, vsName).getOrNull()
-        return if (existing != null) {
+        val saved = if (existing != null) {
             // Adapt description if need be
             if (vsDescription != null && vsDescription != existing.description) {
                 val adapted = existing.withDescription(vsDescription).run {
@@ -278,6 +282,12 @@ class DefaultIngestionModelAccessService(
                 vs
             )
         }
+        // Image setup
+        if (imageDocument != null) {
+            structureService.setValidationStampImage(saved.id, imageDocument)
+        }
+        // OK
+        return saved
     }
 
     override fun setupPromotionLevel(branch: Branch, plName: String, plDescription: String?): PromotionLevel {

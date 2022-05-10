@@ -72,6 +72,7 @@ interface IngestionModelAccessService {
      * @param vsDescription Description of the validation stamp
      * @param dataType FQCN or shortcut of the data type for this validation stamp
      * @param dataTypeConfig JSON configuration for the data type
+     * @param image Image reference
      */
     fun setupValidationStamp(
         branch: Branch,
@@ -79,6 +80,7 @@ interface IngestionModelAccessService {
         vsDescription: String?,
         dataType: String? = null,
         dataTypeConfig: JsonNode? = null,
+        image: String? = null,
     ): ValidationStamp
 
     /**

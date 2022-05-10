@@ -152,6 +152,8 @@ data class ValidationConfig(
     val description: String? = null,
     @APIDescription("Data type")
     val dataType: ValidationTypeConfig? = null,
+    @APIDescription("Reference to the image to set")
+    val image: String? = null,
 )
 
 /**
@@ -184,6 +186,8 @@ data class PromotionConfig(
     val include: String? = null,
     @APIDescription("Regular expression to exclude validation stamps by name")
     val exclude: String? = null,
+    @APIDescription("Reference to the image to set")
+    val image: String? = null,
 )
 
 /**

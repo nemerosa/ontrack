@@ -51,6 +51,7 @@ class DefaultConfigService(
                 vsDescription = validationConfig.description,
                 dataType = validationConfig.dataType?.type,
                 dataTypeConfig = validationConfig.dataType?.config,
+                image = validationConfig.image,
             )
         }
     }
