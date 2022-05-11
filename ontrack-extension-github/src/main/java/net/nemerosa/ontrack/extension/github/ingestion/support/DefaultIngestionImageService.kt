@@ -17,13 +17,10 @@ class DefaultIngestionImageService(
 ) : IngestionImageService {
 
     override fun downloadImage(project: Project, ref: String): Document {
-        val protocol = ref.substringBefore(":")
-            .takeIf { it.isNotBlank() }
-            ?: "github"
-        val path = ref.substringAfter(":")
-        return when (protocol) {
-            "github" -> downloadFromGitHub(project, path)
-            else -> throw IngestionImageProtocolUnsupportedException(protocol, ref)
+        val parsedRef = IngestionImageRefParser.parseRef(ref)
+        return when (parsedRef.protocol) {
+            "github" -> downloadFromGitHub(project, parsedRef.path)
+            else -> throw IngestionImageProtocolUnsupportedException(parsedRef.protocol, ref)
         }
     }
 

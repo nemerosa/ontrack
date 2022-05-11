@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.test.getOptionalEnv
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIf
 
-class GitHubTestEnv(
+data class GitHubTestEnv(
     val user: String,
     val token: String,
     val organization: String,
@@ -20,9 +20,18 @@ class GitHubTestEnv(
     val appInstallationAccountName: String?,
     val branch: String,
     val readme: String,
+    val paths: GitHubTestEnvKnownPaths,
 ) {
     val fullRepository: String = "$organization/$repository"
 }
+
+data class GitHubTestEnvKnownPaths(
+    val images: GitHubTestEnvKnownImagesPaths,
+)
+
+data class GitHubTestEnvKnownImagesPaths(
+    val validation: String,
+)
 
 /**
  * Actual environment for system tests.
@@ -41,6 +50,11 @@ val githubTestEnv: GitHubTestEnv by lazy {
         appInstallationAccountName = getOptionalEnv("ontrack.test.extension.github.app.installation"),
         branch = getOptionalEnv("ontrack.test.extension.github.branch.name") ?: "main",
         readme = getOptionalEnv("ontrack.test.extension.github.branch.readme") ?: "README.md",
+        paths = GitHubTestEnvKnownPaths(
+            images = GitHubTestEnvKnownImagesPaths(
+                validation = getEnv("ontrack.test.extension.github.paths.images.validation"),
+            ),
+        ),
     )
 }
 
@@ -67,8 +81,11 @@ fun githubTestConfigReal(name: String = TestUtils.uid("C")) = githubTestEnv.run 
 annotation class TestOnGitHub
 
 /**
- * Testing if the environment is set for testing against GitHub
+ * Testing if the environment is set for testing against GitHub.
+ *
+ * Used by [TestOnGitHub].
  */
+@Suppress("unused")
 class TestOnGitHubCondition {
 
     companion object {
