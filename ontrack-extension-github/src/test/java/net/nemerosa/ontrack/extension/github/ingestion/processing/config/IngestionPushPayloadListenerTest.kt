@@ -140,4 +140,16 @@ class IngestionPushPayloadListenerTest {
         )
     }
 
+    @Test
+    fun `Ignoring check for tags`() {
+        val payload = IngestionHookFixtures.samplePushPayload(
+            ref = "refs/tags/v0.1.0",
+            added = listOf(INGESTION_CONFIG_FILE_PATH),
+        )
+        assertEquals(
+            PushPayloadListenerCheck.IGNORED,
+            listener.preProcessCheck(payload)
+        )
+    }
+
 }

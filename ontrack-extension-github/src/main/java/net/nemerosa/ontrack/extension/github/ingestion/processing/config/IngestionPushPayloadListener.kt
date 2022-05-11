@@ -14,7 +14,9 @@ class IngestionPushPayloadListener(
 ) : PushPayloadListener {
 
     override fun preProcessCheck(payload: PushPayload): PushPayloadListenerCheck =
-        if (payload.isAddedOrModified(INGESTION_CONFIG_FILE_PATH) || payload.isRemoved(INGESTION_CONFIG_FILE_PATH)) {
+        if (payload.getTag() != null) {
+            PushPayloadListenerCheck.IGNORED
+        } else if (payload.isAddedOrModified(INGESTION_CONFIG_FILE_PATH) || payload.isRemoved(INGESTION_CONFIG_FILE_PATH)) {
             PushPayloadListenerCheck.TO_BE_PROCESSED
         } else {
             PushPayloadListenerCheck.IGNORED
