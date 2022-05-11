@@ -1,0 +1,4 @@
+validations:
+  - name: site
+    description: Site generation
+    image: #path

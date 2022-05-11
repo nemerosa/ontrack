@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationConfig
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
+import net.nemerosa.ontrack.extension.github.TestOnGitHub
+import net.nemerosa.ontrack.extension.github.githubTestEnv
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.model.structure.Branch
@@ -18,10 +20,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 @ContextConfiguration(classes = [ConfigLoaderServiceITMockConfig::class])
 class ConfigServiceIT : AbstractIngestionTestSupport() {
@@ -86,6 +85,56 @@ class ConfigServiceIT : AbstractIngestionTestSupport() {
                 INGESTION_CONFIG_FILE_PATH
             )
             assertEquals(IngestionConfig(), loaded, "Loaded configuration is the default configuration")
+        }
+    }
+
+    @Test
+    @TestOnGitHub
+    fun `Ingestion of validation stamp image`() {
+        asAdmin {
+            project {
+                gitHubRealConfig()
+                branch {
+                    withConfigFile(
+                        "/ingestion/config-validations-image.yml",
+                        mapOf(
+                            "#path" to "${githubTestEnv.organization}/${githubTestEnv.repository}/${githubTestEnv.paths.images.validation}"
+                        )
+                    ) {
+                        checkValidationStampExists(this, "site") { vs ->
+                            assertTrue(vs.isImage, "Image has been created for the validation stamp")
+                            val image = structureService.getValidationStampImage(vs.id)
+                            assertFalse(image.isEmpty, "Image has some content")
+                            assertEquals("image/png", image.type)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    @TestOnGitHub
+    fun `Ingestion of promotion level image`() {
+        asAdmin {
+            project {
+                gitHubRealConfig()
+                branch {
+                    withConfigFile(
+                        "/ingestion/config-promotions-image.yml",
+                        mapOf(
+                            "#path" to "${githubTestEnv.organization}/${githubTestEnv.repository}/${githubTestEnv.paths.images.promotion}"
+                        )
+                    ) {
+                        checkPromotionLevelExists(this, "iron") { pl ->
+                            assertTrue(pl.isImage, "Image has been created for the promotion level")
+                            val image = structureService.getPromotionLevelImage(pl.id)
+                            assertFalse(image.isEmpty, "Image has some content")
+                            assertEquals("image/png", image.type)
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -257,8 +306,12 @@ class ConfigServiceIT : AbstractIngestionTestSupport() {
         }
     }
 
-    fun Branch.withConfigFile(path: String, code: () -> Unit) {
-        val yaml = TestUtils.resourceString(path)
+    fun Branch.withConfigFile(path: String, replacements: Map<String,String> = emptyMap(), code: () -> Unit) {
+        val yaml = TestUtils.resourceString(path).run {
+            replacements.entries.fold(this) { acc, (token, replacement) ->
+                acc.replace(token, replacement)
+            }
+        }
         val config = ConfigParser.parseYaml(yaml)
         every {
             configLoaderService.loadConfig(

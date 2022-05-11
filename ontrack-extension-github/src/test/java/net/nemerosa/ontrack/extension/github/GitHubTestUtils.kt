@@ -31,6 +31,7 @@ data class GitHubTestEnvKnownPaths(
 
 data class GitHubTestEnvKnownImagesPaths(
     val validation: String,
+    val promotion: String,
 )
 
 /**
@@ -53,6 +54,7 @@ val githubTestEnv: GitHubTestEnv by lazy {
         paths = GitHubTestEnvKnownPaths(
             images = GitHubTestEnvKnownImagesPaths(
                 validation = getEnv("ontrack.test.extension.github.paths.images.validation"),
+                promotion = getEnv("ontrack.test.extension.github.paths.images.promotion"),
             ),
         ),
     )

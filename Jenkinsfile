@@ -76,6 +76,8 @@ pipeline {
                 ONTRACK_TEST_EXTENSION_GITHUB_APP_ID = '143291'
                 ONTRACK_TEST_EXTENSION_GITHUB_APP_PEM = credentials('ONTRACK_TEST_EXTENSION_GITHUB_APP_PEM')
                 ONTRACK_TEST_EXTENSION_GITHUB_APP_INSTALLATION = 'nemerosa'
+                ONTRACK_TEST_EXTENSION_GITHUB_PATHS_IMAGES_PROMOTION = 'images/iron.png'
+                ONTRACK_TEST_EXTENSION_GITHUB_PATHS_IMAGES_VALIDATION = 'images/site.png'
             }
             steps {
                 sh ''' ./gradlew clean versionDisplay versionFile --no-daemon'''
