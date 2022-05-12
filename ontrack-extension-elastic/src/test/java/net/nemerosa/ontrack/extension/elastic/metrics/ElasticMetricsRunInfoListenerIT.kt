@@ -19,9 +19,6 @@ class ElasticMetricsRunInfoListenerIT : AbstractDSLTestSupport() {
     @Autowired
     private lateinit var elasticMetricsClient: ElasticMetricsClient
 
-    @Autowired
-    private lateinit var runInfoService: RunInfoService
-
     @Test
     fun `Export of run info for a build`() {
         project {

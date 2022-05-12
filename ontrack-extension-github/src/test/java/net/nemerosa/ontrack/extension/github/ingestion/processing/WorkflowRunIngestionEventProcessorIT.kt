@@ -36,9 +36,6 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
     private lateinit var buildGitHubWorkflowRunDecorator: BuildGitHubWorkflowRunDecorator
 
     @Autowired
-    private lateinit var runInfoService: RunInfoService
-
-    @Autowired
     private lateinit var configLoaderService: ConfigLoaderService
 
     @BeforeEach

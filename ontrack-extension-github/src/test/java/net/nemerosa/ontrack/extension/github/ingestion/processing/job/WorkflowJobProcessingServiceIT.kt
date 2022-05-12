@@ -27,9 +27,6 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
     private lateinit var workflowJobProcessingService: WorkflowJobProcessingService
 
     @Autowired
-    private lateinit var runInfoService: RunInfoService
-
-    @Autowired
     private lateinit var configLoaderService: ConfigLoaderService
 
     @BeforeEach
