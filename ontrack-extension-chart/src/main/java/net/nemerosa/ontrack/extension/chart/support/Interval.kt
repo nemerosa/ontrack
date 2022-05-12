@@ -8,6 +8,22 @@ data class Interval(
     val start: LocalDateTime,
     val end: LocalDateTime,
 ) {
+
+    fun split(intervalPeriod: IntervalPeriod): List<Interval> {
+        check(start < end) { "Start must be < end" }
+        val result = mutableListOf<Interval>()
+        var start = this.start
+        while (start < this.end) {
+            val end = intervalPeriod.addTo(start)
+            result += Interval(start, end)
+            start = end
+        }
+        return result
+    }
+
+    operator fun contains(timestamp: LocalDateTime): Boolean =
+        timestamp >= start && timestamp < end
+
     companion object {
 
         private val fixed = "(\\d+)([dwmy])".toRegex()

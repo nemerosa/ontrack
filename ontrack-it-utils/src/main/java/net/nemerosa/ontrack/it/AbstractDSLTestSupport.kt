@@ -44,6 +44,9 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     @Autowired
     protected lateinit var predefinedValidationStampService: PredefinedValidationStampService
 
+    @Autowired
+    protected lateinit var runInfoService: RunInfoService
+
     /**
      * Kotlin friendly
      */
@@ -240,6 +243,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             validationRunStatusID: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED,
             description: String? = null,
             signature: Signature? = null,
+            duration: Int? = null,
             code: ValidationRun.() -> Unit = {}
     ): ValidationRun {
         return this.validateWithData<Any>(
@@ -247,6 +251,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                 validationRunStatusID = validationRunStatusID,
                 description = description,
                 signature = signature,
+                duration = duration,
         ).apply {
             code()
         }
@@ -279,9 +284,10 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             validationRunData: T? = null,
             description: String? = null,
             signature: Signature? = null,
+            duration: Int? = null,
     ): ValidationRun {
         return asUser().withView(this).with(this, ValidationRunCreate::class.java).call {
-            structureService.newValidationRun(
+            val run = structureService.newValidationRun(
                     this,
                     ValidationRunRequest(
                             validationStampName = validationStampName,
@@ -292,6 +298,14 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                             signature = signature,
                     )
             )
+            // Run info duration
+            if (duration != null) {
+                runInfoService.setRunInfo(run, RunInfoInput(
+                    runTime = duration,
+                ))
+            }
+            // OK
+            run
         }
     }
 
