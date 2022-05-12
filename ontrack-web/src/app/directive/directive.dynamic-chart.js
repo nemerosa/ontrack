@@ -9,12 +9,17 @@ angular.module('ot.directive.dynamic-chart', [
                 // Function which sets up the chart options
                 // It must return a promise
                 options: '&',
+                // Chart options
+                chartOptions: '=',
             },
             link: (scope, element, attr) => {
                 const chart = echarts.init(element[0]);
 
+                let loaded = false;
+
                 // Loading the data
                 const loadData = (chart) => {
+                    console.log("chartOptions(load) = ", scope.chartOptions);
                     chart.showLoading('default', { text: 'Loading data...' });
                     scope.options().then(options => {
                         options = options || {};
@@ -26,8 +31,22 @@ angular.module('ot.directive.dynamic-chart', [
                         } else {
                             chart.showLoading('default', options.errorMsg || { text: 'No data' });
                         }
+                        loaded = true;
                     });
                 };
+
+                // Watching the general chart options
+                scope.$watch("chartOptions", (newVal, oldVal) => {
+                    if (scope.chartOptions) {
+                        console.log("chartOptions = ", scope.chartOptions);
+                        console.log("chartOptions(new) = ", newVal);
+                        console.log("chartOptions(old) = ", oldVal);
+                        console.log("loaded = ", loaded);
+                        if (loaded) {
+                            loadData(chart);
+                        }
+                    }
+                }, /* objectEquality */ true);
 
                 // Loads the data on first call
                 loadData(chart);

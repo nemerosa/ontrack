@@ -38,6 +38,7 @@ const ontrack = angular.module('ontrack', [
         'ot.service.graphql',
         'ot.service.label',
         'ot.service.search',
+        'ot.service.chart',
         // Views
         'ot.view.home',
         'ot.view.search',

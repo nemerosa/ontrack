@@ -2,7 +2,8 @@ angular.module('ot.view.validationStamp', [
     'ui.router',
     'ot.service.core',
     'ot.service.structure',
-    'ot.service.graphql'
+    'ot.service.graphql',
+    'ot.service.chart'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('validationStamp', {
@@ -11,7 +12,7 @@ angular.module('ot.view.validationStamp', [
             controller: 'ValidationStampCtrl'
         });
     })
-    .controller('ValidationStampCtrl', function ($q, $state, $scope, $stateParams, $http, ot, otStructureService, otAlertService, otGraphqlService) {
+    .controller('ValidationStampCtrl', function ($q, $state, $scope, $stateParams, $http, ot, otChartService, otStructureService, otAlertService, otGraphqlService) {
         const view = ot.view();
         let viewInitialised = false;
         // ValidationStamp's id
@@ -245,6 +246,13 @@ angular.module('ot.view.validationStamp', [
             }
         };
 
+        // General chart options
+        $scope.chartOptions = {
+            interval: '1y',
+            period: '1w'
+        };
+        $scope.chartOptionsCount = 0;
+
         // Duration graph
         $scope.durationOptions = () => {
             // Graph data to inject into the options
@@ -314,7 +322,7 @@ angular.module('ot.view.validationStamp', [
                         data: chartData.data.mean
                     },
                     {
-                        name: '90th Percentile',
+                        name: '90th percentile',
                         type: 'line',
                         tooltip: {
                             valueFormatter: function (value) {
@@ -341,8 +349,8 @@ angular.module('ot.view.validationStamp', [
                     getChart(input: {
                         name: "validation-stamp-durations",
                         options: {
-                            period: "1w",
-                            interval: "1y"
+                            interval: "${$scope.chartOptions.interval}",
+                            period: "${$scope.chartOptions.period}"
                         },
                         parameters: {
                             id: ${validationStampId},
@@ -434,8 +442,8 @@ angular.module('ot.view.validationStamp', [
                     getChart(input: {
                         name: "validation-stamp-stability",
                         options: {
-                            period: "1w",
-                            interval: "1y"
+                            interval: "${$scope.chartOptions.interval}",
+                            period: "${$scope.chartOptions.period}"
                         },
                         parameters: {
                             id: ${validationStampId},
@@ -453,6 +461,15 @@ angular.module('ot.view.validationStamp', [
 
                 return options;
             });
+        };
+
+        // Chart options
+        $scope.validationStampChartSettings = () => {
+            // TODO Dialog to set the options, call otChartService
+            $scope.chartOptionsCount++;
+            $scope.chartOptions.interval = `${$scope.chartOptionsCount}m`;
+            $scope.chartOptions.period = '1m';
+            console.log("chartOptions(changed) = ", $scope.chartOptions);
         };
 
     })
