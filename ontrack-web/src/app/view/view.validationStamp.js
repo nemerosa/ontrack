@@ -245,104 +245,136 @@ angular.module('ot.view.validationStamp', [
             }
         };
 
+        // Graph data to inject into the options
+        const chartData = {
+            categories: [],
+            dates: [],
+            data: {
+                mean: [],
+                percentile90: [],
+                maximum: []
+            }
+        };
+
+        // Base options
+        const options = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    crossStyle: {
+                        color: '#999'
+                    }
+                }
+            },
+            toolbox: {
+                feature: {
+                    dataView: { show: true, readOnly: true },
+                    // magicType: { show: true, type: ['line', 'bar'] },
+                    // restore: { show: true },
+                    saveAsImage: { show: true }
+                }
+            },
+            legend: {
+                data: chartData.categories
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    data: chartData.dates,
+                    axisPointer: {
+                        type: 'shadow'
+                    },
+                    axisLabel: {
+                        rotate: 45
+                    }
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    name: 'Duration',
+                    min: 0,
+                    max: 250,
+                    interval: 50,
+                    axisLabel: {
+                        formatter: '{value} s'
+                    }
+                }
+            ],
+            series: [
+                {
+                    name: 'Mean',
+                    type: 'bar',
+                    tooltip: {
+                        valueFormatter: function (value) {
+                            return value + ' s';
+                        }
+                    },
+                    data: chartData.data.mean
+                },
+                {
+                    name: '90th Percentile',
+                    type: 'line',
+                    tooltip: {
+                        valueFormatter: function (value) {
+                            return value + ' s';
+                        }
+                    },
+                    data: chartData.data.percentile90
+                },
+                {
+                    name: 'Maximum',
+                    type: 'line',
+                    tooltip: {
+                        valueFormatter: function (value) {
+                            return value + ' s';
+                        }
+                    },
+                    data: chartData.data.maximum
+                }
+            ]
+        };
+
         // Duration graph
         $scope.durationOptions = () => {
             const d = $q.defer();
-            d.resolve({
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'cross',
-                        crossStyle: {
-                            color: '#999'
-                        }
-                    }
-                },
-                toolbox: {
-                    feature: {
-                        dataView: { show: true, readOnly: true },
-                        // magicType: { show: true, type: ['line', 'bar'] },
-                        // restore: { show: true },
-                        saveAsImage: { show: true }
-                    }
-                },
-                legend: {
-                    data: ['Mean', '90th Percentile', 'Maximum']
-                },
-                xAxis: [
-                    {
-                        type: 'category',
-                        data: [
-                            '2022-02-28',
-                            '2022-03-07',
-                            '2022-03-14',
-                            '2022-03-21',
-                            '2022-03-28',
-                            '2022-04-04',
-                            '2022-04-11',
-                            '2022-04-18',
-                            '2022-04-25',
-                            '2022-05-02',
-                            '2022-05-09',
-                            '2022-05-16'
-                        ],
-                        axisPointer: {
-                            type: 'shadow'
-                        },
-                        axisLabel: {
-                            rotate: 45
-                        }
-                    }
-                ],
-                yAxis: [
-                    {
-                        type: 'value',
-                        name: 'Duration',
-                        min: 0,
-                        max: 250,
-                        interval: 50,
-                        axisLabel: {
-                            formatter: '{value} s'
-                        }
-                    }
-                ],
-                series: [
-                    {
-                        name: 'Mean',
-                        type: 'bar',
-                        tooltip: {
-                            valueFormatter: function (value) {
-                                return value + ' s';
-                            }
-                        },
-                        data: [
-                            2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
-                        ]
-                    },
-                    {
-                        name: '90th Percentile',
-                        type: 'line',
-                        tooltip: {
-                            valueFormatter: function (value) {
-                                return value + ' s';
-                            }
-                        },
-                        data: [
-                            2.6, 5.9, 9.0, 26.4, 28.7, 78.7, 175.6, 182.2, 48.7, 24.8, 7.0, 5.3
-                        ]
-                    },
-                    {
-                        name: 'Maximum',
-                        type: 'line',
-                        tooltip: {
-                            valueFormatter: function (value) {
-                                return value + ' s';
-                            }
-                        },
-                        data: [3.0, 6.2, 9.3, 34.5, 36.3, 80.2, 220.3, 223.4, 53.0, 36.5, 12.0, 6.2]
-                    }
-                ]
-            });
+
+            chartData.categories.length = 0;
+            chartData.categories.push(...['Mean', '90th Percentile', 'Maximum']);
+
+            chartData.dates.length = 0;
+            chartData.dates.push(...[
+                '2022-02-28',
+                '2022-03-07',
+                '2022-03-14',
+                '2022-03-21',
+                '2022-03-28',
+                '2022-04-04',
+                '2022-04-11',
+                '2022-04-18',
+                '2022-04-25',
+                '2022-05-02',
+                '2022-05-09',
+                '2022-05-16'
+            ]);
+
+            chartData.data.mean.length = 0;
+            chartData.data.mean.push(...[
+                2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
+            ]);
+
+            chartData.data.percentile90.length = 0;
+            chartData.data.percentile90.push(...[
+                2.6, 5.9, 9.0, 26.4, 28.7, 78.7, 175.6, 182.2, 48.7, 24.8, 7.0, 5.3
+            ]);
+
+            chartData.data.maximum.length = 0;
+            chartData.data.maximum.push(...[
+                3.0, 6.2, 9.3, 34.5, 36.3, 80.2, 220.3, 223.4, 53.0, 36.5, 12.0, 6.2
+            ]);
+
+            d.resolve(options);
             return d.promise;
         };
 
