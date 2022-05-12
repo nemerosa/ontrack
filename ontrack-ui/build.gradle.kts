@@ -73,6 +73,7 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-elastic"))
     runtimeOnly(project(":ontrack-extension-notifications"))
     runtimeOnly(project(":ontrack-extension-slack"))
+    runtimeOnly(project(":ontrack-extension-chart"))
 }
 
 /**
