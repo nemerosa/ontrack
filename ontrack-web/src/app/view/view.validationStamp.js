@@ -278,7 +278,9 @@ angular.module('ot.view.validationStamp', [
                     }
                 },
                 legend: {
-                    data: chartData.categories
+                    data: ["Mean", "90th Percentile", "Maximum"],
+                    // width: '80%'
+                    // data: chartData.categories
                 },
                 xAxis: [
                     {
