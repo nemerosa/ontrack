@@ -295,8 +295,6 @@ angular.module('ot.view.validationStamp', [
                     type: 'value',
                     name: 'Duration',
                     min: 0,
-                    max: 250,
-                    interval: 50,
                     axisLabel: {
                         formatter: '{value} s'
                     }
