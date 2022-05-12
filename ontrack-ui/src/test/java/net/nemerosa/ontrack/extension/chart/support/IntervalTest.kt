@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.chart.support
 
-import net.nemerosa.ontrack.common.truncate
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
@@ -61,6 +60,13 @@ internal class IntervalTest {
         val interval = Interval.parse("2y", ref)
         assertEquals(ref.minusYears(2), interval.start)
         assertEquals(ref, interval.end)
+    }
+
+    @Test
+    fun `Explicit interval`() {
+        val interval = Interval.parse("2022-05-12T06:50:47-2022-05-12T07:10:00", ref)
+        assertEquals(LocalDateTime.of(2022, 5, 12, 6, 50, 47, 0), interval.start)
+        assertEquals(LocalDateTime.of(2022, 5, 12, 7, 10, 0, 0), interval.end)
     }
 
     private val ref = LocalDateTime.of(2022, 5, 12, 8, 52, 30, 0)

@@ -11,6 +11,8 @@ data class Interval(
     companion object {
 
         private val fixed = "(\\d+)([dwmy])".toRegex()
+        private val explicit =
+            "(\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d)-(\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d)".toRegex()
 
         fun parse(value: String, ref: LocalDateTime = Time.now()): Interval {
             val f = fixed.matchEntire(value)
@@ -19,7 +21,16 @@ data class Interval(
                 val type = f.groupValues[2]
                 fixed(value, count, type, ref)
             } else {
-                TODO()
+                val x = explicit.matchEntire(value)
+                if (x != null) {
+                    val start = Time.fromStorage(x.groupValues[1])
+                        ?: throw IntervalFormatException("Cannot parse interval start date: ${x.groupValues[1]}")
+                    val end = Time.fromStorage(x.groupValues[2])
+                        ?: throw IntervalFormatException("Cannot parse interval start date: ${x.groupValues[2]}")
+                    Interval(start, end)
+                } else {
+                    throw IntervalFormatException("Cannot parse interval: $value")
+                }
             }
         }
 
