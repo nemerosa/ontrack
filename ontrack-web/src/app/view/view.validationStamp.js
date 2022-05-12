@@ -278,9 +278,7 @@ angular.module('ot.view.validationStamp', [
                     }
                 },
                 legend: {
-                    data: ["Mean", "90th Percentile", "Maximum"],
-                    // width: '80%'
-                    // data: chartData.categories
+                    data: chartData.categories
                 },
                 xAxis: [
                     {
@@ -431,31 +429,30 @@ angular.module('ot.view.validationStamp', [
                 ]
             };
 
-            const d = $q.defer();
+            return otGraphqlService.pageGraphQLCall(`
+                query ValidationStampDuration {
+                    getChart(input: {
+                        name: "validation-stamp-stability",
+                        options: {
+                            period: "1w",
+                            interval: "1y"
+                        },
+                        parameters: {
+                            id: ${validationStampId},
+                        }
+                    })
+                }
+            `).then(data => {
+                const chart = data.getChart;
 
-            chartData.dates.length = 0;
-            chartData.dates.push(...[
-                '2022-02-28',
-                '2022-03-07',
-                '2022-03-14',
-                '2022-03-21',
-                '2022-03-28',
-                '2022-04-04',
-                '2022-04-11',
-                '2022-04-18',
-                '2022-04-25',
-                '2022-05-02',
-                '2022-05-09',
-                '2022-05-16'
-            ]);
+                chartData.dates.length = 0;
+                chartData.dates.push(...chart.dates);
 
-            chartData.data.value.length = 0;
-            chartData.data.value.push(...[
-                1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 100, 100
-            ]);
+                chartData.data.value.length = 0;
+                chartData.data.value.push(...chart.data);
 
-            d.resolve(options);
-            return d.promise;
+                return options;
+            });
         };
 
     })
