@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import org.springframework.security.access.AccessDeniedException
+import java.time.LocalDateTime
 import java.util.*
 import java.util.function.BiFunction
 
@@ -374,6 +375,11 @@ interface StructureService {
     ): List<ValidationRun>
 
     fun getValidationRunsForValidationStamp(validationStamp: ValidationStamp, offset: Int, count: Int): List<ValidationRun>
+
+    /**
+     * Gets the validation runs for a given validation stamp between two timestamps.
+     */
+    fun getValidationRunsForValidationStampBetweenDates(validationStampId: ID, start: LocalDateTime, end: LocalDateTime): List<ValidationRun>
 
     fun getValidationRunsForValidationStamp(validationStampId: ID, offset: Int, count: Int): List<ValidationRun>
 

@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 import java.util.*
 import java.util.function.BiFunction
 
@@ -1210,6 +1211,14 @@ class StructureServiceImpl(
     override fun getValidationRunsForValidationStamp(validationStampId: ID, offset: Int, count: Int): List<ValidationRun> {
         val validationStamp = getValidationStamp(validationStampId)
         return getValidationRunsForValidationStamp(validationStamp, offset, count)
+    }
+
+    override fun getValidationRunsForValidationStampBetweenDates(
+        validationStampId: ID,
+        start: LocalDateTime,
+        end: LocalDateTime,
+    ): List<ValidationRun> {
+        TODO("Not yet implemented")
     }
 
     override fun getValidationRunsForValidationStampAndStatus(validationStamp: ValidationStamp, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {
