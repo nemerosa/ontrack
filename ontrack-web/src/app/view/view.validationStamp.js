@@ -337,23 +337,19 @@ angular.module('ot.view.validationStamp', [
             };
 
             return otGraphqlService.pageGraphQLCall(`
-                query ValidationStampDuration(
-                    $validationStampId: Int!,
-                ) {
+                query ValidationStampDuration {
                     getChart(input: {
                         name: "validation-stamp-durations",
                         options: {
                             period: "1w",
-                            interval: "1m"
+                            interval: "1y"
                         },
                         parameters: {
-                            id: $validationStampId,
+                            id: ${validationStampId},
                         }
                     })
                 }
-            `, {
-                validationStampId: validationStampId
-            }).then(data => {
+            `).then(data => {
                 const chart = data.getChart;
 
                 chartData.categories.length = 0;
@@ -370,6 +366,8 @@ angular.module('ot.view.validationStamp', [
 
                 chartData.data.maximum.length = 0;
                 chartData.data.maximum.push(...chart.data.maximum);
+
+                return options;
             });
         };
 
