@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.structure.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -311,6 +312,16 @@ public interface StructureRepository {
     List<ValidationRun> getValidationRunsForBuildAndValidationStampAndStatus(Build build, ValidationStamp validationStamp, List<ValidationRunStatusID> statuses, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
 
     List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
+
+
+    /**
+     * Gets the list of validation runs for a validation stamp between two timestamps.
+     */
+    @NotNull
+    List<ValidationRun> getValidationRunsForValidationStampBetweenDates(@NotNull ValidationStamp validationStamp,
+                                                                        @NotNull LocalDateTime start,
+                                                                        @NotNull LocalDateTime end,
+                                                                        @NotNull Function<String, ValidationRunStatusID> validationRunStatusService);
 
     List<ValidationRun> getValidationRunsForValidationStampAndStatus(ValidationStamp validationStamp, List<ValidationRunStatusID> statuses, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
 

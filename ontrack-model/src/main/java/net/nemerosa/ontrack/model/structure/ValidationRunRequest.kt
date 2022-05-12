@@ -8,5 +8,6 @@ constructor(
         val dataTypeId: String? = null,
         val data: Any? = null,
         val description: String? = null,
-        val properties: List<PropertyCreationRequest> = listOf()
+        val properties: List<PropertyCreationRequest> = listOf(),
+        val signature: Signature? = null,
 )

@@ -1092,7 +1092,7 @@ class StructureServiceImpl(
                 build,
                 validationStamp,
                 0,
-                securityService.currentSignature,
+                validationRunRequest.signature ?: securityService.currentSignature,
                 status.runStatusID,
                 validationRunRequest.description
         ).withData(status.runData)
@@ -1218,7 +1218,9 @@ class StructureServiceImpl(
         start: LocalDateTime,
         end: LocalDateTime,
     ): List<ValidationRun> {
-        TODO("Not yet implemented")
+        val validationStamp = getValidationStamp(validationStampId)
+        securityService.checkProjectFunction(validationStamp, ProjectView::class.java)
+        return structureRepository.getValidationRunsForValidationStampBetweenDates(validationStamp, start, end) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
     override fun getValidationRunsForValidationStampAndStatus(validationStamp: ValidationStamp, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {

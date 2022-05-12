@@ -239,12 +239,14 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             validationStamp: ValidationStamp,
             validationRunStatusID: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED,
             description: String? = null,
+            signature: Signature? = null,
             code: ValidationRun.() -> Unit = {}
     ): ValidationRun {
         return this.validateWithData<Any>(
                 validationStampName = validationStamp.name,
                 validationRunStatusID = validationRunStatusID,
-                description = description
+                description = description,
+                signature = signature,
         ).apply {
             code()
         }
@@ -275,7 +277,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             validationRunStatusID: ValidationRunStatusID? = null,
             validationDataTypeId: String? = null,
             validationRunData: T? = null,
-            description: String? = null
+            description: String? = null,
+            signature: Signature? = null,
     ): ValidationRun {
         return asUser().withView(this).with(this, ValidationRunCreate::class.java).call {
             structureService.newValidationRun(
@@ -285,7 +288,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                             dataTypeId = validationDataTypeId,
                             data = validationRunData,
                             validationRunStatusId = validationRunStatusID,
-                            description = description
+                            description = description,
+                            signature = signature,
                     )
             )
         }

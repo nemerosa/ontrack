@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.PromotionLevelCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.Duration
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -16,7 +16,7 @@ import kotlin.test.assertTrue
 /**
  * This class supersedes [StructureServiceIT], which cannot be replaced as yet.
  */
-class StructureServiceNewIT : AbstractDSLTestJUnit4Support() {
+class StructureServiceNewIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Creating a link twice must not fail`() {
@@ -157,6 +157,52 @@ class StructureServiceNewIT : AbstractDSLTestJUnit4Support() {
                     assertEquals("My predefined description", vs.description)
                     // An image must have been set
                     assertTrue(vs.isImage, "An image must have been set")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Validation runs for a validation stamp between two dates`() {
+        asAdmin {
+            project {
+                branch {
+                    val vs = validationStamp()
+                    // Creates several builds and validations with some date interval
+                    val ref = Time.now().minusDays(100)
+                    var index = 0L
+                    repeat(5) { buildNo ->
+                        build(name = "build-$buildNo") {
+                            repeat(5) { runNo ->
+                                validate(vs, description = "run-$runNo", signature = Signature.of(
+                                    ref.plusDays(index++),
+                                    "test"
+                                ))
+                            }
+                        }
+                    }
+                    // Gets the validation runs between two dates
+                    val runs = structureService.getValidationRunsForValidationStampBetweenDates(
+                        vs.id,
+                        ref.plusDays(12),
+                        ref.plusDays(17),
+                    )
+                    // Extracts the build names & run descriptions
+                    val names = runs.map {
+                        it.build.name to it.lastStatus.description
+                    }
+                    // Checks the names
+                    assertEquals(
+                        listOf(
+                            "build-3" to "run-2",
+                            "build-3" to "run-1",
+                            "build-3" to "run-0",
+                            "build-2" to "run-4",
+                            "build-2" to "run-3",
+                            "build-2" to "run-2",
+                        ),
+                        names
+                    )
                 }
             }
         }

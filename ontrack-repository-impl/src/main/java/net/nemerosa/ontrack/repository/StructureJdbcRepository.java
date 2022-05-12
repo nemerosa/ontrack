@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.Document;
+import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.structure.*;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -1182,6 +1184,29 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 params("validationStampId", validationStamp.id())
                         .addValue("limit", count)
                         .addValue("offset", offset),
+                (rs, rowNum) -> toValidationRun(
+                        rs,
+                        this::getBuild,
+                        id -> validationStamp,
+                        validationRunStatusService
+                )
+        );
+    }
+
+    @NotNull
+    @Override
+    public List<ValidationRun> getValidationRunsForValidationStampBetweenDates(@NotNull ValidationStamp validationStamp, @NotNull LocalDateTime start, @NotNull LocalDateTime end, @NotNull Function<String, ValidationRunStatusID> validationRunStatusService) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
+                        "FROM VALIDATION_RUNS VR " +
+                        "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +
+                        "INNER JOIN VALIDATION_RUN_STATUSES VRS ON VRS.ID = (SELECT ID FROM VALIDATION_RUN_STATUSES WHERE VALIDATIONRUNID = VR.ID ORDER BY ID DESC LIMIT 1) " +
+                        "WHERE VR.VALIDATIONSTAMPID = :validationStampId " +
+                        "AND VRS.CREATION >= :start AND VRS.CREATION <= :end " +
+                        "ORDER BY VR.BUILDID DESC, VR.ID DESC ",
+                params("validationStampId", validationStamp.id())
+                        .addValue("start", Time.forStorage(start))
+                        .addValue("end", Time.forStorage(end)),
                 (rs, rowNum) -> toValidationRun(
                         rs,
                         this::getBuild,
