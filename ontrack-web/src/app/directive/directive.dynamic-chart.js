@@ -19,7 +19,6 @@ angular.module('ot.directive.dynamic-chart', [
 
                 // Loading the data
                 const loadData = (chart) => {
-                    console.log("chartOptions(load) = ", scope.chartOptions);
                     chart.showLoading('default', { text: 'Loading data...' });
                     scope.options().then(options => {
                         options = options || {};
@@ -38,10 +37,6 @@ angular.module('ot.directive.dynamic-chart', [
                 // Watching the general chart options
                 scope.$watch("chartOptions", (newVal, oldVal) => {
                     if (scope.chartOptions) {
-                        console.log("chartOptions = ", scope.chartOptions);
-                        console.log("chartOptions(new) = ", newVal);
-                        console.log("chartOptions(old) = ", oldVal);
-                        console.log("loaded = ", loaded);
                         if (loaded) {
                             loadData(chart);
                         }

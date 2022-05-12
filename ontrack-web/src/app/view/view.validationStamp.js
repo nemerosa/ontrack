@@ -251,7 +251,6 @@ angular.module('ot.view.validationStamp', [
             interval: '1y',
             period: '1w'
         };
-        $scope.chartOptionsCount = 0;
 
         // Duration graph
         $scope.durationOptions = () => {
@@ -465,11 +464,9 @@ angular.module('ot.view.validationStamp', [
 
         // Chart options
         $scope.validationStampChartSettings = () => {
-            // TODO Dialog to set the options, call otChartService
-            $scope.chartOptionsCount++;
-            $scope.chartOptions.interval = `${$scope.chartOptionsCount}m`;
-            $scope.chartOptions.period = '1m';
-            console.log("chartOptions(changed) = ", $scope.chartOptions);
+            otChartService.editChartOptions($scope.chartOptions).then(options => {
+                angular.copy(options, $scope.chartOptions);
+            });
         };
 
     })

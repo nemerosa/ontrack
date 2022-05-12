@@ -34,7 +34,7 @@ angular.module('ot.service.form', [
          * @param formConfig.buttons Additional buttons. List of {"title", action}.
          */
         self.display = function (formConfig) {
-            var d = $q.defer();
+            const d = $q.defer();
 
             self.getForm(formConfig).then(function (form) {
                 // Post form treatment
