@@ -336,44 +336,41 @@ angular.module('ot.view.validationStamp', [
                 ]
             };
 
-            const d = $q.defer();
+            return otGraphqlService.pageGraphQLCall(`
+                query ValidationStampDuration(
+                    $validationStampId: Int!,
+                ) {
+                    getChart(input: {
+                        name: "validation-stamp-durations",
+                        options: {
+                            period: "1w",
+                            interval: "1m"
+                        },
+                        parameters: {
+                            id: $validationStampId,
+                        }
+                    })
+                }
+            `, {
+                validationStampId: validationStampId
+            }).then(data => {
+                const chart = data.getChart;
 
-            chartData.categories.length = 0;
-            chartData.categories.push(...['Mean', '90th Percentile', 'Maximum']);
+                chartData.categories.length = 0;
+                chartData.categories.push(...chart.categories);
 
-            chartData.dates.length = 0;
-            chartData.dates.push(...[
-                '2022-02-28',
-                '2022-03-07',
-                '2022-03-14',
-                '2022-03-21',
-                '2022-03-28',
-                '2022-04-04',
-                '2022-04-11',
-                '2022-04-18',
-                '2022-04-25',
-                '2022-05-02',
-                '2022-05-09',
-                '2022-05-16'
-            ]);
+                chartData.dates.length = 0;
+                chartData.dates.push(...chart.dates);
 
-            chartData.data.mean.length = 0;
-            chartData.data.mean.push(...[
-                2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
-            ]);
+                chartData.data.mean.length = 0;
+                chartData.data.mean.push(...chart.data.mean);
 
-            chartData.data.percentile90.length = 0;
-            chartData.data.percentile90.push(...[
-                2.6, 5.9, 9.0, 26.4, 28.7, 78.7, 175.6, 182.2, 48.7, 24.8, 7.0, 5.3
-            ]);
+                chartData.data.percentile90.length = 0;
+                chartData.data.percentile90.push(...chart.data.percentile90);
 
-            chartData.data.maximum.length = 0;
-            chartData.data.maximum.push(...[
-                3.0, 6.2, 9.3, 34.5, 36.3, 80.2, 220.3, 223.4, 53.0, 36.5, 12.0, 6.2
-            ]);
-
-            d.resolve(options);
-            return d.promise;
+                chartData.data.maximum.length = 0;
+                chartData.data.maximum.push(...chart.data.maximum);
+            });
         };
 
         // Stability graph
