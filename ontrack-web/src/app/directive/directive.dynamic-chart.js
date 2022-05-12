@@ -15,6 +15,7 @@ angular.module('ot.directive.dynamic-chart', [
 
                 // Loading the data
                 const loadData = (chart) => {
+                    chart.showLoading('default', { text: 'Loading data...' });
                     scope.options().then(options => {
                         options = options || {};
                         if (options.forceClear) chart.clear();
