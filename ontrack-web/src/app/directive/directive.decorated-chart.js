@@ -9,7 +9,9 @@ angular.module('ot.directive.decorated-chart', [
                 // Title of the chart
                 title: '@',
                 // Reference to the chart
-                chart: '='
+                chart: '=',
+                // Option to edit the chart options
+                chartOptions: '='
             }
         };
     })
