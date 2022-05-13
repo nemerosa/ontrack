@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":ontrack-extension-chart"))
     implementation(project(":ontrack-ui-graphql"))
     implementation("org.apache.commons:commons-math3")
+    implementation(project(":ontrack-repository-support"))
 
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
