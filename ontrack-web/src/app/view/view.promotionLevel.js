@@ -244,8 +244,17 @@ angular.module('ot.view.promotionLevel', [
             loadPromotionLevel();
         };
 
+        // Shared options
+        $scope.chartOptions = otChartService.loadChartOptions("promotion-level-charts", {
+            interval: "1y",
+            period: "1w"
+        });
+
         // Lead time chart
         $scope.leadTimeChart = otChartService.createDurationChart({
+            title: "Lead time to promotion",
+            chartOptionsKey: "promotion-level-charts",
+            chartOptions: $scope.chartOptions,
             query: (chartOptions) => {
                 return `query PromotionLevelLeadTimeChart {
                         getChart(input: {

@@ -7,6 +7,18 @@ angular.module('ot.service.chart', [
         const self = {};
 
         /**
+         * Loading the chart options from the local storage
+         */
+        self.loadChartOptions = (key, defaultChartOptions) => {
+            const stored = localStorage.getItem(key);
+            if (stored) {
+                return JSON.parse(stored);
+            } else {
+                return defaultChartOptions;
+            }
+        };
+
+        /**
          * Private method to edit some general chart options
          * @param initialOptions
          * @returns {*}
@@ -116,6 +128,7 @@ angular.module('ot.service.chart', [
         /**
          * Creating a chart service for a duration chart (with mean, 90th percentile & max).
          *
+         * @param config.chartOptionsKey Storage key for the chart options
          * @param config.chartOptions General chart options
          * @param config.query Function which takes some [GetChartOptions] as a parameter and returns a complete GraphQL query.
          * @return Chart object.
@@ -244,6 +257,9 @@ angular.module('ot.service.chart', [
             chart.editChartOptions = () => {
                 editChartOptions(chart.chartOptions).then(newOptions => {
                     angular.copy(newOptions, chart.chartOptions);
+                    if (config.chartOptionsKey) {
+                        localStorage.setItem(config.chartOptionsKey, JSON.stringify(chart.chartOptions));
+                    }
                     chart.run();
                 });
             };
@@ -255,6 +271,7 @@ angular.module('ot.service.chart', [
         /**
          * Creating a chart service for a percentage chart.
          *
+         * @param config.chartOptionsKey Storage key for the chart options
          * @param config.name Name of the % axis
          * @param config.chartOptions General chart options
          * @param config.query Function which takes some [GetChartOptions] as a parameter and returns a complete GraphQL query.
@@ -343,6 +360,9 @@ angular.module('ot.service.chart', [
             chart.editChartOptions = () => {
                 editChartOptions(chart.chartOptions).then(newOptions => {
                     angular.copy(newOptions, chart.chartOptions);
+                    if (config.chartOptionsKey) {
+                        localStorage.setItem(config.chartOptionsKey, chart.chartOptions);
+                    }
                     chart.run();
                 });
             };

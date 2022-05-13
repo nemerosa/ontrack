@@ -247,13 +247,14 @@ angular.module('ot.view.validationStamp', [
         };
 
         // General chart options
-        $scope.chartOptions = {
+        $scope.chartOptions = otChartService.loadChartOptions("validation-stamp-charts", {
             interval: '1y',
             period: '1w'
-        };
+        });
 
         // Duration graph
         $scope.durationChart = otChartService.createDurationChart({
+            chartOptionsKey: "validation-stamp-charts",
             chartOptions: $scope.chartOptions,
             query: (chartOptions) => {
                 return `
@@ -276,6 +277,7 @@ angular.module('ot.view.validationStamp', [
         // Stability graph
         $scope.stabilityChart = otChartService.createPercentageChart({
             name: '% of success',
+            chartOptionsKey: "validation-stamp-charts",
             chartOptions: $scope.chartOptions,
             query: (chartOptions) => {
                 return `query ValidationStampStability {
