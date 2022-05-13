@@ -253,132 +253,27 @@ angular.module('ot.view.validationStamp', [
         };
 
         // Duration graph
-        $scope.durationOptions = () => {
-            // Graph data to inject into the options
-            const chartData = {
-                categories: [],
-                dates: [],
-                data: {
-                    mean: [],
-                    percentile90: [],
-                    maximum: []
-                }
-            };
-
-            // Base options
-            const options = {
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'cross',
-                        crossStyle: {
-                            color: '#999'
-                        }
-                    }
-                },
-                toolbox: {
-                    feature: {
-                        dataView: { show: true, readOnly: true },
-                        // magicType: { show: true, type: ['line', 'bar'] },
-                        // restore: { show: true },
-                        saveAsImage: { show: true }
-                    }
-                },
-                legend: {
-                    data: chartData.categories
-                },
-                xAxis: [
-                    {
-                        type: 'category',
-                        data: chartData.dates,
-                        axisPointer: {
-                            type: 'shadow'
-                        },
-                        axisLabel: {
-                            rotate: 45
-                        }
-                    }
-                ],
-                yAxis: [
-                    {
-                        type: 'value',
-                        name: 'Duration',
-                        min: 0,
-                        axisLabel: {
-                            formatter: '{value} s'
-                        }
-                    }
-                ],
-                series: [
-                    {
-                        name: 'Mean',
-                        type: 'bar',
-                        tooltip: {
-                            valueFormatter: function (value) {
-                                return value + ' s';
+        $scope.durationChart = otChartService.createDurationChart({
+            chartOptions: $scope.chartOptions,
+            query: (chartOptions) => {
+                return `
+                    query ValidationStampDuration {
+                        getChart(input: {
+                            name: "validation-stamp-durations",
+                            options: {
+                                interval: "${chartOptions.interval}",
+                                period: "${chartOptions.period}"
+                            },
+                            parameters: {
+                                id: ${validationStampId},
                             }
-                        },
-                        data: chartData.data.mean
-                    },
-                    {
-                        name: '90th percentile',
-                        type: 'line',
-                        tooltip: {
-                            valueFormatter: function (value) {
-                                return value + ' s';
-                            }
-                        },
-                        data: chartData.data.percentile90
-                    },
-                    {
-                        name: 'Maximum',
-                        type: 'line',
-                        tooltip: {
-                            valueFormatter: function (value) {
-                                return value + ' s';
-                            }
-                        },
-                        data: chartData.data.maximum
+                        })
                     }
-                ]
-            };
+                `;
+            }
+        });
 
-            return otGraphqlService.pageGraphQLCall(`
-                query ValidationStampDuration {
-                    getChart(input: {
-                        name: "validation-stamp-durations",
-                        options: {
-                            interval: "${$scope.chartOptions.interval}",
-                            period: "${$scope.chartOptions.period}"
-                        },
-                        parameters: {
-                            id: ${validationStampId},
-                        }
-                    })
-                }
-            `).then(data => {
-                const chart = data.getChart;
-
-                chartData.categories.length = 0;
-                chartData.categories.push(...chart.categories);
-
-                chartData.dates.length = 0;
-                chartData.dates.push(...chart.dates);
-
-                chartData.data.mean.length = 0;
-                chartData.data.mean.push(...chart.data.mean);
-
-                chartData.data.percentile90.length = 0;
-                chartData.data.percentile90.push(...chart.data.percentile90);
-
-                chartData.data.maximum.length = 0;
-                chartData.data.maximum.push(...chart.data.maximum);
-
-                return options;
-            });
-        };
-
-        // Stability graph
+        // TODO Stability graph
         $scope.stabilityOptions = () => {
             // Graph data to inject into the options
             const chartData = {
@@ -464,9 +359,7 @@ angular.module('ot.view.validationStamp', [
 
         // Chart options
         $scope.validationStampChartSettings = () => {
-            otChartService.editChartOptions($scope.chartOptions).then(options => {
-                angular.copy(options, $scope.chartOptions);
-            });
+            $scope.durationChart.editChartOptions();
         };
 
     })

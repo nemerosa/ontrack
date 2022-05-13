@@ -7,8 +7,116 @@ angular.module('ot.service.chart', [
         const self = {};
 
         /**
+         * Private method to edit some general chart options
+         * @param initialOptions
+         * @returns {*}
+         */
+        const editChartOptions = (initialOptions) => {
+            return otFormService.display({
+                form: {
+                    fields: [{
+                        name: 'interval',
+                        type: 'selection',
+                        label: "Interval",
+                        help: "How far to get the data.",
+                        required: true,
+                        value: initialOptions.interval,
+                        items: [{
+                            id: '1w',
+                            name: 'One week',
+                        }, {
+                            id: '2w',
+                            name: 'Two weeks',
+                        }, {
+                            id: '4w',
+                            name: 'Four weeks',
+                        }, {
+                            id: '1m',
+                            name: 'One month',
+                        }, {
+                            id: '2m',
+                            name: 'Two months',
+                        }, {
+                            id: '3m',
+                            name: 'Three months',
+                        }, {
+                            id: '4m',
+                            name: 'Four months',
+                        }, {
+                            id: '6m',
+                            name: 'Six months',
+                        }, {
+                            id: '1y',
+                            name: 'One year',
+                        }, {
+                            id: '2y',
+                            name: 'Two years',
+                        }],
+                        itemId: 'id',
+                        itemName: 'name',
+                    }, {
+                        name: 'period',
+                        type: 'selection',
+                        label: "Period",
+                        help: "Granularity of the statistics.",
+                        required: true,
+                        value: initialOptions.period,
+                        items: [{
+                            id: '1d',
+                            name: 'One day',
+                        }, {
+                            id: '2d',
+                            name: 'Two days',
+                        }, {
+                            id: '3d',
+                            name: 'Three days',
+                        }, {
+                            id: '1w',
+                            name: 'One week',
+                        }, {
+                            id: '2w',
+                            name: 'Two weeks',
+                        }, {
+                            id: '4w',
+                            name: 'Four weeks',
+                        }, {
+                            id: '1m',
+                            name: 'One month',
+                        }, {
+                            id: '2m',
+                            name: 'Two months',
+                        }, {
+                            id: '3m',
+                            name: 'Three months',
+                        }, {
+                            id: '4m',
+                            name: 'Four months',
+                        }, {
+                            id: '6m',
+                            name: 'Six months',
+                        }, {
+                            id: '1y',
+                            name: 'One year',
+                        }, {
+                            id: '2y',
+                            name: 'Two years',
+                        }],
+                        itemId: 'id',
+                        itemName: 'name',
+                    }
+                    ]
+                },
+                title: "Chart options",
+                submit: (submitData) => {
+                    return submitData;
+                }
+            });
+        };
+
+        /**
          * Creating a chart service for a duration chart (with mean, 90th percentile & max).
          *
+         * @param config.chartOptions General chart options
          * @param config.query Function which takes some [GetChartOptions] as a parameter and returns a complete GraphQL query.
          * @return Chart object.
          */
@@ -18,10 +126,7 @@ angular.module('ot.service.chart', [
             const chart = {};
 
             // Default chart options
-            chart.chartOptions = {
-                interval: "3m",
-                period: "1w"
-            };
+            chart.chartOptions = config.chartOptions;
 
             // Graph data to inject into the options
             chart.chartData = {
@@ -135,110 +240,16 @@ angular.module('ot.service.chart', [
                 });
             };
 
+            // Editing the chart options
+            chart.editChartOptions = () => {
+                editChartOptions(chart.chartOptions).then(newOptions => {
+                    angular.copy(newOptions, chart.chartOptions);
+                    chart.run();
+                });
+            };
+
             // OK
             return chart;
-        };
-
-        self.editChartOptions = (initialOptions) => {
-            return otFormService.display({
-                form: {
-                    fields: [{
-                        name: 'interval',
-                        type: 'selection',
-                        label: "Interval",
-                        help: "How far to get the data.",
-                        required: true,
-                        value: initialOptions.interval,
-                        items: [{
-                            id: '1w',
-                            name: 'One week',
-                        }, {
-                            id: '2w',
-                            name: 'Two weeks',
-                        }, {
-                            id: '4w',
-                            name: 'Four weeks',
-                        }, {
-                            id: '1m',
-                            name: 'One month',
-                        }, {
-                            id: '2m',
-                            name: 'Two months',
-                        }, {
-                            id: '3m',
-                            name: 'Three months',
-                        }, {
-                            id: '4m',
-                            name: 'Four months',
-                        }, {
-                            id: '6m',
-                            name: 'Six months',
-                        }, {
-                            id: '1y',
-                            name: 'One year',
-                        }, {
-                            id: '2y',
-                            name: 'Two years',
-                        }],
-                        itemId: 'id',
-                        itemName: 'name',
-                    }, {
-                        name: 'period',
-                        type: 'selection',
-                        label: "Period",
-                        help: "Granularity of the statistics.",
-                        required: true,
-                        value: initialOptions.period,
-                        items: [{
-                            id: '1d',
-                            name: 'One day',
-                        }, {
-                            id: '2d',
-                            name: 'Two days',
-                        }, {
-                            id: '3d',
-                            name: 'Three days',
-                        }, {
-                            id: '1w',
-                            name: 'One week',
-                        }, {
-                            id: '2w',
-                            name: 'Two weeks',
-                        }, {
-                            id: '4w',
-                            name: 'Four weeks',
-                        }, {
-                            id: '1m',
-                            name: 'One month',
-                        }, {
-                            id: '2m',
-                            name: 'Two months',
-                        }, {
-                            id: '3m',
-                            name: 'Three months',
-                        }, {
-                            id: '4m',
-                            name: 'Four months',
-                        }, {
-                            id: '6m',
-                            name: 'Six months',
-                        }, {
-                            id: '1y',
-                            name: 'One year',
-                        }, {
-                            id: '2y',
-                            name: 'Two years',
-                        }],
-                        itemId: 'id',
-                        itemName: 'name',
-                    }
-                    ]
-                },
-                title: "Chart options",
-                submit: (submitData) => {
-                    return submitData;
-                }
-            });
         };
 
         return self;
