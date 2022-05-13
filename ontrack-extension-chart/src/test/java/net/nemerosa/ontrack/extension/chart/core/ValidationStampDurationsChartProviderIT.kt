@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.chart.core
 
-import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.chart.GetChartOptions
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.Signature
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
 internal class ValidationStampDurationsChartProviderIT : AbstractQLKTITSupport() {
@@ -22,7 +22,8 @@ internal class ValidationStampDurationsChartProviderIT : AbstractQLKTITSupport()
                 branch {
                     val vs = validationStamp()
                     // Creates several builds and validations with some date interval
-                    val ref = Time.now().minusDays(25)
+                    val now = LocalDateTime.of(2022, 5, 12, 12, 51, 0)
+                    val ref = now.minusDays(25)
                     var index = 0
                     repeat(5) { buildNo ->
                         build(name = "build-$buildNo") {
@@ -37,7 +38,7 @@ internal class ValidationStampDurationsChartProviderIT : AbstractQLKTITSupport()
                     }
                     // Gets the chart data
                     val chart = validationStampDurationsChartProvider.getChart(
-                        options = GetChartOptions(interval = "1m", period = "1w"),
+                        options = GetChartOptions(ref = now, interval = "1m", period = "1w"),
                         parameters = ValidationStampChartParameters(id = vs.id()),
                     )
                     // Checks the chart data
@@ -46,9 +47,9 @@ internal class ValidationStampDurationsChartProviderIT : AbstractQLKTITSupport()
                             "categories" to listOf("Mean", "90th percentile", "Maximum"),
                             "dates" to listOf("2022-04-12", "2022-04-19", "2022-04-26", "2022-05-03", "2022-05-10"),
                             "data" to mapOf(
-                                "mean" to listOf(2.0, 12.0, 12.142857142857142, 12.285714285714286, 1.0),
-                                "percentile90" to listOf(3.0, 34.0, 34.0, 34.0, 1.0),
-                                "maximum" to listOf(3.0, 34.0, 34.0, 34.0, 1.0)
+                                "mean" to listOf(1.5,12.142857142857142,12.285714285714286,7.571428571428571,17.5),
+                                "percentile90" to listOf(2.0,34.0,34.0,21.0,34.0),
+                                "maximum" to listOf(2.0,34.0,34.0,21.0,34.0)
                             )
                         ).asJson(),
                         chart
