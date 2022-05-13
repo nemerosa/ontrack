@@ -245,10 +245,9 @@ angular.module('ot.view.promotionLevel', [
         };
 
         // Lead time chart
-        $scope.leadTimeChart = () => {
-            return otChartService.durationChart({
-                query: (chartOptions) => {
-                    return `query PromotionLevelLeadTimeChart {
+        $scope.leadTimeChart = otChartService.createDurationChart({
+            query: (chartOptions) => {
+                return `query PromotionLevelLeadTimeChart {
                         getChart(input: {
                             name: "promotion-level-lead-time",
                             options: {
@@ -260,9 +259,8 @@ angular.module('ot.view.promotionLevel', [
                             }
                         })
                     }`;
-                }
-            });
-        };
+            }
+        });
 
     })
 ;
