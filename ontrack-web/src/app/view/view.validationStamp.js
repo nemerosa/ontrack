@@ -273,92 +273,29 @@ angular.module('ot.view.validationStamp', [
             }
         });
 
-        // TODO Stability graph
-        $scope.stabilityOptions = () => {
-            // Graph data to inject into the options
-            const chartData = {
-                dates: [],
-                data: {
-                    value: []
-                }
-            };
-
-            // Base options
-            const options = {
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'cross',
-                        crossStyle: {
-                            color: '#999'
-                        }
-                    }
-                },
-                toolbox: {
-                    feature: {
-                        dataView: { show: true, readOnly: true },
-                        // magicType: { show: true, type: ['line', 'bar'] },
-                        // restore: { show: true },
-                        saveAsImage: { show: true }
-                    }
-                },
-                xAxis: [
-                    {
-                        type: 'category',
-                        data: chartData.dates,
-                        axisPointer: {
-                            type: 'shadow'
-                        },
-                        axisLabel: {
-                            rotate: 45
-                        }
-                    }
-                ],
-                yAxis: [
-                    {
-                        type: 'value',
-                        name: '% of success',
-                        min: 0,
-                        max: 100
-                    }
-                ],
-                series: [
-                    {
-                        name: 'Value',
-                        type: 'bar',
-                        data: chartData.data.value
-                    }
-                ]
-            };
-
-            return otGraphqlService.pageGraphQLCall(`
-                query ValidationStampDuration {
+        // Stability graph
+        $scope.stabilityChart = otChartService.createPercentageChart({
+            name: '% of success',
+            chartOptions: $scope.chartOptions,
+            query: (chartOptions) => {
+                return `query ValidationStampStability {
                     getChart(input: {
                         name: "validation-stamp-stability",
                         options: {
-                            interval: "${$scope.chartOptions.interval}",
-                            period: "${$scope.chartOptions.period}"
+                            interval: "${chartOptions.interval}",
+                            period: "${chartOptions.period}"
                         },
                         parameters: {
                             id: ${validationStampId},
                         }
                     })
-                }
-            `).then(data => {
-                const chart = data.getChart;
-
-                chartData.dates.length = 0;
-                chartData.dates.push(...chart.dates);
-
-                chartData.data.value.length = 0;
-                chartData.data.value.push(...chart.data);
-
-                return options;
-            });
-        };
+                }`;
+            }
+        });
 
         // Chart options
         $scope.validationStampChartSettings = () => {
+            // All charts share the same options, so any chart can initiate the dialog
             $scope.durationChart.editChartOptions();
         };
 
