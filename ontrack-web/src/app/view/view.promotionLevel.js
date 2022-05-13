@@ -271,5 +271,11 @@ angular.module('ot.view.promotionLevel', [
             }
         });
 
+        // Global chart options
+        $scope.promotionLevelChartSettings = () => {
+            // All charts share the same options, so any chart can initiate the dialog
+            $scope.leadTimeChart.editChartOptions();
+        };
+
     })
 ;
