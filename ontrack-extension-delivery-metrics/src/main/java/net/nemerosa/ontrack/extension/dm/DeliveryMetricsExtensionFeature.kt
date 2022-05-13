@@ -13,6 +13,5 @@ class DeliveryMetricsExtensionFeature(
     name = "Delivery metrics",
     description = "Exposes delivery metrics and charts.",
     options = ExtensionFeatureOptions.DEFAULT
-        .withGui(true)
         .withDependency(chartExtensionFeature)
 )

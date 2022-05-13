@@ -9,5 +9,5 @@ class ChartExtensionFeature : AbstractExtensionFeature(
     id = "chart",
     name = "Charts",
     description = "Support for chart data",
-    options = ExtensionFeatureOptions.DEFAULT.withGui(true)
+    options = ExtensionFeatureOptions.DEFAULT
 )

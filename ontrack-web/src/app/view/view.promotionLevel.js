@@ -2,7 +2,8 @@ angular.module('ot.view.promotionLevel', [
     'ui.router',
     'ot.service.core',
     'ot.service.structure',
-    'ot.service.graphql'
+    'ot.service.graphql',
+    'ot.service.chart'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('promotionLevel', {
@@ -11,7 +12,7 @@ angular.module('ot.view.promotionLevel', [
             controller: 'PromotionLevelCtrl'
         });
     })
-    .controller('PromotionLevelCtrl', function ($state, $scope, $stateParams, $http, ot, otStructureService, otAlertService, otGraphqlService) {
+    .controller('PromotionLevelCtrl', function ($state, $scope, $stateParams, $http, ot, otChartService, otStructureService, otAlertService, otGraphqlService) {
         const view = ot.view();
         // PromotionLevel's id
         const promotionLevelId = $stateParams.promotionLevelId;
@@ -241,6 +242,26 @@ angular.module('ot.view.promotionLevel', [
             queryVariables.offset = pageRequest.offset;
             queryVariables.size = pageSize;
             loadPromotionLevel();
+        };
+
+        // Lead time chart
+        $scope.leadTimeChart = () => {
+            return otChartService.durationChart({
+                query: (chartOptions) => {
+                    return `query PromotionLevelLeadTimeChart {
+                        getChart(input: {
+                            name: "promotion-level-lead-time",
+                            options: {
+                                interval: "${chartOptions.interval}",
+                                period: "${chartOptions.period}"
+                            },
+                            parameters: {
+                                id: ${promotionLevelId},
+                            }
+                        })
+                    }`;
+                }
+            });
         };
 
     })
