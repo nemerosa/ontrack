@@ -295,11 +295,5 @@ angular.module('ot.view.validationStamp', [
             }
         });
 
-        // Chart options
-        $scope.validationStampChartSettings = () => {
-            // All charts share the same options, so any chart can initiate the dialog
-            $scope.durationChart.editChartOptions();
-        };
-
     })
 ;
