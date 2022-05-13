@@ -252,7 +252,6 @@ angular.module('ot.view.promotionLevel', [
 
         // Lead time chart
         $scope.leadTimeChart = otChartService.createDurationChart({
-            title: "Lead time to promotion",
             chartOptionsKey: "promotion-level-charts",
             chartOptions: $scope.chartOptions,
             query: (chartOptions) => {
@@ -270,12 +269,6 @@ angular.module('ot.view.promotionLevel', [
                     }`;
             }
         });
-
-        // Global chart options
-        $scope.promotionLevelChartSettings = () => {
-            // All charts share the same options, so any chart can initiate the dialog
-            $scope.leadTimeChart.editChartOptions();
-        };
 
     })
 ;
