@@ -269,6 +269,107 @@ angular.module('ot.service.chart', [
         };
 
         /**
+         * Creating a chart service for a count chart.
+         *
+         * @param config.chartOptionsKey Storage key for the chart options
+         * @param config.chartOptions General chart options
+         * @param config.query Function which takes some [GetChartOptions] as a parameter and returns a complete GraphQL query.
+         * @return Chart object.
+         */
+        self.createCountChart = (config) => {
+
+            // Chart object to return
+            const chart = {};
+
+            // Default chart options
+            chart.chartOptions = config.chartOptions;
+
+            // Graph data to inject into the options
+            chart.chartData = {
+                categories: [],
+                dates: [],
+                data: {
+                    value: []
+                }
+            };
+
+            // Base options
+            chart.options = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    }
+                },
+                toolbox: {
+                    feature: {
+                        dataView: { show: true, readOnly: true },
+                        // magicType: { show: true, type: ['line', 'bar'] },
+                        // restore: { show: true },
+                        saveAsImage: { show: true }
+                    }
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: chart.chartData.dates,
+                        axisPointer: {
+                            type: 'shadow'
+                        },
+                        axisLabel: {
+                            rotate: 45
+                        }
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: 'Count',
+                        min: 0
+                    }
+                ],
+                series: [
+                    {
+                        name: 'Value',
+                        type: 'bar',
+                        data: chart.chartData.data.value
+                    }
+                ]
+            };
+
+            // Dynamic chart options
+            chart.run = () => {
+                const query = config.query(chart.chartOptions);
+                return otGraphqlService.pageGraphQLCall(query).then(data => {
+                    chart.chartData.dates.length = 0;
+                    chart.chartData.dates.push(...data.getChart.dates);
+
+                    chart.chartData.data.value.length = 0;
+                    chart.chartData.data.value.push(...data.getChart.data);
+
+                    return chart.options;
+                });
+            };
+
+            // Editing the chart options
+            chart.editChartOptions = () => {
+                editChartOptions(chart.chartOptions).then(newOptions => {
+                    angular.copy(newOptions, chart.chartOptions);
+                    if (config.chartOptionsKey) {
+                        localStorage.setItem(config.chartOptionsKey, JSON.stringify(chart.chartOptions));
+                    }
+                    chart.run();
+                });
+            };
+
+            // OK
+            return chart;
+        };
+
+        /**
          * Creating a chart service for a percentage chart.
          *
          * @param config.chartOptionsKey Storage key for the chart options

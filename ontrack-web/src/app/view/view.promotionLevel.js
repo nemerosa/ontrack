@@ -270,5 +270,25 @@ angular.module('ot.view.promotionLevel', [
             }
         });
 
+        // Frequency chart
+        $scope.frequencyChart = otChartService.createCountChart({
+            chartOptionsKey: "promotion-level-charts",
+            chartOptions: $scope.chartOptions,
+            query: (chartOptions) => {
+                return `query PromotionLevelFrequencyChart {
+                        getChart(input: {
+                            name: "promotion-level-frequency",
+                            options: {
+                                interval: "${chartOptions.interval}",
+                                period: "${chartOptions.period}"
+                            },
+                            parameters: {
+                                id: ${promotionLevelId},
+                            }
+                        })
+                    }`;
+            }
+        });
+
     })
 ;
