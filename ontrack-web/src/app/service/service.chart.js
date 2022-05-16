@@ -126,14 +126,20 @@ angular.module('ot.service.chart', [
         };
 
         /**
-         * Creating a chart service for a duration chart (with mean, 90th percentile & max).
+         * Common code for creating a chart service for a chart
          *
          * @param config.chartOptionsKey Storage key for the chart options
          * @param config.chartOptions General chart options
          * @param config.query Function which takes some [GetChartOptions] as a parameter and returns a complete GraphQL query.
+         * ---
+         * @param config.chartData Initial empty data
+         * @param config.legend True if a legend based on categories must be displayed
+         * @param config.yAxis Y axis configuration
+         * @param config.series Function of chartData which returns the list of series
+         * @param config.onData Method called when data is received from the server
          * @return Chart object.
          */
-        self.createDurationChart = (config) => {
+        const abstractCreateChart = (config) => {
 
             // Chart object to return
             const chart = {};
@@ -142,15 +148,7 @@ angular.module('ot.service.chart', [
             chart.chartOptions = config.chartOptions;
 
             // Graph data to inject into the options
-            chart.chartData = {
-                categories: [],
-                dates: [],
-                data: {
-                    mean: [],
-                    percentile90: [],
-                    maximum: []
-                }
-            };
+            chart.chartData = config.chartData;
 
             // Base options
             chart.options = {
@@ -172,6 +170,7 @@ angular.module('ot.service.chart', [
                     }
                 },
                 legend: {
+                    show: config.legend,
                     data: chart.chartData.categories
                 },
                 xAxis: [
@@ -186,69 +185,15 @@ angular.module('ot.service.chart', [
                         }
                     }
                 ],
-                yAxis: [
-                    {
-                        type: 'value',
-                        name: 'Duration',
-                        min: 0,
-                        axisLabel: {
-                            formatter: '{value} s'
-                        }
-                    }
-                ],
-                series: [
-                    {
-                        name: 'Mean',
-                        type: 'bar',
-                        tooltip: {
-                            valueFormatter: function (value) {
-                                return value + ' s';
-                            }
-                        },
-                        data: chart.chartData.data.mean
-                    },
-                    {
-                        name: '90th percentile',
-                        type: 'line',
-                        tooltip: {
-                            valueFormatter: function (value) {
-                                return value + ' s';
-                            }
-                        },
-                        data: chart.chartData.data.percentile90
-                    },
-                    {
-                        name: 'Maximum',
-                        type: 'line',
-                        tooltip: {
-                            valueFormatter: function (value) {
-                                return value + ' s';
-                            }
-                        },
-                        data: chart.chartData.data.maximum
-                    }
-                ]
+                yAxis: config.yAxis,
+                series: config.series(config.chartData)
             };
 
             // Dynamic chart options
             chart.run = () => {
                 const query = config.query(chart.chartOptions);
                 return otGraphqlService.pageGraphQLCall(query).then(data => {
-                    chart.chartData.categories.length = 0;
-                    chart.chartData.categories.push(...data.getChart.categories);
-
-                    chart.chartData.dates.length = 0;
-                    chart.chartData.dates.push(...data.getChart.dates);
-
-                    chart.chartData.data.mean.length = 0;
-                    chart.chartData.data.mean.push(...data.getChart.data.mean);
-
-                    chart.chartData.data.percentile90.length = 0;
-                    chart.chartData.data.percentile90.push(...data.getChart.data.percentile90);
-
-                    chart.chartData.data.maximum.length = 0;
-                    chart.chartData.data.maximum.push(...data.getChart.data.maximum);
-
+                    config.onData(data, chart.chartData);
                     return chart.options;
                 });
             };
@@ -266,6 +211,93 @@ angular.module('ot.service.chart', [
 
             // OK
             return chart;
+        };
+
+        /**
+         * Creating a chart service for a duration chart (with mean, 90th percentile & max).
+         *
+         * @param config.chartOptionsKey Storage key for the chart options
+         * @param config.chartOptions General chart options
+         * @param config.query Function which takes some [GetChartOptions] as a parameter and returns a complete GraphQL query.
+         * @return Chart object.
+         */
+        self.createDurationChart = (config) => {
+
+            return abstractCreateChart({
+                chartOptionsKey: config.chartOptionsKey,
+                chartOptions: config.chartOptions,
+                query: config.query,
+                chartData: {
+                    categories: [],
+                    dates: [],
+                    data: {
+                        mean: [],
+                        percentile90: [],
+                        maximum: []
+                    }
+                },
+                legend: true,
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: 'Duration',
+                        min: 0,
+                        axisLabel: {
+                            formatter: '{value} s'
+                        }
+                    }
+                ],
+                series: (chartData) => {
+                    return [
+                        {
+                            name: 'Mean',
+                            type: 'bar',
+                            tooltip: {
+                                valueFormatter: function (value) {
+                                    return value + ' s';
+                                }
+                            },
+                            data: chartData.data.mean
+                        },
+                        {
+                            name: '90th percentile',
+                            type: 'line',
+                            tooltip: {
+                                valueFormatter: function (value) {
+                                    return value + ' s';
+                                }
+                            },
+                            data: chartData.data.percentile90
+                        },
+                        {
+                            name: 'Maximum',
+                            type: 'line',
+                            tooltip: {
+                                valueFormatter: function (value) {
+                                    return value + ' s';
+                                }
+                            },
+                            data: chartData.data.maximum
+                        }
+                    ];
+                },
+                onData: (data, chartData) => {
+                    chartData.categories.length = 0;
+                    chartData.categories.push(...data.getChart.categories);
+
+                    chartData.dates.length = 0;
+                    chartData.dates.push(...data.getChart.dates);
+
+                    chartData.data.mean.length = 0;
+                    chartData.data.mean.push(...data.getChart.data.mean);
+
+                    chartData.data.percentile90.length = 0;
+                    chartData.data.percentile90.push(...data.getChart.data.percentile90);
+
+                    chartData.data.maximum.length = 0;
+                    chartData.data.maximum.push(...data.getChart.data.maximum);
+                }
+            });
         };
 
         /**
