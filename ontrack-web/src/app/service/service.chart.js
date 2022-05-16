@@ -359,51 +359,17 @@ angular.module('ot.service.chart', [
          */
         self.createPercentageChart = (config) => {
 
-            // Chart object to return
-            const chart = {};
-
-            // Default chart options
-            chart.chartOptions = config.chartOptions;
-
-            // Graph data to inject into the options
-            chart.chartData = {
-                dates: [],
-                data: {
-                    value: []
-                }
-            };
-
-            // Base options
-            chart.options = {
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'cross',
-                        crossStyle: {
-                            color: '#999'
-                        }
+            return abstractCreateChart({
+                chartOptionsKey: config.chartOptionsKey,
+                chartOptions: config.chartOptions,
+                query: config.query,
+                chartData: {
+                    dates: [],
+                    data: {
+                        value: []
                     }
                 },
-                toolbox: {
-                    feature: {
-                        dataView: {show: true, readOnly: true},
-                        // magicType: { show: true, type: ['line', 'bar'] },
-                        // restore: { show: true },
-                        saveAsImage: {show: true}
-                    }
-                },
-                xAxis: [
-                    {
-                        type: 'category',
-                        data: chart.chartData.dates,
-                        axisPointer: {
-                            type: 'shadow'
-                        },
-                        axisLabel: {
-                            rotate: 45
-                        }
-                    }
-                ],
+                legend: false,
                 yAxis: [
                     {
                         type: 'value',
@@ -412,43 +378,23 @@ angular.module('ot.service.chart', [
                         max: 100
                     }
                 ],
-                series: [
-                    {
-                        name: 'Value',
-                        type: 'bar',
-                        data: chart.chartData.data.value
-                    }
-                ]
-            };
+                series: (chartData) => {
+                    return [
+                        {
+                            name: 'Value',
+                            type: 'bar',
+                            data: chartData.data.value
+                        }
+                    ];
+                },
+                onData: (data, chartData) => {
+                    chartData.dates.length = 0;
+                    chartData.dates.push(...data.getChart.dates);
 
-            // Dynamic chart options
-            chart.run = () => {
-                const query = config.query(chart.chartOptions);
-                return otGraphqlService.pageGraphQLCall(query).then(data => {
-
-                    chart.chartData.dates.length = 0;
-                    chart.chartData.dates.push(...data.getChart.dates);
-
-                    chart.chartData.data.value.length = 0;
-                    chart.chartData.data.value.push(...data.getChart.data);
-
-                    return chart.options;
-                });
-            };
-
-            // Editing the chart options
-            chart.editChartOptions = () => {
-                editChartOptions(chart.chartOptions).then(newOptions => {
-                    angular.copy(newOptions, chart.chartOptions);
-                    if (config.chartOptionsKey) {
-                        localStorage.setItem(config.chartOptionsKey, chart.chartOptions);
-                    }
-                    chart.run();
-                });
-            };
-
-            // OK
-            return chart;
+                    chartData.data.value.length = 0;
+                    chartData.data.value.push(...data.getChart.data);
+                }
+            });
         };
 
         return self;
