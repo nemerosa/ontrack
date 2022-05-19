@@ -290,5 +290,26 @@ angular.module('ot.view.promotionLevel', [
             }
         });
 
+        // Success rate chart
+        $scope.successRateChart = otChartService.createPercentageChart({
+            name: '% of success',
+            chartOptionsKey: "promotion-level-charts",
+            chartOptions: $scope.chartOptions,
+            query: (chartOptions) => {
+                return `query PromotionLevelSuccessRateChart {
+                        getChart(input: {
+                            name: "promotion-level-success-rate",
+                            options: {
+                                interval: "${chartOptions.interval}",
+                                period: "${chartOptions.period}"
+                            },
+                            parameters: {
+                                id: ${promotionLevelId},
+                            }
+                        })
+                    }`;
+            }
+        });
+
     })
 ;

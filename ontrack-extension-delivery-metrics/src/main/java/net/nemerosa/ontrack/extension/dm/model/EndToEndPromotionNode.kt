@@ -7,6 +7,7 @@ data class EndToEndPromotionNode(
     val branch: String,
     val build: String,
     val buildCreation: LocalDateTime,
+    val promotionId: Int?,
     val promotion: String?,
     val promotionCreation: LocalDateTime?,
 )

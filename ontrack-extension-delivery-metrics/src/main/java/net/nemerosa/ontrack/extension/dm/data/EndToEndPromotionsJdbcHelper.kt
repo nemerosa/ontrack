@@ -19,7 +19,7 @@ class EndToEndPromotionsJdbcHelper(
         private const val QUERY = """
             with recursive links as (
 	
-                select 1 as depth, p.name as ref_project, b.name as ref_branch, n.name as ref_build, n.creation as ref_build_creation, pl.name as ref_promotion, pr.creation as ref_promotion_creation, n.id as build_id, p.name as project, b.name as branch, n.name as build, n.creation as build_creation, pl.name as promotion, pr.creation as promotion_creation
+                select 1 as depth, p.name as ref_project, b.name as ref_branch, n.name as ref_build, n.creation as ref_build_creation, pl.id as ref_promotion_id, pl.name as ref_promotion, pr.creation as ref_promotion_creation, n.id as build_id, p.name as project, b.name as branch, n.name as build, n.creation as build_creation, pl.id as promotion_id, pl.name as promotion, pr.creation as promotion_creation
                 from builds n
                 inner join branches b on b.id = n.branchid
                 inner join projects p on p.id = b.projectid
@@ -28,7 +28,7 @@ class EndToEndPromotionsJdbcHelper(
                 
                 union
                 
-                select links.depth + 1 as depth, links.ref_project, links.ref_branch, links.ref_build, links.ref_build_creation, links.ref_promotion, links.ref_promotion_creation, n.id as build_id, p.name as project, b.name as branch, n.name as build, n.creation as build_creation, pl.name as promotion, pr.creation as promotion_creation
+                select links.depth + 1 as depth, links.ref_project, links.ref_branch, links.ref_build, links.ref_build_creation, links.ref_promotion_id, links.ref_promotion, links.ref_promotion_creation, n.id as build_id, p.name as project, b.name as branch, n.name as build, n.creation as build_creation, pl.id as promotion_id, pl.name as promotion, pr.creation as promotion_creation
                 from build_links l
                 inner join links on links.build_id = l.targetbuildid
                 inner join builds n on l.buildid = n.id
@@ -68,6 +68,10 @@ class EndToEndPromotionsJdbcHelper(
         if (filter.samePromotion) {
             query += " and ref_promotion = promotion"
         }
+        if (filter.promotionId != null) {
+            query += " and ref_promotion_id =  :refPromotionId"
+            params.addValue("refPromotionId", filter.promotionId)
+        }
         if (filter.refProject != null) {
             query += " and ref_project = :refProject"
             params.addValue("refProject", filter.refProject)
@@ -78,7 +82,11 @@ class EndToEndPromotionsJdbcHelper(
         }
         if (filter.afterTime != null) {
             query += " and ref_build_creation >= :afterTime"
-            params.addValue("afterTime", Time.forStorage(filter.afterTime))
+            params.addValue("afterTime", Time.store(filter.afterTime))
+        }
+        if (filter.beforeTime != null) {
+            query += " and ref_build_creation <= :beforeTime"
+            params.addValue("beforeTime", Time.store(filter.beforeTime))
         }
 
         // Ordering
@@ -104,6 +112,7 @@ class EndToEndPromotionsJdbcHelper(
             branch = getString("ref_branch"),
             build = getString("ref_build"),
             buildCreation = dateTimeFromDB(getString("ref_build_creation"))!!,
+            promotionId = getInt("ref_promotion_id"),
             promotion = getString("ref_promotion"),
             promotionCreation = dateTimeFromDB(getString("ref_promotion_creation"))
         ),
@@ -112,6 +121,7 @@ class EndToEndPromotionsJdbcHelper(
             branch = getString("branch"),
             build = getString("build"),
             buildCreation = dateTimeFromDB(getString("build_creation"))!!,
+            promotionId = getInt("promotion_id"),
             promotion = getString("promotion"),
             promotionCreation = dateTimeFromDB(getString("promotion_creation"))
         )
