@@ -1,10 +1,8 @@
 package net.nemerosa.ontrack.extension.dm.charts
 
-import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.chart.GetChartOptions
 import net.nemerosa.ontrack.extension.chart.support.CountChart
 import net.nemerosa.ontrack.extension.chart.support.CountChartItemData
-import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.PromotionRun
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
@@ -12,13 +10,13 @@ import org.springframework.stereotype.Component
 @Component
 class PromotionLevelFrequencyChartProvider(
     structureService: StructureService,
-) : AbstractPromotionLevelChartProvider(
+) : AbstractPromotionLevelChartProvider<CountChart>(
     structureService
 ) {
 
     override val name: String = "promotion-level-frequency"
 
-    override fun getChart(runs: List<PromotionRun>, options: GetChartOptions): JsonNode =
+    override fun getChart(runs: List<PromotionRun>, options: GetChartOptions): CountChart =
         CountChart.compute(
             items = runs.map { run ->
                 CountChartItemData(
@@ -27,6 +25,6 @@ class PromotionLevelFrequencyChartProvider(
             },
             interval = options.actualInterval,
             period = options.period,
-        ).asJson()
+        )
 
 }

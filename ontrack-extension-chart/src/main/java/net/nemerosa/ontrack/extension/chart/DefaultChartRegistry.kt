@@ -4,12 +4,12 @@ import org.springframework.stereotype.Component
 
 @Component
 class DefaultChartRegistry(
-    providers: List<ChartProvider<*>>,
+    providers: List<ChartProvider<*,*>>,
 ) : ChartRegistry {
 
     private val index = providers.associateBy { it.name }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : Any> findProvider(name: String): ChartProvider<T>? =
-        index[name] as ChartProvider<T>?
+    override fun <T : Any, C: Chart> findProvider(name: String): ChartProvider<T, C>? =
+        index[name] as ChartProvider<T, C>?
 }

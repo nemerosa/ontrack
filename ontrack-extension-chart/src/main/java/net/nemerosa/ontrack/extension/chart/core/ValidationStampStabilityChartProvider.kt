@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component
 @Component
 class ValidationStampStabilityChartProvider(
     structureService: StructureService,
-) : AbstractValidationStampChartProvider(
+) : AbstractValidationStampChartProvider<PercentageChart>(
     structureService,
 ) {
 
     override val name: String = "validation-stamp-stability"
 
-    override fun getChart(runs: List<ValidationRun>, options: GetChartOptions): JsonNode =
+    override fun getChart(runs: List<ValidationRun>, options: GetChartOptions): PercentageChart =
         PercentageChart.compute(
             items = runs.map { run ->
                 PercentageChartItemData(
@@ -27,5 +27,5 @@ class ValidationStampStabilityChartProvider(
             },
             interval = options.actualInterval,
             period = options.period,
-        ).asJson()
+        )
 }

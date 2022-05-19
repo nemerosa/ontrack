@@ -1,12 +1,13 @@
 package net.nemerosa.ontrack.extension.chart.support
 
+import net.nemerosa.ontrack.extension.chart.Chart
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import java.time.LocalDateTime
 
 data class PercentageChart(
     val dates: List<String>,
     val data: List<Double>,
-) {
+): Chart {
 
     companion object {
 

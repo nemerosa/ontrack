@@ -8,6 +8,6 @@ interface ChartRegistry {
     /**
      * Gets a provider by name or returns null if not found
      */
-    fun <T: Any> findProvider(name: String): ChartProvider<T>?
+    fun <T: Any, C: Chart> findProvider(name: String): ChartProvider<T, C>?
 
 }

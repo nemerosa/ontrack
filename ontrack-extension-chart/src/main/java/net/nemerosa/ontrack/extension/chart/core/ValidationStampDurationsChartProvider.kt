@@ -14,13 +14,13 @@ import org.springframework.stereotype.Component
 class ValidationStampDurationsChartProvider(
     structureService: StructureService,
     private val runInfoService: RunInfoService,
-) : AbstractValidationStampChartProvider(
+) : AbstractValidationStampChartProvider<DurationChart>(
     structureService,
 ) {
 
     override val name: String = "validation-stamp-durations"
 
-    override fun getChart(runs: List<ValidationRun>, options: GetChartOptions): JsonNode =
+    override fun getChart(runs: List<ValidationRun>, options: GetChartOptions): DurationChart =
         DurationChart.compute(
             items = runs.map { run ->
                 val runInfo = runInfoService.getRunInfo(run)
@@ -31,5 +31,5 @@ class ValidationStampDurationsChartProvider(
             },
             interval = options.actualInterval,
             period = options.period,
-        ).asJson()
+        )
 }

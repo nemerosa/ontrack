@@ -52,7 +52,7 @@ internal class ValidationStampDurationsChartProviderIT : AbstractQLKTITSupport()
                                 "maximum" to listOf(2.0,34.0,34.0,21.0,34.0)
                             )
                         ).asJson(),
-                        chart
+                        chart.asJson()
                     )
                 }
             }

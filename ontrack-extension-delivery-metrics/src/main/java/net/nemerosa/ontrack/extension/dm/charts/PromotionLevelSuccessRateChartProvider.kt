@@ -8,20 +8,19 @@ import net.nemerosa.ontrack.extension.chart.support.PercentageChart
 import net.nemerosa.ontrack.extension.chart.support.PercentageChartItemData
 import net.nemerosa.ontrack.extension.dm.data.EndToEndPromotionFilter
 import net.nemerosa.ontrack.extension.dm.data.EndToEndPromotionsHelper
-import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import org.springframework.stereotype.Component
 
 @Component
 class PromotionLevelSuccessRateChartProvider(
     private val endToEndPromotionsHelper: EndToEndPromotionsHelper,
-) : ChartProvider<PromotionLevelChartParameters> {
+) : ChartProvider<PromotionLevelChartParameters, PercentageChart> {
 
     override val name: String = "promotion-level-success-rate"
 
     override fun parseParameters(data: JsonNode): PromotionLevelChartParameters = data.parse()
 
-    override fun getChart(options: GetChartOptions, parameters: PromotionLevelChartParameters): JsonNode {
+    override fun getChart(options: GetChartOptions, parameters: PromotionLevelChartParameters): PercentageChart {
         val filter = EndToEndPromotionFilter(
             maxDepth = 1,
             promotionId = parameters.id,
@@ -42,6 +41,6 @@ class PromotionLevelSuccessRateChartProvider(
             items,
             interval = options.actualInterval,
             period = options.period,
-        ).asJson()
+        )
     }
 }

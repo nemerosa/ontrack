@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.chart.support
 
+import net.nemerosa.ontrack.extension.chart.Chart
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import java.time.LocalDateTime
 
@@ -8,7 +9,7 @@ data class DurationChart(
     val categories: List<String>,
     val dates: List<String>,
     val data: DurationChartData,
-) {
+): Chart {
 
     companion object {
 

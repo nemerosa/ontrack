@@ -6,8 +6,9 @@ import com.fasterxml.jackson.databind.JsonNode
  * Provides a chart
  *
  * @param T Type for the parameters
+ * @param C Type of chart being returned
  */
-interface ChartProvider<T: Any> {
+interface ChartProvider<T: Any, C: Chart> {
 
     /**
      * Unique name for this chart
@@ -22,6 +23,6 @@ interface ChartProvider<T: Any> {
     /**
      * Gets the chart for a given input
      */
-    fun getChart(options: GetChartOptions, parameters: T): JsonNode
+    fun getChart(options: GetChartOptions, parameters: T): C
 
 }

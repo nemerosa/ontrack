@@ -1,11 +1,12 @@
 package net.nemerosa.ontrack.extension.chart.support
 
+import net.nemerosa.ontrack.extension.chart.Chart
 import java.time.LocalDateTime
 
 data class CountChart(
     val dates: List<String>,
     val data: List<Double>,
-) {
+): Chart {
 
     companion object {
 
