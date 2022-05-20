@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.dm.model.EndToEndPromotionNode
 import net.nemerosa.ontrack.extension.dm.model.EndToEndPromotionRecord
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 import javax.sql.DataSource
@@ -43,6 +44,18 @@ class EndToEndPromotionsJdbcHelper(
             where depth >= :minDepth
             and depth <= :maxDepth
         """
+        private const val QUERY_NO_DEPTH = """
+            select *
+            from (
+                select 1 as depth, p.name as ref_project, b.name as ref_branch, n.name as ref_build, n.creation as ref_build_creation, pl.id as ref_promotion_id, pl.name as ref_promotion, pr.creation as ref_promotion_creation, n.id as build_id, p.name as project, b.name as branch, n.name as build, n.creation as build_creation, pl.id as promotion_id, pl.name as promotion, pr.creation as promotion_creation
+                from builds n
+                inner join branches b on b.id = n.branchid
+                inner join projects p on p.id = b.projectid
+                inner join promotion_levels pl on pl.branchid = b.id
+                left join promotion_runs pr on pr.buildid = n.id and pr.promotionlevelid = pl.id
+            ) as links
+            where 1 = 1
+        """
     }
 
     /**
@@ -60,11 +73,18 @@ class EndToEndPromotionsJdbcHelper(
         filter: EndToEndPromotionFilter,
         code: (record: EndToEndPromotionRecord) -> Unit,
     ) {
-        // Parameters
-        val params = params("minDepth", filter.minDepth).addValue("maxDepth", filter.maxDepth)
+        val params = MapSqlParameterSource()
+        var query: String
+        // Optimization: not using recursivity when maxDepth == 1
+        if (filter.maxDepth == 1) {
+            query = QUERY_NO_DEPTH
+        } else {
+            query = QUERY
+            // Parameters
+            params.addValue("minDepth", filter.minDepth).addValue("maxDepth", filter.maxDepth)
+        }
 
-        // Complete query
-        var query = QUERY
+        // Query filters
         if (filter.samePromotion) {
             query += " and ref_promotion = promotion"
         }

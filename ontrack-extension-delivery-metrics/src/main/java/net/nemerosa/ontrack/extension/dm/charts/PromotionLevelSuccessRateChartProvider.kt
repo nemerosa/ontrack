@@ -30,7 +30,7 @@ class PromotionLevelSuccessRateChartProvider(
         val items = mutableListOf<PercentageChartItemData>()
         endToEndPromotionsHelper.forEachEndToEndPromotionRecord(filter) { record ->
             val buildCreation = record.ref.buildCreation
-            val promoted = record.ref.promotionId != null
+            val promoted = record.ref.promotionCreation != null
             val value = ChartUtils.percentageFromBoolean(promoted)
             items += PercentageChartItemData(
                 timestamp = buildCreation,
