@@ -243,7 +243,17 @@ angular.module('ot.service.chart', [
                         name: 'Duration',
                         min: 0,
                         axisLabel: {
-                            formatter: '{value} s'
+                            formatter: (value) => {
+                                if (value === 0) {
+                                    return '0';
+                                } else {
+                                    return moment.duration(value, 'seconds').humanize({
+                                        h: 72,
+                                        m: 300,
+                                        s: 300
+                                    });
+                                }
+                            }
                         }
                     }
                 ],
