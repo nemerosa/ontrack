@@ -47,6 +47,13 @@ angular.module('ot.directive.decorated-chart', [
                     }
                 }, /* objectEquality */ true);
 
+                // Registers a listener
+                scope.chart.addChartListener({
+                    onZoom: (zoomed) => {
+                        console.log("zoomed: ", zoomed);
+                    }
+                });
+
                 // Loads the data on first call
                 loadData();
             }
