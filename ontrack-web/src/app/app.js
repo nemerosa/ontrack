@@ -24,7 +24,6 @@ const ontrack = angular.module('ontrack', [
         'ot.directive.range-selector',
         'ot.directive.yes-no',
         'ot.directive.chart',
-        'ot.directive.dynamic-chart',
         'ot.directive.decorated-chart',
         // Dialogs
         'ot.dialog.applicationInfo',
