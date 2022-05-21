@@ -15,6 +15,6 @@
     "font-awesome": "4.6.3",
     "react": "15.3.2",
     "fetch": "1.0.0",
-    "echarts": "5.0.2"
+    "echarts": "5.3.2"
   }
 }
