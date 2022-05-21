@@ -50,7 +50,14 @@ angular.module('ot.directive.decorated-chart', [
                 // Registers a listener
                 scope.chart.addChartListener({
                     onZoom: (zoomed) => {
-                        console.log("zoomed: ", zoomed);
+                        if (zoomed) {
+                            domChartContainer.removeClass('ot-chart-unzoomed');
+                            domChartContainer.addClass('ot-chart-zoomed');
+                        } else {
+                            domChartContainer.removeClass('ot-chart-zoomed');
+                            domChartContainer.addClass('ot-chart-unzoomed');
+                        }
+                        eChart.resize();
                     }
                 });
 
