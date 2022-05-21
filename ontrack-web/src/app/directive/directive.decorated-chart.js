@@ -12,6 +12,12 @@ angular.module('ot.directive.decorated-chart', [
                 chart: '=',
                 // Option to edit the chart options
                 chartOptions: '='
+            },
+            link: (scope, element) => {
+                const domChartContainer = angular.element(element[0].children[1]);
+                const domChart = element[0].children[1].children[0];
+
+                const eChart = echarts.init(domChart);
             }
         };
     })
