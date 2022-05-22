@@ -12,10 +12,10 @@ angular.module('ot.view.promotionLevel', [
             controller: 'PromotionLevelCtrl'
         });
     })
-    .controller('PromotionLevelCtrl', function ($state, $scope, $stateParams, $http, ot, otChartService, otStructureService, otAlertService, otGraphqlService) {
+    .controller('PromotionLevelCtrl', function ($location, $state, $scope, $stateParams, $http, ot, otChartService, otStructureService, otAlertService, otGraphqlService) {
         const view = ot.view();
         // PromotionLevel's id
-        const promotionLevelId = $stateParams.promotionLevelId;
+        const promotionLevelId = Number($stateParams.promotionLevelId);
         // GraphQL query
         const query = `query PromotionLevel($id: Int!, $offset: Int!, $size: Int!, $name: String, $version: String, $afterDate: LocalDateTime, $beforeDate: LocalDateTime) {
             promotionLevel(id: $id) {
@@ -76,6 +76,10 @@ angular.module('ot.view.promotionLevel', [
                     id
                     name
                     project {
+                        id
+                        name
+                    }
+                    promotionLevels {
                         id
                         name
                     }
@@ -143,6 +147,21 @@ angular.module('ot.view.promotionLevel', [
                     view.breadcrumbs = ot.branchBreadcrumbs(promotionLevel.branch);
                     // Commands
                     view.commands = [
+                        {
+                            id: 'switch-promotion-level',
+                            name: "Switch",
+                            cls: 'ot-command-switch',
+                            group: true,
+                            actions: data.promotionLevel.branch.promotionLevels
+                                .filter(pl => {
+                                    return pl.id !== promotionLevelId;
+                                })
+                                .map(pl => ({
+                                    id: 'switch-' + pl.id,
+                                    name: pl.name,
+                                    uri: 'promotionLevel/' + pl.id
+                                }))
+                        },
                         {
                             condition: function () {
                                 return promotionLevel.links._update;
