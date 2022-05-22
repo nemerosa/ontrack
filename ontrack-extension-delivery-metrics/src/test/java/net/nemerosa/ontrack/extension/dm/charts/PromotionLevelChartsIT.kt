@@ -18,6 +18,93 @@ internal class PromotionLevelChartsIT : AbstractDSLTestSupport() {
     private lateinit var chartService: ChartService
 
     @Test
+    fun `Promotion level lead time`() {
+        asAdmin {
+            project {
+                branch {
+                    val pl = promotionLevel()
+                    val now = Time.now()
+                    val ref = now.minusDays(28)
+                    val promotions: Map<Long, Long> = mapOf(
+                        // 1st week
+                        0L to 8,
+                        1L to 7,
+                        2L to 6,
+                        3L to 5,
+                        5L to 4,
+                        // 2nd week
+                        8L to 3,
+                        13L to 2,
+                        // 3rd week
+                        21L to 1,
+                    )
+                    (0L..28).forEach { day ->
+                        val time = ref.plusDays(day)
+                        val build = build(name = day.toString()) {
+                            updateBuildSignature(time = time)
+                        }
+                        val promotionTime = promotions[day]
+                        if (promotionTime != null) {
+                            build.promote(
+                                pl, signature = Signature.of(
+                                    time.plusHours(promotionTime),
+                                    "test"
+                                )
+                            )
+                        }
+                    }
+
+                    val data = chartService.getChart(
+                        GetChartInput(
+                            name = "promotion-level-lead-time",
+                            options = GetChartOptions(
+                                ref = now,
+                                interval = "4w",
+                                period = "1w"
+                            ),
+                            parameters = mapOf("id" to pl.id()).asJson()
+                        )
+                    )
+
+                    assertEquals(
+                        mapOf(
+                            "categories" to listOf(
+                                "Mean",
+                                "90th percentile",
+                                "Maximum",
+                            ),
+                            "dates" to (-4L..-1).map { n ->
+                                now.plusWeeks(n).format(DateTimeFormatter.ISO_DATE)
+                            },
+                            "data" to mapOf(
+                                "mean" to listOf(
+                                    19800.0,
+                                    9000.0,
+                                    3600.0,
+                                    Double.NaN,
+                                ),
+                                "percentile90" to listOf(
+                                    25200.0,
+                                    10800.0,
+                                    3600.0,
+                                    Double.NaN,
+                                ),
+                                "maximum" to listOf(
+                                    25200.0,
+                                    10800.0,
+                                    3600.0,
+                                    Double.NaN,
+                                ),
+                            )
+                        ).asJson(),
+                        data
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Promotion level frequency`() {
         asAdmin {
             project {
@@ -37,7 +124,7 @@ internal class PromotionLevelChartsIT : AbstractDSLTestSupport() {
                         }
                         if (day in promotions) {
                             build.promote(
-                                pl, signature = Signature.Companion.of(
+                                pl, signature = Signature.of(
                                     time,
                                     "test"
                                 )
