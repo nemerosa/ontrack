@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.dm.model.EndToEndPromotionRecord
 object EndToEndPromotionMetrics {
 
     const val PROMOTION_LEAD_TIME = "ontrack_dm_promotion_lead_time"
+    const val PROMOTION_TTR = "ontrack_dm_promotion_ttr"
 
     fun endToEndMetricTags(
         record: EndToEndPromotionRecord,

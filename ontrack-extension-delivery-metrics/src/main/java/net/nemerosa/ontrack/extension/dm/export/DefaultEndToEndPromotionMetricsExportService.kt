@@ -21,6 +21,7 @@ class DefaultEndToEndPromotionMetricsExportService(
         val filter = EndToEndPromotionFilter(
             afterTime = start,
             beforeTime = end,
+            buildOrder = true,
         )
         val workers = promotionMetricsCollectors.map {
             it.createWorker()
