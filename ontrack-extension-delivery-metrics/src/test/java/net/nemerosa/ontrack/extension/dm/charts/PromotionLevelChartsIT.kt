@@ -105,6 +105,93 @@ internal class PromotionLevelChartsIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Promotion level time to restore`() {
+        asAdmin {
+            project {
+                branch {
+                    val pl = promotionLevel()
+                    val now = Time.now()
+                    val ref = now.minusDays(28)
+                    val promotions: Map<Long, Long> = mapOf(
+                        // 1st week
+                        0L to 8,
+                        1L to 7,
+                        2L to 6,
+                        3L to 5,
+                        5L to 4,
+                        // 2nd week
+                        8L to 3,
+                        13L to 2,
+                        // 3rd week
+                        21L to 1,
+                    )
+                    (0L..28).forEach { day ->
+                        val time = ref.plusDays(day)
+                        val build = build(name = day.toString()) {
+                            updateBuildSignature(time = time)
+                        }
+                        val promotionTime = promotions[day]
+                        if (promotionTime != null) {
+                            build.promote(
+                                pl, signature = Signature.of(
+                                    time.plusHours(promotionTime),
+                                    "test"
+                                )
+                            )
+                        }
+                    }
+
+                    val data = chartService.getChart(
+                        GetChartInput(
+                            name = "promotion-level-ttr",
+                            options = GetChartOptions(
+                                ref = now,
+                                interval = "4w",
+                                period = "1w"
+                            ),
+                            parameters = mapOf("id" to pl.id()).asJson()
+                        )
+                    )
+
+                    assertEquals(
+                        mapOf(
+                            "categories" to listOf(
+                                "Mean",
+                                "90th percentile",
+                                "Maximum",
+                            ),
+                            "dates" to (-4L..-1).map { n ->
+                                now.plusWeeks(n).format(DateTimeFormatter.ISO_DATE)
+                            },
+                            "data" to mapOf(
+                                "mean" to listOf(
+                                    100800.0,
+                                    95400.0,
+                                    Double.NaN,
+                                    90000.0,
+                                ),
+                                "percentile90" to listOf(
+                                    100800.0,
+                                    97200.0,
+                                    Double.NaN,
+                                    90000.0,
+                                ),
+                                "maximum" to listOf(
+                                    100800.0,
+                                    97200.0,
+                                    Double.NaN,
+                                    90000.0,
+                                ),
+                            )
+                        ).asJson(),
+                        data
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Promotion level frequency`() {
         asAdmin {
             project {
