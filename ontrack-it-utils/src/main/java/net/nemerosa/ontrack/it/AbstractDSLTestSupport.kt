@@ -231,6 +231,10 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         doPromote(this, promotionLevel, description, signature)
     }
 
+    fun Build.promote(promotionLevel: PromotionLevel, description: String = "", time: LocalDateTime) {
+        promote(promotionLevel, description, signature = Signature.Companion.of(time, "test"))
+    }
+
     /**
      * Creates a validation run on a build.
      *

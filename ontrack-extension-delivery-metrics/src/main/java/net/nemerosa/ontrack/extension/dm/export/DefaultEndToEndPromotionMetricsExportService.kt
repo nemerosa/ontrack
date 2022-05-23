@@ -16,12 +16,20 @@ class DefaultEndToEndPromotionMetricsExportService(
     private val metricsExportService: MetricsExportService,
 ) : EndToEndPromotionMetricsExportService {
 
-    override fun exportMetrics(branches: String, start: LocalDateTime, end: LocalDateTime) {
+    override fun exportMetrics(
+        branches: String,
+        start: LocalDateTime,
+        end: LocalDateTime,
+        refProject: String?,
+        targetProject: String?,
+    ) {
         val regex = branches.toRegex()
         val filter = EndToEndPromotionFilter(
             afterTime = start,
             beforeTime = end,
             buildOrder = true,
+            refProject = refProject,
+            targetProject = targetProject,
         )
         val workers = promotionMetricsCollectors.map {
             it.createWorker()
