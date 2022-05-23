@@ -6,6 +6,8 @@ interface ElasticMetricsClient {
 
     fun saveMetric(entry: ECSEntry)
 
+    fun saveMetrics(entries: Collection<ECSEntry>)
+
     fun rawSearch(
         token: String,
         offset: Int = 0,

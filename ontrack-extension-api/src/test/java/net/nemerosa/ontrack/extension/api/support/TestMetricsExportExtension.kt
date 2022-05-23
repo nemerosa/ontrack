@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.api.support
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.api.MetricsExportExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.model.metrics.Metric
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -21,6 +22,19 @@ class TestMetricsExportExtension(
 
     fun clear() {
         data.clear()
+    }
+
+    override fun batchExportMetrics(metrics: Collection<Metric>) {
+        if (enabled) {
+            data.addAll(metrics.map {
+                MetricsData(
+                    metric = it.metric,
+                    tags = it.tags,
+                    fields = it.fields,
+                    timestamp = it.timestamp,
+                )
+            })
+        }
     }
 
     override fun exportMetrics(

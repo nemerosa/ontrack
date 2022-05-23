@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.elastic.metrics
 import net.nemerosa.ontrack.extension.api.MetricsExportExtension
 import net.nemerosa.ontrack.extension.elastic.ElasticExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.model.metrics.Metric
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -17,6 +18,21 @@ class ElasticMetricsExportExtension(
     private val elasticMetricsClient: ElasticMetricsClient,
 ) : AbstractExtension(extensionFeature), MetricsExportExtension {
 
+    override fun batchExportMetrics(metrics: Collection<Metric>) {
+        elasticMetricsClient.saveMetrics(
+            metrics.map { metric ->
+                ECSEntry(
+                    timestamp = metric.timestamp,
+                    event = ECSEvent(
+                        category = metric.metric,
+                    ),
+                    labels = metric.tags,
+                    ontrack = metric.fields,
+                )
+            }
+        )
+    }
+
     override fun exportMetrics(
         metric: String,
         tags: Map<String, String>,
@@ -24,14 +40,14 @@ class ElasticMetricsExportExtension(
         timestamp: LocalDateTime?,
     ) {
         if (timestamp != null) {
-            elasticMetricsClient.saveMetric(
-                ECSEntry(
-                    timestamp = timestamp,
-                    event = ECSEvent(
-                        category = metric,
-                    ),
-                    labels = tags,
-                    ontrack = fields,
+            batchExportMetrics(
+                listOf(
+                    Metric(
+                        metric = metric,
+                        tags = tags,
+                        fields = fields,
+                        timestamp = timestamp
+                    )
                 )
             )
         }

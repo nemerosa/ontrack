@@ -73,27 +73,35 @@ class DefaultElasticMetricsClient(
         }
     }
 
-    override fun saveMetric(entry: ECSEntry) {
+    override fun saveMetrics(entries: Collection<ECSEntry>) {
         if (elasticMetricsConfigProperties.index.immediate) {
             // Direct registration
             val indexName = elasticMetricsConfigProperties.index.name
-            val source = entry.asJson().toJsonMap()
-            client.index(
-                IndexRequest(indexName).source(source),
-                RequestOptions.DEFAULT
-            )
+            entries.forEach { entry ->
+                val source = entry.asJson().toJsonMap()
+                client.index(
+                    IndexRequest(indexName).source(source),
+                    RequestOptions.DEFAULT
+                )
+            }
             // ... and flushing immediately
             val refreshRequest = RefreshRequest(indexName)
             client.indices().refresh(refreshRequest, RequestOptions.DEFAULT)
         } else {
             runBlocking {
                 launch {
-                    debug("Entry queued")
-                    queueSize.incrementAndGet()
-                    queue.send(entry)
+                    entries.forEach { entry ->
+                        // debug("Entry queued")
+                        queueSize.incrementAndGet()
+                        queue.send(entry)
+                    }
                 }
             }
         }
+    }
+
+    override fun saveMetric(entry: ECSEntry) {
+        saveMetrics(listOf(entry))
     }
 
     init {
@@ -118,7 +126,7 @@ class DefaultElasticMetricsClient(
         while (true) {
             val entry = queue.receive()
             queueSize.decrementAndGet()
-            debug("Entry received")
+            // debug("Entry received")
             runBlocking {
                 launch(Job()) {
                     processEvent(entry)
