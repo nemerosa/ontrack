@@ -163,4 +163,64 @@ internal class PromotionLevelChartsIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Promotion level success rate`() {
+        asAdmin {
+            project {
+                branch {
+                    val pl = promotionLevel()
+                    val now = Time.now()
+                    val ref = now.minusDays(28)
+                    val promotions = setOf(
+                        0L, 1, 2, 3, 5, // 1st week, 4 out of 7
+                        8, 13, // 2nd week, 2 out of 7
+                        21, // 3rd week, 1 out of 7
+                        // 4th week, 0 out of 7
+                    )
+                    (0L..28).forEach { day ->
+                        val time = ref.plusDays(day)
+                        val build = build(name = day.toString()) {
+                            updateBuildSignature(time = time)
+                        }
+                        if (day in promotions) {
+                            build.promote(
+                                pl, signature = Signature.of(
+                                    time,
+                                    "test"
+                                )
+                            )
+                        }
+                    }
+
+                    val data = chartService.getChart(
+                        GetChartInput(
+                            name = "promotion-level-success-rate",
+                            options = GetChartOptions(
+                                ref = now,
+                                interval = "4w",
+                                period = "1w"
+                            ),
+                            parameters = mapOf("id" to pl.id()).asJson()
+                        )
+                    )
+
+                    assertEquals(
+                        mapOf(
+                            "dates" to (-4L..-1).map { n ->
+                                now.plusWeeks(n).format(DateTimeFormatter.ISO_DATE)
+                            },
+                            "data" to listOf(
+                                57.142857142857146,
+                                28.571428571428573,
+                                14.285714285714285,
+                                0.0
+                            )
+                        ).asJson(),
+                        data
+                    )
+                }
+            }
+        }
+    }
+
 }
