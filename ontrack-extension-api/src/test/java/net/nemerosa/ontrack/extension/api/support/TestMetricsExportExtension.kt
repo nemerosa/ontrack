@@ -102,7 +102,7 @@ class TestMetricsExportExtension(
 
     fun assertNoMetric(
         metric: String,
-        tags: Map<String, String>,
+        tags: Map<String, String> = emptyMap(),
         fields: Map<String, Double> = emptyMap(),
         timestamp: LocalDateTime? = null
     ) {

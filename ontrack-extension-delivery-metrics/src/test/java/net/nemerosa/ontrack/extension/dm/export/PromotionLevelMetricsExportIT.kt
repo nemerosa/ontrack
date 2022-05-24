@@ -132,6 +132,64 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `End to end time to promotion with dependency promotion earlier than target promotion`() {
+        asAdmin {
+            val ref = Time.now()
+            val promotion = TestUtils.uid("P")
+            // Source project
+            val sourceName = TestUtils.uid("source-")
+            val source = project(NameDescription.nd(sourceName, ""))
+            val sourceBranch = source.branch("main")
+            val sourcePromotionLevel = sourceBranch.run {
+                promotionLevel(name = promotion)
+            }
+            val sourceBuild =
+                sourceBranch.build("source-1").updateBuildSignature(time = ref.minusHours(10)) // We count from here
+            // Target project
+            val targetName = TestUtils.uid("target-")
+            val target = project(NameDescription.nd(targetName, ""))
+            val targetBranch = target.branch("main")
+            val targetPromotionLevel = targetBranch.run {
+                promotionLevel(name = promotion) // Alignment on the name
+            }
+            val targetBuild = targetBranch.build("target-1").updateBuildSignature(time = ref.minusHours(9))
+            // Project dependencies as a link
+            // Target project linked to the previous one
+            targetBuild.linkTo(sourceBuild)
+            // Promotes the source first
+            testMetricsExportExtension.clear()
+            sourceBuild.promote(sourcePromotionLevel, time = ref.minusHours(8))
+            exportMetrics(ref, ref = source)
+            // We don't expect anything because the target promotion has not been reached yet
+            testMetricsExportExtension.assertNoMetric(
+                "ontrack_dm_promotion_lead_time",
+                tags = mapOf(
+                    "targetProject" to targetName,
+                )
+            )
+            // Promotes the target second
+            testMetricsExportExtension.clear()
+            targetBuild.promote(targetPromotionLevel, time = ref.minusHours(6)) // We count until here
+            exportMetrics(ref, ref = source)
+            // Now, promotion has been reached for both
+            testMetricsExportExtension.assertHasMetric(
+                metric = "ontrack_dm_promotion_lead_time",
+                tags = mapOf(
+                    "targetProject" to targetName,
+                    "sourceProject" to sourceName,
+                    "targetBranch" to targetBranch.name,
+                    "sourceBranch" to sourceBranch.name,
+                    "promotion" to promotion
+                ),
+                fields = mapOf(
+                    "value" to Duration.ofHours(4).toSeconds().toDouble()
+                ),
+                timestamp = null
+            )
+        }
+    }
+
     private fun exportMetrics(
         now: LocalDateTime,
         ref: Project? = null,
