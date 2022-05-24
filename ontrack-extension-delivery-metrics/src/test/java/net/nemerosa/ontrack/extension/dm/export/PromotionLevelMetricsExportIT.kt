@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.dm.export
 
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.common.hours
 import net.nemerosa.ontrack.extension.api.support.TestMetricsExportExtension
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.structure.*
@@ -421,6 +422,25 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `With one dependency, no TTR when all ends are promoted twice in a row`() {
+        testing {
+            val component1 = component {
+                build(10.hours).promote(9.hours)
+            }
+            target {
+                build(8.hours).apply { linkTo(component1) }.promote(7.hours)
+            }
+            val component2 = component {
+                build(6.hours).promote(5.hours)
+            }
+            target {
+                build(4.hours).apply { linkTo(component2) }.promote(3.hours)
+            }
+            assertNoEndToEndTTRPromotionMetric(component.branch, target.branch)
+        }
+    }
+
     private fun exportMetrics(
         now: LocalDateTime,
         ref: Project? = null,
@@ -686,6 +706,19 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
             dependent = dependent,
             metric = EndToEndPromotionMetrics.PROMOTION_SUCCESS_RATE,
             expectedValue = value.toDouble()
+        ) {
+            exportMetrics(refTime, ref = dependency.project, target = dependent.project)
+        }
+    }
+
+    private fun TestingContext.assertNoEndToEndTTRPromotionMetric(
+        dependency: Branch,
+        dependent: Branch
+    ) {
+        assertNoEndToEndPromotionMetric(
+            dependency = dependency,
+            dependent = dependent,
+            metric = EndToEndPromotionMetrics.PROMOTION_TTR
         ) {
             exportMetrics(refTime, ref = dependency.project, target = dependent.project)
         }

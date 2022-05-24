@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.common
 
+import java.time.Duration
 import java.time.LocalDateTime
 
 /**
@@ -8,3 +9,9 @@ import java.time.LocalDateTime
  * @see [Time.truncate]
  */
 fun LocalDateTime.truncate() = Time.truncate(this)
+
+
+/**
+ * Converts a number of hours into a [Duration].
+ */
+val Int.hours: Duration get() = Duration.ofHours(toLong())
