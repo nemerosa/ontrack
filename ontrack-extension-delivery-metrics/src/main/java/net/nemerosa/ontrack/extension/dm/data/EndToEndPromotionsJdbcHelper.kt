@@ -118,9 +118,22 @@ class EndToEndPromotionsJdbcHelper(
             }
         }
 
+        // namedParameterJdbcTemplate!!.query(
+        //     "$QUERY order by build_id ", mapOf(
+        //     "minDepth" to filter.minDepth,
+        //     "maxDepth" to filter.maxDepth,
+        // )) { rs ->
+        //     val record = rs.toRecord()
+        //     println("rx: $record")
+        // }
+
         // Runs the template
+        // println("ff: $filter")
         namedParameterJdbcTemplate!!.query(query, params) { rs ->
             val record = rs.toRecord()
+
+            // println("rf: $record")
+
             code(record)
         }
     }

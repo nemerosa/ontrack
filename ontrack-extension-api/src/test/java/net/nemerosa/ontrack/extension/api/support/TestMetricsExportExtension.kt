@@ -94,9 +94,14 @@ class TestMetricsExportExtension(
         val item = MetricsData(
             metric, tags, fields, timestamp
         )
+        val list = if (data.isNotEmpty()) {
+            data.joinToString("\n") { " - $it" }
+        } else {
+            " <empty>"
+        }
         assertTrue(
             item in this,
-            "Expected metric:\n\n - $item\n\nin list:\n${data.joinToString("\n") { " - $it" }}"
+            "Expected metric:\n\n - $item\n\nin list:\n\n$list\n\n"
         )
     }
 
@@ -107,8 +112,13 @@ class TestMetricsExportExtension(
         timestamp: LocalDateTime? = null
     ) {
         val item = MetricsData(metric, tags, fields, timestamp)
+        val list = if (data.isNotEmpty()) {
+            data.joinToString("\n") { " - $it" }
+        } else {
+            " <empty>"
+        }
         assertTrue(item !in this,
-            "Expected no metric:\n\n - $item\n\nin list:\n${data.joinToString("\n") { " - $it" }}")
+            "Expected no metric:\n\n - $item\n\nin list:\n\n$list\n\n")
     }
 }
 

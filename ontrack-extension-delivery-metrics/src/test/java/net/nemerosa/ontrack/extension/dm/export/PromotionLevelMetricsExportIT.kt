@@ -3,11 +3,10 @@ package net.nemerosa.ontrack.extension.dm.export
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.api.support.TestMetricsExportExtension
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.PromotionLevel
+import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.test.TestUtils
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -69,10 +68,10 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
     fun `End to end time to promotion must take into account the oldest reference, not the latest one`() {
         asAdmin {
             val ref = Time.now()
-            val promotion = TestUtils.uid("P")
+            val promotion = uid("P")
             // Source project
-            val sourceName = TestUtils.uid("source-")
-            val source = project(NameDescription.nd(sourceName, ""))
+            val sourceName = uid("source-")
+            val source = project(nd(sourceName, ""))
             val sourceBranch = source.branch("main")
             val sourcePromotionLevel = sourceBranch.run {
                 promotionLevel(name = promotion)
@@ -80,8 +79,8 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
             val sourceBuild =
                 sourceBranch.build("source-1").updateBuildSignature(time = ref.minusHours(10)) // We count from here
             // Target project
-            val targetName = TestUtils.uid("target-")
-            val target = project(NameDescription.nd(targetName, ""))
+            val targetName = uid("target-")
+            val target = project(nd(targetName, ""))
             val targetBranch = target.branch("main")
             val targetPromotionLevel = targetBranch.run {
                 promotionLevel(name = promotion) // Alignment on the name
@@ -138,10 +137,10 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
     fun `End to end time to promotion with dependency promotion earlier than target promotion`() {
         asAdmin {
             val ref = Time.now()
-            val promotion = TestUtils.uid("P")
+            val promotion = uid("P")
             // Source project
-            val sourceName = TestUtils.uid("source-")
-            val source = project(NameDescription.nd(sourceName, ""))
+            val sourceName = uid("source-")
+            val source = project(nd(sourceName, ""))
             val sourceBranch = source.branch("main")
             val sourcePromotionLevel = sourceBranch.run {
                 promotionLevel(name = promotion)
@@ -149,8 +148,8 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
             val sourceBuild =
                 sourceBranch.build("source-1").updateBuildSignature(time = ref.minusHours(10)) // We count from here
             // Target project
-            val targetName = TestUtils.uid("target-")
-            val target = project(NameDescription.nd(targetName, ""))
+            val targetName = uid("target-")
+            val target = project(nd(targetName, ""))
             val targetBranch = target.branch("main")
             val targetPromotionLevel = targetBranch.run {
                 promotionLevel(name = promotion) // Alignment on the name
@@ -196,10 +195,10 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
     fun `End to end time to promotion with dependency promotion later than target promotion`() {
         asAdmin {
             val ref = Time.now()
-            val promotion = TestUtils.uid("P")
+            val promotion = uid("P")
             // Source project
-            val sourceName = TestUtils.uid("source-")
-            val source = project(NameDescription.nd(sourceName, ""))
+            val sourceName = uid("source-")
+            val source = project(nd(sourceName, ""))
             val sourceBranch = source.branch("main")
             val sourcePromotionLevel = sourceBranch.run {
                 promotionLevel(name = promotion)
@@ -207,8 +206,8 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
             val sourceBuild =
                 sourceBranch.build("source-1").updateBuildSignature(time = ref.minusHours(10)) // We start from here
             // Target project
-            val targetName = TestUtils.uid("target-")
-            val target = project(NameDescription.nd(targetName, ""))
+            val targetName = uid("target-")
+            val target = project(nd(targetName, ""))
             val targetBranch = target.branch("main")
             val targetPromotionLevel = targetBranch.run {
                 promotionLevel(name = promotion) // Alignment on the name
@@ -337,15 +336,45 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `End-to-end success rate across two projects with delayed dependency promotion`() {
+        testing {
+            component {
+                build()
+                // Build is created, we cannot have end-to-end metric since there is no link yet
+                assertNoEndToEndPromotionSuccessRateMetric(component, target)
+            }
+            target {
+                build()
+                linkTo(component)
+                // Target build is created and linked to the component, but no promotion
+                assertEndToEndPromotionSuccessRateMetric(component, target, 0)
+                // We now promote the target
+                promote()
+                // We don't expect an end-to-end metric
+                // because the dependency is still not promoted
+                assertEndToEndPromotionSuccessRateMetric(component, target, 0)
+            }
+            component {
+                // We now promote the dependency
+                promote()
+                // Metric is now available
+                assertEndToEndPromotionSuccessRateMetric(component, target, 1)
+            }
+        }
+    }
+
     private fun exportMetrics(
         now: LocalDateTime,
         ref: Project? = null,
+        target: Project? = null,
     ) {
         endToEndPromotionMetricsExportService.exportMetrics(
             branches = EndToEndPromotionMetricsExportSettings.DEFAULT_BRANCHES,
             start = now.minusDays(EndToEndPromotionMetricsExportSettings.DEFAULT_PAST_DAYS.toLong()),
             end = now,
             refProject = ref?.name,
+            targetProject = target?.name,
         )
     }
 
@@ -373,21 +402,21 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
     ) {
         asAdmin {
             val ref = Time.now()
-            val promotion = TestUtils.uid("P")
+            val promotion = uid("P")
             // Project names
-            val libraryName = TestUtils.uid("library-")
-            val componentName = TestUtils.uid("component-")
-            val projectName = TestUtils.uid("project-")
+            val libraryName = uid("library-")
+            val componentName = uid("component-")
+            val projectName = uid("project-")
             // Library level
             lateinit var libraryPromotionLevel: PromotionLevel
-            val library = project(NameDescription.nd(libraryName, ""))
+            val library = project(nd(libraryName, ""))
             val libraryBuild = library.branch<Build>("release-1.0") {
                 libraryPromotionLevel = promotionLevel(promotion)
                 build("10").updateBuildSignature(time = ref.minusHours(input.libraryRelTime)) // Start time for library
             }
             // Component level
             lateinit var componentPromotionLevel: PromotionLevel
-            val component = project(NameDescription.nd(componentName, ""))
+            val component = project(nd(componentName, ""))
             val componentBuild = component.branch<Build>("main") {
                 componentPromotionLevel = promotionLevel(promotion)
                 build("1") {
@@ -395,7 +424,7 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
                 }.updateBuildSignature(time = ref.minusHours(input.componentRelTime)) // Start time for component
             }
             // Target project linked to the previous component
-            project(NameDescription.nd(projectName, "")) {
+            project(nd(projectName, "")) {
                 branch("main") {
                     val pl = promotionLevel(promotion)
                     build().updateBuildSignature(time = ref.minusHours(input.projectRelTime)).apply {
@@ -435,4 +464,173 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
         val componentBuild: Build,
         val projectBuild: Build
     )
+
+    companion object {
+        const val GOLD = "GOLD"
+    }
+
+    protected fun testing(
+        code: TestingContext.() -> Unit
+    ) {
+        testMetricsExportExtension.clear()
+        val context = TestingContext()
+        asAdmin {
+            context.code()
+        }
+    }
+
+    protected inner class TestingContext {
+
+        val refTime: LocalDateTime = Time.now()
+
+        inner class ProjectContext(
+            namePrefix: String
+        ) {
+            val project = project(name = nd(uid(namePrefix), ""))
+            private val branch = project.branch("main")
+            private val pl = branch.promotionLevel(name = GOLD)
+
+            val build: Build by lazy {
+                build(time = Duration.ZERO)
+            }
+
+            fun build() = build
+
+            /**
+             * Creates a build with a custom time
+             */
+            fun build(time: Duration): Build {
+                val build = branch.build()
+                return build.updateBuildSignature(time = refTime.minus(time))
+            }
+
+            fun linkTo(linkedBuild: Build) {
+                build.linkTo(linkedBuild)
+            }
+
+            fun promote() {
+                build.promote(time = Duration.ZERO)
+            }
+
+            /**
+             * Promotes a build with a custom time
+             */
+            fun Build.promote(time: Duration): Build {
+                promote(pl, signature = Signature.of(refTime.minus(time), "test"))
+                return this
+            }
+
+        }
+
+        val libraryContext = ProjectContext("library-")
+        val componentContext = ProjectContext("component-")
+        val targetContext = ProjectContext("target-")
+
+        val library: Build get() = libraryContext.build()
+        val component: Build get() = componentContext.build()
+        val target: Build get() = targetContext.build()
+
+        fun assertEndToEndPromotionMetric(
+            dependency: Build,
+            dependent: Build,
+            metric: String,
+            expectedValue: Double,
+            collection: () -> Unit
+        ) {
+            testMetricsExportExtension.clear()
+            collection()
+            testMetricsExportExtension.assertHasMetric(
+                metric = metric,
+                tags = mapOf(
+                    "targetProject" to dependent.project.name,
+                    "sourceProject" to dependency.project.name,
+                    "sourceBranch" to dependency.branch.name,
+                    "promotion" to GOLD
+                ),
+                fields = mapOf(
+                    "value" to expectedValue
+                ),
+                timestamp = null
+            )
+        }
+
+        fun assertNoEndToEndPromotionMetric(
+            dependency: Build,
+            dependent: Build,
+            metric: String,
+            collection: () -> Unit
+        ) {
+            testMetricsExportExtension.clear()
+            collection()
+            testMetricsExportExtension.assertNoMetric(
+                metric = metric,
+                tags = mapOf(
+                    "targetProject" to dependent.project.name,
+                    "sourceProject" to dependency.project.name,
+                    "sourceBranch" to dependency.branch.name,
+                    "promotion" to GOLD
+                ),
+                timestamp = null
+            )
+        }
+
+        fun assertNoEndToEndPromotionMetric(
+            dependency: Branch,
+            dependent: Branch,
+            metric: String,
+            collection: () -> Unit
+        ) {
+            testMetricsExportExtension.clear()
+            collection()
+            testMetricsExportExtension.assertNoMetric(
+                metric = metric,
+                tags = mapOf(
+                    "targetProject" to dependent.project.name,
+                    "targetBranch" to dependent.name,
+                    "sourceProject" to dependency.project.name,
+                    "sourceBranch" to dependency.name,
+                    "promotion" to GOLD
+                ),
+                timestamp = null
+            )
+        }
+
+        fun <T> library(code: ProjectContext.() -> T): T =
+            libraryContext.code()
+
+        fun <T> component(code: ProjectContext.() -> T): T =
+            componentContext.code()
+
+        fun <T> target(code: ProjectContext.() -> T): T =
+            targetContext.code()
+
+    }
+
+    private fun TestingContext.assertNoEndToEndPromotionSuccessRateMetric(
+        dependency: Build,
+        dependent: Build
+    ) {
+        assertNoEndToEndPromotionMetric(
+            dependency = dependency,
+            dependent = dependent,
+            metric = EndToEndPromotionMetrics.PROMOTION_SUCCESS_RATE
+        ) {
+            exportMetrics(refTime, ref = dependency.project, target = dependent.project)
+        }
+    }
+
+    private fun TestingContext.assertEndToEndPromotionSuccessRateMetric(
+        dependency: Build,
+        dependent: Build,
+        value: Int
+    ) {
+        assertEndToEndPromotionMetric(
+            dependency = dependency,
+            dependent = dependent,
+            metric = EndToEndPromotionMetrics.PROMOTION_SUCCESS_RATE,
+            expectedValue = value.toDouble()
+        ) {
+            exportMetrics(refTime, ref = dependency.project, target = dependent.project)
+        }
+    }
 }
