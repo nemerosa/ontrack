@@ -364,7 +364,7 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `End-to-end failed promotions across two projects with early dependency promotion`() {
+    fun `End-to-end success rate across two projects with early dependency promotion`() {
         testing {
             component {
                 build()
@@ -380,6 +380,42 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
                 // We now promote the target
                 promote()
                 // Metric is now available
+                assertEndToEndPromotionSuccessRateMetric(component, target, 1)
+            }
+        }
+    }
+
+    @Test
+    fun `End-to-end success rate across three projects`() {
+        testing {
+            library {
+                build()
+                promote()
+                // Library promoted, not linked
+                assertNoEndToEndPromotionSuccessRateMetric(library, component)
+                assertNoEndToEndPromotionSuccessRateMetric(library, target)
+            }
+            component {
+                build()
+                linkTo(library)
+                promote()
+                // Link OK from library to component, with promotions at both ends
+                assertEndToEndPromotionSuccessRateMetric(library, component, 1)
+                // Still no link from component to target
+                assertNoEndToEndPromotionSuccessRateMetric(library, target)
+            }
+            target {
+                build()
+                linkTo(component)
+                // Links are all there, but target is not promoted yet
+                assertEndToEndPromotionSuccessRateMetric(library, component, 1)
+                assertEndToEndPromotionSuccessRateMetric(library, target, 0)
+                assertEndToEndPromotionSuccessRateMetric(component, target, 0)
+                // Promotion of the target
+                promote()
+                // End-to-end links are all promoted
+                assertEndToEndPromotionSuccessRateMetric(library, component, 1)
+                assertEndToEndPromotionSuccessRateMetric(library, target, 1)
                 assertEndToEndPromotionSuccessRateMetric(component, target, 1)
             }
         }
