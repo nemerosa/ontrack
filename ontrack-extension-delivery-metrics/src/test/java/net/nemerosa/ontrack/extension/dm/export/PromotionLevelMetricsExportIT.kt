@@ -306,6 +306,37 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Collection of past end to end times to promotion over several projects`() {
+        multiLevelScenario { context ->
+            // Promotion in order (library --> component --> project)
+            context.projectBuild.promote(context.projectPromotionLevel, time = context.ref.minusHours(5))
+            context.componentBuild.promote(
+                context.componentPromotionLevel,
+                time = context.ref.minusHours(4)
+            )
+            context.libraryBuild.promote(context.libraryPromotionLevel, time = context.ref.minusHours(3))
+            // Removes all past metrics
+            testMetricsExportExtension.clear()
+            // Collects them again
+            exportMetrics(context.ref, ref = context.componentBuild.project)
+            exportMetrics(context.ref, ref = context.libraryBuild.project)
+            // Check metrics
+            // Time from the component
+            assertEndToEndMetric(
+                target = context.projectBuild to context.projectPromotionLevel,
+                sourceBuild = context.componentBuild,
+                hours = 4
+            )
+            // Time from the library
+            assertEndToEndMetric(
+                target = context.projectBuild to context.projectPromotionLevel,
+                sourceBuild = context.libraryBuild,
+                hours = 7
+            )
+        }
+    }
+
     private fun exportMetrics(
         now: LocalDateTime,
         ref: Project? = null,
