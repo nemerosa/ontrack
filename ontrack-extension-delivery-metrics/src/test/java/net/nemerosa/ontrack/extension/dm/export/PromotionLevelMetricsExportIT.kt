@@ -708,7 +708,7 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
     }
 
     private fun exportMetrics(
-        now: LocalDateTime,
+        now: LocalDateTime = Time.now(),
         ref: Project? = null,
         target: Project? = null,
     ) {
@@ -836,6 +836,130 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
                             "value" to Duration.ofHours(3).toSeconds().toDouble()
                         ),
                         timestamp = run.signature.time
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Build metric sent on creation`() {
+        project {
+            branch("main") {
+                val silver = promotionLevel()
+                val gold = promotionLevel()
+                build {
+                    testMetricsExportExtension.clear()
+                    exportMetrics(ref = project)
+                    // Checks that metrics have been sent for each promotion
+                    listOf(silver, gold).forEach { pl ->
+                        testMetricsExportExtension.assertHasMetric(
+                            metric = EndToEndPromotionMetrics.PROMOTION_SUCCESS_RATE,
+                            tags = mapOf(
+                                "targetProject" to project.name,
+                                "targetBranch" to branch.name,
+                                "sourceProject" to project.name,
+                                "sourceBranch" to branch.name,
+                                "promotion" to pl.name
+                            ),
+                            fields = mapOf(
+                                "value" to 0.0
+                            ),
+                            timestamp = signature.time
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Build metric sent on promotion`() {
+        project {
+            branch("main") {
+                val silver = promotionLevel()
+                val gold = promotionLevel()
+                build {
+                    // Promotion
+                    promote(silver)
+                    // Checks that metrics has been sent for only the promotion
+                    testMetricsExportExtension.clear()
+                    exportMetrics(ref = project)
+                    testMetricsExportExtension.assertHasMetric(
+                        metric = EndToEndPromotionMetrics.PROMOTION_SUCCESS_RATE,
+                        tags = mapOf(
+                            "targetProject" to project.name,
+                            "targetBranch" to branch.name,
+                            "sourceProject" to project.name,
+                            "sourceBranch" to branch.name,
+                            "promotion" to silver.name
+                        ),
+                        fields = mapOf(
+                            "value" to 1.0
+                        ),
+                        timestamp = signature.time
+                    )
+                    // ... and only for one
+                    testMetricsExportExtension.assertNoMetric(
+                        metric = EndToEndPromotionMetrics.PROMOTION_SUCCESS_RATE,
+                        tags = mapOf(
+                            "targetProject" to project.name,
+                            "targetBranch" to branch.name,
+                            "sourceProject" to project.name,
+                            "sourceBranch" to branch.name,
+                            "promotion" to gold.name
+                        ),
+                        fields = mapOf(
+                            "value" to 1.0
+                        ),
+                        timestamp = signature.time
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Build metric sent on creation, then on promotion`() {
+        project {
+            branch("main") {
+                val silver = promotionLevel()
+                build {
+                    // Checks that metrics has been sent for the creation first
+                    testMetricsExportExtension.clear()
+                    exportMetrics(ref = project)
+                    testMetricsExportExtension.assertHasMetric(
+                        metric = EndToEndPromotionMetrics.PROMOTION_SUCCESS_RATE,
+                        tags = mapOf(
+                            "targetProject" to project.name,
+                            "targetBranch" to branch.name,
+                            "sourceProject" to project.name,
+                            "sourceBranch" to branch.name,
+                            "promotion" to silver.name
+                        ),
+                        fields = mapOf(
+                            "value" to 0.0 // Not promoted
+                        ),
+                        timestamp = signature.time
+                    )
+                    // Promotion
+                    promote(silver)
+                    // ... then for the promotion
+                    testMetricsExportExtension.clear()
+                    exportMetrics(ref = project)
+                    testMetricsExportExtension.assertHasMetric(
+                        metric = EndToEndPromotionMetrics.PROMOTION_SUCCESS_RATE,
+                        tags = mapOf(
+                            "targetProject" to project.name,
+                            "targetBranch" to branch.name,
+                            "sourceProject" to project.name,
+                            "sourceBranch" to branch.name,
+                            "promotion" to silver.name
+                        ),
+                        fields = mapOf(
+                            "value" to 1.0 // ... then promoted
+                        ),
+                        timestamp = signature.time
                     )
                 }
             }
