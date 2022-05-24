@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.api.support.TestMetricsExportExtension
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
-import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -357,6 +356,28 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
             }
             component {
                 // We now promote the dependency
+                promote()
+                // Metric is now available
+                assertEndToEndPromotionSuccessRateMetric(component, target, 1)
+            }
+        }
+    }
+
+    @Test
+    fun `End-to-end failed promotions across two projects with early dependency promotion`() {
+        testing {
+            component {
+                build()
+                promote()
+                // Build is created and promoted, but no link, we don't have an end-to-end metric
+                assertNoEndToEndPromotionSuccessRateMetric(component, target)
+            }
+            target {
+                build()
+                linkTo(component)
+                // Target build is created and linked to the component, but no promotion
+                assertEndToEndPromotionSuccessRateMetric(component, target, 0)
+                // We now promote the target
                 promote()
                 // Metric is now available
                 assertEndToEndPromotionSuccessRateMetric(component, target, 1)
