@@ -721,6 +721,127 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
         )
     }
 
+    @Test
+    fun `No TTR for promotion when no intermediate build`() {
+        val ref = Time.now()
+        project {
+            branch("main") {
+                val pl = promotionLevel()
+                build {
+                    updateBuildSignature(time = ref.minusHours(10))
+                    promote(pl, time = ref.minusHours(9))
+                }
+                build {
+                    updateBuildSignature(time = ref.minusHours(6))
+                    promote(pl, time = ref.minusHours(5))
+                    testMetricsExportExtension.clear()
+                    exportMetrics(ref, ref = project)
+                    // No TTR
+                    testMetricsExportExtension.assertNoMetric(EndToEndPromotionMetrics.PROMOTION_TTR)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `No TTR for promotion when no previous promotion`() {
+        val ref = Time.now()
+        project {
+            branch("main") {
+                val pl = promotionLevel()
+                build {
+                    updateBuildSignature(time = ref.minusHours(6))
+                    promote(pl, time = ref.minusHours(5))
+                    testMetricsExportExtension.clear()
+                    exportMetrics(ref, ref = project)
+                    // No TTR
+                    testMetricsExportExtension.assertNoMetric(EndToEndPromotionMetrics.PROMOTION_TTR)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `TTR for promotion with one intermediate build`() {
+        val ref = Time.now()
+        project {
+            branch("main") {
+                val pl = promotionLevel("GOLD")
+                // First build is promoted
+                build("1") {
+                    updateBuildSignature(time = ref.minusHours(10))
+                    promote(pl, time = ref.minusHours(9))
+                }
+                // Second build is not promoted, we start counting from there
+                build("2") {
+                    updateBuildSignature(time = ref.minusHours(8)) // We start counting here
+                }
+                // Third build fixes
+                build("3") {
+                    updateBuildSignature(time = ref.minusHours(6))
+                    val run = promote(pl, time = ref.minusHours(5)) // We end the count here
+                    testMetricsExportExtension.clear()
+                    exportMetrics(ref, ref = project)
+                    // TTR
+                    testMetricsExportExtension.assertHasMetric(
+                        metric = EndToEndPromotionMetrics.PROMOTION_TTR,
+                        tags = mapOf(
+                            "targetProject" to project.name,
+                            "targetBranch" to branch.name,
+                            "sourceProject" to project.name,
+                            "sourceBranch" to branch.name,
+                            "promotion" to pl.name
+                        ),
+                        fields = mapOf(
+                            "value" to Duration.ofHours(3).toSeconds().toDouble()
+                        ),
+                        timestamp = run.signature.time
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `TTR for promotion with one intermediate build promoted to something else`() {
+        val ref = Time.now()
+        project {
+            branch("main") {
+                val pl = promotionLevel()
+                val other = promotionLevel()
+                build {
+                    updateBuildSignature(time = ref.minusHours(10))
+                    promote(pl, time = ref.minusHours(9)) // End time
+                }
+                build {
+                    updateBuildSignature(time = ref.minusHours(8))
+                    promote(other, time = ref.minusHours(7))
+                }
+                build {
+                    updateBuildSignature(time = ref.minusHours(6)) // Start time
+                    val run = promote(pl, time = ref.minusHours(5))
+                    testMetricsExportExtension.clear()
+                    exportMetrics(ref, ref = project)
+                    // TTR
+                    testMetricsExportExtension.assertHasMetric(
+                        metric = EndToEndPromotionMetrics.PROMOTION_TTR,
+                        tags = mapOf(
+                            "targetProject" to project.name,
+                            "targetBranch" to branch.name,
+                            "sourceProject" to project.name,
+                            "sourceBranch" to branch.name,
+                            "promotion" to pl.name
+                        ),
+                        fields = mapOf(
+                            "value" to Duration.ofHours(3).toSeconds().toDouble()
+                        ),
+                        timestamp = run.signature.time
+                    )
+                }
+            }
+        }
+    }
+
     private fun assertEndToEndMetric(target: Pair<Build, PromotionLevel>, sourceBuild: Build, hours: Long) {
         val (targetBuild, targetPromotion) = target
         testMetricsExportExtension.assertHasMetric(
@@ -999,7 +1120,7 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
             dependency = dependency,
             dependent = dependent,
             metric = EndToEndPromotionMetrics.PROMOTION_TTR,
-            expectedValue = value.toMillis().toDouble()
+            expectedValue = value.toSeconds().toDouble()
         ) {
             exportMetrics(refTime, ref = dependency.project, target = dependent.project)
         }

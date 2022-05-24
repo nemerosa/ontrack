@@ -226,13 +226,11 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     protected fun <T, P : PropertyType<T>> ProjectEntity.property(type: KClass<P>): T? =
             propertyService.getProperty(this, type.java).value
 
-    fun Build.promote(promotionLevel: PromotionLevel, description: String = "", signature: Signature = Signature.of("test")) {
+    fun Build.promote(promotionLevel: PromotionLevel, description: String = "", signature: Signature = Signature.of("test")) =
         doPromote(this, promotionLevel, description, signature)
-    }
 
-    fun Build.promote(promotionLevel: PromotionLevel, description: String = "", time: LocalDateTime) {
+    fun Build.promote(promotionLevel: PromotionLevel, description: String = "", time: LocalDateTime) =
         promote(promotionLevel, description, signature = Signature.Companion.of(time, "test"))
-    }
 
     /**
      * Creates a validation run on a build.

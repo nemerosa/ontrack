@@ -30,7 +30,7 @@ class PromotionLevelTTRMetrics : PromotionMetricsCollector {
                             // We can emit the metric...
                             val maxPromotionTime = maxOf(record.ref.promotionCreation, record.target.promotionCreation)
                             val elapsedTime = Duration.between(previousRecord.ref.buildCreation, maxPromotionTime)
-                            val value = elapsedTime.toMillis().toDouble()
+                            val value = elapsedTime.toSeconds().toDouble()
                             recorder(
                                 Metric(
                                     metric = EndToEndPromotionMetrics.PROMOTION_TTR,
