@@ -441,6 +441,25 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `With one dependency, no TTR when the second build is not promoted at dependency end`() {
+        testing {
+            val component1 = component {
+                build(10.hours).promote(9.hours)
+            }
+            target {
+                build(8.hours).apply { linkTo(component1) }.promote(7.hours)
+            }
+            val component2 = component {
+                build(6.hours) // Not promoted
+            }
+            target {
+                build(4.hours).apply { linkTo(component2) }.promote(3.hours) // Still promoted
+            }
+            assertNoEndToEndTTRPromotionMetric(component.branch, target.branch)
+        }
+    }
+
     private fun exportMetrics(
         now: LocalDateTime,
         ref: Project? = null,
