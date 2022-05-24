@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.dm.export
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.hours
+import net.nemerosa.ontrack.common.minutes
 import net.nemerosa.ontrack.extension.api.support.TestMetricsExportExtension
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.structure.*
@@ -460,6 +461,252 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `With one dependency, no TTR when the second build is not promoted at target end`() {
+        testing {
+            val component1 = component {
+                build(10.hours).promote(9.hours)
+            }
+            target {
+                build(8.hours).apply { linkTo(component1) }.promote(7.hours)
+            }
+            val component2 = component {
+                build(6.hours).promote(5.hours)
+            }
+            target {
+                build(4.hours).apply { linkTo(component2) } // Not promoted
+            }
+            assertNoEndToEndTTRPromotionMetric(component.branch, target.branch)
+        }
+    }
+
+    @Test
+    fun `With one dependency, no TTR when the second build is not promoted at both ends`() {
+        testing {
+            val component1 = component {
+                build(10.hours).promote(9.hours)
+            }
+            target {
+                build(8.hours).apply { linkTo(component1) }.promote(7.hours)
+            }
+            val component2 = component {
+                build(6.hours) // Not promoted
+            }
+            target {
+                build(4.hours).apply { linkTo(component2) } // Not promoted
+            }
+            assertNoEndToEndTTRPromotionMetric(component.branch, target.branch)
+        }
+    }
+
+    @Test
+    fun `With one dependency, TTR when the third build is promoted at both ends`() {
+        testing {
+            val component1 = component {
+                build(10.hours).promote(9.hours)
+            }
+            target {
+                build(8.hours).apply { linkTo(component1) }.promote(7.hours)
+            }
+            val component2 = component {
+                build(6.hours) // Not promoted
+            }
+            target {
+                build(4.hours).apply { linkTo(component2) } // Not promoted
+            }
+            val component3 = component {
+                build(2.hours).promote(1.hours)
+            }
+            val target3 = target {
+                build(30.minutes).apply { linkTo(component3) }.promote(15.minutes)
+            }
+
+            assertEndToEndTTRPromotionMetric(component3, target3, (6.hours - 15.minutes))
+        }
+    }
+
+    @Test
+    fun `With an intermediate dependency, no TTR when all ends are promoted twice in a row`() {
+        testing {
+            // First build links
+            val library1 = library {
+                build(12.hours).promote(11.hours)
+            }
+            val component1 = component {
+                build(10.hours).apply { linkTo(library1) }.promote(9.hours)
+            }
+            target {
+                build(8.hours).apply { linkTo(component1) }.promote(7.hours)
+            }
+            // Second build links
+            val library2 = library {
+                build(6.hours).promote(5.hours)
+            }
+            val component2 = component {
+                build(4.hours).apply { linkTo(library2) }.promote(3.hours)
+            }
+            target {
+                build(2.hours).apply { linkTo(component2) }.promote(1.hours)
+            }
+            assertNoEndToEndTTRPromotionMetric(library.branch, target.branch)
+        }
+    }
+
+    @Test
+    fun `With an intermediate dependency, no TTR when both ends are not promoted`() {
+        testing {
+            // First build links
+            val library1 = library {
+                build(12.hours).promote(11.hours)
+            }
+            val component1 = component {
+                build(10.hours).apply { linkTo(library1) }.promote(9.hours)
+            }
+            target {
+                build(8.hours).apply { linkTo(component1) }.promote(7.hours)
+            }
+            // Second build links
+            val library2 = library {
+                build(6.hours) // Not promoted
+            }
+            val component2 = component {
+                build(4.hours).apply { linkTo(library2) }.promote(3.hours)
+            }
+            target {
+                build(2.hours).apply { linkTo(component2) } // Not promoted
+            }
+            assertNoEndToEndTTRPromotionMetric(library.branch, target.branch)
+        }
+    }
+
+    @Test
+    fun `With an intermediate dependency, no TTR when dependency end is not promoted`() {
+        testing {
+            // First build links
+            val library1 = library {
+                build(12.hours).promote(11.hours)
+            }
+            val component1 = component {
+                build(10.hours).apply { linkTo(library1) }.promote(9.hours)
+            }
+            target {
+                build(8.hours).apply { linkTo(component1) }.promote(7.hours)
+            }
+            // Second build links
+            val library2 = library {
+                build(6.hours) // Not promoted
+            }
+            val component2 = component {
+                build(4.hours).apply { linkTo(library2) }.promote(3.hours)
+            }
+            target {
+                build(2.hours).apply { linkTo(component2) }.promote(1.hours)
+            }
+            assertNoEndToEndTTRPromotionMetric(library.branch, target.branch)
+        }
+    }
+
+    @Test
+    fun `With an intermediate dependency, no TTR when target end is not promoted`() {
+        testing {
+            // First build links
+            val library1 = library {
+                build(12.hours).promote(11.hours)
+            }
+            val component1 = component {
+                build(10.hours).apply { linkTo(library1) }.promote(9.hours)
+            }
+            target {
+                build(8.hours).apply { linkTo(component1) }.promote(7.hours)
+            }
+            // Second build links
+            val library2 = library {
+                build(6.hours).promote(5.hours)
+            }
+            val component2 = component {
+                build(4.hours).apply { linkTo(library2) }.promote(3.hours)
+            }
+            target {
+                build(2.hours).apply { linkTo(component2) } // Not promoted
+            }
+            assertNoEndToEndTTRPromotionMetric(library.branch, target.branch)
+        }
+    }
+
+    @Test
+    fun `With an intermediate dependency, TTR when both ends are promoted after a failure`() {
+        testing {
+            // First build links
+            val library1 = library {
+                build(18.hours).promote(17.hours)
+            }
+            val component1 = component {
+                build(16.hours).apply { linkTo(library1) }.promote(15.hours)
+            }
+            target {
+                build(14.hours).apply { linkTo(component1) }.promote(13.hours)
+            }
+            // Second build links
+            val library2 = library {
+                build(12.hours) // Not promoted, starting the time counter
+            }
+            val component2 = component {
+                build(10.hours).apply { linkTo(library2) }.promote(9.hours)
+            }
+            target {
+                build(8.hours).apply { linkTo(component2) }.promote(7.hours)
+            }
+            // Third build links are the charm
+            val library3 = library {
+                build(6.hours).promote(5.hours)
+            }
+            val component3 = component {
+                build(4.hours).apply { linkTo(library3) }.promote(3.hours)
+            }
+            val target3 = target {
+                build(3.hours).apply { linkTo(component3) }.promote(1.hours) // Fix time
+            }
+            assertEndToEndTTRPromotionMetric(library3, target3, 11.hours)
+        }
+    }
+
+    @Test
+    fun `With an intermediate dependency, TTR when both ends are promoted after a failure even when intermediate dependency is not promoted`() {
+        testing {
+            // First build links
+            val library1 = library {
+                build(18.hours).promote(17.hours)
+            }
+            val component1 = component {
+                build(16.hours).apply { linkTo(library1) }.promote(15.hours)
+            }
+            target {
+                build(14.hours).apply { linkTo(component1) }.promote(13.hours)
+            }
+            // Second build links
+            val library2 = library {
+                build(12.hours) // Not promoted, starting the time counter
+            }
+            val component2 = component {
+                build(10.hours).apply { linkTo(library2) }.promote(9.hours)
+            }
+            target {
+                build(8.hours).apply { linkTo(component2) }.promote(7.hours)
+            }
+            // Third build links are the charm
+            val library3 = library {
+                build(6.hours).promote(5.hours)
+            }
+            val component3 = component {
+                build(4.hours).apply { linkTo(library3) } // Not promoted
+            }
+            val target3 = target {
+                build(3.hours).apply { linkTo(component3) }.promote(1.hours) // Fix time
+            }
+            assertEndToEndTTRPromotionMetric(library3, target3, 11.hours)
+        }
+    }
+
     private fun exportMetrics(
         now: LocalDateTime,
         ref: Project? = null,
@@ -738,6 +985,21 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
             dependency = dependency,
             dependent = dependent,
             metric = EndToEndPromotionMetrics.PROMOTION_TTR
+        ) {
+            exportMetrics(refTime, ref = dependency.project, target = dependent.project)
+        }
+    }
+
+    private fun TestingContext.assertEndToEndTTRPromotionMetric(
+        dependency: Build,
+        dependent: Build,
+        value: Duration
+    ) {
+        assertEndToEndPromotionMetric(
+            dependency = dependency,
+            dependent = dependent,
+            metric = EndToEndPromotionMetrics.PROMOTION_TTR,
+            expectedValue = value.toMillis().toDouble()
         ) {
             exportMetrics(refTime, ref = dependency.project, target = dependent.project)
         }

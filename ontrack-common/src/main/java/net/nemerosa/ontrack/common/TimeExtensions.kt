@@ -15,3 +15,8 @@ fun LocalDateTime.truncate() = Time.truncate(this)
  * Converts a number of hours into a [Duration].
  */
 val Int.hours: Duration get() = Duration.ofHours(toLong())
+
+/**
+ * Converts a number of minutes into a [Duration].
+ */
+val Int.minutes: Duration get() = Duration.ofMinutes(toLong())
