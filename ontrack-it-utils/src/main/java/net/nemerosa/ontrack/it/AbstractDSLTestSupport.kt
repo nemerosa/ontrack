@@ -201,13 +201,12 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     fun Build.updateBuildSignature(
             user: String? = null,
             time: LocalDateTime? = null
-    ) {
+    ) =
         structureService.saveBuild(
                 withSignature(
                         Signature(time ?: signature.time, user?.let { User(user) } ?: signature.user)
                 )
         )
-    }
 
     protected fun <T, P : PropertyType<T>> ProjectEntity.property(type: KClass<P>, value: T?) {
         if (value != null) {

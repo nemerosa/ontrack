@@ -24,6 +24,14 @@ class TestMetricsExportExtension(
         data.clear()
     }
 
+    fun enable() {
+        enabled = true
+    }
+
+    fun disable() {
+        enabled = false
+    }
+
     override fun batchExportMetrics(metrics: Collection<Metric>) {
         if (enabled) {
             data.addAll(metrics.map {
@@ -90,6 +98,17 @@ class TestMetricsExportExtension(
             item in this,
             "Expected metric:\n\n - $item\n\nin list:\n${data.joinToString("\n") { " - $it" }}"
         )
+    }
+
+    fun assertNoMetric(
+        metric: String,
+        tags: Map<String, String>,
+        fields: Map<String, Double> = emptyMap(),
+        timestamp: LocalDateTime? = null
+    ) {
+        val item = MetricsData(metric, tags, fields, timestamp)
+        assertTrue(item !in this,
+            "Expected no metric:\n\n - $item\n\nin list:\n${data.joinToString("\n") { " - $it" }}")
     }
 }
 
