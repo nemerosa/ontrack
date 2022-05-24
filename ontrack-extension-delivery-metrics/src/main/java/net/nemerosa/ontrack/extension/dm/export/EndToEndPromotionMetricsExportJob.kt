@@ -43,7 +43,7 @@ class EndToEndPromotionMetricsExportJob(
             "Export of end-to-end promotion metrics"
 
         override fun isDisabled(): Boolean =
-            cachedSettingsService.getCachedSettings(EndToEndPromotionMetricsExportSettings::class.java).enabled
+            !cachedSettingsService.getCachedSettings(EndToEndPromotionMetricsExportSettings::class.java).enabled
 
     }
 }
