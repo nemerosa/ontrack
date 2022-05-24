@@ -3,8 +3,10 @@ package net.nemerosa.ontrack.extension.dm.export
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.api.support.TestMetricsExportExtension
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -248,6 +250,35 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `End to end time to promotion over several projects, promoted in order`() {
+        multiLevelScenario { context ->
+            context.libraryBuild.promote(context.libraryPromotionLevel, time = context.ref.minusHours(9))
+            context.componentBuild.promote(
+                context.componentPromotionLevel,
+                time = context.ref.minusHours(7)
+            )
+            context.projectBuild.promote(
+                context.projectPromotionLevel,
+                time = context.ref.minusHours(5)
+            ) // Latest time for library & component
+            exportMetrics(context.ref, ref = context.componentBuild.project)
+            exportMetrics(context.ref, ref = context.libraryBuild.project)
+            // Time from the component
+            assertEndToEndMetric(
+                target = context.projectBuild to context.projectPromotionLevel,
+                sourceBuild = context.componentBuild,
+                hours = 3
+            )
+            // Time from the library
+            assertEndToEndMetric(
+                target = context.projectBuild to context.projectPromotionLevel,
+                sourceBuild = context.libraryBuild,
+                hours = 5
+            )
+        }
+    }
+
     private fun exportMetrics(
         now: LocalDateTime,
         ref: Project? = null,
@@ -260,4 +291,90 @@ class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
         )
     }
 
+    private fun assertEndToEndMetric(target: Pair<Build, PromotionLevel>, sourceBuild: Build, hours: Long) {
+        val (targetBuild, targetPromotion) = target
+        testMetricsExportExtension.assertHasMetric(
+            metric = "ontrack_dm_promotion_lead_time",
+            tags = mapOf(
+                "targetProject" to targetBuild.project.name,
+                "sourceProject" to sourceBuild.project.name,
+                "targetBranch" to targetBuild.branch.name,
+                "sourceBranch" to sourceBuild.branch.name,
+                "promotion" to targetPromotion.name
+            ),
+            fields = mapOf(
+                "value" to Duration.ofHours(hours).toSeconds().toDouble()
+            ),
+            timestamp = null
+        )
+    }
+
+    private fun multiLevelScenario(
+        input: MultiLevelScenarioInput = MultiLevelScenarioInput(),
+        promotions: (MultiLevelScenarioContext) -> Unit
+    ) {
+        asAdmin {
+            val ref = Time.now()
+            val promotion = TestUtils.uid("P")
+            // Project names
+            val libraryName = TestUtils.uid("library-")
+            val componentName = TestUtils.uid("component-")
+            val projectName = TestUtils.uid("project-")
+            // Library level
+            lateinit var libraryPromotionLevel: PromotionLevel
+            val library = project(NameDescription.nd(libraryName, ""))
+            val libraryBuild = library.branch<Build>("release-1.0") {
+                libraryPromotionLevel = promotionLevel(promotion)
+                build("10").updateBuildSignature(time = ref.minusHours(input.libraryRelTime)) // Start time for library
+            }
+            // Component level
+            lateinit var componentPromotionLevel: PromotionLevel
+            val component = project(NameDescription.nd(componentName, ""))
+            val componentBuild = component.branch<Build>("main") {
+                componentPromotionLevel = promotionLevel(promotion)
+                build("1") {
+                    linkTo(libraryBuild)
+                }.updateBuildSignature(time = ref.minusHours(input.componentRelTime)) // Start time for component
+            }
+            // Target project linked to the previous component
+            project(NameDescription.nd(projectName, "")) {
+                branch("main") {
+                    val pl = promotionLevel(promotion)
+                    build().updateBuildSignature(time = ref.minusHours(input.projectRelTime)).apply {
+                        // Linked to the source
+                        linkTo(componentBuild)
+                        // Promotions
+                        testMetricsExportExtension.clear()
+                        promotions(
+                            MultiLevelScenarioContext(
+                                ref = ref,
+                                libraryPromotionLevel = libraryPromotionLevel,
+                                componentPromotionLevel = componentPromotionLevel,
+                                projectPromotionLevel = pl,
+                                libraryBuild = libraryBuild,
+                                componentBuild = componentBuild,
+                                projectBuild = this
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private class MultiLevelScenarioInput(
+        val libraryRelTime: Long = 10,
+        val componentRelTime: Long = 8,
+        val projectRelTime: Long = 6
+    )
+
+    private class MultiLevelScenarioContext(
+        val ref: LocalDateTime,
+        val libraryPromotionLevel: PromotionLevel,
+        val componentPromotionLevel: PromotionLevel,
+        val projectPromotionLevel: PromotionLevel,
+        val libraryBuild: Build,
+        val componentBuild: Build,
+        val projectBuild: Build
+    )
 }
