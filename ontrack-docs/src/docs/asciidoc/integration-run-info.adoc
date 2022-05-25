@@ -49,31 +49,9 @@ It is of course available through the REST API, GraphQL and the DSL.
 [[run-info-export]]
 ==== Exporting the run info
 
-While the run info is available from Ontrack, it can also be exported to
-other databases.
+While the run info is available from Ontrack, it can also be exported some metric backends.
 
-As of today, only InfluxDB is supported.
-
-[[run-info-export-influxdb]]
-===== Exporting the run info to InfluxDB
-
-[NOTE]
-====
-InfluxDB connector must be enabled - see <<monitoring-metrics-influxdb>>.
-====
-
-In order to export Ontrack run info as points into an InfluxDB database,
-following elements must be configured:
-
-|===
-| Property | Environment variable | Default | Description
-
-| `ontrack.influxdb.run-info`
-| `ONTRACK_INFLUXDB_RUN_INFO`
-| `true`
-| If `true`, the run info is exported to InfluxDB (`true` by default)
-
-|===
+See <<operations-metrics>> for the list of available metrics backends.
 
 [[run-info-export-extending]]
 ===== Exporting the run info using extensions
@@ -85,5 +63,4 @@ See <<extending-metrics-run-info-listeners>> for more information.
 [[run-info-export-restoration]]
 ===== Restoring the exported run info
 
-It's possible to run the "Run info restoration" manual system job in order
-to re-export all run infos to the registered exporters.
+It's possible to run the "Run info restoration" manual system job in order to re-export all run infos to the registered exporters.

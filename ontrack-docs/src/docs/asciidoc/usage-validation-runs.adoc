@@ -138,28 +138,9 @@ NOTE: The actual validation data type is taken from the validation stamp.
 [[validation-runs-data-metrics]]
 ===== Run data metrics
 
-While the validation run data is available from Ontrack, it can also be exported to
-other databases.
+While the validation run data is available from Ontrack, it can also be exported as metrics.
 
-As of today, only InfluxDB is supported.
-
-[NOTE]
-====
-InfluxDB connector must be enabled - see <<monitoring-metrics-influxdb>>.
-====
-
-In order to export Ontrack validation as points into an InfluxDB database,
-following elements must be configured:
-
-|===
-| Property | Environment variable | Default | Description
-
-| `ontrack.influxdb.validation-data`
-| `ONTRACK_INFLUXDB_VALIDATION_DATA`
-| `true`
-| If `true`, the validation run data is exported to InfluxDB (`true` by default)
-
-|===
+See <<operations-metrics>> for the list of available metrics backends.
 
 Each point contains the following information:
 

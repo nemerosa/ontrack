@@ -99,7 +99,7 @@ metrics system.
 
 [NOTE]
 ====
-As of now, only <<monitoring-metrics-influxdb,InfluxDB>> is supported.
+See <<operations-metrics>> for a list of supported metric backends for this feature.
 ====
 
 To export a metric, just call the `exportMetrics` method on the service:

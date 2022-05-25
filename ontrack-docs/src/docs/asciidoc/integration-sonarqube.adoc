@@ -1,8 +1,7 @@
 [[integration-sonarqube]]
 === SonarQube integration
 
-It's possible to configure <<model,projects>> so that any build which has been scanned by SonarQube gets some measures registered in Ontrack and those same measures can then be exported to some event storage like
-<<monitoring-metrics-influxdb,InfluxDB>>.
+It's possible to configure <<model,projects>> so that any build which has been scanned by SonarQube gets some measures registered in Ontrack and those same measures can then be exported as <<monitoring-metrics,metrics>>.
 
 [plantuml,"integration-sonarqube",png]
 ----
@@ -117,9 +116,9 @@ Once SonarQube measures have been collected for a build, they are available in t
 [[integration-sonarqube-metrics]]
 ==== Export of measures
 
-Once SonarQube measures have been collected for a build, they are automatically exported as metrics, like InfluxDB, if enabled.
+Once SonarQube measures have been collected for a build, they are automatically exported as metrics if enabled.
 
-See <<monitoring-metrics-influxdb>> for more information.
+See <<operations-metrics>> for more information.
 
 The list of metrics are the following.
 

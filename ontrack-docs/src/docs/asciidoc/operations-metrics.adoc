@@ -12,3 +12,6 @@ By default, only the Prometheus export is enabled.
 The list of available metrics is available at <<monitoring>>.
 
 include::operations-metrics-elastic.adoc[]
+
+include::operations-metrics-influxdb.adoc[]
+

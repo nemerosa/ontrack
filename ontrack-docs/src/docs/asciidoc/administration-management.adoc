@@ -75,7 +75,7 @@ The following end points are exposed by default:
 
 Additionally, custom management end points are available:
 
-* `/manage/influxdb` - if <<integration-influxdb,InfluxDB integration>> is enabled. The `GET` method returns the status of the connection between Ontrack and InfluxDB, and the `POST` method forces a reconnection. See <<monitoring-metrics-influxdb-management>> for more information.
+* `/manage/influxdb` - if <<operations-metrics-influxdb,InfluxDB integration>> is enabled. The `GET` method returns the status of the connection between Ontrack and InfluxDB, and the `POST` method forces a reconnection. See <<operations-metrics-influxdb>> for more information.
 
 * `/manage/connectors` - the connectors are used to connect to external systems like Jenkins, JIRA, Git repositories, etc. The `manage/connectors` end point allows an <<security,administrator>> to get information about the state of those connectors.
 
