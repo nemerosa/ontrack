@@ -58,3 +58,42 @@ For API access to the single project delivery metrics, consider using the export
 
 [[delivery-metrics-e2e]]
 ==== End-to-end project delivery metrics
+
+[NOTE]
+====
+As of now, end-to-end delivery metrics are not available in the UI, only as <<operations-metrics,metrics>>. You'll need to use tools like Grafana or Kibana to show them on charts.
+====
+
+The end-to-end delivery metrics are performance metrics for the promotions across several projects, following the links between the builds.
+
+For example:
+
+* given a project P depending on a component C which itself depends on a library L
+* given a promotion GOLD valid on all these components
+
+We can measure the performance of this promotion by following the links from L to C to P.
+
+The metric axes exposed at the beginning translate into:
+
+* lead time - how long does it take from the moment a L build is created to the moment it is available in C and P, with all builds are all levels being GOLD?
+* frequency - how often does it happen that for each L build, all linked L, C and P builds will all be GOLD?
+* success rate - for each L build, how many of them are GOLD and also their linked C and P builds?
+* time to restore - if a chain L -> C -> P is not GOLD, how long does it take to restore it to full GOLD?
+
+All these metrics are <<operations-metrics,exported>> for each transitive link, branch & promotion. In our previous example, we'll have records for the pairs:
+
+* L:L - same as <<delivery-metrics-single-project,single project delivery metric>>
+* L:C, C:P - one level of dependency
+* L:P - two levels of dependency
+
+The following metrics are available:
+
+* ontrack_dm_promotion_lead_time - in seconds - for the lead time
+ontrack_dm_promotion_success_rate - percentage (from 0.0 to 1.0) - success rate
+ontrack_dm_promotion_ttr - in seconds - for the time to restore
+
+Each metric is associated with the following tags:
+
+* sourceProject, sourceBranch
+* targetProject, targetBranch
+* promotion
