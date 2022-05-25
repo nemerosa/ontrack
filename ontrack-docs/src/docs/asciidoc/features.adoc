@@ -25,4 +25,6 @@ include::feature-branches.adoc[]
 //
 //include::searching.adoc[]
 
+include::feature-dm.adoc[]
+
 include::feature-indicators.adoc[]

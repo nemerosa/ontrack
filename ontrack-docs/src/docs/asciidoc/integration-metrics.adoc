@@ -111,3 +111,5 @@ Information about the connectivity of remote Git operations:
 
 * `ontrack_git_connect_retries` - Number of retries on connection errors
 * `ontrack_git_connect_errors` -Number of terminal connection errors
+
+Information about the delivery, see <<delivery-metrics>>.
