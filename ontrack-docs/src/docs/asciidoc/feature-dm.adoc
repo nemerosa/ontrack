@@ -88,9 +88,9 @@ All these metrics are <<operations-metrics,exported>> for each transitive link, 
 
 The following metrics are available:
 
-* ontrack_dm_promotion_lead_time - in seconds - for the lead time
-ontrack_dm_promotion_success_rate - percentage (from 0.0 to 1.0) - success rate
-ontrack_dm_promotion_ttr - in seconds - for the time to restore
+* `ontrack_dm_promotion_lead_time` - in seconds - for the lead time
+* `ontrack_dm_promotion_success_rate` - percentage (from 0.0 to 1.0) - success rate - can be used for the frequency by _counting_ the occurences
+* `ontrack_dm_promotion_ttr` - in seconds - for the time to restore
 
 Each metric is associated with the following tags:
 
