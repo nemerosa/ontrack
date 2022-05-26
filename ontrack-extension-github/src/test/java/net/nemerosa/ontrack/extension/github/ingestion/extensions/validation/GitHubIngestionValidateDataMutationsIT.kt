@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.github.ingestion.ui
+package net.nemerosa.ontrack.extension.github.ingestion.extensions.validation
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
