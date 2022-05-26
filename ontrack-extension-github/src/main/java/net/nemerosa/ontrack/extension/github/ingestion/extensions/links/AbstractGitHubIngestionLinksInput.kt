@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.extensions.links
 
+import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypeRef
 import net.nemerosa.ontrack.model.annotations.APIDescription
 
@@ -12,7 +13,7 @@ abstract class AbstractGitHubIngestionLinksInput(
     @APIDescription("Name of the repository to target")
     val repository: String,
     @APIDescription("List of links")
-    @TypeRef(embedded = true)
+    @ListRef(embedded = true)
     val buildLinks: List<GitHubIngestionLink>,
 ) {
     abstract fun toPayload(): GitHubIngestionLinksPayload

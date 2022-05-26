@@ -2,6 +2,9 @@ package net.nemerosa.ontrack.extension.github.ingestion.validation
 
 import io.mockk.mockk
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
+import net.nemerosa.ontrack.extension.github.ingestion.extensions.validation.GitHubIngestionValidateDataPayload
+import net.nemerosa.ontrack.extension.github.ingestion.extensions.validation.GitHubIngestionValidationDataInput
+import net.nemerosa.ontrack.extension.github.ingestion.extensions.validation.IngestionValidateDateEventProcessor
 import net.nemerosa.ontrack.json.asJson
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals

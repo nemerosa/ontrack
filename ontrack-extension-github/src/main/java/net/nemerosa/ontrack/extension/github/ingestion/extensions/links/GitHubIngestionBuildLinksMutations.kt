@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
  * Mutations used to inject build links.
  */
 @Component
-class GitHubIngestionValidateDataMutations(
+class GitHubIngestionBuildLinksMutations(
     private val ingestionLinksService: IngestionLinksService,
 ) : TypedMutationProvider() {
 
@@ -17,18 +17,18 @@ class GitHubIngestionValidateDataMutations(
         /**
          * Getting the build by run ID
          */
-        simpleMutation(
-            name = "gitHubIngestionBuildLinksByRunId",
-            description = "Sets some links on a build identified using a GHA workflow run ID",
-            input = GitHubIngestionLinksByRunIdInput::class,
-            outputName = "payload",
-            outputType = GitHubIngestionBuildLinksOutput::class,
-            outputDescription = "Payload being processed in the background"
-        ) { input ->
-            GitHubIngestionBuildLinksOutput(
-                ingestionLinksService.ingestLinks(input).toString()
-            )
-        },
+//        simpleMutation(
+//            name = "gitHubIngestionBuildLinksByRunId",
+//            description = "Sets some links on a build identified using a GHA workflow run ID",
+//            input = GitHubIngestionLinksByRunIdInput::class,
+//            outputName = "payload",
+//            outputType = GitHubIngestionBuildLinksOutput::class,
+//            outputDescription = "Payload being processed in the background"
+//        ) { input ->
+//            GitHubIngestionBuildLinksOutput(
+//                ingestionLinksService.ingestLinks(input).toString()
+//            )
+//        },
         /**
          * TODO Getting the build by build name
          */

@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.github.ingestion.validation
+package net.nemerosa.ontrack.extension.github.ingestion.extensions.validation
 
 import net.nemerosa.ontrack.graphql.support.TypeRef
 import net.nemerosa.ontrack.model.annotations.APIDescription
@@ -11,8 +11,6 @@ abstract class AbstractGitHubIngestionValidateDataInput(
     val owner: String,
     @APIDescription("Name of the repository to target")
     val repository: String,
-    // @APIDescription("GitHub ref to target (refs/heads/...)")
-    // val ref: String,
     @APIDescription("Name of the validation stamp to create")
     val validation: String,
     @APIDescription("Validation data")

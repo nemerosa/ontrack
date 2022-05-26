@@ -1,9 +1,7 @@
-package net.nemerosa.ontrack.extension.github.ingestion.validation
+package net.nemerosa.ontrack.extension.github.ingestion.extensions.validation
 
-import net.nemerosa.ontrack.extension.github.ingestion.processing.AbstractIngestionEventProcessor
+import net.nemerosa.ontrack.extension.github.ingestion.extensions.support.AbstractIngestionBuildEventProcessor
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
-import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataTypeNotFoundException
 import net.nemerosa.ontrack.model.structure.*
@@ -17,36 +15,14 @@ class IngestionValidateDateEventProcessor(
     private val runInfoService: RunInfoService,
     private val validationRunStatusService: ValidationRunStatusService,
     private val validationDataTypeService: ValidationDataTypeService,
-) : AbstractIngestionEventProcessor<GitHubIngestionValidateDataPayload>() {
-
-    override fun getPayloadSource(payload: GitHubIngestionValidateDataPayload): String? =
-        payload.getSource()
+) : AbstractIngestionBuildEventProcessor<GitHubIngestionValidateDataPayload>(
+    ingestionModelAccessService
+) {
 
     override fun preProcessingCheck(payload: GitHubIngestionValidateDataPayload): IngestionEventPreprocessingCheck =
         IngestionEventPreprocessingCheck.TO_BE_PROCESSED
 
-    override fun process(
-        payload: GitHubIngestionValidateDataPayload,
-        configuration: String?,
-    ): IngestionEventProcessingResult {
-        val build = if (payload.buildLabel != null) {
-            findBuildByBuildLabel(payload, payload.buildLabel)
-        } else if (payload.buildName != null) {
-            findBuildByBuildName(payload, payload.buildName)
-        } else if (payload.runId != null) {
-            findBuildByRunId(payload, payload.runId)
-        } else {
-            error("Could not find any way to identify a build using $payload")
-        }
-        return if (build != null) {
-            validate(build, payload)
-            IngestionEventProcessingResult.PROCESSED
-        } else {
-            IngestionEventProcessingResult.IGNORED
-        }
-    }
-
-    private fun validate(build: Build, input: GitHubIngestionValidateDataPayload): ValidationRun {
+    override fun process(build: Build, input: GitHubIngestionValidateDataPayload) {
         // Setting up the validation stamp
         val vs = ingestionModelAccessService.setupValidationStamp(
             branch = build.branch,
@@ -92,32 +68,12 @@ class IngestionValidateDateEventProcessor(
                 existingRunInfo
             )
         }
-        // OK
-        return validationRun
     }
 
     override val payloadType: KClass<GitHubIngestionValidateDataPayload> =
         GitHubIngestionValidateDataPayload::class
 
     override val event: String = EVENT
-
-    private fun findBuildByRunId(input: GitHubIngestionValidateDataPayload, runId: Long): Build? =
-        ingestionModelAccessService.findBuildByRunId(
-            repository = Repository.stub(input.owner, input.repository),
-            runId = runId,
-        )
-
-    private fun findBuildByBuildName(input: GitHubIngestionValidateDataPayload, buildName: String): Build? =
-        ingestionModelAccessService.findBuildByBuildName(
-            repository = Repository.stub(input.owner, input.repository),
-            buildName = buildName,
-        )
-
-    private fun findBuildByBuildLabel(input: GitHubIngestionValidateDataPayload, buildLabel: String): Build? =
-        ingestionModelAccessService.findBuildByBuildLabel(
-            repository = Repository.stub(input.owner, input.repository),
-            buildLabel = buildLabel,
-        )
 
     companion object {
         const val EVENT = "x-ontrack-validate-date"

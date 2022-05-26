@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.github.ingestion.validation
+package net.nemerosa.ontrack.extension.github.ingestion.extensions.validation
 
 import java.util.*
 

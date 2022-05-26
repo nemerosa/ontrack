@@ -1,10 +1,10 @@
-package net.nemerosa.ontrack.extension.github.ingestion.ui
+package net.nemerosa.ontrack.extension.github.ingestion.extensions.validation
 
 import graphql.schema.GraphQLObjectType
-import net.nemerosa.ontrack.extension.github.ingestion.validation.GitHubIngestionValidateDataByBuildLabelInput
-import net.nemerosa.ontrack.extension.github.ingestion.validation.GitHubIngestionValidateDataByBuildNameInput
-import net.nemerosa.ontrack.extension.github.ingestion.validation.GitHubIngestionValidateDataByRunIdInput
-import net.nemerosa.ontrack.extension.github.ingestion.validation.IngestionValidateDataService
+import net.nemerosa.ontrack.extension.github.ingestion.extensions.validation.GitHubIngestionValidateDataByBuildLabelInput
+import net.nemerosa.ontrack.extension.github.ingestion.extensions.validation.GitHubIngestionValidateDataByBuildNameInput
+import net.nemerosa.ontrack.extension.github.ingestion.extensions.validation.GitHubIngestionValidateDataByRunIdInput
+import net.nemerosa.ontrack.extension.github.ingestion.extensions.validation.IngestionValidateDataService
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.Mutation

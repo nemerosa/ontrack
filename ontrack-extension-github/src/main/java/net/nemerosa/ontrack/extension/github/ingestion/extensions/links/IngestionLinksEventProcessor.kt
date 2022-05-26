@@ -2,10 +2,8 @@ package net.nemerosa.ontrack.extension.github.ingestion.extensions.links
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
-import net.nemerosa.ontrack.extension.github.ingestion.processing.AbstractIngestionEventProcessor
+import net.nemerosa.ontrack.extension.github.ingestion.extensions.support.AbstractIngestionBuildEventProcessor
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
-import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.BuildSearchForm
@@ -15,12 +13,11 @@ import kotlin.reflect.KClass
 
 @Component
 class IngestionLinksEventProcessor(
-    private val ingestionModelAccessService: IngestionModelAccessService,
+    ingestionModelAccessService: IngestionModelAccessService,
     private val structureService: StructureService,
-) : AbstractIngestionEventProcessor<GitHubIngestionLinksPayload>() {
-
-    override fun getPayloadSource(payload: GitHubIngestionLinksPayload): String? =
-        payload.getSource()
+) : AbstractIngestionBuildEventProcessor<GitHubIngestionLinksPayload>(
+    ingestionModelAccessService
+) {
 
     override fun preProcessingCheck(payload: GitHubIngestionLinksPayload): IngestionEventPreprocessingCheck =
         if (payload.buildLinks.isNotEmpty()) {
@@ -29,28 +26,7 @@ class IngestionLinksEventProcessor(
             IngestionEventPreprocessingCheck.IGNORED
         }
 
-    override fun process(
-        payload: GitHubIngestionLinksPayload,
-        configuration: String?,
-    ): IngestionEventProcessingResult {
-        val build = if (payload.buildLabel != null) {
-            findBuildByBuildLabel(payload, payload.buildLabel)
-        } else if (payload.buildName != null) {
-            findBuildByBuildName(payload, payload.buildName)
-        } else if (payload.runId != null) {
-            findBuildByRunId(payload, payload.runId)
-        } else {
-            error("Could not find any way to identify a build using $payload")
-        }
-        return if (build != null) {
-            process(build, payload)
-            IngestionEventProcessingResult.PROCESSED
-        } else {
-            IngestionEventProcessingResult.IGNORED
-        }
-    }
-
-    private fun process(build: Build, input: GitHubIngestionLinksPayload): Build {
+    override fun process(build: Build, input: GitHubIngestionLinksPayload) {
         val targets = input.buildLinks.mapNotNull { link ->
             getTargetBuild(link)
         }
@@ -58,8 +34,6 @@ class IngestionLinksEventProcessor(
             structureService.addBuildLink(build, link)
         }
         // TODO Add only? See StructureService.editBuildLinks
-        // OK
-        return build
     }
 
     private fun getTargetBuild(link: GitHubIngestionLink): Build? {
@@ -92,24 +66,6 @@ class IngestionLinksEventProcessor(
         GitHubIngestionLinksPayload::class
 
     override val event: String = EVENT
-
-    private fun findBuildByRunId(input: GitHubIngestionLinksPayload, runId: Long): Build? =
-        ingestionModelAccessService.findBuildByRunId(
-            repository = Repository.stub(input.owner, input.repository),
-            runId = runId,
-        )
-
-    private fun findBuildByBuildName(input: GitHubIngestionLinksPayload, buildName: String): Build? =
-        ingestionModelAccessService.findBuildByBuildName(
-            repository = Repository.stub(input.owner, input.repository),
-            buildName = buildName,
-        )
-
-    private fun findBuildByBuildLabel(input: GitHubIngestionLinksPayload, buildLabel: String): Build? =
-        ingestionModelAccessService.findBuildByBuildLabel(
-            repository = Repository.stub(input.owner, input.repository),
-            buildLabel = buildLabel,
-        )
 
     companion object {
         const val EVENT = "x-ontrack-build-links"
