@@ -10577,6 +10577,108 @@
           "possibleTypes": null
         },
         {
+          "kind": "INPUT_OBJECT",
+          "name": "GetChartInput",
+          "description": null,
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "name",
+              "description": "Name of the chart",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "options",
+              "description": "General options for the chart",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "GetChartOptions",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parameters",
+              "description": "Parameters for the chart (as JSON)",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "JSON",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "GetChartOptions",
+          "description": null,
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "interval",
+              "description": "Interval of time for the chart data",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "period",
+              "description": "Period used to consolidate the chart data",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "ref",
+              "description": "Reference data for computing the intervals (null for current time",
+              "type": {
+                "kind": "SCALAR",
+                "name": "LocalDateTime",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "OBJECT",
           "name": "GitChangeLog",
           "description": null,
@@ -11031,6 +11133,152 @@
           "possibleTypes": null
         },
         {
+          "kind": "INPUT_OBJECT",
+          "name": "GitHubIngestionBuildLinksByRunIdInput",
+          "description": "Input type for the gitHubIngestionBuildLinksByRunId mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "runId",
+              "description": "ID of the GHA workflow run",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Long",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "buildLinks",
+              "description": "List of links",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "GitHubIngestionLink"
+                    }
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "owner",
+              "description": "Name of the repository owner to target",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "repository",
+              "description": "Name of the repository to target",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GitHubIngestionBuildLinksByRunIdPayload",
+          "description": "Output type for the gitHubIngestionBuildLinksByRunId mutation.",
+          "fields": [
+            {
+              "name": "payload",
+              "description": "Payload being processed in the background",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GitHubIngestionBuildLinksOutput",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GitHubIngestionBuildLinksOutput",
+          "description": "GitHubIngestionBuildLinksOutput",
+          "fields": [
+            {
+              "name": "uuid",
+              "description": "UUID of the payload being processed in the background",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "OBJECT",
           "name": "GitHubIngestionConfig",
           "description": "Configuration for the ingestion of GitHub Actions workflows.",
@@ -11179,6 +11427,29 @@
                   "kind": "OBJECT",
                   "name": "GitHubIngestionFilterConfig",
                   "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "validations",
+              "description": "Validation stamps configuration",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "GitHubIngestionValidationConfig"
+                    }
+                  }
                 }
               },
               "isDeprecated": false,
@@ -11488,6 +11759,18 @@
               "deprecationReason": null
             },
             {
+              "name": "outcome",
+              "description": "Outcome of the processing",
+              "args": [],
+              "type": {
+                "kind": "ENUM",
+                "name": "IngestionEventProcessingResult",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "started",
               "description": "Timestamp for the start of the processing",
               "args": [],
@@ -11530,6 +11813,18 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "GitHubRepository",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "source",
+              "description": "Source/name of the payload/event",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -11675,6 +11970,45 @@
           "possibleTypes": null
         },
         {
+          "kind": "INPUT_OBJECT",
+          "name": "GitHubIngestionLink",
+          "description": null,
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "buildRef",
+              "description": "Name or label of the build to link to (labels start with #)",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "project",
+              "description": "Name of the project to link to",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "OBJECT",
           "name": "GitHubIngestionPromotionConfig",
           "description": "PromotionConfig",
@@ -11694,6 +12028,18 @@
             {
               "name": "exclude",
               "description": "Regular expression to exclude validation stamps by name",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "image",
+              "description": "Reference to the image to set",
               "args": [],
               "type": {
                 "kind": "SCALAR",
@@ -12282,6 +12628,69 @@
           "possibleTypes": null
         },
         {
+          "kind": "OBJECT",
+          "name": "GitHubIngestionValidationConfig",
+          "description": "ValidationConfig",
+          "fields": [
+            {
+              "name": "dataType",
+              "description": "Data type",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GitHubIngestionValidationTypeConfig",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "description",
+              "description": "Optional description",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "image",
+              "description": "Reference to the image to set",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "name",
+              "description": "Unique name for the validation stamp in the branch",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "INPUT_OBJECT",
           "name": "GitHubIngestionValidationDataInput",
           "description": null,
@@ -12317,6 +12726,45 @@
             }
           ],
           "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GitHubIngestionValidationTypeConfig",
+          "description": "ValidationTypeConfig",
+          "fields": [
+            {
+              "name": "config",
+              "description": "Data type configuration",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "JSON",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "type",
+              "description": "FQCN or shortcut for the data type",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -14609,6 +15057,29 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "IngestionEventProcessingResult",
+          "description": "Outcome of the processing of the payload",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "PROCESSED",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "IGNORED",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
           "possibleTypes": null
         },
         {
@@ -18855,6 +19326,29 @@
               "deprecationReason": null
             },
             {
+              "name": "gitHubIngestionBuildLinksByRunId",
+              "description": "Sets some links on a build identified using a GHA workflow run ID",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "GitHubIngestionBuildLinksByRunIdInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GitHubIngestionBuildLinksByRunIdPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "gitHubIngestionValidateDataByRunId",
               "description": "Sets some validation data on a build identified using a GHA workflow run ID",
               "args": [
@@ -20254,6 +20748,11 @@
             {
               "kind": "OBJECT",
               "name": "FavouriteProjectPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "GitHubIngestionBuildLinksByRunIdPayload",
               "ofType": null
             },
             {
@@ -25433,6 +25932,29 @@
               "deprecationReason": null
             },
             {
+              "name": "gitHubIngestionEventProcessingResults",
+              "description": "List of possible outcomes for the processing of ingestion hook payloads.",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "IngestionEventProcessingResult"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "gitHubIngestionHookPayloadStatuses",
               "description": "List of statuses for the processing of ingestion hook payloads.",
               "args": [],
@@ -25498,6 +26020,16 @@
                   "defaultValue": null
                 },
                 {
+                  "name": "outcome",
+                  "description": "Filter on the outcome",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "IngestionEventProcessingResult",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
                   "name": "uuid",
                   "description": "Filter on the UUID",
                   "type": {
@@ -25510,6 +26042,16 @@
                 {
                   "name": "gitHubDelivery",
                   "description": "Filter on the GitHub Delivery ID",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "source",
+                  "description": "Filter on the source (prefix)",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -25979,6 +26521,33 @@
                   "name": "CasC",
                   "ofType": null
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "getChart",
+              "description": "Getting data for a chart",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Parameters for getting the chart",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "GetChartInput",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "JSON",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null

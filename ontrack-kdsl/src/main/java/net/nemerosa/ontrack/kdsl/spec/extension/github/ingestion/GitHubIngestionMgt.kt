@@ -5,10 +5,8 @@ import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.paginate
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.GitHubIngestionPayloadsQuery
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.GitHubIngestionValidateDataByBuildLabelMutation
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.GitHubIngestionValidateDataByBuildNameMutation
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.GitHubIngestionValidateDataByRunIdMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.*
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.GitHubIngestionLink
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.IngestionHookPayloadStatus
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.connector.support.PaginatedList
@@ -136,6 +134,32 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
         ) {
             it?.gitHubIngestionValidateDataByBuildLabel()?.fragments()?.payloadUserErrors()?.convert()
         }?.gitHubIngestionValidateDataByBuildLabel()?.payload()?.uuid()?.let { UUID.fromString(it) }
+            ?: error("Could not get the UUID of the processed request")
+
+    /**
+     * Sets some build links
+     */
+    fun buildLinksByRunId(
+        owner: String,
+        repository: String,
+        runId: Long,
+        buildLinks: Map<String, String>,
+    ): UUID =
+        graphqlConnector.mutate(
+            GitHubIngestionBuildLinksByRunIdMutation(
+                owner,
+                repository,
+                runId,
+                buildLinks.map { (project, buildRef) ->
+                    GitHubIngestionLink.builder()
+                        .project(project)
+                        .buildRef(buildRef)
+                        .build()
+                },
+            )
+        ) {
+            it?.gitHubIngestionBuildLinksByRunId()?.fragments()?.payloadUserErrors()?.convert()
+        }?.gitHubIngestionBuildLinksByRunId()?.payload()?.uuid()?.let { UUID.fromString(it) }
             ?: error("Could not get the UUID of the processed request")
 
 }
