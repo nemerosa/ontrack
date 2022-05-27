@@ -4,21 +4,27 @@ import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLMissingDataException
 import net.nemerosa.ontrack.kdsl.connector.graphql.checkData
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
+import net.nemerosa.ontrack.kdsl.connector.graphql.paginate
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.BuildUsingQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.BuildValidationRunsQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreatePromotionRunMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
+import net.nemerosa.ontrack.kdsl.connector.support.PaginatedList
+import net.nemerosa.ontrack.kdsl.connector.support.emptyPaginatedList
 
 /**
  * Representation of a build.
  *
  * @property connector Ontrack connector
+ * @property branch Parent branch
  * @property id Build ID
  * @property name Build name
  * @property description Build description
  */
 class Build(
     connector: Connector,
+    val branch: Branch,
     id: UInt,
     val name: String,
     val description: String?,
@@ -62,5 +68,20 @@ class Build(
         )?.builds()?.firstOrNull()?.validationRuns()?.map {
             it.fragments().validationRunFragment().toValidationRun(this)
         } ?: emptyList()
+
+    /**
+     * Gets the list of builds used by _this_ build.
+     */
+    fun getLinksUsing(
+        offset: Int = 0,
+        size: Int = 10,
+    ): PaginatedList<Build> = graphqlConnector.query(
+        BuildUsingQuery(id.toInt(), offset, size)
+    )?.paginate(
+        pageInfo = { it.builds().firstOrNull()?.using()?.pageInfo()?.fragments()?.pageInfoContent() },
+        pageItems = { it.builds().firstOrNull()?.using()?.pageItems() }
+    )?.map {
+        it.fragments().buildFragment().toBuild(this@Build)
+    } ?: emptyPaginatedList()
 
 }

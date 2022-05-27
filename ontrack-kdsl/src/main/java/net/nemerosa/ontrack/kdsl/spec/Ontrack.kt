@@ -55,15 +55,7 @@ class Ontrack(connector: Connector) : Connected(connector) {
     fun findBranchByName(project: String, branch: String): Branch? = graphqlConnector.query(
         FindBranchByNameQuery(project, branch)
     )?.branches()?.firstOrNull()
-        ?.fragments()?.branchFragment()?.run {
-            Branch(
-                connector = connector,
-                id = id().toUInt(),
-                name = name()!!,
-                description = description(),
-                disabled = disabled(),
-            )
-        }
+        ?.fragments()?.branchFragment()?.toBranch(this@Ontrack)
 
     /**
      * Getting a build using its name
@@ -76,13 +68,6 @@ class Ontrack(connector: Connector) : Connected(connector) {
     fun findBuildByName(project: String, branch: String, build: String): Build? = graphqlConnector.query(
         FindByBuildByNameQuery(project, branch, build)
     )?.builds()?.firstOrNull()
-        ?.fragments()?.buildFragment()?.run {
-            Build(
-                connector = connector,
-                id = id().toUInt(),
-                name = name()!!,
-                description = description(),
-            )
-        }
+        ?.fragments()?.buildFragment()?.toBuild(this@Ontrack)
 
 }

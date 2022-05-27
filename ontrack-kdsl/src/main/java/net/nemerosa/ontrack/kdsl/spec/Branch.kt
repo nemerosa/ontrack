@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
  * Representation of a branch.
  *
  * @property connector Ontrack connector
+ * @property project Parent project
  * @property id Branch ID
  * @property name Branch name
  * @property description Branch description
@@ -20,6 +21,7 @@ import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
  */
 class Branch(
     connector: Connector,
+    val project: Project,
     id: UInt,
     val name: String,
     val description: String?,

@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.schema.fragment.BranchFragmen
  */
 fun BranchFragment.toBranch(connected: Connected) = Branch(
     connector = connected.connector,
+    project = project()?.fragments()?.projectFragment()?.toProject(connected) ?: error("Missing parent project"),
     id = id().toUInt(),
     name = name()!!,
     description = description(),

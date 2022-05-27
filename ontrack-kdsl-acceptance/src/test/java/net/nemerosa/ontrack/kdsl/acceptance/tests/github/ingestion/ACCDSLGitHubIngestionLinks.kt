@@ -1,25 +1,15 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.github.ingestion
 
-import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.kdsl.acceptance.annotations.AcceptanceTestSuite
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.AbstractACCDSLGitHubTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.resourceAsText
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
-import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
-import net.nemerosa.ontrack.kdsl.connector.parse
 import net.nemerosa.ontrack.kdsl.spec.extension.general.setLabel
-import net.nemerosa.ontrack.kdsl.spec.extension.github.GitHubConfiguration
 import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHub
-import net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion.GitHubIngestionValidationDataInput
 import net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion.ingestion
 import org.junit.Test
-import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
-import kotlin.test.fail
 
 @AcceptanceTestSuite
 class ACCDSLGitHubIngestionLinks : AbstractACCDSLGitHubIngestionTestSupport() {
@@ -76,7 +66,16 @@ class ACCDSLGitHubIngestionLinks : AbstractACCDSLGitHubIngestionTestSupport() {
 
         // Checks that the build has been created & contains the correct links
         assertNotNull(ontrack.findBuildByName(repository, "main", "ci-1"), "Build has been created") { build ->
-            TODO("Gets and paginates the build links")
+            val links = build.getLinksUsing().items
+            assertEquals(
+                mapOf(
+                    component to "1.0.0",
+                    library to "321",
+                ),
+                links.associate {
+                    it.branch.project.name to it.name
+                }
+            )
         }
     }
 

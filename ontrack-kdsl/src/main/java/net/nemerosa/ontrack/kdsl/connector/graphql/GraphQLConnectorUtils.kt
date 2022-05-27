@@ -16,11 +16,9 @@ fun <T : Any, R> T?.checkData(
 fun <T : Any, R> T.paginate(
     pageInfo: (T) -> PageInfoContent?,
     pageItems: (T) -> List<R>?,
-): PaginatedList<R> = if (pageInfo == null || pageItems == null) {
-    emptyPaginatedList()
-} else {
+): PaginatedList<R> {
     val items = pageItems(this)
-    if (items == null) {
+    return if (items == null) {
         emptyPaginatedList()
     } else {
         PaginatedList(

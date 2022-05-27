@@ -1,0 +1,16 @@
+query BuildUsing(
+    $buildId: Int!,
+    $offset: Int! = 0,
+    $size: Int! = 10,
+) {
+    builds(id: $buildId) {
+        using(offset: $offset, size: $size) {
+            pageInfo {
+                ...PageInfoContent
+            }
+            pageItems {
+                ...BuildFragment
+            }
+        }
+    }
+}

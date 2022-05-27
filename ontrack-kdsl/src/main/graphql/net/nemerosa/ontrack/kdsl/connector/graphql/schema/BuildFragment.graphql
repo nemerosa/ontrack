@@ -2,4 +2,7 @@ fragment BuildFragment on Build {
     id
     name
     description
+    branch {
+        ...BranchFragment
+    }
 }

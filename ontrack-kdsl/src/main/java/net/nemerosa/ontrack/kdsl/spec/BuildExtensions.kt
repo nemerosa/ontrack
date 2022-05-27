@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
  */
 fun BuildFragment.toBuild(connected: Connected) = Build(
     connector = connected.connector,
+    branch = branch()?.fragments()?.branchFragment()?.toBranch(connected) ?: error("Missing parent branch"),
     id = id().toUInt(),
     name = name()!!,
     description = description(),

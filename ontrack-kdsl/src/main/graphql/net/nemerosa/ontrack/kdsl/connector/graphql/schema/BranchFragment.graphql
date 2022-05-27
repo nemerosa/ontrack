@@ -3,4 +3,7 @@ fragment BranchFragment on Branch {
     name
     description
     disabled
+    project {
+        ...ProjectFragment
+    }
 }
