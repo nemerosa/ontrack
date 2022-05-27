@@ -34,20 +34,20 @@ class GitHubIngestionBuildLinksMutations(
             )
         },
         /**
-         * TODO Getting the build by build name
+         * Getting the build by build name
          */
-//        simpleMutation(
-//            name = "gitHubIngestionBuildLinksByBuildName",
-//            description = "Sets some links on a build identified using its name",
-//            input = GitHubIngestionValidateDataByBuildNameInput::class,
-//            outputName = "payload",
-//            outputType = GitHubIngestionBuildLinksOutput::class,
-//            outputDescription = "Payload being processed in the background"
-//        ) { input ->
-//            GitHubIngestionBuildLinksOutput(
-//                TODO()
-//            )
-//        },
+        simpleMutation(
+            name = "gitHubIngestionBuildLinksByBuildName",
+            description = "Sets some links on a build identified using its name",
+            input = GitHubIngestionLinksByBuildNameInput::class,
+            outputName = "payload",
+            outputType = GitHubIngestionBuildLinksOutput::class,
+            outputDescription = "Payload being processed in the background"
+        ) { input ->
+            GitHubIngestionBuildLinksOutput(
+                ingestionLinksService.ingestLinks(input).toString()
+            )
+        },
         /**
          * TODO Getting the build by build label
          */

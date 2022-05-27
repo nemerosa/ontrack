@@ -11134,6 +11134,125 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "GitHubIngestionBuildLinksByBuildNameInput",
+          "description": "Input type for the gitHubIngestionBuildLinksByBuildName mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "buildName",
+              "description": "Name of the build",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "buildLinks",
+              "description": "List of links",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "GitHubIngestionLink"
+                    }
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "owner",
+              "description": "Name of the repository owner to target",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "repository",
+              "description": "Name of the repository to target",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GitHubIngestionBuildLinksByBuildNamePayload",
+          "description": "Output type for the gitHubIngestionBuildLinksByBuildName mutation.",
+          "fields": [
+            {
+              "name": "payload",
+              "description": "Payload being processed in the background",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GitHubIngestionBuildLinksOutput",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "GitHubIngestionBuildLinksByRunIdInput",
           "description": "Input type for the gitHubIngestionBuildLinksByRunId mutation.",
           "fields": null,
@@ -19349,6 +19468,29 @@
               "deprecationReason": null
             },
             {
+              "name": "gitHubIngestionBuildLinksByBuildName",
+              "description": "Sets some links on a build identified using its name",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "GitHubIngestionBuildLinksByBuildNameInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GitHubIngestionBuildLinksByBuildNamePayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "gitHubIngestionValidateDataByRunId",
               "description": "Sets some validation data on a build identified using a GHA workflow run ID",
               "args": [
@@ -20748,6 +20890,11 @@
             {
               "kind": "OBJECT",
               "name": "FavouriteProjectPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "GitHubIngestionBuildLinksByBuildNamePayload",
               "ofType": null
             },
             {

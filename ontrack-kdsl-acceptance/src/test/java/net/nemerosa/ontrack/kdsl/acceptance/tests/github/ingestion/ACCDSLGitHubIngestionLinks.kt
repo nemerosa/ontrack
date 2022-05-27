@@ -79,4 +79,57 @@ class ACCDSLGitHubIngestionLinks : AbstractACCDSLGitHubIngestionTestSupport() {
         }
     }
 
+    /**
+     * Tests the ingestion of build links, with the build being identified by name
+     *
+     * The scenario plays as follows:
+     *
+     * * creating two target projects for the links
+     * * creating a build
+     * * calling the API to set some validation data (simulating a call by GHA)
+     */
+    @Test
+    fun `Ingestion of build links by name`() {
+        // Targets
+        val component = uid("p")
+        val library = uid("p")
+        ontrack.createProject(component, "").createBranch("main", "").createBuild("1.0.0", "")
+        ontrack.createProject(library, "").createBranch("main", "").createBuild("321", "").setLabel("2.0.0")
+
+        // A unique repository name
+        val repository = uid("r")
+
+        // Creating a project, a branch and a build
+        val build = ontrack
+            .createProject(repository, "")
+            .createBranch("main", "")
+            .createBuild("build-15", "")
+
+        // Calling the API to simulate the GHA call
+        val linksUuid = ontrack.gitHub.ingestion.buildLinksByBuildName(
+            owner = "nemerosa",
+            repository = repository,
+            buildName = "build-15",
+            buildLinks = mapOf(
+                component to "1.0.0", // Build by name
+                library to "#2.0.0",  // Build by label
+            )
+        )
+
+        // At the end, waits for all payloads to be processed
+        waitUntilPayloadIsProcessed(linksUuid)
+
+        // Checks that the build has been created & contains the correct links
+        val links = build.getLinksUsing().items
+        assertEquals(
+            mapOf(
+                component to "1.0.0",
+                library to "321",
+            ),
+            links.associate {
+                it.branch.project.name to it.name
+            }
+        )
+    }
+
 }

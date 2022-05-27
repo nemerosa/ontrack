@@ -27,15 +27,33 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
         basicTest()
     }
 
+    @Test
+    fun `Build by name`() {
+        basicTest(buildIdentification = BuildIdentification.BUILD_NAME)
+    }
+
     private fun basicTest(
+        buildIdentification: BuildIdentification = BuildIdentification.RUN_ID,
         runIdProperty: Long = 10,
         runIdQuery: Long = 10,
+        buildName: String = "my-build-name",
         expectedLinks: Map<String, String> = mapOf(
             "one" to "build-one",
             "two" to "build-two",
         ),
         asAuth: (code: () -> Unit) -> Unit = { code -> asAdmin { code() } },
     ) {
+
+        val mutationName = when (buildIdentification) {
+            BuildIdentification.RUN_ID -> "gitHubIngestionBuildLinksByRunId"
+            BuildIdentification.BUILD_NAME -> "gitHubIngestionBuildLinksByBuildName"
+        }
+
+        val mutationParams = when (buildIdentification) {
+            BuildIdentification.RUN_ID -> "runId: $runIdQuery,"
+            BuildIdentification.BUILD_NAME -> """buildName: "$buildName","""
+        }
+
         asAdmin {
             withGitHubIngestionSettings {
                 val targets = mapOf(
@@ -58,7 +76,7 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
                 )
                 project {
                     branch {
-                        build {
+                        build(buildName) {
                             setProperty(
                                 this, BuildGitHubWorkflowRunPropertyType::class.java,
                                 BuildGitHubWorkflowRunProperty(
@@ -73,10 +91,10 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
                                 run(
                                     """
                                     mutation {
-                                        gitHubIngestionBuildLinksByRunId(input: {
+                                        $mutationName(input: {
                                             owner: "nemerosa",
                                             repository: "${project.name}",
-                                            runId: $runIdQuery,
+                                            $mutationParams
                                             buildLinks: [
                                             {
                                                 project: "${targets["one"]?.name}",
@@ -100,7 +118,7 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
                                     }
                                 """
                                 ) { data ->
-                                    checkGraphQLUserErrors(data, "gitHubIngestionBuildLinksByRunId") { node ->
+                                    checkGraphQLUserErrors(data, mutationName) { node ->
                                         val uuid = node.path("payload").getRequiredTextField("uuid")
                                         assertTrue(uuid.isNotBlank(), "UUID has been returned")
                                     }
@@ -131,6 +149,12 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
             runIdQuery = 11,
             expectedLinks = emptyMap(),
         )
+    }
+
+    enum class BuildIdentification {
+        RUN_ID,
+        BUILD_NAME,
+        // TODO BUILD_LABEL,
     }
 
 }

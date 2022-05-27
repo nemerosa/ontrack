@@ -1,0 +1,18 @@
+mutation GitHubIngestionBuildLinksByBuildName(
+    $owner: String!,
+    $repository: String!,
+    $buildName: String!,
+    $buildLinks: [GitHubIngestionLink!]!,
+) {
+    gitHubIngestionBuildLinksByBuildName(input: {
+        owner: $owner,
+        repository: $repository,
+        buildName: $buildName,
+        buildLinks: $buildLinks,
+    }) {
+        payload {
+            uuid
+        }
+        ...PayloadUserErrors
+    }
+}

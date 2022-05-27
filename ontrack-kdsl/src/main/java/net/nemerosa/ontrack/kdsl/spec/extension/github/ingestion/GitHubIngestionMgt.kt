@@ -162,4 +162,30 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
         }?.gitHubIngestionBuildLinksByRunId()?.payload()?.uuid()?.let { UUID.fromString(it) }
             ?: error("Could not get the UUID of the processed request")
 
+    /**
+     * Sets some build links
+     */
+    fun buildLinksByBuildName(
+        owner: String,
+        repository: String,
+        buildName: String,
+        buildLinks: Map<String, String>,
+    ): UUID =
+        graphqlConnector.mutate(
+            GitHubIngestionBuildLinksByBuildNameMutation(
+                owner,
+                repository,
+                buildName,
+                buildLinks.map { (project, buildRef) ->
+                    GitHubIngestionLink.builder()
+                        .project(project)
+                        .buildRef(buildRef)
+                        .build()
+                },
+            )
+        ) {
+            it?.gitHubIngestionBuildLinksByBuildName()?.fragments()?.payloadUserErrors()?.convert()
+        }?.gitHubIngestionBuildLinksByBuildName()?.payload()?.uuid()?.let { UUID.fromString(it) }
+            ?: error("Could not get the UUID of the processed request")
+
 }
