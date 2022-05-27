@@ -181,7 +181,7 @@
                             <div class="ot-description" ng-show="issuesLoading">
                                 <ot-loading>Issues are loading...</ot-loading>
                             </div>
-                            <div ng-show="issues">
+                            <div ng-if="issues && issues.issueServiceConfiguration.serviceId">
                                 <ot-include value="issues" template="extension/{{issues.issueServiceConfiguration.serviceId}}/changelog.issues.tpl.html">
                                 </ot-include>
                             </div>
