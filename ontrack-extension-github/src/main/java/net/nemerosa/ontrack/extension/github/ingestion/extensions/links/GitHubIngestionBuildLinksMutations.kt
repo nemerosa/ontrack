@@ -49,20 +49,20 @@ class GitHubIngestionBuildLinksMutations(
             )
         },
         /**
-         * TODO Getting the build by build label
+         * Getting the build by build label
          */
-//        simpleMutation(
-//            name = "gitHubIngestionBuildLinksByBuildLabel",
-//            description = "Sets some links on a build identified using its release property (label)",
-//            input = GitHubIngestionValidateDataByBuildLabelInput::class,
-//            outputName = "payload",
-//            outputType = GitHubIngestionBuildLinksOutput::class,
-//            outputDescription = "Payload being processed in the background"
-//        ) { input ->
-//            GitHubIngestionBuildLinksOutput(
-//                TODO()
-//            )
-//        },
+        simpleMutation(
+            name = "gitHubIngestionBuildLinksByBuildLabel",
+            description = "Sets some links on a build identified using its release property (label)",
+            input = GitHubIngestionLinksByBuildLabelInput::class,
+            outputName = "payload",
+            outputType = GitHubIngestionBuildLinksOutput::class,
+            outputDescription = "Payload being processed in the background"
+        ) { input ->
+            GitHubIngestionBuildLinksOutput(
+                ingestionLinksService.ingestLinks(input).toString()
+            )
+        },
     )
 }
 

@@ -37,6 +37,7 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
         runIdProperty: Long = 10,
         runIdQuery: Long = 10,
         buildName: String = "my-build-name",
+        buildLabel: String = "0.0.1",
         expectedLinks: Map<String, String> = mapOf(
             "one" to "build-one",
             "two" to "build-two",
@@ -47,11 +48,13 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
         val mutationName = when (buildIdentification) {
             BuildIdentification.RUN_ID -> "gitHubIngestionBuildLinksByRunId"
             BuildIdentification.BUILD_NAME -> "gitHubIngestionBuildLinksByBuildName"
+            BuildIdentification.BUILD_LABEL -> "gitHubIngestionBuildLinksByBuildLabel"
         }
 
         val mutationParams = when (buildIdentification) {
             BuildIdentification.RUN_ID -> "runId: $runIdQuery,"
             BuildIdentification.BUILD_NAME -> """buildName: "$buildName","""
+            BuildIdentification.BUILD_LABEL -> """buildLabel: "$buildLabel","""
         }
 
         asAdmin {
@@ -87,6 +90,13 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
                                     running = true,
                                 )
                             )
+                            if (buildIdentification == BuildIdentification.BUILD_LABEL) {
+                                setProperty(
+                                    this,
+                                    ReleasePropertyType::class.java,
+                                    ReleaseProperty(buildLabel)
+                                )
+                            }
                             asAuth {
                                 run(
                                     """
@@ -123,9 +133,9 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
                                         assertTrue(uuid.isNotBlank(), "UUID has been returned")
                                     }
                                     asAdmin {
-                                        val links = structureService.getBuildsUsedBy(this).pageItems.map {
+                                        val links = structureService.getBuildsUsedBy(this).pageItems.associate {
                                             it.project.name to it.name
-                                        }.toMap()
+                                        }
                                         assertEquals(
                                             expectedLinks.mapKeys { (key, _) ->
                                                 targets[key]?.name ?: ""
@@ -154,7 +164,7 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
     enum class BuildIdentification {
         RUN_ID,
         BUILD_NAME,
-        // TODO BUILD_LABEL,
+        BUILD_LABEL,
     }
 
 }
