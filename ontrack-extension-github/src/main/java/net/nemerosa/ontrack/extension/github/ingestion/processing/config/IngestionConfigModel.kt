@@ -45,6 +45,8 @@ data class IngestionConfig(
     val workflows: IngestionWorkflowConfig = IngestionWorkflowConfig(),
     @APIDescription("Casc configurations")
     val casc: IngestionCascConfig = IngestionCascConfig(),
+    @APIDescription("Tagging configuration")
+    val tagging: IngestionTaggingConfig = IngestionTaggingConfig(),
 )
 
 /**
