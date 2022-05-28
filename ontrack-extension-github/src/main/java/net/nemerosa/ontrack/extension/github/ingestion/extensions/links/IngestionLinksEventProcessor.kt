@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEvent
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.BuildSearchForm
+import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
@@ -30,10 +31,26 @@ class IngestionLinksEventProcessor(
         val targets = input.buildLinks.mapNotNull { link ->
             getTargetBuild(link)
         }
+        // Gets the existing links
+        val existingLinks = structureService.getBuildsUsedBy(build, size = Int.MAX_VALUE).pageItems.map { it.id() }.toMutableSet()
+        // Added links
+        val addedLinks = mutableSetOf<Int>()
+        // Adding all links of the input
         targets.forEach { link ->
             structureService.addBuildLink(build, link)
+            addedLinks += link.id()
         }
-        // TODO Add only? See StructureService.editBuildLinks
+        // Deletes all authorised links which were not added again
+        if (!input.addOnly) {
+            // Other links, not authorised to view, were not subject to edition and are not visible
+            existingLinks.removeAll(addedLinks)
+            existingLinks.forEach { buildId ->
+                structureService.deleteBuildLink(
+                    build,
+                    structureService.getBuild(ID.of(buildId))
+                )
+            }
+        }
     }
 
     private fun getTargetBuild(link: GitHubIngestionLink): Build? {

@@ -1,0 +1,13 @@
+mutation LinksBuild(
+    $fromProject: String!,
+    $fromBuild: String!,
+    $links: [LinksBuildInputItem!]!,
+) {
+    linksBuild(input: {
+        fromBuild: $fromBuild,
+        fromProject: $fromProject,
+        links: $links,
+    }) {
+        ...PayloadUserErrors
+    }
+}

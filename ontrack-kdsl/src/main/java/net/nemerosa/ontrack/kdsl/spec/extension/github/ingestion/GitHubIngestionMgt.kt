@@ -169,6 +169,7 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
         owner: String,
         repository: String,
         buildName: String,
+        addOnly: Boolean,
         buildLinks: Map<String, String>,
     ): UUID =
         graphqlConnector.mutate(
@@ -176,6 +177,7 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
                 owner,
                 repository,
                 buildName,
+                addOnly,
                 buildLinks.map { (project, buildRef) ->
                     GitHubIngestionLink.builder()
                         .project(project)

@@ -9,6 +9,11 @@ class GitHubIngestionLinksPayload(
     buildName: String? = null,
     buildLabel: String? = null,
     val buildLinks: List<GitHubIngestionLink>,
+    val addOnly: Boolean,
 ) : AbstractGitHubIngestionBuildPayload(
     owner, repository, runId, buildName, buildLabel
-)
+) {
+    companion object {
+        const val ADD_ONLY_DEFAULT = false
+    }
+}

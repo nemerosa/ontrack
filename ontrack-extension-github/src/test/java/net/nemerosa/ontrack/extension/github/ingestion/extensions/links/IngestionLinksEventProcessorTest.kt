@@ -18,6 +18,7 @@ internal class IngestionLinksEventProcessorTest {
                     "repository",
                     runId = 12345,
                     buildLinks = emptyList(),
+                    addOnly = true,
                 )
             )
         )
@@ -35,6 +36,7 @@ internal class IngestionLinksEventProcessorTest {
                     "repository",
                     buildName = "name",
                     buildLinks = emptyList(),
+                    addOnly = true,
                 )
             )
         )
@@ -52,6 +54,7 @@ internal class IngestionLinksEventProcessorTest {
                     "repository",
                     buildLabel = "1.0.0",
                     buildLinks = emptyList(),
+                    addOnly = true,
                 )
             )
         )

@@ -2,12 +2,14 @@ mutation GitHubIngestionBuildLinksByBuildName(
     $owner: String!,
     $repository: String!,
     $buildName: String!,
+    $addOnly: Boolean!,
     $buildLinks: [GitHubIngestionLink!]!,
 ) {
     gitHubIngestionBuildLinksByBuildName(input: {
         owner: $owner,
         repository: $repository,
         buildName: $buildName,
+        addOnly: $addOnly,
         buildLinks: $buildLinks,
     }) {
         payload {

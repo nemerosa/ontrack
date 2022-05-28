@@ -7,6 +7,8 @@ import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProp
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.model.security.Roles
+import net.nemerosa.ontrack.model.structure.BuildLinkForm
+import net.nemerosa.ontrack.model.structure.BuildLinkFormItem
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -28,8 +30,58 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
     }
 
     @Test
+    fun `Build by ID not found`() {
+        basicTest(
+            runIdProperty = 10,
+            runIdQuery = 11,
+            expectedLinks = emptyMap(),
+        )
+    }
+
+    @Test
     fun `Build by name`() {
         basicTest(buildIdentification = BuildIdentification.BUILD_NAME)
+    }
+
+    @Test
+    fun `Build by label`() {
+        basicTest(buildIdentification = BuildIdentification.BUILD_LABEL)
+    }
+
+    @Test
+    fun `Links replaced by default`() {
+        basicTest(
+            existingLinks = setOf("three"),
+            expectedLinks = mapOf(
+                "one" to "build-one",
+                "two" to "build-two",
+            ),
+        )
+    }
+
+    @Test
+    fun `Links replaced explicitly`() {
+        basicTest(
+            existingLinks = setOf("three"),
+            expectedLinks = mapOf(
+                "one" to "build-one",
+                "two" to "build-two",
+            ),
+            addOnly = false,
+        )
+    }
+
+    @Test
+    fun `Links added only`() {
+        basicTest(
+            existingLinks = setOf("three"),
+            expectedLinks = mapOf(
+                "one" to "build-one",
+                "two" to "build-two",
+                "three" to "build-three",
+            ),
+            addOnly = true,
+        )
     }
 
     private fun basicTest(
@@ -38,6 +90,8 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
         runIdQuery: Long = 10,
         buildName: String = "my-build-name",
         buildLabel: String = "0.0.1",
+        addOnly: Boolean? = null,
+        existingLinks: Set<String> = emptySet(),
         expectedLinks: Map<String, String> = mapOf(
             "one" to "build-one",
             "two" to "build-two",
@@ -75,7 +129,18 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
                                 )
                             }
                         }
-                    }
+                    },
+                    "three" to project {
+                        branch {
+                            build(name = "build-three") {
+                                setProperty(
+                                    this,
+                                    ReleasePropertyType::class.java,
+                                    ReleaseProperty("3.0.0")
+                                )
+                            }
+                        }
+                    },
                 )
                 project {
                     branch {
@@ -97,10 +162,21 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
                                     ReleaseProperty(buildLabel)
                                 )
                             }
+                            if (existingLinks.isNotEmpty()) {
+                                structureService.editBuildLinks(this, BuildLinkForm(
+                                    addOnly = false,
+                                    links = existingLinks.map {
+                                        BuildLinkFormItem(
+                                            project = targets[it]?.name ?: error("Cannot find project $it"),
+                                            build = "build-$it",
+                                        )
+                                    }
+                                ))
+                            }
                             asAuth {
                                 run(
                                     """
-                                    mutation {
+                                    mutation IngestLinks(${'$'}addOnly: Boolean) {
                                         $mutationName(input: {
                                             owner: "nemerosa",
                                             repository: "${project.name}",
@@ -114,7 +190,8 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
                                                 project: "${targets["two"]?.name}",
                                                 buildRef: "#2.0.0"
                                             }
-                                            ]
+                                            ],
+                                            addOnly: ${'$'}addOnly,
                                         }) {
                                             payload {
                                                 uuid
@@ -126,7 +203,7 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
                                             }
                                         }
                                     }
-                                """
+                                """, mapOf("addOnly" to addOnly)
                                 ) { data ->
                                     checkGraphQLUserErrors(data, mutationName) { node ->
                                         val uuid = node.path("payload").getRequiredTextField("uuid")
@@ -150,15 +227,6 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
                 }
             }
         }
-    }
-
-    @Test
-    fun `Build by ID not found`() {
-        basicTest(
-            runIdProperty = 10,
-            runIdQuery = 11,
-            expectedLinks = emptyMap(),
-        )
     }
 
     enum class BuildIdentification {

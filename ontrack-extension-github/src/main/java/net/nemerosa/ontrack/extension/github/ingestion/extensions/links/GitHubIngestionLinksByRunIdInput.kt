@@ -10,17 +10,20 @@ class GitHubIngestionLinksByRunIdInput(
     owner: String,
     repository: String,
     buildLinks: List<GitHubIngestionLink>,
+    addOnly: Boolean,
     @APIDescription("ID of the GHA workflow run")
     val runId: Long,
 ) : AbstractGitHubIngestionLinksInput(
     owner,
     repository,
     buildLinks,
+    addOnly,
 ) {
     override fun toPayload() = GitHubIngestionLinksPayload(
         owner = owner,
         repository = repository,
         buildLinks = buildLinks,
         runId = runId,
+        addOnly = addOnly ?: GitHubIngestionLinksPayload.ADD_ONLY_DEFAULT,
     )
 }

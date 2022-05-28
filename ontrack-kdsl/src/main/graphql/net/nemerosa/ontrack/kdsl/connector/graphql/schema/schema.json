@@ -11153,6 +11153,16 @@
               "defaultValue": null
             },
             {
+              "name": "addOnly",
+              "description": "True of the links must be added to any existing list of links",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "buildLinks",
               "description": "List of links",
               "type": {
@@ -11272,6 +11282,16 @@
               "defaultValue": null
             },
             {
+              "name": "addOnly",
+              "description": "True of the links must be added to any existing list of links",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "buildLinks",
               "description": "List of links",
               "type": {
@@ -11387,6 +11407,16 @@
                   "name": "Long",
                   "ofType": null
                 }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "addOnly",
+              "description": "True of the links must be added to any existing list of links",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
               },
               "defaultValue": null
             },

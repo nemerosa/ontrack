@@ -15,6 +15,8 @@ abstract class AbstractGitHubIngestionLinksInput(
     @APIDescription("List of links")
     @ListRef(embedded = true)
     val buildLinks: List<GitHubIngestionLink>,
+    @APIDescription("True of the links must be added to any existing list of links")
+    val addOnly: Boolean? = false,
 ) {
     abstract fun toPayload(): GitHubIngestionLinksPayload
 }
