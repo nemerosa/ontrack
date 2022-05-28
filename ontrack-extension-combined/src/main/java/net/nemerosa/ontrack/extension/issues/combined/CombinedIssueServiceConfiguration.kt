@@ -10,7 +10,7 @@ import net.nemerosa.ontrack.model.form.MultiSelection
 import net.nemerosa.ontrack.model.support.Configuration
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 
-class CombinedIssueServiceConfiguration(
+open class CombinedIssueServiceConfiguration(
     override val name: String,
     val issueServiceConfigurationIdentifiers: List<String>
 ) : Configuration<CombinedIssueServiceConfiguration>, IssueServiceConfiguration {
