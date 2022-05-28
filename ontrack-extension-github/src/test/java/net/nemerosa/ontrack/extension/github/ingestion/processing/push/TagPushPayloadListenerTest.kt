@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.push
 import io.mockk.mockk
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Commit
+import net.nemerosa.ontrack.extension.github.ingestion.processing.push.tagging.TagPushPayloadListener
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals

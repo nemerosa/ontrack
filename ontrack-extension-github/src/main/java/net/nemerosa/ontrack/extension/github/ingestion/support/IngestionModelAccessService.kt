@@ -41,6 +41,11 @@ interface IngestionModelAccessService {
     fun findProjectFromRepository(repository: Repository): Project?
 
     /**
+     * Finds a branch from a Git reference
+     */
+    fun findBranchByRef(project: Project, ref: String): Branch?
+
+    /**
      * Finds a build using its workflow run ID.
      */
     fun findBuildByRunId(

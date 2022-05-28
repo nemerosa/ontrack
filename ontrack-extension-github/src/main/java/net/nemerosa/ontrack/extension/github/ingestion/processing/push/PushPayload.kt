@@ -15,6 +15,8 @@ class PushPayload(
     val commits: List<Commit> = emptyList(),
     @JsonProperty("head_commit")
     val headCommit: Commit? = null,
+    @JsonProperty("base_ref")
+    val baseRef: String? = null,
 ) : AbstractRepositoryPayload(
     repository,
 ) {
