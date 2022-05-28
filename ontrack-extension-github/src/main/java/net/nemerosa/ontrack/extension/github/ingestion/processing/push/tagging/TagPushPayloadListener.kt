@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPaylo
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayloadListener
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayloadListenerCheck
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
+import net.nemerosa.ontrack.extension.github.ingestion.support.REFS_HEADS_PREFIX
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.PropertyService
@@ -41,7 +42,13 @@ class TagPushPayloadListener(
         // Gets the project targeted by the payload
         val project = ingestionModelAccessService.getOrCreateProject(payload.repository, configuration)
         // Gets the branch from the base ref if any
-        val branch = payload.baseRef?.let { ingestionModelAccessService.findBranchByRef(project, it) }
+        val branch = payload.baseRef?.let {
+            ingestionModelAccessService.findBranchByRef(
+                project,
+                it.removePrefix(REFS_HEADS_PREFIX),
+                null
+            )
+        }
 
         // If the branch can be found, use the tagging strategies
         val build: Build? = if (branch != null) {

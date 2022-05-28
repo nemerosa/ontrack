@@ -117,6 +117,17 @@ class DefaultIngestionModelAccessService(
         }
     }
 
+    override fun findBranchByRef(project: Project, ref: String, pullRequest: IPullRequest?): Branch? {
+        val branchName = if (pullRequest != null) {
+            "PR-${pullRequest.number}"
+        } else if (ref.startsWith(REFS_TAGS_PREFIX)) {
+            error("Creating branch from tag is not supported: $ref")
+        } else {
+            NameDescription.escapeName(ref).take(Branch.NAME_MAX_LENGTH)
+        }
+        return structureService.findBranchByName(project.name, branchName).getOrNull()
+    }
+
     override fun getOrCreateBranch(
         project: Project,
         headBranch: String,
@@ -290,7 +301,12 @@ class DefaultIngestionModelAccessService(
         return saved
     }
 
-    override fun setupPromotionLevel(branch: Branch, plName: String, plDescription: String?, image: String?): PromotionLevel {
+    override fun setupPromotionLevel(
+        branch: Branch,
+        plName: String,
+        plDescription: String?,
+        image: String?,
+    ): PromotionLevel {
         val existing = structureService.findPromotionLevelByName(branch.project.name, branch.name, plName).getOrNull()
         val imageDocument = image?.run { ingestionImageService.downloadImage(branch.project, this) }
         val pl = if (existing != null) {

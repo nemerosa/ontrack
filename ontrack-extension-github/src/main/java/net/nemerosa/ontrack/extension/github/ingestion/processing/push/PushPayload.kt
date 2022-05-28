@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.AbstractRepositoryPayload
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Commit
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
+import net.nemerosa.ontrack.extension.github.ingestion.support.REFS_HEADS_PREFIX
 import net.nemerosa.ontrack.extension.github.ingestion.support.REFS_TAGS_PREFIX
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -43,6 +44,6 @@ class PushPayload(
         commits.any { it.added.contains(path) }
 
     @JsonIgnore
-    val branchName: String = ref.removePrefix("refs/heads/")
+    val branchName: String = ref.removePrefix(REFS_HEADS_PREFIX)
 
 }

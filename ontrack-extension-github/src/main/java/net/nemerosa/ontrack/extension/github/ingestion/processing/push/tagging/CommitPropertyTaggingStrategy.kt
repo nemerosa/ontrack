@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.push.tagging
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayload
 import net.nemerosa.ontrack.model.structure.*
@@ -11,6 +12,8 @@ class CommitPropertyTaggingStrategy(
 ) : TaggingStrategy<Any> {
 
     override val type: String = COMMIT_PROPERTY_TAGGING_STRATEGY_TYPE
+
+    override fun parseAndValidate(config: JsonNode?): Any? = null
 
     override fun findBuild(config: Any?, branch: Branch, payload: PushPayload): Build? =
         findBuild(config, branch.project, payload)

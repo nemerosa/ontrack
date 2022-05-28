@@ -16,8 +16,10 @@ class TagPushPayloadListenerTest {
     fun before() {
         listener = TagPushPayloadListener(
             propertyService = mockk(),
-            structureService = mockk(),
             ingestionModelAccessService = mockk(),
+            configService = mockk(),
+            taggingStrategyRegistry = mockk(),
+            commitPropertyTaggingStrategy = mockk(),
         )
     }
 

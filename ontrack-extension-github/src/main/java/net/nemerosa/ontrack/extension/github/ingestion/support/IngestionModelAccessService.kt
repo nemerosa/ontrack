@@ -43,7 +43,9 @@ interface IngestionModelAccessService {
     /**
      * Finds a branch from a Git reference
      */
-    fun findBranchByRef(project: Project, ref: String): Branch?
+    fun findBranchByRef(project: Project,
+                        ref: String,
+                        pullRequest: IPullRequest?,): Branch?
 
     /**
      * Finds a build using its workflow run ID.
@@ -108,3 +110,8 @@ interface IngestionModelAccessService {
  * Prefix for the tags
  */
 const val REFS_TAGS_PREFIX = "refs/tags/"
+
+/**
+ * Prefix for the branches
+ */
+const val REFS_HEADS_PREFIX = "refs/heads/"
