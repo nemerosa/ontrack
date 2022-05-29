@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.pr
 
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.extension.github.ingestion.support.getOrCreateBranch
 import org.springframework.stereotype.Component
@@ -13,12 +14,13 @@ class OpenedPRPayloadListener(
 ) : AbstractPRPayloadListener(
     action = PRPayloadAction.opened
 ) {
-    override fun process(payload: PRPayload, configuration: String?) {
+    override fun process(payload: PRPayload, configuration: String?): IngestionEventProcessingResultDetails {
         ingestionModelAccessService.getOrCreateBranch(
             repository = payload.repository,
             configuration = configuration,
             headBranch = payload.pullRequest.head.ref,
             pullRequest = payload.pullRequest,
         )
+        return IngestionEventProcessingResultDetails.processed()
     }
 }

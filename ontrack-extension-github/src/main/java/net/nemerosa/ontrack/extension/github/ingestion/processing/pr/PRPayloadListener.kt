@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.pr
 
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
+
 /**
  * Defines a service which listens to `pull_request` events.
  */
@@ -19,5 +21,5 @@ interface PRPayloadListener {
      * @param payload Payload to process
      * @param configuration GitHub config name
      */
-    fun process(payload: PRPayload, configuration: String?)
+    fun process(payload: PRPayload, configuration: String?): IngestionEventProcessingResultDetails
 }

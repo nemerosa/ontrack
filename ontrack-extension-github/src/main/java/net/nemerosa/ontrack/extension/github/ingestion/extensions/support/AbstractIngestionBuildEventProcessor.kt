@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.extensions.support
 
 import net.nemerosa.ontrack.extension.github.ingestion.processing.AbstractIngestionEventProcessor
-import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.model.structure.Build
@@ -15,7 +15,7 @@ abstract class AbstractIngestionBuildEventProcessor<P : AbstractGitHubIngestionB
     override fun process(
         payload: P,
         configuration: String?,
-    ): IngestionEventProcessingResult {
+    ): IngestionEventProcessingResultDetails {
         val build = if (payload.buildLabel != null) {
             findBuildByBuildLabel(payload, payload.buildLabel)
         } else if (payload.buildName != null) {
@@ -27,13 +27,12 @@ abstract class AbstractIngestionBuildEventProcessor<P : AbstractGitHubIngestionB
         }
         return if (build != null) {
             process(build, payload)
-            IngestionEventProcessingResult.PROCESSED
         } else {
-            IngestionEventProcessingResult.IGNORED
+            IngestionEventProcessingResultDetails.ignored("Cannot find build based on $payload.")
         }
     }
 
-    protected abstract fun process(build: Build, input: P)
+    protected abstract fun process(build: Build, input: P): IngestionEventProcessingResultDetails
 
     private fun findBuildByRunId(input: P, runId: Long): Build? =
         ingestionModelAccessService.findBuildByRunId(

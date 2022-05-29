@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.job
 
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
@@ -22,7 +23,7 @@ interface WorkflowJobProcessingService {
      * @param conclusion Conclusion of the validation
      * @param startedAt Start timestamp for the validation
      * @param completedAt Completion timestamp for the validation
-     * @return If items have been created
+     * @return Result of the processing
      */
     fun setupValidation(
         repository: Repository,
@@ -35,7 +36,7 @@ interface WorkflowJobProcessingService {
         conclusion: WorkflowJobStepConclusion?,
         startedAt: LocalDateTime?,
         completedAt: LocalDateTime?,
-    ): Boolean
+    ): IngestionEventProcessingResultDetails
 
     /**
      * Generic method to create a validation run

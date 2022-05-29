@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.pr
 
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.extension.github.ingestion.support.getOrCreateBranch
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -15,7 +16,7 @@ class ClosedPRPayloadListener(
 ) : AbstractPRPayloadListener(
     action = PRPayloadAction.closed
 ) {
-    override fun process(payload: PRPayload, configuration: String?) {
+    override fun process(payload: PRPayload, configuration: String?): IngestionEventProcessingResultDetails {
         val branch = ingestionModelAccessService.getOrCreateBranch(
             repository = payload.repository,
             configuration = configuration,
@@ -23,5 +24,6 @@ class ClosedPRPayloadListener(
             pullRequest = payload.pullRequest,
         )
         structureService.disableBranch(branch)
+        return IngestionEventProcessingResultDetails.processed()
     }
 }

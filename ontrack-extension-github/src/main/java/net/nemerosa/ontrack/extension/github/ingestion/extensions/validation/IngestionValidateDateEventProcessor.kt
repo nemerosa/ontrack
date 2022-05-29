@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.extensions.validation
 
 import net.nemerosa.ontrack.extension.github.ingestion.extensions.support.AbstractIngestionBuildEventProcessor
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataTypeNotFoundException
 import net.nemerosa.ontrack.model.structure.*
@@ -22,7 +23,7 @@ class IngestionValidateDateEventProcessor(
     override fun preProcessingCheck(payload: GitHubIngestionValidateDataPayload): IngestionEventPreprocessingCheck =
         IngestionEventPreprocessingCheck.TO_BE_PROCESSED
 
-    override fun process(build: Build, input: GitHubIngestionValidateDataPayload) {
+    override fun process(build: Build, input: GitHubIngestionValidateDataPayload): IngestionEventProcessingResultDetails {
         // Setting up the validation stamp
         val vs = ingestionModelAccessService.setupValidationStamp(
             branch = build.branch,
@@ -68,6 +69,8 @@ class IngestionValidateDateEventProcessor(
                 existingRunInfo
             )
         }
+        // OK
+        return IngestionEventProcessingResultDetails.processed()
     }
 
     override val payloadType: KClass<GitHubIngestionValidateDataPayload> =

@@ -55,6 +55,8 @@ data class IngestionHookPayload(
     val status: IngestionHookPayloadStatus = IngestionHookPayloadStatus.SCHEDULED,
     @APIDescription("Outcome of the processing")
     val outcome: IngestionEventProcessingResult? = null,
+    @APIDescription("Details about the outcome of the processing")
+    val outcomeDetails: String? = null,
     @APIDescription("Timestamp for the start of the processing")
     val started: LocalDateTime? = null,
     @APIDescription("Status message (exception stack trace in case of error)")

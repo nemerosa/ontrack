@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.push.tagging
 
 import net.nemerosa.ontrack.extension.general.ReleaseProperty
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.INGESTION_CONFIG_FILE_PATH
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayload
@@ -36,7 +37,7 @@ class TagPushPayloadListener(
             PushPayloadListenerCheck.IGNORED
         }
 
-    override fun process(payload: PushPayload, configuration: String?) {
+    override fun process(payload: PushPayload, configuration: String?): IngestionEventProcessingResultDetails {
         // Gets the tag name (it's already been checked in the precheck)
         val tag = payload.getTag() ?: error("Cannot process tag event because tag is missing.")
         // Gets the project targeted by the payload
@@ -65,12 +66,15 @@ class TagPushPayloadListener(
             commitPropertyTaggingStrategy.findBuild(null, project, payload)
         }
 
-        if (build != null && !propertyService.hasProperty(build, ReleasePropertyType::class.java)) {
+        return if (build != null && !propertyService.hasProperty(build, ReleasePropertyType::class.java)) {
             propertyService.editProperty(
                 build,
                 ReleasePropertyType::class.java,
                 ReleaseProperty(name = tag),
             )
+            IngestionEventProcessingResultDetails.processed("Build ${build.name} found and labelled with $tag.")
+        } else {
+            IngestionEventProcessingResultDetails.ignored("No build found to label or already labelled.")
         }
     }
 

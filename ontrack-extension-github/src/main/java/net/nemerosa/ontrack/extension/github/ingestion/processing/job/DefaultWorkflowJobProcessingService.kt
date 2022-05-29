@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.job
 
 import net.nemerosa.ontrack.extension.git.model.GitBranchNotConfiguredException
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInfo
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
@@ -42,20 +43,31 @@ class DefaultWorkflowJobProcessingService(
         conclusion: WorkflowJobStepConclusion?,
         startedAt: LocalDateTime?,
         completedAt: LocalDateTime?,
-    ): Boolean {
+    ): IngestionEventProcessingResultDetails {
         // Gets the build or does not do anything
-        val build = ingestionModelAccessService.findBuildByRunId(repository, runId) ?: return false
+        val build = ingestionModelAccessService.findBuildByRunId(repository, runId)
+            ?: return IngestionEventProcessingResultDetails.ignored("No build with workflow run ID $runId.")
         // Settings
         val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
         // Gets the ingestion configuration
         val ingestionConfig = getOrLoadIngestionConfig(build.branch)
         // Skipping job or not, depending on the configuration
         if (step == null && ingestionConfig.general.skipJobs) {
-            return false
+            return IngestionEventProcessingResultDetails.ignored(
+                """$job job not processed as a step because filtered out by general "skip jobs" configuration."""
+            )
         }
         // Filtering on jobs and steps
-        if (ignoreJob(job, settings, ingestionConfig)) return false
-        if (step != null && ignoreStep(step, settings, ingestionConfig)) return false
+        if (ignoreJob(job, settings, ingestionConfig)) {
+            return IngestionEventProcessingResultDetails.ignored(
+                """$job job not processed as a step because filtered out by the configuration."""
+            )
+        }
+        if (step != null && ignoreStep(step, settings, ingestionConfig)) {
+            return IngestionEventProcessingResultDetails.ignored(
+                """$step step not processed because filtered out by the configuration."""
+            )
+        }
         // Gets the run property
         val runProperty = propertyService.getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java).value
             ?: error("Cannot find workflow run property on build")
@@ -100,7 +112,11 @@ class DefaultWorkflowJobProcessingService(
             )
         }
         // OK
-        return true
+        return if (run != null) {
+            IngestionEventProcessingResultDetails.processed("Validation run created.")
+        } else {
+            IngestionEventProcessingResultDetails.ignored("Validation run not created.")
+        }
     }
 
     private fun ignoreJob(job: String, settings: GitHubIngestionSettings, ingestionConfig: IngestionConfig): Boolean =

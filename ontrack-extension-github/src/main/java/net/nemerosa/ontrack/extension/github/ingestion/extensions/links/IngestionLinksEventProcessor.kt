@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.extensions.support.AbstractIngestionBuildEventProcessor
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.BuildSearchForm
@@ -27,12 +28,13 @@ class IngestionLinksEventProcessor(
             IngestionEventPreprocessingCheck.IGNORED
         }
 
-    override fun process(build: Build, input: GitHubIngestionLinksPayload) {
+    override fun process(build: Build, input: GitHubIngestionLinksPayload): IngestionEventProcessingResultDetails {
         val targets = input.buildLinks.mapNotNull { link ->
             getTargetBuild(link)
         }
         // Gets the existing links
-        val existingLinks = structureService.getBuildsUsedBy(build, size = Int.MAX_VALUE).pageItems.map { it.id() }.toMutableSet()
+        val existingLinks =
+            structureService.getBuildsUsedBy(build, size = Int.MAX_VALUE).pageItems.map { it.id() }.toMutableSet()
         // Added links
         val addedLinks = mutableSetOf<Int>()
         // Adding all links of the input
@@ -41,9 +43,11 @@ class IngestionLinksEventProcessor(
             addedLinks += link.id()
         }
         // Deletes all authorised links which were not added again
+        var removedLinks = 0
         if (!input.addOnly) {
             // Other links, not authorised to view, were not subject to edition and are not visible
             existingLinks.removeAll(addedLinks)
+            removedLinks = existingLinks.size
             existingLinks.forEach { buildId ->
                 structureService.deleteBuildLink(
                     build,
@@ -51,6 +55,13 @@ class IngestionLinksEventProcessor(
                 )
             }
         }
+        // OK
+        val details = if (input.addOnly) {
+            """Added ${addedLinks.size} links."""
+        } else {
+            """Added ${addedLinks.size} links, removed $removedLinks links."""
+        }
+        return IngestionEventProcessingResultDetails.processed(details)
     }
 
     private fun getTargetBuild(link: GitHubIngestionLink): Build? {

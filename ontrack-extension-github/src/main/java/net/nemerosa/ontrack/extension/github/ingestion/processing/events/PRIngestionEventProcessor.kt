@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.events
 
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
-import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.pr.PRPayload
 import net.nemerosa.ontrack.extension.github.ingestion.processing.pr.PRPayloadListener
 import net.nemerosa.ontrack.extension.github.ingestion.processing.pr.PRPayloadListenerCheck
@@ -32,13 +32,14 @@ class PRIngestionEventProcessor(
         }
     }
 
-    override fun process(payload: PRPayload, configuration: String?): IngestionEventProcessingResult {
+    override fun process(payload: PRPayload, configuration: String?): IngestionEventProcessingResultDetails {
+        var outcome: IngestionEventProcessingResultDetails = IngestionEventProcessingResultDetails.empty
         prPayloadListeners.map { listener ->
             if (listener.preProcessCheck(payload) == PRPayloadListenerCheck.TO_BE_PROCESSED) {
-                listener.process(payload, configuration)
+                outcome += listener.process(payload, configuration)
             }
         }
-        return IngestionEventProcessingResult.PROCESSED
+        return outcome
     }
 
     override fun getPayloadSource(payload: PRPayload): String? = "PR-${payload.pullRequest.number}"

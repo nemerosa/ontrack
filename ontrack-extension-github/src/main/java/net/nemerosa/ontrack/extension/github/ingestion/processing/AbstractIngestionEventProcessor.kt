@@ -13,7 +13,7 @@ abstract class AbstractIngestionEventProcessor<T : Any> : IngestionEventProcesso
         return preProcessingCheck(parsedPayload)
     }
 
-    final override fun process(payload: IngestionHookPayload): IngestionEventProcessingResult {
+    final override fun process(payload: IngestionHookPayload): IngestionEventProcessingResultDetails {
         // Parsing of the payload
         val parsedPayload = parsePayload(payload)
         // Processes the payload
@@ -31,7 +31,7 @@ abstract class AbstractIngestionEventProcessor<T : Any> : IngestionEventProcesso
 
     abstract fun preProcessingCheck(payload: T): IngestionEventPreprocessingCheck
 
-    abstract fun process(payload: T, configuration: String?): IngestionEventProcessingResult
+    abstract fun process(payload: T, configuration: String?): IngestionEventProcessingResultDetails
 
     private fun parsePayload(payload: IngestionHookPayload): T = payload.payload.parseInto(payloadType)
 

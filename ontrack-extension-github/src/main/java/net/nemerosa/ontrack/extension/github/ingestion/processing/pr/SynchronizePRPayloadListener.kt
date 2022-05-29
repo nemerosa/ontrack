@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.pr
 
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.INGESTION_CONFIG_FILE_PATH
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
@@ -16,7 +17,7 @@ class SynchronizePRPayloadListener(
 ) : AbstractPRPayloadListener(
     action = PRPayloadAction.synchronize
 ) {
-    override fun process(payload: PRPayload, configuration: String?) {
+    override fun process(payload: PRPayload, configuration: String?): IngestionEventProcessingResultDetails {
         // Gets or creates the branch
         val branch = ingestionModelAccessService.getOrCreateBranch(
             repository = payload.repository,
@@ -26,5 +27,7 @@ class SynchronizePRPayloadListener(
         )
         // Loads and saves the ingestion configuration
         configService.loadAndSaveConfig(branch, INGESTION_CONFIG_FILE_PATH)
+        // OK
+        return IngestionEventProcessingResultDetails.processed()
     }
 }

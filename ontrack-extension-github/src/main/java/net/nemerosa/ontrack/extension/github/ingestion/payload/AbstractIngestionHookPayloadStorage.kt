@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.payload
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.apache.commons.lang3.exception.ExceptionUtils
@@ -32,6 +32,7 @@ abstract class AbstractIngestionHookPayloadStorage(
                 source = source, // Source only determined at storage time
                 status = payload.status,
                 outcome = payload.outcome,
+                outcomeDetails = payload.outcomeDetails,
                 started = payload.started,
                 message = payload.message,
                 completion = payload.completion,
@@ -61,6 +62,7 @@ abstract class AbstractIngestionHookPayloadStorage(
                 source = old.source,
                 status = old.status,
                 outcome = old.outcome,
+                outcomeDetails = old.outcomeDetails,
                 started = old.started,
                 message = old.message,
                 completion = old.completion,
@@ -90,6 +92,7 @@ abstract class AbstractIngestionHookPayloadStorage(
                 source = old.source,
                 status = old.status,
                 outcome = old.outcome,
+                outcomeDetails = old.outcomeDetails,
                 started = old.started,
                 message = old.message,
                 completion = old.completion,
@@ -119,6 +122,7 @@ abstract class AbstractIngestionHookPayloadStorage(
                 source = old.source,
                 status = IngestionHookPayloadStatus.PROCESSING,
                 outcome = old.outcome,
+                outcomeDetails = old.outcomeDetails,
                 started = Time.now(),
                 message = null,
                 completion = null,
@@ -129,7 +133,7 @@ abstract class AbstractIngestionHookPayloadStorage(
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    override fun finished(payload: IngestionHookPayload, outcome: IngestionEventProcessingResult) {
+    override fun finished(payload: IngestionHookPayload, outcome: IngestionEventProcessingResultDetails) {
         securityService.checkGlobalFunction(GlobalSettings::class.java)
         // Gets the old payload
         val old = getByUUID(payload.uuid)
@@ -147,7 +151,8 @@ abstract class AbstractIngestionHookPayloadStorage(
                 repository = old.repository,
                 source = old.source,
                 status = IngestionHookPayloadStatus.COMPLETED,
-                outcome = outcome,
+                outcome = outcome.result,
+                outcomeDetails = outcome.details,
                 started = old.started,
                 message = null,
                 completion = Time.now(),
@@ -177,6 +182,7 @@ abstract class AbstractIngestionHookPayloadStorage(
                 source = old.source,
                 status = IngestionHookPayloadStatus.ERRORED,
                 outcome = old.outcome,
+                outcomeDetails = old.outcomeDetails,
                 started = old.started,
                 message = ExceptionUtils.getStackTrace(any),
                 completion = Time.now(),

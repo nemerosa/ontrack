@@ -33,7 +33,7 @@ class DefaultIngestionHookProcessingService(
             try {
                 meterRegistry.timeForPayload(payload, IngestionMetrics.Process.time) {
                     val outcome = doProcess(payload)
-                    val metric = when (outcome) {
+                    val metric = when (outcome.result) {
                         IngestionEventProcessingResult.PROCESSED -> IngestionMetrics.Process.successCount
                         IngestionEventProcessingResult.IGNORED -> IngestionMetrics.Process.ignoredCount
                     }
@@ -60,7 +60,7 @@ class DefaultIngestionHookProcessingService(
         }
     }
 
-    private fun doProcess(payload: IngestionHookPayload): IngestionEventProcessingResult {
+    private fun doProcess(payload: IngestionHookPayload): IngestionEventProcessingResultDetails {
         // Gets the processor for this event
         val eventProcessor = eventProcessors[payload.gitHubEvent]
             ?: throw GitHubIngestionHookEventNotSupportedException(payload.gitHubEvent)

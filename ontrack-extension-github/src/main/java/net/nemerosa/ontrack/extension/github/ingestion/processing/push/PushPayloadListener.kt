@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.push
 
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
+
 /**
  * Defines a service to process a push event.
  */
@@ -18,6 +20,7 @@ interface PushPayloadListener {
      *
      * @param payload Payload to process
      * @param configuration GitHub config name
+     * @return Result of the processing
      */
-    fun process(payload: PushPayload, configuration: String?)
+    fun process(payload: PushPayload, configuration: String?): IngestionEventProcessingResultDetails
 }

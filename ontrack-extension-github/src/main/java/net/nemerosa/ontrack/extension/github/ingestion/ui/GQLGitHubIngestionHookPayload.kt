@@ -48,6 +48,7 @@ class GQLGitHubIngestionHookPayload(
                 .description(getPropertyDescription(IngestionHookPayload::outcome))
                 .type(gqlEnumIngestionEventProcessingResult.getTypeRef())
         }
+        .stringField(IngestionHookPayload::outcomeDetails)
         .dateField(
             IngestionHookPayload::started.name,
             getPropertyDescription(IngestionHookPayload::started),

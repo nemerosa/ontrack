@@ -5,6 +5,7 @@ import io.mockk.mockk
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Commit
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayload
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayloadListener
@@ -38,6 +39,7 @@ class PushIngestionEventProcessorTest {
             listenerOnPath1.process(any(), any())
         } answers {
             processedPaths += "path/1"
+            IngestionEventProcessingResultDetails.processed()
         }
 
         val listenerOnPath2 = mockk<PushPayloadListener>()
@@ -55,6 +57,7 @@ class PushIngestionEventProcessorTest {
             listenerOnPath2.process(any(), any())
         } answers {
             processedPaths += "path/2"
+            IngestionEventProcessingResultDetails.processed()
         }
 
         processor = PushIngestionEventProcessor(
@@ -98,7 +101,7 @@ class PushIngestionEventProcessorTest {
         )
         assertEquals(
             IngestionEventProcessingResult.PROCESSED,
-            processor.process(payload, null)
+            processor.process(payload, null).result
         )
         assertEquals(
             setOf("path/1"),
@@ -115,7 +118,7 @@ class PushIngestionEventProcessorTest {
         )
         assertEquals(
             IngestionEventProcessingResult.PROCESSED,
-            processor.process(payload, null)
+            processor.process(payload, null).result
         )
         assertEquals(
             setOf("path/1"),
@@ -132,7 +135,7 @@ class PushIngestionEventProcessorTest {
         )
         assertEquals(
             IngestionEventProcessingResult.PROCESSED,
-            processor.process(payload, null)
+            processor.process(payload, null).result
         )
         assertEquals(
             setOf("path/2"),
@@ -149,7 +152,7 @@ class PushIngestionEventProcessorTest {
         )
         assertEquals(
             IngestionEventProcessingResult.PROCESSED,
-            processor.process(payload, null)
+            processor.process(payload, null).result
         )
         assertEquals(
             setOf("path/1", "path/2"),
@@ -166,7 +169,7 @@ class PushIngestionEventProcessorTest {
         )
         assertEquals(
             IngestionEventProcessingResult.IGNORED,
-            processor.process(payload, null)
+            processor.process(payload, null).result
         )
         assertEquals(
             emptySet(),

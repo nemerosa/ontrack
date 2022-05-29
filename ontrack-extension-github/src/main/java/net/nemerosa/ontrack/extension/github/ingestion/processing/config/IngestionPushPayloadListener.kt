@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayload
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayloadListener
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayloadListenerCheck
@@ -22,7 +23,7 @@ class IngestionPushPayloadListener(
             PushPayloadListenerCheck.IGNORED
         }
 
-    override fun process(payload: PushPayload, configuration: String?) {
+    override fun process(payload: PushPayload, configuration: String?): IngestionEventProcessingResultDetails {
         val branch = ingestionModelAccessService.getOrCreateBranch(
             repository = payload.repository,
             configuration = configuration,
@@ -38,5 +39,6 @@ class IngestionPushPayloadListener(
                 branch = branch,
             )
         }
+        return IngestionEventProcessingResultDetails.processed()
     }
 }

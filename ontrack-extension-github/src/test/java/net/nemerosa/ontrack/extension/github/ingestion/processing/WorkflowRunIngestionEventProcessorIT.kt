@@ -461,7 +461,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                 )
                 assertEquals(
                     IngestionEventProcessingResult.IGNORED,
-                    processor.process(payload, null)
+                    processor.process(payload, null).result
                 )
                 // Checks the project & the branch have been created
                 assertNotNull(structureService.findBranchByName(repoName, "main").getOrNull(),

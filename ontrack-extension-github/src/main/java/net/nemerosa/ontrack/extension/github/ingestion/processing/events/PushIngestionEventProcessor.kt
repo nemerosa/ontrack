@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.events
 
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
-import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayload
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayloadListener
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayloadListenerCheck
@@ -32,19 +32,14 @@ class PushIngestionEventProcessor(
         }
     }
 
-    override fun process(payload: PushPayload, configuration: String?): IngestionEventProcessingResult {
-        var processed = false
+    override fun process(payload: PushPayload, configuration: String?): IngestionEventProcessingResultDetails {
+        var outcome = IngestionEventProcessingResultDetails.empty
         pushPayloadListeners.map { listener ->
             if (listener.preProcessCheck(payload) == PushPayloadListenerCheck.TO_BE_PROCESSED) {
-                listener.process(payload, configuration)
-                processed = true
+                outcome += listener.process(payload, configuration)
             }
         }
-        return if (processed) {
-            IngestionEventProcessingResult.PROCESSED
-        } else {
-            IngestionEventProcessingResult.IGNORED
-        }
+        return outcome
     }
 
     /**

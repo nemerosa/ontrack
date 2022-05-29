@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInfo
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.INGESTION_CONFIG_FILE_PATH
@@ -76,7 +77,7 @@ class WorkflowRunIngestionEventProcessor(
         }
     }
 
-    override fun process(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResult {
+    override fun process(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResultDetails {
         // Gets the branch
         val project = getOrCreateProject(payload, configuration)
         val branch = getOrCreateBranch(project, payload)
@@ -90,11 +91,11 @@ class WorkflowRunIngestionEventProcessor(
             }
         } else {
             // Workflow is ignored
-            IngestionEventProcessingResult.IGNORED
+            IngestionEventProcessingResultDetails.ignored("${payload.workflowRun.name} workflow is filtered out.")
         }
     }
 
-    private fun endBuild(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResult {
+    private fun endBuild(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResultDetails {
         // Build creation & setup
         val build = getOrCreateBuild(payload, running = false, configuration = configuration)
         // Setting the run info
@@ -111,7 +112,7 @@ class WorkflowRunIngestionEventProcessor(
             }
         }
         // OK
-        return IngestionEventProcessingResult.PROCESSED
+        return IngestionEventProcessingResultDetails.processed()
     }
 
     private fun setupRunValidation(build: Build, workflowRun: WorkflowRun, runInfo: RunInfoInput) {
@@ -153,11 +154,11 @@ class WorkflowRunIngestionEventProcessor(
         )
     }
 
-    private fun startBuild(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResult {
+    private fun startBuild(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResultDetails {
         // Build creation & setup
         getOrCreateBuild(payload, running = true, configuration = configuration)
         // OK
-        return IngestionEventProcessingResult.PROCESSED
+        return IngestionEventProcessingResultDetails.processed()
     }
 
     private fun getOrCreateBuild(payload: WorkflowRunPayload, running: Boolean, configuration: String?): Build {

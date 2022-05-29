@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
-import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.job.WorkflowJobProcessingService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
@@ -34,20 +34,20 @@ class WorkflowJobIngestionEventProcessor(
         return IngestionEventPreprocessingCheck.TO_BE_PROCESSED
     }
 
-    override fun process(payload: WorkflowJobPayload, configuration: String?): IngestionEventProcessingResult =
+    override fun process(payload: WorkflowJobPayload, configuration: String?): IngestionEventProcessingResultDetails =
         when (payload.action) {
             WorkflowJobAction.in_progress -> onJob(payload)
             WorkflowJobAction.completed -> onJob(payload)
-            else -> IngestionEventProcessingResult.IGNORED
+            else -> IngestionEventProcessingResultDetails.ignored("Workflow job action ${payload.action} is not processed.")
         }
 
-    private fun onJob(payload: WorkflowJobPayload): IngestionEventProcessingResult {
+    private fun onJob(payload: WorkflowJobPayload): IngestionEventProcessingResultDetails {
         // Processes each step independently
         payload.workflowJob.steps?.forEach { step ->
             onStep(step, payload)
         }
         // Processing of the job itself
-        val ok = workflowJobProcessingService.setupValidation(
+        return workflowJobProcessingService.setupValidation(
             repository = payload.repository,
             runId = payload.workflowJob.runId,
             runAttempt = payload.workflowJob.runAttempt,
@@ -59,12 +59,6 @@ class WorkflowJobIngestionEventProcessor(
             startedAt = payload.workflowJob.startedAtDate,
             completedAt = payload.workflowJob.completedAtDate,
         )
-        // OK
-        return if (ok) {
-            IngestionEventProcessingResult.PROCESSED
-        } else {
-            IngestionEventProcessingResult.IGNORED
-        }
     }
 
     private fun onStep(step: WorkflowJobStep, payload: WorkflowJobPayload) =
