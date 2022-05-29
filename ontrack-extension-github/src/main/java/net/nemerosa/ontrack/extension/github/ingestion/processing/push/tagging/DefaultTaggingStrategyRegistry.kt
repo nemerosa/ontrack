@@ -25,14 +25,18 @@ class DefaultTaggingStrategyRegistry(
         }
     }
 
-    private fun <C> parseTaggingStrategy(config: IngestionTaggingStrategyConfig): ConfiguredTaggingStrategy<C> {
+    internal fun <C> parseTaggingStrategy(config: IngestionTaggingStrategyConfig): ConfiguredTaggingStrategy<C> {
         // Getting the strategy
         @Suppress("UNCHECKED_CAST")
         val strategy: TaggingStrategy<C> = index[config.type]
                 as? TaggingStrategy<C>
             ?: throw TaggingStrategyNotFoundException(config.type)
         // Parsing the configuration
-        val strategyConfig = strategy.parseAndValidate(config.config)
+        val strategyConfig = try {
+            strategy.parseAndValidate(config.config)
+        } catch (ex: Exception) {
+            throw TaggingStrategyConfigParsingException(config, ex)
+        }
         // OK
         return ConfiguredTaggingStrategy(strategy, strategyConfig)
     }

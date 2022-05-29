@@ -31,6 +31,6 @@ class CommitPropertyTaggingStrategy(
     }
 
     companion object {
-        const val COMMIT_PROPERTY_TAGGING_STRATEGY_TYPE = "commit-strategy"
+        const val COMMIT_PROPERTY_TAGGING_STRATEGY_TYPE = "commit-property"
     }
 }
