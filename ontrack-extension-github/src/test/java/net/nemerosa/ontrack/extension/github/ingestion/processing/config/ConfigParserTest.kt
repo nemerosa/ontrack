@@ -119,6 +119,9 @@ class ConfigParserTest {
                     includes: "main"
                     excludes: ""
                     casc: null
+                tagging:
+                  strategies: []
+                  commit-property: true
             """.trimIndent().trim(),
             yaml.trim()
         )
