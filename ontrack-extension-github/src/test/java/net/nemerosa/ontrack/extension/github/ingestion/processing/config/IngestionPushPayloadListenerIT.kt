@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.stale.StalePropertyType
@@ -82,6 +83,43 @@ internal class IngestionPushPayloadListenerIT : AbstractIngestionTestSupport() {
                     assertEquals(listOf("GOLD"), property.promotionsToKeep)
                     assertEquals("release/.*", property.includes)
                     assertEquals("release/1\\..*", property.excludes)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Configuration of the build link display property by the ingestion configuration file`() {
+        asAdmin {
+            onlyOneGitHubConfig()
+            val repository = uid("r")
+            ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
+                casc = IngestionCascConfig(
+                    project = IngestionCascBranchConfig(
+                        casc = mapOf(
+                            "properties" to mapOf(
+                                "buildLinkDisplayProperty" to mapOf(
+                                    "useLabel" to true
+                                )
+                            )
+                        ).asJson()
+                    )
+                )
+            ))
+            ingestionPushPayloadListener.process(
+                payload = IngestionHookFixtures.samplePushPayload(
+                    repoName = repository,
+                    ref = "refs/heads/main",
+                    added = listOf(".github/ontrack/ingestion.yml"),
+                ),
+                configuration = null
+            )
+            assertNotNull(structureService.findBranchByName(repository, "main").getOrNull(),
+                "Branch has been created") { branch ->
+                // Gets its build link display property
+                assertNotNull(getProperty(branch.project, BuildLinkDisplayPropertyType::class.java),
+                    "Build link display property has been set on the project") { property ->
+                    assertEquals(true, property.useLabel)
                 }
             }
         }
