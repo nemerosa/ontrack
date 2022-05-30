@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.kdsl.acceptance.annotations.AcceptanceTestSuite
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.resourceAsText
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
-import net.nemerosa.ontrack.kdsl.spec.extension.general.setLabel
+import net.nemerosa.ontrack.kdsl.spec.extension.general.label
 import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHub
 import net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion.ingestion
 import org.junit.Test
@@ -29,7 +29,9 @@ class ACCDSLGitHubIngestionLinks : AbstractACCDSLGitHubIngestionTestSupport() {
         val component = uid("p")
         val library = uid("p")
         ontrack.createProject(component, "").createBranch("main", "").createBuild("1.0.0", "")
-        ontrack.createProject(library, "").createBranch("main", "").createBuild("321", "").setLabel("2.0.0")
+        ontrack.createProject(library, "").createBranch("main", "").createBuild("321", "").apply {
+            label = "2.0.0"
+        }
 
         // A unique repository name
         val repository = uid("r")
@@ -94,7 +96,9 @@ class ACCDSLGitHubIngestionLinks : AbstractACCDSLGitHubIngestionTestSupport() {
         val component = uid("p")
         val library = uid("p")
         ontrack.createProject(component, "").createBranch("main", "").createBuild("1.0.0", "")
-        ontrack.createProject(library, "").createBranch("main", "").createBuild("321", "").setLabel("2.0.0")
+        ontrack.createProject(library, "").createBranch("main", "").createBuild("321", "").apply {
+            label = "2.0.0"
+        }
 
         // A unique repository name
         val repository = uid("r")
@@ -149,7 +153,9 @@ class ACCDSLGitHubIngestionLinks : AbstractACCDSLGitHubIngestionTestSupport() {
         val component = uid("p")
         val library = uid("p")
         ontrack.createProject(component, "").createBranch("main", "").createBuild("1.0.0", "")
-        ontrack.createProject(library, "").createBranch("main", "").createBuild("321", "").setLabel("2.0.0")
+        ontrack.createProject(library, "").createBranch("main", "").createBuild("321", "").apply {
+            label = "2.0.0"
+        }
 
         // Existing link
         val existing = uid("p")
@@ -213,7 +219,9 @@ class ACCDSLGitHubIngestionLinks : AbstractACCDSLGitHubIngestionTestSupport() {
         val component = uid("p")
         val library = uid("p")
         ontrack.createProject(component, "").createBranch("main", "").createBuild("1.0.0", "")
-        ontrack.createProject(library, "").createBranch("main", "").createBuild("321", "").setLabel("2.0.0")
+        ontrack.createProject(library, "").createBranch("main", "").createBuild("321", "").apply {
+            label = "2.0.0"
+        }
 
         // A unique repository name
         val repository = uid("r")
@@ -223,7 +231,9 @@ class ACCDSLGitHubIngestionLinks : AbstractACCDSLGitHubIngestionTestSupport() {
             .createProject(repository, "")
             .createBranch("main", "")
             .createBuild("build-15", "")
-            .setLabel("3.0.0")
+            .apply {
+                label = "3.0.0"
+            }
 
         // Calling the API to simulate the GHA call
         val linksUuid = ontrack.gitHub.ingestion.buildLinksByBuildLabel(

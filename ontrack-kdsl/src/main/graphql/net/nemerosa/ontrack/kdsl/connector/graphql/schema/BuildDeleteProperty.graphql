@@ -1,0 +1,12 @@
+mutation BuildDeleteProperty(
+    $id: Int!,
+    $type: String!,
+) {
+    setBuildPropertyById(input: {
+        id: $id,
+        property: $type,
+        value: null,
+    }) {
+        ...PayloadUserErrors
+    }
+}

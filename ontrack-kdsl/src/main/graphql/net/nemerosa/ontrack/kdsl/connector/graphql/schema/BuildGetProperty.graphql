@@ -1,0 +1,10 @@
+query BuildGetProperty(
+    $id: Int!,
+    $type: String!,
+) {
+    builds(id: $id) {
+        properties(type: $type) {
+            value
+        }
+    }
+}

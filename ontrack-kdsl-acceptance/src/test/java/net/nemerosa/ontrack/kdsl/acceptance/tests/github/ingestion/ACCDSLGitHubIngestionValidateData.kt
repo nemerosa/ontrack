@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.kdsl.acceptance.annotations.AcceptanceTestSuite
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.resourceAsText
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
-import net.nemerosa.ontrack.kdsl.spec.extension.general.setLabel
+import net.nemerosa.ontrack.kdsl.spec.extension.general.label
 import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHub
 import net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion.GitHubIngestionValidationDataInput
 import net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion.ingestion
@@ -194,8 +194,9 @@ class ACCDSLGitHubIngestionValidateData : AbstractACCDSLGitHubIngestionTestSuppo
         val build = ontrack
             .createProject(repository, "")
             .createBranch("main", "")
-            .createBuild("build-15", "")
-            .setLabel("1.0.0")
+            .createBuild("build-15", "").apply {
+                label = "1.0.0"
+            }
 
         // Calling the API to simulate the GHA call
         val validateDataUuid = ontrack.gitHub.ingestion.validateDataByBuildLabel(
