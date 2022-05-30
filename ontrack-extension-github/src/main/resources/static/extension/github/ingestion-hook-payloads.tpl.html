@@ -142,7 +142,13 @@
                 <tr ng-if="payload.showDetails && !payload.loadingDetails && payload.details">
                     <td colspan="12">
                         <p ng-if="payload.details.message">
-                            {{ payload.details.message }}
+                            Message: {{ payload.details.message }}
+                        </p>
+                        <p ng-if="payload.outcomeDetails">
+                            Outcome details: {{ payload.outcomeDetails }}
+                        </p>
+                        <p>
+                            Payload:
                         </p>
                         <textarea readonly ng-bind="payload.details.payloadJson" style="width: 100%;" rows="20"></textarea>
                     </td>

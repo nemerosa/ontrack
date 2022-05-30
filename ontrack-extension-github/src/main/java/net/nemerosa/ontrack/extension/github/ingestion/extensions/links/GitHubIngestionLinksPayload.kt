@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.github.ingestion.extensions.links
 
 import net.nemerosa.ontrack.extension.github.ingestion.extensions.support.AbstractGitHubIngestionBuildPayload
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.format
 
 class GitHubIngestionLinksPayload(
     owner: String,
@@ -16,4 +18,6 @@ class GitHubIngestionLinksPayload(
     companion object {
         const val ADD_ONLY_DEFAULT = false
     }
+
+    override fun toString(): String = asJson().format()
 }

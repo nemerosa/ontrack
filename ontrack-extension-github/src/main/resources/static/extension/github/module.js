@@ -66,6 +66,7 @@ angular.module('ontrack.extension.github', [
                         gitHubDelivery
                         status
                         outcome
+                        outcomeDetails
                         completion
                         routing
                         queue
