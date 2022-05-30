@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.spec.extension.general.label
 import net.nemerosa.ontrack.kdsl.spec.extension.git.gitCommitProperty
 import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHub
+import net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion.setBranchGitHubIngestionConfig
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -46,7 +47,16 @@ class ACCDSLGitHubIngestionTagging : AbstractACCDSLGitHubIngestionTestSupport() 
             gitCommitProperty = "tag-commit"
         }
 
-        // FIXME Pushing the ingestion config
+        // Pushing the ingestion config
+        branch.setBranchGitHubIngestionConfig(
+            """
+                tagging:
+                    strategies:
+                        - type: promotion
+                          config:
+                            name: BRONZE
+            """
+        )
 
         // Tag event
         val pushTagPayload =
@@ -56,8 +66,7 @@ class ACCDSLGitHubIngestionTagging : AbstractACCDSLGitHubIngestionTestSupport() 
                 .replace("#head_commit", "tag-commit")
                 .replace("#base_ref", "refs/heads/${branch.name}")
                 .parseAsJson()
-        val pushTagPayloadUuid =
-            sendPayloadToHook(gitHubConfiguration, "workflow_run", pushTagPayload)
+        val pushTagPayloadUuid = sendPayloadToHook(gitHubConfiguration, "push", pushTagPayload)
 
         // At the end, waits for all payloads to be processed
         waitUntilPayloadIsProcessed(pushTagPayloadUuid)
@@ -99,7 +108,16 @@ class ACCDSLGitHubIngestionTagging : AbstractACCDSLGitHubIngestionTestSupport() 
         // Build targeted by the tag
         val newest = branch.createBuild("2", "")
 
-        // FIXME Pushing the ingestion config
+        // Pushing the ingestion config
+        branch.setBranchGitHubIngestionConfig(
+            """
+                tagging:
+                    strategies:
+                        - type: promotion
+                          config:
+                            name: BRONZE
+            """
+        )
 
         // Tag event
         val pushTagPayload =
@@ -109,8 +127,7 @@ class ACCDSLGitHubIngestionTagging : AbstractACCDSLGitHubIngestionTestSupport() 
                 .replace("#head_commit", "tag-commit")
                 .replace("#base_ref", "refs/heads/${branch.name}")
                 .parseAsJson()
-        val pushTagPayloadUuid =
-            sendPayloadToHook(gitHubConfiguration, "workflow_run", pushTagPayload)
+        val pushTagPayloadUuid = sendPayloadToHook(gitHubConfiguration, "push", pushTagPayload)
 
         // At the end, waits for all payloads to be processed
         waitUntilPayloadIsProcessed(pushTagPayloadUuid)

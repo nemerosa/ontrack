@@ -1,0 +1,25 @@
+{
+  "ref": "#ref",
+  "sender": {
+    "login": "github-actions[bot]"
+  },
+  "base_ref": "#base_ref",
+  "repository": {
+    "name": "#repository",
+    "description": "",
+    "owner": {
+      "login": "nemerosa"
+    },
+    "html_url": "https://github.com/nemerosa/#repository"
+  },
+  "head_commit": {
+    "id": "#head_commit",
+    "message": "Any message",
+    "added": [],
+    "removed": [],
+    "modified": []
+  },
+  "organization": {
+    "login": "nemerosa"
+  }
+}

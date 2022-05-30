@@ -32,14 +32,7 @@ class DefaultConfigService(
     override fun loadAndSaveConfig(branch: Branch, path: String): IngestionConfig? {
         val config = configLoaderService.loadConfig(branch, path)
         return config?.apply {
-            // Storing the configuration
-            store(branch)
-            // Validations
-            validations(branch, this)
-            // Auto promotions
-            autoPromotions(branch, this)
-            // Applying Casc configuration nodes
-            casc(branch, casc)
+            saveConfig(branch, this)
         }
     }
 
@@ -83,9 +76,11 @@ class DefaultConfigService(
                     exclude = plConfig.exclude ?: "",
                 )
                 if (existingAutoPromotionProperty == null || existingAutoPromotionProperty != autoPromotionProperty) {
-                    propertyService.editProperty(promotion,
+                    propertyService.editProperty(
+                        promotion,
                         AutoPromotionPropertyType::class.java,
-                        autoPromotionProperty)
+                        autoPromotionProperty
+                    )
                 }
             }
         }
@@ -103,7 +98,14 @@ class DefaultConfigService(
     }
 
     override fun saveConfig(branch: Branch, config: IngestionConfig) {
+        // Storing the configuration
         config.store(branch)
+        // Validations
+        validations(branch, config)
+        // Auto promotions
+        autoPromotions(branch, config)
+        // Applying Casc configuration nodes
+        casc(branch, config.casc)
     }
 
     private fun IngestionConfig.store(ontrackBranch: Branch) {

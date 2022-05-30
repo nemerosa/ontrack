@@ -11701,6 +11701,22 @@
               "deprecationReason": null
             },
             {
+              "name": "tagging",
+              "description": "Tagging configuration",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "IngestionTaggingConfig",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "validations",
               "description": "Validation stamps configuration",
               "args": [],
@@ -12033,6 +12049,18 @@
               "type": {
                 "kind": "ENUM",
                 "name": "IngestionEventProcessingResult",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "outcomeDetails",
+              "description": "Details about the outcome of the processing",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -15383,6 +15411,95 @@
               "deprecationReason": null
             }
           ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "IngestionTaggingConfig",
+          "description": "Configuration for the tagging processing.",
+          "fields": [
+            {
+              "name": "commitProperty",
+              "description": "If the commit property strategy must be applied. True by default.",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "strategies",
+              "description": "List of tagging strategies to apply",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "IngestionTaggingStrategyConfig"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "IngestionTaggingStrategyConfig",
+          "description": "Configuration for a tagging strategy",
+          "fields": [
+            {
+              "name": "config",
+              "description": "JSON configuration",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "JSON",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "type",
+              "description": "ID of the tagging strategy",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
           "possibleTypes": null
         },
         {
@@ -19732,6 +19849,29 @@
               "deprecationReason": null
             },
             {
+              "name": "setBranchGitHubIngestionConfig",
+              "description": "Sets the GitHub Ingestion configuration programmatically",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "SetBranchGitHubIngestionConfigInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SetBranchGitHubIngestionConfigPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "createGitHubConfiguration",
               "description": "Creates a new GitHub configuration.",
               "args": [
@@ -21127,6 +21267,11 @@
             {
               "kind": "OBJECT",
               "name": "SetBranchGitConfigPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetBranchGitHubIngestionConfigPayload",
               "ofType": null
             },
             {
@@ -28165,6 +28310,90 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "Branch",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "SetBranchGitHubIngestionConfigInput",
+          "description": "Input type for the setBranchGitHubIngestionConfig mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "branchId",
+              "description": "ID of the branch to update",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "yaml",
+              "description": "Ingestion configuration as YAML. Indentation will be trimmed automatically.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SetBranchGitHubIngestionConfigPayload",
+          "description": "Output type for the setBranchGitHubIngestionConfig mutation.",
+          "fields": [
+            {
+              "name": "configuration",
+              "description": "GitHub ingestion configuration",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GitHubIngestionConfig",
                 "ofType": null
               },
               "isDeprecated": false,

@@ -1,0 +1,11 @@
+mutation GitHubIngestionSetBranchConfig(
+    $branchId: Int!,
+    $yaml: String!,
+) {
+    setBranchGitHubIngestionConfig(input: {
+        branchId: $branchId,
+        yaml: $yaml,
+    }) {
+        ...PayloadUserErrors
+    }
+}
