@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.push
 
+import net.nemerosa.ontrack.extension.general.ReleaseProperty
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 class TagPushPayloadListenerIT : AbstractIngestionTestSupport() {
 
@@ -30,17 +30,29 @@ class TagPushPayloadListenerIT : AbstractIngestionTestSupport() {
             project {
                 branch {
                     build {
-                        setProperty(this, GitCommitPropertyType::class.java, GitCommitProperty(commit = commitId))
+                        setCommitProperty(commitId)
                         // Payload processing
                         listener.process(payload(this), null)
                         // Checks the release property
-                        assertNotNull(getProperty(this, ReleasePropertyType::class.java), "Release property has been set") {
-                            assertEquals("1.0", it.name)
-                        }
+                        assertEquals("1.0", releaseProperty)
                     }
                 }
             }
         }
+    }
+
+    private var Build.releaseProperty: String?
+        get() = getProperty(this, ReleasePropertyType::class.java)?.name
+        set(value) {
+            if (value != null) {
+                setProperty(this, ReleasePropertyType::class.java, ReleaseProperty(value))
+            } else {
+                deleteProperty(this, ReleasePropertyType::class.java)
+            }
+        }
+
+    private fun Build.setCommitProperty(commit: String) {
+        setProperty(this, GitCommitPropertyType::class.java, GitCommitProperty(commit))
     }
 
     private fun payload(build: Build) = PushPayload(
