@@ -109,6 +109,138 @@ class TagPushPayloadListenerIT : AbstractIngestionTestSupport() {
         }
     }
 
+    @Test
+    fun `Setting the release property based on tag using the promotion strategy first`() {
+        ConfigLoaderServiceITMockConfig.customIngestionConfig(
+            configLoaderService, IngestionConfig(
+                tagging = IngestionTaggingConfig(
+                    strategies = listOf(
+                        IngestionTaggingStrategyConfig(
+                            type = "promotion",
+                            config = mapOf(
+                                "name" to "BRONZE"
+                            ).asJson()
+                        )
+                    )
+                )
+            )
+        )
+        asAdmin {
+            project {
+                branch {
+                    val bronze = promotionLevel("BRONZE")
+                    // Promoted build (our target)
+                    val candidate = build {
+                        setCommitProperty("non-matching-commit")
+                        promote(bronze)
+                    }
+                    // New build (matching the tag)
+                    val newest = build {
+                        setCommitProperty("matching-commit")
+                    }
+                    // Payload processing
+                    listener.process(
+                        payload(candidate, baseRef = "refs/heads/$name", commit = "matching-commit", tag = "2.0"),
+                        null
+                    )
+                    // Checks the release property
+                    assertEquals("2.0", candidate.releaseProperty)
+                    assertNull(newest.releaseProperty, "Newest build is untouched")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Setting the release property based on tag using the promotion strategy only`() {
+        ConfigLoaderServiceITMockConfig.customIngestionConfig(
+            configLoaderService, IngestionConfig(
+                tagging = IngestionTaggingConfig(
+                    commitProperty = false,
+                    strategies = listOf(
+                        IngestionTaggingStrategyConfig(
+                            type = "promotion",
+                            config = mapOf(
+                                "name" to "BRONZE"
+                            ).asJson()
+                        )
+                    )
+                )
+            )
+        )
+        asAdmin {
+            project {
+                branch {
+                    val bronze = promotionLevel("BRONZE")
+                    // Promoted build (our target)
+                    val candidate = build {
+                        setCommitProperty("non-matching-commit")
+                        promote(bronze)
+                    }
+                    // New build (matching the tag)
+                    val newest = build {
+                        setCommitProperty("matching-commit")
+                    }
+                    // Payload processing
+                    listener.process(
+                        payload(candidate, baseRef = "refs/heads/$name", commit = "matching-commit", tag = "2.0"),
+                        null
+                    )
+                    // Checks the release property
+                    assertEquals("2.0", candidate.releaseProperty)
+                    assertNull(newest.releaseProperty, "Newest build is untouched")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Setting the release property based on tag using the promotion strategy after the commit property strategy`() {
+        ConfigLoaderServiceITMockConfig.customIngestionConfig(
+            configLoaderService, IngestionConfig(
+                tagging = IngestionTaggingConfig(
+                    commitProperty = false,
+                    strategies = listOf(
+                        IngestionTaggingStrategyConfig(
+                            type = "commit-property",
+                            config = null
+                        ),
+                        IngestionTaggingStrategyConfig(
+                            type = "promotion",
+                            config = mapOf(
+                                "name" to "BRONZE"
+                            ).asJson()
+                        )
+                    )
+                )
+            )
+        )
+        asAdmin {
+            project {
+                branch {
+                    val bronze = promotionLevel("BRONZE")
+                    // Promoted build (our target)
+                    val candidate = build {
+                        setCommitProperty("non-matching-commit")
+                        promote(bronze)
+                    }
+                    // New build (matching the tag)
+                    val newest = build {
+                        setCommitProperty("matching-commit")
+                    }
+                    // Payload processing
+                    listener.process(
+                        payload(candidate, baseRef = "refs/heads/$name", commit = "matching-commit", tag = "2.0"),
+                        null
+                    )
+                    // Checks the release property
+                    assertNull(candidate.releaseProperty, "Promoted build is untouched")
+                    assertEquals("2.0", newest.releaseProperty)
+                }
+            }
+        }
+    }
+
     private var Build.releaseProperty: String?
         get() = getProperty(this, ReleasePropertyType::class.java)?.name
         set(value) {

@@ -17,9 +17,7 @@ class DefaultTaggingStrategyRegistry(
             parseTaggingStrategy<Any>(it)
         }
         return if (tagging.commitProperty && list.none { it.strategy.type == CommitPropertyTaggingStrategy.COMMIT_PROPERTY_TAGGING_STRATEGY_TYPE }) {
-            listOf(
-                ConfiguredTaggingStrategy(commitPropertyTaggingStrategy, null)
-            ) + list
+            list + ConfiguredTaggingStrategy(commitPropertyTaggingStrategy, null)
         } else {
             list
         }

@@ -92,7 +92,7 @@ internal class TaggingStrategyRegistryIT : AbstractIngestionTestSupport() {
     }
 
     @Test
-    fun `Default tagging strategy first`() {
+    fun `Default tagging strategy last`() {
         val strategies = registry.getTaggingStrategies(
             IngestionTaggingConfig(
                 strategies = listOf(
@@ -105,14 +105,14 @@ internal class TaggingStrategyRegistryIT : AbstractIngestionTestSupport() {
         )
         assertEquals(2, strategies.size)
         strategies[0].let {
-            assertIs<CommitPropertyTaggingStrategy>(it.strategy)
-            assertNull(it.config)
-        }
-        strategies[1].let {
             assertIs<PromotionTaggingStrategy>(it.strategy)
             assertIs<PromotionTaggingStrategyConfig>(it.config) { config ->
                 assertEquals("BRONZE", config.name)
             }
+        }
+        strategies[1].let {
+            assertIs<CommitPropertyTaggingStrategy>(it.strategy)
+            assertNull(it.config)
         }
     }
 
