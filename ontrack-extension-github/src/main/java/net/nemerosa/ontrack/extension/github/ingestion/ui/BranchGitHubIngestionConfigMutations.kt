@@ -26,7 +26,11 @@ class BranchGitHubIngestionConfigMutations(
             outputDescription = "GitHub ingestion configuration"
         ) { input ->
             val branch = structureService.getBranch(ID.of(input.branchId))
-            val config = ConfigParser.parseYaml(input.yaml.trimIndent())
+            val config = if (input.yaml.isBlank()) {
+                IngestionConfig()
+            } else {
+                ConfigParser.parseYaml(input.yaml.trimIndent())
+            }
             configService.saveConfig(branch, config)
             config
         }
