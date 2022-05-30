@@ -3,23 +3,23 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.push
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
-import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Commit
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.tagging.TagPushPayloadListener
 import net.nemerosa.ontrack.model.structure.Build
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class TagPushPayloadListenerIT : AbstractIngestionTestJUnit4Support() {
+class TagPushPayloadListenerIT : AbstractIngestionTestSupport() {
 
     @Autowired
     private lateinit var listener: TagPushPayloadListener
 
-    @Before
+    @BeforeEach
     fun init() {
         onlyOneGitHubConfig()
     }
