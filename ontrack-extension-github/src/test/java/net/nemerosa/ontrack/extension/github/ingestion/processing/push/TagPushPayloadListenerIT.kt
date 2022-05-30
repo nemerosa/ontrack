@@ -6,18 +6,17 @@ import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderService
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderServiceITMockConfig
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfig
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionRunConfig
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Commit
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.tagging.TagPushPayloadListener
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.Build
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 @ContextConfiguration(classes = [ConfigLoaderServiceITMockConfig::class])
 class TagPushPayloadListenerIT : AbstractIngestionTestSupport() {
@@ -68,6 +67,48 @@ class TagPushPayloadListenerIT : AbstractIngestionTestSupport() {
         }
     }
 
+    @Test
+    fun `Setting the release property based on tag using the promotion strategy and mismatch commit`() {
+        ConfigLoaderServiceITMockConfig.customIngestionConfig(
+            configLoaderService, IngestionConfig(
+                tagging = IngestionTaggingConfig(
+                    strategies = listOf(
+                        IngestionTaggingStrategyConfig(
+                            type = "promotion",
+                            config = mapOf(
+                                "name" to "BRONZE"
+                            ).asJson()
+                        )
+                    )
+                )
+            )
+        )
+        asAdmin {
+            project {
+                branch {
+                    val bronze = promotionLevel("BRONZE")
+                    // Promoted build
+                    val candidate = build {
+                        setCommitProperty(commitId)
+                        promote(bronze)
+                    }
+                    // New build
+                    val newest = build {
+                        setCommitProperty("yet-another-commit")
+                    }
+                    // Payload processing
+                    listener.process(
+                        payload(candidate, baseRef = "refs/heads/$name", commit = "another-commit", tag = "2.0"),
+                        null
+                    )
+                    // Checks the release property
+                    assertEquals("2.0", candidate.releaseProperty)
+                    assertNull(newest.releaseProperty, "Newest build is untouched")
+                }
+            }
+        }
+    }
+
     private var Build.releaseProperty: String?
         get() = getProperty(this, ReleasePropertyType::class.java)?.name
         set(value) {
@@ -84,15 +125,17 @@ class TagPushPayloadListenerIT : AbstractIngestionTestSupport() {
 
     private fun payload(
         build: Build,
+        tag: String = "1.0",
         baseRef: String = "refs/heads/main",
+        commit: String = commitId,
     ) = PushPayload(
         repository = IngestionHookFixtures.sampleRepository(
             repoName = build.project.name,
         ),
-        ref = "refs/tags/1.0",
+        ref = "refs/tags/$tag",
         baseRef = baseRef,
         headCommit = Commit(
-            id = commitId,
+            id = commit,
             message = "Commit 1",
             author = IngestionHookFixtures.sampleAuthor(),
         ),

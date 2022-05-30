@@ -57,9 +57,9 @@ class TagPushPayloadListener(
             // Gets all the tagging strategies
             val strategies = taggingStrategyRegistry.getTaggingStrategies(config.tagging)
             // Applies them in order to find a proper build to tag
-            strategies.map {
+            strategies.firstNotNullOfOrNull {
                 findBuild(branch, payload, it)
-            }.firstOrNull()
+            }
         }
         // If the branch cannot be found, use the default commit property strategy directly
         else {
