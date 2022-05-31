@@ -273,7 +273,8 @@ angular.module('ot.service.chart', [
                                     return moment.duration(value, 'seconds').humanize({
                                         h: 72,
                                         m: 300,
-                                        s: 300
+                                        s: 300,
+                                        ss: 0
                                     });
                                 }
                             }
