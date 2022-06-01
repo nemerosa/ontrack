@@ -40,4 +40,28 @@ data class AutoVersioningConfig(
     val channel: String?,
     val channelConfig: JsonNode?,
     val autoApprovalMode: AutoApprovalMode?,
-) : AutoVersioningTargetConfig
+) : AutoVersioningTargetConfig {
+
+
+    /**
+     * Validates that this configuration is consistent. Checks that at least the regex or the property is set,
+     * and that, if it is defined, the upgrade branch pattern contains the `<version>` token.
+     */
+    fun validate() {
+        validateTargetRegex()
+        validateUpgradeBranchPrefix()
+    }
+
+    private fun validateTargetRegex() {
+        if (targetRegex.isNullOrBlank() && targetProperty.isNullOrBlank()) {
+            throw MissingTargetRegexOrPropertyException()
+        }
+    }
+
+    private fun validateUpgradeBranchPrefix() {
+        if (upgradeBranchPattern != null && !upgradeBranchPattern.contains("<version>")) {
+            throw UpgradeBranchPrefixNoVersionException(upgradeBranchPattern)
+        }
+    }
+
+}
