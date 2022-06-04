@@ -1,9 +1,15 @@
 package net.nemerosa.ontrack.extension.av.config
 
+import net.nemerosa.ontrack.graphql.support.ListRef
+import net.nemerosa.ontrack.model.annotations.APIDescription
+
 /**
  * Configuration of the auto versioning on a branch.
  */
+@APIDescription("Configuration of the auto versioning on a branch.")
 data class AutoVersioningConfig(
+    @APIDescription("List of configurations")
+    @ListRef(embedded = true)
     val configurations: List<AutoVersioningSourceConfig>,
 ) {
     /**

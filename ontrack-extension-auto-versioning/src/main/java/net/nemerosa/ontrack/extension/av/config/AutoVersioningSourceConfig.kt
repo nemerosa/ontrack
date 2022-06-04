@@ -2,41 +2,38 @@ package net.nemerosa.ontrack.extension.av.config
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.apache.commons.codec.digest.DigestUtils
 
-/**
- * Configuration of the auto versioning for one source.
- *
- * @property sourceProject Project to watch
- * @property sourceBranch Branches to watch using a regular expression
- * @property sourcePromotion Promotion to watch
- * @property targetPath Comma-separated list of file to update with the new version
- * @property targetRegex Regex to use in the target file to identify the line to replace
- *                       with the new version. The first matching group must be the version.
- * @property targetProperty Optional replacement for the regex, using only a property name
- * @property targetPropertyRegex Optional regex to use on the [property][targetProperty] value
- * @property targetPropertyType When [targetProperty] is defined, defines the type of property (defaults to Java properties file, but could be NPM, etc.)
- * @property autoApproval Check if the PR must be approved automatically or not (`true` by default)
- * @property upgradeBranchPattern Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>`
- * @property postProcessing Type of post processing to launch after the version has been updated
- * @property postProcessingConfig Configuration of the post processing
- * @property validationStamp Validation stamp to create on auto versioning (optional)
- * @property autoApprovalMode Auto approval mode
- */
+@APIDescription("Configuration of the auto versioning for one source.")
 data class AutoVersioningSourceConfig(
+    @APIDescription("Project to watch")
     val sourceProject: String,
+    @APIDescription("Branches to watch using a regular expression")
     val sourceBranch: String,
+    @APIDescription("Promotion to watch")
     val sourcePromotion: String,
+    @APIDescription("Comma-separated list of file to update with the new version")
     val targetPath: String,
+    @APIDescription("Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version.")
     override val targetRegex: String?,
+    @APIDescription("Optional replacement for the regex, using only a property name")
     override val targetProperty: String?,
+    @APIDescription("Optional regex to use on the targetProperty value")
     override val targetPropertyRegex: String?,
+    @APIDescription("When targetProperty is defined, defines the type of property (defaults to Java properties file, but could be NPM, etc.)")
     override val targetPropertyType: String?,
+    @APIDescription("Check if the PR must be approved automatically or not (`true` by default)")
     val autoApproval: Boolean?,
+    @APIDescription("Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>`")
     val upgradeBranchPattern: String?,
+    @APIDescription("Type of post processing to launch after the version has been updated")
     val postProcessing: String?,
+    @APIDescription("Configuration of the post processing")
     val postProcessingConfig: JsonNode?,
+    @APIDescription("Validation stamp to create on auto versioning (optional)")
     val validationStamp: String?,
+    @APIDescription("Auto approval mode")
     val autoApprovalMode: AutoApprovalMode?,
 ) : AutoVersioningTargetConfig {
 

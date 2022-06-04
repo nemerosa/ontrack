@@ -9,9 +9,6 @@ import kotlin.test.assertNull
 
 internal class AutoVersioningConfigurationServiceIT : AutoVersioningTestSupport() {
 
-    @Autowired
-    private lateinit var autoVersioningConfigurationService: AutoVersioningConfigurationService
-
     @Test
     fun `Saving and retrieving a configuration`() {
         asAdmin {
