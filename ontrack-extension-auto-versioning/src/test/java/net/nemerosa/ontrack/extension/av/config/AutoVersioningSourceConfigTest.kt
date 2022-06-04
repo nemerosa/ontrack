@@ -1,8 +1,12 @@
 package net.nemerosa.ontrack.extension.av.config
 
+import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures.sourceConfig
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
 
 class AutoVersioningSourceConfigTest {
 
@@ -10,7 +14,7 @@ class AutoVersioningSourceConfigTest {
     fun `Target paths when only one path`() {
         assertEquals(
             listOf("Jenkinsfile"),
-            createConfig(targetPath = "Jenkinsfile").targetPaths
+            sourceConfig(targetPath = "Jenkinsfile").getTargetPaths()
         )
     }
 
@@ -23,42 +27,42 @@ class AutoVersioningSourceConfigTest {
                 "Jenkinsfile.nightly",
                 ".jobs/pipelines/deployDGCDocker.groovy"
             ),
-            createConfig(targetPath = "Jenkinsfile, Jenkinsfile.acceptance, Jenkinsfile.nightly, .jobs/pipelines/deployDGCDocker.groovy").targetPaths
+            sourceConfig(targetPath = "Jenkinsfile, Jenkinsfile.acceptance, Jenkinsfile.nightly, .jobs/pipelines/deployDGCDocker.groovy").getTargetPaths()
         )
     }
 
     @Test
     fun `Missing both target regex and target property`() {
         assertFailsWith<MissingTargetRegexOrPropertyException> {
-            createConfig(targetRegex = null, targetProperty = null).validate()
+            sourceConfig(targetRegex = null, targetProperty = null).validate()
         }
         assertFailsWith<MissingTargetRegexOrPropertyException> {
-            createConfig(targetRegex = "", targetProperty = null).validate()
+            sourceConfig(targetRegex = "", targetProperty = null).validate()
         }
         assertFailsWith<MissingTargetRegexOrPropertyException> {
-            createConfig(targetRegex = "", targetProperty = "").validate()
+            sourceConfig(targetRegex = "", targetProperty = "").validate()
         }
         assertFailsWith<MissingTargetRegexOrPropertyException> {
-            createConfig(targetRegex = null, targetProperty = "").validate()
+            sourceConfig(targetRegex = null, targetProperty = "").validate()
         }
     }
 
     @Test
     fun `At least target regex or target property`() {
-        createConfig(targetRegex = "my-version = (.*)", targetProperty = null).validate()
-        createConfig(targetRegex = "my-version = (.*)", targetProperty = "my-version").validate()
-        createConfig(targetRegex = null, targetProperty = "my-version").validate()
+        sourceConfig(targetRegex = "my-version = (.*)", targetProperty = null).validate()
+        sourceConfig(targetRegex = "my-version = (.*)", targetProperty = "my-version").validate()
+        sourceConfig(targetRegex = null, targetProperty = "my-version").validate()
     }
 
     @Test
     fun `Null upgrade branch pattern is valid`() {
-        val config = createConfig(upgradeBranchPattern = null)
+        val config = sourceConfig(upgradeBranchPattern = null)
         config.validate()
     }
 
     @Test
     fun `Upgrade branch pattern with version and project is valid`() {
-        val config = createConfig(
+        val config = sourceConfig(
             upgradeBranchPattern = "my-custom-branch-with-<project>-and-<version>"
         )
         config.validate()
@@ -66,7 +70,7 @@ class AutoVersioningSourceConfigTest {
 
     @Test
     fun `Upgrade branch pattern with version and no project is valid`() {
-        val config = createConfig(
+        val config = sourceConfig(
             upgradeBranchPattern = "my-custom-branch-with-<version>"
         )
         config.validate()
@@ -74,7 +78,7 @@ class AutoVersioningSourceConfigTest {
 
     @Test
     fun `Upgrade branch pattern with no version is not valid`() {
-        val config = createConfig(
+        val config = sourceConfig(
             upgradeBranchPattern = "my-custom-branch-with-<project>"
         )
         assertFailsWith<UpgradeBranchPrefixNoVersionException> {
@@ -138,27 +142,16 @@ class AutoVersioningSourceConfigTest {
         )
     }
 
-    private fun createConfig(
-        targetRegex: String? = null,
-        targetPath: String = "gradle.properties",
-        targetProperty: String? = "version",
-        upgradeBranchPattern: String? = null,
-    ) =
-        AutoVersioningSourceConfig(
-            sourceProject = "PRJ",
-            sourceBranch = "master",
-            sourcePromotion = "IRON",
-            targetPath = targetPath,
-            targetRegex = targetRegex,
-            targetProperty = targetProperty,
-            targetPropertyRegex = null,
-            targetPropertyType = null,
-            autoApproval = null,
-            upgradeBranchPattern = upgradeBranchPattern,
-            postProcessing = null,
-            postProcessingConfig = null,
-            validationStamp = null,
-            autoApprovalMode = AutoApprovalMode.SCM
+    @Test
+    fun `Null post processing config must be deserialized as null`() {
+        val config = sourceConfig()
+        val json = config.asJson()
+        val parsed = json.parse<AutoVersioningSourceConfig>().postDeserialize()
+        assertNull(
+            parsed.postProcessingConfig,
+            "null postProcessingConfig must be deserialized as null, not a NullNode."
         )
+        assertEquals(config, parsed)
+    }
 
 }

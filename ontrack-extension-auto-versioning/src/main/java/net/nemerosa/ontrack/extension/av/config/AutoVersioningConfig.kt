@@ -25,4 +25,8 @@ data class AutoVersioningConfig(
             throw AutoVersioningConfigDuplicateProjectException(duplicates)
         }
     }
+
+    fun postDeserialize() = AutoVersioningConfig(
+        configurations = configurations.map { it.postDeserialize() }
+    )
 }

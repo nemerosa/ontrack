@@ -43,9 +43,8 @@ data class AutoVersioningSourceConfig(
     /**
      * Gets the list of paths
      */
-    @get:JsonIgnore
-    val targetPaths: List<String>
-        get() = targetPath.split(",").map { it.trim() }
+    @JsonIgnore
+    fun getTargetPaths(): List<String> = targetPath.split(",").map { it.trim() }
 
     /**
      * Validates that this configuration is consistent. Checks that at least the regex or the property is set,
@@ -103,5 +102,23 @@ data class AutoVersioningSourceConfig(
         }
 
     }
+
+    fun postDeserialize() =
+        AutoVersioningSourceConfig(
+            sourceProject = sourceProject,
+            sourceBranch = sourceBranch,
+            sourcePromotion = sourcePromotion,
+            targetPath = targetPath,
+            targetRegex = targetRegex,
+            targetProperty = targetProperty,
+            targetPropertyRegex = targetPropertyRegex,
+            targetPropertyType = targetPropertyType,
+            autoApproval = autoApproval,
+            upgradeBranchPattern = upgradeBranchPattern,
+            postProcessing = postProcessing,
+            postProcessingConfig = postProcessingConfig?.takeIf { !it.isNull },
+            validationStamp = validationStamp,
+            autoApprovalMode = autoApprovalMode
+        )
 
 }
