@@ -14,9 +14,14 @@ class GQLTypeCache {
      */
     fun getOrCreate(name: String, creator: () -> GraphQLObjectType): GraphQLObjectType {
         return index.getOrPut(
-                name,
-                creator
+            name,
+            creator
         )
     }
+
+    /**
+     * Getter only
+     */
+    operator fun get(name: String): GraphQLObjectType? = index[name]
 
 }

@@ -1,13 +1,12 @@
 package net.nemerosa.ontrack.extension.av.config
 
 import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures
-import net.nemerosa.ontrack.extension.av.AutoVersioningTestSupport
+import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-internal class AutoVersioningConfigurationServiceIT : AutoVersioningTestSupport() {
+internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTestSupport() {
 
     @Test
     fun `Saving and retrieving a configuration`() {

@@ -17,16 +17,19 @@ object AutoVersioningTestFixtures {
 
     fun sourceConfig(
         sourceProject: String = uid("P"),
+        sourceBranch: String = "master",
+        sourcePromotion: String = "IRON",
         targetRegex: String? = null,
         targetPath: String = "gradle.properties",
         targetProperty: String? = "version",
         upgradeBranchPattern: String? = null,
         postProcessing: String? = null,
         postProcessingConfig: JsonNode? = null,
+        autoApprovalMode: AutoApprovalMode? = null,
     ) = AutoVersioningSourceConfig(
         sourceProject = sourceProject,
-        sourceBranch = "master",
-        sourcePromotion = "IRON",
+        sourceBranch = sourceBranch,
+        sourcePromotion = sourcePromotion,
         targetPath = targetPath,
         targetProperty = targetProperty,
         targetRegex = targetRegex,
@@ -37,7 +40,7 @@ object AutoVersioningTestFixtures {
         postProcessing = postProcessing,
         postProcessingConfig = postProcessingConfig,
         validationStamp = null,
-        autoApprovalMode = AutoApprovalMode.SCM
+        autoApprovalMode = autoApprovalMode,
     )
 
 }

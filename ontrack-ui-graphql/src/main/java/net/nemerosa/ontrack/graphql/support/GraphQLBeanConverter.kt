@@ -172,6 +172,10 @@ object GraphQLBeanConverter {
                 // Type
                 val fieldType: GraphQLOutputType = if (scalarType != null) {
                     scalarType
+                } else if (javaType is Class<*> && javaType.isEnum) {
+                    // For an Enum, we assume this has been declared elsewhere as a GraphQL type
+                    // with its name equal to the simple Java type name
+                    GraphQLTypeReference(javaType.simpleName)
                 } else {
                     val typeRef = property.findAnnotation<TypeRef>()
                     if (typeRef != null) {

@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationServi
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import org.springframework.beans.factory.annotation.Autowired
 
-abstract class AutoVersioningTestSupport : AbstractQLKTITSupport() {
+abstract class AbstractAutoVersioningTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
     protected lateinit var autoVersioningConfigurationService: AutoVersioningConfigurationService
