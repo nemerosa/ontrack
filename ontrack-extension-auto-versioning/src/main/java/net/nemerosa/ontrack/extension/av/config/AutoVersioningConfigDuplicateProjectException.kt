@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.av.property
+package net.nemerosa.ontrack.extension.av.config
 
 import net.nemerosa.ontrack.model.exceptions.InputException
 

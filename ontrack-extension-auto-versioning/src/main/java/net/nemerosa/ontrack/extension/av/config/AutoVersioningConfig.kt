@@ -1,15 +1,15 @@
-package net.nemerosa.ontrack.extension.av.property
+package net.nemerosa.ontrack.extension.av.config
 
 /**
  * Configuration of the auto versioning on a branch.
  */
-data class AutoVersioningProperty(
-    val configurations: List<AutoVersioningConfig>,
+data class AutoVersioningConfig(
+    val configurations: List<AutoVersioningSourceConfig>,
 ) {
     /**
      * Validates that the configuration is OK.
      *
-     * @see AutoVersioningConfig.validate
+     * @see AutoVersioningSourceConfig.validate
      */
     fun validate() {
         // Individual validation

@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.av.property
+package net.nemerosa.ontrack.extension.av.config
 
 /**
  * Description of an auto versioning configuration

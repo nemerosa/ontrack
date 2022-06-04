@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.av.property
+package net.nemerosa.ontrack.extension.av.config
 
 import com.fasterxml.jackson.databind.JsonNode
 
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode
  * @property channelConfig Notification channel configuration
  * @property autoApprovalMode Auto approval mode
  */
-data class AutoVersioningConfig(
+data class AutoVersioningSourceConfig(
     val sourceProject: String,
     val sourceBranch: String,
     val sourcePromotion: String,
