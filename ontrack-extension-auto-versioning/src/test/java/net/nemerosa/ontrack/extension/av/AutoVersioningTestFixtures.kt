@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.av
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
@@ -20,6 +21,8 @@ object AutoVersioningTestFixtures {
         targetPath: String = "gradle.properties",
         targetProperty: String? = "version",
         upgradeBranchPattern: String? = null,
+        postProcessing: String? = null,
+        postProcessingConfig: JsonNode? = null,
     ) = AutoVersioningSourceConfig(
         sourceProject = sourceProject,
         sourceBranch = "master",
@@ -31,8 +34,8 @@ object AutoVersioningTestFixtures {
         targetPropertyType = null,
         autoApproval = null,
         upgradeBranchPattern = upgradeBranchPattern,
-        postProcessing = null,
-        postProcessingConfig = null,
+        postProcessing = postProcessing,
+        postProcessingConfig = postProcessingConfig,
         validationStamp = null,
         autoApprovalMode = AutoApprovalMode.SCM
     )

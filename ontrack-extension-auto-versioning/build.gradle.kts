@@ -11,6 +11,7 @@ dependencies {
 
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-extension-scm"))
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
 
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
