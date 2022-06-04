@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.av.config
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
+import org.apache.commons.codec.digest.DigestUtils
 
 /**
  * Configuration of the auto versioning for one source.
@@ -19,8 +21,6 @@ import com.fasterxml.jackson.databind.JsonNode
  * @property postProcessing Type of post processing to launch after the version has been updated
  * @property postProcessingConfig Configuration of the post processing
  * @property validationStamp Validation stamp to create on auto versioning (optional)
- * @property channel Notification channel
- * @property channelConfig Notification channel configuration
  * @property autoApprovalMode Auto approval mode
  */
 data class AutoVersioningSourceConfig(
@@ -37,11 +37,15 @@ data class AutoVersioningSourceConfig(
     val postProcessing: String?,
     val postProcessingConfig: JsonNode?,
     val validationStamp: String?,
-    val channel: String?,
-    val channelConfig: JsonNode?,
     val autoApprovalMode: AutoApprovalMode?,
 ) : AutoVersioningTargetConfig {
 
+    /**
+     * Gets the list of paths
+     */
+    @get:JsonIgnore
+    val targetPaths: List<String>
+        get() = targetPath.split(",").map { it.trim() }
 
     /**
      * Validates that this configuration is consistent. Checks that at least the regex or the property is set,
@@ -62,6 +66,42 @@ data class AutoVersioningSourceConfig(
         if (upgradeBranchPattern != null && !upgradeBranchPattern.contains("<version>")) {
             throw UpgradeBranchPrefixNoVersionException(upgradeBranchPattern)
         }
+    }
+
+    companion object {
+
+        const val DEFAULT_UPGRADE_BRANCH_PATTERN = "feature/auto-upgrade-<project>-<version>-<branch>"
+
+        /**
+         * Given a [branch pattern][upgradeBranchPattern], computes an actual branch name
+         * by replacing the `<project>`, `<branch>` and `<version>` tokens by their respective values.
+         *
+         * @param upgradeBranchPattern Branch pattern
+         * @param project Replacement of the `<project>` token
+         * @param version Replacement of the `<version>` token
+         * @param branch Replacement of the `<branch>` token
+         * @param branchHash Flag to indicate if the [branch] value must be hashed before being injected (because
+         * a complete branch name would be too long)
+         * @return Branch name to use
+         */
+        fun getUpgradeBranch(
+            upgradeBranchPattern: String,
+            project: String,
+            version: String,
+            branch: String,
+            branchHash: Boolean,
+        ): String {
+            val branchToken = if (branchHash) {
+                DigestUtils.md5Hex(branch)
+            } else {
+                branch
+            }
+            return upgradeBranchPattern
+                .replace("<project>", project)
+                .replace("<version>", version)
+                .replace("<branch>", branchToken)
+        }
+
     }
 
 }
