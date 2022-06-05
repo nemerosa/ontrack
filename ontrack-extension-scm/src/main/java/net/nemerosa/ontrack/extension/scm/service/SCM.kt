@@ -34,4 +34,14 @@ interface SCM {
      */
     fun download(scmBranch: String, path: String): ByteArray?
 
+    /**
+     * Uploads the content of a file to a branch.
+     *
+     * @param scmBranch Branch to upload the file to
+     * @param commit Commit of the branch
+     * @param path Path to the file
+     * @param content Binary content of the file
+     */
+    fun upload(scmBranch: String, commit: String, path: String, content: ByteArray)
+
 }

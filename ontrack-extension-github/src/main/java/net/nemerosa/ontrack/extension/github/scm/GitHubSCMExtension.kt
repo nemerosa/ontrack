@@ -50,13 +50,22 @@ class GitHubSCMExtension(
         }
 
         override fun createBranch(sourceBranch: String, newBranch: String): String {
-            return client.createBranch(property.repository, sourceBranch, newBranch) ?: throw GitHubCannotCreateBranchException(
-                """Cannot create branch $newBranch from $sourceBranch."""
-            )
+            return client.createBranch(property.repository, sourceBranch, newBranch)
+                ?: throw GitHubCannotCreateBranchException(
+                    """Cannot create branch $newBranch from $sourceBranch."""
+                )
         }
 
         override fun download(scmBranch: String, path: String): ByteArray? =
             client.getFileContent(property.repository, scmBranch, path)
+
+        override fun upload(scmBranch: String, commit: String, path: String, content: ByteArray) {
+            // First, we need the SHA of the file
+            val sha = client.getFile(property.repository, scmBranch, path)
+                ?.sha
+                ?: error("Cannot find file at $path for branch $scmBranch")
+            client.setFileContent(property.repository, scmBranch, sha, path, content)
+        }
 
         private fun checkProject(other: Project) {
             check(other.id == project.id) {

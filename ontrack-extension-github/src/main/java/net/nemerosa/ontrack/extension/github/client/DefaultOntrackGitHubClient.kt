@@ -448,9 +448,12 @@ class DefaultOntrackGitHubClient(
         }
     }
 
-    override fun getFileContent(repository: String, branch: String?, path: String): ByteArray? {
+    override fun getFileContent(repository: String, branch: String?, path: String): ByteArray? =
+        getFile(repository, branch, path)?.contentAsBinary()
+
+    override fun getFile(repository: String, branch: String?, path: String): GitHubFile? {
         // Logging
-        logger.debug("[github] Getting file content {}/{}@{}", repository, path, branch)
+        logger.debug("[github] Getting file {}/{}@{}", repository, path, branch)
         // Getting a client
         val client = createGitHubRestTemplate()
         // Gets the repository for this project
@@ -461,9 +464,11 @@ class DefaultOntrackGitHubClient(
                 "$this?ref=$branch"
             }
             client("Get file content $repository/$path@$branch") {
-                getForObject<JsonNode>(restPath).let {
-                    val encodedContent = it.getRequiredTextField("content")
-                    Base64.decodeBase64(encodedContent)
+                getForObject<GitHubGetContentResponse>(restPath).let {
+                    GitHubFile(
+                        content = it.content,
+                        sha = it.sha,
+                    )
                 }
             }
         } catch (ex: GitHubErrorsException) {
@@ -508,6 +513,25 @@ class DefaultOntrackGitHubClient(
             )
             // Returns the new commit
             response?.`object`?.sha
+        }
+    }
+
+    override fun setFileContent(repository: String, branch: String, sha: String, path: String, content: ByteArray) {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Call
+        client("Setting file content at $path for branch $branch") {
+            put(
+                "/repos/$owner/$name/contents/$path",
+                mapOf(
+                    "message" to "Creating $path",
+                    "content" to Base64.encodeBase64String(content),
+                    "sha" to sha,
+                    "branch" to branch
+                )
+            )
         }
     }
 
@@ -642,6 +666,18 @@ class DefaultOntrackGitHubClient(
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private data class GitHubObject(
+        val sha: String,
+    )
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private data class GitHubGetContentResponse(
+        /**
+         * Base64 encoded content
+         */
+        val content: String,
+        /**
+         * SHA of the file
+         */
         val sha: String,
     )
 

@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.av.config.AutoVersioningTargetFileService
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.properties.FilePropertyType
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
+import net.nemerosa.ontrack.extension.scm.service.uploadLines
 import net.nemerosa.ontrack.model.structure.NameDescription
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -84,7 +85,8 @@ class AutoVersioningProcessingServiceImpl(
                             order
                         )
                         // TODO Audit
-                        // TODO scm.upload(project, upgradeBranch, commitId, targetPath, updatedLines)
+                        // Uploads of the file content
+                        scm.uploadLines(upgradeBranch, commitId, targetPath, updatedLines)
                         // Post processing
                         if (!order.postProcessing.isNullOrBlank()) {
                             // // Gets the post processor

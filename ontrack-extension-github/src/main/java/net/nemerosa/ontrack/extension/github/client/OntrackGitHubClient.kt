@@ -63,7 +63,7 @@ interface OntrackGitHubClient {
         message: String,
         query: String,
         variables: Map<String, *> = emptyMap<String, Any>(),
-        code: (data: JsonNode) -> T
+        code: (data: JsonNode) -> T,
     ): T
 
     /**
@@ -117,6 +117,16 @@ interface OntrackGitHubClient {
     fun getFileContent(repository: String, branch: String?, path: String): ByteArray?
 
     /**
+     * Downloads a file on a branch.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param branch Name of the branch (without refs/heads) or null if the default branch must be used
+     * @param path Path to the file
+     * @return Raw content of the file
+     */
+    fun getFile(repository: String, branch: String?, path: String): GitHubFile?
+
+    /**
      * Gets the last commit for a branch.
      *
      * @param repository Repository name, like `nemerosa/ontrack`
@@ -134,5 +144,16 @@ interface OntrackGitHubClient {
      * @return SHA of the commit, `null` if no source branch
      */
     fun createBranch(repository: String, source: String, destination: String): String?
+
+    /**
+     * Sets the content of the file at [path].
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param branch Branch to target
+     * @param sha Sha of the initial file
+     * @param path Path to get the file at
+     * @param content Content of the file as binary
+     */
+    fun setFileContent(repository: String, branch: String, sha: String, path: String, content: ByteArray)
 
 }
