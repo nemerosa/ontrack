@@ -12,6 +12,8 @@ class AutoVersioningConfigurationServiceImpl(
     private val securityService: SecurityService,
     private val entityDataService: EntityDataService,
     private val structureService: StructureService,
+    private val ordering: OptionalVersionBranchOrdering,
+    private val branchDisplayNameService: BranchDisplayNameService,
 ) : AutoVersioningConfigurationService {
 
     override fun setupAutoVersioning(branch: Branch, config: AutoVersioningConfig?) {
@@ -35,6 +37,23 @@ class AutoVersioningConfigurationServiceImpl(
         ).map {
             structureService.getBranch(ID.of(it.id))
         }
+
+    override fun getLatestBranch(project: Project, config: AutoVersioningSourceConfig): Branch? {
+        val sourceRegex = config.sourceBranch.toRegex()
+        // Version-based ordering
+        val versionComparator = ordering.getComparator(config.sourceBranch)
+        // Gets the list of branches for the source project
+        return structureService.getBranchesForProject(project.id)
+            // ... filters them by regex, using their path
+            .filter { sourceBranch ->
+                // Path of the branch
+                val sourcePath = branchDisplayNameService.getBranchDisplayName(sourceBranch)
+                // Match check
+                sourceRegex.matches(sourcePath) || sourceRegex.matches(sourceBranch.name)
+            }
+            // ... order them by version
+            .minWithOrNull(versionComparator)
+    }
 
     companion object {
         private val STORE: String = AutoVersioningConfig::class.java.name
