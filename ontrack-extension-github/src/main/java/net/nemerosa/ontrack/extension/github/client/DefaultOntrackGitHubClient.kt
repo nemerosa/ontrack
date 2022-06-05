@@ -562,6 +562,98 @@ class DefaultOntrackGitHubClient(
         } ?: throw IllegalStateException("PR creation response did not return a PR.")
     }
 
+    override fun approvePR(repository: String, pr: Int, body: String) {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // TODO Use specific credentials
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Call
+        client("Approving PR $pr") {
+            postForObject(
+                "/repos/$owner/$name/pulls/$pr/reviews",
+                mapOf(
+                    "body" to body,
+                    "event" to "APPROVE"
+                ),
+                JsonNode::class.java
+            )
+        }
+    }
+
+    override fun enableAutoMerge(repository: String, pr: Int) {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Gets the GraphQL node ID for this PR
+        val nodeId = client("Getting PR node ID") {
+            getForObject(
+                "/repos/${owner}/${name}/pulls/${pr}",
+                GitHubPullRequestResponse::class.java
+            )
+        }?.node_id ?: error("Cannot get PR node ID")
+        // Only the GraphQL API is available
+        graphQL(
+            "Enabling auto merge on PR $pr",
+            """
+                 mutation EnableAutoMerge(${'$'}prNodeId: ID!, ${'$'}commitHeadline: String!) {
+                    enablePullRequestAutoMerge(input: {
+                        pullRequestId: ${'$'}prNodeId,
+                        commitHeadline: ${'$'}commitHeadline
+                    }) {
+                        pullRequest {
+                            number
+                        }
+                    }
+                 }
+            """,
+            mapOf(
+                "prNodeId" to nodeId,
+                "commitHeadline" to "Automated merged from Ontrack for auto versioning on promotion"
+            )
+        ) { data ->
+            val prNumber = data.path("enablePullRequestAutoMerge").path("pullRequest").path("number")
+            if (prNumber.isNullOrNullNode()) {
+                throw GitHubAutoMergeNotEnabledException(repository)
+            }
+        }
+    }
+
+    override fun isPRMergeable(repository: String, pr: Int): Boolean {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Call
+        return client("Checking if PR $pr is mergeable") {
+            val response = getForObject(
+                "/repos/$owner/$name/pulls/$pr",
+                GitHubPullRequestResponse::class.java
+            )
+            // We need both the mergeable flag and the mergeable state
+            // Mergeable is not enough since it represents only the fact that the branch can be merged
+            // from a Git-point of view and does not represent the checks
+            (response?.mergeable ?: false) && (response?.mergeable_state == "clean")
+        }
+    }
+
+    override fun mergePR(repository: String, pr: Int, message: String) {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Call
+        client("Merging PR $pr") {
+            put(
+                "/repos/$owner/$name/pulls/$pr/merge",
+                mapOf(
+                    "commit_title" to "Automated merged from Ontrack for auto versioning on promotion"
+                )
+            )
+        }
+    }
+
     private fun JsonNode.getUserField(field: String): GitHubUser? =
         getJsonField(field)?.run {
             GitHubUser(

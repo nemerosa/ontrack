@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.extension.github.scm
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
@@ -77,10 +80,11 @@ class GitHubSCMExtension(
             title: String,
             description: String,
             autoApproval: Boolean,
-            remoteAutoMerge: Boolean
+            remoteAutoMerge: Boolean,
         ): SCMPullRequest {
             // Creates the pull request
             val pr = client.createPR(
+                repository = property.repository,
                 title = title,
                 head = from,
                 base = to,
@@ -89,21 +93,18 @@ class GitHubSCMExtension(
             val prId = pr.number
             // Auto approval process (approval + wait for checks + merge)
             var merged = false
-            // TODO Auto approval
-            // if (autoApproval) {
-            //     // Approving using the auto merge account
-            //     val autoApprovalClient = client.withNewAuthentication(
-            //         username = prCreationSettings.gitHubAutoApprovalUsername,
-            //         password = prCreationSettings.gitHubAutoApprovalPassword ?: ""
-            //     )
-            //     autoApprovalClient.approvePR(pr.number, "Automated review for auto versioning on promotion")
-            //     // Auto merge
-            //     if (remoteAutoMerge) {
-            //         client.enableAutoMerge(pr.number)
-            //     } else {
-            //         merged = waitAndMerge(prId)
-            //     }
-            // }
+            // Auto approval
+            if (autoApproval) {
+                // Approving using the auto merge account
+                // TODO Using other credentials
+                client.approvePR(property.repository, pr.number, "Automated review for auto versioning on promotion")
+                // Auto merge
+                if (remoteAutoMerge) {
+                    client.enableAutoMerge(property.repository, pr.number)
+                } else {
+                    merged = waitAndMerge(prId)
+                }
+            }
             // PR
             return SCMPullRequest(
                 id = pr.number.toString(),
@@ -111,6 +112,36 @@ class GitHubSCMExtension(
                 link = pr.html_url ?: "",
                 merged = merged
             )
+        }
+
+        private fun waitAndMerge(prId: Int): Boolean {
+            // Waits for the PR checks to be OK
+            // See https://docs.github.com/en/free-pro-team@latest/rest/guides/getting-started-with-the-git-database-api#checking-mergeability-of-pull-requests
+            // for a reference
+            // TODO Auto approval settings
+            val autoApprovalTimeoutMillis = 60_000L
+            val autoApprovalIntervalMillis = 5_000L
+            // val autoApprovalTimeoutMillis = prCreationSettings.autoApprovalTimeoutDuration.toMillis()
+            // val autoApprovalIntervalMillis = prCreationSettings.autoApprovalIntervalDuration.toMillis()
+            val merged = runBlocking {
+                withTimeoutOrNull(timeMillis = autoApprovalTimeoutMillis) {
+                    while (!client.isPRMergeable(property.repository, prId)) {
+                        delay(autoApprovalIntervalMillis)
+                    }
+                    true // PR has become mergeable
+                }
+            }
+            if (merged == null || !merged) {
+                return false
+            }
+            // Merges the PR
+            client.mergePR(
+                property.repository,
+                prId,
+                "Automated merged from Ontrack for auto versioning on promotion"
+            )
+            // Merged
+            return true
         }
 
         private fun checkProject(other: Project) {

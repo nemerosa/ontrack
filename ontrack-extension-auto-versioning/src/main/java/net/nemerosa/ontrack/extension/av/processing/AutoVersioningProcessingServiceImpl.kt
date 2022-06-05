@@ -147,7 +147,7 @@ class AutoVersioningProcessingServiceImpl(
                     if (order.autoApproval) {
                         when (order.autoApprovalMode) {
                             AutoApprovalMode.SCM -> TODO("Audit only")
-                            AutoApprovalMode.CLIENT -> if (false /* TODO !pr.merged */) {
+                            AutoApprovalMode.CLIENT -> if (!pr.merged) {
                                 logger.info("Processing auto versioning order PR timed out: {}", order)
                                 // TODO autoVersioningAuditService.onPRTimeout(
                                 // TODO Notification

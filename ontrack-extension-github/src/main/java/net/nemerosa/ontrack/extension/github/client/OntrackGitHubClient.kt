@@ -168,4 +168,41 @@ interface OntrackGitHubClient {
      */
     fun createPR(repository: String, title: String, head: String, base: String, body: String): GitHubPR
 
+    /**
+     * Approves a pull request.
+     *
+     * TODO Other credentials must be specified.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param pr PR number
+     * @param body PR approval description
+     */
+    fun approvePR(repository: String, pr: Int, body: String)
+
+    /**
+     * Enables auto merge on a pull request
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param pr PR number
+     */
+    fun enableAutoMerge(repository: String, pr: Int)
+
+    /**
+     * Checks if a pull request is mergeable
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param pr PR number
+     * @return PR mergeable state
+     */
+    fun isPRMergeable(repository: String, pr: Int): Boolean
+
+    /**
+     * Merges a PR.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param pr PR number
+     * @param message Commit message
+     */
+    fun mergePR(repository: String, pr: Int, message: String)
+
 }
