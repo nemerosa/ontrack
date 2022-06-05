@@ -156,4 +156,16 @@ interface OntrackGitHubClient {
      */
     fun setFileContent(repository: String, branch: String, sha: String, path: String, content: ByteArray)
 
+    /**
+     * Creates a pull request
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param title PR title
+     * @param head Source branch
+     * @param base Target branch
+     * @param body PR description
+     * @return Created PR
+     */
+    fun createPR(repository: String, title: String, head: String, base: String, body: String): GitHubPR
+
 }

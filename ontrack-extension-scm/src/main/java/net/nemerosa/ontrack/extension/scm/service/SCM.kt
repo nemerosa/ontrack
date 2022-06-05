@@ -44,4 +44,26 @@ interface SCM {
      */
     fun upload(scmBranch: String, commit: String, path: String, content: ByteArray)
 
+    /**
+     * Creates a pull request from the branch [from] to the branch [to], with a given [title] and
+     * [description]. If [autoApproval] is `true`, the pull request will have a reviewer approving
+     * it immediately.
+     *
+     * @param from Origin branch
+     * @param to Target branch
+     * @param title Title for the pull request
+     * @param description Description for the pull request
+     * @param autoApproval Must the created pull request be auto-approved?
+     * @param remoteAutoMerge If the SCM allows this, sets the PR in auto merge mode
+     * @return PR information
+     */
+    fun createPR(
+        from: String,
+        to: String,
+        title: String,
+        description: String,
+        autoApproval: Boolean,
+        remoteAutoMerge: Boolean,
+    ): SCMPullRequest
+
 }

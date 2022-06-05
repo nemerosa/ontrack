@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMExtension
+import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
@@ -65,6 +66,51 @@ class GitHubSCMExtension(
                 ?.sha
                 ?: error("Cannot find file at $path for branch $scmBranch")
             client.setFileContent(property.repository, scmBranch, sha, path, content)
+        }
+
+        /**
+         * See https://developer.github.com/v3/pulls/#create-a-pull-request
+         */
+        override fun createPR(
+            from: String,
+            to: String,
+            title: String,
+            description: String,
+            autoApproval: Boolean,
+            remoteAutoMerge: Boolean
+        ): SCMPullRequest {
+            // Creates the pull request
+            val pr = client.createPR(
+                title = title,
+                head = from,
+                base = to,
+                body = description
+            )
+            val prId = pr.number
+            // Auto approval process (approval + wait for checks + merge)
+            var merged = false
+            // TODO Auto approval
+            // if (autoApproval) {
+            //     // Approving using the auto merge account
+            //     val autoApprovalClient = client.withNewAuthentication(
+            //         username = prCreationSettings.gitHubAutoApprovalUsername,
+            //         password = prCreationSettings.gitHubAutoApprovalPassword ?: ""
+            //     )
+            //     autoApprovalClient.approvePR(pr.number, "Automated review for auto versioning on promotion")
+            //     // Auto merge
+            //     if (remoteAutoMerge) {
+            //         client.enableAutoMerge(pr.number)
+            //     } else {
+            //         merged = waitAndMerge(prId)
+            //     }
+            // }
+            // PR
+            return SCMPullRequest(
+                id = pr.number.toString(),
+                name = "#${pr.number}",
+                link = pr.html_url ?: "",
+                merged = merged
+            )
         }
 
         private fun checkProject(other: Project) {

@@ -535,6 +535,33 @@ class DefaultOntrackGitHubClient(
         }
     }
 
+    override fun createPR(repository: String, title: String, head: String, base: String, body: String): GitHubPR {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Call
+        return client("Creating PR from $head to $base") {
+            postForObject(
+                "/repos/$owner/$name/pulls",
+                mapOf(
+                    "title" to title,
+                    "head" to head,
+                    "base" to base,
+                    "body" to body
+                ),
+                GitHubPullRequestResponse::class.java
+            )
+        }?.run {
+            GitHubPR(
+                number = number,
+                mergeable = mergeable,
+                mergeable_state = mergeable_state,
+                html_url = html_url
+            )
+        } ?: throw IllegalStateException("PR creation response did not return a PR.")
+    }
+
     private fun JsonNode.getUserField(field: String): GitHubUser? =
         getJsonField(field)?.run {
             GitHubUser(
@@ -679,6 +706,30 @@ class DefaultOntrackGitHubClient(
          * SHA of the file
          */
         val sha: String,
+    )
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private data class GitHubPullRequestResponse(
+        /**
+         * Local ID of the PR
+         */
+        val number: Int,
+        /**
+         * Node ID (for use in GraphQL)
+         */
+        val node_id: String,
+        /**
+         * Is the PR mergeable?
+         */
+        val mergeable: Boolean?,
+        /**
+         * Mergeable status
+         */
+        val mergeable_state: String?,
+        /**
+         * Link to the PR
+         */
+        val html_url: String?,
     )
 
 }

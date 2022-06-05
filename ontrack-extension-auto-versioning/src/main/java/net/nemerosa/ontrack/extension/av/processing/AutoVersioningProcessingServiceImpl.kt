@@ -130,18 +130,18 @@ class AutoVersioningProcessingServiceImpl(
                 try {
                     logger.info("Processing auto versioning order creating PR: {}", order)
                     // TODO Audit
-                    // TODO PR creation
-                    // val pr = scm.createPR(
-                    //     from = upgradeBranch,
-                    //     to = branchConfiguration.branch,
-                    //     title = "Upgrade of ${prCreationOrder.sourceProject} to version ${prCreationOrder.targetVersion}",
-                    //     // Change log as description?
-                    //     description = "Upgrade of ${prCreationOrder.sourceProject} to version ${prCreationOrder.targetVersion}",
-                    //     // Auto approval
-                    //     autoApproval = prCreationOrder.autoApproval,
-                    //     // Remote auto merge?
-                    //     remoteAutoMerge = (prCreationOrder.autoApprovalMode == AutoApprovalMode.SCM)
-                    // )
+                    // PR creation
+                    val pr = scm.createPR(
+                        from = upgradeBranch,
+                        to = scmBranch,
+                        title = "Upgrade of ${order.sourceProject} to version ${order.targetVersion}",
+                        // Change log as description?
+                        description = "Upgrade of ${order.sourceProject} to version ${order.targetVersion}",
+                        // Auto approval
+                        autoApproval = order.autoApproval,
+                        // Remote auto merge?
+                        remoteAutoMerge = (order.autoApprovalMode == AutoApprovalMode.SCM)
+                    )
                     // If auto approval mode = CLIENT and PR is not merged, we had a timeout
                     logger.info("Processing auto versioning order end of PR process: {}", order)
                     if (order.autoApproval) {
