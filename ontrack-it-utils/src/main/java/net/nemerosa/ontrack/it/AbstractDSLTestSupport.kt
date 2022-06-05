@@ -447,7 +447,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * Creation of a predefined validation stamp
      */
     protected fun predefinedValidationStamp(name: String, description: String = "", image: Boolean = false, dataType: ValidationDataTypeConfig<*>? = null) {
-        asAdmin().call {
+        asAdmin {
             val pps = predefinedValidationStampService.newPredefinedValidationStamp(
                     PredefinedValidationStamp.of(
                             NameDescription.nd(name, description)
