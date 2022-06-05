@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":ontrack-rabbitmq"))
     implementation("io.micrometer:micrometer-core")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))

@@ -922,17 +922,17 @@ class GitServiceImpl(
         jobScheduler.unschedule(getGitBranchSyncJobKey(branch))
     }
 
-    override fun getSCMPathInfo(branch: Branch): Optional<SCMPathInfo> {
-        return getBranchConfiguration(branch)
-                ?.let {
-                    SCMPathInfo(
-                            "git",
-                            it.configuration.remote,
-                            it.branch, null
-                    )
-                }
-                .asOptional()
-    }
+    override fun getSCMPathInfo(branch: Branch): Optional<SCMPathInfo> = getBranchSCMPathInfo(branch).asOptional()
+
+    override fun getBranchSCMPathInfo(branch: Branch): SCMPathInfo? =
+        getBranchConfiguration(branch)
+            ?.let {
+                SCMPathInfo(
+                    "git",
+                    it.configuration.remote,
+                    it.branch, null
+                )
+            }
 
     override fun getCommitForBuild(build: Build): IndexableGitCommit? =
             entityDataService.retrieve(

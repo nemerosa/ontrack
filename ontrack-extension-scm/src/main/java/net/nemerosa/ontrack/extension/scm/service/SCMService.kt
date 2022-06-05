@@ -1,25 +1,20 @@
-package net.nemerosa.ontrack.extension.scm.service;
+package net.nemerosa.ontrack.extension.scm.service
 
-import net.nemerosa.ontrack.extension.scm.model.SCMPathInfo;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Project;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
+import net.nemerosa.ontrack.extension.scm.model.SCMPathInfo
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Project
+import java.util.*
 
 /**
  * Common methods for the SCM accesses
  */
-public interface SCMService {
-
+interface SCMService {
     /**
      * Downloads the file at the given path for a branch
      *
-     * @deprecated Use the version with the branch name
      */
-    @Deprecated
-    Optional<String> download(Branch branch, String path);
+    @Deprecated("Use the version with the branch name")
+    fun download(branch: Branch, path: String): Optional<String>
 
     /**
      * Downloads the file at the given path for a branch
@@ -29,13 +24,18 @@ public interface SCMService {
      * @param path Path to the file, relative to the repository
      * @return Content of the file or null if not found
      */
-    @Nullable
-    String download(@NotNull Project project, @NotNull String scmBranch, @NotNull String path);
+    fun download(project: Project, scmBranch: String, path: String): String?
 
     /**
      * Gets the SCM path info of a branch
      */
-    Optional<SCMPathInfo> getSCMPathInfo(Branch branch);
+    @Deprecated("Use getBranchSCMPathInfo")
+    fun getSCMPathInfo(branch: Branch): Optional<SCMPathInfo>
+
+    /**
+     * Gets the SCM path info of a branch
+     */
+    fun getBranchSCMPathInfo(branch: Branch): SCMPathInfo?
 
     /**
      * Gets the name of the default SCM branch for the project
@@ -43,6 +43,15 @@ public interface SCMService {
      * @param project Project to get information about
      * @return Name of the default SCM branch or null if not available
      */
-    @Nullable
-    String getSCMDefaultBranch(@NotNull Project project);
+    fun getSCMDefaultBranch(project: Project): String?
+
+    /**
+     * Creates a new branch in a project.
+     *
+     * @param project Project holding the configuration
+     * @param sourceBranch Source branch
+     * @param newBranch New branch
+     * @return Commit of the new branch
+     */
+    fun createBranch(project: Project, sourceBranch: String, newBranch: String): String
 }
