@@ -23,7 +23,7 @@ class AutoVersioningProcessingServiceImpl(
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningProcessingServiceImpl::class.java)
 
-    override fun process(order: AutoVersioningOrder) {
+    override fun process(order: AutoVersioningOrder): AutoVersioningProcessingOutcome {
         logger.info("Processing auto versioning order: {}", order)
         // TODO Audit
         val branch = order.branch
@@ -164,17 +164,17 @@ class AutoVersioningProcessingServiceImpl(
                 }
 
                 // OK
-                // TODO return PRCreationStatus.CREATED
+                return AutoVersioningProcessingOutcome.CREATED
 
             } else {
                 logger.info("Processing auto versioning order same version: {}", order)
                 // TODO autoVersioningAuditService.onProcessingAborted(prCreationOrder, "Same version")
-                // TODO return PRCreationStatus.SAME_VERSION
+                return AutoVersioningProcessingOutcome.SAME_VERSION
             }
         } else {
             logger.info("Processing auto versioning order no config: {}", order)
             // TODO autoVersioningAuditService.onProcessingAborted(prCreationOrder, "Target branch is not configured")
-            // TODO return PRCreationStatus.NO_CONFIG
+            return AutoVersioningProcessingOutcome.NO_CONFIG
         }
     }
 

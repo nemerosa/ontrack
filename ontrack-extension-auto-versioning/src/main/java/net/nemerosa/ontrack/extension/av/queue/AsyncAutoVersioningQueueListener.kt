@@ -59,7 +59,8 @@ class AsyncAutoVersioningQueueListener(
             // TODO Metrics
             securityService.asAdmin {
                 // TODO Audit
-                autoVersioningProcessingService.process(order)
+                val outcome = autoVersioningProcessingService.process(order)
+                // TODO Metrics
             }
         } catch (any: Throwable) {
             applicationLogService.log(
