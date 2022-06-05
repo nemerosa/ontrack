@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityID
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import java.util.*
 
 /**
  * Store for data associated with project entities.
@@ -45,5 +44,15 @@ interface EntityDataRepository {
      * Delete
      */
     fun delete(entity: ProjectEntity, key: String)
+
+    /**
+     * Looking for entities using JSON query.
+     */
+    fun findEntities(
+        type: ProjectEntityType,
+        key: String,
+        jsonQuery: String = "",
+        jsonQueryParameters: Map<String, Any> = emptyMap(),
+    ): List<ProjectEntityID>
 
 }

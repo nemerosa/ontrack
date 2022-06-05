@@ -15,8 +15,8 @@ import java.util.*
 
 @Service
 class EntityDataServiceImpl(
-        private val repository: EntityDataRepository,
-        private val securityService: SecurityService
+    private val repository: EntityDataRepository,
+    private val securityService: SecurityService,
 ) : EntityDataService {
 
     private val objectMapper = ObjectMapperFactory.create()
@@ -72,11 +72,19 @@ class EntityDataServiceImpl(
     }
 
     override fun hasEntityValue(entity: ProjectEntity, key: String): Boolean =
-            repository.hasEntityValue(entity, key)
+        repository.hasEntityValue(entity, key)
 
     override fun findEntityByValue(type: ProjectEntityType, key: String, value: JsonNode): ProjectEntityID? {
         return repository.findEntityByValue(type, key, value)
     }
+
+    override fun findEntities(
+        type: ProjectEntityType,
+        key: String,
+        jsonQuery: String,
+        jsonQueryParameters: Map<String, Any>,
+    ): List<ProjectEntityID> =
+        repository.findEntities(type, key, jsonQuery, jsonQueryParameters)
 
     override fun delete(entity: ProjectEntity, key: String) {
         securityService.checkProjectFunction(entity, ProjectConfig::class.java)

@@ -64,6 +64,16 @@ interface EntityDataService {
     fun findEntityByValue(type: ProjectEntityType, key: String, value: JsonNode): ProjectEntityID?
 
     /**
+     * Looking for entities using JSON query.
+     */
+    fun findEntities(
+        type: ProjectEntityType,
+        key: String,
+        jsonQuery: String = "",
+        jsonQueryParameters: Map<String, Any> = emptyMap(),
+    ): List<ProjectEntityID>
+
+    /**
      * Deletes data
      *
      * @param entity Entity to delete data from
