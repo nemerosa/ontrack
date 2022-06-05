@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningTargetFileService
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.properties.FilePropertyType
-import net.nemerosa.ontrack.extension.scm.service.SCMServiceDetector
+import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.model.structure.NameDescription
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class AutoVersioningProcessingServiceImpl(
-    private val scmServiceDetector: SCMServiceDetector,
+    private val scmDetector: SCMDetector,
     private val autoVersioningTargetFileService: AutoVersioningTargetFileService,
 ) : AutoVersioningProcessingService {
 
@@ -27,10 +27,9 @@ class AutoVersioningProcessingServiceImpl(
         // TODO Audit
         val branch = order.branch
         // Gets the SCM configuration for the project
-        val scm = scmServiceDetector.getProjectScmService(branch.project)
-        val scmInfo = scm?.getBranchSCMPathInfo(branch)
-        val scmBranch = scmInfo?.branch
-        if (scm != null && scmInfo != null && scmBranch != null) {
+        val scm = scmDetector.getSCM(branch.project)
+        val scmBranch: String? = scm?.getSCMBranch(branch)
+        if (scm != null && scmBranch != null) {
             // Gets the clone URL for the repository
             // TODO val repositoryUri = scm.repositoryURI
             // Gets the repository credentials ID to use on post processing
@@ -67,6 +66,7 @@ class AutoVersioningProcessingServiceImpl(
                 order.targetPaths.map { targetPath ->
                     // Gets the content of the target file
                     val lines = scm.download(branch.project, scmBranch, targetPath)
+                        ?.toString()
                         ?.lines()
                         ?: emptyList()
                     // Gets the current version in this file

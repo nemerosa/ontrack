@@ -6,7 +6,10 @@ import net.nemerosa.ontrack.model.structure.Project
 import java.util.*
 
 /**
- * Common methods for the SCM accesses
+ * Common methods for the SCM accesses.
+ *
+ * Whenever possible, prefer using the [SCM] interface. The methods of [SCMService] might become
+ * deprecated in preparation of Ontrack V5 and the extraction of local working copies to another service.
  */
 interface SCMService {
     /**
@@ -44,14 +47,4 @@ interface SCMService {
      * @return Name of the default SCM branch or null if not available
      */
     fun getSCMDefaultBranch(project: Project): String?
-
-    /**
-     * Creates a new branch in a project.
-     *
-     * @param project Project holding the configuration
-     * @param sourceBranch Source branch
-     * @param newBranch New branch
-     * @return Commit of the new branch
-     */
-    fun createBranch(project: Project, sourceBranch: String, newBranch: String): String
 }
