@@ -55,7 +55,7 @@ class AutoVersioningProcessingServiceImpl(
                     )
                     // TODO Audit
                     // Creating the branch
-                    scm.createBranch(branch.project, scmBranch, upgradeBranch)
+                    scm.createBranch(scmBranch, upgradeBranch)
                 } catch (e: Exception) {
                     // TODO Notification of error
                     throw e
@@ -65,7 +65,7 @@ class AutoVersioningProcessingServiceImpl(
             val targetPathUpdated: List<Boolean> = try {
                 order.targetPaths.map { targetPath ->
                     // Gets the content of the target file
-                    val lines = scm.download(branch.project, scmBranch, targetPath)
+                    val lines = scm.download(scmBranch, targetPath)
                         ?.toString()
                         ?.lines()
                         ?: emptyList()

@@ -239,7 +239,7 @@ class DefaultOntrackGitHubClient(
         variables: Map<String, *> = emptyMap<String, Any>(),
         collectionAt: List<String>,
         nodes: Boolean = false,
-        code: (node: JsonNode) -> T
+        code: (node: JsonNode) -> T,
     ): List<T>? {
         val results = mutableListOf<T>()
         var hasNext = true
@@ -280,7 +280,7 @@ class DefaultOntrackGitHubClient(
         message: String,
         query: String,
         variables: Map<String, *>,
-        code: (data: JsonNode) -> T
+        code: (data: JsonNode) -> T,
     ): T {
         // Getting a client
         val client = createGitHubTemplate(graphql = true)
@@ -311,7 +311,7 @@ class DefaultOntrackGitHubClient(
 
     private operator fun <T> RestTemplate.invoke(
         message: String,
-        code: RestTemplate.() -> T
+        code: RestTemplate.() -> T,
     ): T {
         logger.debug("[github] {}", message)
         return try {
@@ -475,6 +475,42 @@ class DefaultOntrackGitHubClient(
         }
     }
 
+    override fun getBranchLastCommit(repository: String, branch: String): String? {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Call
+        return client("Get last commit for $branch") {
+            getForObject(
+                "/repos/${owner}/${name}/git/ref/heads/${branch}",
+                GitHubGetRefResponse::class.java
+            )?.`object`?.sha
+        }
+    }
+
+    override fun createBranch(repository: String, source: String, destination: String): String? {
+        // Gets the last commit of the source branch
+        val sourceCommit = getBranchLastCommit(repository, source) ?: return null
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Creating the branch
+        return client("Create branch $destination from $source") {
+            val response = postForObject(
+                "/repos/${owner}/${name}/git/refs",
+                mapOf(
+                    "ref" to "refs/heads/$destination",
+                    "sha" to sourceCommit
+                ),
+                GitHubGetRefResponse::class.java
+            )
+            // Returns the new commit
+            response?.`object`?.sha
+        }
+    }
+
     private fun JsonNode.getUserField(field: String): GitHubUser? =
         getJsonField(field)?.run {
             GitHubUser(
@@ -584,7 +620,7 @@ class DefaultOntrackGitHubClient(
     @JsonIgnoreProperties(ignoreUnknown = true)
     private data class GitHubErrorMessage(
         val message: String,
-        val errors: List<GitHubError>?
+        val errors: List<GitHubError>?,
     ) {
         fun format(message: String): String = mapOf(
             "message" to message,
@@ -596,7 +632,17 @@ class DefaultOntrackGitHubClient(
     private data class GitHubError(
         val resource: String,
         val field: String,
-        val code: String
+        val code: String,
+    )
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private data class GitHubGetRefResponse(
+        val `object`: GitHubObject,
+    )
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private data class GitHubObject(
+        val sha: String,
     )
 
 }

@@ -116,4 +116,23 @@ interface OntrackGitHubClient {
      */
     fun getFileContent(repository: String, branch: String?, path: String): ByteArray?
 
+    /**
+     * Gets the last commit for a branch.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param branch Name of the branch
+     * @return SHA of the last commit of the branch, `null` if no commit or no branch
+     */
+    fun getBranchLastCommit(repository: String, branch: String): String?
+
+    /**
+     * Creates a branch
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param source Source branch
+     * @param destination Branch to create
+     * @return SHA of the commit, `null` if no source branch
+     */
+    fun createBranch(repository: String, source: String, destination: String): String?
+
 }
