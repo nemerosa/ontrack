@@ -1,24 +1,21 @@
-package net.nemerosa.ontrack.extension.scm.service;
+package net.nemerosa.ontrack.extension.scm.service
 
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Project;
-import org.springframework.stereotype.Component;
-
-import java.util.Optional;
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Project
+import org.springframework.stereotype.Component
+import java.util.*
 
 /**
- * PLaceholder for the SCM service providers.
+ * Placeholder for the SCM service providers.
  *
  * @see SCMServiceDetectorImpl
  */
 @Component
-public class NOPSCMServiceProvider implements SCMServiceProvider {
-    @Override
-    public Optional<SCMService> getScmService(Branch branch) {
-        return Optional.empty();
-    }
-    @Override
-    public Optional<SCMService> getScmService(Project project) {
-        return Optional.empty();
-    }
+class NOPSCMServiceProvider : SCMServiceProvider {
+
+    override fun getScmService(branch: Branch): Optional<SCMService> = Optional.empty()
+
+    override fun getScmService(project: Project): Optional<SCMService> = Optional.empty()
+
+    override fun getProjectScmService(project: Project): SCMService? = null
 }

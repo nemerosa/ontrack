@@ -1,37 +1,34 @@
-package net.nemerosa.ontrack.extension.git.service;
+package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
-import net.nemerosa.ontrack.extension.scm.service.SCMService;
-import net.nemerosa.ontrack.extension.scm.service.SCMServiceProvider;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Project;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.Optional;
+import net.nemerosa.ontrack.extension.scm.service.SCMService
+import net.nemerosa.ontrack.extension.scm.service.SCMServiceProvider
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Project
+import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
-public class GitServiceProvider implements SCMServiceProvider {
+class GitServiceProvider(
+    private val gitService: GitService,
+) : SCMServiceProvider {
 
-    private final GitService gitService;
+    override fun getScmService(branch: Branch): Optional<SCMService> = getScmService(branch.project)
 
-    @Autowired
-    public GitServiceProvider(GitService gitService) {
-        this.gitService = gitService;
-    }
-
-    @Override
-    public Optional<SCMService> getScmService(Branch branch) {
-        return getScmService(branch.getProject());
-    }
-
-    @Override
-    public Optional<SCMService> getScmService(Project project) {
-        GitConfiguration projectConfiguration = gitService.getProjectConfiguration(project);
-        if (projectConfiguration != null) {
-            return Optional.of(gitService);
+    override fun getScmService(project: Project): Optional<SCMService> {
+        val projectConfiguration = gitService.getProjectConfiguration(project)
+        return if (projectConfiguration != null) {
+            Optional.of(gitService)
         } else {
-            return Optional.empty();
+            Optional.empty()
+        }
+    }
+
+    override fun getProjectScmService(project: Project): SCMService? {
+        val projectConfiguration = gitService.getProjectConfiguration(project)
+        return if (projectConfiguration != null) {
+            gitService
+        } else {
+            null
         }
     }
 }
