@@ -5,6 +5,9 @@ import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningTargetFileService
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessing
+import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingNotFoundException
+import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingRegistry
 import net.nemerosa.ontrack.extension.av.properties.FilePropertyType
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.extension.scm.service.uploadLines
@@ -19,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional
 class AutoVersioningProcessingServiceImpl(
     private val scmDetector: SCMDetector,
     private val autoVersioningTargetFileService: AutoVersioningTargetFileService,
+    private val postProcessingRegistry: PostProcessingRegistry,
 ) : AutoVersioningProcessingService {
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningProcessingServiceImpl::class.java)
@@ -32,7 +36,7 @@ class AutoVersioningProcessingServiceImpl(
         val scmBranch: String? = scm?.getSCMBranch(branch)
         if (scm != null && scmBranch != null) {
             // Gets the clone URL for the repository
-            // TODO val repositoryUri = scm.repositoryURI
+            val repositoryUri = scm.repositoryURI
             // Gets the repository credentials ID to use on post processing
             // TODO val repositoryCredentials = scm.repositoryCredentialsId
             // Sanitization of the version (for the branch name)
@@ -89,27 +93,25 @@ class AutoVersioningProcessingServiceImpl(
                         scm.uploadLines(upgradeBranch, commitId, targetPath, updatedLines)
                         // Post processing
                         if (!order.postProcessing.isNullOrBlank()) {
-                            // // Gets the post processor
-                            // val postProcessing =
-                            //     postProcessingService.getPostProcessingById<Any>(prCreationOrder.postProcessing)
-                            // // If processing cannot be found, we consider this an error
-                            // if (postProcessing == null) {
-                            //     throw PostProcessingNotFoundException(prCreationOrder.postProcessing)
-                            // }
-                            // // Launching the post processing
-                            // else {
-                            //     logger.info("Processing auto versioning order launching post processing: {}",
-                            //         prCreationOrder)
-                            //     autoVersioningAuditService.onPostProcessingStart(prCreationOrder, upgradeBranch)
-                            //     measureAndLaunchPostProcessing(postProcessing,
-                            //         prCreationOrder,
-                            //         repositoryUri,
-                            //         repositoryCredentials,
-                            //         upgradeBranch)
-                            //     logger.info("Processing auto versioning order end of post processing: {}",
-                            //         prCreationOrder)
-                            //     autoVersioningAuditService.onPostProcessingEnd(prCreationOrder, upgradeBranch)
-                            // }
+                            // Gets the post processor
+                            val postProcessing = postProcessingRegistry.getPostProcessingById<Any>(order.postProcessing)
+                            // If processing cannot be found, we consider this an error
+                            if (postProcessing == null) {
+                                throw PostProcessingNotFoundException(order.postProcessing)
+                            }
+                            // Launching the post processing
+                            else {
+                                logger.info("Processing auto versioning order launching post processing: {}", order)
+                                // TODO autoVersioningAuditService.onPostProcessingStart(prCreationOrder, upgradeBranch)
+                                measureAndLaunchPostProcessing(
+                                    postProcessing,
+                                    order,
+                                    repositoryUri,
+                                    upgradeBranch
+                                )
+                                logger.info("Processing auto versioning order end of post processing: {}", order)
+                                // TODO autoVersioningAuditService.onPostProcessingEnd(prCreationOrder, upgradeBranch)
+                            }
                         }
                         // Changed
                         true
@@ -178,6 +180,52 @@ class AutoVersioningProcessingServiceImpl(
         }
     }
 
+    private fun <T> measureAndLaunchPostProcessing(
+        postProcessing: PostProcessing<T>,
+        order: AutoVersioningOrder,
+        repositoryUri: String,
+        upgradeBranch: String,
+    ) {
+        val tags = arrayOf(
+            "sourceProject" to order.sourceProject,
+            "targetProject" to order.branch.project.name,
+            "targetBranch" to order.branch.name,
+            "postProcessingId" to postProcessing.id
+        )
+        // Count
+        // meterRegistry.increment(PRCreationMetrics.METRIC_ONTRACK_COLLIBRA_PRCREATION_POST_PROCESSING_COUNT, *tags)
+        try {
+            // Timing
+            // meterRegistry.time(
+            //     PRCreationMetrics.METRIC_ONTRACK_COLLIBRA_PRCREATION_POST_PROCESSING_TIME, *tags) {
+            launchPostProcessing(
+                postProcessing,
+                order,
+                repositoryUri,
+                upgradeBranch
+            )
+            // }
+            // Success
+            // meterRegistry.increment(PRCreationMetrics.METRIC_ONTRACK_COLLIBRA_PRCREATION_POST_PROCESSING_SUCCESS_COUNT, *tags)
+        } catch (ex: Exception) {
+            // Metric for the error
+            // meterRegistry.increment(PRCreationMetrics.METRIC_ONTRACK_COLLIBRA_PRCREATION_POST_PROCESSING_ERROR_COUNT, *tags)
+            // Going on with error processing
+            throw ex
+        }
+    }
+
+    private fun <T> launchPostProcessing(
+        postProcessing: PostProcessing<T>,
+        order: AutoVersioningOrder,
+        repositoryUri: String,
+        upgradeBranch: String,
+    ) {
+        // Parsing and validation of the configuration
+        val config: T = postProcessing.parseAndValidate(order.postProcessingConfig)
+        // Launching the post processing
+        postProcessing.postProcessing(config, order, repositoryUri, upgradeBranch)
+    }
 
     private fun AutoVersioningOrder.replaceVersion(content: List<String>): List<String> {
         val type = filePropertyType

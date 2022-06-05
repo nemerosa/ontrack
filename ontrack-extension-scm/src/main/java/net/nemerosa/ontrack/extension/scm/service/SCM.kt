@@ -10,6 +10,11 @@ import net.nemerosa.ontrack.model.structure.Branch
 interface SCM {
 
     /**
+     * Gets the (clone) URL of the project's repository
+     */
+    val repositoryURI: String
+
+    /**
      * Given a branch, returns its SCM branch if any.
      *
      * Throws an error if the branch does not belong to the SCM's project.

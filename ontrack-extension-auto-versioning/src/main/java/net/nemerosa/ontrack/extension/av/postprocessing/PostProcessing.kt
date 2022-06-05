@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.av.postprocessing
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.model.extension.Extension
 
@@ -34,5 +35,10 @@ interface PostProcessing<T> : Extension {
         repositoryUri: String,
         upgradeBranch: String,
     )
+
+    /**
+     * Given the configuration as JSON, parses it and validates it.
+     */
+    fun parseAndValidate(config: JsonNode?): T
 
 }
