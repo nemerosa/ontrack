@@ -18,7 +18,9 @@ class GitHubSCMCatalogProviderIT : AbstractGitHubTestSupport() {
         val env = githubTestEnv
         val config = githubTestConfigReal()
         val settings = GitHubSCMCatalogSettings(
-            orgs = listOf(env.organization)
+            orgs = listOf(env.organization),
+            autoMergeTimeout = GitHubSCMCatalogSettings.DEFAULT_AUTO_MERGE_TIMEOUT,
+            autoMergeInterval = GitHubSCMCatalogSettings.DEFAULT_AUTO_MERGE_INTERVAL,
         )
         val entries = catalogProvider.getConfigEntries(settings, config)
         assertNotNull(entries.find { it.repository == env.fullRepository }) { entry ->

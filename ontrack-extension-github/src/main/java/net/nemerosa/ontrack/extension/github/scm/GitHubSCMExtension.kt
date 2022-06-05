@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
+import net.nemerosa.ontrack.extension.github.catalog.GitHubSCMCatalogSettings
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
@@ -15,6 +16,7 @@ import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMExtension
 import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
@@ -28,15 +30,18 @@ class GitHubSCMExtension(
     gitHubExtensionFeature: GitHubExtensionFeature,
     private val propertyService: PropertyService,
     private val clientFactory: OntrackGitHubClientFactory,
+    private val cachedSettingsService: CachedSettingsService,
 ) : AbstractExtension(gitHubExtensionFeature), SCMExtension {
 
     override fun getSCM(project: Project): SCM? {
         val property: GitHubProjectConfigurationProperty? =
             propertyService.getProperty(project, GitHubProjectConfigurationPropertyType::class.java).value
+        val settings = cachedSettingsService.getCachedSettings(GitHubSCMCatalogSettings::class.java)
         return property?.run {
             GitHubSCM(
                 project,
                 property,
+                settings,
             )
         }
     }
@@ -44,6 +49,7 @@ class GitHubSCMExtension(
     private inner class GitHubSCM(
         private val project: Project,
         private val property: GitHubProjectConfigurationProperty,
+        private val settings: GitHubSCMCatalogSettings,
     ) : SCM {
 
         override fun getSCMBranch(branch: Branch): String? {
@@ -122,11 +128,8 @@ class GitHubSCMExtension(
             // Waits for the PR checks to be OK
             // See https://docs.github.com/en/free-pro-team@latest/rest/guides/getting-started-with-the-git-database-api#checking-mergeability-of-pull-requests
             // for a reference
-            // TODO Auto approval settings
-            val autoApprovalTimeoutMillis = 60_000L
-            val autoApprovalIntervalMillis = 5_000L
-            // val autoApprovalTimeoutMillis = prCreationSettings.autoApprovalTimeoutDuration.toMillis()
-            // val autoApprovalIntervalMillis = prCreationSettings.autoApprovalIntervalDuration.toMillis()
+            val autoApprovalTimeoutMillis = settings.autoMergeTimeout
+            val autoApprovalIntervalMillis = settings.autoMergeInterval
             val merged = runBlocking {
                 withTimeoutOrNull(timeMillis = autoApprovalTimeoutMillis) {
                     while (!client.isPRMergeable(property.repository, prId)) {

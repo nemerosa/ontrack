@@ -85,7 +85,13 @@ class GitHubComplianceIndicatorsIT : AbstractGitHubTestSupport() {
                 project {
                     gitHubRealConfig()
                     // Make sure to launch the SCM catalog indexation
-                    settingsManagerService.saveSettings(GitHubSCMCatalogSettings(orgs = listOf(githubTestEnv.organization)))
+                    settingsManagerService.saveSettings(
+                        GitHubSCMCatalogSettings(
+                            orgs = listOf(githubTestEnv.organization),
+                            autoMergeTimeout = GitHubSCMCatalogSettings.DEFAULT_AUTO_MERGE_TIMEOUT,
+                            autoMergeInterval = GitHubSCMCatalogSettings.DEFAULT_AUTO_MERGE_INTERVAL,
+                        )
+                    )
                     scmCatalog.collectSCMCatalog { println(it) }
                     catalogLinkService.computeCatalogLinks()
                     // Saves the list of indicators
@@ -97,11 +103,23 @@ class GitHubComplianceIndicatorsIT : AbstractGitHubTestSupport() {
                         it.type.id to it.value
                     }
                     // Checks some values
-                    assertEquals(true, values[RepositoryDefaultBranchShouldBeMain.ID], "Test repo default branch should be main")
-                    assertEquals(false, values[RepositoryMustHaveMaintainingTeam.ID], "Test repo must has no maintaining team")
-                    assertEquals(true, values[RepositoryTeamMustHaveDescription.ID], "Test repo must have a description")
+                    assertEquals(
+                        true,
+                        values[RepositoryDefaultBranchShouldBeMain.ID],
+                        "Test repo default branch should be main"
+                    )
+                    assertEquals(
+                        false,
+                        values[RepositoryMustHaveMaintainingTeam.ID],
+                        "Test repo must has no maintaining team"
+                    )
+                    assertEquals(
+                        true,
+                        values[RepositoryTeamMustHaveDescription.ID],
+                        "Test repo must have a description"
+                    )
                     assertEquals(true, values[RepositoryMustHaveDescription.ID], "Test repo must have a description")
-                    assertEquals(true, values[RepositoryMustNotHaveAnyAdmin.ID],"Test repo has no admin")
+                    assertEquals(true, values[RepositoryMustNotHaveAnyAdmin.ID], "Test repo has no admin")
                     assertEquals(true, values[RepositoryMustHaveAReadme.ID], "Test repo must have a readme")
                     // TODO assertEquals(false, values[RepositoryShouldBeInternalOrPrivate.ID])
                 }
@@ -122,7 +140,7 @@ class GitHubComplianceIndicatorsIT : AbstractGitHubTestSupport() {
     private fun GitHubComplianceCheck<*, *>.save(
         enabled: Boolean,
         link: String? = null,
-        values: Map<String, String?> = emptyMap()
+        values: Map<String, String?> = emptyMap(),
     ) {
         toConfigurableIndicatorType().save(enabled, link, values)
     }
@@ -130,7 +148,7 @@ class GitHubComplianceIndicatorsIT : AbstractGitHubTestSupport() {
     private fun ConfigurableIndicatorType<*, *>.save(
         enabled: Boolean,
         link: String? = null,
-        values: Map<String, String?> = emptyMap()
+        values: Map<String, String?> = emptyMap(),
     ) {
         configurableIndicatorService.saveConfigurableIndicator(
             type = this,
