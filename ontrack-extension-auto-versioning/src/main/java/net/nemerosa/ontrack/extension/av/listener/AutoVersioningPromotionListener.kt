@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.av.listener
 
+import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningDispatcher
 import net.nemerosa.ontrack.extension.av.settings.AutoVersioningSettings
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component
 class AutoVersioningPromotionListener(
     private val cachedSettingsService: CachedSettingsService,
     private val autoVersioningEventService: AutoVersioningEventService,
+    private val autoVersioningDispatcher: AutoVersioningDispatcher,
 ) : EventListener {
 
     override fun onEvent(event: Event) {
@@ -28,7 +30,8 @@ class AutoVersioningPromotionListener(
                 val promotion: PromotionLevel = event.getEntity(ProjectEntityType.PROMOTION_LEVEL)
                 // Gets the list of configured branches
                 val configuredBranches = autoVersioningEventService.getConfiguredBranches(build, promotion)
-                // TODO Dispatching
+                // Dispatching
+                autoVersioningDispatcher.dispatch(configuredBranches)
             }
         }
     }

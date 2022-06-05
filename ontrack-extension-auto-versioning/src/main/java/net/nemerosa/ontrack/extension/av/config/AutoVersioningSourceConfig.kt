@@ -66,6 +66,8 @@ data class AutoVersioningSourceConfig(
 
     companion object {
 
+        val DEFAULT_AUTO_APPROVAL_MODE = AutoApprovalMode.CLIENT
+
         const val DEFAULT_UPGRADE_BRANCH_PATTERN = "feature/auto-upgrade-<project>-<version>-<branch>"
 
         /**
