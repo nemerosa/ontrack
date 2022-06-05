@@ -280,10 +280,11 @@ class DefaultOntrackGitHubClient(
         message: String,
         query: String,
         variables: Map<String, *>,
+        token: String?,
         code: (data: JsonNode) -> T,
     ): T {
         // Getting a client
-        val client = createGitHubTemplate(graphql = true)
+        val client = createGitHubTemplate(graphql = true, token = token)
         // GraphQL call
         return client(message) {
             val response = postForObject(
@@ -335,30 +336,34 @@ class DefaultOntrackGitHubClient(
         }
     }
 
-    override fun createGitHubRestTemplate(): RestTemplate =
-        createGitHubTemplate(graphql = false)
+    override fun createGitHubRestTemplate(token: String?): RestTemplate =
+        createGitHubTemplate(graphql = false, token = token)
 
-    private fun createGitHubTemplate(graphql: Boolean): RestTemplate = RestTemplateBuilder()
+    private fun createGitHubTemplate(graphql: Boolean, token: String?): RestTemplate = RestTemplateBuilder()
         .rootUri(getApiRoot(configuration.url, graphql))
         .setConnectTimeout(timeout)
         .setReadTimeout(timeout)
         .run {
-            when (configuration.authenticationType()) {
-                GitHubAuthenticationType.ANONYMOUS -> this // Nothing to be done
-                GitHubAuthenticationType.PASSWORD -> {
-                    basicAuthentication(configuration.user, configuration.password)
-                }
-                GitHubAuthenticationType.USER_TOKEN -> {
-                    basicAuthentication(configuration.user, configuration.oauth2Token)
-                }
-                GitHubAuthenticationType.TOKEN -> {
-                    defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${configuration.oauth2Token}")
-                }
-                GitHubAuthenticationType.APP -> {
-                    defaultHeader(
-                        HttpHeaders.AUTHORIZATION,
-                        "Bearer ${gitHubAppTokenService.getAppInstallationToken(configuration)}"
-                    )
+            if (token != null) {
+                defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer $token")
+            } else {
+                when (configuration.authenticationType()) {
+                    GitHubAuthenticationType.ANONYMOUS -> this // Nothing to be done
+                    GitHubAuthenticationType.PASSWORD -> {
+                        basicAuthentication(configuration.user, configuration.password)
+                    }
+                    GitHubAuthenticationType.USER_TOKEN -> {
+                        basicAuthentication(configuration.user, configuration.oauth2Token)
+                    }
+                    GitHubAuthenticationType.TOKEN -> {
+                        defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${configuration.oauth2Token}")
+                    }
+                    GitHubAuthenticationType.APP -> {
+                        defaultHeader(
+                            HttpHeaders.AUTHORIZATION,
+                            "Bearer ${gitHubAppTokenService.getAppInstallationToken(configuration)}"
+                        )
+                    }
                 }
             }
         }
@@ -562,10 +567,9 @@ class DefaultOntrackGitHubClient(
         } ?: throw IllegalStateException("PR creation response did not return a PR.")
     }
 
-    override fun approvePR(repository: String, pr: Int, body: String) {
+    override fun approvePR(repository: String, pr: Int, body: String, token: String?) {
         // Getting a client
-        val client = createGitHubRestTemplate()
-        // TODO Use specific credentials
+        val client = createGitHubRestTemplate(token)
         // Gets the repository for this project
         val (owner, name) = getRepositoryParts(repository)
         // Call

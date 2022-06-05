@@ -44,9 +44,11 @@ interface OntrackGitHubClient {
      * This should be used exclusively for calling the REST API of GitHub. For GraphQL calls,
      * please use the [graphQL] function.
      *
+     * @param token Alternative token
+     *
      * @see graphQL
      */
-    fun createGitHubRestTemplate(): RestTemplate
+    fun createGitHubRestTemplate(token: String? = null): RestTemplate
 
     /**
      * Performs a GraphQL call against GitHub.
@@ -54,6 +56,7 @@ interface OntrackGitHubClient {
      * @param message Title for the call (used in Ontrack logs)
      * @param query GraphQL query
      * @param variables GraphQL variables
+     * @param token Alternative token
      * @param code Code to run against the `data` node of the GraphQL response. Note that GraphQL level errors
      * have already been processed.
      * @return Response returns by [code]
@@ -63,6 +66,7 @@ interface OntrackGitHubClient {
         message: String,
         query: String,
         variables: Map<String, *> = emptyMap<String, Any>(),
+        token: String? = null,
         code: (data: JsonNode) -> T,
     ): T
 
@@ -171,13 +175,12 @@ interface OntrackGitHubClient {
     /**
      * Approves a pull request.
      *
-     * TODO Other credentials must be specified.
-     *
      * @param repository Repository name, like `nemerosa/ontrack`
      * @param pr PR number
      * @param body PR approval description
+     * @param token If defined, used for the authentication of this call
      */
-    fun approvePR(repository: String, pr: Int, body: String)
+    fun approvePR(repository: String, pr: Int, body: String, token: String?)
 
     /**
      * Enables auto merge on a pull request
