@@ -52,6 +52,8 @@ class GitHubSCMExtension(
         private val settings: GitHubSCMCatalogSettings,
     ) : SCM {
 
+        override val repositoryURI: String = "${property.configuration.url}/${property.repository}"
+
         override fun getSCMBranch(branch: Branch): String? {
             checkProject(branch.project)
             val branchProperty: GitBranchConfigurationProperty? =
