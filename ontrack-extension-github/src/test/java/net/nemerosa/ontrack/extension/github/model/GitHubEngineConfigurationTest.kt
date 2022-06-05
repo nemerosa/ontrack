@@ -196,6 +196,25 @@ class GitHubEngineConfigurationTest {
     }
 
     @Test
+    fun `Backward compatibility for auto merge token`() {
+        assertEquals(
+            GitHubEngineConfiguration(
+                "test",
+                "https://github.com",
+                oauth2Token = "xxxx",
+                autoMergeToken = null,
+            ),
+            mapOf(
+                "name" to "test",
+                "url" to "https://github.com",
+                "oauth2Token" to "xxxx"
+            ).asJson().parse<GitHubEngineConfiguration>().apply {
+                checkFields()
+            }
+        )
+    }
+
+    @Test
     fun obfuscation_of_password() {
         val configuration = GitHubEngineConfiguration(
             "ontrack",
@@ -242,6 +261,7 @@ class GitHubEngineConfigurationTest {
                 "appId" to null,
                 "appPrivateKey" to null,
                 "appInstallationAccountName" to null,
+                "autoMergeToken" to null,
             ).asJson(),
             GitHubEngineConfiguration(
                 "ontrack",
@@ -282,6 +302,7 @@ class GitHubEngineConfigurationTest {
                 "appId" to null,
                 "appPrivateKey" to null,
                 "appInstallationAccountName" to null,
+                "autoMergeToken" to null,
             ).asJson(),
             GitHubEngineConfiguration(
                 "ontrack",
@@ -328,6 +349,7 @@ class GitHubEngineConfigurationTest {
                 "appId" to "123456",
                 "appPrivateKey" to "xxxxxxx",
                 "appInstallationAccountName" to null,
+                "autoMergeToken" to null,
             ).asJson(),
             GitHubEngineConfiguration(
                 "ontrack",
@@ -372,6 +394,7 @@ class GitHubEngineConfigurationTest {
                 "appId" to "123456",
                 "appPrivateKey" to "xxxxxxx",
                 "appInstallationAccountName" to "test",
+                "autoMergeToken" to null,
             ).asJson(),
             GitHubEngineConfiguration(
                 "ontrack",
