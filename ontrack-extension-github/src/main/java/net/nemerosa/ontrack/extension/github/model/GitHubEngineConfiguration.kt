@@ -19,6 +19,7 @@ import net.nemerosa.ontrack.model.support.CredentialsConfiguration
  * @property appId ID of the GitHub App to use for authentication
  * @property appPrivateKey GitHub App private key
  * @property appInstallationAccountName Account name of the GitHub App installation (used when more than 1 installation for the app)
+ * @property autoMergeToken Token for an account used to approve pull requests for auto approval processes
  */
 open class GitHubEngineConfiguration(
     override val name: String,
@@ -28,7 +29,8 @@ open class GitHubEngineConfiguration(
     val oauth2Token: String? = null,
     val appId: String? = null,
     val appPrivateKey: String? = null,
-    val appInstallationAccountName: String? = null
+    val appInstallationAccountName: String? = null,
+    val autoMergeToken: String? = null,
 ) : CredentialsConfiguration<GitHubEngineConfiguration> {
 
     /**
@@ -70,6 +72,7 @@ open class GitHubEngineConfiguration(
             appId = appId,
             appPrivateKey = null,
             appInstallationAccountName = appInstallationAccountName,
+            autoMergeToken = null,
         )
 
     /**
@@ -102,6 +105,11 @@ open class GitHubEngineConfiguration(
                 appPrivateKey
             },
             appInstallationAccountName = appInstallationAccountName,
+            autoMergeToken = if (autoMergeToken.isNullOrBlank()) {
+                oldConfig.autoMergeToken
+            } else {
+                autoMergeToken
+            },
         )
     }
 
@@ -114,9 +122,10 @@ open class GitHubEngineConfiguration(
         appId = appId,
         appPrivateKey = crypting(appPrivateKey?.takeIf { it.isNotBlank() }),
         appInstallationAccountName = appInstallationAccountName,
+        autoMergeToken = crypting(autoMergeToken?.takeIf { it.isNotBlank() }),
     )
 
-    override fun decrypt(decrypting: (encrypted: String?) -> String?)= GitHubEngineConfiguration(
+    override fun decrypt(decrypting: (encrypted: String?) -> String?) = GitHubEngineConfiguration(
         name = name,
         url = url,
         user = user,
@@ -125,6 +134,7 @@ open class GitHubEngineConfiguration(
         appId = appId,
         appPrivateKey = decrypting(appPrivateKey?.takeIf { it.isNotBlank() }),
         appInstallationAccountName = appInstallationAccountName,
+        autoMergeToken = decrypting(autoMergeToken?.takeIf { it.isNotBlank() }),
     )
 
     fun asForm(): Form = form(this)
@@ -143,6 +153,7 @@ open class GitHubEngineConfiguration(
         if (appPrivateKey != other.appPrivateKey) return false
         if (appInstallationAccountName != other.appInstallationAccountName) return false
         if (url != other.url) return false
+        if (autoMergeToken != other.autoMergeToken) return false
 
         return true
     }
@@ -156,6 +167,7 @@ open class GitHubEngineConfiguration(
         result = 31 * result + (appPrivateKey?.hashCode() ?: 0)
         result = 31 * result + (appInstallationAccountName?.hashCode() ?: 0)
         result = 31 * result + url.hashCode()
+        result = 31 * result + (autoMergeToken?.hashCode() ?: 0)
         return result
     }
 
@@ -195,7 +207,7 @@ open class GitHubEngineConfiguration(
     }
 
     override fun toString(): String {
-        return "GitHubEngineConfiguration(name='$name', user=$user, password=$password, oauth2Token=$oauth2Token, appId=$appId, appPrivateKey=$appPrivateKey, appInstallationAccountName=$appInstallationAccountName, url='$url')"
+        return "GitHubEngineConfiguration(name='$name', user=$user, password=$password, oauth2Token=$oauth2Token, appId=$appId, appPrivateKey=$appPrivateKey, appInstallationAccountName=$appInstallationAccountName, url='$url', autoMergeToken=$autoMergeToken)"
     }
 
     companion object {
@@ -264,6 +276,13 @@ open class GitHubEngineConfiguration(
                         .help("Optional. In case of several installations for this app, select the account where this app has been installed.")
                         .optional()
                         .value(configuration?.appInstallationAccountName)
+                )
+                .with(
+                    Password.of(GitHubEngineConfiguration::autoMergeToken.name)
+                        .label("Auto merge token")
+                        .help("Token for an account used to approve pull requests for auto approval processes")
+                        .length(50)
+                        .optional()
                 )
         }
     }

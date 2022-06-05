@@ -39,6 +39,7 @@ class GitHubEngineConfigurationContext(
                 cascField("app-id", cascString, "GitHub App ID (for GitHub App authentication)", required = false),
                 cascField("app-private-key", cascString, "GitHub App Private Key (for GitHub App authentication)", required = false),
                 cascField("app-installation", cascString, "Name of the account of the GitHub App installation (for GitHub App authentication)", required = false),
+                cascField("auto-merge-token", cascString, "Token for an account used to approve pull requests for auto approval processes", required = false),
             )
         )
 
@@ -93,5 +94,6 @@ class GitHubEngineConfigurationContext(
             appId = getTextField("app-id"),
             appPrivateKey = getTextField("app-private-key"),
             appInstallationAccountName = getTextField("app-installation"),
+            autoMergeToken = getTextField("auto-merge-token"),
         )
 }
