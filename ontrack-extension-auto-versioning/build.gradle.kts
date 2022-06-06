@@ -16,6 +16,8 @@ dependencies {
     implementation("io.micrometer:micrometer-core")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.apache.commons:commons-lang3")
+    implementation("jakarta.annotation:jakarta.annotation-api")
 
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
