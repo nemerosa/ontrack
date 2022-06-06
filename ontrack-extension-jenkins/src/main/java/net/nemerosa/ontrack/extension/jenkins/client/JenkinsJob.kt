@@ -1,11 +1,6 @@
-package net.nemerosa.ontrack.extension.jenkins.client;
+package net.nemerosa.ontrack.extension.jenkins.client
 
-import lombok.Data;
-
-@Data
-public class JenkinsJob {
-
-    private final String name;
-    private final String url;
-
-}
+data class JenkinsJob(
+    val name: String,
+    val url: String,
+)
