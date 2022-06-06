@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.av.queue
 import net.nemerosa.ontrack.extension.av.AutoVersioningConfigProperties
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditService
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.av.metrics.AutoVersioningMetricsService
 import net.nemerosa.ontrack.extension.av.processing.AutoVersioningProcessingService
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
@@ -25,6 +26,7 @@ class AsyncAutoVersioningQueueListener(
     private val autoVersioningAuditService: AutoVersioningAuditService,
     private val securityService: SecurityService,
     private val applicationLogService: ApplicationLogService,
+    private val metrics: AutoVersioningMetricsService,
 ) : RabbitListenerConfigurer {
 
     private val listener = MessageListener(::onMessage)
@@ -57,8 +59,8 @@ class AsyncAutoVersioningQueueListener(
         try {
             val body = message.body.toString(Charsets.UTF_8)
             val order = body.parseAsJson().parse<AutoVersioningOrder>()
-            // TODO val queue = message.messageProperties.consumerQueue
-            // TODO Metrics
+            val queue = message.messageProperties.consumerQueue
+            metrics.onReceiving(order, queue)
             securityService.asAdmin {
                 autoVersioningAuditService.onReceived(order)
                 val outcome = autoVersioningProcessingService.process(order)
