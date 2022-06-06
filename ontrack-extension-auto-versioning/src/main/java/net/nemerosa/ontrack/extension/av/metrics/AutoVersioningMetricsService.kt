@@ -9,6 +9,12 @@ interface AutoVersioningMetricsService {
     fun onQueuing(order: AutoVersioningOrder, routingKey: String)
     fun onReceiving(order: AutoVersioningOrder, queue: String?)
 
+    fun processingTiming(
+        order: AutoVersioningOrder,
+        queue: String?,
+        code: () -> AutoVersioningProcessingOutcome,
+    ): AutoVersioningProcessingOutcome
+
     fun onProcessingCompleted(order: AutoVersioningOrder, outcome: AutoVersioningProcessingOutcome)
     fun onProcessingUncaughtError()
 

@@ -63,7 +63,9 @@ class AsyncAutoVersioningQueueListener(
             metrics.onReceiving(order, queue)
             securityService.asAdmin {
                 autoVersioningAuditService.onReceived(order)
-                val outcome = autoVersioningProcessingService.process(order)
+                val outcome = metrics.processingTiming(order, queue) {
+                    autoVersioningProcessingService.process(order)
+                }
                 metrics.onProcessingCompleted(order, outcome)
             }
         } catch (any: Throwable) {

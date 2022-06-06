@@ -29,6 +29,17 @@ class AutoVersioningMetricsServiceImpl(
         )
     }
 
+    override fun processingTiming(
+        order: AutoVersioningOrder,
+        queue: String?,
+        code: () -> AutoVersioningProcessingOutcome,
+    ): AutoVersioningProcessingOutcome = meterRegistry.time(
+        AutoVersioningMetrics.Processing.time,
+        *getTags(order, AutoVersioningMetrics.Tags.QUEUE to (queue ?: "-")).toTypedArray()
+    ) {
+        code()
+    }
+
     override fun onProcessingCompleted(order: AutoVersioningOrder, outcome: AutoVersioningProcessingOutcome) {
         meterRegistry.increment(
             order,
