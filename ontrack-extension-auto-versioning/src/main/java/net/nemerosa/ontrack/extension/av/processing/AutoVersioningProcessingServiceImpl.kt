@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.av.processing
 
 import net.nemerosa.ontrack.common.replaceGroup
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditService
 import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningTargetFileService
@@ -23,13 +24,14 @@ class AutoVersioningProcessingServiceImpl(
     private val scmDetector: SCMDetector,
     private val autoVersioningTargetFileService: AutoVersioningTargetFileService,
     private val postProcessingRegistry: PostProcessingRegistry,
+    private val autoVersioningAuditService: AutoVersioningAuditService,
 ) : AutoVersioningProcessingService {
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningProcessingServiceImpl::class.java)
 
     override fun process(order: AutoVersioningOrder): AutoVersioningProcessingOutcome {
         logger.info("Processing auto versioning order: {}", order)
-        // TODO Audit
+        autoVersioningAuditService.onProcessingStart(order)
         val branch = order.branch
         // Gets the SCM configuration for the project
         val scm = scmDetector.getSCM(branch.project)
@@ -37,8 +39,6 @@ class AutoVersioningProcessingServiceImpl(
         if (scm != null && scmBranch != null) {
             // Gets the clone URL for the repository
             val repositoryUri = scm.repositoryURI
-            // Gets the repository credentials ID to use on post processing
-            // TODO val repositoryCredentials = scm.repositoryCredentialsId
             // Sanitization of the version (for the branch name)
             val sanitizedVersion: String = NameDescription.escapeName(order.targetVersion)
             // Name of the upgrade branch
@@ -58,7 +58,8 @@ class AutoVersioningProcessingServiceImpl(
                         upgradeBranch,
                         order
                     )
-                    // TODO Audit
+                    // Audit
+                    autoVersioningAuditService.onProcessingCreatingBranch(order, upgradeBranch)
                     // Creating the branch
                     scm.createBranch(scmBranch, upgradeBranch)
                 } catch (e: Exception) {
@@ -88,7 +89,8 @@ class AutoVersioningProcessingServiceImpl(
                             targetPath,
                             order
                         )
-                        // TODO Audit
+                        // Audit
+                        autoVersioningAuditService.onProcessingUpdatingFile(order, upgradeBranch, targetPath)
                         // Uploads of the file content
                         scm.uploadLines(upgradeBranch, commitId, targetPath, updatedLines)
                         // Post processing
@@ -102,7 +104,7 @@ class AutoVersioningProcessingServiceImpl(
                             // Launching the post processing
                             else {
                                 logger.info("Processing auto versioning order launching post processing: {}", order)
-                                // TODO autoVersioningAuditService.onPostProcessingStart(prCreationOrder, upgradeBranch)
+                                autoVersioningAuditService.onPostProcessingStart(order, upgradeBranch)
                                 measureAndLaunchPostProcessing(
                                     postProcessing,
                                     order,
@@ -110,7 +112,7 @@ class AutoVersioningProcessingServiceImpl(
                                     upgradeBranch
                                 )
                                 logger.info("Processing auto versioning order end of post processing: {}", order)
-                                // TODO autoVersioningAuditService.onPostProcessingEnd(prCreationOrder, upgradeBranch)
+                                autoVersioningAuditService.onPostProcessingEnd(order, upgradeBranch)
                             }
                         }
                         // Changed
@@ -131,7 +133,8 @@ class AutoVersioningProcessingServiceImpl(
                 // Creates a PR with auto approval
                 try {
                     logger.info("Processing auto versioning order creating PR: {}", order)
-                    // TODO Audit
+                    // Audit
+                    autoVersioningAuditService.onPRCreating(order, upgradeBranch)
                     // PR creation
                     val pr = scm.createPR(
                         from = upgradeBranch,
@@ -148,17 +151,38 @@ class AutoVersioningProcessingServiceImpl(
                     logger.info("Processing auto versioning order end of PR process: {}", order)
                     if (order.autoApproval) {
                         when (order.autoApprovalMode) {
-                            AutoApprovalMode.SCM -> TODO("Audit only")
+                            AutoApprovalMode.SCM -> autoVersioningAuditService.onPRApproved(
+                                order = order,
+                                upgradeBranch = upgradeBranch,
+                                prName = pr.name,
+                                prLink = pr.link
+                            )
                             AutoApprovalMode.CLIENT -> if (!pr.merged) {
                                 logger.info("Processing auto versioning order PR timed out: {}", order)
-                                // TODO autoVersioningAuditService.onPRTimeout(
+                                // Audit
+                                autoVersioningAuditService.onPRTimeout(
+                                    order = order,
+                                    upgradeBranch = upgradeBranch,
+                                    prName = pr.name,
+                                    prLink = pr.link
+                                )
                                 // TODO Notification
                             } else {
-                                // TODO Audit
+                                autoVersioningAuditService.onPRMerged(
+                                    order = order,
+                                    upgradeBranch = upgradeBranch,
+                                    prName = pr.name,
+                                    prLink = pr.link
+                                )
                             }
                         }
                     } else {
-                        // TODO Audit
+                        autoVersioningAuditService.onPRCreated(
+                            order = order,
+                            upgradeBranch = upgradeBranch,
+                            prName = pr.name,
+                            prLink = pr.link
+                        )
                     }
                 } catch (e: Exception) {
                     // TODO Notification
@@ -170,12 +194,12 @@ class AutoVersioningProcessingServiceImpl(
 
             } else {
                 logger.info("Processing auto versioning order same version: {}", order)
-                // TODO autoVersioningAuditService.onProcessingAborted(prCreationOrder, "Same version")
+                autoVersioningAuditService.onProcessingAborted(order, "Same version")
                 return AutoVersioningProcessingOutcome.SAME_VERSION
             }
         } else {
             logger.info("Processing auto versioning order no config: {}", order)
-            // TODO autoVersioningAuditService.onProcessingAborted(prCreationOrder, "Target branch is not configured")
+            autoVersioningAuditService.onProcessingAborted(order, "Target branch is not configured")
             return AutoVersioningProcessingOutcome.NO_CONFIG
         }
     }

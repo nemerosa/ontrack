@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.av.queue
 
 import net.nemerosa.ontrack.extension.av.AutoVersioningConfigProperties
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditService
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.processing.AutoVersioningProcessingService
 import net.nemerosa.ontrack.json.parse
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component
 class AsyncAutoVersioningQueueListener(
     private val autoVersioningConfigProperties: AutoVersioningConfigProperties,
     private val autoVersioningProcessingService: AutoVersioningProcessingService,
+    private val autoVersioningAuditService: AutoVersioningAuditService,
     private val securityService: SecurityService,
     private val applicationLogService: ApplicationLogService,
 ) : RabbitListenerConfigurer {
@@ -58,7 +60,7 @@ class AsyncAutoVersioningQueueListener(
             // TODO val queue = message.messageProperties.consumerQueue
             // TODO Metrics
             securityService.asAdmin {
-                // TODO Audit
+                autoVersioningAuditService.onReceived(order)
                 val outcome = autoVersioningProcessingService.process(order)
                 // TODO Metrics
             }
