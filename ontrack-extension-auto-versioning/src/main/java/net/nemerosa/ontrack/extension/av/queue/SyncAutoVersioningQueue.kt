@@ -23,7 +23,6 @@ class SyncAutoVersioningQueue(
 ) : AutoVersioningQueue {
 
     override fun queue(order: AutoVersioningOrder) {
-        // TODO Metrics
         runBlocking {
             launch(Job()) {
                 autoVersioningProcessingService.process(order)

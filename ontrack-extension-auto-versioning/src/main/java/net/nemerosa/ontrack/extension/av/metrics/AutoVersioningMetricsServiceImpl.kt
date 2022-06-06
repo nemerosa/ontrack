@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.av.metrics
 
 import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.av.processing.AutoVersioningProcessingOutcome
 import net.nemerosa.ontrack.model.metrics.increment
 import org.springframework.stereotype.Component
 
@@ -23,6 +24,20 @@ class AutoVersioningMetricsServiceImpl(
             order,
             AutoVersioningMetrics.Queue.consumedCount,
             AutoVersioningMetrics.Tags.QUEUE to (queue ?: "-"),
+        )
+    }
+
+    override fun onProcessingCompleted(order: AutoVersioningOrder, outcome: AutoVersioningProcessingOutcome) {
+        meterRegistry.increment(
+            order,
+            AutoVersioningMetrics.Processing.completedCount,
+            AutoVersioningMetrics.Tags.OUTCOME to outcome.name,
+        )
+    }
+
+    override fun onProcessingUncaughtError() {
+        meterRegistry.increment(
+            AutoVersioningMetrics.Processing.uncaughtErrorCount
         )
     }
 
