@@ -1,12 +1,37 @@
 package net.nemerosa.ontrack.extension.av
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
+import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.test.TestUtils.uid
+import java.util.*
 
 object AutoVersioningTestFixtures {
+
+    fun Branch.createOrder(
+        sourceProject: String,
+        targetVersion: String = "2.0.0"
+    ) = AutoVersioningOrder(
+        uuid = UUID.randomUUID().toString(),
+        sourceProject = sourceProject,
+        branch = this,
+        targetPaths = listOf("gradle.properties"),
+        targetRegex = null,
+        targetProperty = "version",
+        targetPropertyRegex = null,
+        targetPropertyType = null,
+        targetVersion = targetVersion,
+        autoApproval = true,
+        upgradeBranchPattern = "feature/version-<version>",
+        postProcessing = null,
+        postProcessingConfig = NullNode.instance,
+        validationStamp = null,
+        autoApprovalMode = AutoApprovalMode.SCM
+    )
 
     fun sampleConfig() = AutoVersioningConfig(
         configurations = listOf(
