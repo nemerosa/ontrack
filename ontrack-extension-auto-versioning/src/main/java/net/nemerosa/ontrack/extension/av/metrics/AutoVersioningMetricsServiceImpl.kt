@@ -2,8 +2,10 @@ package net.nemerosa.ontrack.extension.av.metrics
 
 import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessing
 import net.nemerosa.ontrack.extension.av.processing.AutoVersioningProcessingOutcome
 import net.nemerosa.ontrack.model.metrics.increment
+import net.nemerosa.ontrack.model.metrics.time
 import org.springframework.stereotype.Component
 
 @Component
@@ -41,19 +43,60 @@ class AutoVersioningMetricsServiceImpl(
         )
     }
 
+    override fun onPostProcessingStarted(
+        order: AutoVersioningOrder,
+        postProcessing: PostProcessing<*>,
+    ) {
+        meterRegistry.increment(
+            order,
+            AutoVersioningMetrics.PostProcessing.startedCount,
+            AutoVersioningMetrics.Tags.POST_PROCESSING to postProcessing.id
+        )
+    }
+
+    override fun postProcessingTiming(order: AutoVersioningOrder, postProcessing: PostProcessing<*>, code: () -> Unit) {
+        meterRegistry.time(
+            AutoVersioningMetrics.PostProcessing.time,
+            *getTags(order, AutoVersioningMetrics.Tags.POST_PROCESSING to postProcessing.id).toTypedArray(),
+        ) {
+            code()
+        }
+    }
+
+    override fun onPostProcessingSuccess(order: AutoVersioningOrder, postProcessing: PostProcessing<*>) {
+        meterRegistry.increment(
+            order,
+            AutoVersioningMetrics.PostProcessing.successCount,
+            AutoVersioningMetrics.Tags.POST_PROCESSING to postProcessing.id
+        )
+    }
+
+    override fun onPostProcessingError(order: AutoVersioningOrder, postProcessing: PostProcessing<*>) {
+        meterRegistry.increment(
+            order,
+            AutoVersioningMetrics.PostProcessing.errorCount,
+            AutoVersioningMetrics.Tags.POST_PROCESSING to postProcessing.id
+        )
+    }
+
     private fun MeterRegistry.increment(
         order: AutoVersioningOrder,
         metric: String,
         vararg extraTags: Pair<String, String>,
     ) {
-        val tags = listOf(
-            "sourceProject" to order.sourceProject,
-            "targetProject" to order.branch.project.name,
-            "targetBranch" to order.branch.name,
-        ) + extraTags.toList()
+        val tags = getTags(order, *extraTags)
         increment(
             metric,
             *tags.toTypedArray()
         )
     }
+
+    private fun getTags(
+        order: AutoVersioningOrder,
+        vararg extraTags: Pair<String, String>,
+    ) = listOf(
+        "sourceProject" to order.sourceProject,
+        "targetProject" to order.branch.project.name,
+        "targetBranch" to order.branch.name,
+    ) + extraTags.toList()
 }

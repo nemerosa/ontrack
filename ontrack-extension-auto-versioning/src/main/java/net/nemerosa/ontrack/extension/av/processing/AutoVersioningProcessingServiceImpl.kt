@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningTargetFileService
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.av.metrics.AutoVersioningMetricsService
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessing
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingNotFoundException
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingRegistry
@@ -25,6 +26,7 @@ class AutoVersioningProcessingServiceImpl(
     private val autoVersioningTargetFileService: AutoVersioningTargetFileService,
     private val postProcessingRegistry: PostProcessingRegistry,
     private val autoVersioningAuditService: AutoVersioningAuditService,
+    private val metrics: AutoVersioningMetricsService,
 ) : AutoVersioningProcessingService {
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningProcessingServiceImpl::class.java)
@@ -210,30 +212,23 @@ class AutoVersioningProcessingServiceImpl(
         repositoryUri: String,
         upgradeBranch: String,
     ) {
-        val tags = arrayOf(
-            "sourceProject" to order.sourceProject,
-            "targetProject" to order.branch.project.name,
-            "targetBranch" to order.branch.name,
-            "postProcessingId" to postProcessing.id
-        )
         // Count
-        // meterRegistry.increment(PRCreationMetrics.METRIC_ONTRACK_COLLIBRA_PRCREATION_POST_PROCESSING_COUNT, *tags)
+        metrics.onPostProcessingStarted(order, postProcessing)
         try {
             // Timing
-            // meterRegistry.time(
-            //     PRCreationMetrics.METRIC_ONTRACK_COLLIBRA_PRCREATION_POST_PROCESSING_TIME, *tags) {
-            launchPostProcessing(
-                postProcessing,
-                order,
-                repositoryUri,
-                upgradeBranch
-            )
-            // }
+            metrics.postProcessingTiming(order, postProcessing) {
+                launchPostProcessing(
+                    postProcessing,
+                    order,
+                    repositoryUri,
+                    upgradeBranch
+                )
+            }
             // Success
-            // meterRegistry.increment(PRCreationMetrics.METRIC_ONTRACK_COLLIBRA_PRCREATION_POST_PROCESSING_SUCCESS_COUNT, *tags)
+            metrics.onPostProcessingSuccess(order, postProcessing)
         } catch (ex: Exception) {
             // Metric for the error
-            // meterRegistry.increment(PRCreationMetrics.METRIC_ONTRACK_COLLIBRA_PRCREATION_POST_PROCESSING_ERROR_COUNT, *tags)
+            metrics.onPostProcessingError(order, postProcessing)
             // Going on with error processing
             throw ex
         }
