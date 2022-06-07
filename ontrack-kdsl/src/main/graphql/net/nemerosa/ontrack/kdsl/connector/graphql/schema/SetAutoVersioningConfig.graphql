@@ -1,0 +1,11 @@
+mutation SetAutoVersioningConfig(
+    $branchId: Int!,
+    $configurations: [AutoVersioningSourceConfigInput!]!,
+) {
+    setAutoVersioningConfig(input: {
+        branchId: $branchId,
+        configurations: $configurations,
+    }) {
+        ...PayloadUserErrors
+    }
+}

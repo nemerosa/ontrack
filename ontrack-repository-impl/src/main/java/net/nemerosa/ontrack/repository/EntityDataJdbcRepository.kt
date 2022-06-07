@@ -110,7 +110,7 @@ class EntityDataJdbcRepository(
         """
         params["key"] = key
         if (jsonQuery.isNotBlank()) {
-            query += jsonQuery
+            query += " AND $jsonQuery"
         }
         query += " ORDER BY ID DESC"
         return namedParameterJdbcTemplate!!.query(

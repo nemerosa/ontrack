@@ -3,7 +3,9 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.spec.Branch
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSettings
+import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.autoVersioning
+import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
 import net.nemerosa.ontrack.kdsl.spec.settings.settings
 
 abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport() {
@@ -36,11 +38,21 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
     protected fun Branch.configuredForAutoVersioning(
         sourceProject: String,
         sourceBranch: String,
+        sourcePromotion: String,
         targetPath: String,
         targetProperty: String? = null,
-        promotion: String,
     ) {
-        TODO("Not yet implemented")
+        setAutoVersioningConfig(
+            listOf(
+                AutoVersioningSourceConfig(
+                    sourceProject = sourceProject,
+                    sourceBranch = sourceBranch,
+                    sourcePromotion = sourcePromotion,
+                    targetPath = targetPath,
+                    targetProperty = targetProperty,
+                )
+            )
+        )
     }
 
     protected fun waitForAutoVersioningCompletion() {

@@ -27,7 +27,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                             sourceBranch = dependency.name,
                             targetPath = "gradle.properties",
                             targetProperty = "some-version",
-                            promotion = "IRON",
+                            sourcePromotion = "IRON",
                         )
 
                         dependency.apply {

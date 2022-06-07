@@ -779,6 +779,425 @@
           "possibleTypes": null
         },
         {
+          "kind": "ENUM",
+          "name": "AutoApprovalMode",
+          "description": "List of ways the auto approval is managed.",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "CLIENT",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "SCM",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "AutoVersioningConfig",
+          "description": "Configuration of the auto versioning on a branch.",
+          "fields": [
+            {
+              "name": "configurations",
+              "description": "List of configurations",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "AutoVersioningSourceConfig"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "AutoVersioningSourceConfig",
+          "description": "Configuration of the auto versioning for one source.",
+          "fields": [
+            {
+              "name": "autoApproval",
+              "description": "Check if the PR must be approved automatically or not (`true` by default)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "autoApprovalMode",
+              "description": "Auto approval mode",
+              "args": [],
+              "type": {
+                "kind": "ENUM",
+                "name": "AutoApprovalMode",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "postProcessing",
+              "description": "Type of post processing to launch after the version has been updated",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "postProcessingConfig",
+              "description": "Configuration of the post processing",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "JSON",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "sourceBranch",
+              "description": "Branches to watch using a regular expression",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "sourceProject",
+              "description": "Project to watch",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "sourcePromotion",
+              "description": "Promotion to watch",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "targetPath",
+              "description": "Comma-separated list of file to update with the new version",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "targetProperty",
+              "description": "Optional replacement for the regex, using only a property name",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "targetPropertyRegex",
+              "description": "Optional regex to use on the targetProperty value",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "targetPropertyType",
+              "description": "When targetProperty is defined, defines the type of property (defaults to Java properties file, but could be NPM, etc.)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "targetRegex",
+              "description": "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version.",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "upgradeBranchPattern",
+              "description": "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>`",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "validationStamp",
+              "description": "Validation stamp to create on auto versioning (optional)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "AutoVersioningSourceConfigInput",
+          "description": null,
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "autoApproval",
+              "description": "Check if the PR must be approved automatically or not (`true` by default)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "autoApprovalMode",
+              "description": "Auto approval mode",
+              "type": {
+                "kind": "ENUM",
+                "name": "AutoApprovalMode",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "postProcessing",
+              "description": "Type of post processing to launch after the version has been updated",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "postProcessingConfig",
+              "description": "Configuration of the post processing",
+              "type": {
+                "kind": "SCALAR",
+                "name": "JSON",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "sourceBranch",
+              "description": "Branches to watch using a regular expression",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "sourceProject",
+              "description": "Project to watch",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "sourcePromotion",
+              "description": "Promotion to watch",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "targetPath",
+              "description": "Comma-separated list of file to update with the new version",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "targetProperty",
+              "description": "Optional replacement for the regex, using only a property name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "targetPropertyRegex",
+              "description": "Optional regex to use on the targetProperty value",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "targetPropertyType",
+              "description": "When targetProperty is defined, defines the type of property (defaults to Java properties file, but could be NPM, etc.)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "targetRegex",
+              "description": "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "upgradeBranchPattern",
+              "description": "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>`",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "validationStamp",
+              "description": "Validation stamp to create on auto versioning (optional)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "SCALAR",
           "name": "Boolean",
           "description": "Built-in Boolean",
@@ -1156,6 +1575,18 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "GitPullRequest",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "autoVersioningConfig",
+              "description": "Auto versioning configuration",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "AutoVersioningConfig",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -20171,6 +20602,29 @@
               "deprecationReason": null
             },
             {
+              "name": "setAutoVersioningConfig",
+              "description": "Sets the auto versioning configuration for a branch",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "SetAutoVersioningConfigInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SetAutoVersioningConfigPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "deleteNotificationRecords",
               "description": "Deleting notification records",
               "args": [
@@ -21257,6 +21711,11 @@
             {
               "kind": "OBJECT",
               "name": "ReloadCascPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetAutoVersioningConfigPayload",
               "ofType": null
             },
             {
@@ -28158,6 +28617,97 @@
           ],
           "inputFields": null,
           "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "SetAutoVersioningConfigInput",
+          "description": "Input type for the setAutoVersioningConfig mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "branchId",
+              "description": "ID of the branch to configure",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configurations",
+              "description": "List of configurations",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "AutoVersioningSourceConfigInput"
+                    }
+                  }
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SetAutoVersioningConfigPayload",
+          "description": "Output type for the setAutoVersioningConfig mutation.",
+          "fields": [
+            {
+              "name": "branch",
+              "description": "Configured branch",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Branch",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
