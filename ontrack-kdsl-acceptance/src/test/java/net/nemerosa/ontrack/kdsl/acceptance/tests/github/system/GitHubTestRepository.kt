@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.github.system
 import net.nemerosa.ontrack.kdsl.acceptance.tests.github.gitHubPlaygroundClient
 import net.nemerosa.ontrack.kdsl.acceptance.tests.github.gitHubPlaygroundEnv
 import net.nemerosa.ontrack.kdsl.spec.Branch
+import org.apache.commons.codec.binary.Base64
 import java.util.*
 
 fun withTestGitHubRepository(
@@ -60,7 +61,15 @@ class GitHubRepositoryContext(
         branch: String = "main",
         content: () -> String,
     ) {
-        TODO()
+        // TODO createBranchIfNotExisting
+        gitHubPlaygroundClient.put(
+            "/repos/${gitHubPlaygroundEnv.organization}/${repository}/contents/$path",
+            mapOf(
+                "message" to "Creating $path",
+                "content" to Base64.encodeBase64String(content().toByteArray()),
+                "branch" to branch
+            )
+        )
     }
 
     fun Branch.configuredForGitHubRepository(
