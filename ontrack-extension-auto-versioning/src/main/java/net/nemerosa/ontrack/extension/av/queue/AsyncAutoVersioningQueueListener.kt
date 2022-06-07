@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
+import org.springframework.amqp.core.AmqpAdmin
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.core.MessageListener
 import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer
@@ -18,6 +19,7 @@ import org.springframework.amqp.rabbit.config.SimpleRabbitListenerEndpoint
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpoint
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistrar
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 class AsyncAutoVersioningQueueListener(
@@ -27,9 +29,18 @@ class AsyncAutoVersioningQueueListener(
     private val securityService: SecurityService,
     private val applicationLogService: ApplicationLogService,
     private val metrics: AutoVersioningMetricsService,
-) : RabbitListenerConfigurer {
+    private val amqpAdmin: AmqpAdmin,
+) : RabbitListenerConfigurer, AutoVersioningQueueStats {
 
     private val listener = MessageListener(::onMessage)
+
+    override val pendingOrders: Int
+        get() =
+            (1..autoVersioningConfigProperties.queue.scale).sumOf { no ->
+                val queue = getDefaultQueueName(no)
+                val queueProperties: Properties? = amqpAdmin.getQueueProperties(queue)
+                queueProperties?.get("QUEUE_MESSAGE_COUNT")?.toString()?.toInt(10) ?: 0
+            }
 
     override fun configureRabbitListeners(registrar: RabbitListenerEndpointRegistrar) {
         // Listener for the default queues
@@ -41,9 +52,12 @@ class AsyncAutoVersioningQueueListener(
     }
 
     private fun createDefaultListener(no: Int): RabbitListenerEndpoint {
-        val queue = "${AsyncAutoVersioningQueueConfig.QUEUE_PREFIX}.${AsyncAutoVersioningQueueConfig.DEFAULT}.$no"
+        val queue = getDefaultQueueName(no)
         return SimpleRabbitListenerEndpoint().configure(queue)
     }
+
+    private fun getDefaultQueueName(no: Int) =
+        "${AsyncAutoVersioningQueueConfig.QUEUE_PREFIX}.${AsyncAutoVersioningQueueConfig.DEFAULT}.$no"
 
     private fun SimpleRabbitListenerEndpoint.configure(
         queue: String,

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
+import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.Branch
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSettings
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
@@ -56,7 +57,9 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
     }
 
     protected fun waitForAutoVersioningCompletion() {
-        TODO()
+        waitUntil(initial = 1_000L) {
+            ontrack.autoVersioning.stats.pendingOrders == 0
+        }
     }
 
 }

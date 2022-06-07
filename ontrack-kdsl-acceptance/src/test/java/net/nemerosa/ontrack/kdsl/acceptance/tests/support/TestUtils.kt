@@ -27,11 +27,15 @@ fun uid(prefix: String): String =
  * Waiting until a condition is met.
  */
 fun waitUntil(
+    initial: Long = 0L,
     timeout: Long = 60_000L,
     interval: Long = 10_000L,
     condition: () -> Boolean,
 ) {
     runBlocking {
+        if (initial > 0) {
+            delay(initial)
+        }
         withTimeout(timeout) {
             while (!condition()) {
                 delay(interval)

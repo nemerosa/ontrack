@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.kdsl.connector
 
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
 import java.nio.charset.Charset
 
