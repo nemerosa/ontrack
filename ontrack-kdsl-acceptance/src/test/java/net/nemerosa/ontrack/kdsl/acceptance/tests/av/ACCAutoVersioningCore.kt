@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
+import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHubPlayground
 import net.nemerosa.ontrack.kdsl.acceptance.tests.github.system.withTestGitHubRepository
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
+@TestOnGitHubPlayground
 class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test

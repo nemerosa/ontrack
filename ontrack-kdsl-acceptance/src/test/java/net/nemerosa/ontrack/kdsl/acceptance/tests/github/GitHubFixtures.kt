@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.github
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.getEnv
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.getOptionalEnv
 import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.http.HttpHeaders
 import org.springframework.web.client.RestTemplate
 
 class GitHubTestEnv(
@@ -66,9 +67,9 @@ val gitHubPlaygroundEnv: GitHubPlaygroundEnv by lazy {
 
 val gitHubPlaygroundClient: RestTemplate by lazy {
     RestTemplateBuilder()
-        .rootUri("https://github.com")
+        .rootUri("https://api.github.com")
         .defaultHeader(
-            "Authorization",
+            HttpHeaders.AUTHORIZATION,
             "Bearer ${gitHubPlaygroundEnv.token}"
         )
         .build()
