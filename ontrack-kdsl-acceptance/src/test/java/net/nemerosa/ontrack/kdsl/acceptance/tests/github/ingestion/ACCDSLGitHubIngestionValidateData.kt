@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.github.ingestion
 
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
-import net.nemerosa.ontrack.kdsl.acceptance.annotations.AcceptanceTestSuite
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.resourceAsText
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.spec.extension.general.label
@@ -13,7 +12,6 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-@AcceptanceTestSuite
 class ACCDSLGitHubIngestionValidateData : AbstractACCDSLGitHubIngestionTestSupport() {
 
     /**

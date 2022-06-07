@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.notifications.webhooks
 
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
-import net.nemerosa.ontrack.kdsl.acceptance.annotations.AcceptanceTestSuite
 import net.nemerosa.ontrack.kdsl.acceptance.tests.notifications.AbstractACCDSLNotificationsTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.seconds
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.Duration
 
-@AcceptanceTestSuite
 class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
 
     companion object {

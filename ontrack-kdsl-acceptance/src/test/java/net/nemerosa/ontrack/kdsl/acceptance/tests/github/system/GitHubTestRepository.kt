@@ -1,14 +1,59 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.github.system
 
+import net.nemerosa.ontrack.kdsl.acceptance.tests.github.gitHubPlaygroundClient
+import net.nemerosa.ontrack.kdsl.acceptance.tests.github.gitHubPlaygroundEnv
 import net.nemerosa.ontrack.kdsl.spec.Branch
+import java.util.*
 
 fun withTestGitHubRepository(
+    autoMerge: Boolean = false,
     code: GitHubRepositoryContext.() -> Unit,
 ) {
-    TODO()
+    // Unique name for the repository
+    val uuid = UUID.randomUUID().toString()
+    val repo = "ontrack-auto-versioning-test-$uuid"
+
+    // Creates the repository
+    gitHubPlaygroundClient.postForObject(
+        "/orgs/${gitHubPlaygroundEnv.organization}/repos",
+        mapOf(
+            "name" to repo,
+            "description" to "Test repository for auto versioning - can be deleted at any time",
+            "private" to true,
+            "has_issues" to false,
+            "has_projects" to false,
+            "has_wiki" to false
+        ),
+        Unit::class.java
+    )
+
+    try {
+
+        // Creating a dummy file
+        // createFile(
+        //     branch = "master", path = "README.md", content = listOf(
+        //         "Test repository - can be deleted"
+        //     )
+        // )
+
+        // Context
+        val context = GitHubRepositoryContext(repo)
+
+        // Running the code
+        context.code()
+
+
+    } finally {
+        // Deleting the repository
+        gitHubPlaygroundClient.delete(
+            "/repos/${gitHubPlaygroundEnv.organization}/$repo"
+        )
+    }
 }
 
-class GitHubRepositoryContext {
+class GitHubRepositoryContext(
+    val repository: String,
+) {
 
     fun repositoryFile(
         path: String,

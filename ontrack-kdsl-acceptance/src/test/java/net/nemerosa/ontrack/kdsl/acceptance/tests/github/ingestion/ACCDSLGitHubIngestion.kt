@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.github.ingestion
 
-import net.nemerosa.ontrack.kdsl.acceptance.annotations.AcceptanceTestSuite
 import net.nemerosa.ontrack.kdsl.acceptance.tests.github.AbstractACCDSLGitHubTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.metrics.MetricCollection
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.resourceAsJson
@@ -15,7 +14,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
-@AcceptanceTestSuite
 class ACCDSLGitHubIngestion : AbstractACCDSLGitHubTestSupport() {
 
     @Test

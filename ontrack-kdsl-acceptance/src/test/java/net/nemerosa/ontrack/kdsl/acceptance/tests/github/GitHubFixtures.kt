@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.github
 
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.getEnv
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.getOptionalEnv
+import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.web.client.RestTemplate
 
 class GitHubTestEnv(
     val user: String,
@@ -40,3 +42,34 @@ val githubTestEnv: GitHubTestEnv by lazy {
     )
 }
 
+/**
+ * Playground environment
+ */
+class GitHubPlaygroundEnv(
+    val organization: String,
+    val token: String,
+)
+
+/**
+ * Access to the playground environment
+ */
+val gitHubPlaygroundEnv: GitHubPlaygroundEnv by lazy {
+    GitHubPlaygroundEnv(
+        organization = getEnv("ontrack.test.extension.github.playground.organization"),
+        token = getEnv("ontrack.test.extension.github.playground.token"),
+    )
+}
+
+/**
+ * Playground client
+ */
+
+val gitHubPlaygroundClient: RestTemplate by lazy {
+    RestTemplateBuilder()
+        .rootUri("https://github.com")
+        .defaultHeader(
+            "Authorization",
+            "Bearer ${gitHubPlaygroundEnv.token}"
+        )
+        .build()
+}
