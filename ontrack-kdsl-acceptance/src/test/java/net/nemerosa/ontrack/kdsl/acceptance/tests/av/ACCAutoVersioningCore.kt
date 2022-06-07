@@ -40,7 +40,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatGitHubRepository {
                             hasPR(
-                                from = "feature/auto-upgrade-<project:a>-2.0.0-eb0a191797624dd3a48fa681d3061212",
+                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-eb0a191797624dd3a48fa681d3061212",
                                 to = "main"
                             )
                             fileContains("gradle.properties") {

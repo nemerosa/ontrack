@@ -1,8 +1,12 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.github.system
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.kdsl.acceptance.tests.github.gitHubPlaygroundClient
 import net.nemerosa.ontrack.kdsl.acceptance.tests.github.gitHubPlaygroundEnv
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
+import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.Branch
 import net.nemerosa.ontrack.kdsl.spec.Ontrack
 import net.nemerosa.ontrack.kdsl.spec.Project
@@ -116,9 +120,22 @@ class GitHubRepositoryContext(
         context.code()
     }
 
+    private fun getPR(from: String, to: String): GitHubPR? {
+        var url = "/repos/${gitHubPlaygroundEnv.organization}/$repository/pulls?state=all"
+        url += "&head=$from"
+        url += "&base=$to"
+        return gitHubPlaygroundClient.getForObject(
+            url,
+            JsonNode::class.java
+        )?.firstOrNull()?.parse()
+    }
+
     inner class AssertionContext {
-        fun hasPR(from: String, to: String) {
-            TODO("Not yet implemented")
+        fun hasPR(from: String, to: String, checkPR: (GitHubPR?) -> Boolean = { it != null }) {
+            waitUntil {
+                val pr = getPR(from, to)
+                checkPR(pr)
+            }
         }
 
         fun fileContains(
@@ -129,6 +146,13 @@ class GitHubRepositoryContext(
             TODO("Not yet implemented")
         }
 
+
     }
 
 }
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class GitHubPR(
+    val number: Int,
+    val state: String,
+)
