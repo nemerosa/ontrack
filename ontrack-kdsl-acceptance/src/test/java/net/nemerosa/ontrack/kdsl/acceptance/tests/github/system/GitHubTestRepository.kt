@@ -33,7 +33,7 @@ fun withTestGitHubRepository(
         mapOf(
             "name" to repo,
             "description" to "Test repository for auto versioning - can be deleted at any time",
-            "private" to true,
+            "private" to false,
             "has_issues" to false,
             "has_projects" to false,
             "has_wiki" to false
@@ -59,9 +59,7 @@ fun withTestGitHubRepository(
 
     } finally {
         // Deleting the repository
-        gitHubPlaygroundClient.delete(
-            "/repos/${gitHubPlaygroundEnv.organization}/$repo"
-        )
+        // gitHubPlaygroundClient.delete("/repos/${gitHubPlaygroundEnv.organization}/$repo")
     }
 }
 
