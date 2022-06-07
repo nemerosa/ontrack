@@ -1,0 +1,12 @@
+mutation ProjectDeleteProperty(
+    $id: Int!,
+    $type: String!,
+) {
+    setProjectPropertyById(input: {
+        id: $id,
+        property: $type,
+        value: null,
+    }) {
+        ...PayloadUserErrors
+    }
+}

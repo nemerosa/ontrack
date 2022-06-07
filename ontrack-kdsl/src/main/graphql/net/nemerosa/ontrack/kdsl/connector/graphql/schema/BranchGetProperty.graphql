@@ -1,0 +1,10 @@
+query BranchGetProperty(
+    $id: Int!,
+    $type: String!,
+) {
+    branches(id: $id) {
+        properties(type: $type) {
+            value
+        }
+    }
+}

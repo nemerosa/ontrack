@@ -1,0 +1,13 @@
+mutation ProjectSetProperty(
+    $id: Int!,
+    $type: String!,
+    $value: JSON!,
+) {
+    setProjectPropertyById(input: {
+        id: $id,
+        property: $type,
+        value: $value,
+    }) {
+        ...PayloadUserErrors
+    }
+}

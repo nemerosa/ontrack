@@ -21,7 +21,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion("IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository()
+                        configuredForGitHubRepository(ontrack)
                         configuredForAutoVersioning(
                             sourceProject = dependency.project.name,
                             sourceBranch = dependency.name,

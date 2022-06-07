@@ -1,0 +1,12 @@
+mutation BranchDeleteProperty(
+    $id: Int!,
+    $type: String!,
+) {
+    setBranchPropertyById(input: {
+        id: $id,
+        property: $type,
+        value: null,
+    }) {
+        ...PayloadUserErrors
+    }
+}

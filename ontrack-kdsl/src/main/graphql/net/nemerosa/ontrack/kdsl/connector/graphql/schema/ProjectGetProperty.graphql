@@ -1,0 +1,10 @@
+query ProjectGetProperty(
+    $id: Int!,
+    $type: String!,
+) {
+    projects(id: $id) {
+        properties(type: $type) {
+            value
+        }
+    }
+}

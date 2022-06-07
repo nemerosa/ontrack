@@ -1,0 +1,13 @@
+mutation BranchSetProperty(
+    $id: Int!,
+    $type: String!,
+    $value: JSON!,
+) {
+    setBranchPropertyById(input: {
+        id: $id,
+        property: $type,
+        value: $value,
+    }) {
+        ...PayloadUserErrors
+    }
+}

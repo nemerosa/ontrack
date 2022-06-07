@@ -2,7 +2,14 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.github.system
 
 import net.nemerosa.ontrack.kdsl.acceptance.tests.github.gitHubPlaygroundClient
 import net.nemerosa.ontrack.kdsl.acceptance.tests.github.gitHubPlaygroundEnv
+import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.spec.Branch
+import net.nemerosa.ontrack.kdsl.spec.Ontrack
+import net.nemerosa.ontrack.kdsl.spec.Project
+import net.nemerosa.ontrack.kdsl.spec.extension.github.GitHubConfiguration
+import net.nemerosa.ontrack.kdsl.spec.extension.github.GitHubProjectConfigurationProperty
+import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHub
+import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHubConfigurationProperty
 import org.apache.commons.codec.binary.Base64
 import java.util.*
 
@@ -72,9 +79,31 @@ class GitHubRepositoryContext(
         )
     }
 
+    fun createGitHubConfiguration(ontrack: Ontrack): String {
+        val name = uid("gh")
+        ontrack.gitHub.createConfig(
+            GitHubConfiguration(
+                name = name,
+                url = "https://github.com",
+                oauth2Token = gitHubPlaygroundEnv.token,
+            )
+        )
+        return name
+    }
+
+    fun Project.configuredForGitHub(ontrack: Ontrack) {
+        val config = createGitHubConfiguration(ontrack)
+        gitHubConfigurationProperty = GitHubProjectConfigurationProperty(
+            configuration = config,
+            repository = "${gitHubPlaygroundEnv.organization}/$repository",
+        )
+    }
+
     fun Branch.configuredForGitHubRepository(
+        ontrack: Ontrack,
         scmBranch: String = "main",
     ) {
+        project.configuredForGitHub(ontrack)
         TODO()
     }
 
