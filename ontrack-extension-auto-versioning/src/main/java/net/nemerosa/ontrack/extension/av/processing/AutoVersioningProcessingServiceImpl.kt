@@ -74,7 +74,7 @@ class AutoVersioningProcessingServiceImpl(
                 order.targetPaths.map { targetPath ->
                     // Gets the content of the target file
                     val lines = scm.download(scmBranch, targetPath)
-                        ?.toString()
+                        ?.toString(Charsets.UTF_8)
                         ?.lines()
                         ?: emptyList()
                     // Gets the current version in this file
