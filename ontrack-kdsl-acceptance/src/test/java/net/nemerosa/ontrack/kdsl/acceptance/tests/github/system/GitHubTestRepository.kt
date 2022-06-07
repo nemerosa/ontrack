@@ -59,7 +59,7 @@ fun withTestGitHubRepository(
 
     } finally {
         // Deleting the repository
-        // gitHubPlaygroundClient.delete("/repos/${gitHubPlaygroundEnv.organization}/$repo")
+        gitHubPlaygroundClient.delete("/repos/${gitHubPlaygroundEnv.organization}/$repo")
     }
 }
 
