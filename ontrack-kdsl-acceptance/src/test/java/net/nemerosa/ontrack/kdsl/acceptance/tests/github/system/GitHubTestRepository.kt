@@ -92,6 +92,7 @@ class GitHubRepositoryContext(
                 name = name,
                 url = "https://github.com",
                 oauth2Token = gitHubPlaygroundEnv.token,
+                autoMergeToken = gitHubPlaygroundEnv.autoMergeToken,
             )
         )
         return name

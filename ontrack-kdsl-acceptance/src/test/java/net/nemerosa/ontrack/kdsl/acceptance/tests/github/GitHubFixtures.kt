@@ -49,6 +49,7 @@ val githubTestEnv: GitHubTestEnv by lazy {
 class GitHubPlaygroundEnv(
     val organization: String,
     val token: String,
+    val autoMergeToken: String,
 )
 
 /**
@@ -58,6 +59,7 @@ val gitHubPlaygroundEnv: GitHubPlaygroundEnv by lazy {
     GitHubPlaygroundEnv(
         organization = getEnv("ontrack.test.extension.github.playground.organization"),
         token = getEnv("ontrack.test.extension.github.playground.token"),
+        autoMergeToken = getEnv("ontrack.test.extension.github.playground.automerge.token"),
     )
 }
 

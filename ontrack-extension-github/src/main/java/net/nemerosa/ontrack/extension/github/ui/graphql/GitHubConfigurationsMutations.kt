@@ -34,6 +34,7 @@ class GitHubConfigurationsMutations(
                         appId = appId,
                         appPrivateKey = appPrivateKey,
                         appInstallationAccountName = appInstallationAccountName,
+                        autoMergeToken = autoMergeToken,
                     )
                 }
             )
@@ -60,4 +61,6 @@ data class CreateGitHubConfigurationInput(
     val appPrivateKey: String? = null,
     @APIDescription("Account name of the GitHub App installation (used when more than 1 installation for the app)")
     val appInstallationAccountName: String? = null,
+    @APIDescription("Token for an account used to approve pull requests for auto approval processes")
+    val autoMergeToken: String? = null,
 )

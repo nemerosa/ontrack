@@ -31,6 +31,7 @@ class GitHubMgt(connector: Connector) : Connected(connector) {
                 Input.fromNullable(appId),
                 Input.fromNullable(appPrivateKey),
                 Input.fromNullable(appInstallationAccountName),
+                Input.fromNullable(autoMergeToken),
             )
         }
     ) {
@@ -47,6 +48,7 @@ class GitHubMgt(connector: Connector) : Connected(connector) {
             appId = null,
             appPrivateKey = null,
             appInstallationAccountName = null,
+            autoMergeToken = null,
         )
     } ?: throw GraphQLMissingDataException("Did not get back the created GitHub configuration.")
 

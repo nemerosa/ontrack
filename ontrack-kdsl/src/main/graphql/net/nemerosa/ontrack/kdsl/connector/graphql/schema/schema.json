@@ -4785,6 +4785,16 @@
               "defaultValue": null
             },
             {
+              "name": "autoMergeToken",
+              "description": "Token for an account used to approve pull requests for auto approval processes",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "name",
               "description": "Name of this configuration",
               "type": {
