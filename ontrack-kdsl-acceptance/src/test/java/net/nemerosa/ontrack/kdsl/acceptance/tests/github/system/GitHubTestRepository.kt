@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.spec.Branch
 import net.nemerosa.ontrack.kdsl.spec.Ontrack
 import net.nemerosa.ontrack.kdsl.spec.Project
+import net.nemerosa.ontrack.kdsl.spec.extension.git.GitBranchConfigurationProperty
+import net.nemerosa.ontrack.kdsl.spec.extension.git.gitBranchConfigurationProperty
 import net.nemerosa.ontrack.kdsl.spec.extension.github.GitHubConfiguration
 import net.nemerosa.ontrack.kdsl.spec.extension.github.GitHubProjectConfigurationProperty
 import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHub
@@ -104,7 +106,7 @@ class GitHubRepositoryContext(
         scmBranch: String = "main",
     ) {
         project.configuredForGitHub(ontrack)
-        TODO()
+        gitBranchConfigurationProperty = GitBranchConfigurationProperty(branch = scmBranch)
     }
 
     fun assertThatGitHubRepository(
