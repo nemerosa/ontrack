@@ -12,13 +12,14 @@ import net.nemerosa.ontrack.kdsl.spec.settings.settings
 abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport() {
 
     protected fun withAutoVersioning(
+        enabled: Boolean = true,
         code: () -> Unit,
     ) {
         val old = ontrack.settings.autoVersioning.get()
         try {
             ontrack.settings.autoVersioning.set(
                 AutoVersioningSettings(
-                    enabled = true
+                    enabled = enabled,
                 )
             )
             code()
@@ -45,6 +46,7 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
         sourcePromotion: String,
         targetPath: String,
         targetProperty: String? = null,
+        postProcessing: String? = null,
     ) {
         setAutoVersioningConfig(
             listOf(
@@ -54,6 +56,7 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
                     sourcePromotion = sourcePromotion,
                     targetPath = targetPath,
                     targetProperty = targetProperty,
+                    postProcessing = postProcessing,
                 )
             )
         )

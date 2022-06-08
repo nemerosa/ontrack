@@ -17,7 +17,9 @@ import net.nemerosa.ontrack.kdsl.spec.extension.github.GitHubProjectConfiguratio
 import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHub
 import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHubConfigurationProperty
 import org.apache.commons.codec.binary.Base64
+import org.springframework.web.client.HttpClientErrorException
 import java.util.*
+import kotlin.test.fail
 
 fun withTestGitHubRepository(
     autoMerge: Boolean = false,
@@ -119,10 +121,14 @@ class GitHubRepositoryContext(
         context.code()
     }
 
-    private fun getPR(from: String, to: String): GitHubPR? {
+    private fun getPR(from: String?, to: String?): GitHubPR? {
         var url = "/repos/${gitHubPlaygroundEnv.organization}/$repository/pulls?state=all"
-        url += "&head=$from"
-        url += "&base=$to"
+        if (from != null) {
+            url += "&head=$from"
+        }
+        if (to != null) {
+            url += "&base=$to"
+        }
         return gitHubPlaygroundClient.getForObject(
             url,
             JsonNode::class.java
@@ -138,11 +144,41 @@ class GitHubRepositoryContext(
             ?: emptyList()
     }
 
+    private fun getBranch(branch: String) =
+        try {
+            gitHubPlaygroundClient.getForObject(
+                "/repos/${gitHubPlaygroundEnv.organization}/$repository/branches/$branch",
+                GitHubBranch::class.java
+            )
+        } catch (ex: HttpClientErrorException.NotFound) {
+            null
+        }
+
     inner class AssertionContext {
-        fun hasPR(from: String, to: String, checkPR: (GitHubPR?) -> Boolean = { it != null }) {
+
+        fun hasNoBranch(branch: String) {
+            val gitHubBranch = getBranch(branch)
+            if (gitHubBranch != null) {
+                fail("Branch $branch exists when it was expected not to.")
+            }
+        }
+
+        private fun checkPR(from: String?, to: String?, checkPR: (GitHubPR?) -> Boolean) {
             waitUntil {
                 val pr = getPR(from, to)
                 checkPR(pr)
+            }
+        }
+
+        fun hasPR(from: String, to: String) {
+            checkPR(from = from, to = to) {
+                it != null
+            }
+        }
+
+        fun hasNoPR(to: String) {
+            checkPR(from = null, to = to) {
+                it == null
             }
         }
 
@@ -171,4 +207,16 @@ class GitHubPR(
 @JsonIgnoreProperties(ignoreUnknown = true)
 private class GitHubContentsResponse(
     val content: String,
+)
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class GitHubBranch(
+    val name: String,
+    val commit: GitHubCommit,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class GitHubCommit(
+    val sha: String,
 )
