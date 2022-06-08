@@ -129,6 +129,15 @@ class GitHubRepositoryContext(
         )?.firstOrNull()?.parse()
     }
 
+    private fun getFile(path: String, branch: String): List<String> {
+        val response = gitHubPlaygroundClient.getForObject(
+            "/repos/${gitHubPlaygroundEnv.organization}/$repository/contents/$path?ref=$branch",
+            GitHubContentsResponse::class.java
+        )
+        return response?.content?.run { String(Base64.decodeBase64(this)) }?.lines()?.filter { it.isNotBlank() }
+            ?: emptyList()
+    }
+
     inner class AssertionContext {
         fun hasPR(from: String, to: String, checkPR: (GitHubPR?) -> Boolean = { it != null }) {
             waitUntil {
@@ -142,9 +151,12 @@ class GitHubRepositoryContext(
             branch: String = "main",
             content: () -> String,
         ) {
-            TODO("Not yet implemented")
+            val expectedContent = content()
+            waitUntil {
+                val actualContent = getFile(path, branch).joinToString("\n")
+                expectedContent in actualContent
+            }
         }
-
 
     }
 
@@ -154,4 +166,9 @@ class GitHubRepositoryContext(
 class GitHubPR(
     val number: Int,
     val state: String,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+private class GitHubContentsResponse(
+    val content: String,
 )

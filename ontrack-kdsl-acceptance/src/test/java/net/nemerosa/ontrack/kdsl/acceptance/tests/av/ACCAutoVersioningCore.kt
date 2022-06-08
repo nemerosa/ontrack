@@ -47,7 +47,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                                 """
                                     # Some comment
                                     some-property = some-value
-                                    some-version = 2.0.0 
+                                    some-version = 2.0.0
                                 """.trimIndent()
                             }
                         }
