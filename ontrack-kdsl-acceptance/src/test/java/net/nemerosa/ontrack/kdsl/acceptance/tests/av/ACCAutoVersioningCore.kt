@@ -264,4 +264,55 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
         }
     }
 
+    @Test
+    fun `Auto versioning not requested if no match on branch`() {
+        withTestGitHubRepository {
+            withAutoVersioning {
+                repositoryFile("gradle.properties") {
+                    """
+                        some-version = 1.0.0
+                    """.trimIndent()
+                }
+                val dependency = branchWithPromotion(promotion = "IRON")
+                val other = branchWithPromotion(promotion = "IRON")
+                project {
+                    branch {
+                        configuredForGitHubRepository(ontrack)
+                        configuredForAutoVersioning(
+                            sourceProject = other.project.name,
+                            sourceBranch = other.name,
+                            targetPath = "gradle.properties",
+                            targetProperty = "some-version",
+                            sourcePromotion = "IRON",
+                            postProcessing = "",
+                        )
+
+                        dependency.apply {
+                            build(name = "2.0.0") {
+                                promote("IRON")
+                            }
+                        }
+
+                        waitForAutoVersioningCompletion()
+
+                        assertThatGitHubRepository {
+
+                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61")
+
+                            fileContains("gradle.properties") {
+                                """
+                                    some-version = 1.0.0
+                                """.trimIndent()
+                            }
+
+                            hasNoPR(to = "main")
+
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
 }
