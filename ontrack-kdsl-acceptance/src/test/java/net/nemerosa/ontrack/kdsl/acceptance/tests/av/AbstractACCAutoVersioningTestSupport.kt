@@ -28,10 +28,13 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
     }
 
     protected fun branchWithPromotion(
+        name: String = "main",
         promotion: String,
+        code: Branch.() -> Unit = {},
     ): Branch = project {
-        branch {
+        branch(name = name) {
             promotion(name = promotion)
+            code()
             this
         }
     }
