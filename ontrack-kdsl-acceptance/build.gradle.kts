@@ -9,8 +9,10 @@ plugins {
 dependencies {
     testImplementation(project(":ontrack-json"))
     testImplementation("org.springframework.boot:spring-boot-starter")
+    testImplementation("org.springframework:spring-web")
     testImplementation(project(":ontrack-kdsl"))
     testImplementation("commons-io:commons-io")
+    testImplementation("commons-codec:commons-codec")
 }
 
 // Pre-acceptance tests: starting the environment
