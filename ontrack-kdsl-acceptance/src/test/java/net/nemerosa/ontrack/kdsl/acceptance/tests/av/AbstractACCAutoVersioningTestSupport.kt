@@ -46,6 +46,7 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
         sourcePromotion: String,
         targetPath: String,
         targetProperty: String? = null,
+        targetRegex: String? = null,
         postProcessing: String? = null,
     ) {
         setAutoVersioningConfig(
@@ -56,6 +57,7 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
                     sourcePromotion = sourcePromotion,
                     targetPath = targetPath,
                     targetProperty = targetProperty,
+                    targetRegex = targetRegex,
                     postProcessing = postProcessing,
                 )
             )

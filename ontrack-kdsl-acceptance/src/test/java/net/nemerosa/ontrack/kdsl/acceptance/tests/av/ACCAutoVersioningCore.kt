@@ -315,4 +315,107 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
         }
     }
 
+    @Test
+    fun `Auto versioning not requested if no match on promotion`() {
+        withTestGitHubRepository {
+            withAutoVersioning {
+                repositoryFile("gradle.properties") {
+                    """
+                        some-version = 1.0.0
+                    """.trimIndent()
+                }
+                val dependency = project {
+                    branch(name = "main") {
+                        promotion(name = "IRON")
+                        promotion(name = "SILVER")
+                        this
+                    }
+                }
+                project {
+                    branch {
+                        configuredForGitHubRepository(ontrack)
+                        configuredForAutoVersioning(
+                            sourceProject = dependency.project.name,
+                            sourceBranch = dependency.name,
+                            targetPath = "gradle.properties",
+                            targetProperty = "some-version",
+                            sourcePromotion = "SILVER",
+                            postProcessing = "",
+                        )
+
+                        dependency.apply {
+                            build(name = "2.0.0") {
+                                promote("IRON")
+                            }
+                        }
+
+                        waitForAutoVersioningCompletion()
+
+                        assertThatGitHubRepository {
+
+                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61")
+
+                            fileContains("gradle.properties") {
+                                """
+                                    some-version = 1.0.0
+                                """.trimIndent()
+                            }
+
+                            hasNoPR(to = "main")
+
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Auto versioning on promotion using regex for property`() {
+        withTestGitHubRepository {
+            withAutoVersioning {
+                repositoryFile("package.json") {
+                    """
+                        "my-version":    "^1.0.0",
+                    """.trimIndent()
+                }
+                val dependency = branchWithPromotion(promotion = "IRON")
+                project {
+                    branch {
+                        configuredForGitHubRepository(ontrack)
+                        configuredForAutoVersioning(
+                            sourceProject = dependency.project.name,
+                            sourceBranch = dependency.name,
+                            targetPath = "package.json",
+                            targetRegex = """"my-version"\s*:\s*"\^(.*)",""",
+                            sourcePromotion = "IRON",
+                        )
+
+                        dependency.apply {
+                            build(name = "2.0.0") {
+                                promote("IRON")
+                            }
+                        }
+
+                        waitForAutoVersioningCompletion()
+
+                        assertThatGitHubRepository {
+                            hasPR(
+                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
+                                to = "main"
+                            )
+                            fileContains("package.json") {
+                                """
+                                    "my-version":    "^2.0.0",
+                                """.trimIndent()
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
 }
