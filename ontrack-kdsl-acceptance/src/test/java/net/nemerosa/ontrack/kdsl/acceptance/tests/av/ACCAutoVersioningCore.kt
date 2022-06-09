@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
 import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHubPlayground
 import net.nemerosa.ontrack.kdsl.acceptance.tests.github.system.withTestGitHubRepository
+import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
+import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
 import org.junit.jupiter.api.Test
 
 @TestOnGitHubPlayground
@@ -22,12 +24,16 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 project {
                     branch {
                         configuredForGitHubRepository(ontrack)
-                        configuredForAutoVersioning(
-                            sourceProject = dependency.project.name,
-                            sourceBranch = dependency.name,
-                            targetPath = "gradle.properties",
-                            targetProperty = "some-version",
-                            sourcePromotion = "IRON",
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "some-version",
+                                )
+                            )
                         )
 
                         dependency.apply {
@@ -73,12 +79,16 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 project {
                     branch {
                         configuredForGitHubRepository(ontrack)
-                        configuredForAutoVersioning(
-                            sourceProject = dependency.project.name,
-                            sourceBranch = dependency.name,
-                            targetPath = "gradle.properties",
-                            targetProperty = "some-version",
-                            sourcePromotion = "IRON",
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "some-version",
+                                )
+                            )
                         )
 
                         dependency.apply {
@@ -126,12 +136,16 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 project {
                     branch {
                         configuredForGitHubRepository(ontrack)
-                        configuredForAutoVersioning(
-                            sourceProject = dependency.project.name,
-                            sourceBranch = "release/1.0",
-                            targetPath = "gradle.properties",
-                            targetProperty = "some-version",
-                            sourcePromotion = "IRON",
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = "release/1.0",
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "some-version",
+                                )
+                            )
                         )
 
                         dependency.apply {
@@ -177,13 +191,17 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 project {
                     branch {
                         configuredForGitHubRepository(ontrack)
-                        configuredForAutoVersioning(
-                            sourceProject = dependency.project.name,
-                            sourceBranch = dependency.name,
-                            targetPath = "gradle.properties",
-                            targetProperty = "some-version",
-                            sourcePromotion = "IRON",
-                            postProcessing = "",
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "some-version",
+                                    postProcessing = "",
+                                )
+                            )
                         )
 
                         dependency.apply {
@@ -227,13 +245,17 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 project {
                     branch {
                         configuredForGitHubRepository(ontrack)
-                        configuredForAutoVersioning(
-                            sourceProject = dependency.project.name,
-                            sourceBranch = dependency.name,
-                            targetPath = "gradle.properties",
-                            targetProperty = "some-version",
-                            sourcePromotion = "IRON",
-                            postProcessing = "",
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "some-version",
+                                    postProcessing = "",
+                                )
+                            )
                         )
 
                         dependency.apply {
@@ -278,13 +300,17 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 project {
                     branch {
                         configuredForGitHubRepository(ontrack)
-                        configuredForAutoVersioning(
-                            sourceProject = other.project.name,
-                            sourceBranch = other.name,
-                            targetPath = "gradle.properties",
-                            targetProperty = "some-version",
-                            sourcePromotion = "IRON",
-                            postProcessing = "",
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = other.project.name,
+                                    sourceBranch = other.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "some-version",
+                                    postProcessing = "",
+                                )
+                            )
                         )
 
                         dependency.apply {
@@ -334,13 +360,17 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 project {
                     branch {
                         configuredForGitHubRepository(ontrack)
-                        configuredForAutoVersioning(
-                            sourceProject = dependency.project.name,
-                            sourceBranch = dependency.name,
-                            targetPath = "gradle.properties",
-                            targetProperty = "some-version",
-                            sourcePromotion = "SILVER",
-                            postProcessing = "",
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "SILVER",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "some-version",
+                                    postProcessing = "",
+                                )
+                            )
                         )
 
                         dependency.apply {
@@ -384,12 +414,16 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 project {
                     branch {
                         configuredForGitHubRepository(ontrack)
-                        configuredForAutoVersioning(
-                            sourceProject = dependency.project.name,
-                            sourceBranch = dependency.name,
-                            targetPath = "package.json",
-                            targetRegex = """"my-version"\s*:\s*"\^(.*)",""",
-                            sourcePromotion = "IRON",
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "package.json",
+                                    targetRegex = """"my-version"\s*:\s*"\^(.*)",""",
+                                )
+                            )
                         )
 
                         dependency.apply {
@@ -433,13 +467,17 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 project {
                     branch {
                         configuredForGitHubRepository(ontrack)
-                        configuredForAutoVersioning(
-                            sourceProject = dependency.project.name,
-                            sourceBranch = dependency.name,
-                            targetPath = "gradle.properties",
-                            targetProperty = "some-version",
-                            sourcePromotion = "IRON",
-                            autoApproval = true,
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "some-version",
+                                    autoApproval = true,
+                                )
+                            )
                         )
 
                         dependency.apply {
@@ -485,13 +523,17 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 project {
                     branch {
                         configuredForGitHubRepository(ontrack)
-                        configuredForAutoVersioning(
-                            sourceProject = dependency.project.name,
-                            sourceBranch = dependency.name,
-                            targetPath = "gradle.properties",
-                            targetProperty = "some-version",
-                            sourcePromotion = "IRON",
-                            autoApproval = false,
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "some-version",
+                                    autoApproval = false,
+                                )
+                            )
                         )
 
                         dependency.apply {
@@ -531,13 +573,17 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 project {
                     branch {
                         configuredForGitHubRepository(ontrack)
-                        configuredForAutoVersioning(
-                            sourceProject = dependency.project.name,
-                            sourceBranch = dependency.name,
-                            targetPath = "gradle.properties",
-                            targetProperty = "some-version",
-                            sourcePromotion = "IRON",
-                            upgradeBranchPattern = "feature/upgrade-test-AAA-<version>",
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "some-version",
+                                    upgradeBranchPattern = "feature/upgrade-test-AAA-<version>",
+                                )
+                            )
                         )
 
                         dependency.apply {
@@ -583,13 +629,17 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 project {
                     branch {
                         configuredForGitHubRepository(ontrack)
-                        configuredForAutoVersioning(
-                            sourceProject = dependency.project.name,
-                            sourceBranch = dependency.name,
-                            targetPath = "gradle.properties",
-                            targetProperty = "some-version",
-                            sourcePromotion = "IRON",
-                            upgradeBranchPattern = "feature/upgrade-test-${dependency.project.name}-2.0.0",
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "some-version",
+                                    upgradeBranchPattern = "feature/upgrade-test-${dependency.project.name}-2.0.0",
+                                )
+                            )
                         )
 
                         dependency.apply {
@@ -636,12 +686,16 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                     branch {
                         project.configuredForGitHub(ontrack)
                         // configuredForGitHubRepository(ontrack) Only the project, not the branch
-                        configuredForAutoVersioning(
-                            sourceProject = dependency.project.name,
-                            sourceBranch = dependency.name,
-                            targetPath = "gradle.properties",
-                            targetProperty = "some-version",
-                            sourcePromotion = "IRON",
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "some-version",
+                                )
+                            )
                         )
 
                         dependency.apply {
@@ -663,6 +717,106 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                             }
 
                             hasNoPR(to = "main")
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Auto versioning with several source branches`() {
+        withTestGitHubRepository {
+            withAutoVersioning {
+                repositoryFile("gradle.properties") {
+                    """
+                        some-property = some-value
+                        a-version = 1.1.0
+                        b-version = 2.0.0
+                    """.trimIndent()
+                }
+                val a = project {
+                    branch(name = "main") {
+                        promotion(name = "IRON")
+                        this
+                    }
+                }
+                val b = project {
+                    branch(name = "main") {
+                        promotion(name = "IRON")
+                        promotion(name = "SILVER")
+                        this
+                    }
+                }
+                project {
+                    branch {
+                        configuredForGitHubRepository(ontrack)
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = a.project.name,
+                                    sourceBranch = a.name,
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "a-version",
+                                    sourcePromotion = "IRON",
+                                ),
+                                AutoVersioningSourceConfig(
+                                    sourceProject = b.project.name,
+                                    sourceBranch = b.name,
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "b-version",
+                                    sourcePromotion = "SILVER",
+                                ),
+                            )
+                        )
+
+                        // A dependency
+
+                        a.apply {
+                            build(name = "1.1.1") {
+                                promote("IRON")
+                            }
+                        }
+
+                        waitForAutoVersioningCompletion()
+
+                        assertThatGitHubRepository {
+                            hasPR(
+                                from = "feature/auto-upgrade-${a.project.name}-1.1.1-fad58de7366495db4650cfefac2fcd61",
+                                to = "main"
+                            )
+                            fileContains("gradle.properties") {
+                                """
+                                    some-property = some-value
+                                    a-version = 1.1.1
+                                    b-version = 2.0.0
+                                """.trimIndent()
+                            }
+                        }
+
+                        // B dependency
+
+                        b.apply {
+                            build(name = "2.1.0") {
+                                promote("SILVER")
+                            }
+                        }
+
+                        waitForAutoVersioningCompletion()
+
+                        assertThatGitHubRepository {
+                            hasPR(
+                                from = "feature/auto-upgrade-${b.project.name}-2.1.0-fad58de7366495db4650cfefac2fcd61",
+                                to = "main"
+                            )
+                            fileContains("gradle.properties") {
+                                """
+                                    some-property = some-value
+                                    a-version = 1.1.1
+                                    b-version = 2.1.0
+                                """.trimIndent()
+                            }
                         }
 
                     }
