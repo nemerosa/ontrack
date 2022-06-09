@@ -620,4 +620,55 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
         }
     }
 
+    @Test
+    fun `Auto versioning not requested if branch not configured for Git`() {
+        withTestGitHubRepository {
+            withAutoVersioning {
+                repositoryFile("gradle.properties") {
+                    """
+                        # Some comment
+                        some-property = some-value
+                        some-version = 1.0.0
+                    """.trimIndent()
+                }
+                val dependency = branchWithPromotion(promotion = "IRON")
+                project {
+                    branch {
+                        project.configuredForGitHub(ontrack)
+                        // configuredForGitHubRepository(ontrack) Only the project, not the branch
+                        configuredForAutoVersioning(
+                            sourceProject = dependency.project.name,
+                            sourceBranch = dependency.name,
+                            targetPath = "gradle.properties",
+                            targetProperty = "some-version",
+                            sourcePromotion = "IRON",
+                        )
+
+                        dependency.apply {
+                            build(name = "2.0.0") {
+                                promote("IRON")
+                            }
+                        }
+
+                        waitForAutoVersioningCompletion()
+
+                        assertThatGitHubRepository {
+
+                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61")
+
+                            fileContains("gradle.properties") {
+                                """
+                                    some-version = 1.0.0
+                                """.trimIndent()
+                            }
+
+                            hasNoPR(to = "main")
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
 }
