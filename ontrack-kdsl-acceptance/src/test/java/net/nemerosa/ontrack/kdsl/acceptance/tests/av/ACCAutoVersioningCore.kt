@@ -516,4 +516,108 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
         }
     }
 
+    @Test
+    fun `Auto versioning on promotion with custom upgrade branch with custom project`() {
+        withTestGitHubRepository {
+            withAutoVersioning {
+                repositoryFile("gradle.properties") {
+                    """
+                        # Some comment
+                        some-property = some-value
+                        some-version = 1.0.0
+                    """.trimIndent()
+                }
+                val dependency = branchWithPromotion(promotion = "IRON")
+                project {
+                    branch {
+                        configuredForGitHubRepository(ontrack)
+                        configuredForAutoVersioning(
+                            sourceProject = dependency.project.name,
+                            sourceBranch = dependency.name,
+                            targetPath = "gradle.properties",
+                            targetProperty = "some-version",
+                            sourcePromotion = "IRON",
+                            upgradeBranchPattern = "feature/upgrade-test-AAA-<version>",
+                        )
+
+                        dependency.apply {
+                            build(name = "2.0.0") {
+                                promote("IRON")
+                            }
+                        }
+
+                        waitForAutoVersioningCompletion()
+
+                        assertThatGitHubRepository {
+                            hasPR(
+                                from = "feature/upgrade-test-AAA-2.0.0",
+                                to = "main"
+                            )
+                            fileContains("gradle.properties") {
+                                """
+                                    # Some comment
+                                    some-property = some-value
+                                    some-version = 2.0.0
+                                """.trimIndent()
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Auto versioning on promotion with custom upgrade branch with default project`() {
+        withTestGitHubRepository {
+            withAutoVersioning {
+                repositoryFile("gradle.properties") {
+                    """
+                        # Some comment
+                        some-property = some-value
+                        some-version = 1.0.0
+                    """.trimIndent()
+                }
+                val dependency = branchWithPromotion(promotion = "IRON")
+                project {
+                    branch {
+                        configuredForGitHubRepository(ontrack)
+                        configuredForAutoVersioning(
+                            sourceProject = dependency.project.name,
+                            sourceBranch = dependency.name,
+                            targetPath = "gradle.properties",
+                            targetProperty = "some-version",
+                            sourcePromotion = "IRON",
+                            upgradeBranchPattern = "feature/upgrade-test-${dependency.project.name}-2.0.0",
+                        )
+
+                        dependency.apply {
+                            build(name = "2.0.0") {
+                                promote("IRON")
+                            }
+                        }
+
+                        waitForAutoVersioningCompletion()
+
+                        assertThatGitHubRepository {
+                            hasPR(
+                                from = "feature/upgrade-test-AAA-2.0.0",
+                                to = "main"
+                            )
+                            fileContains("gradle.properties") {
+                                """
+                                    # Some comment
+                                    some-property = some-value
+                                    some-version = 2.0.0
+                                """.trimIndent()
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
 }

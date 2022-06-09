@@ -47,6 +47,7 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
         targetPath: String,
         targetProperty: String? = null,
         targetRegex: String? = null,
+        upgradeBranchPattern: String? = null,
         postProcessing: String? = null,
         autoApproval: Boolean? = null,
     ) {
@@ -59,6 +60,7 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
                     targetPath = targetPath,
                     targetProperty = targetProperty,
                     targetRegex = targetRegex,
+                    upgradeBranchPattern = upgradeBranchPattern,
                     postProcessing = postProcessing,
                     autoApproval = autoApproval,
                 )
