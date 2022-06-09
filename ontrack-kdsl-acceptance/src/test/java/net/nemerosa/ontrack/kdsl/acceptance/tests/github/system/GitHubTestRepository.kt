@@ -19,6 +19,7 @@ import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHubConfigurationProper
 import org.apache.commons.codec.binary.Base64
 import org.springframework.web.client.HttpClientErrorException
 import java.util.*
+import kotlin.test.assertTrue
 import kotlin.test.fail
 
 fun withTestGitHubRepository(
@@ -135,6 +136,14 @@ class GitHubRepositoryContext(
         )?.firstOrNull()?.parse()
     }
 
+    private fun getPRReviews(pr: GitHubPR): List<GitHubPRReview> =
+        gitHubPlaygroundClient.getForObject(
+            "/repos/${gitHubPlaygroundEnv.organization}/$repository/pulls/${pr.number}/reviews",
+            JsonNode::class.java
+        )?.map {
+            it.parse<GitHubPRReview>()
+        } ?: emptyList()
+
     private fun getFile(path: String, branch: String): List<String> {
         val response = gitHubPlaygroundClient.getForObject(
             "/repos/${gitHubPlaygroundEnv.organization}/$repository/contents/$path?ref=$branch",
@@ -163,23 +172,32 @@ class GitHubRepositoryContext(
             }
         }
 
-        private fun checkPR(from: String?, to: String?, checkPR: (GitHubPR?) -> Boolean) {
+        private fun checkPR(from: String?, to: String?, checkPR: (GitHubPR?) -> Boolean): GitHubPR? {
+            var pr: GitHubPR? = null
             waitUntil {
-                val pr = getPR(from, to)
+                pr = getPR(from, to)
                 checkPR(pr)
             }
+            return pr
         }
 
-        fun hasPR(from: String, to: String) {
+        fun hasPR(from: String, to: String): GitHubPR =
             checkPR(from = from, to = to) {
                 it != null
-            }
-        }
+            } ?: error("PR cannot be null after the check")
 
         fun hasNoPR(to: String) {
             checkPR(from = null, to = to) {
                 it == null
             }
+        }
+
+        fun checkPRIsNotApproved(pr: GitHubPR) {
+            val reviews = getPRReviews(pr)
+            assertTrue(
+                reviews.none { it.state == "APPROVED" },
+                "No review was approved"
+            )
         }
 
         fun fileContains(
@@ -205,6 +223,12 @@ class GitHubPR(
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+class GitHubPRReview(
+    val user: GitHubUser,
+    val state: String,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 private class GitHubContentsResponse(
     val content: String,
 )
@@ -219,4 +243,9 @@ class GitHubBranch(
 @JsonIgnoreProperties(ignoreUnknown = true)
 class GitHubCommit(
     val sha: String,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class GitHubUser(
+    val login: String,
 )

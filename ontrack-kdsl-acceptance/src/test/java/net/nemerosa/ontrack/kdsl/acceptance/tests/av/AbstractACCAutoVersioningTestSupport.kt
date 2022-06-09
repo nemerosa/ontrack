@@ -48,6 +48,7 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
         targetProperty: String? = null,
         targetRegex: String? = null,
         postProcessing: String? = null,
+        autoApproval: Boolean? = null,
     ) {
         setAutoVersioningConfig(
             listOf(
@@ -59,6 +60,7 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
                     targetProperty = targetProperty,
                     targetRegex = targetRegex,
                     postProcessing = postProcessing,
+                    autoApproval = autoApproval,
                 )
             )
         )
