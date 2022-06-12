@@ -9,7 +9,7 @@ class NotificationsConfigProperties {
     /**
      * Are the notifications enabled?
      */
-    var enabled: Boolean = true
+    var enabled: Boolean = false
 
     /**
      * In-memory channel?
