@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
+import org.apache.commons.lang3.exception.ExceptionUtils
 import org.springframework.amqp.core.AmqpAdmin
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.core.MessageListener
@@ -71,8 +72,9 @@ class AsyncAutoVersioningQueueListener(
 
     private fun onMessage(message: Message) {
         val body = message.body.toString(Charsets.UTF_8)
+        var order: AutoVersioningOrder? = null
         try {
-            val order = body.parseAsJson().parse<AutoVersioningOrder>()
+            order = body.parseAsJson().parse<AutoVersioningOrder>()
             val queue = message.messageProperties.consumerQueue
             metrics.onReceiving(order, queue)
             securityService.asAdmin {
@@ -84,13 +86,21 @@ class AsyncAutoVersioningQueueListener(
             }
         } catch (any: Throwable) {
             metrics.onProcessingError()
-            applicationLogService.log(
-                ApplicationLogEntry.error(
-                    any,
-                    NameDescription.nd("auto-versioning-error", "Auto versioning processing error"),
-                    "Auto versioning could not be processed: $body"
-                ).withDetail("message", any.message)
-            )
+            val root = ExceptionUtils.getRootCause(any)
+            try {
+                // Audit in the order
+                order?.let {
+                    autoVersioningAuditService.onError(it, root)
+                }
+            } finally {
+                applicationLogService.log(
+                    ApplicationLogEntry.error(
+                        any,
+                        NameDescription.nd("auto-versioning-error", "Auto versioning processing error"),
+                        "Auto versioning could not be processed: $body"
+                    ).withDetail("message", any.message)
+                )
+            }
         }
     }
 }
