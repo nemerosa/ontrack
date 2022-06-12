@@ -1,5 +1,6 @@
-package net.nemerosa.ontrack.extension.av.config
+package net.nemerosa.ontrack.extension.av.graphql
 
+import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
 import net.nemerosa.ontrack.graphql.schema.AbstractGQLEnum
 import org.springframework.stereotype.Component
 

@@ -1,6 +1,7 @@
-package net.nemerosa.ontrack.extension.av.config
+package net.nemerosa.ontrack.extension.av.graphql
 
 import graphql.schema.GraphQLFieldDefinition
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.graphql.schema.GQLProjectEntityFieldContributor
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ProjectEntity

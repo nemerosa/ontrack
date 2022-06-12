@@ -9,4 +9,6 @@ class AutoVersioningMgt(connector: Connector) : Connected(connector) {
     val stats: AutoVersioningStats
         get() = connector.get("/extension/auto-versioning/stats").body.parse()
 
+    val audit: AutoVersioningAuditMgt = AutoVersioningAuditMgt(connector)
+
 }

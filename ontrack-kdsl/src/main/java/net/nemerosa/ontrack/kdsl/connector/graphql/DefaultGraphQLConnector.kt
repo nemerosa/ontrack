@@ -21,6 +21,7 @@ class DefaultGraphQLConnector(
             .serverUrl("${connector.url}/graphql")
             .addCustomTypeAdapter(LocalDateTimeCustomTypeAdapter.TYPE, LocalDateTimeCustomTypeAdapter())
             .addCustomTypeAdapter(UUIDCustomTypeAdapter.TYPE, UUIDCustomTypeAdapter())
+            .addCustomTypeAdapter(JSONCustomTypeAdapter.TYPE, JSONCustomTypeAdapter())
             .okHttpClient(
                 OkHttpClient.Builder()
                     .addInterceptor(

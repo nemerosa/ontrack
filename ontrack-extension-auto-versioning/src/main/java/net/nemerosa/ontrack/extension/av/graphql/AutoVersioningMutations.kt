@@ -1,9 +1,9 @@
-package net.nemerosa.ontrack.extension.av.config
+package net.nemerosa.ontrack.extension.av.graphql
 
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.graphql.schema.Mutation
-import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -37,11 +37,3 @@ class AutoVersioningMutations(
     )
 }
 
-@APIDescription("Auto versioning configuration")
-data class SetAutoVersioningConfigInput(
-    @APIDescription("ID of the branch to configure")
-    val branchId: Int,
-    @APIDescription("List of configurations")
-    @ListRef(embedded = true, suffix = "Input")
-    val configurations: List<AutoVersioningSourceConfig>,
-)

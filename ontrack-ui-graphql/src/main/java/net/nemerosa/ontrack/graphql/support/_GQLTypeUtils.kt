@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.graphql.support
 
-import com.fasterxml.jackson.databind.JsonNode
 import graphql.Scalars.*
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType

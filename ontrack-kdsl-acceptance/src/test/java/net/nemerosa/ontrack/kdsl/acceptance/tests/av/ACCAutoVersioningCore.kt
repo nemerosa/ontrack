@@ -825,4 +825,66 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
         }
     }
 
+    @Test
+    fun `Auto versioning on promotion failure in missing version`() {
+        withTestGitHubRepository {
+            withAutoVersioning {
+                repositoryFile("gradle.properties") {
+                    """
+                        some-version = 1.0.0
+                    """.trimIndent()
+                }
+                val dependency = branchWithPromotion(promotion = "IRON")
+                project {
+                    branch {
+                        project.configuredForGitHub(ontrack)
+                        // configuredForGitHubRepository(ontrack) Only the project, not the branch
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "another-version",
+                                )
+                            )
+                        )
+
+                        dependency.apply {
+                            build(name = "2.0.0") {
+                                promote("IRON")
+                            }
+                        }
+
+                        waitForAutoVersioningCompletion()
+
+                        assertThatGitHubRepository {
+
+                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61")
+
+                            fileContains("gradle.properties") {
+                                """
+                                    some-version = 1.0.0
+                                """.trimIndent()
+                            }
+
+                            hasNoPR(to = "main")
+
+                            // TODO And most recent state for auto versioning audit for source "<project:a>" and target "b" is "ERROR"
+                        }
+
+                        checkErrorMessageLogged("""Cannot find version in "gradle.properties"""")
+                        checkMostRecentStateOfAutoVersioningAuditForSourceAndTargetBranch(
+                            dependency.project,
+                            this,
+                            "ERROR"
+                        )
+
+                    }
+                }
+            }
+        }
+    }
+
 }

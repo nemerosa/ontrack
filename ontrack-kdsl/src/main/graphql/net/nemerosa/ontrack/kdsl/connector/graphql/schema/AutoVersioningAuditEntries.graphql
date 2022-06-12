@@ -1,0 +1,35 @@
+query AutoVersioningAuditEntries(
+    $offset: Int! = 0,
+    $size: Int! = 10,
+    $source: String = null,
+    $project: String = null,
+    $branch: String = null,
+) {
+    autoVersioningAuditEntries(
+        offset: $offset,
+        size: $size,
+        filter: {
+            source: $source,
+            project: $project,
+            branch: $branch,
+        }
+    ) {
+        pageInfo {
+            ...PageInfoContent
+        }
+        pageItems {
+            order {
+                uuid
+            }
+            running
+            mostRecentState {
+                data
+                state
+            }
+            audit {
+                data
+                state
+            }
+        }
+    }
+}
