@@ -4,49 +4,12 @@ import com.apollographql.apollo.api.CustomTypeAdapter
 import com.apollographql.apollo.api.CustomTypeValue
 import com.apollographql.apollo.api.ScalarType
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.*
+import net.nemerosa.ontrack.json.asJson
 
 class JSONCustomTypeAdapter : CustomTypeAdapter<JsonNode> {
 
-    private val jsonNodeFactory = JsonNodeFactory(false)
-
     override fun decode(value: CustomTypeValue<*>): JsonNode =
-        when (value) {
-            is CustomTypeValue.GraphQLNull -> NullNode.instance
-            is CustomTypeValue.GraphQLBoolean -> BooleanNode.valueOf(value.value)
-            is CustomTypeValue.GraphQLNumber -> {
-                @Suppress("MoveVariableDeclarationIntoWhen")
-                val number = value.value
-                when (number) {
-                    is Int -> IntNode.valueOf(number)
-                    is Long -> LongNode.valueOf(number)
-                    is Float -> FloatNode.valueOf(number)
-                    is Double -> DoubleNode.valueOf(number)
-                    else -> error("Unsupported GraphQL number type: ${number::class}")
-                }
-            }
-            is CustomTypeValue.GraphQLString -> TextNode.valueOf(value.value)
-            is CustomTypeValue.GraphQLJsonList -> ArrayNode(jsonNodeFactory).apply {
-                value.value.forEach { element ->
-                    if (element is CustomTypeValue<*>) {
-                        add(decode(element))
-                    } else {
-                        error("Unsupported property in GraphQL object: ${element::class}")
-                    }
-                }
-            }
-            is CustomTypeValue.GraphQLJsonObject -> ObjectNode(jsonNodeFactory).apply {
-                value.value.forEach { (name, element) ->
-                    if (element is CustomTypeValue<*>) {
-                        val node = decode(element)
-                        set(name, node)
-                    } else {
-                        error("Unsupported property in GraphQL object: ${element::class}")
-                    }
-                }
-            }
-            else -> error("Unsupported GraphQL type: ${value::class}")
-        }
+        value.value.asJson()
 
     override fun encode(value: JsonNode): CustomTypeValue<*> =
         when {
