@@ -56,7 +56,7 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
     ) {
         // Gets auto versioning entry
         val entry = ontrack.autoVersioning.audit.entries(
-            count = 1,
+            size = 1,
             source = sourceProject.name,
             project = targetBranch.project.name,
             branch = targetBranch.name
@@ -73,7 +73,7 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
                     val actualValue = it.mostRecentState.data[key]
                     assertNotNull(actualValue, "Data $key is expected in the audit entry") { value ->
                         assertTrue(
-                            value.matches(valueRegex.toRegex()),
+                            value.asText().matches(valueRegex.toRegex()),
                             "Data $key with value $value must match $valueRegex"
                         )
                     }
