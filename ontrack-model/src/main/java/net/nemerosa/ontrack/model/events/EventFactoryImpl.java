@@ -57,6 +57,10 @@ public class EventFactoryImpl implements EventFactory {
         register(PROPERTY_CHANGE);
         register(PROPERTY_DELETE);
 
+        register(NEW_CONFIGURATION);
+        register(UPDATE_CONFIGURATION);
+        register(DELETE_CONFIGURATION);
+
     }
 
     @Override
