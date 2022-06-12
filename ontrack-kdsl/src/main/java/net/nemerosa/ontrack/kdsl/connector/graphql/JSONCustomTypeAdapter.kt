@@ -15,6 +15,7 @@ class JSONCustomTypeAdapter : CustomTypeAdapter<JsonNode> {
             is CustomTypeValue.GraphQLNull -> NullNode.instance
             is CustomTypeValue.GraphQLBoolean -> BooleanNode.valueOf(value.value)
             is CustomTypeValue.GraphQLNumber -> {
+                @Suppress("MoveVariableDeclarationIntoWhen")
                 val number = value.value
                 when (number) {
                     is Int -> IntNode.valueOf(number)
@@ -34,7 +35,16 @@ class JSONCustomTypeAdapter : CustomTypeAdapter<JsonNode> {
                     }
                 }
             }
-            is CustomTypeValue.GraphQLJsonObject -> TODO()
+            is CustomTypeValue.GraphQLJsonObject -> ObjectNode(jsonNodeFactory).apply {
+                value.value.forEach { (name, element) ->
+                    if (element is CustomTypeValue<*>) {
+                        val node = decode(element)
+                        set(name, node)
+                    } else {
+                        error("Unsupported property in GraphQL object: ${element::class}")
+                    }
+                }
+            }
             else -> error("Unsupported GraphQL type: ${value::class}")
         }
 
@@ -48,15 +58,39 @@ class JSONCustomTypeAdapter : CustomTypeAdapter<JsonNode> {
             value.isDouble -> CustomTypeValue.GraphQLNumber(value.asDouble())
             value.isTextual -> CustomTypeValue.GraphQLString(value.asText())
             value.isArray -> CustomTypeValue.GraphQLJsonList(
-                value.map {
-                    encode(it)
+                value.mapNotNull {
+                    encodePrimitive(it)
                 }
             )
-            value.isObject -> CustomTypeValue.GraphQLJsonObject(
-                value.fields().asSequence().associate { (name, node) ->
-                    name to encode(node)
+            value.isObject -> {
+                val map = mutableMapOf<String, Any>()
+                value.fields().forEach { (name, node) ->
+                    val encoded = encodePrimitive(node)
+                    if (encoded != null)
+                        map[name] = encoded
                 }
-            )
+                CustomTypeValue.GraphQLJsonObject(map)
+            }
+            else -> error("Unsupported type of Json value: ${value.nodeType}")
+        }
+
+    private fun encodePrimitive(value: JsonNode): Any? =
+        when {
+            value.isNull -> null
+            value.isBoolean -> value.asBoolean()
+            value.isInt -> value.asInt()
+            value.isLong -> value.asLong()
+            value.isFloat -> value.asDouble()
+            value.isDouble -> value.asDouble()
+            value.isTextual -> value.asText()
+            value.isArray -> value.map {
+                encodePrimitive(it)
+            }
+            value.isObject -> value.fields()
+                .asSequence()
+                .associate { (name, node) ->
+                    name to encodePrimitive(node)
+                }
             else -> error("Unsupported type of Json value: ${value.nodeType}")
         }
 

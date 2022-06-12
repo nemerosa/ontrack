@@ -48,9 +48,9 @@ class AutoVersioningMetricsServiceImpl(
         )
     }
 
-    override fun onProcessingUncaughtError() {
+    override fun onProcessingError() {
         meterRegistry.increment(
-            AutoVersioningMetrics.Processing.uncaughtErrorCount
+            AutoVersioningMetrics.Processing.errorCount
         )
     }
 

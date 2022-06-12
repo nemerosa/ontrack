@@ -9,7 +9,7 @@ object AutoVersioningMetrics {
 
     object Processing {
         const val completedCount = "ontrack_extension_auto_versioning_processing_completed_count"
-        const val uncaughtErrorCount = "ontrack_extension_auto_versioning_processing_uncaught_error_count"
+        const val errorCount = "ontrack_extension_auto_versioning_processing_error_count"
 
         const val time = "ontrack_extension_auto_versioning_processing_time"
     }

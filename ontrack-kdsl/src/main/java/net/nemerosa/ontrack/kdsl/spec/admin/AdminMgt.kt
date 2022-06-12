@@ -17,7 +17,7 @@ class AdminMgt(connector: Connector) : Connected(connector) {
      * @param count Number of entries to return
      */
     fun logEntries(text: String = "", count: Int = 1): List<LogEntry> =
-        connector.get("rest/admin/logs?count=$count&text=${URLEncoder.encode(text, "UTF-8")}")
+        connector.get("/rest/admin/logs?count=$count&text=${URLEncoder.encode(text, "UTF-8")}")
             .body
             .parse<LogEntries>()
             .resources

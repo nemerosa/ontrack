@@ -70,8 +70,8 @@ class AsyncAutoVersioningQueueListener(
     }
 
     private fun onMessage(message: Message) {
+        val body = message.body.toString(Charsets.UTF_8)
         try {
-            val body = message.body.toString(Charsets.UTF_8)
             val order = body.parseAsJson().parse<AutoVersioningOrder>()
             val queue = message.messageProperties.consumerQueue
             metrics.onReceiving(order, queue)
@@ -83,13 +83,13 @@ class AsyncAutoVersioningQueueListener(
                 metrics.onProcessingCompleted(order, outcome)
             }
         } catch (any: Throwable) {
-            metrics.onProcessingUncaughtError()
+            metrics.onProcessingError()
             applicationLogService.log(
                 ApplicationLogEntry.error(
                     any,
-                    NameDescription.nd("auto-versioning-error", "Catch-all error in auto versioning processing"),
-                    "Uncaught error during the auto versioning processing"
-                )
+                    NameDescription.nd("auto-versioning-error", "Auto versioning processing error"),
+                    "Auto versioning could not be processed: $body"
+                ).withDetail("message", any.message)
             )
         }
     }

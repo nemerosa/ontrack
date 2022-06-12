@@ -837,8 +837,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        project.configuredForGitHub(ontrack)
-                        // configuredForGitHubRepository(ontrack) Only the project, not the branch
+                        configuredForGitHubRepository(ontrack)
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -871,7 +870,6 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                             hasNoPR(to = "main")
 
-                            // TODO And most recent state for auto versioning audit for source "<project:a>" and target "b" is "ERROR"
                         }
 
                         checkErrorMessageLogged("""Cannot find version in "gradle.properties"""")

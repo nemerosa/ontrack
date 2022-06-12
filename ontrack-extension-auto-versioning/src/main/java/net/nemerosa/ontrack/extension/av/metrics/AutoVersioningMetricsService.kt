@@ -16,7 +16,7 @@ interface AutoVersioningMetricsService {
     ): AutoVersioningProcessingOutcome
 
     fun onProcessingCompleted(order: AutoVersioningOrder, outcome: AutoVersioningProcessingOutcome)
-    fun onProcessingUncaughtError()
+    fun onProcessingError()
 
     fun onPostProcessingStarted(order: AutoVersioningOrder, postProcessing: PostProcessing<*>)
     fun postProcessingTiming(order: AutoVersioningOrder, postProcessing: PostProcessing<*>, code: () -> Unit)
