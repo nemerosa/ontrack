@@ -19,7 +19,11 @@ internal class JSONCustomTypeAdapterTest {
         val value = adapter.encode(input)
         val decoded = adapter.decode(value)
         assertEquals(
-            input,
+            mapOf(
+                "configuration" to "gh05513124",
+                "repository" to "owner/77bd738eac45",
+                "indexationInterval" to 0,
+            ).asJson(),
             decoded
         )
     }
