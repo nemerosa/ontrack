@@ -57,6 +57,7 @@ val kdslAcceptanceTestComposeDown by tasks.named("kdslAcceptanceTestComposeDown"
 // Restricting unit tests
 
 tasks.named<Test>("test") {
+    useJUnitPlatform()
     exclude("**/ACC*")
 }
 
@@ -64,6 +65,7 @@ tasks.named<Test>("test") {
 
 
 val kdslAcceptanceTest by tasks.registering(Test::class) {
+    useJUnitPlatform()
     mustRunAfter("test")
     include("**/ACC*.class")
     minHeapSize = "512m"

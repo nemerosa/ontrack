@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.kdsl.spec.extension.general.label
 import net.nemerosa.ontrack.kdsl.spec.extension.git.gitCommitProperty
 import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHub
 import net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion.setBranchGitHubIngestionConfig
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class ACCDSLGitHubIngestionTagging : AbstractACCDSLGitHubIngestionTestSupport() {
