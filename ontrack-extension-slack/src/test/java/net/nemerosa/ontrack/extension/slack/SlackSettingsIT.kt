@@ -1,22 +1,16 @@
 package net.nemerosa.ontrack.extension.slack
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.model.support.SettingsRepository
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class SlackSettingsIT : AbstractDSLTestSupport() {
 
-    @Autowired
-    private lateinit var settingsRepository: SettingsRepository
-
     @Test
     fun `Default settings`() {
-        withSettings<SlackSettings> {
-            settingsRepository.deleteAll(SlackSettings::class.java)
+        withCleanSettings<SlackSettings> {
             val settings = settingsService.getCachedSettings(SlackSettings::class.java)
             assertFalse(settings.enabled, "Slack not enabled by default")
             assertEquals("", settings.token, "No Slack token by default")
