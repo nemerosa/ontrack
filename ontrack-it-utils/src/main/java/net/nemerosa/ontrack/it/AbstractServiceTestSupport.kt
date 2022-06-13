@@ -36,7 +36,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     protected lateinit var settingsManagerService: SettingsManagerService
 
     @Autowired
-    protected lateinit var cachedSettingsService: CachedSettingsService
+    lateinit var cachedSettingsService: CachedSettingsService
 
     @Autowired
     protected lateinit var securityService: SecurityService

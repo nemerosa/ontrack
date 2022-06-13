@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.av.config
 
-import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLType
 import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.extension.av.graphql.SetAutoVersioningConfigInput
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.jupiter.api.Test

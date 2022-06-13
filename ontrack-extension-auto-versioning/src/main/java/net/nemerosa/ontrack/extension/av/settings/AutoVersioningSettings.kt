@@ -22,12 +22,12 @@ data class AutoVersioningSettings(
         const val DEFAULT_ENABLED = false
 
         /**
-         * Default value for [PRCreationSettings.auditRetentionDuration]
+         * Default value for [AutoVersioningSettings.auditRetentionDuration]
          */
         val DEFAULT_AUDIT_RETENTION_DURATION: Duration = Duration.ofDays(14)
 
         /**
-         * Default value for [PRCreationSettings.auditCleanupDuration]
+         * Default value for [AutoVersioningSettings.auditCleanupDuration]
          */
         val DEFAULT_AUDIT_CLEANUP_DURATION: Duration = Duration.ofDays(90)
     }

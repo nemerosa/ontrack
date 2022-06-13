@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.model.support.SettingsRepository
 import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
@@ -37,6 +38,9 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
 
     @Autowired
     protected lateinit var settingsService: CachedSettingsService
+
+    @Autowired
+    lateinit var settingsRepository: SettingsRepository
 
     @Autowired
     protected lateinit var predefinedPromotionLevelService: PredefinedPromotionLevelService
@@ -468,6 +472,17 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      */
     protected final inline fun <reified T: Any> withSettings(noinline code: () -> Unit) {
         withSettings(T::class, code)
+    }
+
+    /**
+     * Saving the the current settings and removing them for the duration of the code
+     */
+    protected final inline fun <reified T: Any> withCleanSettings(noinline code: () -> Unit) {
+        withSettings<T> {
+            cachedSettingsService.invalidate(T::class.java)
+            settingsRepository.deleteAll(T::class.java)
+            code()
+        }
     }
 
     /**

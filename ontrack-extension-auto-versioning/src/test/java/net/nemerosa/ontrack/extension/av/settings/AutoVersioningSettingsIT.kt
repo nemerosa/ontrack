@@ -9,7 +9,7 @@ internal class AutoVersioningSettingsIT : AbstractAutoVersioningTestSupport() {
     @Test
     fun `Saving and retrieving the settings`() {
         asAdmin {
-            withSettings<AutoVersioningSettings> {
+            withCleanSettings<AutoVersioningSettings> {
                 val settings = AutoVersioningSettings(
                     enabled = true,
                 )
@@ -23,7 +23,7 @@ internal class AutoVersioningSettingsIT : AbstractAutoVersioningTestSupport() {
     @Test
     fun `Default settings`() {
         asAdmin {
-            withSettings<AutoVersioningSettings> {
+            withCleanSettings<AutoVersioningSettings> {
                 val settings = settingsService.getCachedSettings(AutoVersioningSettings::class.java)
                 assertEquals(AutoVersioningSettings.DEFAULT_ENABLED, settings.enabled)
             }
