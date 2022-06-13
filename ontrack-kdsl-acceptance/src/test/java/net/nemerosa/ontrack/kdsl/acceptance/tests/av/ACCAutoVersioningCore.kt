@@ -4,6 +4,8 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHubPlayground
 import net.nemerosa.ontrack.kdsl.acceptance.tests.github.system.withTestGitHubRepository
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
+import net.nemerosa.ontrack.kdsl.spec.extension.general.buildLinkDisplayUseLabel
+import net.nemerosa.ontrack.kdsl.spec.extension.general.label
 import org.junit.jupiter.api.Test
 
 @TestOnGitHubPlayground
@@ -878,6 +880,64 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                             this,
                             "ERROR"
                         )
+
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Auto versioning from a project using version as a label`() {
+        withTestGitHubRepository {
+            withAutoVersioning {
+                repositoryFile("gradle.properties") {
+                    """
+                        depVersion = 1.0.0
+                    """.trimIndent()
+                }
+                val dependency = project {
+                    buildLinkDisplayUseLabel = true
+                    branch(name = "main") {
+                        promotion(name = "IRON")
+                        this
+                    }
+                }
+                project {
+                    branch {
+                        configuredForGitHubRepository(ontrack)
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "depVersion",
+                                )
+                            )
+                        )
+
+                        dependency.apply {
+                            build(name = "1.1.0-1") {
+                                label = "1.1.0"
+                                promote("IRON")
+                            }
+                        }
+
+                        waitForAutoVersioningCompletion()
+
+                        assertThatGitHubRepository {
+                            hasPR(
+                                from = "feature/auto-upgrade-${dependency.project.name}-1.1.0-fad58de7366495db4650cfefac2fcd61",
+                                to = "main"
+                            )
+                            fileContains("gradle.properties") {
+                                """
+                                    depVersion = 1.1.0
+                                """.trimIndent()
+                            }
+                        }
 
                     }
                 }
