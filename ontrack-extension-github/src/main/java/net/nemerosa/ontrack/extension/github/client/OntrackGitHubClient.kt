@@ -44,9 +44,11 @@ interface OntrackGitHubClient {
      * This should be used exclusively for calling the REST API of GitHub. For GraphQL calls,
      * please use the [graphQL] function.
      *
+     * @param token Alternative token
+     *
      * @see graphQL
      */
-    fun createGitHubRestTemplate(): RestTemplate
+    fun createGitHubRestTemplate(token: String? = null): RestTemplate
 
     /**
      * Performs a GraphQL call against GitHub.
@@ -54,6 +56,7 @@ interface OntrackGitHubClient {
      * @param message Title for the call (used in Ontrack logs)
      * @param query GraphQL query
      * @param variables GraphQL variables
+     * @param token Alternative token
      * @param code Code to run against the `data` node of the GraphQL response. Note that GraphQL level errors
      * have already been processed.
      * @return Response returns by [code]
@@ -63,7 +66,8 @@ interface OntrackGitHubClient {
         message: String,
         query: String,
         variables: Map<String, *> = emptyMap<String, Any>(),
-        code: (data: JsonNode) -> T
+        token: String? = null,
+        code: (data: JsonNode) -> T,
     ): T
 
     /**
@@ -115,5 +119,93 @@ interface OntrackGitHubClient {
      * @return Binary content of the file or null if the file cannot be found
      */
     fun getFileContent(repository: String, branch: String?, path: String): ByteArray?
+
+    /**
+     * Downloads a file on a branch.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param branch Name of the branch (without refs/heads) or null if the default branch must be used
+     * @param path Path to the file
+     * @return Raw content of the file
+     */
+    fun getFile(repository: String, branch: String?, path: String): GitHubFile?
+
+    /**
+     * Gets the last commit for a branch.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param branch Name of the branch
+     * @return SHA of the last commit of the branch, `null` if no commit or no branch
+     */
+    fun getBranchLastCommit(repository: String, branch: String): String?
+
+    /**
+     * Creates a branch
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param source Source branch
+     * @param destination Branch to create
+     * @return SHA of the commit, `null` if no source branch
+     */
+    fun createBranch(repository: String, source: String, destination: String): String?
+
+    /**
+     * Sets the content of the file at [path].
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param branch Branch to target
+     * @param sha Sha of the initial file
+     * @param path Path to get the file at
+     * @param content Content of the file as binary
+     */
+    fun setFileContent(repository: String, branch: String, sha: String, path: String, content: ByteArray)
+
+    /**
+     * Creates a pull request
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param title PR title
+     * @param head Source branch
+     * @param base Target branch
+     * @param body PR description
+     * @return Created PR
+     */
+    fun createPR(repository: String, title: String, head: String, base: String, body: String): GitHubPR
+
+    /**
+     * Approves a pull request.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param pr PR number
+     * @param body PR approval description
+     * @param token If defined, used for the authentication of this call
+     */
+    fun approvePR(repository: String, pr: Int, body: String, token: String?)
+
+    /**
+     * Enables auto merge on a pull request
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param pr PR number
+     */
+    fun enableAutoMerge(repository: String, pr: Int)
+
+    /**
+     * Checks if a pull request is mergeable
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param pr PR number
+     * @return PR mergeable state
+     */
+    fun isPRMergeable(repository: String, pr: Int): Boolean
+
+    /**
+     * Merges a PR.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param pr PR number
+     * @param message Commit message
+     */
+    fun mergePR(repository: String, pr: Int, message: String)
 
 }

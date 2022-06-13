@@ -239,7 +239,7 @@ class DefaultOntrackGitHubClient(
         variables: Map<String, *> = emptyMap<String, Any>(),
         collectionAt: List<String>,
         nodes: Boolean = false,
-        code: (node: JsonNode) -> T
+        code: (node: JsonNode) -> T,
     ): List<T>? {
         val results = mutableListOf<T>()
         var hasNext = true
@@ -280,10 +280,11 @@ class DefaultOntrackGitHubClient(
         message: String,
         query: String,
         variables: Map<String, *>,
-        code: (data: JsonNode) -> T
+        token: String?,
+        code: (data: JsonNode) -> T,
     ): T {
         // Getting a client
-        val client = createGitHubTemplate(graphql = true)
+        val client = createGitHubTemplate(graphql = true, token = token)
         // GraphQL call
         return client(message) {
             val response = postForObject(
@@ -311,7 +312,7 @@ class DefaultOntrackGitHubClient(
 
     private operator fun <T> RestTemplate.invoke(
         message: String,
-        code: RestTemplate.() -> T
+        code: RestTemplate.() -> T,
     ): T {
         logger.debug("[github] {}", message)
         return try {
@@ -335,30 +336,34 @@ class DefaultOntrackGitHubClient(
         }
     }
 
-    override fun createGitHubRestTemplate(): RestTemplate =
-        createGitHubTemplate(graphql = false)
+    override fun createGitHubRestTemplate(token: String?): RestTemplate =
+        createGitHubTemplate(graphql = false, token = token)
 
-    private fun createGitHubTemplate(graphql: Boolean): RestTemplate = RestTemplateBuilder()
+    private fun createGitHubTemplate(graphql: Boolean, token: String?): RestTemplate = RestTemplateBuilder()
         .rootUri(getApiRoot(configuration.url, graphql))
         .setConnectTimeout(timeout)
         .setReadTimeout(timeout)
         .run {
-            when (configuration.authenticationType()) {
-                GitHubAuthenticationType.ANONYMOUS -> this // Nothing to be done
-                GitHubAuthenticationType.PASSWORD -> {
-                    basicAuthentication(configuration.user, configuration.password)
-                }
-                GitHubAuthenticationType.USER_TOKEN -> {
-                    basicAuthentication(configuration.user, configuration.oauth2Token)
-                }
-                GitHubAuthenticationType.TOKEN -> {
-                    defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${configuration.oauth2Token}")
-                }
-                GitHubAuthenticationType.APP -> {
-                    defaultHeader(
-                        HttpHeaders.AUTHORIZATION,
-                        "Bearer ${gitHubAppTokenService.getAppInstallationToken(configuration)}"
-                    )
+            if (token != null) {
+                defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer $token")
+            } else {
+                when (configuration.authenticationType()) {
+                    GitHubAuthenticationType.ANONYMOUS -> this // Nothing to be done
+                    GitHubAuthenticationType.PASSWORD -> {
+                        basicAuthentication(configuration.user, configuration.password)
+                    }
+                    GitHubAuthenticationType.USER_TOKEN -> {
+                        basicAuthentication(configuration.user, configuration.oauth2Token)
+                    }
+                    GitHubAuthenticationType.TOKEN -> {
+                        defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${configuration.oauth2Token}")
+                    }
+                    GitHubAuthenticationType.APP -> {
+                        defaultHeader(
+                            HttpHeaders.AUTHORIZATION,
+                            "Bearer ${gitHubAppTokenService.getAppInstallationToken(configuration)}"
+                        )
+                    }
                 }
             }
         }
@@ -448,9 +453,12 @@ class DefaultOntrackGitHubClient(
         }
     }
 
-    override fun getFileContent(repository: String, branch: String?, path: String): ByteArray? {
+    override fun getFileContent(repository: String, branch: String?, path: String): ByteArray? =
+        getFile(repository, branch, path)?.contentAsBinary()
+
+    override fun getFile(repository: String, branch: String?, path: String): GitHubFile? {
         // Logging
-        logger.debug("[github] Getting file content {}/{}@{}", repository, path, branch)
+        logger.debug("[github] Getting file {}/{}@{}", repository, path, branch)
         // Getting a client
         val client = createGitHubRestTemplate()
         // Gets the repository for this project
@@ -461,9 +469,11 @@ class DefaultOntrackGitHubClient(
                 "$this?ref=$branch"
             }
             client("Get file content $repository/$path@$branch") {
-                getForObject<JsonNode>(restPath).let {
-                    val encodedContent = it.getRequiredTextField("content")
-                    Base64.decodeBase64(encodedContent)
+                getForObject<GitHubGetContentResponse>(restPath).let {
+                    GitHubFile(
+                        content = it.content,
+                        sha = it.sha,
+                    )
                 }
             }
         } catch (ex: GitHubErrorsException) {
@@ -472,6 +482,179 @@ class DefaultOntrackGitHubClient(
             } else {
                 throw ex
             }
+        }
+    }
+
+    override fun getBranchLastCommit(repository: String, branch: String): String? {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Call
+        return client("Get last commit for $branch") {
+            getForObject(
+                "/repos/${owner}/${name}/git/ref/heads/${branch}",
+                GitHubGetRefResponse::class.java
+            )?.`object`?.sha
+        }
+    }
+
+    override fun createBranch(repository: String, source: String, destination: String): String? {
+        // Gets the last commit of the source branch
+        val sourceCommit = getBranchLastCommit(repository, source) ?: return null
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Creating the branch
+        return client("Create branch $destination from $source") {
+            val response = postForObject(
+                "/repos/${owner}/${name}/git/refs",
+                mapOf(
+                    "ref" to "refs/heads/$destination",
+                    "sha" to sourceCommit
+                ),
+                GitHubGetRefResponse::class.java
+            )
+            // Returns the new commit
+            response?.`object`?.sha
+        }
+    }
+
+    override fun setFileContent(repository: String, branch: String, sha: String, path: String, content: ByteArray) {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Call
+        client("Setting file content at $path for branch $branch") {
+            put(
+                "/repos/$owner/$name/contents/$path",
+                mapOf(
+                    "message" to "Creating $path",
+                    "content" to Base64.encodeBase64String(content),
+                    "sha" to sha,
+                    "branch" to branch
+                )
+            )
+        }
+    }
+
+    override fun createPR(repository: String, title: String, head: String, base: String, body: String): GitHubPR {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Call
+        return client("Creating PR from $head to $base") {
+            postForObject(
+                "/repos/$owner/$name/pulls",
+                mapOf(
+                    "title" to title,
+                    "head" to head,
+                    "base" to base,
+                    "body" to body
+                ),
+                GitHubPullRequestResponse::class.java
+            )
+        }?.run {
+            GitHubPR(
+                number = number,
+                mergeable = mergeable,
+                mergeable_state = mergeable_state,
+                html_url = html_url
+            )
+        } ?: throw IllegalStateException("PR creation response did not return a PR.")
+    }
+
+    override fun approvePR(repository: String, pr: Int, body: String, token: String?) {
+        // Getting a client
+        val client = createGitHubRestTemplate(token)
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Call
+        client("Approving PR $pr") {
+            postForObject(
+                "/repos/$owner/$name/pulls/$pr/reviews",
+                mapOf(
+                    "body" to body,
+                    "event" to "APPROVE"
+                ),
+                JsonNode::class.java
+            )
+        }
+    }
+
+    override fun enableAutoMerge(repository: String, pr: Int) {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Gets the GraphQL node ID for this PR
+        val nodeId = client("Getting PR node ID") {
+            getForObject(
+                "/repos/${owner}/${name}/pulls/${pr}",
+                GitHubPullRequestResponse::class.java
+            )
+        }?.node_id ?: error("Cannot get PR node ID")
+        // Only the GraphQL API is available
+        graphQL(
+            "Enabling auto merge on PR $pr",
+            """
+                 mutation EnableAutoMerge(${'$'}prNodeId: ID!, ${'$'}commitHeadline: String!) {
+                    enablePullRequestAutoMerge(input: {
+                        pullRequestId: ${'$'}prNodeId,
+                        commitHeadline: ${'$'}commitHeadline
+                    }) {
+                        pullRequest {
+                            number
+                        }
+                    }
+                 }
+            """,
+            mapOf(
+                "prNodeId" to nodeId,
+                "commitHeadline" to "Automated merged from Ontrack for auto versioning on promotion"
+            )
+        ) { data ->
+            val prNumber = data.path("enablePullRequestAutoMerge").path("pullRequest").path("number")
+            if (prNumber.isNullOrNullNode()) {
+                throw GitHubAutoMergeNotEnabledException(repository)
+            }
+        }
+    }
+
+    override fun isPRMergeable(repository: String, pr: Int): Boolean {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Call
+        return client("Checking if PR $pr is mergeable") {
+            val response = getForObject(
+                "/repos/$owner/$name/pulls/$pr",
+                GitHubPullRequestResponse::class.java
+            )
+            // We need both the mergeable flag and the mergeable state
+            // Mergeable is not enough since it represents only the fact that the branch can be merged
+            // from a Git-point of view and does not represent the checks
+            (response?.mergeable ?: false) && (response?.mergeable_state == "clean")
+        }
+    }
+
+    override fun mergePR(repository: String, pr: Int, message: String) {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Call
+        client("Merging PR $pr") {
+            put(
+                "/repos/$owner/$name/pulls/$pr/merge",
+                mapOf(
+                    "commit_title" to "Automated merged from Ontrack for auto versioning on promotion"
+                )
+            )
         }
     }
 
@@ -584,7 +767,7 @@ class DefaultOntrackGitHubClient(
     @JsonIgnoreProperties(ignoreUnknown = true)
     private data class GitHubErrorMessage(
         val message: String,
-        val errors: List<GitHubError>?
+        val errors: List<GitHubError>?,
     ) {
         fun format(message: String): String = mapOf(
             "message" to message,
@@ -596,7 +779,53 @@ class DefaultOntrackGitHubClient(
     private data class GitHubError(
         val resource: String,
         val field: String,
-        val code: String
+        val code: String,
+    )
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private data class GitHubGetRefResponse(
+        val `object`: GitHubObject,
+    )
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private data class GitHubObject(
+        val sha: String,
+    )
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private data class GitHubGetContentResponse(
+        /**
+         * Base64 encoded content
+         */
+        val content: String,
+        /**
+         * SHA of the file
+         */
+        val sha: String,
+    )
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private data class GitHubPullRequestResponse(
+        /**
+         * Local ID of the PR
+         */
+        val number: Int,
+        /**
+         * Node ID (for use in GraphQL)
+         */
+        val node_id: String,
+        /**
+         * Is the PR mergeable?
+         */
+        val mergeable: Boolean?,
+        /**
+         * Mergeable status
+         */
+        val mergeable_state: String?,
+        /**
+         * Link to the PR
+         */
+        val html_url: String?,
     )
 
 }
