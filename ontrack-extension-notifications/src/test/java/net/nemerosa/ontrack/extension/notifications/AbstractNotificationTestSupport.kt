@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.extension.notifications.mock.OtherMockNotificationCh
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionService
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.events.EventFactory
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
 
@@ -30,5 +32,21 @@ abstract class AbstractNotificationTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
     protected lateinit var eventFactory: EventFactory
+
+    @Autowired
+    protected lateinit var notificationsConfigProperties: NotificationsConfigProperties
+
+    private var notificationsConfigPropertiesEnabled = false
+
+    @BeforeEach
+    fun before() {
+        notificationsConfigPropertiesEnabled = notificationsConfigProperties.enabled
+        notificationsConfigProperties.enabled = true
+    }
+
+    @AfterEach
+    fun after() {
+        notificationsConfigProperties.enabled = notificationsConfigPropertiesEnabled
+    }
 
 }

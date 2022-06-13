@@ -149,7 +149,7 @@ ontrack.config.search.index.tracing = false
 [source,properties]
 ----
 # Are the notifications enabled?
-ontrack.config.extension.notifications.enabled = true
+ontrack.config.extension.notifications.enabled = false
 
 # Dispatching configuration
 

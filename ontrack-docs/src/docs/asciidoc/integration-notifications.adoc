@@ -3,6 +3,11 @@
 
 Ontrack has the possibility to send send notifications to different <<notifications-backends,backends>> like some webhooks, email, Slack messages, etc.
 
+[WARNING]
+====
+By default, notifications are _not_ enabled. You need to activate them by setting the <<configuration-properties-notifications,`ontrack.config.extension.notifications.enabled`>> configuration property to `true`.
+====
+
 A notification is the association between an _event_ occurring on an _entity_ and sent to a given _backend_ using some _configuration_.
 
 For example, a notification can be:
