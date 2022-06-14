@@ -69,6 +69,8 @@ services:
          SPRING_RABBITMQ_HOST: rabbitmq
          SPRING_RABBITMQ_USERNAME: ontrack
          SPRING_RABBITMQ_PASSWORD: ontrack
+         # Notifications
+         ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_ENABLED: "false"
    selenium:
       image: "selenium/standalone-chrome:91.0"
       shm_size: 2g
