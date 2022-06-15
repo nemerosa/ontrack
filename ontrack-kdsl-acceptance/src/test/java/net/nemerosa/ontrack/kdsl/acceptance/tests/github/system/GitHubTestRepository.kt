@@ -174,7 +174,9 @@ class GitHubRepositoryContext(
 
         private fun checkPR(from: String?, to: String?, checkPR: (GitHubPR?) -> Boolean): GitHubPR? {
             var pr: GitHubPR? = null
-            waitUntil {
+            waitUntil(
+                task = "Checking the PR from $from to $to"
+            ) {
                 pr = getPR(from, to)
                 checkPR(pr)
             }
