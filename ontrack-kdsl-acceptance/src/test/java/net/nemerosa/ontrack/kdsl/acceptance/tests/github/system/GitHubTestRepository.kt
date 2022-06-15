@@ -209,7 +209,19 @@ class GitHubRepositoryContext(
         ) {
             val expectedContent = content()
             waitUntil(
-                task = "Waiting for file $path on branch $branch to have a given content."
+                task = "Waiting for file $path on branch $branch to have a given content.",
+                onTimeout = {
+                    val actualContent = getFile(path, branch).joinToString("\n")
+                    fail("""
+Expected the following content for the $path file on the $branch branch:
+
+$expectedContent
+
+but got:
+
+$actualContent
+""".trimIndent())
+                }
             ) {
                 val actualContent = getFile(path, branch).joinToString("\n")
                 expectedContent in actualContent
