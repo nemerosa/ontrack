@@ -45,17 +45,21 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
                 )
                 // Sends all kinds of notifications to the internal end point
                 repeat(injectionWebhookRolls) {
-                    ontrack.notifications.webhooks.internalEndpoint.testOk(webhookName,
+                    ontrack.notifications.webhooks.internalEndpoint.testOk(
+                        webhookName,
                         "OK $it"
                     )
-                    ontrack.notifications.webhooks.internalEndpoint.testOk(webhookName,
+                    ontrack.notifications.webhooks.internalEndpoint.testOk(
+                        webhookName,
                         "OK $it with delay",
                         delayMs = 1000L,
                     )
-                    ontrack.notifications.webhooks.internalEndpoint.testNotFound(webhookName,
+                    ontrack.notifications.webhooks.internalEndpoint.testNotFound(
+                        webhookName,
                         "Not found $it"
                     )
-                    ontrack.notifications.webhooks.internalEndpoint.testError(webhookName,
+                    ontrack.notifications.webhooks.internalEndpoint.testError(
+                        webhookName,
                         "Error $it"
                     )
                 }
@@ -93,8 +97,26 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
                 )
                 // Creating a new branch
                 val branch = branch { this }
+                // Code to run in case of timeout
+                val onTimeout: () -> Unit = {
+                    // Details about the webhook
+                    val webhook = ontrack.notifications.webhooks.findWebhookByName(webhookName)
+                    println("$webhookName webhook details:")
+                    println(webhook)
+                    // Get the last deliveries of the webhook
+                    println("$webhookName webhook last deliveries:")
+                    val deliveries = ontrack.notifications.webhooks.getDeliveries(webhook = webhookName).items
+                    deliveries.forEach { delivery ->
+                        println("----------------------------")
+                        println(delivery)
+                    }
+                }
                 // Checking the webhook has received the payload
-                waitUntil(timeout = 10.seconds, interval = 500) {
+                waitUntil(
+                    timeout = 10.seconds, interval = 500,
+                    task = "Checking the webhook has received the payload with event_type=new_branch, project=$name, branch=${branch.name}",
+                    onTimeout = onTimeout,
+                ) {
                     ontrack.notifications.webhooks.internalEndpoint.payloads.any {
                         it.type == "event" &&
                                 it.data.path("eventType").path("id").asText() == "new_branch"
@@ -125,7 +147,10 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
             // Pinging the webhook
             ontrack.notifications.webhooks.ping(webhookName)
             // Checks that the webhook received the event
-            waitUntil(timeout = 10.seconds, interval = 500) {
+            waitUntil(
+                timeout = 10.seconds, interval = 500,
+                task = "Checking the webhook has received the payload with type=type, message=Webhook $webhookName ping"
+            ) {
                 val payloads = ontrack.notifications.webhooks.internalEndpoint.payloads
                 payloads.any {
                     it.type == "ping"
