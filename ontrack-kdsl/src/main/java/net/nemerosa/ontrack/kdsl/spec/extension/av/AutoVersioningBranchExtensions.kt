@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.kdsl.spec.extension.av
 
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.GetBranchAutoVersioningConfigQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.SetAutoVersioningConfigMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoVersioningSourceConfigInput
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
@@ -39,3 +40,29 @@ fun Branch.setAutoVersioningConfig(
         )
     ) { it?.setAutoVersioningConfig()?.fragments()?.payloadUserErrors()?.convert() }
 }
+
+fun Branch.getAutoVersioningConfig(): List<AutoVersioningSourceConfig> =
+    graphqlConnector.query(
+        GetBranchAutoVersioningConfigQuery(id.toInt())
+    )?.branches()?.firstOrNull()?.autoVersioningConfig()?.configurations()?.map {
+        AutoVersioningSourceConfig(
+            sourceProject = it.sourceProject(),
+            sourceBranch = it.sourceBranch(),
+            sourcePromotion = it.sourcePromotion(),
+            targetPath = it.targetPath(),
+            targetRegex = it.targetRegex(),
+            targetProperty = it.targetProperty(),
+            targetPropertyRegex = it.targetPropertyRegex(),
+            targetPropertyType = it.targetPropertyType(),
+            autoApproval = it.autoApproval(),
+            upgradeBranchPattern = it.upgradeBranchPattern(),
+            postProcessing = it.postProcessing(),
+            postProcessingConfig = it.postProcessingConfig(),
+            validationStamp = it.validationStamp(),
+            autoApprovalMode = when (it.autoApprovalMode()) {
+                net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoApprovalMode.CLIENT -> AutoApprovalMode.CLIENT
+                net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoApprovalMode.SCM -> AutoApprovalMode.SCM
+                else -> null
+            },
+        )
+    } ?: emptyList()

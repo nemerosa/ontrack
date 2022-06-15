@@ -1,0 +1,24 @@
+query GetBranchAutoVersioningConfig(
+    $branchId: Int!,
+) {
+    branches(id: $branchId) {
+        autoVersioningConfig {
+            configurations {
+                autoApproval
+                autoApprovalMode
+                postProcessing
+                postProcessingConfig
+                sourceBranch
+                sourceProject
+                sourcePromotion
+                targetPath
+                targetProperty
+                targetPropertyRegex
+                targetPropertyType
+                targetRegex
+                upgradeBranchPattern
+                validationStamp
+            }
+        }
+    }
+}
