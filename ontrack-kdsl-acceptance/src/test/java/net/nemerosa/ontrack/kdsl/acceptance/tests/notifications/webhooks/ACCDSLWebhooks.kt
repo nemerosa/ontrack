@@ -19,7 +19,7 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
         private const val injectionWebhookCount = 3
         private const val injectionWebhookRolls = 30
 
-        private val waitingDelayForWebhook = 30.seconds
+        private val waitingDelayForWebhook = 120.seconds
     }
 
     /**
@@ -187,6 +187,12 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
         deliveries.forEach { delivery ->
             println("----------------------------")
             println(delivery)
+        }
+        // Get the payloads received by the internal webhook
+        println("Last internal endpoint payloads:")
+        ontrack.notifications.webhooks.internalEndpoint.payloads.forEach { payload ->
+            println("----------------------------")
+            println(payload)
         }
     }
 
