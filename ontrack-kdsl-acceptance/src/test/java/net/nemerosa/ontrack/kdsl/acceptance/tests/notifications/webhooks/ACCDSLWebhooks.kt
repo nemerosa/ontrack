@@ -18,6 +18,8 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
     companion object {
         private const val injectionWebhookCount = 3
         private const val injectionWebhookRolls = 30
+
+        private val waitingDelayForWebhook = 30.seconds
     }
 
     /**
@@ -35,7 +37,7 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
                 ontrack.notifications.webhooks.createWebhook(
                     name = webhookName,
                     enabled = true,
-                    url = "${ontractConnectionProperties.url}/extension/notifications/webhooks/internal",
+                    url = "${ontractConnectionProperties.internalUrl}/extension/notifications/webhooks/internal",
                     timeout = Duration.ofMinutes(1),
                     authenticationType = "header",
                     authenticationConfig = mapOf(
@@ -75,7 +77,7 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
             ontrack.notifications.webhooks.createWebhook(
                 name = webhookName,
                 enabled = true,
-                url = "${ontractConnectionProperties.url}/extension/notifications/webhooks/internal",
+                url = "${ontractConnectionProperties.internalUrl}/extension/notifications/webhooks/internal",
                 timeout = Duration.ofMinutes(1),
                 authenticationType = "header",
                 authenticationConfig = mapOf(
@@ -99,7 +101,7 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
                 val branch = branch { this }
                 // Checking the webhook has received the payload
                 waitUntil(
-                    timeout = 10.seconds, interval = 500,
+                    timeout = waitingDelayForWebhook, interval = 500,
                     task = "Checking the webhook has received the payload with event_type=new_branch, project=$name, branch=${branch.name}",
                     onTimeout = onTimeout(webhookName),
                 ) {
@@ -122,7 +124,7 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
             ontrack.notifications.webhooks.createWebhook(
                 name = webhookName,
                 enabled = true,
-                url = "${ontractConnectionProperties.url}/extension/notifications/webhooks/internal",
+                url = "${ontractConnectionProperties.internalUrl}/extension/notifications/webhooks/internal",
                 timeout = Duration.ofMinutes(1),
                 authenticationType = "header",
                 authenticationConfig = mapOf(
@@ -134,7 +136,7 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
             ontrack.notifications.webhooks.ping(webhookName)
             // Checks that the webhook received the event
             waitUntil(
-                timeout = 10.seconds, interval = 500,
+                timeout = waitingDelayForWebhook, interval = 500,
                 task = "Checking the webhook has received the payload with type=type, message=Webhook $webhookName ping",
                 onTimeout = onTimeout(webhookName),
             ) {
@@ -146,7 +148,7 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
             }
             // Checks that the delivery has been registered
             waitUntil(
-                timeout = 10.seconds, interval = 500,
+                timeout = waitingDelayForWebhook, interval = 500,
                 task = "Checking the webhook delivery has been registered",
                 onTimeout = onTimeout(webhookName),
             ) {

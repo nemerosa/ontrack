@@ -24,6 +24,11 @@ object ACCProperties {
             @DefaultValue("http://localhost:8800/manage")
             val url: String by fromEnv()
         }
+
+        object Internal {
+            @DefaultValue("http://localhost:8080")
+            val url: String by fromEnv()
+        }
     }
 
     @Target(AnnotationTarget.PROPERTY)
