@@ -206,7 +206,9 @@ class GitHubRepositoryContext(
             content: () -> String,
         ) {
             val expectedContent = content()
-            waitUntil {
+            waitUntil(
+                task = "Waiting for file $path on branch $branch to have a given content."
+            ) {
                 val actualContent = getFile(path, branch).joinToString("\n")
                 expectedContent in actualContent
             }
