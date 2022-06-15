@@ -32,7 +32,7 @@ class AutoVersioningProcessingServiceImpl(
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningProcessingServiceImpl::class.java)
 
     override fun process(order: AutoVersioningOrder): AutoVersioningProcessingOutcome {
-        logger.info("Processing auto versioning order: {}", order)
+        logger.debug("Processing auto versioning order: {}", order)
         autoVersioningAuditService.onProcessingStart(order)
         val branch = order.branch
         // Gets the SCM configuration for the project
@@ -55,7 +55,7 @@ class AutoVersioningProcessingServiceImpl(
             val commitId: String by lazy {
                 // Creates an upgrade branch and gets its commit ID
                 try {
-                    logger.info(
+                    logger.debug(
                         "Processing auto versioning order creating branch {}: {}",
                         upgradeBranch,
                         order
@@ -85,7 +85,7 @@ class AutoVersioningProcessingServiceImpl(
                         // Changes the version
                         val updatedLines = order.replaceVersion(lines)
                         // Pushes the change to the branch
-                        logger.info(
+                        logger.debug(
                             "Processing auto versioning order pushing upgrade to {}/{}: {}",
                             upgradeBranch,
                             targetPath,
@@ -105,7 +105,7 @@ class AutoVersioningProcessingServiceImpl(
                             }
                             // Launching the post processing
                             else {
-                                logger.info("Processing auto versioning order launching post processing: {}", order)
+                                logger.debug("Processing auto versioning order launching post processing: {}", order)
                                 autoVersioningAuditService.onPostProcessingStart(order, upgradeBranch)
                                 measureAndLaunchPostProcessing(
                                     postProcessing,
@@ -113,7 +113,7 @@ class AutoVersioningProcessingServiceImpl(
                                     repositoryUri,
                                     upgradeBranch
                                 )
-                                logger.info("Processing auto versioning order end of post processing: {}", order)
+                                logger.debug("Processing auto versioning order end of post processing: {}", order)
                                 autoVersioningAuditService.onPostProcessingEnd(order, upgradeBranch)
                             }
                         }
@@ -134,7 +134,7 @@ class AutoVersioningProcessingServiceImpl(
 
                 // Creates a PR with auto approval
                 try {
-                    logger.info("Processing auto versioning order creating PR: {}", order)
+                    logger.debug("Processing auto versioning order creating PR: {}", order)
                     // Audit
                     autoVersioningAuditService.onPRCreating(order, upgradeBranch)
                     // PR creation
@@ -150,7 +150,7 @@ class AutoVersioningProcessingServiceImpl(
                         remoteAutoMerge = (order.autoApprovalMode == AutoApprovalMode.SCM)
                     )
                     // If auto approval mode = CLIENT and PR is not merged, we had a timeout
-                    logger.info("Processing auto versioning order end of PR process: {}", order)
+                    logger.debug("Processing auto versioning order end of PR process: {}", order)
                     if (order.autoApproval) {
                         when (order.autoApprovalMode) {
                             AutoApprovalMode.SCM -> autoVersioningAuditService.onPRApproved(
@@ -160,7 +160,7 @@ class AutoVersioningProcessingServiceImpl(
                                 prLink = pr.link
                             )
                             AutoApprovalMode.CLIENT -> if (!pr.merged) {
-                                logger.info("Processing auto versioning order PR timed out: {}", order)
+                                logger.debug("Processing auto versioning order PR timed out: {}", order)
                                 // Audit
                                 autoVersioningAuditService.onPRTimeout(
                                     order = order,
@@ -195,12 +195,12 @@ class AutoVersioningProcessingServiceImpl(
                 return AutoVersioningProcessingOutcome.CREATED
 
             } else {
-                logger.info("Processing auto versioning order same version: {}", order)
+                logger.debug("Processing auto versioning order same version: {}", order)
                 autoVersioningAuditService.onProcessingAborted(order, "Same version")
                 return AutoVersioningProcessingOutcome.SAME_VERSION
             }
         } else {
-            logger.info("Processing auto versioning order no config: {}", order)
+            logger.debug("Processing auto versioning order no config: {}", order)
             autoVersioningAuditService.onProcessingAborted(order, "Target branch is not configured")
             return AutoVersioningProcessingOutcome.NO_CONFIG
         }
