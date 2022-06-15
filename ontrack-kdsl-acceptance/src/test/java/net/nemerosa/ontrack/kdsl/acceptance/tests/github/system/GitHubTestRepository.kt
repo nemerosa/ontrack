@@ -18,6 +18,7 @@ import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHub
 import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHubConfigurationProperty
 import org.apache.commons.codec.binary.Base64
 import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.HttpClientErrorException.NotFound
 import java.util.*
 import kotlin.test.assertTrue
 import kotlin.test.fail
@@ -75,15 +76,45 @@ class GitHubRepositoryContext(
         branch: String = "main",
         content: () -> String,
     ) {
-        // TODO createBranchIfNotExisting
+        createBranchIfNotExisting(branch)
+
+        val existingFile = getRawFile(path, branch)
+
+        val body = mutableMapOf(
+            "message" to "Creating $path",
+            "content" to Base64.encodeBase64String(content().toByteArray()),
+            "branch" to branch,
+        )
+
+        if (existingFile != null) {
+            body["sha"] = existingFile.sha
+        }
+
         gitHubPlaygroundClient.put(
             "/repos/${gitHubPlaygroundEnv.organization}/${repository}/contents/$path",
-            mapOf(
-                "message" to "Creating $path",
-                "content" to Base64.encodeBase64String(content().toByteArray()),
-                "branch" to branch
-            )
+            body
         )
+    }
+
+    private fun createBranchIfNotExisting(branch: String, base: String = "main") {
+        if (branch != base) {
+            // Checks if the branch exists
+            val gitHubBranch = getBranch(branch)
+            if (gitHubBranch == null) {
+                // Gets the last commit of the base branch
+                val baseBranch = getBranch(base) ?: throw IllegalStateException("Cannot find base branch $base")
+                val baseCommit = baseBranch.commit.sha
+                // Creates the branch
+                gitHubPlaygroundClient.postForObject(
+                    "/repos/${gitHubPlaygroundEnv.organization}/${repository}/git/refs",
+                    mapOf(
+                        "ref" to "refs/heads/$branch",
+                        "sha" to baseCommit
+                    ),
+                    JsonNode::class.java
+                )
+            }
+        }
     }
 
     fun createGitHubConfiguration(ontrack: Ontrack): String {
@@ -144,14 +175,20 @@ class GitHubRepositoryContext(
             it.parse<GitHubPRReview>()
         } ?: emptyList()
 
-    private fun getFile(path: String, branch: String): List<String> {
-        val response = gitHubPlaygroundClient.getForObject(
-            "/repos/${gitHubPlaygroundEnv.organization}/$repository/contents/$path?ref=$branch",
-            GitHubContentsResponse::class.java
-        )
-        return response?.content?.run { String(Base64.decodeBase64(this)) }?.lines()?.filter { it.isNotBlank() }
+    private fun getFile(path: String, branch: String): List<String> =
+        getRawFile(path, branch)?.content?.run { String(Base64.decodeBase64(this)) }?.lines()
+            ?.filter { it.isNotBlank() }
             ?: emptyList()
-    }
+
+    private fun getRawFile(path: String, branch: String): GitHubContentsResponse? =
+        try {
+            gitHubPlaygroundClient.getForObject(
+                "/repos/${gitHubPlaygroundEnv.organization}/$repository/contents/$path?ref=$branch",
+                GitHubContentsResponse::class.java
+            )
+        } catch (ex: NotFound) {
+            null
+        }
 
     private fun getBranch(branch: String) =
         try {
@@ -212,7 +249,8 @@ class GitHubRepositoryContext(
                 task = "Waiting for file $path on branch $branch to have a given content.",
                 onTimeout = {
                     val actualContent = getFile(path, branch).joinToString("\n")
-                    fail("""
+                    fail(
+                        """
 Expected the following content for the $path file on the $branch branch:
 
 $expectedContent
@@ -220,7 +258,8 @@ $expectedContent
 but got:
 
 $actualContent
-""".trimIndent())
+""".trimIndent()
+                    )
                 }
             ) {
                 val actualContent = getFile(path, branch).joinToString("\n")
@@ -247,6 +286,7 @@ class GitHubPRReview(
 @JsonIgnoreProperties(ignoreUnknown = true)
 private class GitHubContentsResponse(
     val content: String,
+    val sha: String,
 )
 
 
