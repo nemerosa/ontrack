@@ -97,25 +97,11 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
                 )
                 // Creating a new branch
                 val branch = branch { this }
-                // Code to run in case of timeout
-                val onTimeout: () -> Unit = {
-                    // Details about the webhook
-                    val webhook = ontrack.notifications.webhooks.findWebhookByName(webhookName)
-                    println("$webhookName webhook details:")
-                    println(webhook)
-                    // Get the last deliveries of the webhook
-                    println("$webhookName webhook last deliveries:")
-                    val deliveries = ontrack.notifications.webhooks.getDeliveries(webhook = webhookName).items
-                    deliveries.forEach { delivery ->
-                        println("----------------------------")
-                        println(delivery)
-                    }
-                }
                 // Checking the webhook has received the payload
                 waitUntil(
                     timeout = 10.seconds, interval = 500,
                     task = "Checking the webhook has received the payload with event_type=new_branch, project=$name, branch=${branch.name}",
-                    onTimeout = onTimeout,
+                    onTimeout = onTimeout(webhookName),
                 ) {
                     ontrack.notifications.webhooks.internalEndpoint.payloads.any {
                         it.type == "event" &&
@@ -149,7 +135,8 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
             // Checks that the webhook received the event
             waitUntil(
                 timeout = 10.seconds, interval = 500,
-                task = "Checking the webhook has received the payload with type=type, message=Webhook $webhookName ping"
+                task = "Checking the webhook has received the payload with type=type, message=Webhook $webhookName ping",
+                onTimeout = onTimeout(webhookName),
             ) {
                 val payloads = ontrack.notifications.webhooks.internalEndpoint.payloads
                 payloads.any {
@@ -158,7 +145,11 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
                 }
             }
             // Checks that the delivery has been registered
-            waitUntil(timeout = 10.seconds, interval = 500) {
+            waitUntil(
+                timeout = 10.seconds, interval = 500,
+                task = "Checking the webhook delivery has been registered",
+                onTimeout = onTimeout(webhookName),
+            ) {
                 val items = ontrack.notifications.webhooks.getDeliveries(webhook = webhookName).items
                 items.any {
                     it.request.type == "ping"
@@ -180,6 +171,20 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
             code()
         } finally {
             ontrack.settings.webhooks.set(old)
+        }
+    }
+
+    private fun onTimeout(webhookName: String): () -> Unit = {
+        // Details about the webhook
+        val webhook = ontrack.notifications.webhooks.findWebhookByName(webhookName)
+        println("$webhookName webhook details:")
+        println(webhook)
+        // Get the last deliveries of the webhook
+        println("$webhookName webhook last deliveries:")
+        val deliveries = ontrack.notifications.webhooks.getDeliveries(webhook = webhookName).items
+        deliveries.forEach { delivery ->
+            println("----------------------------")
+            println(delivery)
         }
     }
 
