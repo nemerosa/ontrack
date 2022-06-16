@@ -33,7 +33,6 @@ class TokenHeaderAuthenticationFilter(
 
     override fun doFilterInternal(request: HttpServletRequest,
                                   response: HttpServletResponse, chain: FilterChain) {
-        val debug = logger.isDebugEnabled
         try {
             val token: String? = request.getHeader(headerName)
             if (token.isNullOrBlank()) {
@@ -42,17 +41,11 @@ class TokenHeaderAuthenticationFilter(
             } else if (authenticationIsRequired(token)) {
                 val authRequest = TokenAuthenticationToken(token)
                 val authResult = authenticationManager.authenticate(authRequest)
-                if (debug) {
-                    logger.debug("Authentication success: $authResult")
-                }
                 SecurityContextHolder.getContext().authentication = authResult
                 rememberMeServices.loginSuccess(request, response, authResult)
             }
         } catch (failed: AuthenticationException) {
             SecurityContextHolder.clearContext()
-            if (debug) {
-                logger.debug("Authentication request for failed!", failed)
-            }
             rememberMeServices.loginFail(request, response)
             if (isIgnoreFailure) {
                 chain.doFilter(request, response)
