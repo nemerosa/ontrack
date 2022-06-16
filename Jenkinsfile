@@ -165,6 +165,9 @@ pipeline {
                             pattern: 'ontrack-kdsl-acceptance/build/test-results/**/*.xml',
                     )
                 }
+                failure {
+                    archiveArtifacts(artifacts: "ontrack-kdsl-acceptance/build/logs/**", allowEmptyArchive: true)
+                }
             }
         }
 
