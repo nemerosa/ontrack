@@ -22,6 +22,7 @@ configure<ComposeExtension> {
         useComposeFiles = listOf("src/test/compose/docker-compose.yml")
         projectName = "kdsl"
         environment["ONTRACK_VERSION"] = project.version.toString()
+        captureContainersOutputToFiles = file("build/logs/containers")
     }
 }
 
