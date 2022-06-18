@@ -53,7 +53,7 @@ class AutoVersioningEventServiceImpl(
             .withRef(order.branch)
             .withProject(sourceProject(order))
             .with("version", order.targetVersion)
-            .with("message", message)
+            .with("message", close(message))
             .with("pr-name", pr.name)
             .with("pr-link", pr.link)
             .get()
@@ -67,8 +67,8 @@ class AutoVersioningEventServiceImpl(
             .withRef(order.branch)
             .withProject(sourceProject(order))
             .with("version", order.targetVersion)
-            .with("message", message)
-            .with("error", error.message)
+            .with("message", close(message))
+            .with("error", close(error.message ?: error::class.java.name))
             .get()
 
     internal fun prMergeTimeoutError(
@@ -83,6 +83,11 @@ class AutoVersioningEventServiceImpl(
             .with("pr-link", pr.link)
             .get()
 
+    private fun close(message: String) = if (message.endsWith(".")) {
+        message
+    } else {
+        "$message."
+    }
 
     private fun sourceProject(order: AutoVersioningOrder): Project =
         structureService.findProjectByName(order.sourceProject).getOrNull()
@@ -94,6 +99,8 @@ class AutoVersioningEventServiceImpl(
             "auto-versioning-success",
             """
                 Auto versioning of ${'$'}{REF} for dependency ${'$'}{PROJECT} version "${'$'}{:version}" has been done.
+                
+                ${'$'}{:message}
                 
                 Pull request ${'$'}{:pr-name:pr-link}
             """.trimIndent()
