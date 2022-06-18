@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningTargetFileService
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.av.event.AutoVersioningEventService
 import net.nemerosa.ontrack.extension.av.metrics.AutoVersioningMetricsService
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessing
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingNotFoundException
@@ -27,6 +28,7 @@ class AutoVersioningProcessingServiceImpl(
     private val postProcessingRegistry: PostProcessingRegistry,
     private val autoVersioningAuditService: AutoVersioningAuditService,
     private val metrics: AutoVersioningMetricsService,
+    private val autoVersioningEventService: AutoVersioningEventService,
 ) : AutoVersioningProcessingService {
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningProcessingServiceImpl::class.java)
@@ -65,7 +67,7 @@ class AutoVersioningProcessingServiceImpl(
                     // Creating the branch
                     scm.createBranch(scmBranch, upgradeBranch)
                 } catch (e: Exception) {
-                    // TODO Notification of error
+                    autoVersioningEventService.sendError(order, "Failed to create branch $upgradeBranch", e)
                     throw e
                 }
             }
@@ -125,7 +127,11 @@ class AutoVersioningProcessingServiceImpl(
                     }
                 }
             } catch (e: Exception) {
-                // TODO Notification
+                autoVersioningEventService.sendError(
+                    order,
+                    e.message?.takeIf { it.isNotBlank() } ?: "Issue while processing the change",
+                    e
+                )
                 throw e
             }
 
@@ -153,12 +159,19 @@ class AutoVersioningProcessingServiceImpl(
                     logger.debug("Processing auto versioning order end of PR process: {}", order)
                     if (order.autoApproval) {
                         when (order.autoApprovalMode) {
-                            AutoApprovalMode.SCM -> autoVersioningAuditService.onPRApproved(
-                                order = order,
-                                upgradeBranch = upgradeBranch,
-                                prName = pr.name,
-                                prLink = pr.link
-                            )
+                            AutoApprovalMode.SCM -> {
+                                autoVersioningAuditService.onPRApproved(
+                                    order = order,
+                                    upgradeBranch = upgradeBranch,
+                                    prName = pr.name,
+                                    prLink = pr.link
+                                )
+                                autoVersioningEventService.sendSuccess(
+                                    order,
+                                    "Auto versioning PR has been created and approved. Its merge process will be done at SCM level.",
+                                    pr
+                                )
+                            }
                             AutoApprovalMode.CLIENT -> if (!pr.merged) {
                                 logger.debug("Processing auto versioning order PR timed out: {}", order)
                                 // Audit
@@ -168,13 +181,23 @@ class AutoVersioningProcessingServiceImpl(
                                     prName = pr.name,
                                     prLink = pr.link
                                 )
-                                // TODO Notification
+                                // Notification
+                                autoVersioningEventService.sendError(
+                                    order,
+                                    message = "Timeout while waiting for the PR to be ready to be merged",
+                                    pr = pr
+                                )
                             } else {
                                 autoVersioningAuditService.onPRMerged(
                                     order = order,
                                     upgradeBranch = upgradeBranch,
                                     prName = pr.name,
                                     prLink = pr.link
+                                )
+                                autoVersioningEventService.sendSuccess(
+                                    order,
+                                    "Auto versioning PR has been created, approved and merged.",
+                                    pr
                                 )
                             }
                         }
@@ -187,7 +210,7 @@ class AutoVersioningProcessingServiceImpl(
                         )
                     }
                 } catch (e: Exception) {
-                    // TODO Notification
+                    autoVersioningEventService.sendError(order, "Failed to create PR", e)
                     throw e
                 }
 
