@@ -9,14 +9,22 @@ import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.StartupService
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional
 class AutoVersioningEventServiceImpl(
     private val eventFactory: EventFactory,
     private val eventPostService: EventPostService,
     private val structureService: StructureService,
 ) : AutoVersioningEventService, StartupService {
 
+    /**
+     * We do need a separate transaction to send events in case of error
+     * because the current transaction WILL be cancelled
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun sendError(order: AutoVersioningOrder, message: String, error: Exception) {
         eventPostService.post(
             error(order, message, error)

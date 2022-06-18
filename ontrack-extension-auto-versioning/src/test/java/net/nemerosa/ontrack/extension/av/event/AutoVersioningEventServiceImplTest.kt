@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 import java.util.*
 import kotlin.test.assertEquals
 
-internal class AutoVersioningEventServiceTest {
+internal class AutoVersioningEventServiceImplTest {
 
     private lateinit var structureService: StructureService
 
@@ -43,7 +43,7 @@ internal class AutoVersioningEventServiceTest {
         val text = event.render(renderer)
         assertEquals(
             """
-                Auto versioning of <a href="http://localhost:8080/#/branch/10">main</a> for dependency <a href="http://localhost:8080/#/project/2">source</a> version "2.0.0" has been done.
+                Auto versioning of <a href="http://localhost:8080/#/project/1">target</a>/<a href="http://localhost:8080/#/branch/10">main</a> for dependency <a href="http://localhost:8080/#/project/2">source</a> version "2.0.0" has been done.
                 
                 Reason of success.
 
@@ -63,7 +63,7 @@ internal class AutoVersioningEventServiceTest {
         val text = event.render(renderer)
         assertEquals(
             """
-                Auto versioning of <a href="http://localhost:8080/#/branch/10">main</a> for dependency <a href="http://localhost:8080/#/project/2">source</a> version "2.0.0" has failed.
+                Auto versioning of <a href="http://localhost:8080/#/project/1">target</a>/<a href="http://localhost:8080/#/branch/10">main</a> for dependency <a href="http://localhost:8080/#/project/2">source</a> version "2.0.0" has failed.
                 
                 Reason of failure.
                 
@@ -82,7 +82,7 @@ internal class AutoVersioningEventServiceTest {
         val text = event.render(renderer)
         assertEquals(
             """
-                Auto versioning of <a href="http://localhost:8080/#/branch/10">main</a> for dependency <a href="http://localhost:8080/#/project/2">source</a> version "2.0.0" has failed.
+                Auto versioning of <a href="http://localhost:8080/#/project/1">target</a>/<a href="http://localhost:8080/#/branch/10">main</a> for dependency <a href="http://localhost:8080/#/project/2">source</a> version "2.0.0" has failed.
                 
                 Timeout while waiting for the PR to be ready to be merged.
                 

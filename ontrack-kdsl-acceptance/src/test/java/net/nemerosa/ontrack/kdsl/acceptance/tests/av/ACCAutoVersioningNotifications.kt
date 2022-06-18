@@ -69,14 +69,30 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
                         waitUntil(
                             timeout = 30_000,
                             interval = 500L,
+                            task = "Error notification",
+                            onTimeout = displayNotifications(dependencyGroup)
                         ) {
                             ontrack.notifications.inMemory.group(dependencyGroup).firstOrNull() ==
-                                    """Auto versioning of ${this@branch.project.name}/${this@branch.name} for dependency ${dependency.project.name}/${dependency.name} version "2.0.0" has failed."""
+                                    """
+                                        Auto versioning of ${project.name}/$name for dependency ${dependency.project.name} version "2.0.0" has failed.
+    
+                                        Cannot find version in "gradle.properties".
+    
+                                        Error: Cannot find version in "gradle.properties".
+                                    """.trimIndent()
                         }
 
                     }
                 }
             }
+        }
+    }
+
+    private fun displayNotifications(group: String): () -> Unit = {
+        println("Notifications for group $group:")
+        ontrack.notifications.inMemory.group(group).forEach {
+            println("--------------")
+            println(it)
         }
     }
 
