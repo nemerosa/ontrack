@@ -1,12 +1,8 @@
 package net.nemerosa.ontrack.extension.av.event
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.model.events.*
-import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
-import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.StartupService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
@@ -17,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional
 class AutoVersioningEventServiceImpl(
     private val eventFactory: EventFactory,
     private val eventPostService: EventPostService,
-    private val structureService: StructureService,
 ) : AutoVersioningEventService, StartupService {
 
     /**
@@ -58,8 +53,8 @@ class AutoVersioningEventServiceImpl(
         pr: SCMPullRequest,
     ): Event =
         Event.of(AUTO_VERSIONING_SUCCESS)
-            .withRef(order.branch)
-            .withProject(sourceProject(order))
+            .withBranch(order.branch)
+            .with("source", order.sourceProject)
             .with("version", order.targetVersion)
             .with("message", close(message))
             .with("pr-name", pr.name)
@@ -73,7 +68,7 @@ class AutoVersioningEventServiceImpl(
     ): Event =
         Event.of(AUTO_VERSIONING_ERROR)
             .withRef(order.branch)
-            .withProject(sourceProject(order))
+            .with("source", order.sourceProject)
             .with("version", order.targetVersion)
             .with("message", close(message))
             .with("error", close(error.message ?: error::class.java.name))
@@ -85,7 +80,7 @@ class AutoVersioningEventServiceImpl(
     ): Event =
         Event.of(AUTO_VERSIONING_PR_MERGE_TIMEOUT_ERROR)
             .withRef(order.branch)
-            .withProject(sourceProject(order))
+            .with("source", order.sourceProject)
             .with("version", order.targetVersion)
             .with("pr-name", pr.name)
             .with("pr-link", pr.link)
@@ -97,16 +92,12 @@ class AutoVersioningEventServiceImpl(
         "$message."
     }
 
-    private fun sourceProject(order: AutoVersioningOrder): Project =
-        structureService.findProjectByName(order.sourceProject).getOrNull()
-            ?: throw ProjectNotFoundException(order.sourceProject)
-
     companion object {
 
         private val AUTO_VERSIONING_SUCCESS: EventType = SimpleEventType.of(
             "auto-versioning-success",
             """
-                Auto versioning of ${'$'}{REF} for dependency ${'$'}{PROJECT} version "${'$'}{:version}" has been done.
+                Auto versioning of ${'$'}{PROJECT}/${'$'}{BRANCH} for dependency ${'$'}{:source} version "${'$'}{:version}" has been done.
                 
                 ${'$'}{:message}
                 
@@ -117,7 +108,7 @@ class AutoVersioningEventServiceImpl(
         private val AUTO_VERSIONING_ERROR: EventType = SimpleEventType.of(
             "auto-versioning-error",
             """
-                Auto versioning of ${'$'}{REF} for dependency ${'$'}{PROJECT} version "${'$'}{:version}" has failed.
+                Auto versioning of ${'$'}{PROJECT}/${'$'}{BRANCH} for dependency ${'$'}{:source} version "${'$'}{:version}" has failed.
                 
                 ${'$'}{:message}
                 
@@ -128,7 +119,7 @@ class AutoVersioningEventServiceImpl(
         private val AUTO_VERSIONING_PR_MERGE_TIMEOUT_ERROR: EventType = SimpleEventType.of(
             "auto-versioning-pr-merge-timeout-error",
             """
-                Auto versioning of ${'$'}{REF} for dependency ${'$'}{PROJECT} version "${'$'}{:version}" has failed.
+                Auto versioning of ${'$'}{PROJECT}/${'$'}{BRANCH} for dependency ${'$'}{:source} version "${'$'}{:version}" has failed.
                 
                 Timeout while waiting for the PR to be ready to be merged.
                 

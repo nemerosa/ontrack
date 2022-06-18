@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.av.event
 
-import io.mockk.every
 import io.mockk.mockk
 import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures.createOrder
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
@@ -10,26 +9,20 @@ import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
 import kotlin.test.assertEquals
 
 internal class AutoVersioningEventServiceImplTest {
-
-    private lateinit var structureService: StructureService
 
     private lateinit var autoVersioningEventService: AutoVersioningEventServiceImpl
 
     @BeforeEach
     fun before() {
-        structureService = mockk()
         autoVersioningEventService = AutoVersioningEventServiceImpl(
             eventFactory = mockk(),
             eventPostService = mockk(),
-            structureService = structureService,
         )
     }
 
@@ -43,7 +36,7 @@ internal class AutoVersioningEventServiceImplTest {
         val text = event.render(renderer)
         assertEquals(
             """
-                Auto versioning of <a href="http://localhost:8080/#/project/1">target</a>/<a href="http://localhost:8080/#/branch/10">main</a> for dependency <a href="http://localhost:8080/#/project/2">source</a> version "2.0.0" has been done.
+                Auto versioning of <a href="http://localhost:8080/#/project/1">target</a>/<a href="http://localhost:8080/#/branch/10">main</a> for dependency source version "2.0.0" has been done.
                 
                 Reason of success.
 
@@ -63,7 +56,7 @@ internal class AutoVersioningEventServiceImplTest {
         val text = event.render(renderer)
         assertEquals(
             """
-                Auto versioning of <a href="http://localhost:8080/#/project/1">target</a>/<a href="http://localhost:8080/#/branch/10">main</a> for dependency <a href="http://localhost:8080/#/project/2">source</a> version "2.0.0" has failed.
+                Auto versioning of <a href="http://localhost:8080/#/project/1">target</a>/<a href="http://localhost:8080/#/branch/10">main</a> for dependency source version "2.0.0" has failed.
                 
                 Reason of failure.
                 
@@ -82,7 +75,7 @@ internal class AutoVersioningEventServiceImplTest {
         val text = event.render(renderer)
         assertEquals(
             """
-                Auto versioning of <a href="http://localhost:8080/#/project/1">target</a>/<a href="http://localhost:8080/#/branch/10">main</a> for dependency <a href="http://localhost:8080/#/project/2">source</a> version "2.0.0" has failed.
+                Auto versioning of <a href="http://localhost:8080/#/project/1">target</a>/<a href="http://localhost:8080/#/branch/10">main</a> for dependency source version "2.0.0" has failed.
                 
                 Timeout while waiting for the PR to be ready to be merged.
                 
@@ -97,9 +90,6 @@ internal class AutoVersioningEventServiceImplTest {
     ): AutoVersioningOrder {
         val targetProject = Project.of(nd("target", "")).withId(ID.of(1))
         val targetBranch = Branch.of(targetProject, nd("main", "")).withId(ID.of(10))
-
-        val sourceProject = Project.of(nd(source, "")).withId(ID.of(2))
-        every { structureService.findProjectByName(source) } returns Optional.of(sourceProject)
 
         return targetBranch.createOrder(
             sourceProject = source,
