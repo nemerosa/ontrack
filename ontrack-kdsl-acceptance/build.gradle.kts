@@ -77,8 +77,8 @@ val kdslAcceptanceTest by tasks.registering(Test::class) {
      * Sets the Ontrack URL
      */
     doFirst {
-        val ontrackUrl = rootProject.ext["ontrackUrl"] ?: error("Missing ontrackUrl parameter")
-        val ontrackMgtUrl = rootProject.ext["ontrackMgtUrl"] ?: error("Missing ontrackMgtUrl parameter")
+        val ontrackUrl = rootProject.ext["ontrackUrl"] ?: error("ontrackUrl must be defined")
+        val ontrackMgtUrl = rootProject.ext["ontrackMgtUrl"] ?: error("ontrackMgtUrl must be defined")
         println("Setting Ontrack URL for KDSL Acceptance Tests: $ontrackUrl")
         println("Setting Ontrack Mgt URL for KDSL Acceptance Tests: $ontrackMgtUrl")
         systemProperty("net.nemerosa.ontrack.kdsl.acceptance.tests.accproperties.connection.url", ontrackUrl)

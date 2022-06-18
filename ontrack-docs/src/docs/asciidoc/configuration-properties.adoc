@@ -143,6 +143,15 @@ ontrack.config.search.index.logging = false
 ontrack.config.search.index.tracing = false
 ----
 
+[[configuration-properties-rabbitmq]]
+==== Global setup for RabbitMQ
+
+[source,properties]
+----
+# True (default) to make the sending of messages part of the current transaction.
+ontrack.config.rabbitmq.transactional = true
+----
+
 [[configuration-properties-notifications]]
 ==== Notifications Configuration properties
 
