@@ -6,9 +6,10 @@ import net.nemerosa.ontrack.extension.notifications.metrics.incrementForEvent
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.format
 import net.nemerosa.ontrack.model.events.Event
-import org.springframework.amqp.core.AmqpTemplate
+import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 @ConditionalOnProperty(
@@ -17,13 +18,14 @@ import org.springframework.stereotype.Component
     havingValue = "true",
     matchIfMissing = true,
 )
+@Transactional
 class AsyncEventListeningQueue(
-    private val amqpTemplate: AmqpTemplate,
+    private val rabbitTemplate: RabbitTemplate,
     private val meterRegistry: MeterRegistry,
 ) : EventListeningQueue {
     override fun publish(event: Event) {
         val message = AsyncEventListeningQueueEvent(event).asJson().format()
-        amqpTemplate.convertAndSend(
+        rabbitTemplate.convertAndSend(
             AsyncEventListeningQueueConfig.TOPIC,
             AsyncEventListeningQueueConfig.DEFAULT,
             message,

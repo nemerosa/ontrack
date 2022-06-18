@@ -7,9 +7,10 @@ import net.nemerosa.ontrack.extension.notifications.model.Notification
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.format
 import net.nemerosa.ontrack.model.metrics.increment
-import org.springframework.amqp.core.AmqpTemplate
+import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 @ConditionalOnProperty(
@@ -18,8 +19,9 @@ import org.springframework.stereotype.Component
     havingValue = "true",
     matchIfMissing = true,
 )
+@Transactional
 class AsyncNotificationQueue(
-    private val amqpTemplate: AmqpTemplate,
+    private val rabbitTemplate: RabbitTemplate,
     private val notificationsConfigProperties: NotificationsConfigProperties,
     private val notificationQueueItemConverter: NotificationQueueItemConverter,
     private val meterRegistry: MeterRegistry,
@@ -34,7 +36,7 @@ class AsyncNotificationQueue(
             "routing" to routingKey,
         )
         val message = notificationQueueItemConverter.convertForQueue(item).asJson().format()
-        amqpTemplate.convertAndSend(
+        rabbitTemplate.convertAndSend(
             AsyncNotificationQueueConfig.TOPIC,
             routingKey,
             message,
