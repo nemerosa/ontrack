@@ -9,11 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 @TestPropertySource(
     properties = [
+        // Sending messages outside of the transaction
+        "ontrack.config.rabbitmq.transactional=false",
+        // Using async messaging
         "ontrack.extension.github.ingestion.processing.async=true",
+        // Number of queues to generate
         "ontrack.extension.github.ingestion.processing.scale=10",
     ]
 )
@@ -34,8 +39,7 @@ class AsyncIngestionHookQueueScalableIT : AbstractGitHubTestSupport() {
         asAdmin {
             storage.store(payload, "source")
             queue.queue(payload)
-            // Waiting until the payload has been processed
-            waitUntil("Waiting until the queue has been assigned") {
+            waitUntil(message = "Queue has been assigned", timeout = 20.seconds) {
                 val queueName = storage.findByUUID(payload.uuid.toString())?.queue
                 queueName == "github.ingestion.default.$expectedQueue"
             }

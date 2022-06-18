@@ -13,12 +13,13 @@ import javax.annotation.PostConstruct
 @EnableRabbit
 class OntrackRabbitMQConfig(
     private val rabbitTemplate: RabbitTemplate,
+    private val properties: OntrackRabbitMQConfigProperties,
 ) {
 
     @PostConstruct
     protected fun init() {
         // make rabbit template to support transactions
-        rabbitTemplate.isChannelTransacted = true
+        rabbitTemplate.isChannelTransacted = properties.transactional
     }
 
 }
