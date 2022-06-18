@@ -17,13 +17,13 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-class AutoVersioningEventServiceImpl(
+class AutoVersioningPromotionListenerServiceImpl(
     private val buildDisplayNameService: BuildDisplayNameService,
     private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
     private val scmDetector: SCMDetector,
-) : AutoVersioningEventService {
+) : AutoVersioningPromotionListenerService {
 
-    private val logger: Logger = LoggerFactory.getLogger(AutoVersioningEventServiceImpl::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(AutoVersioningPromotionListenerServiceImpl::class.java)
 
     override fun getConfiguredBranches(build: Build, promotion: PromotionLevel): AutoVersioningConfiguredBranches {
         logger.debug("Looking for configured branches: ${build.entityDisplayName} @ ${promotion.name}...")

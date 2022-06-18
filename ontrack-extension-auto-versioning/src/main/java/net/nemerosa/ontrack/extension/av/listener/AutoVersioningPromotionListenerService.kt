@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.model.structure.PromotionLevel
 /**
  * Service used to select & configure branches eligible for auto versioning based on an event
  */
-interface AutoVersioningEventService {
+interface AutoVersioningPromotionListenerService {
     /**
      * Given a [build] promoted to a given [promotion], returns a list of configured branches eligible for auto versioning.
      */

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component
 @Component
 class AutoVersioningPromotionListener(
     private val cachedSettingsService: CachedSettingsService,
-    private val autoVersioningEventService: AutoVersioningEventService,
+    private val autoVersioningEventService: AutoVersioningPromotionListenerService,
     private val autoVersioningDispatcher: AutoVersioningDispatcher,
 ) : EventListener {
 
