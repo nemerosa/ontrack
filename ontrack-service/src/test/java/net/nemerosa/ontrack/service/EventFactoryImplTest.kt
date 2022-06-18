@@ -240,6 +240,9 @@ class EventFactoryImplTest {
         override fun render(valueKey: String, value: NameValue, event: Event): String =
                 """<i class="$valueKey">${value.value}</i>"""
 
+        override fun renderLink(text: NameValue, link: NameValue, event: Event): String =
+            """<a href="${link.value}">${text.value}</a>"""
+
         private fun link(name: String, uri: String): String = """<a href="#/$uri">$name</a>"""
     }
 

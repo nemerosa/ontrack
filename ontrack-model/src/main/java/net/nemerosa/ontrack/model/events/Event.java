@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 @Data
 public final class Event {
 
-    private static final Pattern EXPRESSION = Pattern.compile("\\$\\{([:a-zA-Z_]+)\\}");
+    private static final Pattern EXPRESSION = Pattern.compile("\\$\\{([:a-zA-Z_-]+)\\}");
 
     private final EventType eventType;
     private final Signature signature;
@@ -67,7 +67,7 @@ public final class Event {
 
     public String render(EventRenderer eventRenderer) {
         Matcher m = EXPRESSION.matcher(eventType.getTemplate());
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
         while (m.find()) {
             String value = expandExpression(m.group(1), eventRenderer);
             m.appendReplacement(output, value);
@@ -78,12 +78,27 @@ public final class Event {
 
     private String expandExpression(String expression, EventRenderer eventRenderer) {
         if (StringUtils.startsWith(expression, ":")) {
-            String valueKey = expression.substring(1);
-            NameValue value = values.get(valueKey);
-            if (value == null) {
-                throw new EventMissingValueException(eventType.getTemplate(), valueKey);
+            int linkIndex = expression.indexOf(":", 1);
+            if (linkIndex > 0) {
+                String textKey = expression.substring(1, linkIndex);
+                NameValue text = values.get(textKey);
+                if (text == null) {
+                    throw new EventMissingValueException(eventType.getTemplate(), textKey);
+                }
+                String linkKey = expression.substring(linkIndex + 1);
+                NameValue link = values.get(linkKey);
+                if (link == null) {
+                    throw new EventMissingValueException(eventType.getTemplate(), linkKey);
+                }
+                return eventRenderer.renderLink(text, link, this);
+            } else {
+                String valueKey = expression.substring(1);
+                NameValue value = values.get(valueKey);
+                if (value == null) {
+                    throw new EventMissingValueException(eventType.getTemplate(), valueKey);
+                }
+                return eventRenderer.render(valueKey, value, this);
             }
-            return eventRenderer.render(valueKey, value, this);
         } else if ("REF".equals(expression)) {
             if (ref == null) {
                 throw new EventMissingRefEntityException(eventType.getTemplate());

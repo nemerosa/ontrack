@@ -14,8 +14,15 @@ interface AutoVersioningEventService {
     fun sendError(
         order: AutoVersioningOrder,
         message: String,
-        error: Exception? = null,
-        pr: SCMPullRequest? = null,
+        error: Exception,
+    )
+
+    /**
+     * Broadcasts an error event about a PR not being able to be merged in time.
+     */
+    fun sendPRMergeTimeoutError(
+        order: AutoVersioningOrder,
+        pr: SCMPullRequest,
     )
 
     /**

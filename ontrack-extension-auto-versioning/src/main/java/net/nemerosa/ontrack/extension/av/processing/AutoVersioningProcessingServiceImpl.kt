@@ -182,9 +182,8 @@ class AutoVersioningProcessingServiceImpl(
                                     prLink = pr.link
                                 )
                                 // Notification
-                                autoVersioningEventService.sendError(
+                                autoVersioningEventService.sendPRMergeTimeoutError(
                                     order,
-                                    message = "Timeout while waiting for the PR to be ready to be merged",
                                     pr = pr
                                 )
                             } else {

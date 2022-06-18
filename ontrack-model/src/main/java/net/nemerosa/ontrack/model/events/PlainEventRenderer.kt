@@ -10,6 +10,8 @@ class PlainEventRenderer : AbstractEventRenderer() {
 
     override fun render(valueKey: String, value: NameValue, event: Event): String = value.value
 
+    override fun renderLink(text: NameValue, link: NameValue, event: Event): String = text.value
+
     companion object {
         @JvmField
         val INSTANCE: EventRenderer = PlainEventRenderer()
