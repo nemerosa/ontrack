@@ -45,6 +45,7 @@ class AutoVersioningEventServiceImpl(
     override fun start() {
         eventFactory.register(AUTO_VERSIONING_SUCCESS)
         eventFactory.register(AUTO_VERSIONING_ERROR)
+        eventFactory.register(AUTO_VERSIONING_PR_MERGE_TIMEOUT_ERROR)
     }
 
     internal fun success(
