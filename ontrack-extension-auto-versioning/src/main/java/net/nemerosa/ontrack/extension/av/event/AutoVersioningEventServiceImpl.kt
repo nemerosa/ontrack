@@ -124,7 +124,7 @@ class AutoVersioningEventServiceImpl(
                 
                 Timeout while waiting for the PR to be ready to be merged.
                 
-                PR: ${'$'}{:pr-name:pr-link}
+                Pull request ${'$'}{:pr-name:pr-link}
             """.trimIndent()
         )
 
