@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.scm.service
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.BranchDisplayNameExtension
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractExtension
@@ -9,11 +8,10 @@ import org.springframework.stereotype.Component
 
 @Component
 class SCMPathBranchDisplayNameExtension(
-        extensionFeature: SCMExtensionFeature,
-        private val scmServiceDetector: SCMServiceDetector
+    extensionFeature: SCMExtensionFeature,
+    private val scmDetector: SCMDetector,
 ) : AbstractExtension(extensionFeature), BranchDisplayNameExtension {
     override fun getBranchDisplayName(branch: Branch): String? =
-            scmServiceDetector.getScmService(branch.project).getOrNull()
-                    ?.getSCMPathInfo(branch)?.getOrNull()
-                    ?.branch
+        scmDetector.getSCM(branch.project)
+            ?.getSCMBranch(branch)
 }

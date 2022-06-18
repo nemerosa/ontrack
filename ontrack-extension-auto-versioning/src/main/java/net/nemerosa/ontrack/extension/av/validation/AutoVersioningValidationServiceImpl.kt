@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningTargetFileService
-import net.nemerosa.ontrack.extension.av.config.OptionalVersionBranchOrdering
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.*
@@ -18,11 +17,9 @@ class AutoVersioningValidationServiceImpl(
     private val structureService: StructureService,
     private val autoVersioningValidationDataType: AutoVersioningValidationDataType,
     private val buildDisplayNameService: BuildDisplayNameService,
-    private val branchDisplayNameService: BranchDisplayNameService,
     private val scmDetector: SCMDetector,
     private val autoVersioningTargetFileService: AutoVersioningTargetFileService,
     private val buildFilterService: BuildFilterService,
-    private val ordering: OptionalVersionBranchOrdering,
 ) : AutoVersioningValidationService {
 
     override fun checkAndValidate(build: Build): List<AutoVersioningValidationData> {
@@ -119,7 +116,7 @@ class AutoVersioningValidationServiceImpl(
         // Gets the source project
         val sourceProject = structureService.findProjectByName(config.sourceProject).getOrNull()
         // Gets the latest eligible branch for the source project
-        val sourceBranch = sourceProject?.run { getLatestBranch(sourceProject, config) }
+        val sourceBranch = sourceProject?.run { autoVersionConfigurationService.getLatestBranch(sourceProject, config) }
         // Gets the latest build for this branch having the corresponding promotion
         val sourceBuild = sourceBranch?.run {
             buildFilterService.standardFilterProviderData(1)
@@ -130,23 +127,6 @@ class AutoVersioningValidationServiceImpl(
         }
         // Gets its version
         return sourceBuild?.run { buildDisplayNameService.getBuildDisplayName(sourceBuild) }
-    }
-
-    fun getLatestBranch(sourceProject: Project, config: AutoVersioningSourceConfig): Branch? {
-        val sourceRegex = config.sourceBranch.toRegex()
-        // Version-based ordering
-        val versionComparator = ordering.getComparator(config.sourceBranch)
-        // Gets the list of branches for the source project
-        return structureService.getBranchesForProject(sourceProject.id)
-            // ... filters them by regex, using their path
-            .filter { sourceBranch ->
-                // Path of the branch
-                val sourcePath = branchDisplayNameService.getBranchDisplayName(sourceBranch)
-                // Match check
-                sourceRegex.matches(sourcePath) || sourceRegex.matches(sourceBranch.name)
-            }
-            // ... order them by version
-            .minWithOrNull(versionComparator)
     }
 
 }

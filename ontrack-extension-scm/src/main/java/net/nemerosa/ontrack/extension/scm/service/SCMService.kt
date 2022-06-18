@@ -11,6 +11,7 @@ import java.util.*
  * Whenever possible, prefer using the [SCM] interface. The methods of [SCMService] might become
  * deprecated in preparation of Ontrack V5 and the extraction of local working copies to another service.
  */
+@Deprecated("Prefer using SCM")
 interface SCMService {
     /**
      * Downloads the file at the given path for a branch

@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfiguredBranch
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.model.AutoVersioningConfiguredBranches
 import net.nemerosa.ontrack.extension.av.model.PromotionEvent
-import net.nemerosa.ontrack.extension.scm.service.SCMServiceDetector
+import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.BuildDisplayNameService
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional
 class AutoVersioningEventServiceImpl(
     private val buildDisplayNameService: BuildDisplayNameService,
     private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
-    private val scmServiceDetector: SCMServiceDetector,
+    private val scmDetector: SCMDetector,
 ) : AutoVersioningEventService {
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningEventServiceImpl::class.java)
@@ -62,7 +62,7 @@ class AutoVersioningEventServiceImpl(
     ): AutoVersioningConfiguredBranch? {
         logger.debug("Filtering branch ${branch.entityDisplayName} for event $promotionEvent...")
         // The project must be configured for a SCM
-        if (scmServiceDetector.getProjectScmService(branch.project) != null) {
+        if (scmDetector.getSCM(branch.project) != null) {
             // Gets the auto versioning configuration for the branch
             val config = autoVersioningConfigurationService.getAutoVersioning(branch)
             if (config != null) {

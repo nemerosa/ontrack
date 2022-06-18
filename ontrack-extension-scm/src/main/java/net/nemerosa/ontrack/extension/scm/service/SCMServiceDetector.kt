@@ -7,6 +7,7 @@ import java.util.*
 /**
  * Service used to get the SCM service associated with a branch.
  */
+@Deprecated("Prefer using SCMDetector")
 interface SCMServiceDetector {
     /**
      * Gets the SCM service associated with a branch, or empty if none is available.

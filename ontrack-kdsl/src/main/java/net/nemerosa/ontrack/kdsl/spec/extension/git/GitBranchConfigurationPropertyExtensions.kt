@@ -21,6 +21,16 @@ var Branch.gitBranchConfigurationProperty: GitBranchConfigurationProperty?
         }
     }
 
+var Branch.gitBranchConfigurationPropertyBranch: String?
+    get() = gitBranchConfigurationProperty?.branch
+    set(value) {
+        gitBranchConfigurationProperty = if (value != null) {
+            GitBranchConfigurationProperty(branch = value)
+        } else {
+            null
+        }
+    }
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 class GitBranchConfigurationProperty(
 

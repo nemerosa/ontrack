@@ -15,8 +15,7 @@ class BranchDisplayNameServiceImpl(
 
     override fun getBranchDisplayName(branch: Branch): String {
         val extendedName = extensionManager.getExtensions(BranchDisplayNameExtension::class.java)
-                .mapNotNull { extension -> extension.getBranchDisplayName(branch) }
-                .firstOrNull()
+            .firstNotNullOfOrNull { extension -> extension.getBranchDisplayName(branch) }
         return extendedName ?: branch.name
     }
 
