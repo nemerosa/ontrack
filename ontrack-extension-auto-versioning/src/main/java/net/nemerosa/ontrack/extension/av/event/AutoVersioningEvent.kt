@@ -24,7 +24,7 @@ class AutoVersioningEvent(
 
         val AUTO_VERSIONING_SUCCESS: EventType = SimpleEventType.of(
             "auto-versioning-success",
-            "TODO"
+            "Auto versioning of ${this@branch.project.name}/${this@branch.name} for dependency ${dependency.project.name}/${dependency.name} version \"2.0.0\" has failed."
         )
 
         val AUTO_VERSIONING_ERROR: EventType = SimpleEventType.of(
