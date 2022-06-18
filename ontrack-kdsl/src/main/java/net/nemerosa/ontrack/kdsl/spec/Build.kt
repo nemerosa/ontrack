@@ -106,4 +106,11 @@ class Build(
         }
     }
 
+    /**
+     * See [linksTo].
+     */
+    fun linksTo(vararg links: Pair<String, String>) {
+        linksTo(links.toMap())
+    }
+
 }
