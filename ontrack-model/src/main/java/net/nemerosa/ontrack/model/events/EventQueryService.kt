@@ -17,9 +17,9 @@ interface EventQueryService {
 
     fun getEvents(entityType: ProjectEntityType, entityId: ID, eventType: EventType, offset: Int, count: Int): List<Event>
 
-    fun getLastEventSignature(entityType: ProjectEntityType, entityId: ID, eventType: EventType): Optional<Signature>
+    fun getLastEventSignature(entityType: ProjectEntityType, entityId: ID, eventType: EventType): Signature?
 
-    fun getLastEvent(entityType: ProjectEntityType, entityId: ID, eventType: EventType): Optional<Event>
+    fun getLastEvent(entityType: ProjectEntityType, entityId: ID, eventType: EventType): Event?
 
     fun getLastEvent(entity: ProjectEntity, eventType: EventType): Event?
 

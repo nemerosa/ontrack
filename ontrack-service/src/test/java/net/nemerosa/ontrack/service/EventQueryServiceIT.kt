@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.events.EventQueryService
 import net.nemerosa.ontrack.test.assertPresent
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.test.assertNotNull
 
 class EventQueryServiceIT : AbstractServiceTestJUnit4Support() {
 
@@ -21,7 +22,7 @@ class EventQueryServiceIT : AbstractServiceTestJUnit4Support() {
             eventQueryService.getLastEventSignature(branch.projectEntityType, branch.id, EventFactory.NEW_BRANCH)
         }
 
-        assertPresent(o) {}
+        assertNotNull(o, "Signature is present")
     }
 
 }
