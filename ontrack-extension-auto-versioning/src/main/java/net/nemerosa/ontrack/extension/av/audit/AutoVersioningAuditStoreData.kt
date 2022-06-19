@@ -20,6 +20,8 @@ internal data class AutoVersioningAuditStoreData(
     val validationStamp: String?,
     val autoApprovalMode: AutoApprovalMode,
     val states: List<AutoVersioningAuditEntryState>,
+    val routing: String,
+    val queue: String?,
 ) {
     val mostRecentState
         get() = states.first().state
@@ -41,6 +43,8 @@ internal data class AutoVersioningAuditStoreData(
         validationStamp = validationStamp,
         autoApprovalMode = autoApprovalMode,
         // Adding the new state at the beginning
-        states = listOf(newState) + states
+        states = listOf(newState) + states,
+        routing = routing,
+        queue = queue,
     )
 }

@@ -68,7 +68,9 @@ class AutoVersioningAuditStoreDataTest {
             states = listOf(
                 AutoVersioningAuditEntryState(Signature.of("test"), AutoVersioningAuditState.RECEIVED, emptyMap()),
                 AutoVersioningAuditEntryState(Signature.of("test"), AutoVersioningAuditState.CREATED, emptyMap())
-            )
+            ),
+            routing = "routing",
+            queue = "queue",
         )
         assertEquals(AutoVersioningAuditState.RECEIVED, data.mostRecentState)
         val json = data.asJson()
@@ -97,7 +99,9 @@ class AutoVersioningAuditStoreDataTest {
             states = listOf(
                 AutoVersioningAuditEntryState(Signature.of("test"), AutoVersioningAuditState.RECEIVED, emptyMap()),
                 AutoVersioningAuditEntryState(Signature.of("test"), AutoVersioningAuditState.CREATED, emptyMap())
-            )
+            ),
+            routing = "routing",
+            queue = "queue",
         )
         assertEquals(AutoVersioningAuditState.RECEIVED, data.mostRecentState)
         val json = data.asJson()
@@ -127,7 +131,9 @@ class AutoVersioningAuditStoreDataTest {
                 AutoVersioningAuditEntryState(Signature.of("test"), AutoVersioningAuditState.ERROR, emptyMap()),
                 AutoVersioningAuditEntryState(Signature.of("test"), AutoVersioningAuditState.RECEIVED, emptyMap()),
                 AutoVersioningAuditEntryState(Signature.of("test"), AutoVersioningAuditState.CREATED, emptyMap())
-            )
+            ),
+            routing = "routing",
+            queue = "queue",
         )
         assertEquals(AutoVersioningAuditState.ERROR, data.mostRecentState)
         val json = data.asJson()
@@ -156,7 +162,9 @@ class AutoVersioningAuditStoreDataTest {
             states = listOf(
                 AutoVersioningAuditEntryState(Signature.of("test"), AutoVersioningAuditState.RECEIVED, emptyMap()),
                 AutoVersioningAuditEntryState(Signature.of("test"), AutoVersioningAuditState.CREATED, emptyMap())
-            )
+            ),
+            routing = "routing",
+            queue = "queue",
         )
         assertEquals(AutoVersioningAuditState.RECEIVED, data.mostRecentState)
         val json = data.asJson()

@@ -20,12 +20,12 @@ class AutoVersioningAuditServiceImpl(
         logger.info("[auto-versioning] Using production auto versioning audit service")
     }
 
-    override fun onQueuing(order: AutoVersioningOrder) {
-        super.onQueuing(order)
+    override fun onQueuing(order: AutoVersioningOrder, routing: String) {
+        super.onQueuing(order, routing)
     }
 
-    override fun onReceived(order: AutoVersioningOrder) {
-        super.onReceived(order)
+    override fun onReceived(order: AutoVersioningOrder, queue: String) {
+        super.onReceived(order, queue)
     }
 
     override fun onError(order: AutoVersioningOrder, error: Throwable) {

@@ -24,15 +24,17 @@ interface AutoVersioningAuditService {
      * The [order] was just queued. It's the first event in the story of this auto versioning order.
      *
      * @param order Auto versioning order
+     * @param routing Queue routing key being used
      */
-    fun onQueuing(order: AutoVersioningOrder)
+    fun onQueuing(order: AutoVersioningOrder, routing: String)
 
     /**
      * The [order] was received on the queue and is ready for processing
      *
      * @param order Auto versioning order
+     * @param queue Actual queue where the message was sent
      */
-    fun onReceived(order: AutoVersioningOrder)
+    fun onReceived(order: AutoVersioningOrder, queue: String)
 
     /**
      * Marks the [order] has been in error.

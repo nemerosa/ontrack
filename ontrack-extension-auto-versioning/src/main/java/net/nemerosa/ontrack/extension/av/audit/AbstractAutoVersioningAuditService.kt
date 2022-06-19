@@ -18,12 +18,12 @@ abstract class AbstractAutoVersioningAuditService(
             ExceptionUtils.getStackFrames(error).take(MAX_STACK_HEIGHT).joinToString("\n")
     }
 
-    override fun onQueuing(order: AutoVersioningOrder) {
-        store.create(order)
+    override fun onQueuing(order: AutoVersioningOrder, routing: String) {
+        store.create(order, routing)
     }
 
-    override fun onReceived(order: AutoVersioningOrder) {
-        store.addState(order.branch, order.uuid, AutoVersioningAuditState.RECEIVED)
+    override fun onReceived(order: AutoVersioningOrder, queue: String) {
+        store.addState(order.branch, order.uuid, queue, AutoVersioningAuditState.RECEIVED)
     }
 
     override fun onError(order: AutoVersioningOrder, error: Throwable) {
@@ -31,23 +31,25 @@ abstract class AbstractAutoVersioningAuditService(
         store.addState(
             order.branch,
             order.uuid,
+            null,
             AutoVersioningAuditState.ERROR,
             "error" to stack
         )
     }
 
     override fun onProcessingStart(order: AutoVersioningOrder) {
-        store.addState(order.branch, order.uuid, AutoVersioningAuditState.PROCESSING_START)
+        store.addState(order.branch, order.uuid, null, AutoVersioningAuditState.PROCESSING_START)
     }
 
     override fun onProcessingAborted(order: AutoVersioningOrder, message: String) {
-        store.addState(order.branch, order.uuid, AutoVersioningAuditState.PROCESSING_ABORTED, "message" to message)
+        store.addState(order.branch, order.uuid, null, AutoVersioningAuditState.PROCESSING_ABORTED, "message" to message)
     }
 
     override fun onProcessingCreatingBranch(order: AutoVersioningOrder, upgradeBranch: String) {
         store.addState(
             order.branch,
             order.uuid,
+            null,
             AutoVersioningAuditState.PROCESSING_CREATING_BRANCH,
             "branch" to upgradeBranch
         )
@@ -56,6 +58,7 @@ abstract class AbstractAutoVersioningAuditService(
     override fun onProcessingUpdatingFile(order: AutoVersioningOrder, upgradeBranch: String, targetPath: String) {
         store.addState(
             order.branch, order.uuid,
+            null,
             AutoVersioningAuditState.PROCESSING_UPDATING_FILE,
             "branch" to upgradeBranch,
             "path" to targetPath
@@ -66,6 +69,7 @@ abstract class AbstractAutoVersioningAuditService(
         store.addState(
             order.branch,
             order.uuid,
+            null,
             AutoVersioningAuditState.POST_PROCESSING_START,
             "branch" to upgradeBranch
         )
@@ -75,18 +79,21 @@ abstract class AbstractAutoVersioningAuditService(
         store.addState(
             order.branch,
             order.uuid,
+            null,
             AutoVersioningAuditState.POST_PROCESSING_END,
             "branch" to upgradeBranch
         )
     }
 
     override fun onPRCreating(order: AutoVersioningOrder, upgradeBranch: String) {
-        store.addState(order.branch, order.uuid, AutoVersioningAuditState.PR_CREATING, "branch" to upgradeBranch)
+        store.addState(order.branch, order.uuid, null, AutoVersioningAuditState.PR_CREATING, "branch" to upgradeBranch)
     }
 
     override fun onPRTimeout(order: AutoVersioningOrder, upgradeBranch: String, prName: String, prLink: String) {
         store.addState(
-            order.branch, order.uuid, AutoVersioningAuditState.PR_TIMEOUT,
+            order.branch, order.uuid,
+            null,
+            AutoVersioningAuditState.PR_TIMEOUT,
             AutoVersioningAuditEntryStateDataKeys.BRANCH to upgradeBranch,
             AutoVersioningAuditEntryStateDataKeys.PR_NAME to prName,
             AutoVersioningAuditEntryStateDataKeys.PR_LINK to prLink
@@ -95,7 +102,9 @@ abstract class AbstractAutoVersioningAuditService(
 
     override fun onPRCreated(order: AutoVersioningOrder, upgradeBranch: String, prName: String, prLink: String) {
         store.addState(
-            order.branch, order.uuid, AutoVersioningAuditState.PR_CREATED,
+            order.branch, order.uuid,
+            null,
+            AutoVersioningAuditState.PR_CREATED,
             AutoVersioningAuditEntryStateDataKeys.BRANCH to upgradeBranch,
             AutoVersioningAuditEntryStateDataKeys.PR_NAME to prName,
             AutoVersioningAuditEntryStateDataKeys.PR_LINK to prLink
@@ -104,7 +113,9 @@ abstract class AbstractAutoVersioningAuditService(
 
     override fun onPRApproved(order: AutoVersioningOrder, upgradeBranch: String, prName: String, prLink: String) {
         store.addState(
-            order.branch, order.uuid, AutoVersioningAuditState.PR_APPROVED,
+            order.branch, order.uuid,
+            null,
+            AutoVersioningAuditState.PR_APPROVED,
             AutoVersioningAuditEntryStateDataKeys.BRANCH to upgradeBranch,
             AutoVersioningAuditEntryStateDataKeys.PR_NAME to prName,
             AutoVersioningAuditEntryStateDataKeys.PR_LINK to prLink
@@ -113,7 +124,9 @@ abstract class AbstractAutoVersioningAuditService(
 
     override fun onPRMerged(order: AutoVersioningOrder, upgradeBranch: String, prName: String, prLink: String) {
         store.addState(
-            order.branch, order.uuid, AutoVersioningAuditState.PR_MERGED,
+            order.branch, order.uuid,
+            null,
+            AutoVersioningAuditState.PR_MERGED,
             AutoVersioningAuditEntryStateDataKeys.BRANCH to upgradeBranch,
             AutoVersioningAuditEntryStateDataKeys.PR_NAME to prName,
             AutoVersioningAuditEntryStateDataKeys.PR_LINK to prLink

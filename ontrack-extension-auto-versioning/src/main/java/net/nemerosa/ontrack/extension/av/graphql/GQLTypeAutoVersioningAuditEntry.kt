@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.field
 import net.nemerosa.ontrack.graphql.support.listType
+import net.nemerosa.ontrack.graphql.support.stringField
 import net.nemerosa.ontrack.graphql.support.toNotNull
 import org.springframework.stereotype.Component
 
@@ -47,6 +48,9 @@ class GQLTypeAutoVersioningAuditEntry(
                     .description("Elapsed time between the creation of this process and its last state (in ms)")
                     .type(Scalars.GraphQLInt)
             }
+            // Routing & queue
+            .stringField(AutoVersioningAuditEntry::routing)
+            .stringField(AutoVersioningAuditEntry::queue)
             // OK
             .build()
 }

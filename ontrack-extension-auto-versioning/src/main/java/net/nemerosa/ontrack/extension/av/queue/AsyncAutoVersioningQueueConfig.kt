@@ -33,11 +33,11 @@ class AsyncAutoVersioningQueueConfig(
         }
         // Project queues
         autoVersioningConfigProperties.queue.projects.forEach { config ->
-            val queue = Queue("$QUEUE_PREFIX.$PROJECT.${config.name}", true)
+            val queue = Queue("$QUEUE_PREFIX.$PROJECT.$config", true)
             val binding = BindingBuilder
                 .bind(queue)
                 .to(exchange)
-                .with(config.name)
+                .with("$PROJECT.$config")
             declarables += queue
             declarables += binding
         }
@@ -55,11 +55,11 @@ class AsyncAutoVersioningQueueConfig(
             order: AutoVersioningOrder,
         ): String =
             autoVersioningConfigProperties.queue.projects.find {
-                it.name == order.branch.project.name
+                it == order.branch.project.name
             }
                 // Specific project queue
                 ?.let { config ->
-                    "$QUEUE_PREFIX.$PROJECT.${config.name}"
+                    "$PROJECT.$config"
                 }
             // Default queue
                 ?: "$DEFAULT.${(order.branch.id() % autoVersioningConfigProperties.queue.scale) + 1}"

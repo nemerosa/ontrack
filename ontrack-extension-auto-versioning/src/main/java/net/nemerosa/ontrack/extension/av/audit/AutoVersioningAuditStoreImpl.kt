@@ -31,7 +31,7 @@ class AutoVersioningAuditStoreImpl(
 
     private fun signature() = signatureProvider()
 
-    override fun create(order: AutoVersioningOrder) {
+    override fun create(order: AutoVersioningOrder, routing: String) {
         val signature = signature()
         entityDataStore.addObject(
             order.branch,
@@ -60,7 +60,9 @@ class AutoVersioningAuditStoreImpl(
                             state = AutoVersioningAuditState.CREATED,
                             data = emptyMap()
                         )
-                    )
+                    ),
+                    routing = routing,
+                    queue = null,
                 )
             }
         )
@@ -69,19 +71,44 @@ class AutoVersioningAuditStoreImpl(
     override fun addState(
         targetBranch: Branch,
         uuid: String,
+        queue: String?,
         state: AutoVersioningAuditState,
         vararg data: Pair<String, String>,
     ) {
         val record =
             entityDataStore.findLastByCategoryAndName(targetBranch, STORE_CATEGORY, uuid, Time.now()).getOrNull()
         if (record != null) {
-            val initialData: AutoVersioningAuditStoreData = record.data.parse()
+            var initialData: AutoVersioningAuditStoreData = record.data.parse()
             val signature = signature()
             val newState = AutoVersioningAuditEntryState(
                 signature = signature,
                 state = state,
                 data = data.toMap()
             )
+
+            if (queue != null) {
+                initialData = initialData.apply {
+                    AutoVersioningAuditStoreData(
+                        sourceProject = sourceProject,
+                        targetPaths = targetPaths,
+                        targetRegex = targetRegex,
+                        targetProperty = targetProperty,
+                        targetPropertyRegex = targetPropertyRegex,
+                        targetPropertyType = targetPropertyType,
+                        targetVersion = targetVersion,
+                        autoApproval = autoApproval,
+                        upgradeBranchPattern = upgradeBranchPattern,
+                        postProcessing = postProcessing,
+                        postProcessingConfig = postProcessingConfig,
+                        validationStamp = validationStamp,
+                        autoApprovalMode = autoApprovalMode,
+                        states = states,
+                        routing = routing,
+                        queue = queue,
+                    )
+                }
+            }
+
             val newData = initialData.addState(newState)
             entityDataStore.replaceOrAddObject(
                 targetBranch,
@@ -143,7 +170,9 @@ class AutoVersioningAuditStoreImpl(
                     validationStamp = validationStamp,
                     autoApprovalMode = autoApprovalMode,
                 ),
-                audit = states
+                audit = states,
+                routing = routing,
+                queue = queue,
             )
         }
 

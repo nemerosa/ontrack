@@ -44,7 +44,9 @@ class AutoVersioningAuditMgt(connector: Connector) : Connected(connector) {
                         state = auditEntry.state().name,
                         data = auditEntry.data(),
                     )
-                }
+                },
+                routing = item.routing(),
+                queue = item.queue(),
             )
         } ?: emptyList()
 

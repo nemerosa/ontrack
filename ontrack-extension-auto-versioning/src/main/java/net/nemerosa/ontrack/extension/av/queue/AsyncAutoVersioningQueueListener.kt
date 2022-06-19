@@ -67,13 +67,13 @@ class AsyncAutoVersioningQueueListener(
         return SimpleRabbitListenerEndpoint().configure(queue)
     }
 
-    private fun createProjectListener(config: AutoVersioningConfigProperties.ProjectQueueConfig): RabbitListenerEndpoint {
+    private fun createProjectListener(config: String): RabbitListenerEndpoint {
         val queue = getProjectQueueName(config)
         return SimpleRabbitListenerEndpoint().configure(queue)
     }
 
-    private fun getProjectQueueName(config: AutoVersioningConfigProperties.ProjectQueueConfig): String =
-        "${AsyncAutoVersioningQueueConfig.QUEUE_PREFIX}.${AsyncAutoVersioningQueueConfig.PROJECT}.${config.name}"
+    private fun getProjectQueueName(config: String): String =
+        "${AsyncAutoVersioningQueueConfig.QUEUE_PREFIX}.${AsyncAutoVersioningQueueConfig.PROJECT}.$config"
 
     private fun getDefaultQueueName(no: Int) =
         "${AsyncAutoVersioningQueueConfig.QUEUE_PREFIX}.${AsyncAutoVersioningQueueConfig.DEFAULT}.$no"
@@ -96,7 +96,7 @@ class AsyncAutoVersioningQueueListener(
             val queue = message.messageProperties.consumerQueue
             metrics.onReceiving(order, queue)
             securityService.asAdmin {
-                autoVersioningAuditService.onReceived(order)
+                autoVersioningAuditService.onReceived(order, queue)
                 val outcome = metrics.processingTiming(order, queue) {
                     autoVersioningProcessingService.process(order)
                 }

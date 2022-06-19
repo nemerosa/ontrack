@@ -30,6 +30,8 @@ query AutoVersioningAuditEntries(
                 data
                 state
             }
+            routing
+            queue
         }
     }
 }

@@ -14,12 +14,12 @@ interface AutoVersioningAuditStore {
      *
      * @param order Audit entry to create
      */
-    fun create(order: AutoVersioningOrder)
+    fun create(order: AutoVersioningOrder, routing: String)
 
     /**
      * Adds a new state to an auto versioning process.
      */
-    fun addState(targetBranch: Branch, uuid: String, state: AutoVersioningAuditState, vararg data: Pair<String, String>)
+    fun addState(targetBranch: Branch, uuid: String, queue: String? = null, state: AutoVersioningAuditState, vararg data: Pair<String, String>)
 
     fun findByUUID(targetBranch: Branch, uuid: String): AutoVersioningAuditEntry?
     fun findByFilter(filter: AutoVersioningAuditQueryFilter): List<AutoVersioningAuditEntry>

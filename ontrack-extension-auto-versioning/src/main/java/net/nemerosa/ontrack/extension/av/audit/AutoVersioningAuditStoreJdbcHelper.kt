@@ -68,7 +68,9 @@ class AutoVersioningAuditStoreJdbcHelper(
                     validationStamp = data.validationStamp,
                     autoApprovalMode = data.autoApprovalMode,
                 ),
-                audit = data.states
+                audit = data.states,
+                routing = data.routing,
+                queue = data.queue,
             )
         }
     }
