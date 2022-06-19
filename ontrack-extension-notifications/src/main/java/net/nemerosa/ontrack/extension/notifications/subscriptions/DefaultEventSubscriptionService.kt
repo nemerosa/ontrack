@@ -5,7 +5,10 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.extension.notifications.channels.getChannel
-import net.nemerosa.ontrack.json.*
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.asJsonString
+import net.nemerosa.ontrack.json.format
+import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.pagination.spanningPaginatedList
@@ -129,9 +132,13 @@ class DefaultEventSubscriptionService(
 
     override fun findSubscriptionById(projectEntity: ProjectEntity?, id: String): EventSubscription? =
         if (projectEntity != null) {
-            if (securityService.isProjectFunctionGranted(projectEntity,
-                    ProjectView::class.java) && securityService.isProjectFunctionGranted(projectEntity,
-                    ProjectSubscriptionsRead::class.java)
+            if (securityService.isProjectFunctionGranted(
+                    projectEntity,
+                    ProjectView::class.java
+                ) && securityService.isProjectFunctionGranted(
+                    projectEntity,
+                    ProjectSubscriptionsRead::class.java
+                )
             ) {
                 entityDataStore.findLastByCategoryAndName(projectEntity, ENTITY_STORE, id, null)
                     .getOrNull()
@@ -396,25 +403,36 @@ class DefaultEventSubscriptionService(
     }
 
     override fun forEveryMatchingSubscription(event: Event, code: (subscription: EventSubscription) -> Unit) {
-        if (event.entities.isNotEmpty()) {
-            event.entities.values.forEach { projectEntity ->
-                val filter = EntityDataStoreFilter(
-                    entity = projectEntity,
-                    category = ENTITY_STORE,
-                    jsonContext = "left join jsonb_array_elements_text(json::jsonb->'events') as events on true",
-                    jsonFilter = "events = :event",
-                    jsonFilterCriterias = mapOf(
-                        "event" to event.eventType.id
+
+        fun matching(
+            entities: Map<ProjectEntityType, ProjectEntity>,
+        ) {
+            if (entities.isNotEmpty()) {
+                entities.values.forEach { projectEntity ->
+                    val filter = EntityDataStoreFilter(
+                        entity = projectEntity,
+                        category = ENTITY_STORE,
+                        jsonContext = "left join jsonb_array_elements_text(json::jsonb->'events') as events on true",
+                        jsonFilter = "events = :event",
+                        jsonFilterCriterias = mapOf(
+                            "event" to event.eventType.id
+                        )
                     )
-                )
-                entityDataStore.forEachByFilter(filter) { storeRecord ->
-                    val subscription = fromRecord(projectEntity, storeRecord)
-                    if (subscription != null && event.matchesKeywords(subscription.data.keywords)) {
-                        code(subscription.data)
+                    entityDataStore.forEachByFilter(filter) { storeRecord ->
+                        val subscription = fromRecord(projectEntity, storeRecord)
+                        if (subscription != null && event.matchesKeywords(subscription.data.keywords)) {
+                            code(subscription.data)
+                        }
                     }
                 }
             }
         }
+
+        // Regular entities
+        matching(event.entities)
+        // Extra entities
+        matching(event.extraEntities)
+
         // Getting the global subscriptions
         storageService.forEach(
             store = GLOBAL_STORE,
@@ -486,7 +504,6 @@ class DefaultEventSubscriptionService(
         val keywords: String?,
         val disabled: Boolean,
     ) {
-        fun toSubscriptionRecord() = SubscriptionRecord(channel, channelConfig, events, keywords, disabled)
         fun disabled(disabled: Boolean) =
             SignedSubscriptionRecord(signature, channel, channelConfig, events, keywords, disabled)
     }
