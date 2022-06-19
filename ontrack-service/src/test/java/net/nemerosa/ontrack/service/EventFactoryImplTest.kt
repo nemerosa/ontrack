@@ -40,7 +40,7 @@ class EventFactoryImplTest {
     @Test
     fun newBuild() {
         val e = factory.newBuild(build())
-        assertEquals("user", e.signature.user.name)
+        assertEquals("user", e.signature?.user?.name)
         assertEquals(e.entities.size, 3)
         assertEquals("New build 1 for branch B in P.", e.renderText())
         assertEquals("""New build <a href="#/build/100">1</a> for branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>.""", e.render(testRenderer))
@@ -113,7 +113,7 @@ class EventFactoryImplTest {
     @Test
     fun newPromotionRun() {
         val e = factory.newPromotionRun(promotionRun())
-        assertEquals("user", e.signature.user.name)
+        assertEquals("user", e.signature?.user?.name)
         assertEntities(
                 e,
                 ProjectEntityType.PROJECT,
@@ -144,7 +144,7 @@ class EventFactoryImplTest {
     @Test
     fun newValidationRun() {
         val e = factory.newValidationRun(validationRun())
-        assertEquals("user", e.signature.user.name)
+        assertEquals("user", e.signature?.user?.name)
         assertEquals(e.entities.size, 5)
         assertEquals("Build 1 has run for SMOKE with status Failed in branch B in P.", e.renderText())
         assertEquals("""Build <a href="#/build/100">1</a> has run for <a href="#/validationStamp/100">SMOKE</a> with status <i class="status">Failed</i> in branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>.""", e.render(testRenderer))
@@ -153,7 +153,7 @@ class EventFactoryImplTest {
     @Test
     fun newValidationRunStatus() {
         val e = factory.newValidationRunStatus(validationRun())
-        assertEquals("user", e.signature.user.name)
+        assertEquals("user", e.signature?.user?.name)
         assertEquals(e.entities.size, 5)
         assertEquals("Status for SMOKE validation #1 for build 1 in branch B of P has changed to Failed.", e.renderText())
         assertEquals("""Status for <a href="#/validationStamp/100">SMOKE</a> validation <a href="#/validationRun/1000">#1</a> for build <a href="#/build/100">1</a> in branch <a href="#/branch/10">B</a> of <a href="#/project/1">P</a> has changed to <i class="status">Failed</i>.""", e.render(testRenderer))

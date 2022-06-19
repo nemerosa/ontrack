@@ -1,270 +1,208 @@
-package net.nemerosa.ontrack.model.events;
+package net.nemerosa.ontrack.model.events
 
-import lombok.Data;
-import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.model.support.NameValue;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.NameValue
+import org.apache.commons.lang3.StringUtils
+import java.util.regex.Pattern
 
 /**
  * Definition of an event
  */
-@Data
-public final class Event {
+class Event(
+    val eventType: EventType,
+    val signature: Signature?,
+    val entities: Map<ProjectEntityType, ProjectEntity>,
+    val extraEntities: Map<ProjectEntityType, ProjectEntity>,
+    val ref: ProjectEntityType?,
+    val values: Map<String, NameValue>,
+) {
 
-    private static final Pattern EXPRESSION = Pattern.compile("\\$\\{([:a-zA-Z_-]+)}");
-
-    private final EventType eventType;
-    private final Signature signature;
-    private final Map<ProjectEntityType, ProjectEntity> entities;
-    private final Map<ProjectEntityType, ProjectEntity> extraEntities;
-    private final ProjectEntityType ref;
-    private final Map<String, NameValue> values;
-
-    public int getIntValue(String name) {
-        return Integer.parseInt(getValue(name), 10);
+    fun getIntValue(name: String): Int {
+        return getValue(name).toInt(10)
     }
 
-    public String getValue(String name) {
-        return getOptionalValue(name).orElseThrow(
-                () -> new IllegalStateException(
-                        String.format(
-                                "Missing '%s' in the event",
-                                name
-                        )
-                )
-        );
+    fun getValue(name: String): String =
+        values[name]?.value ?: error("Missing value '$name' in the event.")
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T : ProjectEntity> getEntity(entityType: ProjectEntityType): T =
+        entities[entityType] as T ?: error("Missing entity $entityType in the event.")
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T : ProjectEntity?> getExtraEntity(entityType: ProjectEntityType): T =
+        extraEntities[entityType] as T ?: error("Missing extra entity X_$entityType in the event.")
+
+    fun renderText(): String {
+        return render(PlainEventRenderer.INSTANCE)
     }
 
-    public Optional<String> getOptionalValue(String name) {
-        return Optional.of(values.get(name)).map(NameValue::getValue);
-    }
-
-    public <T extends ProjectEntity> T getEntity(ProjectEntityType entityType) {
-        return this.<T>getOptionalEntity(entityType).orElseThrow(
-                () -> new IllegalStateException(
-                        String.format(
-                                "Missing entity %s in the event",
-                                entityType
-                        )
-                )
-        );
-    }
-
-    public <T extends ProjectEntity> T getExtraEntity(ProjectEntityType entityType) {
-        return this.<T>getOptionalExtraEntity(entityType).orElseThrow(
-                () -> new IllegalStateException(
-                        String.format(
-                                "Missing extra entity %s in the event",
-                                entityType
-                        )
-                )
-        );
-    }
-
-    public <T extends ProjectEntity> Optional<T> getOptionalEntity(ProjectEntityType entityType) {
-        @SuppressWarnings("unchecked")
-        T entity = (T) entities.get(entityType);
-        return Optional.of(entity);
-    }
-
-    public <T extends ProjectEntity> Optional<T> getOptionalExtraEntity(ProjectEntityType entityType) {
-        @SuppressWarnings("unchecked")
-        T entity = (T) extraEntities.get(entityType);
-        return Optional.of(entity);
-    }
-
-    public String renderText() {
-        return render(PlainEventRenderer.INSTANCE);
-    }
-
-    public String render(EventRenderer eventRenderer) {
-        Matcher m = EXPRESSION.matcher(eventType.getTemplate());
-        StringBuilder output = new StringBuilder();
+    fun render(eventRenderer: EventRenderer): String {
+        val m = EXPRESSION.matcher(eventType.template)
+        val output = StringBuilder()
         while (m.find()) {
-            String value = expandExpression(m.group(1), eventRenderer);
-            m.appendReplacement(output, value);
+            val value = expandExpression(m.group(1), eventRenderer)
+            m.appendReplacement(output, value)
         }
-        m.appendTail(output);
-        return output.toString();
+        m.appendTail(output)
+        return output.toString()
     }
 
-    private String expandExpression(String expression, EventRenderer eventRenderer) {
-        if (StringUtils.startsWith(expression, ":")) {
-            int linkIndex = expression.indexOf(":", 1);
+    private fun expandExpression(expression: String, eventRenderer: EventRenderer): String {
+        return if (StringUtils.startsWith(expression, ":")) {
+            val linkIndex = expression.indexOf(":", 1)
             if (linkIndex > 0) {
-                String textKey = expression.substring(1, linkIndex);
-                NameValue text = values.get(textKey);
-                if (text == null) {
-                    throw new EventMissingValueException(eventType.getTemplate(), textKey);
-                }
-                String linkKey = expression.substring(linkIndex + 1);
-                NameValue link = values.get(linkKey);
-                if (link == null) {
-                    throw new EventMissingValueException(eventType.getTemplate(), linkKey);
-                }
-                return eventRenderer.renderLink(text, link, this);
+                val textKey = expression.substring(1, linkIndex)
+                val text = values[textKey] ?: throw EventMissingValueException(eventType.template, textKey)
+                val linkKey = expression.substring(linkIndex + 1)
+                val link = values[linkKey] ?: throw EventMissingValueException(eventType.template, linkKey)
+                eventRenderer.renderLink(text, link, this)
             } else {
-                String valueKey = expression.substring(1);
-                NameValue value = values.get(valueKey);
-                if (value == null) {
-                    throw new EventMissingValueException(eventType.getTemplate(), valueKey);
-                }
-                return eventRenderer.render(valueKey, value, this);
+                val valueKey = expression.substring(1)
+                val value = values[valueKey] ?: throw EventMissingValueException(eventType.template, valueKey)
+                eventRenderer.render(valueKey, value, this)
             }
-        } else if ("REF".equals(expression)) {
+        } else if ("REF" == expression) {
             if (ref == null) {
-                throw new EventMissingRefEntityException(eventType.getTemplate());
+                throw EventMissingRefEntityException(eventType.template)
             } else {
-                ProjectEntity entity = entities.get(ref);
-                if (entity == null) {
-                    throw new EventMissingEntityException(eventType.getTemplate(), ref);
-                }
-                return eventRenderer.render(entity, this);
+                val entity = entities[ref] ?: throw EventMissingEntityException(eventType.template, ref)
+                eventRenderer.render(entity, this)
             }
         } else if (expression.startsWith("X_")) {
             // Final reference
-            String type = expression.substring(2);
+            val type = expression.substring(2)
             // Project entity type
-            ProjectEntityType projectEntityType = ProjectEntityType.valueOf(type);
+            val projectEntityType = ProjectEntityType.valueOf(type)
             // Gets the corresponding entity
-            ProjectEntity projectEntity = extraEntities.get(projectEntityType);
-            if (projectEntity == null) {
-                throw new EventMissingEntityException(eventType.getTemplate(), projectEntityType);
-            }
+            val projectEntity = extraEntities[projectEntityType]
+                ?: throw EventMissingEntityException(eventType.template, projectEntityType)
             // Rendering
-            return eventRenderer.render(projectEntity, this);
+            eventRenderer.render(projectEntity, this)
         } else {
             // Project entity type
-            ProjectEntityType projectEntityType = ProjectEntityType.valueOf(expression);
+            val projectEntityType = ProjectEntityType.valueOf(expression)
             // Gets the corresponding entity
-            ProjectEntity projectEntity = entities.get(projectEntityType);
-            if (projectEntity == null) {
-                throw new EventMissingEntityException(eventType.getTemplate(), projectEntityType);
-            }
+            val projectEntity = entities[projectEntityType]
+                ?: throw EventMissingEntityException(eventType.template, projectEntityType)
             // Rendering
-            return eventRenderer.render(projectEntity, this);
+            eventRenderer.render(projectEntity, this)
         }
     }
 
-    public static EventBuilder of(EventType eventType) {
-        return new EventBuilder(eventType);
-    }
+    fun withSignature(signature: Signature?): Event = Event(
+        eventType,
+        signature,
+        entities,
+        extraEntities,
+        ref,
+        values
+    )
 
-    public Event withSignature(Signature signature) {
-        return new Event(
+    class EventBuilder(private val eventType: EventType) {
+
+        private var signature: Signature? = null
+        private val entities = mutableMapOf<ProjectEntityType, ProjectEntity>()
+        private val extraEntities = mutableMapOf<ProjectEntityType, ProjectEntity>()
+        private var ref: ProjectEntityType? = null
+        private val values = mutableMapOf<String, NameValue>()
+
+        fun with(signature: Signature?): EventBuilder {
+            this.signature = signature
+            return this
+        }
+
+        fun withNoSignature(): EventBuilder {
+            signature = null
+            return this
+        }
+
+        fun withBuild(build: Build): EventBuilder {
+            return withBranch(build.branch).with(build).with(build.signature)
+        }
+
+        fun withPromotionRun(promotionRun: PromotionRun): EventBuilder {
+            return withBuild(promotionRun.build).with(promotionRun).with(promotionRun.promotionLevel)
+                .with(promotionRun.signature)
+        }
+
+        fun withValidationRun(validationRun: ValidationRun): EventBuilder {
+            return withBuild(validationRun.build).with(validationRun.validationStamp).with(validationRun)
+                .with(validationRun.lastStatus.signature)
+        }
+
+        fun withPromotionLevel(promotionLevel: PromotionLevel): EventBuilder {
+            return withBranch(promotionLevel.branch).with(promotionLevel)
+        }
+
+        fun withValidationStamp(validationStamp: ValidationStamp): EventBuilder {
+            return withBranch(validationStamp.branch).with(validationStamp)
+        }
+
+        fun withBranch(branch: Branch): EventBuilder {
+            return withProject(branch.project).with(branch)
+        }
+
+        fun withProject(project: Project): EventBuilder {
+            return with(project)
+        }
+
+        fun withExtraProject(project: Project): EventBuilder {
+            return withExtra(project)
+        }
+
+        fun withRef(entity: ProjectEntity): EventBuilder {
+            ref = entity.projectEntityType
+            return withProject(entity.project).with(entity)
+        }
+
+        fun with(entity: ProjectEntity): EventBuilder {
+            entities[entity.projectEntityType] = entity
+            return this
+        }
+
+        fun withExtra(entity: ProjectEntity): EventBuilder {
+            extraEntities[entity.projectEntityType] = entity
+            return this
+        }
+
+        fun withValidationRunStatus(statusID: ValidationRunStatusID): EventBuilder {
+            return with("status", NameValue(statusID.id, statusID.name))
+        }
+
+        fun with(name: String, value: NameValue): EventBuilder {
+            values[name] = value
+            return this
+        }
+
+        fun with(name: String, value: String?): EventBuilder {
+            return with(name, NameValue(name, value!!))
+        }
+
+        fun get(): Event {
+            // Creates the event
+            val event = Event(
                 eventType,
                 signature,
                 entities,
                 extraEntities,
                 ref,
                 values
-        );
-    }
-
-    public static class EventBuilder {
-
-        private final EventType eventType;
-        private Signature signature;
-        private Map<ProjectEntityType, ProjectEntity> entities = new LinkedHashMap<>();
-        private Map<ProjectEntityType, ProjectEntity> extraEntities = new LinkedHashMap<>();
-        private ProjectEntityType ref = null;
-        private Map<String, NameValue> values = new LinkedHashMap<>();
-
-        public EventBuilder(EventType eventType) {
-            this.eventType = eventType;
-        }
-
-        public EventBuilder with(Signature signature) {
-            this.signature = signature;
-            return this;
-        }
-
-        public EventBuilder withNoSignature() {
-            this.signature = null;
-            return this;
-        }
-
-        public EventBuilder withBuild(Build build) {
-            return withBranch(build.getBranch()).with(build).with(build.getSignature());
-        }
-
-        public EventBuilder withPromotionRun(PromotionRun promotionRun) {
-            return withBuild(promotionRun.getBuild()).with(promotionRun).with(promotionRun.getPromotionLevel()).with(promotionRun.getSignature());
-        }
-
-        public EventBuilder withValidationRun(ValidationRun validationRun) {
-            return withBuild(validationRun.getBuild()).with(validationRun.getValidationStamp()).with(validationRun).with(validationRun.getLastStatus().getSignature());
-        }
-
-        public EventBuilder withPromotionLevel(PromotionLevel promotionLevel) {
-            return withBranch(promotionLevel.getBranch()).with(promotionLevel);
-        }
-
-        public EventBuilder withValidationStamp(ValidationStamp validationStamp) {
-            return withBranch(validationStamp.getBranch()).with(validationStamp);
-        }
-
-        public EventBuilder withBranch(Branch branch) {
-            return withProject(branch.getProject()).with(branch);
-        }
-
-        public EventBuilder withProject(Project project) {
-            return with(project);
-        }
-
-        public EventBuilder withExtraProject(Project project) {
-            return withExtra(project);
-        }
-
-        public EventBuilder withRef(ProjectEntity entity) {
-            this.ref = entity.getProjectEntityType();
-            return withProject(entity.getProject()).with(entity);
-        }
-
-        public EventBuilder with(ProjectEntity entity) {
-            entities.put(entity.getProjectEntityType(), entity);
-            return this;
-        }
-
-        public EventBuilder withExtra(ProjectEntity entity) {
-            extraEntities.put(entity.getProjectEntityType(), entity);
-            return this;
-        }
-
-        public EventBuilder withValidationRunStatus(ValidationRunStatusID statusID) {
-            return with("status", new NameValue(statusID.getId(), statusID.getName()));
-        }
-
-        public EventBuilder with(String name, NameValue value) {
-            values.put(name, value);
-            return this;
-        }
-
-        public EventBuilder with(String name, String value) {
-            return with(name, new NameValue(name, value));
-        }
-
-        public Event get() {
-            // Creates the event
-            Event event = new Event(
-                    eventType,
-                    signature,
-                    entities,
-                    extraEntities,
-                    ref,
-                    values
-            );
+            )
             // Checks the event can be resolved with all its references
-            event.renderText();
+            event.renderText()
             // OK
-            return event;
+            return event
         }
     }
 
+    companion object {
+
+        private val EXPRESSION = Pattern.compile("\\$\\{([:a-zA-Z_-]+)}")
+
+        @JvmStatic
+        fun of(eventType: EventType): EventBuilder {
+            return EventBuilder(eventType)
+        }
+
+    }
 }
