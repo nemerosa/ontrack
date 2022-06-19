@@ -69,6 +69,7 @@ class EventJdbcRepository(
         ) { rs: ResultSet, _: Int -> toEvent(rs, entityLoader, eventTypeLoader) }
     }
 
+    @Suppress("SqlResolve")
     override fun query(
         entityType: ProjectEntityType,
         entityId: ID,
@@ -78,15 +79,21 @@ class EventJdbcRepository(
         eventTypeLoader: (type: String) -> EventType,
     ): List<Event> {
         return namedParameterJdbcTemplate!!.query(
-            String.format("SELECT * FROM EVENTS WHERE %s = :entityId", entityType.name) +
-                    " ORDER BY ID DESC" +
-                    " LIMIT :count OFFSET :offset",
+            """
+                SELECT * 
+                FROM EVENTS 
+                WHERE ${entityType.name} = :entityId 
+                OR X_${entityType.name} = :entityId 
+                ORDER BY ID DESC 
+                LIMIT :count OFFSET :offset
+            """,
             params("entityId", entityId.get())
                 .addValue("count", count)
                 .addValue("offset", offset)
         ) { rs: ResultSet, _: Int -> toEvent(rs, entityLoader, eventTypeLoader) }
     }
 
+    @Suppress("SqlResolve")
     override fun query(
         eventType: EventType,
         entityType: ProjectEntityType,
@@ -97,10 +104,14 @@ class EventJdbcRepository(
         eventTypeLoader: (type: String) -> EventType,
     ): List<Event> {
         return namedParameterJdbcTemplate!!.query(
-            String.format("SELECT * FROM EVENTS WHERE %s = :entityId", entityType.name) +
-                    " AND EVENT_TYPE = :eventType" +
-                    " ORDER BY ID DESC" +
-                    " LIMIT :count OFFSET :offset",
+            """
+                SELECT *
+                FROM EVENTS 
+                WHERE (${entityType.name} = :entityId OR X_${entityType.name} = :entityId)
+                AND EVENT_TYPE = :eventType 
+                ORDER BY ID DESC 
+                LIMIT :count OFFSET :offset
+            """,
             params("entityId", entityId.get())
                 .addValue("eventType", eventType.id)
                 .addValue("count", count)
@@ -113,7 +124,14 @@ class EventJdbcRepository(
         entityId: ID,
         eventType: EventType,
     ): Signature? = getFirstItem(
-        "SELECT * FROM EVENTS WHERE ${entityType.name} = :entityId AND EVENT_TYPE = :eventType ORDER BY ID DESC LIMIT 1",
+        """
+            SELECT * 
+            FROM EVENTS 
+            WHERE (${entityType.name} = :entityId OR X_${entityType.name} = :entityId)
+            AND EVENT_TYPE = :eventType 
+            ORDER BY ID DESC 
+            LIMIT 1
+        """,
         params("entityId", entityId.get()).addValue("eventType", eventType.id)
     ) { rs: ResultSet?, _: Int -> readSignature(rs, "event_time", "event_user") }
 
@@ -124,9 +142,16 @@ class EventJdbcRepository(
         entityLoader: (type: ProjectEntityType, id: ID) -> ProjectEntity,
         eventTypeLoader: (type: String) -> EventType,
     ): Event? = getFirstItem(
-        "SELECT * FROM EVENTS WHERE ${entityType.name} = :entityId AND EVENT_TYPE = :eventType ORDER BY ID DESC LIMIT 1",
+        """
+            SELECT * 
+            FROM EVENTS 
+            WHERE (${entityType.name} = :entityId OR X_${entityType.name} = :entityId)
+            AND EVENT_TYPE = :eventType 
+            ORDER BY ID DESC 
+            LIMIT 1
+        """,
         params("entityId", entityId.get()).addValue("eventType", eventType.id)
-    ) { rs: ResultSet, num: Int -> toEvent(rs, entityLoader, eventTypeLoader) }
+    ) { rs: ResultSet, _: Int -> toEvent(rs, entityLoader, eventTypeLoader) }
 
     private fun toEvent(
         rs: ResultSet,
