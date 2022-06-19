@@ -32,6 +32,7 @@ class EventControllerTest {
                 EventFactory.PROPERTY_CHANGE,
                 Signature.of("test"),
                 emptyMap(),
+                emptyMap(),
                 null,
                 mapOf(
                         "property" to NameValue(

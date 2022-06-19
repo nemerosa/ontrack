@@ -22,7 +22,7 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
 
                 // Subscribing at source level
-                val dependencyGroup = uid("g")
+                val dependencyGroup = uid("dep-g-")
                 ontrack.notifications.subscribe(
                     channel = "in-memory",
                     channelConfig = mapOf("group" to dependencyGroup),
@@ -34,7 +34,7 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
                 project {
 
                     // Subscribing at target level
-                    val projectGroup = uid("g")
+                    val projectGroup = uid("tar-g-")
                     ontrack.notifications.subscribe(
                         channel = "in-memory",
                         channelConfig = mapOf("group" to projectGroup),
@@ -69,7 +69,7 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
                         waitUntil(
                             timeout = 30_000,
                             interval = 500L,
-                            task = "Error notification",
+                            task = "Error notification at dependency level",
                             onTimeout = displayNotifications(dependencyGroup)
                         ) {
                             ontrack.notifications.inMemory.group(dependencyGroup).firstOrNull() ==
@@ -81,6 +81,8 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
                                         Error: Cannot find version in "gradle.properties".
                                     """.trimIndent()
                         }
+
+                        // TODO Test at target level
 
                     }
                 }

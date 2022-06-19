@@ -11,6 +11,7 @@ data class NotificationQueueItem(
     val eventType: String,
     val signature: Signature?,
     val entities: Map<ProjectEntityType, Int>,
+    val extraEntities: Map<ProjectEntityType, Int>,
     val ref: ProjectEntityType?,
     val values: Map<String, NameValue>,
 )

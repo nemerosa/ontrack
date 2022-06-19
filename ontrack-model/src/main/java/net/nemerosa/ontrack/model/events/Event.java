@@ -17,11 +17,12 @@ import java.util.regex.Pattern;
 @Data
 public final class Event {
 
-    private static final Pattern EXPRESSION = Pattern.compile("\\$\\{([:a-zA-Z_-]+)\\}");
+    private static final Pattern EXPRESSION = Pattern.compile("\\$\\{([:a-zA-Z_-]+)}");
 
     private final EventType eventType;
     private final Signature signature;
     private final Map<ProjectEntityType, ProjectEntity> entities;
+    private final Map<ProjectEntityType, ProjectEntity> extraEntities;
     private final ProjectEntityType ref;
     private final Map<String, NameValue> values;
 
@@ -55,9 +56,26 @@ public final class Event {
         );
     }
 
+    public <T extends ProjectEntity> T getExtraEntity(ProjectEntityType entityType) {
+        return this.<T>getOptionalExtraEntity(entityType).orElseThrow(
+                () -> new IllegalStateException(
+                        String.format(
+                                "Missing extra entity %s in the event",
+                                entityType
+                        )
+                )
+        );
+    }
+
     public <T extends ProjectEntity> Optional<T> getOptionalEntity(ProjectEntityType entityType) {
         @SuppressWarnings("unchecked")
         T entity = (T) entities.get(entityType);
+        return Optional.of(entity);
+    }
+
+    public <T extends ProjectEntity> Optional<T> getOptionalExtraEntity(ProjectEntityType entityType) {
+        @SuppressWarnings("unchecked")
+        T entity = (T) extraEntities.get(entityType);
         return Optional.of(entity);
     }
 
@@ -109,6 +127,18 @@ public final class Event {
                 }
                 return eventRenderer.render(entity, this);
             }
+        } else if (expression.startsWith("X_")) {
+            // Final reference
+            String type = expression.substring(2);
+            // Project entity type
+            ProjectEntityType projectEntityType = ProjectEntityType.valueOf(type);
+            // Gets the corresponding entity
+            ProjectEntity projectEntity = extraEntities.get(projectEntityType);
+            if (projectEntity == null) {
+                throw new EventMissingEntityException(eventType.getTemplate(), projectEntityType);
+            }
+            // Rendering
+            return eventRenderer.render(projectEntity, this);
         } else {
             // Project entity type
             ProjectEntityType projectEntityType = ProjectEntityType.valueOf(expression);
@@ -131,6 +161,7 @@ public final class Event {
                 eventType,
                 signature,
                 entities,
+                extraEntities,
                 ref,
                 values
         );
@@ -141,6 +172,7 @@ public final class Event {
         private final EventType eventType;
         private Signature signature;
         private Map<ProjectEntityType, ProjectEntity> entities = new LinkedHashMap<>();
+        private Map<ProjectEntityType, ProjectEntity> extraEntities = new LinkedHashMap<>();
         private ProjectEntityType ref = null;
         private Map<String, NameValue> values = new LinkedHashMap<>();
 
@@ -186,6 +218,10 @@ public final class Event {
             return with(project);
         }
 
+        public EventBuilder withExtraProject(Project project) {
+            return withExtra(project);
+        }
+
         public EventBuilder withRef(ProjectEntity entity) {
             this.ref = entity.getProjectEntityType();
             return withProject(entity.getProject()).with(entity);
@@ -193,6 +229,11 @@ public final class Event {
 
         public EventBuilder with(ProjectEntity entity) {
             entities.put(entity.getProjectEntityType(), entity);
+            return this;
+        }
+
+        public EventBuilder withExtra(ProjectEntity entity) {
+            extraEntities.put(entity.getProjectEntityType(), entity);
             return this;
         }
 
@@ -215,6 +256,7 @@ public final class Event {
                     eventType,
                     signature,
                     entities,
+                    extraEntities,
                     ref,
                     values
             );

@@ -44,11 +44,21 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
         for (ProjectEntityType type : event.getEntities().keySet()) {
             sql.append(", ").append(type.name());
         }
+        for (ProjectEntityType type : event.getExtraEntities().keySet()) {
+            sql.append(", X_").append(type.name());
+        }
         sql.append(") VALUES (:eventValues, :eventTime, :eventUser, :eventType, :ref");
         for (Map.Entry<ProjectEntityType, ProjectEntity> entry : event.getEntities().entrySet()) {
             ProjectEntityType type = entry.getKey();
             ProjectEntity entity = entry.getValue();
             String typeEntry = type.name().toLowerCase();
+            sql.append(", :").append(typeEntry);
+            params.addValue(typeEntry, entity.id());
+        }
+        for (Map.Entry<ProjectEntityType, ProjectEntity> entry : event.getExtraEntities().entrySet()) {
+            ProjectEntityType type = entry.getKey();
+            ProjectEntity entity = entry.getValue();
+            String typeEntry = "x_" + type.name().toLowerCase();
             sql.append(", :").append(typeEntry);
             params.addValue(typeEntry, entity.id());
         }
@@ -152,6 +162,15 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
                 entities.put(type, entity);
             }
         }
+        // Extra entities
+        Map<ProjectEntityType, ProjectEntity> extraEntities = new LinkedHashMap<>();
+        for (ProjectEntityType type : ProjectEntityType.values()) {
+            int entityId = rs.getInt("X_" + type.name());
+            if (!rs.wasNull()) {
+                ProjectEntity entity = entityLoader.apply(type, ID.of(entityId));
+                extraEntities.put(type, entity);
+            }
+        }
         // Reference (if any)
         ProjectEntityType refEntity = getEnum(ProjectEntityType.class, rs, "ref");
         // Values
@@ -161,6 +180,7 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
                 eventTypeLoader.apply(eventTypeName),
                 signature,
                 entities,
+                extraEntities,
                 refEntity,
                 values
         );

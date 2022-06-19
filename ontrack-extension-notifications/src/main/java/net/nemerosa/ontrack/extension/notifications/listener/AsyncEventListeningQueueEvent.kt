@@ -15,6 +15,7 @@ data class AsyncEventListeningQueueEvent(
     val eventType: String,
     val signature: Signature?,
     val entities: Map<ProjectEntityType, Int>,
+    val extraEntities: Map<ProjectEntityType, Int>,
     val ref: ProjectEntityType?,
     val values: Map<String, NameValue>,
 ) {
@@ -22,6 +23,7 @@ data class AsyncEventListeningQueueEvent(
         eventType = event.eventType.id,
         signature = event.signature,
         entities = event.entities.mapValues { (_, entity) -> entity.id() },
+        extraEntities = event.extraEntities.mapValues { (_, entity) -> entity.id() },
         ref = event.ref,
         values = event.values,
     )
@@ -33,6 +35,7 @@ data class AsyncEventListeningQueueEvent(
         eventFactory.toEventType(eventType),
         signature,
         entities.mapValues { (type, id) -> type.getEntityFn(structureService).apply(ID.of(id)) },
+        extraEntities.mapValues { (type, id) -> type.getEntityFn(structureService).apply(ID.of(id)) },
         ref,
         values,
     )

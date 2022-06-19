@@ -51,7 +51,7 @@ fun waitUntil(
                 onTimeout()
             }
             if (task != null) {
-                fail("Timeout waiting for $task to complete.")
+                fail("Timeout waiting for [$task] to complete.")
             } else {
                 val message = """
                     Timeout waiting for a task to complete.

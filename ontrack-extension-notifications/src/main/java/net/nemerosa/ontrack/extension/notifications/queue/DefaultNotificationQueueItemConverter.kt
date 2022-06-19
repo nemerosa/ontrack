@@ -19,6 +19,7 @@ class DefaultNotificationQueueItemConverter(
         eventType = item.event.eventType.id,
         signature = item.event.signature,
         entities = item.event.entities.mapValues { (_, entity) -> entity.id() },
+        extraEntities = item.event.extraEntities.mapValues { (_, entity) -> entity.id() },
         ref = item.event.ref,
         values = item.event.values,
     )
@@ -30,6 +31,9 @@ class DefaultNotificationQueueItemConverter(
             eventFactory.toEventType(item.eventType),
             item.signature,
             item.entities.mapValues { (type, id) ->
+                type.getEntityFn(structureService).apply(ID.of(id))
+            },
+            item.extraEntities.mapValues { (type, id) ->
                 type.getEntityFn(structureService).apply(ID.of(id))
             },
             item.ref,
