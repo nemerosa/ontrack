@@ -41,6 +41,10 @@ class AsyncAutoVersioningQueueListener(
                 val queue = getDefaultQueueName(no)
                 val queueProperties: Properties? = amqpAdmin.getQueueProperties(queue)
                 queueProperties?.get("QUEUE_MESSAGE_COUNT")?.toString()?.toInt(10) ?: 0
+            } + autoVersioningConfigProperties.queue.projects.sumOf { config ->
+                val queue = getProjectQueueName(config)
+                val queueProperties: Properties? = amqpAdmin.getQueueProperties(queue)
+                queueProperties?.get("QUEUE_MESSAGE_COUNT")?.toString()?.toInt(10) ?: 0
             }
 
     override fun configureRabbitListeners(registrar: RabbitListenerEndpointRegistrar) {
@@ -50,12 +54,26 @@ class AsyncAutoVersioningQueueListener(
                 createDefaultListener(no)
             )
         }
+        // Listener for the project queues
+        autoVersioningConfigProperties.queue.projects.forEach { config ->
+            registrar.registerEndpoint(
+                createProjectListener(config)
+            )
+        }
     }
 
     private fun createDefaultListener(no: Int): RabbitListenerEndpoint {
         val queue = getDefaultQueueName(no)
         return SimpleRabbitListenerEndpoint().configure(queue)
     }
+
+    private fun createProjectListener(config: AutoVersioningConfigProperties.ProjectQueueConfig): RabbitListenerEndpoint {
+        val queue = getProjectQueueName(config)
+        return SimpleRabbitListenerEndpoint().configure(queue)
+    }
+
+    private fun getProjectQueueName(config: AutoVersioningConfigProperties.ProjectQueueConfig): String =
+        "${AsyncAutoVersioningQueueConfig.QUEUE_PREFIX}.${AsyncAutoVersioningQueueConfig.PROJECT}.${config.name}"
 
     private fun getDefaultQueueName(no: Int) =
         "${AsyncAutoVersioningQueueConfig.QUEUE_PREFIX}.${AsyncAutoVersioningQueueConfig.DEFAULT}.$no"

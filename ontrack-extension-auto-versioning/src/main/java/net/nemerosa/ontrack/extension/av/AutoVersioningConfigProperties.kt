@@ -15,7 +15,12 @@ class AutoVersioningConfigProperties {
     class QueueConfigProperties {
         var async: Boolean = true
         var scale: Int = 1
+        var projects: List<ProjectQueueConfig> = emptyList()
     }
+
+    class ProjectQueueConfig(
+        var name: String,
+    )
 
     companion object {
         /**

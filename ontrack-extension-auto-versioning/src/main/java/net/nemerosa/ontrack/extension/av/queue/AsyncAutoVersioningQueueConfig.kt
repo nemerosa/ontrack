@@ -31,6 +31,16 @@ class AsyncAutoVersioningQueueConfig(
             declarables += queue
             declarables += binding
         }
+        // Project queues
+        autoVersioningConfigProperties.queue.projects.forEach { config ->
+            val queue = Queue("$QUEUE_PREFIX.$PROJECT.${config.name}", true)
+            val binding = BindingBuilder
+                .bind(queue)
+                .to(exchange)
+                .with(config.name)
+            declarables += queue
+            declarables += binding
+        }
         // OK
         return Declarables(declarables)
     }
@@ -43,7 +53,16 @@ class AsyncAutoVersioningQueueConfig(
         fun getRoutingKey(
             autoVersioningConfigProperties: AutoVersioningConfigProperties,
             order: AutoVersioningOrder,
-        ): String = "$DEFAULT.${(order.branch.id() % autoVersioningConfigProperties.queue.scale) + 1}"
+        ): String =
+            autoVersioningConfigProperties.queue.projects.find {
+                it.name == order.branch.project.name
+            }
+                // Specific project queue
+                ?.let { config ->
+                    "$QUEUE_PREFIX.$PROJECT.${config.name}"
+                }
+            // Default queue
+                ?: "$DEFAULT.${(order.branch.id() % autoVersioningConfigProperties.queue.scale) + 1}"
 
         /**
          * Topic exchange name
@@ -59,6 +78,11 @@ class AsyncAutoVersioningQueueConfig(
          * Default queuing
          */
         const val DEFAULT = "default"
+
+        /**
+         * Project queuing
+         */
+        const val PROJECT = "project"
 
     }
 
