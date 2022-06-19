@@ -87,7 +87,7 @@ class AutoVersioningAuditStoreImpl(
             )
 
             if (queue != null) {
-                initialData = initialData.apply {
+                initialData = initialData.run {
                     AutoVersioningAuditStoreData(
                         sourceProject = sourceProject,
                         targetPaths = targetPaths,
