@@ -1,9 +1,10 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.common.*
+import net.nemerosa.ontrack.common.Document
+import net.nemerosa.ontrack.common.UserException
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.BuildValidationExtension
 import net.nemerosa.ontrack.extension.api.ExtensionManager
-import net.nemerosa.ontrack.extension.api.ValidationRunMetricsExtension
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.events.BuildLinkListenerService
 import net.nemerosa.ontrack.model.events.EventFactory
@@ -11,6 +12,7 @@ import net.nemerosa.ontrack.model.events.EventPostService
 import net.nemerosa.ontrack.model.exceptions.*
 import net.nemerosa.ontrack.model.extension.PromotionLevelPropertyType
 import net.nemerosa.ontrack.model.extension.ValidationStampPropertyType
+import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
@@ -51,7 +53,8 @@ class StructureServiceImpl(
         private val promotionRunCheckService: PromotionRunCheckService,
         private val statsRepository: StatsRepository,
         private val buildLinkListenerService: BuildLinkListenerService,
-        private val coreBuildFilterRepository: CoreBuildFilterRepository
+        private val coreBuildFilterRepository: CoreBuildFilterRepository,
+        private val metricsExportService: MetricsExportService,
 ) : StructureService {
 
     private val logger = LoggerFactory.getLogger(StructureService::class.java)
@@ -1128,20 +1131,42 @@ class StructureServiceImpl(
     }
 
     private fun publishValidationRunMetrics(validationRun: ValidationRun) {
-        try {
-            extensionManager.getExtensions(ValidationRunMetricsExtension::class.java).forEach { it.onValidationRun(validationRun) }
-        } catch (ex: Exception) {
-            logger.error("Cannot publish metrics for ${validationRun.entityDisplayName}", ex)
+        val validationRunData: ValidationRunData<*>? = validationRun.data
+        if (validationRunData != null) {
+            publishValidationRunMetricsData(validationRun, validationRunData)
+        }
+    }
+
+    private fun <T> publishValidationRunMetricsData(
+        validationRun: ValidationRun,
+        validationRunData: ValidationRunData<T>,
+    ) {
+        val dataType: ValidationDataType<Any, T>? = validationDataTypeService.getValidationDataType(validationRunData.descriptor.id)
+        if (dataType != null) {
+            val metrics: Map<String, *>? = dataType.getMetrics(validationRunData.data)
+            if (metrics != null && metrics.isNotEmpty()) {
+                metricsExportService.exportMetrics(
+                    metric = "validation_data",
+                    tags = mapOf(
+                        "project" to validationRun.project.name,
+                        "branch" to validationRun.validationStamp.branch.name,
+                        "validation" to validationRun.validationStamp.name,
+                        "status" to validationRun.lastStatus.statusID.id,
+                        "type" to validationRunData.descriptor.id,
+                    ),
+                    fields = metrics,
+                    timestamp = validationRun.signature.time,
+                )
+            }
         }
     }
 
     override fun restoreValidationRunDataMetrics(logger: (String) -> Unit) {
-        val extensions = extensionManager.getExtensions(ValidationRunMetricsExtension::class.java)
         var count = 0
         val total = statsRepository.validationRunCount
         structureRepository.forEachValidationRun({ validationRunStatusService.getValidationRunStatus(it) }) { validationRun ->
             try {
-                extensions.forEach { it.onValidationRun(validationRun) }
+                publishValidationRunMetrics(validationRun)
                 count++
                 if (count % 100 == 0) {
                     this.logger.info("Restored $count/$total validation run data metrics...")

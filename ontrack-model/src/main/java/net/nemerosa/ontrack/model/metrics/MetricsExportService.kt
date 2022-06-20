@@ -9,7 +9,7 @@ interface MetricsExportService {
     fun exportMetrics(
         metric: String,
         tags: Map<String, String>,
-        fields: Map<String, Double>,
+        fields: Map<String, *>,
         timestamp: LocalDateTime? = null,
     )
 

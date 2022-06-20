@@ -1,9 +1,7 @@
 package net.nemerosa.ontrack.extension.influxdb
 
 import net.nemerosa.ontrack.extension.influxdb.metrics.InfluxDBMetricsExportExtension
-import net.nemerosa.ontrack.extension.influxdb.validation.data.InfluxDBValidationRunMetricsExtension
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.ValidationDataTypeService
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
@@ -38,14 +36,6 @@ class InfluxDBExtensionConfiguration(
         influxDBExtensionFeature,
         influxDBConnection
     )
-
-    @Bean
-    @ConditionalOnBean(InfluxDBConnection::class)
-    fun influxDBValidationRunMetricsExtension(
-        influxDBExtensionFeature: InfluxDBExtensionFeature,
-        validationDataTypeService: ValidationDataTypeService,
-        influxDBConnection: InfluxDBConnection,
-    ) = InfluxDBValidationRunMetricsExtension(influxDBExtensionFeature, validationDataTypeService, influxDBConnection)
 
     @Bean
     @ConditionalOnBean(InfluxDBConnection::class)

@@ -48,7 +48,7 @@ class TestMetricsExportExtension(
     override fun exportMetrics(
         metric: String,
         tags: Map<String, String>,
-        fields: Map<String, Double>,
+        fields: Map<String, *>,
         timestamp: LocalDateTime?
     ) {
         if (enabled) {
@@ -125,7 +125,7 @@ class TestMetricsExportExtension(
 data class MetricsData(
     val metric: String,
     val tags: Map<String, String>,
-    val fields: Map<String, Double>,
+    val fields: Map<String, *>,
     val timestamp: LocalDateTime?
 ) {
     override fun toString(): String {

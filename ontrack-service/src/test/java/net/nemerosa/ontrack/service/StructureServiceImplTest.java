@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.events.BuildLinkListenerService;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
+import net.nemerosa.ontrack.model.metrics.MetricsExportService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService;
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
@@ -58,7 +59,8 @@ public class StructureServiceImplTest {
                 promotionRunCheckService,
                 statsRepository,
                 mock(BuildLinkListenerService.class),
-                coreBuildFilterRepository
+                coreBuildFilterRepository,
+                mock(MetricsExportService.class)
         );
         // Model
         Project project = Project.of(nd("P", "Project")).withId(ID.of(1));

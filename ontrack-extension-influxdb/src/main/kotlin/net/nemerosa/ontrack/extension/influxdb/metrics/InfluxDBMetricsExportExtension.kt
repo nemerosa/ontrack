@@ -18,7 +18,7 @@ class InfluxDBMetricsExportExtension(
     override fun exportMetrics(
         metric: String,
         tags: Map<String, String>,
-        fields: Map<String, Double>,
+        fields: Map<String, *>,
         timestamp: LocalDateTime?,
     ) {
         batchExportMetrics(
