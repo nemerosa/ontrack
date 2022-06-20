@@ -26,6 +26,11 @@ object ACCProperties {
         }
     }
 
+    object InfluxDB {
+        @DefaultValue("http://localhost:8086")
+        val url: String by fromEnv()
+    }
+
     @Target(AnnotationTarget.PROPERTY)
     @Retention(AnnotationRetention.RUNTIME)
     annotation class DefaultValue(

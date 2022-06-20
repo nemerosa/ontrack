@@ -19,52 +19,6 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 class ACCInfluxDBValidationData extends AcceptanceTestClient {
 
     @Test
-    void 'Validation run data is exported to InfluxDB'() {
-        def p = uid("P")
-        ontrack.project(p) {
-            branch("master") {
-                validationStamp("VS")
-                build("1.0.0") {
-                    validateWithTestSummary("VS", new TestSummary(
-                            passed: 10, skipped: 1, failed: 0
-                    ), "PASSED")
-                }
-            }
-        }
-        // Checks the data has been written in InfluxDB
-        def influxDB = InfluxDBFactory.connect(
-                configRule.config.influxdbUri
-        )
-        def result = influxDB.query(
-                new Query(
-                        "SELECT * " +
-                                "FROM ontrack_value_validation_data " +
-                                "WHERE project = '${p}' " +
-                                "AND branch = 'master' " +
-                                "AND validation = 'VS'",
-                        "ontrack"
-                )
-        )
-        def resultMapper = new InfluxDBResultMapper()
-        def measurements = resultMapper.toPOJO(
-                result,
-                ValidationDataMeasurement
-        )
-        assert !measurements.empty
-        def measurement = measurements.first()
-        assert measurement.project == p
-        assert measurement.branch == "master"
-        assert measurement.build == "1.0.0"
-        assert measurement.validation == "VS"
-        assert measurement.status == "PASSED"
-        assert measurement.type == "net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType"
-        assert measurement.passed == 10
-        assert measurement.skipped == 1
-        assert measurement.failed == 0
-        assert measurement.total == 11
-    }
-
-    @Test
     void 'Metrics validation run data is exported to InfluxDB'() {
         def p = uid("P")
         ontrack.project(p) {

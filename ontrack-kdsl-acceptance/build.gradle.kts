@@ -11,6 +11,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter")
     testImplementation(project(":ontrack-kdsl"))
     testImplementation("commons-io:commons-io")
+    
+    testImplementation("org.influxdb:influxdb-java")
 }
 
 // Pre-acceptance tests: starting the environment

@@ -32,9 +32,11 @@ class InfluxDBExtensionConfiguration(
     fun influxDBMetricsExportExtension(
         influxDBExtensionFeature: InfluxDBExtensionFeature,
         influxDBConnection: InfluxDBConnection,
+        influxDBExtensionProperties: InfluxDBExtensionProperties,
     ) = InfluxDBMetricsExportExtension(
         influxDBExtensionFeature,
-        influxDBConnection
+        influxDBConnection,
+        influxDBExtensionProperties,
     )
 
     @Bean
