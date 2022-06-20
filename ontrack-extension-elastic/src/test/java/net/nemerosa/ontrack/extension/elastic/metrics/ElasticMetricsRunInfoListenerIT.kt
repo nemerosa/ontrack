@@ -13,6 +13,7 @@ import kotlin.test.assertEquals
 @TestPropertySource(properties = [
     "ontrack.extension.elastic.metrics.enabled=true",
     "ontrack.extension.elastic.metrics.index.immediate=true",
+    "management.metrics.export.elastic.enabled=false",
 ])
 class ElasticMetricsRunInfoListenerIT : AbstractDSLTestSupport() {
 
