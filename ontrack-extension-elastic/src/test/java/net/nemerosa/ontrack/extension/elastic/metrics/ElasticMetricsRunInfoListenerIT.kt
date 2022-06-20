@@ -34,17 +34,36 @@ class ElasticMetricsRunInfoListenerIT : AbstractDSLTestSupport() {
                     )
                     // Checks the metric has been exported into ES
                     val results = elasticMetricsClient.rawSearch(
-                        token = this.name,
+                        token = project.name
                     )
                     // Expecting only one result
                     assertEquals(1, results.items.size, "One metric registered")
                     val result = results.items.first()
                     val source = result.source.asJson()
                     val ecs = source.parse<ECSEntry>()
-                    assertEquals(50, ecs.ontrack?.get("value"))
-                    assertEquals(this.name, ecs.labels?.get("name"))
-                    assertEquals(this.project.name, ecs.labels?.get("project"))
-                    assertEquals(this.branch.name, ecs.labels?.get("branch"))
+
+                    assertEquals(
+                        mapOf("value" to 50.0),
+                        ecs.ontrack
+                    )
+
+                    assertEquals(
+                        mapOf(
+                            "project" to project.name,
+                            "branch" to branch.name,
+                        ),
+                        ecs.labels
+                    )
+
+                    assertNull(ecs.tags)
+
+                    assertEquals(
+                        ECSEvent(
+                            kind = ECSEventKind.metric,
+                            category = "ontrack_run_build_time_seconds",
+                        ),
+                        ecs.event
+                    )
                 }
             }
         }
