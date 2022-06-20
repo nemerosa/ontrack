@@ -41,7 +41,9 @@ class AutoVersioningAuditStoreDataTest {
                         )
                     )
                 )
-            )
+            ),
+            "routing" to "routing",
+            "queue" to null,
         ).asJson()
         val data: AutoVersioningAuditStoreData = json.parse()
         assertEquals(AutoVersioningAuditState.CREATED, data.mostRecentState)
