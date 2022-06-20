@@ -49,6 +49,8 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
             uuid = it.uuid()!!,
             status = it.status().name,
             message = it.message(),
+            routing = it.routing(),
+            queue = it.queue(),
         )
     } ?: emptyPaginatedList()
 

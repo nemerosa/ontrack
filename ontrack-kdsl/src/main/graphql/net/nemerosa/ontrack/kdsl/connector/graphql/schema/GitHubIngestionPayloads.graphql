@@ -21,6 +21,8 @@ query GitHubIngestionPayloads(
             uuid
             status
             message
+            routing
+            queue
         }
     }
 }
