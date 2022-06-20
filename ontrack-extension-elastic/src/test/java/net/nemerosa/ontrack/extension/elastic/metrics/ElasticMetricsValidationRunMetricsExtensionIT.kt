@@ -9,11 +9,14 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
-@TestPropertySource(properties = [
-    "ontrack.extension.elastic.metrics.enabled=true",
-    "ontrack.extension.elastic.metrics.index.immediate=true",
-])
+@TestPropertySource(
+    properties = [
+        "ontrack.extension.elastic.metrics.enabled=true",
+        "ontrack.extension.elastic.metrics.index.immediate=true",
+    ]
+)
 class ElasticMetricsValidationRunMetricsExtensionIT : AbstractDSLTestSupport() {
 
     @Autowired
@@ -35,13 +38,15 @@ class ElasticMetricsValidationRunMetricsExtensionIT : AbstractDSLTestSupport() {
                 // Build
                 build {
                     // Validation with data
-                    validateWithData(vs, validationRunData = MetricsValidationData(
-                        mapOf(
-                            "position" to 10.0,
-                            "speed" to 5.0,
-                            "acceleration" to 0.5,
+                    validateWithData(
+                        vs, validationRunData = MetricsValidationData(
+                            mapOf(
+                                "position" to 10.0,
+                                "speed" to 5.0,
+                                "acceleration" to 0.5,
+                            )
                         )
-                    ))
+                    )
                     // Checks the metric has been exported into ES
                     val results = elasticMetricsClient.rawSearch(
                         token = vs.name,
@@ -49,21 +54,37 @@ class ElasticMetricsValidationRunMetricsExtensionIT : AbstractDSLTestSupport() {
                     // Expecting only one result
                     assertEquals(1, results.items.size, "One metric registered")
                     val result = results.items.first()
-                    val source = result.source.asJson().parse<ECSEntry>()
+                    val ecs = result.source.asJson().parse<ECSEntry>()
 
-                    assertEquals("validation_data", source.event.category)
-                    assertEquals(ECSEventOutcome.success, source.event.outcome)
+                    assertEquals(
+                        mapOf(
+                            "acceleration" to 0.5,
+                            "position" to 10.0,
+                            "speed" to 5.0,
+                        ),
+                        ecs.ontrack
+                    )
 
-                    assertEquals(project.name, source.labels?.get("project"))
-                    assertEquals(branch.name, source.labels?.get("branch"))
-                    assertEquals(name, source.labels?.get("build"))
-                    assertEquals(vs.name, source.labels?.get("validation"))
-                    assertEquals("PASSED", source.labels?.get("status"))
-                    assertEquals(metricsValidationDataType::class.java.name, source.labels?.get("type"))
+                    assertEquals(
+                        mapOf(
+                            "project" to project.name,
+                            "branch" to branch.name,
+                            "type" to "net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType",
+                            "validation" to vs.name,
+                            "status" to "PASSED",
+                        ),
+                        ecs.labels
+                    )
 
-                    assertEquals(10.0, source.ontrack?.get("position"))
-                    assertEquals(5.0, source.ontrack?.get("speed"))
-                    assertEquals(0.5, source.ontrack?.get("acceleration"))
+                    assertNull(ecs.tags)
+
+                    assertEquals(
+                        ECSEvent(
+                            kind = ECSEventKind.metric,
+                            category = "validation_data",
+                        ),
+                        ecs.event
+                    )
                 }
             }
         }
@@ -83,11 +104,13 @@ class ElasticMetricsValidationRunMetricsExtensionIT : AbstractDSLTestSupport() {
                 // Build
                 build {
                     // Validation with data
-                    validateWithData(vs, validationRunData = TestSummaryValidationData(
-                        passed = 13,
-                        skipped = 8,
-                        failed = 5,
-                    ))
+                    validateWithData(
+                        vs, validationRunData = TestSummaryValidationData(
+                            passed = 13,
+                            skipped = 8,
+                            failed = 5,
+                        )
+                    )
                     // Checks the metric has been exported into ES
                     val results = elasticMetricsClient.rawSearch(
                         token = vs.name,
@@ -95,21 +118,38 @@ class ElasticMetricsValidationRunMetricsExtensionIT : AbstractDSLTestSupport() {
                     // Expecting only one result
                     assertEquals(1, results.items.size, "One metric registered")
                     val result = results.items.first()
-                    val source = result.source.asJson().parse<ECSEntry>()
+                    val ecs = result.source.asJson().parse<ECSEntry>()
 
-                    assertEquals("validation_data", source.event.category)
-                    assertEquals(ECSEventOutcome.failure, source.event.outcome)
+                    assertEquals(
+                        mapOf(
+                            "total" to 26,
+                            "passed" to 13,
+                            "failed" to 5,
+                            "skipped" to 8
+                        ),
+                        ecs.ontrack
+                    )
 
-                    assertEquals(project.name, source.labels?.get("project"))
-                    assertEquals(branch.name, source.labels?.get("branch"))
-                    assertEquals(name, source.labels?.get("build"))
-                    assertEquals(vs.name, source.labels?.get("validation"))
-                    assertEquals("FAILED", source.labels?.get("status"))
-                    assertEquals(testSummaryValidationDataType::class.java.name, source.labels?.get("type"))
+                    assertEquals(
+                        mapOf(
+                            "project" to project.name,
+                            "branch" to branch.name,
+                            "type" to "net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType",
+                            "validation" to vs.name,
+                            "status" to "FAILED",
+                        ),
+                        ecs.labels
+                    )
 
-                    assertEquals(13, source.ontrack?.get("passed"))
-                    assertEquals(8, source.ontrack?.get("skipped"))
-                    assertEquals(5, source.ontrack?.get("failed"))
+                    assertNull(ecs.tags)
+
+                    assertEquals(
+                        ECSEvent(
+                            kind = ECSEventKind.metric,
+                            category = "validation_data",
+                        ),
+                        ecs.event
+                    )
                 }
             }
         }
