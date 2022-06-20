@@ -22,6 +22,10 @@ services:
         soft: -1
         hard: -1
 
+  # InfluxDB for metrics
+  influxdb:
+    image: influxdb:1.8.6
+
   # Rabbit MQ
   rabbitmq:
     image: rabbitmq:3.8.25-management
@@ -43,6 +47,8 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_started
+      influxdb:
+        condition: service_started
     environment:
       # Test configuration
       PROFILE: acceptance
@@ -56,9 +62,11 @@ services:
       # Database
       SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
       # Elastic search
-      ONTRACK_CONFIG_SEARCH_ENGINE: "elasticsearch"
       ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
       SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
+      # InfluxDB being enabled
+      ONTRACK_INFLUXDB_ENABLED: "true"
+      ONTRACK_INFLUXDB_URI: "http://influxdb:8086"
       # RabbitMQ
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_USERNAME: ontrack

@@ -1,0 +1,11 @@
+fragment ValidationStampFragment on ValidationStamp {
+    id
+    name
+    description
+    dataType {
+        descriptor {
+            id
+        }
+        config
+    }
+}

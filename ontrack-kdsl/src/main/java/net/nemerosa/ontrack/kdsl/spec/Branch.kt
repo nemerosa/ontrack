@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.kdsl.spec
 
+import com.apollographql.apollo.api.Input
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLMissingDataException
 import net.nemerosa.ontrack.kdsl.connector.graphql.checkData
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateBuildMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreatePromotionLevelMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateValidationStampMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
@@ -51,6 +53,34 @@ class Branch(
             ?.checkData { it.createPromotionLevelById()?.promotionLevel() }
             ?.fragments()?.promotionLevelFragment()?.toPromotionLevel(this)
             ?: throw GraphQLMissingDataException("Did not get back the created promotion level")
+
+    /**
+     * Create a validation stamp inside this branch.
+     *
+     * @param name Name of the validation stamp to create
+     * @param description Description of the validation stamp
+     * @return Created validation stamp
+     */
+    fun createValidationStamp(
+        name: String,
+        description: String,
+        dataType: String? = null,
+        dataTypeConfig: Any? = null,
+    ): ValidationStamp =
+        graphqlConnector.mutate(
+            CreateValidationStampMutation(
+                id.toInt(),
+                name,
+                description,
+                Input.fromNullable(dataType),
+                Input.fromNullable(dataTypeConfig)
+            )
+        ) {
+            it?.createValidationStampById()?.fragments()?.payloadUserErrors()?.convert()
+        }
+            ?.checkData { it.createValidationStampById()?.validationStamp() }
+            ?.fragments()?.validationStampFragment()?.toValidationStamp(this)
+            ?: throw GraphQLMissingDataException("Did not get back the created validation stamp")
 
     /**
      * Create a build inside this branch.

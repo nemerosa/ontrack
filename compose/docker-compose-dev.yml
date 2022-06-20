@@ -33,10 +33,10 @@ services:
 #    environment:
 #      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
 
-#  influxdb:
-#    image: influxdb:1.8.6
-#    ports:
-#      - "8086:8086"
+  influxdb:
+    image: influxdb:1.8.6
+    ports:
+      - "8086:8086"
 
   # Vault
   # Non production setup
