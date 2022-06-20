@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.notifications.webhooks
 
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
-import net.nemerosa.ontrack.kdsl.acceptance.annotations.AcceptanceTestSuite
 import net.nemerosa.ontrack.kdsl.acceptance.tests.notifications.AbstractACCDSLNotificationsTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.seconds
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
@@ -14,12 +13,13 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.Duration
 
-@AcceptanceTestSuite
 class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
 
     companion object {
         private const val injectionWebhookCount = 3
         private const val injectionWebhookRolls = 30
+
+        private val waitingDelayForWebhook = 120.seconds
     }
 
     /**
@@ -37,7 +37,7 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
                 ontrack.notifications.webhooks.createWebhook(
                     name = webhookName,
                     enabled = true,
-                    url = "${ontractConnectionProperties.url}/extension/notifications/webhooks/internal",
+                    url = "${ontractConnectionProperties.internalUrl}/extension/notifications/webhooks/internal",
                     timeout = Duration.ofMinutes(1),
                     authenticationType = "header",
                     authenticationConfig = mapOf(
@@ -47,17 +47,21 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
                 )
                 // Sends all kinds of notifications to the internal end point
                 repeat(injectionWebhookRolls) {
-                    ontrack.notifications.webhooks.internalEndpoint.testOk(webhookName,
+                    ontrack.notifications.webhooks.internalEndpoint.testOk(
+                        webhookName,
                         "OK $it"
                     )
-                    ontrack.notifications.webhooks.internalEndpoint.testOk(webhookName,
+                    ontrack.notifications.webhooks.internalEndpoint.testOk(
+                        webhookName,
                         "OK $it with delay",
                         delayMs = 1000L,
                     )
-                    ontrack.notifications.webhooks.internalEndpoint.testNotFound(webhookName,
+                    ontrack.notifications.webhooks.internalEndpoint.testNotFound(
+                        webhookName,
                         "Not found $it"
                     )
-                    ontrack.notifications.webhooks.internalEndpoint.testError(webhookName,
+                    ontrack.notifications.webhooks.internalEndpoint.testError(
+                        webhookName,
                         "Error $it"
                     )
                 }
@@ -73,7 +77,7 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
             ontrack.notifications.webhooks.createWebhook(
                 name = webhookName,
                 enabled = true,
-                url = "${ontractConnectionProperties.url}/extension/notifications/webhooks/internal",
+                url = "${ontractConnectionProperties.internalUrl}/extension/notifications/webhooks/internal",
                 timeout = Duration.ofMinutes(1),
                 authenticationType = "header",
                 authenticationConfig = mapOf(
@@ -96,7 +100,11 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
                 // Creating a new branch
                 val branch = branch { this }
                 // Checking the webhook has received the payload
-                waitUntil(timeout = 10.seconds, interval = 500) {
+                waitUntil(
+                    timeout = waitingDelayForWebhook, interval = 500,
+                    task = "Checking the webhook has received the payload with event_type=new_branch, project=$name, branch=${branch.name}",
+                    onTimeout = onTimeout(webhookName),
+                ) {
                     ontrack.notifications.webhooks.internalEndpoint.payloads.any {
                         it.type == "event" &&
                                 it.data.path("eventType").path("id").asText() == "new_branch"
@@ -116,7 +124,7 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
             ontrack.notifications.webhooks.createWebhook(
                 name = webhookName,
                 enabled = true,
-                url = "${ontractConnectionProperties.url}/extension/notifications/webhooks/internal",
+                url = "${ontractConnectionProperties.internalUrl}/extension/notifications/webhooks/internal",
                 timeout = Duration.ofMinutes(1),
                 authenticationType = "header",
                 authenticationConfig = mapOf(
@@ -127,7 +135,11 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
             // Pinging the webhook
             ontrack.notifications.webhooks.ping(webhookName)
             // Checks that the webhook received the event
-            waitUntil(timeout = 10.seconds, interval = 500) {
+            waitUntil(
+                timeout = waitingDelayForWebhook, interval = 500,
+                task = "Checking the webhook has received the payload with type=type, message=Webhook $webhookName ping",
+                onTimeout = onTimeout(webhookName),
+            ) {
                 val payloads = ontrack.notifications.webhooks.internalEndpoint.payloads
                 payloads.any {
                     it.type == "ping"
@@ -135,7 +147,11 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
                 }
             }
             // Checks that the delivery has been registered
-            waitUntil(timeout = 10.seconds, interval = 500) {
+            waitUntil(
+                timeout = waitingDelayForWebhook, interval = 500,
+                task = "Checking the webhook delivery has been registered",
+                onTimeout = onTimeout(webhookName),
+            ) {
                 val items = ontrack.notifications.webhooks.getDeliveries(webhook = webhookName).items
                 items.any {
                     it.request.type == "ping"
@@ -157,6 +173,26 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
             code()
         } finally {
             ontrack.settings.webhooks.set(old)
+        }
+    }
+
+    private fun onTimeout(webhookName: String): () -> Unit = {
+        // Details about the webhook
+        val webhook = ontrack.notifications.webhooks.findWebhookByName(webhookName)
+        println("$webhookName webhook details:")
+        println(webhook)
+        // Get the last deliveries of the webhook
+        println("$webhookName webhook last deliveries:")
+        val deliveries = ontrack.notifications.webhooks.getDeliveries(webhook = webhookName).items
+        deliveries.forEach { delivery ->
+            println("----------------------------")
+            println(delivery)
+        }
+        // Get the payloads received by the internal webhook
+        println("Last internal endpoint payloads:")
+        ontrack.notifications.webhooks.internalEndpoint.payloads.forEach { payload ->
+            println("----------------------------")
+            println(payload)
         }
     }
 

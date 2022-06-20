@@ -27,6 +27,7 @@ abstract class AbstractACCTestSupport {
         OntractConnectionProperties(
             url = ACCProperties.Connection.url,
             token = ACCProperties.Connection.token,
+            internalUrl = ACCProperties.Connection.Internal.url,
         )
     }
 

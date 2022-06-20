@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.support
 
 import com.fasterxml.jackson.databind.JsonNode
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import net.nemerosa.ontrack.json.parseAsJson
 import org.apache.commons.io.IOUtils
+import org.junit.jupiter.api.fail
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.time.Duration
@@ -27,14 +29,38 @@ fun uid(prefix: String): String =
  * Waiting until a condition is met.
  */
 fun waitUntil(
+    initial: Long = 0L,
     timeout: Long = 60_000L,
     interval: Long = 10_000L,
+    task: String? = null,
+    onTimeout: (() -> Unit)? = null,
     condition: () -> Boolean,
 ) {
     runBlocking {
-        withTimeout(timeout) {
-            while (!condition()) {
-                delay(interval)
+        if (initial > 0) {
+            delay(initial)
+        }
+        try {
+            withTimeout(timeout) {
+                while (!condition()) {
+                    delay(interval)
+                }
+            }
+        } catch (ex: TimeoutCancellationException) {
+            if (onTimeout != null) {
+                onTimeout()
+            }
+            if (task != null) {
+                fail("Timeout waiting for [$task] to complete.")
+            } else {
+                val message = """
+                    Timeout waiting for a task to complete.
+                    
+                    No task name was provided, proving difficult to assert what exactly has timed out.
+                    
+                    Consider adding the `task` parameter to the call of the `waitUntil` method.
+                """.trimIndent()
+                fail(message, ex)
             }
         }
     }

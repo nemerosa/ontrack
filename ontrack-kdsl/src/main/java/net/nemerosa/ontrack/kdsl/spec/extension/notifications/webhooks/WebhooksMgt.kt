@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.paginate
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateWebhookMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.FindWebhookByNameQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.WebhookDeliveriesQuery
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.connector.support.PaginatedList
@@ -104,5 +105,21 @@ class WebhooksMgt(connector: Connector) : Connected(connector) {
     val internalEndpoint: InternalEndpointMgt by lazy {
         InternalEndpointMgt(connector)
     }
+
+    /**
+     * Gets a webhook by name
+     */
+    fun findWebhookByName(name: String): Webhook? =
+        graphqlConnector.query(
+            FindWebhookByNameQuery(name)
+        )?.webhooks()?.firstOrNull()?.fragments()?.webhookFragment()?.run {
+            Webhook(
+                name = name(),
+                enabled = enabled(),
+                url = url(),
+                timeoutSeconds = timeoutSeconds(),
+                authenticationType = authenticationType(),
+            )
+        }
 
 }
