@@ -18,50 +18,6 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 @AcceptanceTestSuite
 class ACCInfluxDBValidationData extends AcceptanceTestClient {
 
-    @Test
-    void 'Metrics validation run data is exported to InfluxDB'() {
-        def p = uid("P")
-        ontrack.project(p) {
-            branch("master") {
-                validationStamp("VS")
-                build("1.0.0") {
-                    validateWithMetrics("VS", [
-                            "js.bundle": 1500.56,
-                            "js.error" : 150
-                    ], "PASSED")
-                }
-            }
-        }
-        // Checks the data has been written in InfluxDB
-        def influxDB = InfluxDBFactory.connect(
-                configRule.config.influxdbUri
-        )
-        def result = influxDB.query(
-                new Query(
-                        "SELECT * " +
-                                "FROM ontrack_value_validation_data " +
-                                "WHERE project = '${p}' " +
-                                "AND branch = 'master' " +
-                                "AND validation = 'VS'",
-                        "ontrack"
-                )
-        )
-        def resultMapper = new InfluxDBResultMapper()
-        def measurements = resultMapper.toPOJO(
-                result,
-                MetricsValidationDataMeasurement
-        )
-        assert !measurements.empty
-        def measurement = measurements.first()
-        assert measurement.project == p
-        assert measurement.branch == "master"
-        assert measurement.build == "1.0.0"
-        assert measurement.validation == "VS"
-        assert measurement.status == "PASSED"
-        assert measurement.type == "net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType"
-        assert measurement.bundle == 1500.56d
-        assert measurement.error == 150d
-    }
 
     @Measurement(name = "ontrack_value_validation_data")
     static class ValidationDataMeasurement {
