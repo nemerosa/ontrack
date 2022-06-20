@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateBuildMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreatePromotionLevelMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateValidationStampMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.RunInfoInput
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
 /**
@@ -87,17 +88,26 @@ class Branch(
      *
      * @param name Name of the build to create
      * @param description Description of the build
+     * @param runTime Run time in seconds
      * @return Created build
      */
     fun createBuild(
         name: String,
         description: String,
+        runTime: Int? = null,
     ): Build =
         graphqlConnector.mutate(
             CreateBuildMutation(
                 id.toInt(),
                 name,
-                description
+                description,
+                Input.fromNullable(
+                    runTime?.let {
+                        RunInfoInput.builder()
+                            .runTime(it)
+                            .build()
+                    }
+                )
             )
         ) {
             it?.createBuild()?.fragments()?.payloadUserErrors()?.convert()

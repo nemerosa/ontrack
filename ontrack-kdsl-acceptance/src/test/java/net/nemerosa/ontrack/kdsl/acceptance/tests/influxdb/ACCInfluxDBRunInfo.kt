@@ -19,9 +19,7 @@ class ACCInfluxDBRunInfo : AbstractACCDSLTestSupport() {
     fun `Run info is exported to InfluxDB`() {
         val project = project {
             branch("1.0") {
-                build("1.0.0") {
-                    TODO("Sets the run info")
-                }
+                build("1.0.0", runTime = 20) {}
             }
             this
         }
@@ -53,7 +51,7 @@ class ACCInfluxDBRunInfo : AbstractACCDSLTestSupport() {
         val measurement = measurements.firstOrNull()
         assertNotNull(measurement, "One measurement found") {
             assertEquals(project.name, it.project)
-            assertEquals("main", it.branch)
+            assertEquals("1.0", it.branch)
             assertEquals(20, it.value)
         }
 
