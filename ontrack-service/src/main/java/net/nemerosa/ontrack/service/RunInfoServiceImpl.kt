@@ -20,7 +20,6 @@ class RunInfoServiceImpl(
     private val structureService: StructureService,
     private val securityService: SecurityService,
     private val metricsExportService: MetricsExportService,
-    private val runInfoListeners: List<RunInfoListener>,
 ) : RunInfoService {
 
     private val logger: Logger = LoggerFactory.getLogger(RunInfoService::class.java)
@@ -45,18 +44,7 @@ class RunInfoServiceImpl(
             input,
             securityService.currentSignature
         )
-        val time = input.runTime
-        if (time != null) {
-            metricsExportService.exportMetrics(
-                metric = "ontrack_run_${entity.runnableEntityType.name}_time_seconds",
-                tags = entity.runMetricTags,
-                fields = mapOf("value" to time.toDouble()),
-                timestamp = entity.signature.time,
-            )
-        }
-        // Listeners
-        runInfoListeners.forEach { it.onRunInfoCreated(entity, runInfo) }
-        // OK
+        exportRunInfoTime(entity, runInfo)
         return runInfo
     }
 
@@ -68,6 +56,18 @@ class RunInfoServiceImpl(
         )
     }
 
+    private fun exportRunInfoTime(entity: RunnableEntity, runInfo: RunInfo) {
+        val time = runInfo.runTime
+        if (time != null) {
+            metricsExportService.exportMetrics(
+                metric = "ontrack_run_${entity.runnableEntityType.name}_time_seconds",
+                tags = entity.runMetricTags,
+                fields = mapOf("value" to time.toDouble()),
+                timestamp = entity.signature.time,
+            )
+        }
+    }
+
     @Transactional(readOnly = true)
     override fun restore(logger: (String) -> Unit) {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
@@ -77,7 +77,7 @@ class RunInfoServiceImpl(
             val total = runInfoRepository.getCountByRunnableEntityType(type)
             runInfoRepository.forEachRunnableEntityType(type) { id, runInfo ->
                 val entity = type.load(structureService, id)
-                runInfoListeners.forEach { it.onRunInfoCreated(entity, runInfo) }
+                exportRunInfoTime(entity, runInfo)
                 count++
                 if (count % 100 == 0) {
                     this.logger.info("Restored $count/$total ${type}s...")
