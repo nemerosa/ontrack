@@ -2,8 +2,6 @@ package net.nemerosa.ontrack.extension.github.ingestion
 
 import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.github.ingestion.metrics.INGESTION_METRIC_EVENT_TAG
-import net.nemerosa.ontrack.extension.github.ingestion.metrics.INGESTION_METRIC_OWNER_TAG
-import net.nemerosa.ontrack.extension.github.ingestion.metrics.INGESTION_METRIC_REPOSITORY_TAG
 import net.nemerosa.ontrack.extension.github.ingestion.metrics.IngestionMetrics
 import net.nemerosa.ontrack.extension.github.ingestion.payload.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
@@ -86,8 +84,6 @@ class IngestionHookController(
                 meterRegistry.increment(
                     IngestionMetrics.Hook.repositoryRejectedCount,
                     INGESTION_METRIC_EVENT_TAG to gitHubEvent,
-                    INGESTION_METRIC_OWNER_TAG to repository.owner.login,
-                    INGESTION_METRIC_REPOSITORY_TAG to repository.name,
                 )
                 return IngestionHookResponse(
                     message = "Ingestion request for event $gitHubEvent and repository ${repository.fullName} has been received correctly but won't be processed because of the exclusion rules",
@@ -99,8 +95,6 @@ class IngestionHookController(
                 meterRegistry.increment(
                     IngestionMetrics.Hook.repositoryAcceptedCount,
                     INGESTION_METRIC_EVENT_TAG to gitHubEvent,
-                    INGESTION_METRIC_OWNER_TAG to repository.owner.login,
-                    INGESTION_METRIC_REPOSITORY_TAG to repository.name,
                 )
             }
         }
@@ -121,8 +115,6 @@ class IngestionHookController(
                 meterRegistry.increment(
                     IngestionMetrics.Hook.acceptedCount,
                     INGESTION_METRIC_EVENT_TAG to gitHubEvent,
-                    INGESTION_METRIC_OWNER_TAG to (repository?.owner?.login ?: ""),
-                    INGESTION_METRIC_REPOSITORY_TAG to (repository?.name ?: ""),
                 )
                 // Stores it
                 storage.store(payload, eventProcessor.getPayloadSource(payload))
@@ -140,8 +132,6 @@ class IngestionHookController(
                 meterRegistry.increment(
                     IngestionMetrics.Hook.ignoredCount,
                     INGESTION_METRIC_EVENT_TAG to gitHubEvent,
-                    INGESTION_METRIC_OWNER_TAG to (repository?.owner?.login ?: ""),
-                    INGESTION_METRIC_REPOSITORY_TAG to (repository?.name ?: ""),
                 )
                 IngestionHookResponse(
                     message = "Ingestion request ${payload.uuid}/${payload.gitHubEvent} has been received correctly but won't be processed.",
