@@ -81,7 +81,6 @@ Job metrics have the following tags:
 
 * `job-category` - category of the job
 * `job-type` - type of the job
-* `job-id` - ID of the job
 ====
 
 Run information:
