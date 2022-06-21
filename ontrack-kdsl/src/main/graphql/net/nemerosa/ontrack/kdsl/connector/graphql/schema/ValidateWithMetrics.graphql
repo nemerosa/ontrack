@@ -1,0 +1,17 @@
+mutation ValidateWithMetrics(
+    $buildId: Int!,
+    $description: String,
+    $validation: String!,
+    $status: String,
+    $metrics: [MetricsEntryInput!]!,
+) {
+    validateBuildByIdWithMetrics(input: {
+        id: $buildId,
+        description: $description,
+        validation: $validation,
+        status: $status,
+        metrics: $metrics,
+    }) {
+        ...PayloadUserErrors
+    }
+}

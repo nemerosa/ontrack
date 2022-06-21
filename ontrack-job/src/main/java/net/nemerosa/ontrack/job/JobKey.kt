@@ -16,16 +16,11 @@ data class JobKey(
     }
 
     override fun toString(): String {
-        return String.format(
-                "%s[%s]",
-                type,
-                id
-        )
+        return "$type[$id]"
     }
 
     val metricTags: List<Tag>
         get() = listOf(
-                Tag.of("job-id", id),
                 Tag.of("job-type", type.key),
                 Tag.of("job-category", type.category.key)
         )

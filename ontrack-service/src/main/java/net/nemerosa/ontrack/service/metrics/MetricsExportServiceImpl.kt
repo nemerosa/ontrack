@@ -18,7 +18,7 @@ class MetricsExportServiceImpl(
         }
     }
 
-    override fun exportMetrics(metric: String, tags: Map<String, String>, fields: Map<String, Double>, timestamp: LocalDateTime?) {
+    override fun exportMetrics(metric: String, tags: Map<String, String>, fields: Map<String, *>, timestamp: LocalDateTime?) {
         extensionManager.getExtensions(MetricsExportExtension::class.java).forEach {
             it.exportMetrics(metric, tags, fields, timestamp)
         }

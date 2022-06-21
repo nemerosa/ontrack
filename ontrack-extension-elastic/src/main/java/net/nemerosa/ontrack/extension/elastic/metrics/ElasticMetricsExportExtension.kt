@@ -36,7 +36,7 @@ class ElasticMetricsExportExtension(
     override fun exportMetrics(
         metric: String,
         tags: Map<String, String>,
-        fields: Map<String, Double>,
+        fields: Map<String, *>,
         timestamp: LocalDateTime?,
     ) {
         if (timestamp != null) {

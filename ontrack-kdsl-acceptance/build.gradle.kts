@@ -13,6 +13,8 @@ dependencies {
     testImplementation(project(":ontrack-kdsl"))
     testImplementation("commons-io:commons-io")
     testImplementation("commons-codec:commons-codec")
+
+    testImplementation("org.influxdb:influxdb-java")
 }
 
 // Pre-acceptance tests: starting the environment

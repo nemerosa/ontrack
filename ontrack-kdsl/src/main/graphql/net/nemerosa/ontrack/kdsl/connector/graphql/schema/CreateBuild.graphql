@@ -2,11 +2,13 @@ mutation CreateBuild(
     $branchId: Int!,
     $name: String!,
     $description: String!,
+    $runInfo: RunInfoInput,
 ) {
     createBuild(input: {
         branchId: $branchId,
         name: $name,
         description: $description,
+        runInfo: $runInfo,
     }) {
         build {
             ...BuildFragment

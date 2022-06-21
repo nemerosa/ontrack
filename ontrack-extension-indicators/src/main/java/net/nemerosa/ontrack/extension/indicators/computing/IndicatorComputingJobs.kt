@@ -38,19 +38,19 @@ class IndicatorComputingJobs(
     private fun createJobRegistrations(computer: IndicatorComputer, projects: List<Project>): List<JobRegistration> {
         return if (computer.perProject) {
             projects
-                    .filter { computer.isProjectEligible(it) }
-                    .map { project ->
-                        JobRegistration(
-                                job = createJob(computer, project),
-                                schedule = computer.schedule
-                        )
-                    }
+                .filter { computer.isProjectEligible(it) }
+                .map { project ->
+                    JobRegistration(
+                        job = createJob(computer, project),
+                        schedule = computer.schedule
+                    )
+                }
         } else {
             listOf(
-                    JobRegistration(
-                            job = createJob(computer, projects),
-                            schedule = computer.schedule
-                    )
+                JobRegistration(
+                    job = createJob(computer, projects),
+                    schedule = computer.schedule
+                )
             )
         }
     }
@@ -62,7 +62,7 @@ class IndicatorComputingJobs(
         override fun getKey(): JobKey = getJobType(computer).getKey(project.name)
 
         override fun getDescription(): String =
-                "Computing indicator values by ${computer.name} for project ${project.name}"
+            "Computing indicator values by ${computer.name} for project ${project.name}"
 
         override fun getTask() = JobRun {
             compute(computer, project, allowFailure = true)
@@ -76,24 +76,23 @@ class IndicatorComputingJobs(
         override fun getKey(): JobKey = getJobType(computer).getKey("all")
 
         override fun getDescription(): String =
-                "Computing indicator values by ${computer.name} for all projects"
+            "Computing indicator values by ${computer.name} for all projects"
 
         override fun getTask() = JobRun {
             projects
-                    .filter {
-                        !it.isDisabled && computer.isProjectEligible(it)
-                    }
-                    .forEach { project ->
-                        compute(computer, project, allowFailure = false)
-                    }
+                .filter {
+                    !it.isDisabled && computer.isProjectEligible(it)
+                }
+                .forEach { project ->
+                    compute(computer, project, allowFailure = false)
+                }
         }
     }
 
     private fun compute(computer: IndicatorComputer, project: Project, allowFailure: Boolean) {
         meterRegistry.time(
-                METRIC_ONTRACK_INDICATORS_COMPUTING_MS,
-                "computer" to computer.id,
-                "project" to project.name
+            METRIC_ONTRACK_INDICATORS_COMPUTING_MS,
+            "computer" to computer.id,
         ) {
             try {
                 logger.info("[indicator-computing] computer=${computer.id},project=${project.name},start")
@@ -121,7 +120,7 @@ class IndicatorComputingJobs(
     }
 
     private fun getJobType(computer: IndicatorComputer): JobType =
-            CATEGORY.getType(computer.id).withName("Indicator computing for ${computer.name}")
+        CATEGORY.getType(computer.id).withName("Indicator computing for ${computer.name}")
 
     companion object {
         val CATEGORY: JobCategory = JobCategory.of("indicator-computing").withName("Indicator computing")

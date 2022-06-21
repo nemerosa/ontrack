@@ -22,6 +22,26 @@ class InfluxDBExtensionProperties {
     var log = InfluxDB.LogLevel.NONE
 
     /**
+     * Prefix to add before the metric name.
+     *
+     * For example, if prefix = `ontrack`
+     *
+     * * `validation_data` becomes `ontrack_validation_data`
+     * * `ontrack_metric` becomes `ontrack_metric` (no change)
+     *
+     * For example, if prefix = `ontrack_acceptance`
+     *
+     * * `validation_data` becomes `ontrack_acceptance_validation_data`
+     * * `ontrack_metric` becomes `ontrack_acceptance_metric`
+     *
+     * For example, if prefix = `instance`
+     *
+     * * `validation_data` becomes `instance_validation_data`
+     * * `ontrack_metric` becomes `instance_metric`
+     */
+    var prefix: String = "ontrack"
+
+    /**
      * Duration after which the connection to InfluxDB is checked for validity and renewed if necessary.
      */
     @DurationUnit(ChronoUnit.MINUTES)
@@ -30,4 +50,11 @@ class InfluxDBExtensionProperties {
     class SSLProperties {
         var hostCheck: Boolean = true
     }
+
+    fun getMeasurementName(name: String): String =
+        if (name.startsWith("ontrack_")) {
+            "${prefix}_${name.removePrefix("ontrack_")}"
+        } else {
+            "${prefix}_$name"
+        }
 }

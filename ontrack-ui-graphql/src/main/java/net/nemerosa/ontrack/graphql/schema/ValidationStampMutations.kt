@@ -3,14 +3,17 @@ package net.nemerosa.ontrack.graphql.schema
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
+import javax.validation.constraints.NotNull
+import javax.validation.constraints.Pattern
 
 @Component
 class ValidationStampMutations(
     private val structureService: StructureService,
-    private val validationDataTypeService: ValidationDataTypeService
+    private val validationDataTypeService: ValidationDataTypeService,
 ) : TypedMutationProvider() {
 
     override val mutations: List<Mutation>
@@ -26,7 +29,27 @@ class ValidationStampMutations(
                 outputDescription = "Created or updated validation stamp",
                 outputType = ValidationStamp::class,
                 fetcher = this::setupValidationStamp
-            )
+            ),
+            /**
+             * Creating a validation stamp from a branch ID
+             */
+            simpleMutation(
+                "createValidationStampById",
+                "Creates a new validation stamp from a branch ID",
+                CreateValidationStampByIdInput::class,
+                "validationStamp",
+                "Created validation stamp",
+                ValidationStamp::class
+            ) { input ->
+                val branch = structureService.getBranch(ID.of(input.branchId))
+                createValidationStamp(
+                    branch = branch,
+                    validation = input.name,
+                    description = input.description,
+                    dataType = input.dataType,
+                    dataTypeConfig = input.dataTypeConfig,
+                )
+            },
         )
 
     private fun setupValidationStamp(input: SetupValidationStampInput): ValidationStamp {
@@ -58,14 +81,30 @@ class ValidationStampMutations(
         val branch =
             structureService.findBranchByName(input.project, input.branch).getOrNull()
                 ?: throw BranchNotFoundException(input.project, input.branch)
-        val dataTypeConfig = validationDataTypeService.validateValidationDataTypeConfig<Any>(
-            input.dataType,
-            input.dataTypeConfig
+        return createValidationStamp(
+            branch = branch,
+            validation = input.validation,
+            description = input.description,
+            dataType = input.dataType,
+            dataTypeConfig = input.dataTypeConfig,
+        )
+    }
+
+    private fun createValidationStamp(
+        branch: Branch,
+        validation: String,
+        description: String?,
+        dataType: String?,
+        dataTypeConfig: JsonNode?,
+    ): ValidationStamp {
+        val actualDataTypeConfig = validationDataTypeService.validateValidationDataTypeConfig<Any>(
+            dataType,
+            dataTypeConfig
         )
         val validationStamp = ValidationStamp.of(
             branch,
-            NameDescription.nd(input.validation, input.description)
-        ).withDataType(dataTypeConfig)
+            NameDescription.nd(validation, description)
+        ).withDataType(actualDataTypeConfig)
         // Saves it into the repository
         return structureService.newValidationStamp(validationStamp)
     }
@@ -81,5 +120,23 @@ data class SetupValidationStampInput(
     val validation: String,
     val description: String?,
     val dataType: String?,
-    val dataTypeConfig: JsonNode?
+    val dataTypeConfig: JsonNode?,
+)
+
+/**
+ * Input for the `createValidationStamp` mutation
+ */
+data class CreateValidationStampByIdInput(
+    @APIDescription("Branch ID")
+    val branchId: Int,
+    @get:NotNull(message = "The name is required.")
+    @get:Pattern(regexp = NameDescription.NAME, message = "The name ${NameDescription.NAME_MESSAGE_SUFFIX}")
+    @APIDescription("Validation stamp name")
+    val name: String,
+    @APIDescription("Validation stamp description")
+    val description: String,
+    @APIDescription("FQCN of the data type")
+    val dataType: String?,
+    @APIDescription("Configuration of the data type")
+    val dataTypeConfig: JsonNode?,
 )

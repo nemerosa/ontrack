@@ -25,7 +25,11 @@ fun <T> T?.toJson(): JsonNode? =
 /**
  * Non-null JSON transformation
  */
-fun <T> T.asJson(): JsonNode = JsonUtils.format(this)!!
+fun <T> T.asJson(): JsonNode = if (this is JsonNode) {
+    this
+} else {
+    JsonUtils.format(this)!!
+}
 
 /**
  * To a Map through JSON

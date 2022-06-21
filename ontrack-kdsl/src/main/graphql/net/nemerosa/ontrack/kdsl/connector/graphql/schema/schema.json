@@ -6304,6 +6304,124 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "CreateValidationStampByIdInput",
+          "description": "Input type for the createValidationStampById mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "branchId",
+              "description": "Branch ID",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "dataType",
+              "description": "FQCN of the data type",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "dataTypeConfig",
+              "description": "Configuration of the data type",
+              "type": {
+                "kind": "SCALAR",
+                "name": "JSON",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "description",
+              "description": "Validation stamp description",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Validation stamp name",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "CreateValidationStampByIdPayload",
+          "description": "Output type for the createValidationStampById mutation.",
+          "fields": [
+            {
+              "name": "validationStamp",
+              "description": "Created validation stamp",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ValidationStamp",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "CreateWebhookInput",
           "description": "Input type for the createWebhook mutation.",
           "fields": null,
@@ -20674,6 +20792,29 @@
               "deprecationReason": null
             },
             {
+              "name": "createValidationStampById",
+              "description": "Creates a new validation stamp from a branch ID",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "CreateValidationStampByIdInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "CreateValidationStampByIdPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "disableAccount",
               "description": "Disables an account",
               "args": [
@@ -21970,6 +22111,11 @@
             {
               "kind": "OBJECT",
               "name": "CreateValidationRunPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "CreateValidationStampByIdPayload",
               "ofType": null
             },
             {

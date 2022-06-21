@@ -7,4 +7,6 @@ class GitHubIngestionPayload(
     val uuid: String,
     val status: String,
     val message: String?,
+    val routing: String?,
+    val queue: String?,
 )

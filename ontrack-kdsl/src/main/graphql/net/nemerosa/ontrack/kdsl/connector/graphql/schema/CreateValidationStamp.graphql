@@ -1,0 +1,20 @@
+mutation CreateValidationStamp(
+    $branchId: Int!,
+    $name: String!,
+    $description: String!,
+    $dataType: String,
+    $dataTypeConfig: JSON,
+) {
+    createValidationStampById(input: {
+        branchId: $branchId,
+        name: $name,
+        description: $description,
+        dataType: $dataType,
+        dataTypeConfig: $dataTypeConfig,
+    }) {
+        validationStamp {
+            ...ValidationStampFragment
+        }
+        ...PayloadUserErrors
+    }
+}
