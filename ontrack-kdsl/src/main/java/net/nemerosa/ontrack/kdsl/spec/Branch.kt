@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.kdsl.spec
 
 import com.apollographql.apollo.api.Input
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLMissingDataException
 import net.nemerosa.ontrack.kdsl.connector.graphql.checkData
@@ -74,7 +75,7 @@ class Branch(
                 name,
                 description,
                 Input.fromNullable(dataType),
-                Input.fromNullable(dataTypeConfig)
+                Input.fromNullable(dataTypeConfig?.asJson())
             )
         ) {
             it?.createValidationStampById()?.fragments()?.payloadUserErrors()?.convert()

@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.influxdb
 
-import net.nemerosa.ontrack.kdsl.acceptance.annotations.AcceptanceTestSuite
 import net.nemerosa.ontrack.kdsl.acceptance.tests.ACCProperties
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import org.influxdb.InfluxDBFactory
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-@AcceptanceTestSuite
 class ACCInfluxDBRunInfo : AbstractACCDSLTestSupport() {
 
     @Test
