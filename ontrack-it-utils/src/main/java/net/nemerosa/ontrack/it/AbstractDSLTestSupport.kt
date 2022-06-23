@@ -259,6 +259,29 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     }
 
     /**
+     * Creates a validation run on a build with a specific time
+     *
+     * @receiver Build to validate
+     * @param validationStamp Stamp to apply
+     * @param validationRunStatusID Status to apply
+     */
+    fun Build.validateWithTime(
+            validationStamp: ValidationStamp,
+            validationRunStatusID: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED,
+            description: String? = null,
+            time: LocalDateTime? = null,
+            duration: Int? = null,
+            code: ValidationRun.() -> Unit = {}
+    ): ValidationRun = validate(
+        validationStamp,
+        validationRunStatusID,
+        description,
+        time?.let { Signature(it, User("test")) },
+        duration,
+        code,
+    )
+
+    /**
      * Creates a validation run on a build, possibly with some data and a status.
      */
     fun <T> Build.validateWithData(
