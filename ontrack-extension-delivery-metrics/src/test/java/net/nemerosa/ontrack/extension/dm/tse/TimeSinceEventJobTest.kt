@@ -50,11 +50,11 @@ class TimeSinceEventJobTest {
         val job = timeSinceEventJob.collectJobRegistrations().toList().firstOrNull()
         assertNotNull(job) {
             // Every 30 minutes by default
-            assertEquals(30, it.schedule.period)
-            assertEquals(TimeUnit.MINUTES, it.schedule.unit)
+            assertEquals(30 * 60, it.schedule.period)
+            assertEquals(TimeUnit.SECONDS, it.schedule.unit)
             // Key
             assertEquals("P", it.job.key.id)
-            assertEquals("P time since promotions", it.job.description)
+            assertEquals("P time since events", it.job.description)
         }
     }
 
@@ -68,8 +68,8 @@ class TimeSinceEventJobTest {
         val job = timeSinceEventJob.collectJobRegistrations().toList().firstOrNull()
         assertNotNull(job) {
             // Every 120 minutes as per configuration
-            assertEquals(120, it.schedule.period)
-            assertEquals(TimeUnit.MINUTES, it.schedule.unit)
+            assertEquals(120 * 60, it.schedule.period)
+            assertEquals(TimeUnit.SECONDS, it.schedule.unit)
             // Key
             assertEquals("P", it.job.key.id)
         }

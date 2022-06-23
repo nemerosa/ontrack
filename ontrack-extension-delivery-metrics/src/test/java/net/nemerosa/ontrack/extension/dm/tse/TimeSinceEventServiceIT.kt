@@ -14,7 +14,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-class TimeSinceEventServiceTest : AbstractDSLTestSupport() {
+class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var timeSinceEventService: TimeSinceEventService
