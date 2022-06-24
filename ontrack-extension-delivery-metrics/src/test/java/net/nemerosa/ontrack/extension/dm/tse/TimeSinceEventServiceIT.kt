@@ -8,6 +8,8 @@ import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.support.NameValue
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.Duration
@@ -21,6 +23,16 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var testMetricsExportExtension: TestMetricsExportExtension
+
+    @BeforeEach
+    fun enable() {
+        testMetricsExportExtension.enable()
+    }
+
+    @AfterEach
+    fun disable() {
+        testMetricsExportExtension.disable()
+    }
 
     @Test
     fun `Relative time to promotion when there is a previous promotion level`() {
@@ -205,7 +217,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
     fun `Metric enabled for main branch in project with branch model`() {
         project {
             setSampleBranchModel()
-            branch("gatekeeper") {
+            branch("main") {
                 val iron = promotionLevel("IRON")
                 build("1") {
                     updateBuildSignature(signature.user.name, 82.hours.ago)
@@ -223,7 +235,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
                 metric = "ontrack_dm_time_since_promotion",
                 tags = mapOf(
                     "project" to name,
-                    "branch" to "gatekeeper",
+                    "branch" to "main",
                     "promotion" to "IRON"
                 ),
                 fields = mapOf(
@@ -239,7 +251,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
     fun `Metric set to 0 when last build is promoted`() {
         project {
             setSampleBranchModel()
-            branch("gatekeeper") {
+            branch("main") {
                 val iron = promotionLevel("IRON")
                 build("1") {
                     updateBuildSignature(signature.user.name, 82.hours.ago)
@@ -257,7 +269,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
                 metric = "ontrack_dm_time_since_promotion",
                 tags = mapOf(
                     "project" to name,
-                    "branch" to "gatekeeper",
+                    "branch" to "main",
                     "promotion" to "IRON"
                 ),
                 fields = mapOf(
@@ -273,7 +285,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
     fun `Metric not enabled for main branch in project without branch model`() {
         project {
             // No branch model
-            branch("gatekeeper") {
+            branch("main") {
                 val iron = promotionLevel("IRON")
                 build("1") {
                     updateBuildSignature(signature.user.name, 82.hours.ago)
@@ -321,7 +333,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
     fun `Metric not enabled when no promotion run`() {
         project {
             setSampleBranchModel()
-            branch("gatekeeper") {
+            branch("main") {
                 build("1") {
                     updateBuildSignature(signature.user.name, 82.hours.ago)
                 }
@@ -345,10 +357,10 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
                 mapOf(
                     "release" to "release-.*",
                     "maintenance" to "maintenance-.*",
-                    "development" to "gatekeeper"
+                    "development" to "main"
                 )
             )
-            branch("gatekeeper")
+            branch("main")
             // Clears previous metrics
             testMetricsExportExtension.clear()
             // Exports the metrics
@@ -362,7 +374,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
     fun `Metric not enabled for disabled branch`() {
         project {
             setSampleBranchModel()
-            branch("gatekeeper") {
+            branch("main") {
                 disableBranch()
                 val iron = promotionLevel("IRON")
                 build("1") {
@@ -387,7 +399,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
     fun `Validation metric enabled for main branch in project with branch model`() {
         project {
             setSampleBranchModel()
-            branch("gatekeeper") {
+            branch("main") {
                 val vs = validationStamp("VS")
                 build("1") {
                     updateBuildSignature(signature.user.name, 82.hours.ago)
@@ -405,7 +417,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
                 metric = "ontrack_dm_time_since_passed_validation",
                 tags = mapOf(
                     "project" to name,
-                    "branch" to "gatekeeper",
+                    "branch" to "main",
                     "validation_stamp" to "VS"
                 ),
                 fields = mapOf(
@@ -418,7 +430,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
                 metric = "ontrack_dm_time_since_validation",
                 tags = mapOf(
                     "project" to name,
-                    "branch" to "gatekeeper",
+                    "branch" to "main",
                     "validation_stamp" to "VS",
                     "status" to "PASSED"
                 ),
@@ -435,7 +447,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
     fun `Validation metric for last build being PASSED`() {
         project {
             setSampleBranchModel()
-            branch("gatekeeper") {
+            branch("main") {
                 val vs = validationStamp("VS")
                 build("1") {
                     updateBuildSignature(signature.user.name, 82.hours.ago)
@@ -453,7 +465,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
                 metric = "ontrack_dm_time_since_passed_validation",
                 tags = mapOf(
                     "project" to name,
-                    "branch" to "gatekeeper",
+                    "branch" to "main",
                     "validation_stamp" to "VS"
                 ),
                 fields = mapOf(
@@ -466,7 +478,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
                 metric = "ontrack_dm_time_since_validation",
                 tags = mapOf(
                     "project" to name,
-                    "branch" to "gatekeeper",
+                    "branch" to "main",
                     "validation_stamp" to "VS",
                     "status" to "PASSED"
                 ),
@@ -483,7 +495,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
     fun `Validation metric for last build being FAILED`() {
         project {
             setSampleBranchModel()
-            branch("gatekeeper") {
+            branch("main") {
                 val vs = validationStamp("VS")
                 build("1") {
                     updateBuildSignature(signature.user.name, 82.hours.ago)
@@ -501,7 +513,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
                 metric = "ontrack_dm_time_since_passed_validation",
                 tags = mapOf(
                     "project" to name,
-                    "branch" to "gatekeeper",
+                    "branch" to "main",
                     "validation_stamp" to "VS"
                 ),
                 fields = mapOf(
@@ -514,7 +526,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
                 metric = "ontrack_dm_time_since_validation",
                 tags = mapOf(
                     "project" to name,
-                    "branch" to "gatekeeper",
+                    "branch" to "main",
                     "validation_stamp" to "VS",
                     "status" to "FAILED"
                 ),
@@ -532,7 +544,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
             mapOf(
                 "release" to "release-.*",
                 "maintenance" to "maintenance-.*",
-                "development" to "gatekeeper"
+                "development" to "main"
             )
         )
     }
@@ -541,7 +553,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
     fun `Validation metric for previous build being FAILED`() {
         project {
             setSampleBranchModel()
-            branch("gatekeeper") {
+            branch("main") {
                 val vs = validationStamp("VS")
                 build("1") {
                     updateBuildSignature(signature.user.name, 82.hours.ago)
@@ -562,7 +574,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
                 metric = "ontrack_dm_time_since_passed_validation",
                 tags = mapOf(
                     "project" to name,
-                    "branch" to "gatekeeper",
+                    "branch" to "main",
                     "validation_stamp" to "VS"
                 ),
                 fields = mapOf(
@@ -575,7 +587,7 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
                 metric = "ontrack_dm_time_since_validation",
                 tags = mapOf(
                     "project" to name,
-                    "branch" to "gatekeeper",
+                    "branch" to "main",
                     "validation_stamp" to "VS",
                     "status" to "FAILED"
                 ),
