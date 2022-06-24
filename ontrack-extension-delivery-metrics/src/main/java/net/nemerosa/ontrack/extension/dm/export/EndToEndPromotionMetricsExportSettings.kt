@@ -12,12 +12,15 @@ data class EndToEndPromotionMetricsExportSettings(
     val branches: String,
     @APIDescription("Number of days in the past when looking for event metrics")
     val pastDays: Int,
+    @APIDescription("Number of days in the past to restore")
+    val restorationDays: Int,
 ) {
 
     companion object {
         const val DEFAULT_ENABLED = false
         const val DEFAULT_BRANCHES = "develop|main|master|release-.*|gatekeeper|maintenance-.*"
         const val DEFAULT_PAST_DAYS = 7
+        const val DEFAULT_RESTORATION_DAYS = 1460 // 4 years
     }
 
 }

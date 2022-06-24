@@ -25,12 +25,14 @@ internal class EndToEndPromotionMetricsExportSettingsCascContextIT : AbstractCas
                                 enabled: true
                                 branches: "develop|main|master|release-.*|maintenance-.*"
                                 pastDays: 14
+                                restorationDays: 730
             """.trimIndent()
             )
             val settings = settingsService.getCachedSettings(EndToEndPromotionMetricsExportSettings::class.java)
             assertTrue(settings.enabled)
             assertEquals("develop|main|master|release-.*|maintenance-.*", settings.branches)
             assertEquals(14, settings.pastDays)
+            assertEquals(730, settings.restorationDays)
         }
     }
 
