@@ -9,6 +9,10 @@ import net.nemerosa.ontrack.json.toJsonMap
 import net.nemerosa.ontrack.model.structure.SearchNodeResults
 import net.nemerosa.ontrack.model.structure.SearchResultNode
 import org.apache.http.HttpHost
+import org.apache.http.auth.AuthScope
+import org.apache.http.auth.Credentials
+import org.apache.http.auth.UsernamePasswordCredentials
+import org.apache.http.impl.client.BasicCredentialsProvider
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest
 import org.elasticsearch.action.bulk.BulkRequest
 import org.elasticsearch.action.index.IndexRequest
@@ -244,6 +248,19 @@ class DefaultElasticMetricsClient(
             )
         }
         val builder = RestClient.builder(*hosts.toTypedArray())
+        if (!elasticMetricsConfigProperties.custom.username.isNullOrBlank()) {
+            builder.setHttpClientConfigCallback {
+                it.setDefaultCredentialsProvider(
+                    BasicCredentialsProvider().apply {
+                        val credentials: Credentials = UsernamePasswordCredentials(
+                            elasticMetricsConfigProperties.custom.username,
+                            elasticMetricsConfigProperties.custom.password
+                        )
+                        setCredentials(AuthScope.ANY, credentials)
+                    }
+                )
+            }
+        }
         if (elasticMetricsConfigProperties.custom.pathPrefix != null) {
             builder.setPathPrefix(elasticMetricsConfigProperties.custom.pathPrefix)
         }
