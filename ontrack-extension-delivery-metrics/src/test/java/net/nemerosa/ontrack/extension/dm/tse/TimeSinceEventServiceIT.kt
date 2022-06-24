@@ -282,30 +282,6 @@ class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `Metric not enabled for main branch in project without branch model`() {
-        project {
-            // No branch model
-            branch("main") {
-                val iron = promotionLevel("IRON")
-                build("1") {
-                    updateBuildSignature(signature.user.name, 82.hours.ago)
-                    promote(iron, time = 80.hours.ago)
-                }
-                build("2") {
-                    updateBuildSignature(signature.user.name, 40.hours.ago)
-                    // Not promoted
-                }
-            }
-            // Clears previous metrics
-            testMetricsExportExtension.clear()
-            // Exports the metrics
-            timeSinceEventService.collectTimesSinceEvents(project) { println(it) }
-            // Checks that no metrics have been exported
-            testMetricsExportExtension.assertNoMetric("ontrack_dm_time_since_promotion")
-        }
-    }
-
-    @Test
     fun `Metric not enabled for branch not in project branch model`() {
         project {
             setSampleBranchModel()
