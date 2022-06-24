@@ -11,11 +11,11 @@ dependencies {
 
     implementation(project(":ontrack-extension-chart"))
     implementation(project(":ontrack-extension-casc"))
+    implementation(project(":ontrack-extension-git"))
     implementation(project(":ontrack-ui-graphql"))
     implementation("org.apache.commons:commons-math3")
     implementation(project(":ontrack-repository-support"))
 
-    testImplementation(project(":ontrack-extension-git"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
