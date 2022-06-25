@@ -1,6 +1,10 @@
 package net.nemerosa.ontrack.extension.github.autoversioning
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
+import kotlinx.coroutines.runBlocking
+import net.nemerosa.ontrack.common.untilTimeout
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessing
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingMissingConfigException
@@ -13,6 +17,9 @@ import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.getForObject
+import java.net.URLEncoder
+import java.time.Duration
 import java.util.*
 
 @Component
@@ -105,9 +112,75 @@ class GitHubPostProcessing(
         val client = ontrackGitHubClientFactory.create(ghConfig).createGitHubRestTemplate()
         // Launches the workflow run
         val id = launchWorkflowRun(client, repository, workflow, branch, inputs)
-        TODO("Getting the workflow run")
+        // Getting the workflow run
+        val runId = findWorkflowRun(client, repository, workflow, branch, id, settings)
         TODO("Waiting until the workflow run completes")
     }
+
+    private fun findWorkflowRun(
+        client: RestTemplate,
+        repository: String,
+        workflow: String,
+        branch: String,
+        id: String,
+        settings: GitHubPostProcessingSettings,
+    ): Long =
+        runBlocking {
+            untilTimeout(
+                name = "Getting workflow run for $repository/$workflow/$branch",
+                retryCount = settings.retries,
+                retryDelay = Duration.ofSeconds(settings.retriesDelaySeconds.toLong()),
+            ) {
+                // Gets the list of runs
+                val runs = getWorkflowRuns(client, repository, branch)
+                // Checks the artifacts for each run
+                runs.find { run ->
+                    hasWorkflowId(client, repository, run.id, id)
+                }?.id
+            }
+        }
+
+    private fun hasWorkflowId(
+        client: RestTemplate,
+        repository: String,
+        runId: Long,
+        id: String,
+    ): Boolean {
+        val expectedName = "inputs-$id.properties"
+        val artifacts = client.getForObject<JsonNode>("/repos/$repository/actions/runs/$runId/artifacts")
+            .path("artifacts")
+            .map {
+                it.parse<Artifact>()
+            }
+        return artifacts.any {
+            it.name == expectedName
+        }
+    }
+
+    private fun getWorkflowRuns(
+        client: RestTemplate,
+        repository: String,
+        branch: String,
+    ): List<WorkflowRun> {
+        val encodedBranch = URLEncoder.encode(branch, Charsets.UTF_8)
+        return client.getForObject<JsonNode>("/repos/$repository/actions/runs?event=workflow_dispatch&branch=$encodedBranch")
+            .path("workflow_runs")
+            .map {
+                it.parse()
+            }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private data class Artifact(
+        val name: String,
+    )
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private data class WorkflowRun(
+        val id: Long,
+        @JsonProperty("head_branch")
+        val headBranch: String,
+    )
 
     private fun launchWorkflowRun(
         client: RestTemplate,
