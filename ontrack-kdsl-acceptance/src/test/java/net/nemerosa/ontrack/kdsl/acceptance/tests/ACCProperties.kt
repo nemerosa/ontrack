@@ -32,6 +32,12 @@ object ACCProperties {
 
     }
 
+    object GitHub {
+        val organization: String by fromEnv()
+        val token: String by fromEnv()
+        val autoMergeToken: String by fromEnv()
+    }
+
     object InfluxDB {
         @DefaultValue("http://localhost:8086")
         val url: String by fromEnv()
