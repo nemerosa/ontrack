@@ -25,6 +25,10 @@ class EndToEndPromotionMetricsExportSettingsProvider(
             EndToEndPromotionMetricsExportSettings::pastDays,
             EndToEndPromotionMetricsExportSettings.DEFAULT_PAST_DAYS
         ),
+        restorationDays = settingsRepository.getInt(
+            EndToEndPromotionMetricsExportSettings::restorationDays,
+            EndToEndPromotionMetricsExportSettings.DEFAULT_RESTORATION_DAYS
+        ),
     )
 
     override fun getSettingsClass(): Class<EndToEndPromotionMetricsExportSettings> =

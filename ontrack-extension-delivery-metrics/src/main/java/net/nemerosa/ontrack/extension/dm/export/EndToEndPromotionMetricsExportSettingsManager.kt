@@ -27,12 +27,14 @@ class EndToEndPromotionMetricsExportSettingsManager(
         settingsRepository.setBoolean<EndToEndPromotionMetricsExportSettings>(settings::enabled)
         settingsRepository.setString<EndToEndPromotionMetricsExportSettings>(settings::branches)
         settingsRepository.setInt<EndToEndPromotionMetricsExportSettings>(settings::pastDays)
+        settingsRepository.setInt<EndToEndPromotionMetricsExportSettings>(settings::restorationDays)
     }
 
     override fun getSettingsForm(settings: EndToEndPromotionMetricsExportSettings): Form = Form.create()
         .yesNoField(EndToEndPromotionMetricsExportSettings::enabled, settings.enabled)
         .textField(EndToEndPromotionMetricsExportSettings::branches, settings.branches)
         .intField(EndToEndPromotionMetricsExportSettings::pastDays, settings.pastDays)
+        .intField(EndToEndPromotionMetricsExportSettings::restorationDays, settings.restorationDays)
 
     override fun getId(): String = "end-to-end-promotion-metrics-export"
 

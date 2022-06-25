@@ -295,5 +295,26 @@ angular.module('ot.view.validationStamp', [
             }
         });
 
+        // Frequency graph
+        $scope.frequencyChart = otChartService.createCountChart({
+            name: '% of success',
+            chartOptionsKey: "validation-stamp-charts",
+            chartOptions: $scope.chartOptions,
+            query: (chartOptions) => {
+                return `query ValidationStampFrequency {
+                    getChart(input: {
+                        name: "validation-stamp-frequency",
+                        options: {
+                            interval: "${chartOptions.interval}",
+                            period: "${chartOptions.period}"
+                        },
+                        parameters: {
+                            id: ${validationStampId},
+                        }
+                    })
+                }`;
+            }
+        });
+
     })
 ;
