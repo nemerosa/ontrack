@@ -9,9 +9,6 @@ import kotlin.test.assertTrue
 
 internal class EndToEndPromotionMetricsExportSettingsCascContextIT : AbstractCascTestSupport() {
 
-    @Autowired
-    private lateinit var settingsRepository: SettingsRepository
-
     @Test
     fun `End to end promotion metrics export settings using CasC`() {
         withSettings<EndToEndPromotionMetricsExportSettings> {

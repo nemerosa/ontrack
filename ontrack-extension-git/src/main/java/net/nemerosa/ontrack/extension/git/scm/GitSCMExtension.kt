@@ -44,6 +44,9 @@ class GitSCMExtension(
         override val repositoryURI: String
             get() = unsupported("repositoryURI")
 
+        override val repository: String
+            get() = unsupported("repository")
+
         override fun getSCMBranch(branch: Branch): String? {
             checkProject(branch.project)
             val branchProperty: GitBranchConfigurationProperty? =

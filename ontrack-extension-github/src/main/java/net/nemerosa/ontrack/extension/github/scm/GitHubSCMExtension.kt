@@ -54,6 +54,8 @@ class GitHubSCMExtension(
 
         override val repositoryURI: String = "${property.configuration.url}/${property.repository}"
 
+        override val repository: String = property.repository
+
         override fun getSCMBranch(branch: Branch): String? {
             checkProject(branch.project)
             val branchProperty: GitBranchConfigurationProperty? =
