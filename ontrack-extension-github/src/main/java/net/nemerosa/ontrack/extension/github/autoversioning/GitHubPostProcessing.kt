@@ -114,7 +114,30 @@ class GitHubPostProcessing(
         val id = launchWorkflowRun(client, repository, workflow, branch, inputs)
         // Getting the workflow run
         val runId = findWorkflowRun(client, repository, workflow, branch, id, settings)
-        TODO("Waiting until the workflow run completes")
+        // Waiting until the workflow run completes
+        waitUntilWorkflowRun(client, repository, runId, settings)
+    }
+
+    private fun waitUntilWorkflowRun(
+        client: RestTemplate,
+        repository: String,
+        runId: Long,
+        settings: GitHubPostProcessingSettings,
+    ) {
+        runBlocking {
+            untilTimeout(
+                name = "Waiting for workflow run $repository/$runId",
+                retryCount = settings.retries,
+                retryDelay = Duration.ofSeconds(settings.retriesDelaySeconds.toLong()),
+            ) {
+                val status = client.getForObject<WorkflowRun>("/repos/$repository/actions/runs/$runId").status
+                if (status == "completed") {
+                    true
+                } else {
+                    null // Not finished yet
+                }
+            }
+        }
     }
 
     private fun findWorkflowRun(
@@ -180,6 +203,7 @@ class GitHubPostProcessing(
         val id: Long,
         @JsonProperty("head_branch")
         val headBranch: String,
+        val status: String,
     )
 
     private fun launchWorkflowRun(
