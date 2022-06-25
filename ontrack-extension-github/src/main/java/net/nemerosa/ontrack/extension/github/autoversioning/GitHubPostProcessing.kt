@@ -38,6 +38,7 @@ class GitHubPostProcessing(
     override fun postProcessing(
         config: GitHubPostProcessingConfig,
         autoVersioningOrder: AutoVersioningOrder,
+        repositoryURI: String,
         repository: String,
         upgradeBranch: String,
     ) {

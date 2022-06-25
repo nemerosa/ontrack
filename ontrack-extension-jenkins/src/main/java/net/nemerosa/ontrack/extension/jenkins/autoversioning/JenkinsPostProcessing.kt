@@ -41,7 +41,8 @@ class JenkinsPostProcessing(
     override fun postProcessing(
         config: JenkinsPostProcessingConfig,
         autoVersioningOrder: AutoVersioningOrder,
-        repositoryUri: String,
+        repositoryURI: String,
+        repository: String,
         upgradeBranch: String,
     ) {
         // Gets the global settings
@@ -68,8 +69,7 @@ class JenkinsPostProcessing(
                     "DOCKER_IMAGE" to config.dockerImage,
                     "DOCKER_COMMAND" to config.dockerCommand,
                     "COMMIT_MESSAGE" to (config.commitMessage ?: autoVersioningOrder.defaultCommitMessage),
-                    "REPOSITORY_URI" to repositoryUri,
-                    // TODO "REPOSITORY_CREDENTIALS" to repositoryCredentials,
+                    "REPOSITORY_URI" to repositoryURI,
                     "UPGRADE_BRANCH" to upgradeBranch,
                     "CREDENTIALS" to config.credentials.renderParameter(),
                 ),

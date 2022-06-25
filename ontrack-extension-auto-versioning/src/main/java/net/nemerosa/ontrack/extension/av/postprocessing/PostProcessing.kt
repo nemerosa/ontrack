@@ -26,13 +26,15 @@ interface PostProcessing<T> : Extension {
      *
      * @param config Configuration of the post processing service
      * @param autoVersioningOrder Auto versioning order being processed
-     * @param repositoryUri URI of the repository being processed
+     * @param repositoryURI Full URI to the repository
+     * @param repository Path to the repository
      * @param upgradeBranch Remote branch already containing the upgraded version
      */
     fun postProcessing(
         config: T,
         autoVersioningOrder: AutoVersioningOrder,
-        repositoryUri: String,
+        repositoryURI: String,
+        repository: String,
         upgradeBranch: String,
     )
 

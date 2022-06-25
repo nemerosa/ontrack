@@ -15,6 +15,11 @@ interface SCM {
     val repositoryURI: String
 
     /**
+     * Gets the (short) path to the project's repository
+     */
+    val repository: String
+
+    /**
      * Given a branch, returns its SCM branch if any.
      *
      * Throws an error if the branch does not belong to the SCM's project.

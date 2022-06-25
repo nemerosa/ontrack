@@ -41,8 +41,9 @@ class AutoVersioningProcessingServiceImpl(
         val scm = scmDetector.getSCM(branch.project)
         val scmBranch: String? = scm?.getSCMBranch(branch)
         if (scm != null && scmBranch != null) {
-            // Gets the clone URL for the repository
-            val repositoryUri = scm.repositoryURI
+            // Gets the clone URL & name for the repository
+            val repositoryURI = scm.repositoryURI
+            val repository = scm.repository
             // Sanitization of the version (for the branch name)
             val sanitizedVersion: String = NameDescription.escapeName(order.targetVersion)
             // Name of the upgrade branch
@@ -112,7 +113,8 @@ class AutoVersioningProcessingServiceImpl(
                                 measureAndLaunchPostProcessing(
                                     postProcessing,
                                     order,
-                                    repositoryUri,
+                                    repositoryURI,
+                                    repository,
                                     upgradeBranch
                                 )
                                 logger.debug("Processing auto versioning order end of post processing: {}", order)
@@ -231,7 +233,8 @@ class AutoVersioningProcessingServiceImpl(
     private fun <T> measureAndLaunchPostProcessing(
         postProcessing: PostProcessing<T>,
         order: AutoVersioningOrder,
-        repositoryUri: String,
+        repositoryURI: String,
+        repository: String,
         upgradeBranch: String,
     ) {
         // Count
@@ -242,7 +245,8 @@ class AutoVersioningProcessingServiceImpl(
                 launchPostProcessing(
                     postProcessing,
                     order,
-                    repositoryUri,
+                    repositoryURI,
+                    repository,
                     upgradeBranch
                 )
             }
@@ -259,13 +263,14 @@ class AutoVersioningProcessingServiceImpl(
     private fun <T> launchPostProcessing(
         postProcessing: PostProcessing<T>,
         order: AutoVersioningOrder,
-        repositoryUri: String,
+        repositoryURI: String,
+        repository: String,
         upgradeBranch: String,
     ) {
         // Parsing and validation of the configuration
         val config: T = postProcessing.parseAndValidate(order.postProcessingConfig)
         // Launching the post processing
-        postProcessing.postProcessing(config, order, repositoryUri, upgradeBranch)
+        postProcessing.postProcessing(config, order, repositoryURI, repository, upgradeBranch)
     }
 
     private fun AutoVersioningOrder.replaceVersion(content: List<String>): List<String> {
