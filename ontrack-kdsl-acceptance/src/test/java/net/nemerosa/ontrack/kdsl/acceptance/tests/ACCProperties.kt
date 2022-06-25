@@ -33,9 +33,25 @@ object ACCProperties {
     }
 
     object GitHub {
-        val organization: String by fromEnv()
-        val token: String by fromEnv()
-        val autoMergeToken: String by fromEnv()
+        val organization: String? by optionalFromEnv()
+        val token: String? by optionalFromEnv()
+        val autoMergeToken: String? by optionalFromEnv()
+
+        object AutoVersioning {
+
+            object PostProcessing {
+
+                val repository: String? by optionalFromEnv()
+
+                @DefaultValue("post-processing.yml")
+                val workflow: String by fromEnv()
+
+                @DefaultValue("main")
+                val branch: String by fromEnv()
+
+            }
+
+        }
     }
 
     object InfluxDB {

@@ -1,31 +1,57 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.github
 
-import net.nemerosa.ontrack.kdsl.acceptance.tests.support.getOptionalEnv
+import net.nemerosa.ontrack.kdsl.acceptance.tests.ACCProperties
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIf
 
 
 /**
- * Testing if the environment is set for testing against the GitHub playground.
+ * Annotation to use on tests relying on GitHub.
+ */
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@Test
+@EnabledIf("net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHubCondition#isTestOnGitHubEnabled")
+annotation class TestOnGitHub
+
+/**
+ * Annotation to use on tests relying on GitHub postprocessing.
+ */
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@Test
+@TestOnGitHub
+@EnabledIf("net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHubPostProcessingCondition#isTestOnGitHubPostProcessingEnabled")
+annotation class TestOnGitHubPostProcessing
+
+/**
+ * Testing if the environment is set for testing against GitHub.
  *
- * Used by [TestOnGitHubPlayground].
+ * Used by [TestOnGitHub].
  */
 @Suppress("unused")
-class TestOnGitHubPlaygroundCondition {
+class TestOnGitHubCondition {
 
     companion object {
         @JvmStatic
-        fun isTestOnGitHubPlaygroundEnabled(): Boolean =
-            !getOptionalEnv("ontrack.test.extension.github.playground.organization").isNullOrBlank()
+        fun isTestOnGitHubEnabled(): Boolean =
+            ACCProperties.GitHub.organization != null
     }
 
 }
 
 /**
- * Annotation to use on tests relying on an external GitHub playground.
+ * Testing if the environment is set for testing post-processing against GitHub.
+ *
+ * Used by [TestOnGitHubPostProcessing].
  */
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
-@Test
-@EnabledIf("net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHubPlaygroundCondition#isTestOnGitHubPlaygroundEnabled")
-annotation class TestOnGitHubPlayground
+@Suppress("unused")
+class TestOnGitHubPostProcessingCondition {
+
+    companion object {
+        @JvmStatic
+        fun isTestOnGitHubPostProcessingEnabled(): Boolean =
+            ACCProperties.GitHub.AutoVersioning.PostProcessing.repository != null
+    }
+
+}
