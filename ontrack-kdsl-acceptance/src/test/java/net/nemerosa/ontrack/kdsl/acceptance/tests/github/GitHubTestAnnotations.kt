@@ -51,7 +51,11 @@ class TestOnGitHubPostProcessingCondition {
     companion object {
         @JvmStatic
         fun isTestOnGitHubPostProcessingEnabled(): Boolean =
-            ACCProperties.GitHub.AutoVersioning.PostProcessing.repository != null
+            TestOnGitHubCondition.isTestOnGitHubEnabled() &&
+                    ACCProperties.GitHub.AutoVersioning.PostProcessing.repositoryOrg != null &&
+                    ACCProperties.GitHub.AutoVersioning.PostProcessing.repository != null &&
+                    ACCProperties.GitHub.AutoVersioning.PostProcessing.sampleOrg != null &&
+                    ACCProperties.GitHub.AutoVersioning.PostProcessing.sample != null
     }
 
 }

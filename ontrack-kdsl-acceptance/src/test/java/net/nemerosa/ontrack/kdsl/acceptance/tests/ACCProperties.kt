@@ -41,7 +41,11 @@ object ACCProperties {
 
             object PostProcessing {
 
+                val repositoryOrg: String? by optionalFromEnv()
                 val repository: String? by optionalFromEnv()
+
+                val sampleOrg: String? by optionalFromEnv()
+                val sample: String? by optionalFromEnv()
 
                 @DefaultValue("post-processing.yml")
                 val workflow: String by fromEnv()

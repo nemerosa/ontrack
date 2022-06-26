@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate
  * Playground client
  */
 
-val gitHubPlaygroundClient: RestTemplate by lazy {
+val gitHubClient: RestTemplate by lazy {
     RestTemplateBuilder()
         .rootUri("https://api.github.com")
         .defaultHeader(

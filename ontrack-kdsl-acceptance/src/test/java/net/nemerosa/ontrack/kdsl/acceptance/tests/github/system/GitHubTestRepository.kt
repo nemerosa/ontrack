@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.kdsl.acceptance.tests.ACCProperties
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.gitHubPlaygroundClient
+import net.nemerosa.ontrack.kdsl.acceptance.tests.github.gitHubClient
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.Branch
@@ -32,7 +32,7 @@ fun withTestGitHubRepository(
     val repo = "ontrack-auto-versioning-test-$uuid"
 
     // Creates the repository
-    gitHubPlaygroundClient.postForObject(
+    gitHubClient.postForObject(
         "/orgs/${ACCProperties.GitHub.organization}/repos",
         mapOf(
             "name" to repo,
@@ -47,13 +47,6 @@ fun withTestGitHubRepository(
 
     try {
 
-        // Creating a dummy file
-        // createFile(
-        //     branch = "master", path = "README.md", content = listOf(
-        //         "Test repository - can be deleted"
-        //     )
-        // )
-
         // Context
         val context = GitHubRepositoryContext(repo)
 
@@ -63,7 +56,7 @@ fun withTestGitHubRepository(
 
     } finally {
         // Deleting the repository
-        gitHubPlaygroundClient.delete("/repos/${ACCProperties.GitHub.organization}/$repo")
+        gitHubClient.delete("/repos/${ACCProperties.GitHub.organization}/$repo")
     }
 }
 
@@ -90,7 +83,7 @@ class GitHubRepositoryContext(
             body["sha"] = existingFile.sha
         }
 
-        gitHubPlaygroundClient.put(
+        gitHubClient.put(
             "/repos/${ACCProperties.GitHub.organization}/${repository}/contents/$path",
             body
         )
@@ -105,7 +98,7 @@ class GitHubRepositoryContext(
                 val baseBranch = getBranch(base) ?: throw IllegalStateException("Cannot find base branch $base")
                 val baseCommit = baseBranch.commit.sha
                 // Creates the branch
-                gitHubPlaygroundClient.postForObject(
+                gitHubClient.postForObject(
                     "/repos/${ACCProperties.GitHub.organization}/${repository}/git/refs",
                     mapOf(
                         "ref" to "refs/heads/$branch",
@@ -161,14 +154,14 @@ class GitHubRepositoryContext(
         if (to != null) {
             url += "&base=$to"
         }
-        return gitHubPlaygroundClient.getForObject(
+        return gitHubClient.getForObject(
             url,
             JsonNode::class.java
         )?.firstOrNull()?.parse()
     }
 
     private fun getPRReviews(pr: GitHubPR): List<GitHubPRReview> =
-        gitHubPlaygroundClient.getForObject(
+        gitHubClient.getForObject(
             "/repos/${ACCProperties.GitHub.organization}/$repository/pulls/${pr.number}/reviews",
             JsonNode::class.java
         )?.map {
@@ -182,7 +175,7 @@ class GitHubRepositoryContext(
 
     private fun getRawFile(path: String, branch: String): GitHubContentsResponse? =
         try {
-            gitHubPlaygroundClient.getForObject(
+            gitHubClient.getForObject(
                 "/repos/${ACCProperties.GitHub.organization}/$repository/contents/$path?ref=$branch",
                 GitHubContentsResponse::class.java
             )
@@ -192,7 +185,7 @@ class GitHubRepositoryContext(
 
     private fun getBranch(branch: String) =
         try {
-            gitHubPlaygroundClient.getForObject(
+            gitHubClient.getForObject(
                 "/repos/${ACCProperties.GitHub.organization}/$repository/branches/$branch",
                 GitHubBranch::class.java
             )
