@@ -123,20 +123,22 @@ class GitHubRepositoryContext(
         return name
     }
 
-    fun Project.configuredForGitHub(ontrack: Ontrack) {
+    fun Project.configuredForGitHub(ontrack: Ontrack): String {
         val config = createGitHubConfiguration(ontrack)
         gitHubConfigurationProperty = GitHubProjectConfigurationProperty(
             configuration = config,
             repository = "${ACCProperties.GitHub.organization}/$repository",
         )
+        return config
     }
 
     fun Branch.configuredForGitHubRepository(
         ontrack: Ontrack,
         scmBranch: String = "main",
-    ) {
-        project.configuredForGitHub(ontrack)
+    ): String {
+        val configName = project.configuredForGitHub(ontrack)
         gitBranchConfigurationProperty = GitBranchConfigurationProperty(branch = scmBranch)
+        return configName
     }
 
     fun assertThatGitHubRepository(
@@ -235,10 +237,12 @@ class GitHubRepositoryContext(
         fun fileContains(
             path: String,
             branch: String = "main",
+            timeout: Long = 60_000L,
             content: () -> String,
         ) {
             val expectedContent = content()
             waitUntil(
+                timeout = timeout,
                 task = "Waiting for file $path on branch $branch to have a given content.",
                 onTimeout = {
                     val actualContent = getFile(path, branch).joinToString("\n")

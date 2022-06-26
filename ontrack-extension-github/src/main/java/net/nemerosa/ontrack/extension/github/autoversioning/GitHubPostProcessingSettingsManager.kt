@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.github.autoversioning
 
 import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.intField
+import net.nemerosa.ontrack.model.form.textField
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -28,9 +30,13 @@ class GitHubPostProcessingSettingsManager(
         settingsRepository.setInt<GitHubPostProcessingSettings>(settings::retriesDelaySeconds)
     }
 
-    override fun getSettingsForm(settings: GitHubPostProcessingSettings?): Form {
-        TODO("Not yet implemented")
-    }
+    override fun getSettingsForm(settings: GitHubPostProcessingSettings): Form = Form.create()
+        .textField(GitHubPostProcessingSettings::config, settings.config)
+        .textField(GitHubPostProcessingSettings::repository, settings.repository)
+        .textField(GitHubPostProcessingSettings::workflow, settings.workflow)
+        .textField(GitHubPostProcessingSettings::branch, settings.branch)
+        .intField(GitHubPostProcessingSettings::retries, settings.retries)
+        .intField(GitHubPostProcessingSettings::retriesDelaySeconds, settings.retriesDelaySeconds)
 
     override fun getId(): String = "github-av-post-processing"
 

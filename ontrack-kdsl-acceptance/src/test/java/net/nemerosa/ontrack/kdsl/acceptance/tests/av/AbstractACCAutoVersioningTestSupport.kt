@@ -42,8 +42,13 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
         }
     }
 
-    protected fun waitForAutoVersioningCompletion() {
-        waitUntil(initial = 1_000L) {
+    protected fun waitForAutoVersioningCompletion(
+        timeout: Long = 60_000L,
+    ) {
+        waitUntil(
+            initial = 1_000L,
+            timeout = timeout,
+        ) {
             ontrack.autoVersioning.stats.pendingOrders == 0
         }
     }

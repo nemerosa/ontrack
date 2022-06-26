@@ -8,6 +8,9 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.github.gitHubClient
 import net.nemerosa.ontrack.kdsl.acceptance.tests.github.system.GitHubRepositoryContext
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
+import net.nemerosa.ontrack.kdsl.spec.extension.github.autoversioning.GitHubPostProcessingSettings
+import net.nemerosa.ontrack.kdsl.spec.extension.github.autoversioning.gitHubPostProcessing
+import net.nemerosa.ontrack.kdsl.spec.settings.settings
 import org.junit.jupiter.api.Test
 import java.util.*
 
@@ -18,13 +21,23 @@ class ACCAutoVersioningPostProcessing : AbstractACCAutoVersioningTestSupport() {
     fun `Auto versioning post processing`() {
         withTestGitHubPostProcessingRepository {
             withAutoVersioning {
-                // TODO Configures the GitHub post processing
                 // Ontrack as a dependency
                 val ontrackDep = branchWithPromotion(promotion = "RELEASE")
                 // Sample project to automatically upgrade & post-process
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        val configName = configuredForGitHubRepository(ontrack)
+                        // Configures the GitHub post processing
+                        ontrack.settings.gitHubPostProcessing.set(
+                            GitHubPostProcessingSettings(
+                                config = configName,
+                                repository = "${ACCProperties.GitHub.AutoVersioning.PostProcessing.Processor.org}/${ACCProperties.GitHub.AutoVersioning.PostProcessing.Processor.repository}",
+                                workflow = ACCProperties.GitHub.AutoVersioning.PostProcessing.Processor.workflow,
+                                branch = ACCProperties.GitHub.AutoVersioning.PostProcessing.Processor.branch,
+                                retries = 10,
+                                retriesDelaySeconds = 30,
+                            )
+                        )
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -50,10 +63,10 @@ class ACCAutoVersioningPostProcessing : AbstractACCAutoVersioningTestSupport() {
                             }
                         }
 
-                        waitForAutoVersioningCompletion()
+                        waitForAutoVersioningCompletion(timeout = 300_000L)
 
                         assertThatGitHubRepository {
-                            fileContains("gradle.properties") {
+                            fileContains("gradle.properties", timeout = 300_000L) {
                                 "${ACCProperties.GitHub.AutoVersioning.PostProcessing.Sample.property} = ${ACCProperties.GitHub.AutoVersioning.PostProcessing.Sample.version}"
                             }
                         }
