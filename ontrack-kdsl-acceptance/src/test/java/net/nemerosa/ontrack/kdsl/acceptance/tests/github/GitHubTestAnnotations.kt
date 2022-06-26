@@ -52,10 +52,11 @@ class TestOnGitHubPostProcessingCondition {
         @JvmStatic
         fun isTestOnGitHubPostProcessingEnabled(): Boolean =
             TestOnGitHubCondition.isTestOnGitHubEnabled() &&
-                    ACCProperties.GitHub.AutoVersioning.PostProcessing.repositoryOrg != null &&
-                    ACCProperties.GitHub.AutoVersioning.PostProcessing.repository != null &&
-                    ACCProperties.GitHub.AutoVersioning.PostProcessing.sampleOrg != null &&
-                    ACCProperties.GitHub.AutoVersioning.PostProcessing.sample != null
+                    ACCProperties.GitHub.AutoVersioning.PostProcessing.Processor.org != null &&
+                    ACCProperties.GitHub.AutoVersioning.PostProcessing.Processor.repository != null &&
+                    ACCProperties.GitHub.AutoVersioning.PostProcessing.Sample.org != null &&
+                    ACCProperties.GitHub.AutoVersioning.PostProcessing.Sample.repository != null &&
+                    ACCProperties.GitHub.AutoVersioning.PostProcessing.Sample.version != null
     }
 
 }
