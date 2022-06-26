@@ -20,7 +20,7 @@ class SourceProjectAutoVersioningAuditActionExtension(
                 Action.of(
                     "auto-versioning-audit-source",
                     "Auto versioning audit (source)",
-                    "auto-versioning-audit/source/${entity.name}"
+                    "audit/source/${entity.name}"
                 )
             )
         } else {

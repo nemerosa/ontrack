@@ -20,7 +20,7 @@ class BranchAutoVersioningAuditActionExtension(
                 Action.of(
                     "auto-versioning-audit-branch",
                     "Auto versioning audit",
-                    "auto-versioning-audit/branch/${entity.project.name}/${entity.name}"
+                    "audit/branch/${entity.project.name}/${entity.name}"
                 )
             )
         } else {
