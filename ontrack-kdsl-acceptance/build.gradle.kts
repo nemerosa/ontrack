@@ -83,9 +83,9 @@ val kdslAcceptanceTest by tasks.registering(Test::class) {
         val ontrackMgtUrl = rootProject.ext["ontrackMgtUrl"] ?: error("ontrackMgtUrl must be defined")
         println("Setting Ontrack URL for KDSL Acceptance Tests: $ontrackUrl")
         println("Setting Ontrack Mgt URL for KDSL Acceptance Tests: $ontrackMgtUrl")
-        systemProperty("net.nemerosa.ontrack.kdsl.acceptance.tests.accproperties.connection.url", ontrackUrl)
-        systemProperty("net.nemerosa.ontrack.kdsl.acceptance.tests.accproperties.connection.username", "admin")
-        systemProperty("net.nemerosa.ontrack.kdsl.acceptance.tests.accproperties.connection.password", "admin")
-        systemProperty("net.nemerosa.ontrack.kdsl.acceptance.tests.accproperties.connection.mgt.url", ontrackMgtUrl)
+        systemProperty("ontrack.acceptance.connection.url", ontrackUrl)
+        systemProperty("ontrack.acceptance.connection.username", "admin")
+        systemProperty("ontrack.acceptance.connection.password", "admin")
+        systemProperty("ontrack.acceptance.connection.mgt.url", ontrackMgtUrl)
     }
 }
