@@ -1,0 +1,220 @@
+<div class="well" id="filterForm">
+    <form class="form-horizontal" ng-submit="onSearch()">
+        <div class="form-group">
+            <label for="filterProject" class="col-sm-1 control-label" ng-hide="project">Project</label>
+            <input class="form-control col-sm-2"
+                   ng-hide="project"
+                   id="filterProject"
+                   type="text"
+                   ng-model="filter.project"/>
+            <label for="filterBranch" class="col-sm-1 control-label" ng-hide="branch">Branch</label>
+            <input class="form-control col-sm-2"
+                   ng-hide="branch"
+                   id="filterBranch"
+                   type="text"
+                   ng-model="filter.branch"/>
+        </div>
+        <div class="form-group">
+            <label for="filterState" class="col-sm-1 control-label" ng-hide="branch">State</label>
+            <select class="form-control col-sm-2"
+                    ng-hide="branch"
+                    id="filterState"
+                    ng-model="filter.state"
+                    ng-options="state for state in autoVersioningAuditStates">
+                <option value="">Any</option>
+            </select>
+            <label for="filterRunning" class="col-sm-1 control-label">Running</label>
+            <select class="form-control col-sm-2"
+                    id="filterRunning"
+                    ng-model="filter.running">
+                <option value="">Any</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="filterSource" class="col-sm-1 control-label" ng-hide="source">Source</label>
+            <input class="form-control col-sm-2"
+                   ng-hide="source"
+                   id="filterSource"
+                   type="text"
+                   ng-model="filter.source"/>
+            <label for="filterVersion" class="col-sm-1 control-label">Version</label>
+            <input class="form-control col-sm-2"
+                   id="filterVersion"
+                   type="text"
+                   ng-model="filter.version"/>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-1 control-label"></label>
+            <button type="submit" class="btn btn-primary" ng-disabled="runningQuery" id="filterSearch">
+                <i class="fa fa-search"></i>
+                Search
+            </button>
+            <button type="button" class="btn btn-link" ng-click="onClear()" ng-disabled="runningQuery" id="filterClear">
+                <i class="fa fa-ban"></i>
+                Clear
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="row" ng-show="runningQuery">
+    <div class="col-span-12">
+        <div class="alert alert-info">
+            <span class="ot-loading-indicator"></span>
+            Running query...
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="items.length == 0 && !runningQuery">
+    <div class="col-span-12">
+        <div class="alert alert-info">
+            No auto versioning audit entry was found.
+        </div>
+    </div>
+</div>
+
+<table class="table" ng-show="items.length > 0 && !runningQuery" id="searchResults">
+    <thead>
+    <tr>
+        <th ng-if="!project || !branch">Target</th>
+        <th ng-if="!source">Source</th>
+        <th>Version</th>
+        <th>Post processing</th>
+        <th>Approval</th>
+        <th>Running</th>
+        <th>State</th>
+        <th title="Link to pull request (if any)">PR</th>
+        <th>Time</th>
+        <th>Duration</th>
+        <th>
+            <span class="fa fa-toggle-off ot-action" title="Collapses all details sections when opened." ng-click="hideAllDetails()"></span>
+        </th>
+    </tr>
+    </thead>
+    <tbody ng-repeat-start="item in items" class="auto-versioning-audit-entry">
+    <tr id="entry-{{ item.order.uuid }}" ng-class="{
+        info: details[item.order.uuid]
+    }">
+        <!-- Target -->
+        <td ng-if="!project || !branch">
+            <span ng-if="!project">
+                <a href="{{ item.order.branch.project.links._page }}" class="auto-versioning-audit-entry-target">{{ item.order.branch.project.name }}</a> /
+            </span>
+            <span ng-if="!branch">
+                <a href="{{ item.order.branch.links._page }}" class="auto-versioning-audit-entry-branch">{{ item.order.branch.name }}</a>
+            </span>
+        </td>
+        <!-- Source -->
+        <td ng-if="!source" class="auto-versioning-audit-entry-source">
+            {{ item.order.sourceProject }}
+        </td>
+        <!-- Version -->
+        <td>
+            {{ item.order.targetVersion }}
+        </td>
+        <!-- Post processing -->
+        <td>
+            <span ng-if="item.order.postProcessing">{{ item.order.postProcessing }}</span>
+            <span ng-if="!item.order.postProcessing"><i class="fa fa-ban text-muted"></i></span>
+        </td>
+        <!-- Approval -->
+        <td>
+            <span ng-if="!item.order.autoApproval"><i class="fa fa-ban text-muted"></i></span>
+            <span ng-if="item.order.autoApproval">{{ item.order.autoApprovalMode }}</span>
+        </td>
+        <!-- Running -->
+        <td>
+            <span ng-if="item.running"><i class="fa fa-play"></i>&nbsp;Running</span>
+            <span ng-if="!item.running"><i class="fa fa-pause"></i>&nbsp;Stopped</span>
+        </td>
+        <!-- State -->
+        <td>
+            <span ng-if="item.mostRecentState.state == 'ERROR'"><i class="fa fa-times text-danger"></i></span>
+            <span ng-if="item.mostRecentState.state == 'PROCESSING_ABORTED'"><i class="fa fa-clock-o text-danger"></i></span>
+            <span ng-if="item.mostRecentState.state == 'PR_TIMEOUT'"><i class="fa fa-times-circle  text-warning" title="The PR was created but its checks timed out before it could be merged."></i></span>
+            <span ng-if="item.mostRecentState.state == 'PR_PROCESSED'"><i class="fa fa-check text-success"></i></span>
+            <span ng-if="item.mostRecentState.state == 'PR_MERGED'"><i class="fa fa-check text-success" title="The PR has merged by Ontrack"></i></span>
+            <span ng-if="item.mostRecentState.state == 'PR_CREATED'"><i class="fa fa-check text-success" title="The PR was created by Ontrack"></i></span>
+            <span ng-if="item.mostRecentState.state == 'PR_APPROVED'"><i class="fa fa-check text-success" title="The PR has created and approved by Ontrack"></i></span>
+            <span class="auto-versioning-audit-entry-state">{{ item.mostRecentState.state }}</span>
+        </td>
+        <!-- PR -->
+        <td>
+            <a ng-if="item.mostRecentState.data.prName && item.mostRecentState.data.prLink"
+               href="{{ item.mostRecentState.data.prLink }}"
+               ><i class="fa fa-code-fork"></i>&nbsp;{{ item.mostRecentState.data.prName }}</a>
+        </td>
+        <!-- Timestamp -->
+        <td>
+            {{ item.mostRecentState.creation.time | date:'shortDate' }}
+            {{ item.mostRecentState.creation.time | date:'mediumTime' }}
+        </td>
+        <!-- Duration -->
+        <td>
+            {{ getItemDuration(item) }}
+        </td>
+        <!-- Details -->
+        <td>
+            <span ng-hide="details[item.order.uuid]" ng-click="showItemDetails(item)" title="Show details and history" class="ot-action auto-versioning-audit-entry-details-toggle auto-versioning-audit-entry-details-toggle-off"><i class="fa fa-toggle-off text-muted"></i></span>
+            <span ng-show="details[item.order.uuid]" ng-click="hideItemDetails(item)" title="Hide details and history" class="ot-action auto-versioning-audit-entry-details-toggle auto-versioning-audit-entry-details-toggle-on"><i class="fa fa-toggle-on"></i></span>
+        </td>
+    </tr>
+    </tbody>
+    <!-- Details -->
+    <tbody ng-repeat-end ng-show="details[item.order.uuid]" class="auto-versioning-audit-entry-detail">
+    <tr id="entry-details-{{ item.order.uuid }}">
+        <td>&nbsp;</td>
+        <!-- State history -->
+        <td colspan="6">
+            History
+            <table class="table table-condensed">
+                <thead>
+                <tr>
+                    <th>State</th>
+                    <th>Time</th>
+                    <th>Data</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="audit in item.audit">
+                    <td class="auto-versioning-audit-entry-details-history-state">
+                        {{ audit.state }}
+                    </td>
+                    <td>
+                        {{ audit.creation.time | date:'shortDate' }}
+                        {{ audit.creation.time | date:'mediumTime' }}
+                    </td>
+                    <td>
+                        <dl ng-if="audit.data">
+                            <dt ng-repeat-start="(name, value) in audit.data">
+                                {{ name }}
+                            </dt>
+                            <dd ng-repeat-end="">
+                                {{ value }}
+                            </dd>
+                        </dl>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+        <!-- Order -->
+        <td colspan="3">
+            Order
+            <dl>
+                <dt ng-repeat-start="(name, value) in item.order">
+                    {{ name }}
+                </dt>
+                <dd ng-repeat-end>
+                    {{ value }}
+                </dd>
+            </dl>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<button class="btn btn-link" ng-if="pageInfo.nextPage" ng-click="loadNextPage()">More...</button>

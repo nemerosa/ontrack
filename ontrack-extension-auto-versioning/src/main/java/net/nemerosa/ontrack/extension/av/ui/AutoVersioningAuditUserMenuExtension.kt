@@ -18,6 +18,6 @@ class AutoVersioningAuditUserMenuExtension(
     override fun getGlobalFunction(): Class<out GlobalFunction>? = null
 
     override fun getAction(): Action =
-        Action.of("auto-versioning-audit-global", "Auto versioning audit", "auto-versioning-audit/global")
+        Action.of("auto-versioning-audit-global", "Auto versioning audit", "audit/global")
 
 }
