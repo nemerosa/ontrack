@@ -54,7 +54,7 @@ class GitHubPostProcessing(
 
         // Gets the name of the GitHub configuration
         val ghConfigName = config.config
-            ?: settings.config
+            ?: settings.config?.takeIf { it.isNotBlank() }
             ?: throw GitHubPostProcessingConfigException("Default GitHub configuration is not defined in the settings.")
 
         // Loading the configuration
