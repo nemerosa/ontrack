@@ -127,8 +127,9 @@ object ACCProperties {
     private fun optionalFromEnv(): ReadOnlyProperty<Any, String?> =
         ReadOnlyProperty { thisRef, property ->
             val className = thisRef::class.qualifiedName ?: error("Expecting a full class name")
+            val finalName = className.replace(ACCProperties::class.java.name, "ontrack.acceptance")
             val propName = property.name
-            val sysProperty = "$className.$propName".lowercase()
+            val sysProperty = "$finalName.$propName".lowercase()
             val sysValue = System.getProperty(sysProperty)
             if (!sysValue.isNullOrBlank()) {
                 sysValue
