@@ -45,6 +45,22 @@ angular.module('ontrack.extension.auto-versioning', [
         view.title = `Auto versioning audit from ${$scope.sourceName}`;
     })
 
+    .config(function ($stateProvider) {
+        $stateProvider.state('auto-versioning-audit-branch', {
+            url: '/extension/auto-versioning/audit/branch/{project}/{branch}',
+            templateUrl: 'extension/auto-versioning/audit-branch.tpl.html',
+            controller: 'AutoVersioningAuditBranchCtrl'
+        });
+    })
+
+    .controller('AutoVersioningAuditBranchCtrl', function ($stateParams, $scope, ot) {
+        $scope.projectName = $stateParams.project;
+        $scope.branchName = $stateParams.branch;
+
+        const view = ot.view();
+        view.title = `Auto versioning audit for ${$scope.projectName} / ${$scope.branchName}`;
+    })
+
     .directive('otExtensionAutoVersioningAudit', function () {
 
         const parametersQuery = ` { autoVersioningAuditStates } `;
