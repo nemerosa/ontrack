@@ -52,7 +52,9 @@ class GitHubSCMExtension(
         private val settings: GitHubSCMCatalogSettings,
     ) : SCM {
 
-        override val repositoryURI: String = "${property.configuration.url}/${property.repository}"
+        override val repositoryURI: String = "${property.configuration.url}/${property.repository}.git"
+
+        override val repositoryHtmlURL: String = "${property.configuration.url}/${property.repository}"
 
         override val repository: String = property.repository
 

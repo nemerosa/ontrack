@@ -44,6 +44,9 @@ class GitSCMExtension(
         override val repositoryURI: String
             get() = unsupported("repositoryURI")
 
+        override val repositoryHtmlURL: String
+            get() = unsupported("repositoryHtmlURL")
+
         override val repository: String
             get() = unsupported("repository")
 

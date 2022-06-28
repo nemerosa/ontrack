@@ -13,6 +13,10 @@ interface SCM {
      * Gets the (clone) URL of the project's repository
      */
     val repositoryURI: String
+    /**
+     * Gets the URL of the project's repository page
+     */
+    val repositoryHtmlURL: String
 
     /**
      * Gets the (short) path to the project's repository

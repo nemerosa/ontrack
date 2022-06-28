@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.extension.av.graphql
 
 import graphql.Scalars
+import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLList
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeBranch
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component
 @Component
 class GQLTypeAutoVersioningOrder(
     private val gqlEnumAutoApprovalMode: GQLEnumAutoApprovalMode,
+    private val scmDetector: SCMDetector,
 ) : GQLType {
 
     override fun getTypeName(): String = AutoVersioningOrder::class.java.simpleName
@@ -64,5 +67,15 @@ class GQLTypeAutoVersioningOrder(
                 AutoVersioningOrder::autoApprovalMode,
                 "Defines the way the PR is merged when auto approval is set."
             )
+            .field {
+                it.name("repositoryHtmlURL")
+                    .description("Link to the target repository")
+                    .type(GraphQLString)
+                    .dataFetcher { env ->
+                        val order: AutoVersioningOrder = env.getSource()
+                        scmDetector.getSCM(order.branch.project)
+                            ?.repositoryHtmlURL
+                    }
+            }
             .build()
 }
