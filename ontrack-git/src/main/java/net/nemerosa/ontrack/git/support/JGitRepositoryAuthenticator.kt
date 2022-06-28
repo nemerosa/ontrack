@@ -13,7 +13,7 @@ fun GitRepositoryAuthenticator.getCredentialsProvider(): CredentialsProvider? = 
     is TokenGitRepositoryAuthenticator ->
         tokenCredentialsProvider(token)
     is AppTokenGitRepositoryAuthenticator ->
-        tokenCredentialsProvider(token)
+        tokenCredentialsProvider(tokenAccess())
     else -> null // Nothing by default
 }
 

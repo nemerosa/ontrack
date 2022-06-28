@@ -71,9 +71,11 @@ class GitHubConfigurator(
             )
             GitHubAuthenticationType.TOKEN -> TokenGitRepositoryAuthenticator(configuration.oauth2Token!!)
             GitHubAuthenticationType.APP -> AppTokenGitRepositoryAuthenticator(
-                gitHubAppTokenService.getAppInstallationToken(
-                    configuration
-                ) ?: throw GitHubAppNoTokenException(configuration.appId!!)
+                tokenAccess = {
+                    gitHubAppTokenService.getAppInstallationToken(
+                        configuration
+                    ) ?: throw GitHubAppNoTokenException(configuration.appId!!)
+                }
             )
         }
 

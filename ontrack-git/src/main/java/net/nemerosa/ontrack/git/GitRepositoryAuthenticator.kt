@@ -17,6 +17,9 @@ data class TokenGitRepositoryAuthenticator(
     val token: String,
 ) : GitRepositoryAuthenticator
 
+/**
+ * This authenticator gives access to a token which may change at any time.
+ */
 data class AppTokenGitRepositoryAuthenticator(
-    val token: String,
+    val tokenAccess: () -> String,
 ) : GitRepositoryAuthenticator
