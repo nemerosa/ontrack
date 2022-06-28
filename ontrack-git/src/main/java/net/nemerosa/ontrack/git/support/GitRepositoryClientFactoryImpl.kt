@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.git.exceptions.GitRepositoryDirException
 import org.apache.commons.io.FileUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.cache.CacheManager
 import java.io.File
 import java.io.IOException
 import java.time.Duration
@@ -15,16 +14,11 @@ import java.util.concurrent.locks.ReentrantLock
 
 class GitRepositoryClientFactoryImpl(
     private val root: File,
-    private val cacheManager: CacheManager,
     private val timeout: Duration = Duration.ofSeconds(60),
     private val operationTimeout: Duration = Duration.ofMinutes(10),
     private val retries: UInt = 3u,
     private val interval: Duration = Duration.ofSeconds(30),
 ) : GitRepositoryClientFactory {
-
-    companion object {
-        const val CACHE_GIT_REPOSITORY_CLIENT = "gitRepositoryClient"
-    }
 
     private val logger: Logger = LoggerFactory.getLogger(GitRepositoryClientFactoryImpl::class.java)
 
@@ -51,26 +45,13 @@ class GitRepositoryClientFactoryImpl(
     }
 
     override fun getClient(repository: GitRepository): GitRepositoryClient {
-        val remote = repository.remote
         lock.lock()
         try {
             // Gets any existing repository in the cache
-            val repositoryClient =
-                cacheManager.getCache(CACHE_GIT_REPOSITORY_CLIENT)?.get(remote)?.get() as? GitRepositoryClient?
-            return if (repositoryClient != null && repositoryClient.isCompatible(repository)) {
-                repositoryClient
-            } else {
-                createAndRegisterRepositoryClient(repository)
-            }// Repository to be created
+            return createRepositoryClient(repository)
         } finally {
             lock.unlock()
         }
-    }
-
-    private fun createAndRegisterRepositoryClient(repository: GitRepository): GitRepositoryClient {
-        val client = createRepositoryClient(repository)
-        cacheManager.getCache(CACHE_GIT_REPOSITORY_CLIENT)?.put(repository.remote, client)
-        return client
     }
 
     private fun createRepositoryClient(repository: GitRepository): GitRepositoryClient {
