@@ -27,4 +27,6 @@ include::feature-branches.adoc[]
 
 include::feature-dm.adoc[]
 
+include::feature-auto-versioning.adoc[]
+
 include::feature-indicators.adoc[]

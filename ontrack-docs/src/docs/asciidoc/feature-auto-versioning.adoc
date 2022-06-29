@@ -1,0 +1,45 @@
+[[auto-versioning]]
+=== Auto versioning on promotion
+
+Beside collecting data about the performance of your delivery, Ontrack can in turn use this information to drive other automation processes.
+
+One of these processes that Ontrack can drive is the "auto promotion on promotion", which allows the propagation of versions from one repository to others using quality gates based on Ontrack <<model,promotions>>.
+
+Let's imagine a project `parent` which has a dependency on a `module` expressed through a version property somewhere in a file.
+
+Ideally, whenever the `module` has a new version is a given range, we want this version to be used automatically by the `parent`.
+
+Manually, we can do this of course:
+
+* we update the version in the `parent`
+* we perform any needed post-processing like a resolution of locks
+* we commit and push the change. Voilà.
+
+If we put extra automation in the mix, you can define a perfectly valid auto versioning process.
+
+This becomes more complex whenever having a new version of the `module` is not enough of a criteria to have it used. This may be a release which has not been qualified yet by extra quality processes (long running ones maybe).
+
+That's where the concept of <<model,promotion>> in Ontrack can play a very important rule:
+
+* the `module` is promoted
+* this starts the following process:
+  * Ontrack creates a pull request for the `parent` where the version of the `module` has been changed to the one being promoted
+  * any required post processing is performed on this PR
+  * when the PR is ready to be merged (with all its controls), it's merged automatically
+
+Result:
+
+* versions are propagated automatically only when "promotion gates" are opened
+
+This is valid from one module to a project, and can be easily extended to a full tree of dependent modules.
+
+[[auto-versioning-not]]
+==== When not to use auto versioning
+
+While auto versioning is pretty easy to put in place, it should not be used where traditional dependency management based on locks can be used instead for simple code libraries.
+
+Auto versioning on promotion is however particularly well suited to deal with situations like:
+
+* modular monoliths
+* GitOps repositories with fixed versions
+
