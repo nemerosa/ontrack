@@ -1,5 +1,6 @@
-<p ng-if="project">
-
+<p ng-if="gitRepositoryHtmlURL">
+    <a href="{{ gitRepositoryHtmlURL }}"><span class="fa fa-external-link"></span></a>
+    <a href="{{ gitRepositoryHtmlURL }}">{{ gitRepositoryHtmlURL }}</a>
 </p>
 
 <div class="well" id="filterForm">

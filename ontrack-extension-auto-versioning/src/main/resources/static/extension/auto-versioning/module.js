@@ -69,8 +69,13 @@ angular.module('ontrack.extension.auto-versioning', [
             query AutoVersioningAuditEntries(
                 $offset: Int!,
                 $size: Int!,
-                $filter: AutoVersioningAuditQueryFilter!
+                $filter: AutoVersioningAuditQueryFilter!,
+                $projectVisible: Boolean!,
+                $projectName: String!,
             ) {
+                projects(name: $projectName) @include(if: $projectVisible) {
+                    gitRepositoryHtmlURL
+                }
                 autoVersioningAuditEntries(offset: $offset, size: $size, filter: $filter) {
                     pageInfo {
                         nextPage {
@@ -158,12 +163,20 @@ angular.module('ontrack.extension.auto-versioning', [
 
                 const onSearch = (reset) => {
                     let project;
+                    let projectVisible;
+                    let projectName;
                     if ($scope.project) {
                         project = $scope.project;
+                        projectVisible = true;
+                        projectName = $scope.project;
                     } else if ($scope.filter.project) {
                         project = $scope.filter.project;
+                        projectVisible = false;
+                        projectName = '';
                     } else {
                         project = null;
+                        projectVisible = false;
+                        projectName = '';
                     }
 
                     let branch;
@@ -220,11 +233,18 @@ angular.module('ontrack.extension.auto-versioning', [
                             running: running,
                             source: source,
                             version: version
-                        }
+                        },
+                        projectName: projectName,
+                        projectVisible: projectVisible
                     };
 
                     $scope.runningQuery = true;
                     otGraphqlService.pageGraphQLCall(auditQuery, queryVariables).then(data => {
+                        if (data.projects && data.projects[0].gitRepositoryHtmlURL) {
+                            $scope.gitRepositoryHtmlURL = data.projects[0].gitRepositoryHtmlURL;
+                        } else {
+                            $scope.gitRepositoryHtmlURL = undefined;
+                        }
                         $scope.pageInfo = data.autoVersioningAuditEntries.pageInfo;
                         if (reset) {
                             $scope.items = data.autoVersioningAuditEntries.pageItems;
