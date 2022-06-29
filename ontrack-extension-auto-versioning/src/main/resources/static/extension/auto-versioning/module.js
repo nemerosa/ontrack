@@ -110,6 +110,7 @@ angular.module('ontrack.extension.auto-versioning', [
                                     }
                                 }
                             }
+                            repositoryHtmlURL
                             targetPaths
                             targetRegex
                             targetProperty

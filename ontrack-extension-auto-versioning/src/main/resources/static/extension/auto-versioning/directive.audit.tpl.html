@@ -1,3 +1,7 @@
+<p ng-if="project">
+
+</p>
+
 <div class="well" id="filterForm">
     <form class="form-horizontal" ng-submit="onSearch()">
         <div class="form-group">
@@ -101,7 +105,11 @@
         <!-- Target -->
         <td ng-if="!project || !branch">
             <span ng-if="!project">
-                <a href="{{ item.order.branch.project.links._page }}" class="auto-versioning-audit-entry-target">{{ item.order.branch.project.name }}</a> /
+                <a href="{{ item.order.branch.project.links._page }}" class="auto-versioning-audit-entry-target">{{ item.order.branch.project.name }}</a>
+                <a href="{{ item.order.repositoryHtmlURL }}" ng-if="item.order.repositoryHtmlURL" title="Repository">
+                    <span class="fa fa-external-link"></span>
+                </a>
+                /
             </span>
             <span ng-if="!branch">
                 <a href="{{ item.order.branch.links._page }}" class="auto-versioning-audit-entry-branch">{{ item.order.branch.name }}</a>
