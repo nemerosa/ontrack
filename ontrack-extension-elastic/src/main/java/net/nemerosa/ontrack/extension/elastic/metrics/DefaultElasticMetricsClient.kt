@@ -20,6 +20,7 @@ import org.elasticsearch.action.search.SearchRequest
 import org.elasticsearch.client.RequestOptions
 import org.elasticsearch.client.RestClient
 import org.elasticsearch.client.RestHighLevelClient
+import org.elasticsearch.client.RestHighLevelClientBuilder
 import org.elasticsearch.index.query.MultiMatchQueryBuilder
 import org.elasticsearch.search.builder.SearchSourceBuilder
 import org.slf4j.Logger
@@ -268,6 +269,9 @@ class DefaultElasticMetricsClient(
         if (elasticMetricsConfigProperties.custom.pathPrefix != null) {
             builder.setPathPrefix(elasticMetricsConfigProperties.custom.pathPrefix)
         }
-        return RestHighLevelClient(builder)
+        val client = builder.build()
+        return RestHighLevelClientBuilder(client)
+            .setApiCompatibilityMode(elasticMetricsConfigProperties.apiCompatibilityMode)
+            .build()
     }
 }
