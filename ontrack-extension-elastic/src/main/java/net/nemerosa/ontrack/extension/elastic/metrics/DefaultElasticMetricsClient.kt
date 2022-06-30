@@ -78,29 +78,33 @@ class DefaultElasticMetricsClient(
     }
 
     override fun saveMetrics(entries: Collection<ECSEntry>) {
-        if (elasticMetricsConfigProperties.index.immediate) {
-            // Direct registration
-            val indexName = elasticMetricsConfigProperties.index.name
-            entries.forEach { entry ->
-                val source = entry.asJson().toJsonMap()
-                client.index(
-                    IndexRequest(indexName).source(source),
-                    RequestOptions.DEFAULT
-                )
-            }
-            // ... and flushing immediately
-            val refreshRequest = RefreshRequest(indexName)
-            client.indices().refresh(refreshRequest, RequestOptions.DEFAULT)
-        } else {
-            runBlocking {
-                launch {
-                    entries.forEach { entry ->
-                        // debug("Entry queued")
-                        queueSize.incrementAndGet()
-                        queue.send(entry)
+        try {
+            if (elasticMetricsConfigProperties.index.immediate) {
+                // Direct registration
+                val indexName = elasticMetricsConfigProperties.index.name
+                entries.forEach { entry ->
+                    val source = entry.asJson().toJsonMap()
+                    client.index(
+                        IndexRequest(indexName).source(source),
+                        RequestOptions.DEFAULT
+                    )
+                }
+                // ... and flushing immediately
+                val refreshRequest = RefreshRequest(indexName)
+                client.indices().refresh(refreshRequest, RequestOptions.DEFAULT)
+            } else {
+                runBlocking {
+                    launch {
+                        entries.forEach { entry ->
+                            // debug("Entry queued")
+                            queueSize.incrementAndGet()
+                            queue.send(entry)
+                        }
                     }
                 }
             }
+        } catch (ex: Exception) {
+            logger.error("Cannot export ${entries.size} metrics to ElasticSearch", ex)
         }
     }
 
