@@ -104,7 +104,7 @@ class DefaultElasticMetricsClient(
                     }
                 }
             }
-        } catch (ex: Exception) {
+        } catch (ex: Throwable) {
             logger.error("Cannot export ${entries.size} metrics to ElasticSearch", ex)
         }
     }
