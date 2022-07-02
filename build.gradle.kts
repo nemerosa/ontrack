@@ -260,7 +260,6 @@ configure(coreProjects) p@{
         imports {
             mavenBom(SpringBootPlugin.BOM_COORDINATES) {
                 bomProperty("kotlin.version", Versions.kotlinVersion)
-                bomProperty("elasticsearch.version", Versions.elasticVersion)
             }
         }
         dependencies {
@@ -281,7 +280,12 @@ configure(coreProjects) p@{
             dependency("io.jsonwebtoken:jjwt-api:${Versions.jjwtVersion}")
             dependency("io.jsonwebtoken:jjwt-impl:${Versions.jjwtVersion}")
             dependency("io.jsonwebtoken:jjwt-jackson:${Versions.jjwtVersion}")
-
+            // Overriding Elastic Search client version
+            // See https://docs.spring.io/dependency-management-plugin/docs/current/reference/html/#dependency-management-configuration-bom-import-override-dependency-management
+            // and the warning about the POM (explicit overridding is needed here)
+            dependency("org.elasticsearch:elasticsearch:${Versions.elasticVersion}")
+            dependency("org.elasticsearch.client:elasticsearch-rest-client:${Versions.elasticVersion}")
+            dependency("org.elasticsearch.client:elasticsearch-rest-high-level-client:${Versions.elasticVersion}")
         }
     }
 
