@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.test.TestUtils.uid
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
@@ -22,6 +23,11 @@ class ElasticMetricsExportExtensionIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var elasticMetricsClient: ElasticMetricsClient
+
+    @BeforeEach
+    fun clear() {
+        elasticMetricsClient.dropIndex()
+    }
 
     @Test
     fun `Exporting metrics to Elastic`() {
@@ -68,10 +74,10 @@ class ElasticMetricsExportExtensionIT : AbstractDSLTestSupport() {
 
         // Checks the metric has been exported into ES
         val results = elasticMetricsClient.rawSearch(
-            token = "$project $branch",
-        ).items.filter { it.score > 1 }
-        assertEquals(1, results.size, "One metric registered")
-        val result = results.first()
+            token = metric,
+        )
+        assertEquals(1, results.items.size, "One metric registered")
+        val result = results.items.first()
         val initialId = result.id
         val source = result.source.asJson().parse<ECSEntry>()
         assertEquals(metric, source.event.category)
@@ -83,10 +89,10 @@ class ElasticMetricsExportExtensionIT : AbstractDSLTestSupport() {
 
         // Checking the value again
         val newResults = elasticMetricsClient.rawSearch(
-            token = "$project $branch",
-        ).items.filter { it.score > 1 }
-        assertEquals(1, newResults.size, "One metric registered")
-        val newResult = newResults.first()
+            token = metric,
+        )
+        assertEquals(1, newResults.items.size, "One metric registered")
+        val newResult = newResults.items.first()
         assertEquals(initialId, newResult.id, "Same document is returned")
         val newSource = newResult.source.asJson().parse<ECSEntry>()
         assertEquals(metric, newSource.event.category)
