@@ -65,7 +65,7 @@ class ElasticMetricsReexportExtensionIT : AbstractDSLTestSupport() {
     ) {
         metricsExportService.exportMetrics(metric, tags, values, timestamp)
         val results = elasticMetricsClient.rawSearch(
-            token = "development",
+            token = metric,
         )
         assertEquals(1, results.items.size, "One metric registered")
         val result = results.items.first()
