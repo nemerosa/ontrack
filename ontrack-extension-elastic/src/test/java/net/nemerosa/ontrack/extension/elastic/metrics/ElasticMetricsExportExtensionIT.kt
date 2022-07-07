@@ -38,7 +38,7 @@ class ElasticMetricsExportExtensionIT : AbstractDSLTestSupport() {
         metricsExportService.exportMetrics(metric, tags, values, timestamp)
         // Checks the metric has been exported into ES
         val results = elasticMetricsClient.rawSearch(
-            token = "development",
+            token = metric,
         )
         // Expecting only one result
         assertEquals(1, results.items.size, "One metric registered")

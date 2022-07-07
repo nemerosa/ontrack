@@ -14,4 +14,9 @@ interface ElasticMetricsClient {
         size: Int = 10,
     ): SearchNodeResults
 
+    /**
+     * Drops the target index, and all its data.
+     */
+    fun dropIndex()
+
 }

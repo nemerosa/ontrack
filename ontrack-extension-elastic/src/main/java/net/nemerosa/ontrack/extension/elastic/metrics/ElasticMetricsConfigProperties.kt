@@ -51,6 +51,11 @@ class ElasticMetricsConfigProperties {
     var apiCompatibilityMode: Boolean = false
 
     /**
+     * Set to false to disable the possibility to clear the index in case of re-indexation
+     */
+    var allowDrop: Boolean = true
+
+    /**
      * Index properties
      */
     class IndexConfigProperties {

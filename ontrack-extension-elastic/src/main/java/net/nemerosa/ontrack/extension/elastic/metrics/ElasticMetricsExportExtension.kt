@@ -18,6 +18,10 @@ class ElasticMetricsExportExtension(
     private val elasticMetricsClient: ElasticMetricsClient,
 ) : AbstractExtension(extensionFeature), MetricsExportExtension {
 
+    override fun prepareReexport() {
+        elasticMetricsClient.dropIndex()
+    }
+
     override fun batchExportMetrics(metrics: Collection<Metric>) {
         elasticMetricsClient.saveMetrics(
             metrics.map { metric ->
