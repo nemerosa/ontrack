@@ -86,7 +86,7 @@ class DefaultElasticMetricsClient(
                 entries.forEach { entry ->
                     val source = entry.asJson().toJsonMap()
                     client.index(
-                        IndexRequest(indexName).source(source),
+                        IndexRequest(indexName).id(entry.getId()).source(source),
                         RequestOptions.DEFAULT
                     )
                 }
@@ -181,7 +181,7 @@ class DefaultElasticMetricsClient(
             val request = BulkRequest()
             entries.forEach {
                 val source = it.asJson().toJsonMap()
-                request.add(IndexRequest(indexName).source(source))
+                request.add(IndexRequest(indexName).id(it.getId()).source(source))
             }
             // Bulk request execution
             client.bulk(request, RequestOptions.DEFAULT)
@@ -189,6 +189,16 @@ class DefaultElasticMetricsClient(
             debug("Nothing to flush")
         }
     }
+
+    /**
+     * Computing the ID of an entry based on its labels & tags
+     */
+    private fun ECSEntry.getId(): String? =
+        if ((labels != null && labels.isNotEmpty()) || (tags != null && tags.isNotEmpty())) {
+            ((labels?.hashCode() ?: 0) + 31 * (tags?.hashCode() ?: 0)).toString()
+        } else {
+            null // No tags, no label, we let ES compute the ID for us
+        }
 
     override fun rawSearch(
         token: String,

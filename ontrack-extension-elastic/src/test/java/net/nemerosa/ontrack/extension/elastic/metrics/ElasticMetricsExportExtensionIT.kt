@@ -50,4 +50,48 @@ class ElasticMetricsExportExtensionIT : AbstractDSLTestSupport() {
         assertEquals(values, source.ontrack)
     }
 
+    @Test
+    fun `Unique documents for the metrics in ElasticSearch`() {
+        val metric = uid("m")
+        val project = uid("prj-")
+        val branch = uid("b-")
+        val tags = mapOf(
+            "project" to project,
+            "branch" to branch,
+        )
+        val values = mapOf(
+            "old" to 1.0,
+            "new" to 2.0,
+        )
+        val timestamp = Time.now()
+        metricsExportService.exportMetrics(metric, tags, values, timestamp)
+
+        // Checks the metric has been exported into ES
+        val results = elasticMetricsClient.rawSearch(
+            token = "$project $branch",
+        ).items.filter { it.score > 1 }
+        assertEquals(1, results.size, "One metric registered")
+        val result = results.first()
+        val initialId = result.id
+        val source = result.source.asJson().parse<ECSEntry>()
+        assertEquals(metric, source.event.category)
+        assertEquals(tags, source.labels)
+        assertEquals(values, source.ontrack)
+
+        // Re-exporting the metric
+        metricsExportService.exportMetrics(metric, tags, values, timestamp)
+
+        // Checking the value again
+        val newResults = elasticMetricsClient.rawSearch(
+            token = "$project $branch",
+        ).items.filter { it.score > 1 }
+        assertEquals(1, newResults.size, "One metric registered")
+        val newResult = newResults.first()
+        assertEquals(initialId, newResult.id, "Same document is returned")
+        val newSource = newResult.source.asJson().parse<ECSEntry>()
+        assertEquals(metric, newSource.event.category)
+        assertEquals(tags, newSource.labels)
+        assertEquals(values, newSource.ontrack)
+    }
+
 }

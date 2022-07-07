@@ -21,8 +21,7 @@ services:
       - "discovery.type=single-node"
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "xpack.security.enabled=true"
-      - "ELASTIC_PASSWORD=test"
+      - "xpack.security.enabled=false"
     ulimits:
       memlock:
         soft: -1
