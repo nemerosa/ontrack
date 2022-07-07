@@ -9,6 +9,12 @@ import java.time.LocalDateTime
  */
 interface MetricsExportExtension : Extension {
 
+    /**
+     * Before a complete re-export of metrics is attempted, this method is called to prepare the backend
+     * for the new metrics. Like for example, deleting & recreating an index.
+     */
+    fun prepareReexport()
+
     fun batchExportMetrics(metrics: Collection<Metric>)
 
     fun exportMetrics(

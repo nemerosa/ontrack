@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.job.*
+import net.nemerosa.ontrack.model.metrics.MetricsReexportJobProvider
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.JobProvider
 import net.nemerosa.ontrack.model.support.RestorationJobs
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component
 @Component
 class ValidationRunDataMetricsRestorationJob(
         private val structureService: StructureService
-) : JobProvider, Job {
+) : JobProvider, Job, MetricsReexportJobProvider {
 
     override fun getStartingJobs(): Collection<JobRegistration> = listOf(
             JobRegistration(
@@ -22,6 +23,8 @@ class ValidationRunDataMetricsRestorationJob(
     )
 
     override fun isDisabled(): Boolean = false
+
+    override fun getReexportJobKey() = key
 
     override fun getKey(): JobKey =
             RestorationJobs.RESTORATION_JOB_TYPE.getKey("validation-run-data-metrics-restoration")

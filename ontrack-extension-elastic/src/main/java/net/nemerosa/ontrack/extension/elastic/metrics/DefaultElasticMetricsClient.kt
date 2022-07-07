@@ -13,6 +13,7 @@ import org.apache.http.auth.AuthScope
 import org.apache.http.auth.Credentials
 import org.apache.http.auth.UsernamePasswordCredentials
 import org.apache.http.impl.client.BasicCredentialsProvider
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest
 import org.elasticsearch.action.bulk.BulkRequest
 import org.elasticsearch.action.index.IndexRequest
@@ -187,6 +188,16 @@ class DefaultElasticMetricsClient(
             client.bulk(request, RequestOptions.DEFAULT)
         } else {
             debug("Nothing to flush")
+        }
+    }
+
+    override fun dropIndex() {
+        if (elasticMetricsConfigProperties.allowDrop) {
+            logger.info("Dropping the ${elasticMetricsConfigProperties.index.name} index before re-export")
+            client.indices().delete(
+                DeleteIndexRequest(elasticMetricsConfigProperties.index.name),
+                RequestOptions.DEFAULT
+            )
         }
     }
 

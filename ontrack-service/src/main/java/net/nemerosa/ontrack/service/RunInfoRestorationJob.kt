@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.job.*
+import net.nemerosa.ontrack.model.metrics.MetricsReexportJobProvider
 import net.nemerosa.ontrack.model.structure.RunInfoService
 import net.nemerosa.ontrack.model.support.JobProvider
 import net.nemerosa.ontrack.model.support.RestorationJobs
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component
 @Component
 class RunInfoRestorationJob(
         private val runInfoService: RunInfoService
-): JobProvider, Job {
+): JobProvider, Job, MetricsReexportJobProvider {
 
     override fun getStartingJobs(): Collection<JobRegistration> =
             listOf(
@@ -23,6 +24,8 @@ class RunInfoRestorationJob(
             )
 
     override fun isDisabled(): Boolean = false
+
+    override fun getReexportJobKey(): JobKey = key
 
     override fun getKey(): JobKey =
             RestorationJobs.RESTORATION_JOB_TYPE.getKey("run-info-restoration")
