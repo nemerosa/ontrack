@@ -24,7 +24,7 @@ data class ECSEntry(
      */
     fun computeId(): String {
         val prefix: String = DigestUtils.md5Hex(event.category)
-        val base = "$event-${labels?.toSortedMap()}-${tags?.sorted()}"
+        val base = "$event-${labels?.toSortedMap()}-${tags?.sorted()}-$timestamp"
         val hashedBase = DigestUtils.sha1Hex(base)
         return "$prefix-$hashedBase"
     }
