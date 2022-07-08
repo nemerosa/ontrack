@@ -218,8 +218,11 @@ The Jenkins job is responsible to:
 
 After a branch is created to hold the new version, after this branch has been optionally post-processed, Ontrack will create a pull request from this branch to the initial target branch.
 
-The fate of this pull request depends on the _auto approval mode_ which has been set in the <<auto-versioning-config,branch configuration>>:
+The `autoApproval` <<auto-versioning-config,branch configuration property>> (set to `true` by default) is used by Ontrack to check if created pull requests must managed at all.
 
+If set to `false`, Ontrack will just create a pull request and stop here.
+
+If set to `true`, the fate of the pull request depends on the _auto approval mode_ which has been set in the <<auto-versioning-config,branch configuration>>:
 
 |===
 |Auto approval mode |Description |Pro's |Con's
