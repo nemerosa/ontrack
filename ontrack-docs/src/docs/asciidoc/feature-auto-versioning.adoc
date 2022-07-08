@@ -230,10 +230,8 @@ a|This is the default behaviour. Ontrack takes the ownership of the pull request
 * PR is approved automatically
 * Ontrack waits for the PR to become mergeable
 * Ontrack merges the PR
-a|
-* Full visibility on the PR lifecycle within Ontrack
-a|
-* This creates additional load on Ontrack
+|Full visibility on the PR lifecycle within Ontrack
+|This creates additional load on Ontrack
 
 |`SCM`
 a|Ontrack relies on the SCM (GitHub for example) for the lifecycle of the pull request, in a "fire and forget" mode:
@@ -241,12 +239,46 @@ a|Ontrack relies on the SCM (GitHub for example) for the lifecycle of the pull r
 * PR is approved automatically
 * PR is set for auto merge
 * In the background, the PR will be merged automatically once all the conditions are met, but Ontrack does not follow that up
-a|
-* Less load on Ontrack since the PR lifecycle is fully managed by the SCM
-a|
-* Less visibility on the PR lifecycle from Ontrack
+|Less load on Ontrack since the PR lifecycle is fully managed by the SCM
+|Less visibility on the PR lifecycle from Ontrack
 
 |===
+
+[[auto-versioning-pr-config]]
+===== General configuration
+
+Both modes, `CLIENT` and `SCM`, need the SCM configuration used by Ontrack to have additional attributes.
+
+[[auto-versioning-pr-config-github]]
+====== General configuration for GitHub
+
+The GitHub configuration used by the Ontrack project must have its `autoMergeToken` attribute set to a GitHub Personal Access Token with the following permissions:
+
+* `repo`
+
+and the corresponding user must have at least the `Triage` role on the target repositories.
+
+[IMPORTANT]
+====
+This `autoMergeToken` must be linked to a user _which is not_ the user used by the GitHub configuration. It's because a user cannot approve their own pull requests.
+====
+
+[[auto-versioning-pr-client]]
+===== `CLIENT` mode
+
+No specific configuration is needed for the `CLIENT` mode.
+
+[[auto-versioning-pr-scm]]
+===== `SCM` mode
+
+There is some configuration to be done at SCM level.
+
+[[auto-versioning-pr-scm-github]]
+===== `SCM` mode for GitHub
+
+The target repository, the one defining the project being auto-versioned, must have the following settings:
+
+* the `Allow auto-merge` feature must be enabled in the repository
 
 [[auto-versioning-audit]]
 ==== Audit logs
