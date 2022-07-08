@@ -17,7 +17,7 @@ class JenkinsPostProcessingSettings(
     @APIDescription("Default Jenkins configuration to use for the connection")
     val config: String,
     @APILabel("Job")
-    @APIDescription("Default path to the job to launch for the post processing")
+    @APIDescription("Default path to the job to launch for the post-processing, relative to the Jenkins root URL (note that `/job/` separators can be omitted)")
     val job: String,
     @APILabel("Retries")
     @APIDescription("The amount of times we check for successful scheduling and completion of the post-processing job")
