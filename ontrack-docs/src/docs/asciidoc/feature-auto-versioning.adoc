@@ -74,6 +74,29 @@ ontrack:
 ----
 ====
 
+[[auto-versioning-queue]]
+===== Queue configuration
+
+Ontrack uses queues in RabbitMQ to schedule and process auto versioning events.
+
+By default, one and only one queue, called `auto-versioning.default.1` is available. When the load becomes too important, you can use two mechanisms to scale the auto versioning:
+
+* increase the number of default queues. You can set the `ontrack.extension.auto-versioning.queue.scale` <<configuration-properties-auto-versioning,configuration property>> to a higher number than 1
+
+* create dedicated queues for some projects, see below.
+
+[[auto-versioning-queue-dedicated]]
+====== Dedicated queues
+
+For a given Ontrack <<model,project>>, you can setup a dedicated queue, which will be used exclusively for this project (whereas the default queues are shared between all projects).
+
+Use the `ontrack.extension.auto-versioning.queue.projects` <<configuration-properties-auto-versioning,configuration property>> to defined a comma-separated list of projects which must have dedicated queues. For example, using environment variables:
+
+[source,bash]
+----
+ONTRACK_EXTENSION_AUTO_VERSIONING_QUEUE_PROJECTS=project-one,project-two
+----
+
 [[auto-versioning-audit]]
 ==== Audit logs
 
