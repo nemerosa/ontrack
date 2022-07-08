@@ -25,14 +25,7 @@ class ElasticMetricsExportExtension(
     override fun batchExportMetrics(metrics: Collection<Metric>) {
         elasticMetricsClient.saveMetrics(
             metrics.map { metric ->
-                ECSEntry(
-                    timestamp = metric.timestamp,
-                    event = ECSEvent(
-                        category = metric.metric,
-                    ),
-                    labels = metric.tags,
-                    ontrack = metric.fields,
-                )
+                metric.toECSEntry()
             }
         )
     }
