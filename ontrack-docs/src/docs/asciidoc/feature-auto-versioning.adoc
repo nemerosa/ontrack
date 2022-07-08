@@ -97,6 +97,41 @@ Use the `ontrack.extension.auto-versioning.queue.projects` <<configuration-prope
 ONTRACK_EXTENSION_AUTO_VERSIONING_QUEUE_PROJECTS=project-one,project-two
 ----
 
+[[auto-versioning-config]]
+==== Branch configuration
+
+TODO
+
+[[auto-versioning-post-processing]]
+==== Post processing
+
+In some cases, it's not enough to have only a version being updated into one file. Some additional post-processing may be needed.
+
+For example, if using Gradle or NPM dependency locks, after the version is updated, you'd need to resolve and write the new dependency locks.
+
+The Auto Versioning feature allows you to configure this post-processing.
+
+In the <<auto-versioning-config,branch configuration>>, you can set two properties for each source configuration:
+
+* `postProcessing` - ID of the post-processing mechanism
+* `postProcessingConfig` - configuration for the post-processing mechanism
+
+As of now, only two post-processing mechanisms are supported. See the sections below for their respective configurations.
+
+[[auto-versioning-post-processing-github]]
+===== GitHub post-processing
+
+You can delegate the post-processing to a GitHub workflow.
+
+TODO
+
+[[auto-versioning-post-processing-jenkins]]
+===== Jenkins post-processing
+
+You can delegate the post-processing to a Jenkins job.
+
+TODO
+
 [[auto-versioning-audit]]
 ==== Audit logs
 
