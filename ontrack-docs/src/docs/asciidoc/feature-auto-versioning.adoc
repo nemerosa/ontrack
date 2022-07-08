@@ -33,6 +33,10 @@ Result:
 
 This is valid from one module to a project, and can be easily extended to a full tree of dependent modules.
 
+The diagram below shows how this works:
+
+image::images/auto-versioning-overview.png[alt="Auto versioning overview"]
+
 [[auto-versioning-not]]
 ==== When not to use auto versioning
 
