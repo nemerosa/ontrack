@@ -213,6 +213,41 @@ The Jenkins job is responsible to:
 * run the `DOCKER_COMMAND` command inside the container
 * commit and push any change using the `COMMIT_MESSAGE` message to the `UPGRADE_BRANCH` branch
 
+[[auto-versioning-pr]]
+==== Pull requests
+
+After a branch is created to hold the new version, after this branch has been optionally post-processed, Ontrack will create a pull request from this branch to the initial target branch.
+
+The fate of this pull request depends on the _auto approval mode_ which has been set in the <<auto-versioning-config,branch configuration>>:
+
+
+|===
+|Auto approval mode |Description |Pro's |Con's
+
+|`CLIENT`
+a|This is the default behaviour. Ontrack takes the ownership of the pull request lifecycle:
+
+* PR is approved automatically
+* Ontrack waits for the PR to become mergeable
+* Ontrack merges the PR
+a|
+* Full visibility on the PR lifecycle within Ontrack
+a|
+* This creates additional load on Ontrack
+
+|`SCM`
+a|Ontrack relies on the SCM (GitHub for example) for the lifecycle of the pull request, in a "fire and forget" mode:
+
+* PR is approved automatically
+* PR is set for auto merge
+* In the background, the PR will be merged automatically once all the conditions are met, but Ontrack does not follow that up
+a|
+* Less load on Ontrack since the PR lifecycle is fully managed by the SCM
+a|
+* Less visibility on the PR lifecycle from Ontrack
+
+|===
+
 [[auto-versioning-audit]]
 ==== Audit logs
 
