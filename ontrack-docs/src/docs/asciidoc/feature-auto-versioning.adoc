@@ -47,3 +47,34 @@ Auto versioning on promotion is however particularly well suited to deal with si
 * modular monoliths
 * GitOps repositories with fixed versions
 
+[[auto-versioning-settings]]
+==== General configuration
+
+Auto versioning is not enabled by default. This can be done in the _Settings > Auto Versioning_.
+
+Three parameters are available:
+
+* _Enabled_ - check to enable auto versioning
+* _Audit retention_ - maximum number of seconds to keep non-running audit entries for auto versioning requests (see <<auto-versioning-audit>> for more information)
+* _Audit cleanup_ - maximum number of seconds to keep audit entries for auto versioning requests. This time is counted after the retention period for the non-running entries  (see <<auto-versioning-audit>> for more information)
+
+[NOTE]
+====
+These settings can also be <<casc,configured as code>>. For example using:
+
+[source,yaml]
+----
+ontrack:
+  config:
+    settings:
+      auto-versioning:
+        enabled: true
+        auditRetentionDuration: 14d
+        auditCleanupDuration: 90d
+----
+====
+
+[[auto-versioning-audit]]
+==== Audit logs
+
+TODO
