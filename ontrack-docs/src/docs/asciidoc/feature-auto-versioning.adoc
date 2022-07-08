@@ -287,3 +287,90 @@ The target repository, the one defining the project being auto-versioned, must h
 ==== Audit logs
 
 TODO
+
+[[auto-versioning-metrics]]
+==== Metrics
+
+The following operational metrics are exposed by Ontrack, which allow to track the load of the auto versioning processes:
+
+|===
+|Metric |Tags |Description |Type
+
+|ontrack_extension_auto_versioning_queue_produced_count
+a|
+* `routingKey` - RabbitMQ routing key used for the processing
+* `sourceProject` - source project
+* `targetProject` - target project
+* `targetBranch` - target branch
+| Number of processing orders queued
+| Count
+
+|ontrack_extension_auto_versioning_queue_consumed_count
+a|
+* `queue` - RabbitMQ queue used for the processing
+* `sourceProject` - source project
+* `targetProject` - target project
+* `targetBranch` - target branch
+| Number of processing orders queued
+| Count
+
+|ontrack_extension_auto_versioning_processing_completed_count
+a|
+* `outcome` - Result of the processing, one of `CREATED`, `SAME_VERSION` or `NO_CONFIG`
+* `sourceProject` - source project
+* `targetProject` - target project
+* `targetBranch` - target branch
+| Number of processing orders queued
+| Count
+
+|ontrack_extension_auto_versioning_processing_error_count
+| None
+| Number of processing orders stopped because of an error
+| Count
+
+|ontrack_extension_auto_versioning_processing_time
+a|
+* `queue` - RabbitMQ queue used for the processing
+* `sourceProject` - source project
+* `targetProject` - target project
+* `targetBranch` - target branch
+| Time it took to process an order
+| Timer
+
+|ontrack_extension_auto_versioning_post_processing_started_count
+a|
+* `postProcessing` - ID of the post-processor (`github`, ...)
+* `sourceProject` - source project
+* `targetProject` - target project
+* `targetBranch` - target branch
+| Number of post-processing having started
+| Count
+
+|ontrack_extension_auto_versioning_post_processing_success_count
+a|
+* `postProcessing` - ID of the post-processor (`github`, ...)
+* `sourceProject` - source project
+* `targetProject` - target project
+* `targetBranch` - target branch
+| Number of post-processing having completed with success
+| Count
+
+|ontrack_extension_auto_versioning_post_processing_error_count
+a|
+* `postProcessing` - ID of the post-processor (`github`, ...)
+* `sourceProject` - source project
+* `targetProject` - target project
+* `targetBranch` - target branch
+| Number of post-processing having completed with an error
+| Count
+
+|ontrack_extension_auto_versioning_post_processing_time
+a|
+* `postProcessing` - ID of the post-processor (`github`, ...)
+* `sourceProject` - source project
+* `targetProject` - target project
+* `targetBranch` - target branch
+| Time it took to complete the post-processing
+| Timer
+|===
+
