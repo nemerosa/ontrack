@@ -44,6 +44,18 @@ class ElasticMetricsConfigProperties {
     var custom = ElasticsearchProperties()
 
     /**
+     * Set to true to enable the API Compatibility mode when accessing a 8.x ES server.
+     *
+     * See https://www.elastic.co/guide/en/elasticsearch/client/java-rest/7.17/java-rest-high-compatibility.html
+     */
+    var apiCompatibilityMode: Boolean = false
+
+    /**
+     * Set to false to disable the possibility to clear the index in case of re-indexation
+     */
+    var allowDrop: Boolean = true
+
+    /**
      * Index properties
      */
     class IndexConfigProperties {

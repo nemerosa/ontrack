@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.casc.CascContext
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.getPropertyName
+import java.time.Duration
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
@@ -42,6 +43,10 @@ class CascJson : CascType("JSON type") {
     override val __type: String = "JSON"
 }
 
+class CascDuration: CascType("Duration") {
+    override val __type: String = "Duration"
+}
+
 sealed class CascScalar(
     override val __type: String,
     description: String,
@@ -57,6 +62,7 @@ val cascInt = CascInt()
 val cascLong = CascLong()
 val cascBoolean = CascBoolean()
 val cascJson = CascJson()
+val cascDuration = CascDuration()
 
 private val builtinTypes = listOf(
     cascString,
@@ -167,6 +173,7 @@ internal fun cascFieldType(property: KProperty<*>): CascType =
             Int::class -> cascInt
             Long::class -> cascLong
             JsonNode::class -> cascJson
+            Duration::class -> cascDuration
             else -> error("Cannot get CasC type for $property")
         }
     }

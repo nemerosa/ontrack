@@ -18,17 +18,14 @@ class ElasticMetricsExportExtension(
     private val elasticMetricsClient: ElasticMetricsClient,
 ) : AbstractExtension(extensionFeature), MetricsExportExtension {
 
+    override fun prepareReexport() {
+        elasticMetricsClient.dropIndex()
+    }
+
     override fun batchExportMetrics(metrics: Collection<Metric>) {
         elasticMetricsClient.saveMetrics(
             metrics.map { metric ->
-                ECSEntry(
-                    timestamp = metric.timestamp,
-                    event = ECSEvent(
-                        category = metric.metric,
-                    ),
-                    labels = metric.tags,
-                    ontrack = metric.fields,
-                )
+                metric.toECSEntry()
             }
         )
     }

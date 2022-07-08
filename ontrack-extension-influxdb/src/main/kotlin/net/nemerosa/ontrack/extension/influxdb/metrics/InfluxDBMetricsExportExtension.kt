@@ -35,6 +35,12 @@ class InfluxDBMetricsExportExtension(
         )
     }
 
+    /**
+     * Nothing to be done here. Tags are guarantying the unicity.
+     */
+    override fun prepareReexport() {
+    }
+
     override fun batchExportMetrics(metrics: Collection<Metric>) {
         influxDBConnection.safe {
             metrics.forEach { metric ->

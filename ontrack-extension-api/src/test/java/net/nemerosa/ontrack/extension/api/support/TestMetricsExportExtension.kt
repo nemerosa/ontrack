@@ -32,6 +32,12 @@ class TestMetricsExportExtension(
         enabled = false
     }
 
+    /**
+     * Nothing to be done here.
+     */
+    override fun prepareReexport() {
+    }
+
     override fun batchExportMetrics(metrics: Collection<Metric>) {
         if (enabled) {
             data.addAll(metrics.map {
