@@ -100,7 +100,168 @@ ONTRACK_EXTENSION_AUTO_VERSIONING_QUEUE_PROJECTS=project-one,project-two
 [[auto-versioning-config]]
 ==== Branch configuration
 
-TODO
+The configuration of a branch for the auto versioning of its dependencies can be done using:
+
+* the <<integration-graphql,GraphQL>> `setAutoVersioningConfig` mutation
+* the https://github.com/nemerosa/ontrack-jenkins-cli-pipeline[Jenkins Ontrack pipeline library]
+* the https://github.com/nemerosa/ontrack-github-ingestion-auto-versioning[`ontrack-github-ingestion-auto-versioning`] GitHub action which sets up auto versioning for the <<integration-github-ingestion,GitHub ingestion>>
+
+All these integrations rely on setting up an _auto versioning model_ for a branch which contains a list of _auto versioning source configurations_. This can be represented as YAML using:
+
+[source,yaml]
+----
+# List of configurations
+configurations:
+    # Project to watch
+    sourceProject: String
+    # Name of the branch to take into account for the dependency. Several branches can be selected using
+    # a regular expression. If several branches are eligible, only the latest version
+    # can be used, based on inverted order of semantic versioning. Branches which
+    # do not comply with semantic versioning are discarded.
+    # See <Targeting a series of branches> for more information.
+    sourceBranch: String
+    # Promotion to watch
+    sourcePromotion: String
+    # Comma-separated list of file to update with the new version
+    targetPath: String
+    # Regex to use in the target file to identify the line to replace with the new version.
+    # It must have a capturing group in position 1, which will be replaced by the actual version.
+    # For example:
+    # `coreVersion = (.*)`
+    targetRegex: String?
+    # Can be used instead of the `regex` when we consider
+    # property files. In the sample above, the target property can be set to `coreVersion`
+    targetProperty: String?
+    # When `property` is used, `propertyRegex` can define a regular expression to extract / update
+    # the actual version from/into the property value. The regular expression must contain at least
+    # one capturing group, holding the actual version value. This `propertyRegex` is useful for cases
+    # when the version is part of a bigger string, for example, for a Docker image qualified name.
+    # Example:
+    # When targetProperty = "repository/image:tag"
+    # to target tag, you can use targetPropertyRegex: "repository\/image\:(.*)"
+    targetPropertyRegex: String
+    # when `property` is set, defines how the target file
+    # must be handled. For example, it could be a dependency notation in a NPM `package.json` file, or
+    # a property entry in Java properties file for Gradle. For NPM, use `npm`. For Java properties,
+    # use `properties`. When not specified, it defaults to `properties`. Other types are available,
+    # see <Target files types>
+    targetPropertyType: String?
+    # Check if the PR must be approved automatically or not (`true` by default)
+    autoApproval: Boolean?,
+    # Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>`.
+    # If set manually, the `<project>` and `<version>` tokens can be used to be replaced respectively
+    # by the dependency project (the `project` above) and the actual version.
+    # Only the `<version>` token is required.
+    upgradeBranchPattern: String?
+    # Type of post-processing to launch after the version has been updated
+    postProcessing: String?
+    # Configuration of the post processing
+    postProcessingConfig: JsonNode?
+    # If defined, will create a validation stamp in the target branch being upgraded. If this parameter
+    # is set to `auto`, the validation stamp name will be created automatically from the source project,
+    # with `auto-versioning-` as a prefix.
+    validationStamp: String
+    # Auto approval mode
+    autoApprovalMode: CLIENT | SCM
+----
+
+[NOTE]
+====
+The auto versioning model for a branch, if set, is shown on the branch page.
+====
+
+[[auto-versioning-config-branch]]
+===== Targeting a series of branches
+
+In this scenario, the parent wants to be notified of a promotion on a series of branches,
+and Ontrack triggers the upgrade _only_ if the promotion has occurred on the _latest_ branch.
+
+Setup:
+
+* set the `branch` parameter to a regular expression on the Git branch, for example: `release\/.\..*`
+
+How does it work?
+
+* when a promotion occurs on the desired level, Ontrack gets the list of branches for the dependency, orders them by descending version, filter them using the regular version, and triggers an upgrade only if the promoted branch is the first in this list (latest in terms of version)
+
+Pro's:
+
+* simple
+* allows auto upgrades fairly easily
+
+Con's:
+
+* the dependency must really take care of a strong semantic versioning
+
+[[auto-versioning-config-type]]
+===== Target files types
+
+Auto versioning, in the end, works by updating a _target file_, designed in the configuration by the `path` property. Typically, it'll be a `gradle.properties` or a `package.json` file but it could be anything else.
+
+A regular expression (`regex` parameter) can be used to identify the change. This expression is used to 1) identify the current version 2) replace the current version by a new one. In order for this to work, the regular expression must:
+
+* match the whole target line in the target file
+* have a capturing group in position 1 identifying the version to read or replace
+
+It is also possible to use a higher level of file type, by specifying a _propertyName_ and optionally a _propertyType_.
+
+The _propertyName_ designates a _property_ in the target file and the _propertyType_ designates the type of the file to replace. Two types are currently supported:
+
+* `properties` (default) - Java properties file, typically used for a `gradle.properties` file
+* `npm` - NPM package file, typically used for `package.json`
+* `yaml` - YAML file, see <<auto-versioning-config-type-yaml>>
+
+See the <<auto-versioning-config-examples,examples section>> for their usage.
+
+[[auto-versioning-config-type-yaml]]
+====== YAML files
+
+When `propertyType` is set to `yaml`, `property` is expected to define a path inside the YAML file.
+
+This path is expressed using the https://docs.spring.io/spring/docs/4.3.25.RELEASE/spring-framework-reference/htmlsingle/#expressions[Spring Expression Language].
+
+For example, given the following YAML file (a deployment fragment in Kubernetes):
+
+[source,yaml]
+----
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  template:
+    spec:
+      containers:
+      - name: component
+        image: repo/component:0.1.1
+----
+
+In order to get to the `repo/component:0.1.1` value, the path to set will be:
+
+[source]
+----
+#root.^[kind == 'Deployment' and metadata.name == 'my-app'].spec.template.spec.containers.^[name == 'component'].image
+----
+
+See the https://docs.spring.io/spring/docs/4.3.25.RELEASE/spring-framework-reference/htmlsingle/#expressions[Spring Expression Language] reference
+for a complete reference but this expression already illustrates some key points:
+
+* `#root` refers to the "root object", used to evaluate the expression, in our case, the list of YAML "documents", separated by `---`
+* `.^[<filter>]` is an operator for a list, evaluating the given filter for each element until one element is found. Only the found
+element is returned.
+* `.name` returns the value of the `name` property on an object
+* literal strings are using single quotes, for example: `'Deployment'`
+
+If `property` is set to the expression mentioned above, the value being returned will be
+`repo/component:0.1.1`. However, we want to use `0.1.1`only.
+
+For this purpose, you need to specify also the `propertyRegex` and set it, for this example to:
+
+[source]
+----
+^repo\/component:(.*)$
+----
 
 [[auto-versioning-post-processing]]
 ==== Post processing
