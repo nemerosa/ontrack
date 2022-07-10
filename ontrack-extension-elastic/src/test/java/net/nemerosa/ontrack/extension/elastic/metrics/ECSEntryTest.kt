@@ -105,4 +105,37 @@ internal class ECSEntryTest {
         )
     }
 
+    @Test
+    fun `Two metrics with different timestamps have not the same ID`() {
+        val oneTime = Time.now()
+        val twoTime = oneTime.plusSeconds(1)
+        val metric = uid("m-")
+        val one = Metric(
+            metric = metric,
+            tags = mapOf(
+                "project" to "my-project",
+                "branch" to "my-branch",
+            ),
+            fields = mapOf(
+                "value" to 2.0,
+            ),
+            timestamp = oneTime,
+        )
+        val two = Metric(
+            metric = metric,
+            tags = mapOf(
+                "project" to "my-project",
+                "branch" to "my-branch",
+            ),
+            fields = mapOf(
+                "value" to 2.0,
+            ),
+            timestamp = twoTime,
+        )
+        assertTrue(
+            one.toECSEntry().computeId() != two.toECSEntry().computeId(),
+            "Two metrics with different timestamps have not the same ID"
+        )
+    }
+
 }
