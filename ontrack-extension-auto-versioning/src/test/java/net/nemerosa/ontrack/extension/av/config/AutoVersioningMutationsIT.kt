@@ -72,4 +72,70 @@ internal class AutoVersioningMutationsIT : AbstractAutoVersioningTestSupport() {
         }
     }
 
+    @Test
+    fun `Setting a configuration by name`() {
+        asAdmin {
+            project {
+                branch {
+                    run(
+                        """
+                        mutation {
+                            setAutoVersioningConfigByName(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                configurations: [
+                                    {
+                                        sourceProject: "A",
+                                        sourceBranch: "main",
+                                        sourcePromotion: "GOLD",
+                                        targetPath: "gradle.properties",
+                                        targetProperty: "a-version",
+                                    },
+                                    {
+                                        sourceProject: "B",
+                                        sourceBranch: "main",
+                                        sourcePromotion: "GOLD",
+                                        targetPath: "gradle.properties",
+                                        targetProperty: "b-version",
+                                        autoApprovalMode: CLIENT,
+                                    },
+                                ]
+                            }) {
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """
+                    ) { data ->
+                        checkGraphQLUserErrors(data, "setAutoVersioningConfigByName")
+                        val config = autoVersioningConfigurationService.getAutoVersioning(this)
+                        assertEquals(
+                            AutoVersioningConfig(
+                                listOf(
+                                    sourceConfig(
+                                        sourceProject = "A",
+                                        sourceBranch = "main",
+                                        sourcePromotion = "GOLD",
+                                        targetPath = "gradle.properties",
+                                        targetProperty = "a-version",
+                                    ),
+                                    sourceConfig(
+                                        sourceProject = "B",
+                                        sourceBranch = "main",
+                                        sourcePromotion = "GOLD",
+                                        targetPath = "gradle.properties",
+                                        targetProperty = "b-version",
+                                        autoApprovalMode = AutoApprovalMode.CLIENT,
+                                    ),
+                                )
+                            ),
+                            config
+                        )
+                    }
+                }
+            }
+        }
+    }
+
 }

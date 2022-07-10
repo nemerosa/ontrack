@@ -92,7 +92,12 @@ object GraphQLBeanConverter {
                                         ?: if (listRef.embedded) {
                                             getOrCreateEmbeddedInputType(elementType, listRef.suffix, dictionary)
                                         } else {
-                                            GraphQLTypeReference(elementType.simpleName)
+                                            val refName = if (listRef.suffix.isNotBlank()) {
+                                                "${elementType.simpleName}${listRef.suffix}"
+                                            } else {
+                                                elementType.simpleName
+                                            }
+                                            GraphQLTypeReference(refName)
                                         }
                                     fields += GraphQLInputObjectField.newInputObjectField()
                                         .name(name)

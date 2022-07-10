@@ -102,7 +102,7 @@ ONTRACK_EXTENSION_AUTO_VERSIONING_QUEUE_PROJECTS=project-one,project-two
 
 The configuration of a branch for the auto versioning of its dependencies can be done using:
 
-* the <<integration-graphql,GraphQL>> `setAutoVersioningConfig` mutation
+* the <<integration-graphql,GraphQL>> `setAutoVersioningConfig` or `setAutoVersioningConfigByName` mutation
 * the https://github.com/nemerosa/ontrack-jenkins-cli-pipeline[Jenkins Ontrack pipeline library]
 * the https://github.com/nemerosa/ontrack-github-ingestion-auto-versioning[`ontrack-github-ingestion-auto-versioning`] GitHub action which sets up auto versioning for the <<integration-github-ingestion,GitHub ingestion>>
 

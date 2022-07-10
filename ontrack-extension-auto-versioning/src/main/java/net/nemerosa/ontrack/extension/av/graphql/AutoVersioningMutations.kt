@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.extension.av.graphql
 
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
+import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -32,7 +34,27 @@ class AutoVersioningMutations(
                 )
             )
             branch
-        }
+        },
+
+        simpleMutation(
+            name = "setAutoVersioningConfigByName",
+            description = "Sets the auto versioning configuration for a branch identified by name",
+            input = SetAutoVersioningConfigByNameInput::class,
+            outputName = "branch",
+            outputDescription = "Configured branch",
+            outputType = Branch::class
+        ) { input ->
+            val branch = structureService.findBranchByName(input.project, input.branch)
+                .getOrNull()
+                ?: throw BranchNotFoundException(input.project, input.branch)
+            autoVersioningConfigurationService.setupAutoVersioning(
+                branch = branch,
+                config = AutoVersioningConfig(
+                    configurations = input.configurations
+                )
+            )
+            branch
+        },
 
     )
 }
