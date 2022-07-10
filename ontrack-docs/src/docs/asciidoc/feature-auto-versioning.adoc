@@ -436,6 +436,15 @@ When the details are shown, the following information is available:
 
 To avoid accumulating audit log entries forever, a cleanup job is run every day to remove obsolete entries. The behaviour of the cleanup is controlled through the <<auto-versioning-settings,global settings>>.
 
+[[auto-versioning-audit-metrics]]
+===== Audit metrics
+
+The following operational metrics is exposed as a gauge by the Ontrack auto versioning feature:
+
+* `ontrack_extension_auto_versioning_audit_state`
+* tags: `state` auto versioning state
+* count of auto versioning entries having this state
+
 [[auto-versioning-notifications]]
 ==== Notifications
 
