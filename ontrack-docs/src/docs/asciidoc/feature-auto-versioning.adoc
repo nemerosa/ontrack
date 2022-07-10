@@ -263,6 +263,43 @@ For this purpose, you need to specify also the `propertyRegex` and set it, for t
 ^repo\/component:(.*)$
 ----
 
+[[auto-versioning-config-examples]]
+===== Examples
+
+[[auto-versioning-config-examples-gradle]]
+====== Gradle update for last release
+
+To automatically update the `dependencyVersion` in `gradle.properties` to the latest version
+`1.*` of the project `dependency` when it is promoted to `GOLD`:
+
+* project: `dependency`
+* branch: `release/1\..*`
+* promotion: `GOLD`
+* path: `gradle.properties`
+* propertyName: `dependencyVersion`
+* propertyType: `properties` (or nothing, it's a default)
+* postProcessing: `...`
+* postProcessingConfig:
+** `dockerImage`: `openjdk/8`
+** `dockerCommand`: `./gradlew resolveAndLockAll --write-locks`
+
+[[auto-versioning-config-examples-npm]]
+====== NPM update for last release
+
+To automatically update the `@test/module` in `package.json` to the latest version
+`1.*` of the project `dependency` when it is promoted to `GOLD`:
+
+* project: `dependency`
+* branch: `release/1\..*`
+* promotion: `GOLD`
+* path: `package.json`
+* propertyName: `@test/module`
+* propertyType: `npm`
+* postProcessing: `...`
+* postProcessingConfig:
+** `dockerImage`: `node:jessie`
+** `dockerCommand`: `npm -i`
+
 [[auto-versioning-post-processing]]
 ==== Post processing
 
