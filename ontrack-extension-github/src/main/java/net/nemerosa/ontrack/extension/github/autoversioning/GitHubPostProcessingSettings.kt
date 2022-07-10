@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.model.annotations.APILabel
 
 class GitHubPostProcessingSettings(
     @APILabel("Configuration")
-    @APIDescription("Default Collibra configuration to use for the connection")
+    @APIDescription("Default GitHub configuration to use for the connection")
     val config: String?,
     @APILabel("Repository")
     @APIDescription("Default repository (like `owner/repository`) containing the workflow to run")
@@ -19,7 +19,7 @@ class GitHubPostProcessingSettings(
     @APILabel("Retries")
     @APIDescription("The amount of times we check for successful scheduling and completion of the post-processing job")
     val retries: Int,
-    @APILabel("Retry internal")
+    @APILabel("Retry interval")
     @APIDescription("The time (in seconds) between two checks for successful scheduling and completion of the post-processing job")
     val retriesDelaySeconds: Int,
 ) {
