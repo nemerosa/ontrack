@@ -1,16 +1,11 @@
 package net.nemerosa.ontrack.extension.casc.context.settings
 
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
-import net.nemerosa.ontrack.model.support.SettingsRepository
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import java.time.Duration
 import kotlin.test.assertEquals
 
 class SampleDurationSettingsCascIT : AbstractCascTestSupport() {
-
-    @Autowired
-    private lateinit var settingsRepository: SettingsRepository
 
     @Test
     fun `Casc duration`() {
