@@ -398,7 +398,38 @@ The target repository, the one defining the project being auto-versioned, must h
 [[auto-versioning-audit]]
 ==== Audit logs
 
-TODO
+All auto versioning processes and all their statuses are recorded in an audit log, which can be accessed using dedicated pages (and the <<integration-graphql,GraphQL API>>).
+
+The auto versioning audit can be accessed:
+
+* from the _Auto versioning audit_ user menu, for all projects and branches
+* from the _Tools > Auto versioning audit (target)_ from a project page when the project is considered a _target_ of the auto versioning
+* from the _Tools > Auto versioning audit (source)_ from a project page when the project is considered a _source_ of the auto versioning
+* from the _Tools > Auto versioning audit_ from a branch page when the branch is targeted by the auto versioning
+
+All these pages are similar and show:
+
+* a form to filter the audit log entries
+* a paginated list of audit log entries
+
+Each log entry contains the following information:
+
+* target project and branch (only available in global & project views)
+* source project
+* version being updated
+* <<auto-versioning-post-processing,post-processing>> ID if any
+* <<auto-versioning-pr,auto approval mode>> if any
+* running flag - is the auto versioning process still running?
+* current state of the auto versioning process
+* link to the <<auto-versioning-pr,PR>> if any
+* timestamp of the latest state
+* duration of the process until the latest state
+* a button to show more details about the process
+
+When the details are shown, the following information is available:
+
+* the history of the states of the process
+* a JSON representation of the auto versioning order
 
 [[auto-versioning-notifications]]
 ==== Notifications
