@@ -431,6 +431,11 @@ When the details are shown, the following information is available:
 * the history of the states of the process
 * a JSON representation of the auto versioning order
 
+[[auto-versioning-audit-cleanup]]
+===== Audit cleanup
+
+To avoid accumulating audit log entries forever, a cleanup job is run every day to remove obsolete entries. The behaviour of the cleanup is controlled through the <<auto-versioning-settings,global settings>>.
+
 [[auto-versioning-notifications]]
 ==== Notifications
 
