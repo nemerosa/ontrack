@@ -288,6 +288,15 @@ The target repository, the one defining the project being auto-versioned, must h
 
 TODO
 
+[[auto-versioning-notifications]]
+==== Notifications
+
+The auto versioning feature integrates with the <<notifications>> framework by emitting several events you can subscribe to:
+
+* `auto-versioning-success` - whenever an auto versioning process completes
+* `auto-versioning-error` - whenever an auto versioning process finishes with an error
+* `auto-versioning-pr-merge-timeout-error` - whenever an auto versioning process cannot merge a pull request because of a timeout on its merge condition (only when `autoApprovalMode` is set to `CLIENT` - see <<auto-versioning-pr>>)
+
 [[auto-versioning-metrics]]
 ==== Metrics
 
