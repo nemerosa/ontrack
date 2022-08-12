@@ -17,7 +17,10 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepr
 import net.nemerosa.ontrack.git.*
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import java.io.IOException
 
 @Component
 class GitHubConfigurator(
@@ -27,6 +30,8 @@ class GitHubConfigurator(
     private val ontrackGitHubClientFactory: OntrackGitHubClientFactory,
     private val gitHubAppTokenService: GitHubAppTokenService,
 ) : GitConfigurator {
+
+    private val logger: Logger = LoggerFactory.getLogger(GitHubConfigurator::class.java)
 
     override fun isProjectConfigured(project: Project): Boolean {
         return propertyService.hasProperty(project, GitHubProjectConfigurationPropertyType::class.java)
@@ -41,11 +46,16 @@ class GitHubConfigurator(
     override fun getPullRequest(configuration: GitConfiguration, id: Int): GitPullRequest? =
         if (configuration is GitHubGitConfiguration) {
             val client = ontrackGitHubClientFactory.create(configuration.property.configuration)
-            client.getPullRequest(
-                repository = configuration.property.repository,
-                id = id,
-                ignoreError = true,
-            )
+            try {
+                client.getPullRequest(
+                    repository = configuration.property.repository,
+                    id = id,
+                    ignoreError = true,
+                )
+            } catch (any: IOException) {
+                logger.error("Cannot check PR for a branch", any)
+                null
+            }
         } else {
             null
         }
