@@ -380,7 +380,7 @@ angular.module('ontrack.extension.indicators', [
         view.title = "Indicator view report";
 
         const query = `
-            query IndicatorViewReport($id: String!, $filledOnly: Boolean!, $duration: Int) {
+            query IndicatorViewReport($id: String!, $filledOnly: Boolean!, $duration: Int, $rate: String) {
               indicatorViewList {
                 views(id: $id) {
                   id
@@ -389,7 +389,7 @@ angular.module('ontrack.extension.indicators', [
                     id
                     name
                   }
-                  reports(filledOnly: $filledOnly, duration: $duration) {
+                  reports(filledOnly: $filledOnly, duration: $duration, rate: $rate) {
                     project {
                       id
                       name
@@ -430,6 +430,7 @@ angular.module('ontrack.extension.indicators', [
 
         $scope.filter = {
             filledOnly: true,
+            rate: '',
             duration: '',
         };
 
@@ -446,6 +447,11 @@ angular.module('ontrack.extension.indicators', [
                 queryVariables.duration = Number($scope.filter.duration);
             } else {
                 queryVariables.duration = null;
+            }
+            if ($scope.filter.rate) {
+                queryVariables.rate = $scope.filter.rate;
+            } else {
+                queryVariables.rate = null;
             }
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.theView = data.indicatorViewList.views[0];
