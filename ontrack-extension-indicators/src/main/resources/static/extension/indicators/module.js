@@ -614,13 +614,13 @@ angular.module('ontrack.extension.indicators', [
         view.title = "Indicator type report";
 
         const query = `
-            query IndicatorTypeReport($id: String!, $filledOnly: Boolean!) {
+            query IndicatorTypeReport($id: String!, $filledOnly: Boolean!, $rate: String) {
               indicatorTypes {
                 types(id: $id) {
                   id
                   name
                   link
-                  indicators(filledOnly: $filledOnly) {
+                  indicators(filledOnly: $filledOnly, rate: $rate) {
                     project {
                         id
                         name
@@ -653,17 +653,24 @@ angular.module('ontrack.extension.indicators', [
         `;
 
         $scope.filter = {
-            filledOnly: true
+            filledOnly: true,
+            rate: ''
         };
 
         let viewInitialized = false;
 
         $scope.loadReport = () => {
             $scope.loadingReport = true;
-            otGraphqlService.pageGraphQLCall(query, {
+            let queryVariables = {
                 id: typeId,
                 filledOnly: $scope.filter.filledOnly
-            }).then((data) => {
+            };
+            if ($scope.filter.rate) {
+                queryVariables.rate = $scope.filter.rate;
+            } else {
+                queryVariables.rate = null;
+            }
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.type = data.indicatorTypes.types[0];
 
                 if (!viewInitialized) {
