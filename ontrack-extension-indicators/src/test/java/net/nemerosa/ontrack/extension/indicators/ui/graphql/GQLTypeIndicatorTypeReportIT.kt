@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
+import net.nemerosa.ontrack.extension.indicators.model.Rating
+import net.nemerosa.ontrack.extension.indicators.support.Percentage
 import net.nemerosa.ontrack.test.assertJsonNotNull
 import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.Test
@@ -9,6 +11,70 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class GQLTypeIndicatorTypeReportIT : AbstractIndicatorsTestSupport() {
+
+    @Test
+    fun `Getting report for a type filtered on rate`() {
+        val type = category().percentageType(threshold = 100)
+        // Projects with indicator values for this category
+        val projects = (1..3).map { project() }
+        projects.forEachIndexed { pi, project ->
+                project.indicator(type, Percentage(pi * 30))
+                /**
+                 * List of values
+                 *
+                 * Project 0
+                 *      Type 0    Value = 0    Rating = F
+                 * Project 1
+                 *      Type 0    Value = 30   Rating = E
+                 * Project 2
+                 *      Type 0    Value = 60   Rating = C
+                 */
+        }
+
+        // Getting the view report for different rates
+        val expectedRates = mapOf(
+            Rating.A to (0..2),
+            Rating.B to (0..2),
+            Rating.C to (0..2),
+            Rating.D to (0..1),
+            Rating.E to (0..1),
+            Rating.F to (0..0),
+        )
+
+        expectedRates.forEach { (rating, expectedProjects) ->
+
+            run("""
+                {
+                    indicatorTypes {
+                        types(id: "${type.id}") {
+                            indicators(rate: "$rating") {
+                                project {
+                                    name
+                                }
+                            }
+                        }
+                    }
+                }
+            """).let { data ->
+                val reports = data.path("indicatorTypes").path("types").first().path("indicators")
+                val projectNames = reports.map { it.path("project").path("name").asText() }
+                val expectedProjectNames = expectedProjects.map { index ->
+                    projects[index].name
+                }
+
+                println("---- Checking for rate $rating")
+                println("Expecting: $expectedProjectNames")
+                println("Actual   : $projectNames")
+
+                assertEquals(
+                    expectedProjectNames,
+                    projectNames,
+                    "Expecting ${expectedProjectNames.size} projects having rating worse or equal than $rating"
+                )
+            }
+        }
+
+    }
 
     @Test
     fun `Getting indicator type values for all projects`() {
