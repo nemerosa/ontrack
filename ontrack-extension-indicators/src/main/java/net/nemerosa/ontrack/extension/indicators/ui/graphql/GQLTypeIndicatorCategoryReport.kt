@@ -3,10 +3,7 @@ package net.nemerosa.ontrack.extension.indicators.ui.graphql
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategory
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorService
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorType
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
+import net.nemerosa.ontrack.extension.indicators.model.*
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicator
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
@@ -36,9 +33,14 @@ class GQLTypeIndicatorCategoryReport(
             .description("Report of indicators for a category")
             // Reports per projects
             .field {
-                it.name(IndicatorCategoryReport::projectReport.name)
+                it.name("projectReport")
                     .description("Report of indicators per project")
+                    .rateArgument()
                     .type(listType(indicatorCategoryReportProject.typeRef))
+                    .dataFetcher { env ->
+                        val indicatorCategoryReport = env.getSource<IndicatorCategoryReport>()
+                        indicatorCategoryReport.getProjectReport(env)
+                    }
             }
             // Reports per type
             .field {
@@ -61,8 +63,11 @@ class GQLTypeIndicatorCategoryReport(
         private val reportEnv: DataFetchingEnvironment,
     ) {
 
-        val projectReport: List<GQLTypeIndicatorCategoryReportProject.IndicatorCategoryReportProject> by lazy {
-            projects.map { project ->
+        fun getProjectReport(
+            env: DataFetchingEnvironment,
+        ): List<GQLTypeIndicatorCategoryReportProject.IndicatorCategoryReportProject> {
+            val rate = env.getRateArgument()
+            return projects.map { project ->
                 GQLTypeIndicatorCategoryReportProject.IndicatorCategoryReportProject(
                     project = project,
                     indicators = types.map { type ->
@@ -71,6 +76,13 @@ class GQLTypeIndicatorCategoryReport(
                         }
                     }
                 )
+            }.filter { indicatorCategoryReportProject ->
+                // Keeps only the projects where an indicator is worse or equal to the given rate
+                rate == null || indicatorCategoryReportProject.indicators.any { projectIndicator ->
+                    projectIndicator.compliance?.let { compliance ->
+                        Rating.asRating(compliance.value) <= rate
+                    } ?: false
+                }
             }
         }
 
@@ -105,12 +117,12 @@ class GQLTypeIndicatorCategoryReport(
 
 @Component
 class GQLTypeIndicatorCategoryReportProject(
-    private val projectIndicator: GQLTypeProjectIndicator
+    private val projectIndicator: GQLTypeProjectIndicator,
 ) : GQLType {
 
     class IndicatorCategoryReportProject(
         val project: Project,
-        val indicators: List<ProjectIndicator>
+        val indicators: List<ProjectIndicator>,
     )
 
     override fun getTypeName(): String = "IndicatorCategoryReportProject"
@@ -139,12 +151,12 @@ class GQLTypeIndicatorCategoryReportProject(
 @Component
 class GQLTypeIndicatorCategoryReportType(
     private val indicatorType: GQLTypeProjectIndicatorType,
-    private val indicatorCategoryReportTypeEntryType: GQLTypeIndicatorCategoryReportTypeEntry
+    private val indicatorCategoryReportTypeEntryType: GQLTypeIndicatorCategoryReportTypeEntry,
 ) : GQLType {
 
     class IndicatorCategoryReportType(
         val type: IndicatorType<*, *>,
-        val projectIndicators: List<GQLTypeIndicatorCategoryReportTypeEntry.IndicatorCategoryReportTypeEntry>
+        val projectIndicators: List<GQLTypeIndicatorCategoryReportTypeEntry.IndicatorCategoryReportTypeEntry>,
     )
 
     override fun getTypeName(): String = "IndicatorCategoryReportType"
@@ -172,12 +184,12 @@ class GQLTypeIndicatorCategoryReportType(
 
 @Component
 class GQLTypeIndicatorCategoryReportTypeEntry(
-    private val projectIndicator: GQLTypeProjectIndicator
+    private val projectIndicator: GQLTypeProjectIndicator,
 ) : GQLType {
 
     class IndicatorCategoryReportTypeEntry(
         val project: Project,
-        val indicator: ProjectIndicator
+        val indicator: ProjectIndicator,
     )
 
     override fun getTypeName(): String = "IndicatorCategoryReportTypeEntry"
