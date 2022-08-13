@@ -20,6 +20,20 @@
                         Only projects with values
                     </label>
                 </div>
+                <div class="form-group">
+                    <label>
+                        With rating worse or equal than
+                        <select id="filter-rate" class="form-control" ng-model="filter.rate" ng-change="loadReport()">
+                            <option value="">All ratings</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                            <option value="E">E</option>
+                            <option value="F">F</option>
+                        </select>
+                    </label>
+                </div>
             </form>
         </div>
     </div>

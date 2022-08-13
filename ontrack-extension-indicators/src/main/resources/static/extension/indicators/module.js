@@ -380,7 +380,7 @@ angular.module('ontrack.extension.indicators', [
         view.title = "Indicator view report";
 
         const query = `
-            query IndicatorViewReport($id: String!, $filledOnly: Boolean!, $duration: Int) {
+            query IndicatorViewReport($id: String!, $filledOnly: Boolean!, $duration: Int, $rate: String) {
               indicatorViewList {
                 views(id: $id) {
                   id
@@ -389,7 +389,7 @@ angular.module('ontrack.extension.indicators', [
                     id
                     name
                   }
-                  reports(filledOnly: $filledOnly, duration: $duration) {
+                  reports(filledOnly: $filledOnly, duration: $duration, rate: $rate) {
                     project {
                       id
                       name
@@ -430,6 +430,7 @@ angular.module('ontrack.extension.indicators', [
 
         $scope.filter = {
             filledOnly: true,
+            rate: '',
             duration: '',
         };
 
@@ -446,6 +447,11 @@ angular.module('ontrack.extension.indicators', [
                 queryVariables.duration = Number($scope.filter.duration);
             } else {
                 queryVariables.duration = null;
+            }
+            if ($scope.filter.rate) {
+                queryVariables.rate = $scope.filter.rate;
+            } else {
+                queryVariables.rate = null;
             }
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.theView = data.indicatorViewList.views[0];
@@ -502,13 +508,13 @@ angular.module('ontrack.extension.indicators', [
         view.title = "Indicator category report";
 
         const query = `
-            query IndicatorCategoryReport($id: String!, $filledOnly: Boolean!) {
+            query IndicatorCategoryReport($id: String!, $filledOnly: Boolean!, $rate: String) {
               indicatorCategories {
                 categories(id: $id) {
                   id
                   name
                   report(filledOnly: $filledOnly) {
-                    projectReport {
+                    projectReport(rate: $rate) {
                         project {
                             id
                             name
@@ -551,17 +557,24 @@ angular.module('ontrack.extension.indicators', [
         `;
 
         $scope.filter = {
-            filledOnly: true
+            filledOnly: true,
+            rate: ''
         };
 
         let viewInitialized = false;
 
         $scope.loadReport = () => {
             $scope.loadingReport = true;
-            otGraphqlService.pageGraphQLCall(query, {
+            let queryVariables = {
                 id: categoryId,
                 filledOnly: $scope.filter.filledOnly
-            }).then((data) => {
+            };
+            if ($scope.filter.rate) {
+                queryVariables.rate = $scope.filter.rate;
+            } else {
+                queryVariables.rate = null;
+            }
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.category = data.indicatorCategories.categories[0];
                 $scope.report = $scope.category.report;
 
@@ -601,13 +614,13 @@ angular.module('ontrack.extension.indicators', [
         view.title = "Indicator type report";
 
         const query = `
-            query IndicatorTypeReport($id: String!, $filledOnly: Boolean!) {
+            query IndicatorTypeReport($id: String!, $filledOnly: Boolean!, $rate: String) {
               indicatorTypes {
                 types(id: $id) {
                   id
                   name
                   link
-                  indicators(filledOnly: $filledOnly) {
+                  indicators(filledOnly: $filledOnly, rate: $rate) {
                     project {
                         id
                         name
@@ -640,17 +653,24 @@ angular.module('ontrack.extension.indicators', [
         `;
 
         $scope.filter = {
-            filledOnly: true
+            filledOnly: true,
+            rate: ''
         };
 
         let viewInitialized = false;
 
         $scope.loadReport = () => {
             $scope.loadingReport = true;
-            otGraphqlService.pageGraphQLCall(query, {
+            let queryVariables = {
                 id: typeId,
                 filledOnly: $scope.filter.filledOnly
-            }).then((data) => {
+            };
+            if ($scope.filter.rate) {
+                queryVariables.rate = $scope.filter.rate;
+            } else {
+                queryVariables.rate = null;
+            }
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.type = data.indicatorTypes.types[0];
 
                 if (!viewInitialized) {

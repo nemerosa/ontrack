@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.indicators.ui.graphql
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategoryService
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
+import net.nemerosa.ontrack.extension.indicators.model.Rating
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorView
 import net.nemerosa.ontrack.extension.indicators.stats.IndicatorStatsService
 import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
@@ -51,10 +52,13 @@ class GQLTypeIndicatorView(
                     .type(listType(indicatorViewProjectReport.typeRef))
                     .arguments(indicatorReportingService.arguments)
                     .durationArgument()
+                    .rateArgument()
                     .dataFetcher { env ->
                         val view: IndicatorView = env.getSource()
                         // Gets the trending duration
                         val duration = env.getDurationArgument()
+                        // Gets the rate condition
+                        val rate = env.getRateArgument()
                         // Gets the list of all categories
                         val categories = view.categories.mapNotNull(indicatorCategoryService::findCategoryById)
                         // Gets the list of all the types
@@ -69,6 +73,17 @@ class GQLTypeIndicatorView(
                                     indicatorStatsService.getStatsForCategoryAndProject(category, project, duration)
                                 }
                             )
+                        }.filter { projectReport ->
+                            if (rate != null) {
+                                // At least one avg rate in one category must be worse or equal to this rate
+                                projectReport.viewStats.any { stats ->
+                                    stats.stats.avg?.let { candidate ->
+                                        Rating.asRating(candidate.value) <= rate
+                                    } ?: false
+                                }
+                            } else {
+                                true
+                            }
                         }
                     }
             }

@@ -6,6 +6,7 @@ import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorService
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorType
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
+import net.nemerosa.ontrack.extension.indicators.model.Rating
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicator
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicatorType
 import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
@@ -22,7 +23,7 @@ class GQLTypeProjectIndicatorType(
     private val indicatorReportingService: GQLIndicatorReportingService,
     private val indicatorService: IndicatorService,
     private val indicatorSource: GQLTypeIndicatorSource,
-    private val fieldContributors: List<GQLFieldContributor>
+    private val fieldContributors: List<GQLFieldContributor>,
 ) : GQLType {
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType = GraphQLObjectType.newObject()
@@ -79,6 +80,7 @@ class GQLTypeProjectIndicatorType(
                 .description("List of indicators for this type")
                 .type(listType(ProjectIndicator::class.toTypeRef()))
                 .arguments(indicatorReportingService.arguments)
+                .rateArgument()
                 .dataFetcher { env ->
                     val typeRef = env.getSource<ProjectIndicatorType>()
                     val type = indicatorTypeService.getTypeById(typeRef.id)
@@ -92,11 +94,20 @@ class GQLTypeProjectIndicatorType(
 
     private fun indicators(type: IndicatorType<*, *>, env: DataFetchingEnvironment): List<ProjectIndicator> {
         val projects = indicatorReportingService.findProjects(env, listOf(type))
+        val rate = env.getRateArgument()
         return projects.map { project ->
             ProjectIndicator(
                 project = project,
                 indicator = indicatorService.getProjectIndicator(project, type)
             )
+        }.filter { projectIndicator ->
+            if (rate != null) {
+                projectIndicator.compliance?.let { compliance ->
+                    Rating.asRating(compliance.value) <= rate
+                } ?: false
+            } else {
+                true
+            }
         }
     }
 

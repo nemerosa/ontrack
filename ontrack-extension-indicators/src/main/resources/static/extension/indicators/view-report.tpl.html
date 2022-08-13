@@ -14,10 +14,24 @@
     <div class="row" ng-hide="loadingReport">
         <div class="col-md-12">
             <form class="form-inline">
-                <div class="checkbox">
+                <div class="form-group checkbox">
                     <label>
-                        <input id="filter-filled-only" ng-model="filter.filledOnly" type="checkbox" ng-change="loadReport()">
                         Only projects with values
+                        <input id="filter-filled-only" ng-model="filter.filledOnly" type="checkbox" class="form-control" ng-change="loadReport()">
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        With rating worse or equal than
+                        <select id="filter-rate" class="form-control" ng-model="filter.rate" ng-change="loadReport()">
+                            <option value="">All ratings</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                            <option value="E">E</option>
+                            <option value="F">F</option>
+                        </select>
                     </label>
                 </div>
                 <div class="form-group">
