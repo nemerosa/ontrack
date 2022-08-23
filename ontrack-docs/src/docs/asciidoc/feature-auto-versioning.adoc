@@ -103,10 +103,10 @@ ONTRACK_EXTENSION_AUTO_VERSIONING_QUEUE_PROJECTS=project-one,project-two
 The configuration of a branch for the auto versioning of its dependencies can be done using:
 
 * the <<integration-graphql,GraphQL>> `setAutoVersioningConfig` or `setAutoVersioningConfigByName` mutation
-* the https://github.com/nemerosa/ontrack-jenkins-cli-pipeline[Jenkins Ontrack pipeline library]
-* the https://github.com/nemerosa/ontrack-github-ingestion-auto-versioning[`ontrack-github-ingestion-auto-versioning`] GitHub action which sets up auto versioning for the <<integration-github-ingestion,GitHub ingestion>>
+* <<auto-versioning-config-integrations-jenkins,Jenkins Ontrack pipeline library>> for Jenkins pipelines
+* <<auto-versioning-config-integrations-github,GitHub>> for the <<integration-github-ingestion,GitHub ingestion>>
 
-All these integrations rely on setting up an _auto versioning model_ for a branch which contains a list of _auto versioning source configurations_. This can be represented as YAML using:
+All these integrations rely on setting up a version of the _auto versioning model_ for a branch which contains a list of _auto versioning source configurations_. This can be represented as YAML using:
 
 [source,yaml]
 ----
@@ -262,6 +262,47 @@ For this purpose, you need to specify also the `propertyRegex` and set it, for t
 ----
 ^repo\/component:(.*)$
 ----
+
+[[auto-versioning-config-integrations]]
+===== Integrations
+
+[[auto-versioning-config-integrations-jenkins]]
+====== Jenkins pipeline
+
+By using the https://github.com/nemerosa/ontrack-jenkins-cli-pipeline[Jenkins Ontrack pipeline library], you can setup the auto versioning configuration for a branch.
+
+For example:
+
+[source,groovy]
+----
+ontrackCliAutoVersioning {
+    branch "main"
+    yaml "auto-versioning.yml"
+}
+----
+
+where `auto-versioning.yml` is a file in the repository containing for example:
+
+[source,yaml]
+----
+dependencies:
+  - project: my-library
+    branch: release-1.3"
+    promotion: IRON
+    path: gradle.properties
+    property: my-version
+    postProcessing: jenkins
+    postProcessingConfig:
+        dockerImage  : openjdk:8
+        dockerCommand: ./gradlew clean
+----
+
+[[auto-versioning-config-integrations-github]]
+====== GitHub Actions
+
+TBD
+
+https://github.com/nemerosa/ontrack-github-ingestion-auto-versioning[`ontrack-github-ingestion-auto-versioning`] GitHub action which sets up auto versioning for the <<integration-github-ingestion,GitHub ingestion>>
 
 [[auto-versioning-config-examples]]
 ===== Examples
