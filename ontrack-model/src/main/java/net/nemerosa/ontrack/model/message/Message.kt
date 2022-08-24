@@ -4,6 +4,7 @@ import java.time.LocalDateTime
 
 data class Message(
     val id: String,
+    val category: String,
     val datetime: LocalDateTime,
     val content: String,
     val type: MessageType,

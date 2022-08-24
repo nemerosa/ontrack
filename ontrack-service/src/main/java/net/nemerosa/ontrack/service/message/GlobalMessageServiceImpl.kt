@@ -19,6 +19,7 @@ class GlobalMessageServiceImpl(
             .map { (id, stored) ->
                 Message(
                     id = id,
+                    category = stored.category,
                     datetime = stored.datetime,
                     content = stored.content,
                     type = stored.type,
@@ -27,6 +28,7 @@ class GlobalMessageServiceImpl(
             .sortedWith(compareBy(Message::type, Message::datetime))
 
     private data class StoredMessage(
+        val category: String,
         val datetime: LocalDateTime,
         val content: String,
         val type: MessageType,
