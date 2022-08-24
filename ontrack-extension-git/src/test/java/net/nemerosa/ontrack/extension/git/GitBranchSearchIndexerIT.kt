@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.model.structure.SearchRequest
+import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertTrue
@@ -13,6 +14,11 @@ class GitBranchSearchIndexerIT : AbstractGitSearchTestSupport() {
 
     @Autowired
     protected lateinit var gitBranchSearchIndexer: GitBranchSearchIndexer
+
+    @Before
+    fun before() {
+        searchIndexService.resetIndex(gitBranchSearchIndexer, reindex = false)
+    }
 
     @Test
     fun `Looking for a Git branch`() {
