@@ -9,5 +9,5 @@ class LicenseExtensionFeature : AbstractExtensionFeature(
     "license",
     "License",
     "License management",
-    ExtensionFeatureOptions.DEFAULT
+    ExtensionFeatureOptions.DEFAULT.withGui(true)
 )
