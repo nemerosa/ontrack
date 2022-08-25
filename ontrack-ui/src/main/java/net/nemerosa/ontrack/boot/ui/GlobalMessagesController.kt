@@ -22,7 +22,7 @@ class GlobalMessagesController(
     )
 
     data class GlobalMessages(
-        val message: List<Message>,
+        val messages: List<Message>,
     )
 
 }

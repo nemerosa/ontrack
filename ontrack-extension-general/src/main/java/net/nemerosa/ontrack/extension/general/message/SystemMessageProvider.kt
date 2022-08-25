@@ -15,11 +15,11 @@ class SystemMessageProvider(
 
     override val globalMessages: List<Message>
         get() = cachedSettingsService.getCachedSettings(SystemMessageSettings::class.java)
-            .takeIf { it.content.isNotBlank() }
+            .takeIf { it.content != null && it.content.isNotBlank() }
             ?.let { settings ->
                 listOf(
                     Message(
-                        content = settings.content,
+                        content = settings.content!!,
                         type = settings.type,
                     )
                 )

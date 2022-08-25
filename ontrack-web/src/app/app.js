@@ -216,10 +216,6 @@ const ontrack = angular.module('ontrack', [
              * Scope methods
              */
 
-                // Global messages
-
-            $scope.globalMessages = [];
-
                 // Notification
 
             $scope.hasNotification = function () {
