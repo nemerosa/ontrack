@@ -12,4 +12,9 @@ class StripeLicenseConfigurationProperties {
      */
     var token: String? = null
 
+    /**
+     * Subscription ID
+     */
+    var subscription: String? = null
+
 }
