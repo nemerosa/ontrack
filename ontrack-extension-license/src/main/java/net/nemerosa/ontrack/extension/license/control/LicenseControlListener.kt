@@ -4,25 +4,25 @@ import net.nemerosa.ontrack.extension.license.LicenseService
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventListener
-import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 
 @Component
 class LicenseControlListener(
     private val licenseService: LicenseService,
-    private val structureService: StructureService,
-    private val securityService: SecurityService,
-): EventListener {
+    private val licenseControlService: LicenseControlService,
+) : EventListener {
 
     override fun onEvent(event: Event) {
         if (event.eventType == EventFactory.NEW_PROJECT) {
             val license = licenseService.license
-            if (license != null) {
-                val count = securityService.asAdmin {
-                    structureService.projectList.size
+            val control = licenseControlService.control(license)
+            if (license != null && !control.valid) {
+                if (control.expired) {
+                    throw LicenseExpiredException(license)
                 }
-                LicenseControl.control(license, count)
+                if (control.projectCountExceeded) {
+                    throw LicenseMaxProjectExceededException(license)
+                }
             }
         }
     }
