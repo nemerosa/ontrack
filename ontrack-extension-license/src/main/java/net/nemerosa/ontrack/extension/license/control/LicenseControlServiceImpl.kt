@@ -26,6 +26,7 @@ class LicenseControlServiceImpl(
 
 
     fun control(license: License, count: Int) = LicenseControl(
+        active = license.active,
         expired = isExpired(license),
         projectCountExceeded = isProjectCountExceeded(license, count),
     )

@@ -17,6 +17,9 @@ class LicenseControlListener(
             val license = licenseService.license
             val control = licenseControlService.control(license)
             if (license != null && !control.valid) {
+                if (!control.active) {
+                    throw LicenseInactiveException(license)
+                }
                 if (control.expired) {
                     throw LicenseExpiredException(license)
                 }

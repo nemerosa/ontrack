@@ -12,10 +12,13 @@ data class StripeSubscription(
     val status: String,
     @JsonProperty("current_period_end")
     val currentPeriodEnd: Long,
-): StripeMetadataContainer {
+) : StripeMetadataContainer {
     fun extractFirstPrice(): StripePrice =
         items.data.firstOrNull()?.price
             ?: error("Stripe subsccription has no price associated with it")
+
+    fun extractActiveFlag(): Boolean =
+        status == "trialing" || status == "active"
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -39,12 +42,12 @@ data class StripeSubscriptionItem(
 data class StripePrice(
     override val id: String,
     override val metadata: Map<String, String>,
-): StripeMetadataContainer
+) : StripeMetadataContainer
 
 interface StripeEntity {
     val id: String
 }
 
-interface StripeMetadataContainer: StripeEntity {
+interface StripeMetadataContainer : StripeEntity {
     val metadata: Map<String, String>
 }

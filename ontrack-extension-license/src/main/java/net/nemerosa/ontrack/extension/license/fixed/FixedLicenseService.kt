@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
     matchIfMissing = false
 )
 class FixedLicenseService(
-    private val fixedLicenseConfigurationProperties: FixedLicenseConfigurationProperties,
+    fixedLicenseConfigurationProperties: FixedLicenseConfigurationProperties,
 ) : LicenseService {
 
     override var license: License? = License(
@@ -21,6 +21,7 @@ class FixedLicenseService(
         assignee = fixedLicenseConfigurationProperties.assignee,
         validUntil = Time.fromStorage(fixedLicenseConfigurationProperties.validUntil),
         maxProjects = fixedLicenseConfigurationProperties.maxProjects,
+        active = fixedLicenseConfigurationProperties.active,
     )
 
 }

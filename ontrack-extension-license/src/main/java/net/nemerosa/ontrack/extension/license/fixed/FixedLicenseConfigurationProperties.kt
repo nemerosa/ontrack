@@ -12,5 +12,6 @@ class FixedLicenseConfigurationProperties {
     var assignee: String = "n/a"
     var validUntil: String? = null
     var maxProjects: Int = 0
+    var active: Boolean = true
 
 }

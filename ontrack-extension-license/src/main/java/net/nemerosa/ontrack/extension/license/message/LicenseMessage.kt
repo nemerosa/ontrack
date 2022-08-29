@@ -28,17 +28,21 @@ class LicenseMessage(
     internal fun checkLicense(license: License?): List<Message> {
         val messages = mutableListOf<Message>()
         if (license != null) {
+            if (!license.active) {
+                messages += Message(
+                    type = MessageType.ERROR,
+                    content = """License "${license.name}" is not active."""
+                )
+            }
             when {
-                isExpired(license) -> messages +=
-                    Message(
-                        type = MessageType.ERROR,
-                        content = """License "${license.name}" is expired. It was valid until ${license.validUntil}."""
-                    )
-                isAlmostExpired(license) -> messages +=
-                    Message(
-                        type = MessageType.WARNING,
-                        content = """License "${license.name}" expires at ${license.validUntil}."""
-                    )
+                isExpired(license) -> messages += Message(
+                    type = MessageType.ERROR,
+                    content = """License "${license.name}" is expired. It was valid until ${license.validUntil}."""
+                )
+                isAlmostExpired(license) -> messages += Message(
+                    type = MessageType.WARNING,
+                    content = """License "${license.name}" expires at ${license.validUntil}."""
+                )
             }
             if (license.maxProjects > 0) {
                 val count = securityService.asAdmin {
