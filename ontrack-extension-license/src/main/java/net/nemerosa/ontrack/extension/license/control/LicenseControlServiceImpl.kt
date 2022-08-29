@@ -33,12 +33,12 @@ class LicenseControlServiceImpl(
     private fun isExpired(license: License): Boolean =
         if (license.validUntil != null) {
             val now = Time.now()
-            now < license.validUntil
+            now >= license.validUntil
         } else {
             false
         }
 
     private fun isProjectCountExceeded(license: License, count: Int): Boolean =
-        count <= license.maxProjects
+        count >= license.maxProjects
 
 }
