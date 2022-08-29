@@ -28,6 +28,7 @@ abstract class AbstractLicenseTestSupport : AbstractDSLTestSupport() {
                 assignee = "CI",
                 validUntil = validUntil,
                 maxProjects = maxProjects,
+                active = true,
             )
             code()
         } finally {
