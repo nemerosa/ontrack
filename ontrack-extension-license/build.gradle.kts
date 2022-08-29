@@ -6,11 +6,18 @@ plugins {
 
 apply<OntrackExtensionPlugin>()
 
+repositories {
+    maven {
+        url = uri("https://licensespring-maven.s3.eu-central-1.amazonaws.com/")
+    }
+}
+
 dependencies {
     api(project(":ontrack-extension-support"))
     api(project(":ontrack-ui-support"))
 
     implementation(project(":ontrack-ui-graphql"))
+    implementation("com.licensespring:licensespring-license-management:2.5.4")
 
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
