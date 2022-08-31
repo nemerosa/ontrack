@@ -20,7 +20,7 @@ class LicenseControlListener(
                 if (!control.active) {
                     throw LicenseInactiveException(license)
                 }
-                if (control.expired) {
+                if (control.expiration == LicenseExpiration.EXPIRED) {
                     throw LicenseExpiredException(license)
                 }
                 if (control.projectCountExceeded) {

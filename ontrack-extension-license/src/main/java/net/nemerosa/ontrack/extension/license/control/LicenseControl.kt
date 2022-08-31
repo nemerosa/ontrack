@@ -2,16 +2,16 @@ package net.nemerosa.ontrack.extension.license.control
 
 data class LicenseControl(
     val active: Boolean,
-    val expired: Boolean,
+    val expiration: LicenseExpiration,
     val projectCountExceeded: Boolean,
 ) {
 
-    val valid = active && !expired && !projectCountExceeded
+    val valid = active && (expiration != LicenseExpiration.EXPIRED) && !projectCountExceeded
 
     companion object {
         val OK = LicenseControl(
             active = true,
-            expired = false,
+            expiration = LicenseExpiration.OK,
             projectCountExceeded = false,
         )
     }

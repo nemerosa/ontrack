@@ -61,6 +61,9 @@ internal class LicenseMessageIT : AbstractLicenseTestSupport() {
 
     @Test
     fun `Error when project count exceeded`() {
+        repeat(2) {
+            project()
+        }
         asAdmin {
             val count = structureService.projectList.size
             withLicense(maxProjects = count) {
@@ -80,6 +83,9 @@ internal class LicenseMessageIT : AbstractLicenseTestSupport() {
 
     @Test
     fun `Error and warning when project count exceeded and almost expired`() {
+        repeat(2) {
+            project()
+        }
         asAdmin {
             val validUntil = Time.now().plusDays(10)
             val count = structureService.projectList.size

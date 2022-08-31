@@ -18,9 +18,12 @@ class LicenseControlIT : AbstractLicenseTestSupport() {
 
     @Test
     fun `Cannot create a project when number of projects is exceeded`() {
+        repeat(2) {
+            project()
+        }
         asAdmin {
             val count = structureService.projectList.size
-            withLicense(maxProjects = count) {
+            withLicense(maxProjects = count - 1) {
                 assertFailsWith<LicenseMaxProjectExceededException> {
                     project()
                 }
