@@ -1,0 +1,23 @@
+query Search(
+    $token: String!,
+    $size: Int!,
+) {
+    search(token: $token, size: $size) {
+        pageInfo {
+            ...PageInfoContent
+        }
+        pageItems {
+            type {
+                id
+                name
+                description
+                feature {
+                    id
+                }
+            }
+            title
+            description
+            accuracy
+        }
+    }
+}
