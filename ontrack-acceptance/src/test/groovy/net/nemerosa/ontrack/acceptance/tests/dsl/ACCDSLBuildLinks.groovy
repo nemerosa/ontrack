@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.acceptance.AbstractACCDSL
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.v4.SearchResult
 import net.nemerosa.ontrack.dsl.v4.http.OTNotFoundException
+import org.junit.Ignore
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
@@ -15,6 +16,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 class ACCDSLBuildLinks extends AbstractACCDSL {
 
     @Test
+    @Ignore
     void 'Build link search'() {
         // Creating two builds with some build links
         def p1 = uid('P1')
