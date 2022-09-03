@@ -10,6 +10,14 @@ pipeline {
         GPG_KEY_RING = credentials("GPG_KEY_RING")
     }
 
+    parameters {
+        booleanParam(
+                name: 'SKIP_ACCEPTANCE',
+                defaultValue: false,
+                description: 'Skipping acceptance tests'
+        )
+    }
+
     agent {
         docker {
             image "nemerosa/ontrack-build:3.2.1"
@@ -146,6 +154,9 @@ pipeline {
                 not {
                     branch 'master'
                 }
+                expression {
+                    return !params.SKIP_ACCEPTANCE
+                }
             }
             environment {
                 ONTRACK_ACCEPTANCE_GITHUB_ORGANIZATION = credentials("ONTRACK_ACCEPTANCE_GITHUB_ORGANIZATION")
@@ -185,6 +196,9 @@ pipeline {
             when {
                 not {
                     branch 'master'
+                }
+                expression {
+                    return !params.SKIP_ACCEPTANCE
                 }
             }
             steps {
@@ -245,6 +259,9 @@ pipeline {
                 not {
                     branch "master"
                 }
+                expression {
+                    return !params.SKIP_ACCEPTANCE
+                }
             }
             steps {
                 timeout(time: 25, unit: 'MINUTES') {
@@ -289,6 +306,9 @@ pipeline {
             when {
                 not {
                     branch "master"
+                }
+                expression {
+                    return !params.SKIP_ACCEPTANCE
                 }
             }
             steps {
