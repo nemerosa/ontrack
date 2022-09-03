@@ -19,6 +19,7 @@ import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHubConfigurationProper
 import org.apache.commons.codec.binary.Base64
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpClientErrorException.NotFound
+import org.springframework.web.client.RestClientException
 import java.util.*
 import kotlin.test.assertTrue
 import kotlin.test.fail
@@ -56,7 +57,11 @@ fun withTestGitHubRepository(
 
     } finally {
         // Deleting the repository
-        gitHubClient.delete("/repos/${ACCProperties.GitHub.organization}/$repo")
+        try {
+            gitHubClient.delete("/repos/${ACCProperties.GitHub.organization}/$repo")
+        } catch (ignored: RestClientException) {
+            // Ignoring errors at deletion
+        }
     }
 }
 
