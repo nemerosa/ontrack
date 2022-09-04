@@ -96,6 +96,20 @@
         </div>
     </nav>
 
+    <!-- Global messages -->
+
+    <div class="container-fluid" ng-if="globalMessages.length > 0">
+        <div ng-repeat="message in globalMessages">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="ot-global-message-{{ message.type.toLowerCase() }}">
+                        <span>{{ message.content }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Notification section -->
 
     <div class="container-fluid" ng-if="hasNotification()">

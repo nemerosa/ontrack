@@ -56,29 +56,31 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
 
     @Test
     void 'Login with Keycloak and sets as admin'() {
-        withKeycloakConfigured { String realm, userAdmin, _ ->
-            browser { browser ->
-                // Initial login
-                def loginPage = goTo(LoginPage, [:])
-                assert loginPage.hasExtension(realm): "OIDC extension is present"
-                def keycloakLoginPage = loginPage.useExtension(realm)
-                def homePage = keycloakLoginPage.login(userAdmin, "secret")
-                def userName = homePage.header.userName
-                assert userName == "Admin ${userAdmin}"
-                loginPage = homePage.logout()
-                // Setup of group mappings
-                ontrack.admin.setGroupMapping("oidc", realm, "ontrack-admin", "Administrators")
-                // Re-login
-                assert loginPage.hasExtension(realm): "OIDC extension is present"
-                homePage = loginPage.useExtension(realm, HomePage) // We are already authenticated in Keycloak, going directly to the Home page
-                // Checks the user can create a project
-                def projectName = uid('P')
-                homePage.createProject {
-                    name = projectName
-                    description = "Project ${projectName}"
+        withMaxProjects(100) {
+            withKeycloakConfigured { String realm, userAdmin, _ ->
+                browser { browser ->
+                    // Initial login
+                    def loginPage = goTo(LoginPage, [:])
+                    assert loginPage.hasExtension(realm): "OIDC extension is present"
+                    def keycloakLoginPage = loginPage.useExtension(realm)
+                    def homePage = keycloakLoginPage.login(userAdmin, "secret")
+                    def userName = homePage.header.userName
+                    assert userName == "Admin ${userAdmin}"
+                    loginPage = homePage.logout()
+                    // Setup of group mappings
+                    ontrack.admin.setGroupMapping("oidc", realm, "ontrack-admin", "Administrators")
+                    // Re-login
+                    assert loginPage.hasExtension(realm): "OIDC extension is present"
+                    homePage = loginPage.useExtension(realm, HomePage) // We are already authenticated in Keycloak, going directly to the Home page
+                    // Checks the user can create a project
+                    def projectName = uid('P')
+                    homePage.createProject {
+                        name = projectName
+                        description = "Project ${projectName}"
+                    }
+                    // Checks the project is visible in the list
+                    assert homePage.isProjectPresent(projectName)
                 }
-                // Checks the project is visible in the list
-                assert homePage.isProjectPresent(projectName)
             }
         }
     }

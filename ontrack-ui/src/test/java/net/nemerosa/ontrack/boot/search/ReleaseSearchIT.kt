@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.general.RELEASE_SEARCH_INDEX
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.model.structure.SearchRequest
 import net.nemerosa.ontrack.test.TestUtils.uid
+import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -11,6 +12,7 @@ import kotlin.test.assertTrue
 class ReleaseSearchIT : AbstractSearchTestSupport() {
 
     @Test
+    @Ignore("flaky")
     fun `Looking for builds with release information after creation`() {
         val value = uid("V")
         project {

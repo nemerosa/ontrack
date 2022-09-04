@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.test.assertJsonNotNull
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -307,6 +308,7 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
     }
 
     @Test
+    @Ignore("flaky")
     fun `Change log export of issues without grouping and with exclusions`() {
         doTestChangeLogExport("""            |
             |* #2 Issue #2

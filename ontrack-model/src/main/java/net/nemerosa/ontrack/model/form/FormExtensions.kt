@@ -70,3 +70,21 @@ fun Form.selectionOfString(
             .items(items.map { IdName(it, it) })
             .value(value)
     )
+
+inline fun <reified E : Enum<E>> Form.enumField(
+    property: KProperty1<*, E?>,
+    value: E?,
+): Form =
+    with(
+
+        Selection.of(property.name)
+            .label(getPropertyLabel(property))
+            .help(getPropertyDescription(property))
+            .optional(property.returnType.isMarkedNullable)
+            .items(
+                enumValues<E>().map { e ->
+                    IdName(id = e.name, name = e.name)
+                }
+            )
+            .value(value?.name)
+    )

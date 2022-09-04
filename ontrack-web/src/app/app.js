@@ -31,6 +31,7 @@ const ontrack = angular.module('ontrack', [
         'ot.service.core',
         'ot.service.user',
         'ot.service.info',
+        'ot.service.globalMessage',
         'ot.service.task',
         'ot.service.form',
         'ot.service.action',
@@ -101,7 +102,7 @@ const ontrack = angular.module('ontrack', [
             $urlRouterProvider.deferIntercept();
         })
         // Initialisation work
-        .run(function ($rootScope, $log, $http, $ocLazyLoad, $q, $urlRouter, ot, otUserService, otInfoService, otSearchService) {
+        .run(function ($rootScope, $log, $http, $ocLazyLoad, $q, $urlRouter, ot, otUserService, otInfoService, otGlobalMessageService) {
             /**
              * Loading the extensions
              */
@@ -119,7 +120,7 @@ const ontrack = angular.module('ontrack', [
                              // Computing the path to the extension
                              var extensionPath;
                              var extensionVersion = extension.version;
-                             if (extensionVersion && extensionVersion != 'none') {
+                             if (extensionVersion && extensionVersion !== 'none') {
                                  extensionPath = 'extension/' + extension.id + '/' + extensionVersion + '/module.js';
                              } else {
                                  extensionPath = 'extension/' + extension.id + '/module.js';
@@ -166,6 +167,11 @@ const ontrack = angular.module('ontrack', [
              */
 
             otInfoService.init();
+
+            /**
+             * Global messages
+             */
+            otGlobalMessageService.init();
 
             /**
              * Global search
