@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventListener
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PropertyService
@@ -14,7 +15,8 @@ import org.springframework.stereotype.Component
 @Component
 class SonarQubeMeasuresEventListener(
         private val propertyService: PropertyService,
-        private val sonarQubeMeasuresCollectionService: SonarQubeMeasuresCollectionService
+        private val sonarQubeMeasuresCollectionService: SonarQubeMeasuresCollectionService,
+        private val cachedSettingsService: CachedSettingsService,
 ) : EventListener {
     override fun onEvent(event: Event) {
         if (event.eventType == EventFactory.NEW_VALIDATION_RUN) {
@@ -22,7 +24,7 @@ class SonarQubeMeasuresEventListener(
             val build: Build = event.getEntity(ProjectEntityType.BUILD)
             // Gets the project & the SonarQube property
             val project = build.project
-            val property: SonarQubeProperty? = propertyService.getProperty(project, SonarQubePropertyType::class.java).value
+            val property: SonarQubeProperty? = propertyService.getPropertyValue(project, SonarQubePropertyType::class.java)
             if (property != null) {
                 // Gets the validation stamp
                 val stamp: ValidationStamp = event.getEntity(ProjectEntityType.VALIDATION_STAMP)
@@ -30,8 +32,12 @@ class SonarQubeMeasuresEventListener(
                 if (stamp.name == property.validationStamp) {
                     // Filtering on the branch
                     if (sonarQubeMeasuresCollectionService.matches(build, property)) {
-                        // Launching the collection of metrics
-                        sonarQubeMeasuresCollectionService.collect(build, property)
+                        // Checking the settings
+                        val settings = cachedSettingsService.getCachedSettings(SonarQubeMeasuresSettings::class.java)
+                        if (!settings.disabled) {
+                            // Launching the collection of metrics
+                            sonarQubeMeasuresCollectionService.collect(build, property)
+                        }
                     }
                 }
             }

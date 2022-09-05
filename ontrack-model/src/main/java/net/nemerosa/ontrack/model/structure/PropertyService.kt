@@ -73,6 +73,15 @@ interface PropertyService {
     fun <T> getProperty(entity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>): Property<T>
 
     /**
+     * This method is better suited for testing but can also be used in most of other cases
+     *
+     * @param entity            Entity to get the edition form for
+     * @param propertyTypeClass Class of the property type to get the property for
+     * @return A response that defines the property
+     */
+    fun <T> getPropertyValue(entity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>): T?
+
+    /**
      * Edits the value of a property.
      *
      * @param entity           Entity to edit
