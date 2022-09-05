@@ -73,6 +73,10 @@ class PropertyServiceImpl(
         return getProperty(entity, propertyTypeClass.name)
     }
 
+    override fun <T> getPropertyValue(entity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>): T? {
+        return getProperty(entity, propertyTypeClass).value
+    }
+
     override fun <T> hasProperty(entity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>): Boolean {
         return propertyRepository.hasProperty(propertyTypeClass.name, entity.projectEntityType, entity.id)
     }
