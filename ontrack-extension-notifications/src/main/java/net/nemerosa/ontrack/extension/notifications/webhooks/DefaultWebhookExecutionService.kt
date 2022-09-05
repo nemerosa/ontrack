@@ -69,7 +69,7 @@ class DefaultWebhookExecutionService(
                 "type" to payload.type,
             ) {
                 client.send(request, BodyHandlers.ofString())
-            }
+            } ?: error("Did not receive a valid HTTP response")
             meterRegistry.increment(
                 WebhookMetrics.webhook_delivery_answered,
                 "webhook" to webhook.name,
