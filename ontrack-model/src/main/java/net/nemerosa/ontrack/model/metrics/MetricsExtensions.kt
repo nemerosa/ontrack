@@ -29,10 +29,10 @@ fun MeterRegistry.increment(
 fun <T> MeterRegistry.time(
         name: String,
         vararg tags: Pair<String, String>,
-        code: () -> T
-): T {
+        code: () -> T?
+): T? {
     val timer = timer(name, tags.map { Tag.of(it.first, it.second) })
-    return timer.record(code)!!
+    return timer.record(code)
 }
 
 
@@ -54,8 +54,8 @@ fun <T> MeterRegistry.measure(
         error: String,
         time: String,
         tags: Map<String, String>,
-        code: () -> T
-): T {
+        code: () -> T?
+): T? {
     val actualTags = tags.toList().toTypedArray()
     increment(started, *actualTags)
     return try {
