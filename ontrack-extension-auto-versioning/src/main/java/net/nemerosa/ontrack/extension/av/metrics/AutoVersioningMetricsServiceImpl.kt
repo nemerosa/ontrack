@@ -38,7 +38,7 @@ class AutoVersioningMetricsServiceImpl(
         *getTags(order, AutoVersioningMetrics.Tags.QUEUE to (queue ?: "-")).toTypedArray()
     ) {
         code()
-    }
+    } ?: error("Could not get the outcome of the processing.")
 
     override fun onProcessingCompleted(order: AutoVersioningOrder, outcome: AutoVersioningProcessingOutcome) {
         meterRegistry.increment(
