@@ -123,10 +123,7 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
                         "measure-1" to 12.3,
                         "measure-2" to 45.0
                 ),
-                returnedMeasures = mapOf(
-                        "measure-1" to 12.3,
-                        "measure-2" to 45.0
-                )
+                returnedMeasures = null,
         )
     }
 
