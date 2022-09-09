@@ -16,25 +16,25 @@ data class AutoVersioningSourceConfig(
     @APIDescription("Comma-separated list of file to update with the new version")
     val targetPath: String,
     @APIDescription("Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version.")
-    override val targetRegex: String?,
+    override val targetRegex: String? = null,
     @APIDescription("Optional replacement for the regex, using only a property name")
-    override val targetProperty: String?,
+    override val targetProperty: String? = null,
     @APIDescription("Optional regex to use on the targetProperty value")
-    override val targetPropertyRegex: String?,
+    override val targetPropertyRegex: String? = null,
     @APIDescription("When targetProperty is defined, defines the type of property (defaults to Java properties file, but could be NPM, etc.)")
-    override val targetPropertyType: String?,
+    override val targetPropertyType: String? = null,
     @APIDescription("Check if the PR must be approved automatically or not (`true` by default)")
-    val autoApproval: Boolean?,
+    val autoApproval: Boolean? = null,
     @APIDescription("Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>`")
-    val upgradeBranchPattern: String?,
+    val upgradeBranchPattern: String? = null,
     @APIDescription("Type of post processing to launch after the version has been updated")
-    val postProcessing: String?,
+    val postProcessing: String? = null,
     @APIDescription("Configuration of the post processing")
-    val postProcessingConfig: JsonNode?,
+    val postProcessingConfig: JsonNode? = null,
     @APIDescription("Validation stamp to create on auto versioning (optional)")
-    val validationStamp: String?,
+    val validationStamp: String? = null,
     @APIDescription("Auto approval mode")
-    val autoApprovalMode: AutoApprovalMode?,
+    val autoApprovalMode: AutoApprovalMode? = null,
 ) : AutoVersioningTargetConfig {
 
     /**
