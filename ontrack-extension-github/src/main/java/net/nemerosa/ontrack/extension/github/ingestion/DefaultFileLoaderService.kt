@@ -17,14 +17,14 @@ class DefaultFileLoaderService(
 
     override fun loadFile(branch: Branch, path: String): String? {
         val gitHubProjectProperty =
-            propertyService.getProperty(branch.project, GitHubProjectConfigurationPropertyType::class.java).value
+            propertyService.getPropertyValue(branch.project, GitHubProjectConfigurationPropertyType::class.java)
                 ?: return null
         val pr = gitService.getBranchAsPullRequest(branch)
         val ref = if (pr != null) {
             pr.source
         } else {
             val gitBranchProperty =
-                propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java).value
+                propertyService.getPropertyValue(branch, GitBranchConfigurationPropertyType::class.java)
                     ?: return null
             gitBranchProperty.branch
         }
