@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.acceptance.AcceptanceTestClient
 import net.nemerosa.ontrack.acceptance.browser.pages.HomePage
 import net.nemerosa.ontrack.acceptance.browser.pages.LoginPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
+import org.junit.Before
 import org.junit.Test
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.admin.client.KeycloakBuilder
@@ -14,6 +15,11 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 
 @AcceptanceTestSuite
 class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
+
+    @Before
+    void 'Clear projects first'() {
+        deleteAllProjects()
+    }
 
     @Test
     void 'Login with Keycloak'() {
