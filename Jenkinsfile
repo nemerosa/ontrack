@@ -118,23 +118,10 @@ pipeline {
                         --no-daemon \\
                         --console plain
                 '''
-                sh '''
-                    echo "(*) Building the test extension..."
-                    cd ontrack-extension-test
-                    ./gradlew \\
-                        clean \\
-                        build \\
-                        -PontrackVersion=${VERSION} \\
-                        -PbowerOptions='--allow-root' \\
-                        -Dorg.gradle.jvmargs=-Xmx2048m \\
-                        --stacktrace \\
-                        --console plain
-                '''
                 echo "Pushing image to registry..."
                 sh '''
                     docker tag nemerosa/ontrack:${VERSION} docker.nemerosa.net/nemerosa/ontrack:${VERSION}
                     docker tag nemerosa/ontrack-acceptance:${VERSION} docker.nemerosa.net/nemerosa/ontrack-acceptance:${VERSION}
-                    docker tag nemerosa/ontrack-extension-test:${VERSION} docker.nemerosa.net/nemerosa/ontrack-extension-test:${VERSION}
                 '''
             }
             post {
@@ -248,54 +235,6 @@ pipeline {
                         docker-compose \\
                             --project-name local \\
                             --file docker-compose.yml \\
-                            down --volumes
-                    '''
-                }
-            }
-        }
-
-        stage('Local extension tests') {
-            when {
-                not {
-                    branch "master"
-                }
-                expression {
-                    return !params.SKIP_ACCEPTANCE
-                }
-            }
-            steps {
-                timeout(time: 25, unit: 'MINUTES') {
-                    // Cleanup
-                    sh ' rm -rf ontrack-acceptance/src/main/compose/build '
-                    // Launches the tests
-                    sh '''
-                        cd ontrack-acceptance/src/main/compose
-                        docker-compose \\
-                            --project-name ext \\
-                            --file docker-compose-ext.yml \\
-                            up \\
-                            --exit-code-from ontrack_acceptance
-                    '''
-                }
-            }
-            post {
-                always {
-                    sh '''
-                        mkdir -p build
-                        rm -rf build/extension
-                        cp -r ontrack-acceptance/src/main/compose/build build/extension
-                    '''
-                    ontrackCliValidateTests(
-                            stamp: 'EXTENSIONS',
-                            pattern: 'build/extension/*.xml',
-                    )
-                }
-                cleanup {
-                    sh '''
-                        cd ontrack-acceptance/src/main/compose
-                        docker-compose \\
-                            --project-name ext \\
-                            --file docker-compose-ext.yml \\
                             down --volumes
                     '''
                 }
