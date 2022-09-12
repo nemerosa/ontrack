@@ -19,7 +19,7 @@ class AutoVersioningCheckMutations(
          * Getting the build by run ID
          */
         simpleMutation(
-            name = "checkAutoVersioningByRunId",
+            name = "gitHubCheckAutoVersioningByRunId",
             description = "Checks the dependencies based on the auto versioning information.",
             input = CheckAutoVersioningByRunIdInput::class,
             outputName = "payload",

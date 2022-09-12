@@ -17,6 +17,7 @@ import kotlin.reflect.full.findAnnotation
  * # the [APIName] annotation if any
  * # the simple name of the class
  */
+@Deprecated("Use getAPITypeName")
 fun getTypeName(type: KClass<*>, name: String? = null): String =
     name
         ?: type.findAnnotation<APIName>()?.value

@@ -1,0 +1,3 @@
+package net.nemerosa.ontrack.extension.github.autoversioning
+
+internal class AutoVersioningCheckMutationsIT
