@@ -18,11 +18,13 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.apache.commons:commons-lang3")
     implementation("jakarta.annotation:jakarta.annotation-api")
-
     implementation(project(":ontrack-extension-notifications"))
+
+    testImplementation(project(":ontrack-extension-general"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-scm", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-general", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
 
     testRuntimeOnly(project(":ontrack-service"))

@@ -42,18 +42,23 @@ abstract class AbstractAutoVersioningTestSupport : AbstractQLKTITSupport() {
 
     protected class AutoVersioningConfigSetup {
 
-        private var project: String? = null
-        private var branch: String = "master"
-        private var promotion: String = "IRON"
+        var project: String? = null
+        var branch: String = "main"
+        var promotion: String = "IRON"
 
+        var validationStamp: String? = null
+
+        @Deprecated("Use project property directory")
         fun sourceProject(value: String) {
             project = value
         }
 
+        @Deprecated("Use branch property directory")
         fun sourceBranch(value: String) {
             branch = value
         }
 
+        @Deprecated("Use promotion property directory")
         fun sourcePromotion(value: String) {
             promotion = value
         }
@@ -63,15 +68,15 @@ abstract class AbstractAutoVersioningTestSupport : AbstractQLKTITSupport() {
             sourceBranch = branch,
             sourcePromotion = promotion,
             targetPath = "gradle.properties",
-            targetRegex = "version = (.*)",
-            targetProperty = null,
+            targetRegex = null,
+            targetProperty = "version",
             targetPropertyRegex = null,
             targetPropertyType = null,
             autoApproval = null,
             upgradeBranchPattern = null,
             postProcessing = null,
             postProcessingConfig = null,
-            validationStamp = null,
+            validationStamp = validationStamp,
             autoApprovalMode = AutoApprovalMode.SCM
         )
 
