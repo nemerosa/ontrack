@@ -1099,7 +1099,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 break;
             case RUN_TIME:
                 sql += "LEFT JOIN RUN_INFO RI ON RI.VALIDATION_RUN = VR.ID ";
-                order = "ORDER BY RI.RUN_TIME DESC, VR.ID DESC";
+                order = "ORDER BY RI.RUN_TIME DESC, VR.ID DESC ";
                 break;
         }
         return getNamedParameterJdbcTemplate().query(
