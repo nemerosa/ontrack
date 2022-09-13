@@ -330,12 +330,13 @@ interface StructureService {
     /**
      * Gets the list of validation runs for a build.
      *
-     * @param buildId ID of the build
-     * @param offset  Offset in the list
-     * @param count   Maximum number of elements to return
+     * @param buildId      ID of the build
+     * @param offset       Offset in the list
+     * @param count        Maximum number of elements to return
+     * @param sortingMode  How to sort the runs ([ValidationRunSortingMode.ID] by default)
      * @return List of validation runs
      */
-    fun getValidationRunsForBuild(buildId: ID, offset: Int, count: Int): List<ValidationRun>
+    fun getValidationRunsForBuild(buildId: ID, offset: Int, count: Int, sortingMode: ValidationRunSortingMode = ValidationRunSortingMode.ID): List<ValidationRun>
 
     /**
      * Gets the number of validation runs for a build.

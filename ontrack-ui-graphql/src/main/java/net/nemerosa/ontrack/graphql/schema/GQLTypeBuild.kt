@@ -1,13 +1,10 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars.*
-import graphql.schema.DataFetcher
-import graphql.schema.DataFetchingEnvironment
+import graphql.schema.*
 import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
-import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
-import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
 import net.nemerosa.ontrack.graphql.schema.actions.actions
@@ -26,6 +23,7 @@ class GQLTypeBuild(
     private val validation: GQLTypeValidation,
     private val validationRun: GQLTypeValidationRun,
     private val runInfo: GQLTypeRunInfo,
+    private val gqlEnumValidationRunSortingMode: GQLEnumValidationRunSortingMode,
     private val runInfoService: RunInfoService,
     private val paginatedListFactory: GQLPaginatedListFactory,
     creation: GQLTypeCreation,
@@ -105,16 +103,27 @@ class GQLTypeBuild(
                                 fieldName = "validationRunsPaginated",
                                 fieldDescription = "Paginated list of validation runs",
                                 itemType = validationRun,
+                                arguments = listOf(
+                                    newArgument()
+                                        .name(ARG_SORTING_MODE)
+                                        .description("Describes how the validation runs must be sorted.")
+                                        .type(gqlEnumValidationRunSortingMode.getTypeRef())
+                                        .build(),
+                                ),
                                 itemListCounter = { _, build ->
                                     structureService.getValidationRunsCountForBuild(
                                             build.id
                                     )
                                 },
-                                itemListProvider = { _, build, offset, size ->
+                                itemListProvider = { env, build, offset, size ->
+                                    val sortingMode = env.getArgument<String?>(ARG_SORTING_MODE)
+                                        ?.let { ValidationRunSortingMode.valueOf(it) }
+                                        ?: ValidationRunSortingMode.ID
                                     structureService.getValidationRunsForBuild(
-                                            build.id,
-                                            offset,
-                                            size
+                                        buildId = build.id,
+                                        offset = offset,
+                                        count = size,
+                                        sortingMode = sortingMode
                                     )
                                 }
                         )
@@ -389,5 +398,9 @@ class GQLTypeBuild(
          * Last per level argument
          */
         const val ARG_LAST_PER_LEVEL = "lastPerLevel"
+        /**
+         * Sorting mode for the validation runs
+         */
+        const val ARG_SORTING_MODE = "sortingMode"
     }
 }

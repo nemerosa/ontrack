@@ -295,9 +295,10 @@ public interface StructureRepository {
      * @param offset                     Offset in the list
      * @param count                      Maximum number of elements to return
      * @param validationRunStatusService Run status mapping function (provided by caller)
+     * @param sortingMode                How to sort the runs (null is {@link ValidationRunSortingMode#ID} by default)
      * @return List of validation runs
      */
-    List<ValidationRun> getValidationRunsForBuild(Build build, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
+    List<ValidationRun> getValidationRunsForBuild(Build build, int offset, int count, @Nullable ValidationRunSortingMode sortingMode, Function<String, ValidationRunStatusID> validationRunStatusService);
 
     /**
      * Gets the number of validation runs for a build.

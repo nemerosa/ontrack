@@ -101,7 +101,7 @@ angular.module('ot.view.build', [
                         }
                       }
                     }
-                    validationRunsPaginated(offset: $validationRunsOffset, size: 10) {
+                    validationRunsPaginated(offset: $validationRunsOffset, size: 10, sortingMode: RUN_TIME) {
                       pageInfo {
                         ...pageInfoContent
                       }
