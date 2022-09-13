@@ -1191,10 +1191,10 @@ class StructureServiceImpl(
                 securityService.isProjectFunctionGranted(it, ProjectView::class.java)
             }
 
-    override fun getValidationRunsForBuild(buildId: ID, offset: Int, count: Int): List<ValidationRun> {
+    override fun getValidationRunsForBuild(buildId: ID, offset: Int, count: Int, sortingMode: ValidationRunSortingMode): List<ValidationRun> {
         val build = getBuild(buildId)
         securityService.checkProjectFunction(build.branch.project.id(), ProjectView::class.java)
-        return structureRepository.getValidationRunsForBuild(build, offset, count) { validationRunStatusService.getValidationRunStatus(it) }
+        return structureRepository.getValidationRunsForBuild(build, offset, count, sortingMode) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
     override fun getValidationRunsCountForBuild(buildId: ID): Int {

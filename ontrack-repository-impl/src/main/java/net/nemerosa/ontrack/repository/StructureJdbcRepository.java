@@ -1087,13 +1087,25 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public List<ValidationRun> getValidationRunsForBuild(Build build, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService) {
+    public List<ValidationRun> getValidationRunsForBuild(Build build, int offset, int count, @Nullable ValidationRunSortingMode sortingMode, Function<String, ValidationRunStatusID> validationRunStatusService) {
+        ValidationRunSortingMode actualSortingMode = sortingMode != null ? sortingMode : ValidationRunSortingMode.ID;
+        String sql = "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
+                "FROM VALIDATION_RUNS VR " +
+                "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID ";
+        String order = "";
+        switch (actualSortingMode) {
+            case ID:
+                order = "ORDER BY VR.ID DESC ";
+                break;
+            case RUN_TIME:
+                sql += "LEFT JOIN RUN_INFO RI ON RI.VALIDATION_RUN = VR.ID ";
+                order = "ORDER BY RI.RUN_TIME DESC, VR.ID DESC";
+                break;
+        }
         return getNamedParameterJdbcTemplate().query(
-                "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
-                        "FROM VALIDATION_RUNS VR " +
-                        "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +
+                sql +
                         "WHERE VR.BUILDID = :buildId " +
-                        "ORDER BY VR.ID DESC " +
+                        order +
                         "LIMIT :limit OFFSET :offset",
                 params("buildId", build.id())
                         .addValue("offset", offset)
