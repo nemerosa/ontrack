@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.git.support
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 
-class GitCommitPropertyCommitLinkIT : AbstractGitTestSupport() {
+class GitCommitPropertyCommitLinkIT : AbstractGitTestJUnit4Support() {
 
     @Test(expected = NoGitCommitPropertyException::class)
     fun `Commit from build without property`() {

@@ -29,7 +29,8 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
+@Deprecated(message = "JUnit 4 is deprecated", replaceWith = ReplaceWith("AbstractGitTestSupport"))
+abstract class AbstractGitTestJUnit4Support : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     protected lateinit var gitConfigProperties: GitConfigProperties

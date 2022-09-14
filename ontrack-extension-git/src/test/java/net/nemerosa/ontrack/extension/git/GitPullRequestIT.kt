@@ -11,7 +11,7 @@ import kotlin.test.assertNull
 /**
  * Interacting with pull requests
  */
-class GitPullRequestIT : AbstractGitTestSupport() {
+class GitPullRequestIT : AbstractGitTestJUnit4Support() {
 
     @Autowired
     private lateinit var gitMockingConfigurator: GitMockingConfigurator

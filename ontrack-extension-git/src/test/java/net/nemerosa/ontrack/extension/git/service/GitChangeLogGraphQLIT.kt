@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
 import net.nemerosa.ontrack.extension.issues.support.MockIssue
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.support.MockIssueStatus
@@ -18,7 +18,7 @@ import kotlin.test.assertEquals
 /**
  * Integration tests for Git support.
  */
-class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
+class GitChangeLogGraphQLIT : AbstractGitTestJUnit4Support() {
 
     @Autowired
     private lateinit var mockIssueServiceExtension: MockIssueServiceExtension

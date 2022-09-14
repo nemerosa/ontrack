@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class GitPullRequestInformationExtensionIT : AbstractGitTestSupport() {
+class GitPullRequestInformationExtensionIT : AbstractGitTestJUnit4Support() {
 
     @Autowired
     private lateinit var gitMockingConfigurator: GitMockingConfigurator

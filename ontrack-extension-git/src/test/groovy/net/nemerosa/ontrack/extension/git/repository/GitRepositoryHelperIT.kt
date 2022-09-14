@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.extension.git.repository
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class GitRepositoryHelperIT : AbstractGitTestSupport() {
+class GitRepositoryHelperIT : AbstractGitTestJUnit4Support() {
 
     @Autowired
     private lateinit var gitRepositoryHelper: GitRepositoryHelper

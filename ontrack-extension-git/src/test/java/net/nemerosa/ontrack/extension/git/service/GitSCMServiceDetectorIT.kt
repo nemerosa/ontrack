@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
 import net.nemerosa.ontrack.extension.scm.service.SCMServiceDetector
 import net.nemerosa.ontrack.test.assertPresent
 import org.junit.Test
@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 /**
  * Integration tests for Git as a SCM service
  */
-class GitSCMServiceDetectorIT : AbstractGitTestSupport() {
+class GitSCMServiceDetectorIT : AbstractGitTestJUnit4Support() {
 
     @Autowired
     private lateinit var scmServiceDetector: SCMServiceDetector

@@ -5,7 +5,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class GitBranchDisplayNameExtensionIT : AbstractGitTestSupport() {
+class GitBranchDisplayNameExtensionIT : AbstractGitTestJUnit4Support() {
 
     @Autowired
     private lateinit var branchDisplayNameService: BranchDisplayNameService
