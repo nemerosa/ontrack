@@ -88,10 +88,19 @@ class GitHubRepositoryContext(
             body["sha"] = existingFile.sha
         }
 
-        gitHubClient.put(
-            "/repos/${ACCProperties.GitHub.organization}/${repository}/contents/$path",
-            body
-        )
+        waitUntil(task = "Setting file content on branch $branch at path $path") {
+            try {
+                gitHubClient.put(
+                    "/repos/${ACCProperties.GitHub.organization}/${repository}/contents/$path",
+                    body
+                )
+                // Assuming it's OK
+                true
+            } catch (_: NotFound) {
+                // We need to retry
+                false
+            }
+        }
     }
 
     private fun createBranchIfNotExisting(branch: String, base: String = "main") {
