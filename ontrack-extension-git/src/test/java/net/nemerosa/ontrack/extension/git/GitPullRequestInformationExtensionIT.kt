@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurator
-import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Before
 import org.junit.Test

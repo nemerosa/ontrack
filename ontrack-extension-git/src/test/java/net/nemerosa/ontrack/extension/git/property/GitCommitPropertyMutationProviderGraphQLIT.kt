@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.git.property
 
 import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
-import org.junit.Assert
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull

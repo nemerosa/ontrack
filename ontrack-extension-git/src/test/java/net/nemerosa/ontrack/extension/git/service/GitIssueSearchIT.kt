@@ -8,7 +8,6 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 class GitIssueSearchIT : AbstractGitTestJUnit4Support() {
 
