@@ -1,0 +1,13 @@
+mutation PromotionLevelSetProperty(
+    $id: Int!,
+    $type: String!,
+    $value: JSON!,
+) {
+    setPromotionLevelPropertyById(input: {
+        id: $id,
+        property: $type,
+        value: $value,
+    }) {
+        ...PayloadUserErrors
+    }
+}
