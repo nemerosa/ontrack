@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.acceptance.AbstractACCDSL
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.v4.SearchResult
 import net.nemerosa.ontrack.dsl.v4.http.OTNotFoundException
+import org.junit.Ignore
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
@@ -12,6 +13,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
  * Acceptance tests for the build links
  */
 @AcceptanceTestSuite
+@Ignore("flaky")
 class ACCDSLBuildLinks extends AbstractACCDSL {
 
     @Test
