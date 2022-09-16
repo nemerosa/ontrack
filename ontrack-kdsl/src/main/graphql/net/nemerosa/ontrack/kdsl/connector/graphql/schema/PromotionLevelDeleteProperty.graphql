@@ -1,0 +1,12 @@
+mutation PromotionLevelDeleteProperty(
+    $id: Int!,
+    $type: String!,
+) {
+    setPromotionLevelPropertyById(input: {
+        id: $id,
+        property: $type,
+        value: null,
+    }) {
+        ...PayloadUserErrors
+    }
+}

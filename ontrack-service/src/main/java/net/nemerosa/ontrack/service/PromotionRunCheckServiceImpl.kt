@@ -4,11 +4,12 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.api.PromotionRunCheckExtension
 import net.nemerosa.ontrack.model.structure.PromotionRun
 import net.nemerosa.ontrack.model.structure.PromotionRunCheckService
+import net.nemerosa.ontrack.model.support.UserTransaction
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-@Transactional
+@UserTransaction
 class PromotionRunCheckServiceImpl(
         private val extensionManager: ExtensionManager
 ) : PromotionRunCheckService {

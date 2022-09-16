@@ -20,6 +20,7 @@ import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityDefined
 import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityNew
+import net.nemerosa.ontrack.model.support.UserTransaction
 import net.nemerosa.ontrack.repository.CoreBuildFilterRepository
 import net.nemerosa.ontrack.repository.StatsRepository
 import net.nemerosa.ontrack.repository.StructureRepository
@@ -35,9 +36,7 @@ import java.util.*
 import java.util.function.BiFunction
 
 @Service
-@Transactional(
-        noRollbackFor = [UserException::class]
-)
+@UserTransaction
 class StructureServiceImpl(
         private val securityService: SecurityService,
         private val eventPostService: EventPostService,
