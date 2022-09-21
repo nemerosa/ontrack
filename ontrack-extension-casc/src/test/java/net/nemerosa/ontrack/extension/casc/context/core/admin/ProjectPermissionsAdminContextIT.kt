@@ -1,12 +1,94 @@
 package net.nemerosa.ontrack.extension.casc.context.core.admin
 
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
+import net.nemerosa.ontrack.extension.casc.schema.cascString
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.security.PermissionInput
+import net.nemerosa.ontrack.model.security.PermissionTargetType
 import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
 class ProjectPermissionsAdminContextIT : AbstractCascTestSupport() {
+
+    @Autowired
+    private lateinit var context: ProjectPermissionsAdminContext
+
+    @Test
+    fun `Rendering of permissions`() {
+        asAdmin {
+            // Deletes existing groups
+            accountService.accountGroups.forEach { group ->
+                accountService.deleteGroup(group.id)
+            }
+            // Deletes existing projects
+            structureService.projectList.forEach { project ->
+                structureService.deleteProject(project.id)
+            }
+            // Existing items
+            val p1 = project()
+            val p2 = project()
+            val p3 = project()
+            val group1 = doCreateAccountGroup()
+            val group2 = doCreateAccountGroup()
+            val group3 = doCreateAccountGroup()
+            // Different roles per project
+            accountService.saveProjectPermission(
+                p1.id,
+                PermissionTargetType.GROUP,
+                group1.id(),
+                PermissionInput(Roles.PROJECT_OWNER)
+            )
+            accountService.saveProjectPermission(
+                p3.id,
+                PermissionTargetType.GROUP,
+                group1.id(),
+                PermissionInput(Roles.PROJECT_OWNER)
+            )
+            accountService.saveProjectPermission(
+                p1.id,
+                PermissionTargetType.GROUP,
+                group2.id(),
+                PermissionInput(Roles.PROJECT_VALIDATION_MANAGER)
+            )
+            accountService.saveProjectPermission(
+                p2.id,
+                PermissionTargetType.GROUP,
+                group3.id(),
+                PermissionInput(Roles.PROJECT_OWNER)
+            )
+            // Rendering
+            assertEquals(
+                listOf(
+                    mapOf(
+                        "group" to group1.name,
+                        "role" to "OWNER",
+                        "projects" to listOf(
+                            p1.name,
+                            p3.name,
+                        )
+                    ),
+                    mapOf(
+                        "group" to group2.name,
+                        "role" to "VALIDATION_MANAGER",
+                        "projects" to listOf(
+                            p1.name,
+                        )
+                    ),
+                    mapOf(
+                        "group" to group3.name,
+                        "role" to "OWNER",
+                        "projects" to listOf(
+                            p2.name,
+                        )
+                    ),
+                ).asJson(),
+                context.render()
+            )
+        }
+    }
 
     @Test
     fun `Setting up permissions on two existing projects and one existing group`() {

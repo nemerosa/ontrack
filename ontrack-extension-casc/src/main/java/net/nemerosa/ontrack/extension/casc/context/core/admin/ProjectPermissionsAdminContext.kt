@@ -5,8 +5,10 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
 import net.nemerosa.ontrack.extension.casc.schema.*
 import net.nemerosa.ontrack.json.JsonParseException
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -93,7 +95,37 @@ class ProjectPermissionsAdminContext(
     }
 
     override fun render(): JsonNode {
-        TODO("Gets the list of all projects and all their permissions (excluding projects without any specific permission)")
+        // Gets all the groups
+        val groups = accountService.accountGroups
+        // Collects the permissions for each of these groups
+        val permissions = mutableMapOf<Pair<String, String>, MutableList<String>>()
+        groups.forEach { group ->
+            val roleAssociations: Collection<ProjectRoleAssociation> =
+                accountService.getProjectPermissionsForAccountGroup(group)
+            roleAssociations.forEach { roleAssociation ->
+                val project = structureService.findProjectByID(ID.of(roleAssociation.projectId))
+                if (project != null) {
+                    val role = roleAssociation.projectRole.id
+                    val projectList = permissions[group.name to role]
+                    if (projectList != null) {
+                        projectList += project.name
+                    } else {
+                        permissions[group.name to role] = mutableListOf(project.name)
+                    }
+                }
+            }
+        }
+        // Conversion into the model
+        val projectPermissions = permissions.map { (association, projectList) ->
+            val (group, role) = association
+            ProjectPermission(
+                group = group,
+                role = role,
+                projects = projectList,
+            )
+        }
+        // Conversion to JSON
+        return projectPermissions.asJson()
     }
 
     data class ProjectPermission(
