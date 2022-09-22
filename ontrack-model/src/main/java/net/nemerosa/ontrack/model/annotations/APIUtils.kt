@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.annotations
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
 
@@ -47,3 +48,15 @@ fun getPropertyName(property: KProperty<*>): String =
         ?: property.findAnnotation<JsonProperty>()?.value
         ?: property.getter.findAnnotation<JsonProperty>()?.value
         ?: property.name
+
+/**
+ * Getting the name for a class
+ *
+ * Will use in order:
+ *
+ * # any [APIName] annotation
+ * # the simple Java class name
+ */
+fun <T : Any> getAPITypeName(type: KClass<T>): String =
+    type.findAnnotation<APIName>()?.value
+        ?: type.java.simpleName
