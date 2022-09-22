@@ -13,6 +13,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
  * Acceptance tests for the build links
  */
 @AcceptanceTestSuite
+@Ignore("flaky")
 class ACCDSLBuildLinks extends AbstractACCDSL {
 
     @Test

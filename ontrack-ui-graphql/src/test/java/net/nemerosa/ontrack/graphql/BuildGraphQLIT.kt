@@ -13,17 +13,14 @@ import net.nemerosa.ontrack.model.structure.RunInfoInput
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertJsonNull
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
-import kotlin.test.fail
+import kotlin.test.*
 
 /**
  * Integration tests around the `builds` root query.
  */
-class BuildGraphQLIT : AbstractQLKTITJUnit4Support() {
+class BuildGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Build creation`() {
@@ -167,15 +164,19 @@ class BuildGraphQLIT : AbstractQLKTITJUnit4Support() {
         }
     }
 
-    @Test(expected = BranchNotFoundException::class)
+    @Test
     fun `By branch not found`() {
         project {
             val name = uid("B")
-            run("""{
-                builds(project: "${project.name}", branch: "$name") {
-                    name
-                }
-            }""")
+            assertFailsWith<BranchNotFoundException> {
+                run(
+                    """{
+                        builds(project: "${project.name}", branch: "$name") {
+                            name
+                        }
+                    }"""
+                )
+            }
         }
     }
 
@@ -192,14 +193,18 @@ class BuildGraphQLIT : AbstractQLKTITJUnit4Support() {
         }
     }
 
-    @Test(expected = ProjectNotFoundException::class)
+    @Test
     fun `By project not found`() {
         val name = uid("P")
-        run("""{
-            builds(project: "$name") {
-                name
-            }
-        }""")
+        assertFailsWith<ProjectNotFoundException> {
+            run(
+                """{
+                    builds(project: "$name") {
+                        name
+                    }
+                }"""
+            )
+        }
     }
 
     @Test
@@ -269,7 +274,7 @@ class BuildGraphQLIT : AbstractQLKTITJUnit4Support() {
         }
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test
     fun `Branch filter requires a branch`() {
         // Builds
         val branch = doCreateBranch()
@@ -278,25 +283,33 @@ class BuildGraphQLIT : AbstractQLKTITJUnit4Support() {
         val pl = doCreatePromotionLevel(branch, nd("PL", ""))
         doPromote(build1, pl, "")
         // Query
-        run("""{
-            builds( 
-                    buildBranchFilter: {withPromotionLevel: "PL"}) {
-                id
-            }
-        }""")
+        assertFailsWith<IllegalStateException> {
+            run(
+                """{
+                    builds( 
+                            buildBranchFilter: {withPromotionLevel: "PL"}) {
+                        id
+                    }
+                }"""
+            )
+        }
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test
     fun `Project filter requires a project`() {
         // Builds
         doCreateBuild()
         // Query
-        run("""{
-            builds( 
-                    buildProjectFilter: {promotionName: "PL"}) {
-                id
-            }
-        }""")
+        assertFailsWith<IllegalStateException> {
+            run(
+                """{
+                    builds( 
+                            buildProjectFilter: {promotionName: "PL"}) {
+                        id
+                    }
+                }"""
+            )
+        }
     }
 
     @Test
@@ -1331,6 +1344,56 @@ class BuildGraphQLIT : AbstractQLKTITJUnit4Support() {
                     // Checks the validation runs
                     val runs = data["builds"][0]["validationRuns"]
                     assertEquals(2, runs.size())
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Validation runs sorted by decreasing run time`() {
+        project {
+            branch {
+                val stamps = (1..3).map {
+                    validationStamp(name = "VS$it")
+                }
+                build {
+                    // Creating validation runs with decreasing run times
+                    val runs = stamps.mapIndexed { index, vs ->
+                        validate(vs, duration = 100 - 10 * index)
+                    }
+                    // Validation runs for this build, ordered by decreasing run time
+                    asUserWithView {
+                        run("""{
+                            builds(id: $id) {
+                                validationRunsPaginated(sortingMode: RUN_TIME) {
+                                    pageItems {
+                                        id
+                                        runInfo {
+                                            runTime
+                                        }
+                                    }
+                                }
+                            }
+                        }""") { data ->
+                            val build = data.path("builds").path(0)
+                            val actualRunIds = build.path("validationRunsPaginated").path("pageItems").map {
+                                it.getRequiredIntField("id")
+                            }
+                            val runTimes = build.path("validationRunsPaginated").path("pageItems").map {
+                                it.path("runInfo").getRequiredIntField("runTime")
+                            }
+                            val expectedRunIds = runs.map { it.id() }
+                            assertEquals(
+                                expectedRunIds, actualRunIds,
+                                "Runs are sorted"
+                            )
+                            assertEquals(
+                                listOf(100, 90, 80),
+                                runTimes,
+                                "Correctly sorted run times"
+                            )
+                        }
+                    }
                 }
             }
         }

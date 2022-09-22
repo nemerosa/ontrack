@@ -40,6 +40,7 @@ class LicenseMessage(
                     type = MessageType.WARNING,
                     content = """License "${license.name}" expires at ${license.validUntil}."""
                 )
+                else -> {} // Nothing
             }
             if (control.projectCountExceeded) {
                 messages += Message(

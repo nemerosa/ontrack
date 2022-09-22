@@ -1,0 +1,10 @@
+query PromotionLevelGetProperty(
+    $id: Int!,
+    $type: String!,
+) {
+    promotionLevel(id: $id) {
+        properties(type: $type) {
+            value
+        }
+    }
+}

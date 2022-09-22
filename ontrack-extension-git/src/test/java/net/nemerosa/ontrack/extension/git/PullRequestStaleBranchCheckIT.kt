@@ -11,7 +11,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class PullRequestStaleBranchCheckIT : AbstractGitTestSupport() {
+class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
 
     @Autowired
     private lateinit var check: PullRequestStaleBranchCheck

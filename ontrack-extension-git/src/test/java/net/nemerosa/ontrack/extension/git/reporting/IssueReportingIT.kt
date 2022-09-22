@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.git.reporting
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
 import net.nemerosa.ontrack.extension.issues.support.MockIssue
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.support.MockIssueStatus
@@ -23,7 +23,7 @@ import kotlin.test.assertNull
  * | 1.0   | Failed | Failed with #3 closed | Passed              |
  * ```
  */
-class IssueReportingIT : AbstractGitTestSupport() {
+class IssueReportingIT : AbstractGitTestJUnit4Support() {
 
     @Autowired
     private lateinit var mockIssueServiceExtension: MockIssueServiceExtension

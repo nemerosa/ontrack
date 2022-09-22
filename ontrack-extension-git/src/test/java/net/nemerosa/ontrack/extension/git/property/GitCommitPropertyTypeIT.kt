@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.git.property
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
 import net.nemerosa.ontrack.model.structure.BuildSearchForm
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlin.test.assertNotNull
 
-class GitCommitPropertyTypeIT : AbstractGitTestSupport() {
+class GitCommitPropertyTypeIT : AbstractGitTestJUnit4Support() {
 
     @Test
     fun `Build filter on commit`() {

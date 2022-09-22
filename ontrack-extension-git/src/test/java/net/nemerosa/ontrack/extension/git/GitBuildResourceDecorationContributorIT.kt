@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-class GitBuildResourceDecorationContributorIT : AbstractGitTestSupport() {
+class GitBuildResourceDecorationContributorIT : AbstractGitTestJUnit4Support() {
 
     @Autowired
     private lateinit var contributor: GitBuildResourceDecorationContributor

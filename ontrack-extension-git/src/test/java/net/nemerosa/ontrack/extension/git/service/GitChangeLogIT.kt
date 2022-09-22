@@ -1,14 +1,14 @@
 package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
-import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
 import org.junit.Test
 import kotlin.test.assertEquals
 
 /**
  * Integration tests for Git support.
  */
-class GitChangeLogIT : AbstractGitTestSupport() {
+class GitChangeLogIT : AbstractGitTestJUnit4Support() {
 
     @Test
     fun `Change log issues IDs`() {

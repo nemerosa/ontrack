@@ -28,7 +28,6 @@ version = ontrackVersion
 repositories {
     mavenLocal() // Important: used for testing
     mavenCentral()
-    // FIXME #762 Remove when using final version of Spring Boot
     maven { url = uri("https://repo.spring.io/milestone") }
 }
 

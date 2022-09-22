@@ -2,15 +2,10 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import io.mockk.every
 import io.mockk.mockk
-import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
-import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
-import net.nemerosa.ontrack.extension.git.service.GitService
-import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient
-import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
-import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
-import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
-import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.extension.github.ingestion.FileLoaderService
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 import kotlin.test.assertFailsWith
@@ -68,63 +63,25 @@ class DefaultConfigLoaderServiceTest {
         val project = Project.of(NameDescription.nd("test", ""))
         val branch = Branch.of(project, NameDescription.nd("main", ""))
 
-        val gitService = mockk<GitService>()
-        every { gitService.getBranchAsPullRequest(any()) } returns null
+        val fileLoaderService = mockk<FileLoaderService>()
 
-        val gitHubClientFactory = mockk<OntrackGitHubClientFactory>()
-        val gitHubClient = mockk<OntrackGitHubClient>()
-        every { gitHubClientFactory.create(any()) } returns gitHubClient
-        if (pathFound) {
+        if (pathFound && branchConfigured && projectConfigured) {
             val path = if (incorrectConfig) {
                 "/ingestion/config-incorrect.yml"
             } else {
                 "/ingestion/config.yml"
             }
-            every { gitHubClient.getFileContent("org/repo", "release/1.0", INGESTION_CONFIG_FILE_PATH) } returns
-                    TestUtils.resourceBytes(path)
+            every {
+                fileLoaderService.loadFile(branch, INGESTION_CONFIG_FILE_PATH)
+            } returns TestUtils.resourceString(path)
         } else {
-            every { gitHubClient.getFileContent("org/repo", "release/1.0", INGESTION_CONFIG_FILE_PATH) } returns null
-        }
-
-        val propertyService = mockk<PropertyService>()
-        if (projectConfigured) {
-            every { propertyService.getProperty(project, GitHubProjectConfigurationPropertyType::class.java) } returns
-                    Property.of(
-                        mockk<GitHubProjectConfigurationPropertyType>(),
-                        GitHubProjectConfigurationProperty(
-                            GitHubEngineConfiguration("test", null, oauth2Token = "some-token"),
-                            "org/repo",
-                            30,
-                            issueServiceConfigurationIdentifier = null,
-                        )
-                    )
-        } else {
-            every { propertyService.getProperty(project, GitHubProjectConfigurationPropertyType::class.java) } returns
-                    Property.of(mockk<GitHubProjectConfigurationPropertyType>(), null)
-        }
-        if (branchConfigured) {
-            every { propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java) } returns
-                    Property.of(
-                        mockk<GitBranchConfigurationPropertyType>(),
-                        GitBranchConfigurationProperty(
-                            branch = "release/1.0",
-                            buildCommitLink = null,
-                            isOverride = false,
-                            buildTagInterval = 0,
-                        )
-                    )
-        } else {
-            every { propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java) } returns
-                    Property.of(
-                        mockk<GitBranchConfigurationPropertyType>(),
-                        null
-                    )
+            every {
+                fileLoaderService.loadFile(branch, INGESTION_CONFIG_FILE_PATH)
+            } returns null
         }
 
         val configLoaderService = DefaultConfigLoaderService(
-            gitHubClientFactory = gitHubClientFactory,
-            propertyService = propertyService,
-            gitService = gitService,
+            fileLoaderService = fileLoaderService,
         )
         val config = configLoaderService.loadConfig(branch, INGESTION_CONFIG_FILE_PATH)
         if (expectedConfig) {

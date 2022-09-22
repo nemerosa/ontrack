@@ -20,6 +20,7 @@ import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityDefined
 import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityNew
+import net.nemerosa.ontrack.model.support.UserTransaction
 import net.nemerosa.ontrack.repository.CoreBuildFilterRepository
 import net.nemerosa.ontrack.repository.StatsRepository
 import net.nemerosa.ontrack.repository.StructureRepository
@@ -35,9 +36,7 @@ import java.util.*
 import java.util.function.BiFunction
 
 @Service
-@Transactional(
-        noRollbackFor = [UserException::class]
-)
+@UserTransaction
 class StructureServiceImpl(
         private val securityService: SecurityService,
         private val eventPostService: EventPostService,
@@ -1191,10 +1190,10 @@ class StructureServiceImpl(
                 securityService.isProjectFunctionGranted(it, ProjectView::class.java)
             }
 
-    override fun getValidationRunsForBuild(buildId: ID, offset: Int, count: Int): List<ValidationRun> {
+    override fun getValidationRunsForBuild(buildId: ID, offset: Int, count: Int, sortingMode: ValidationRunSortingMode): List<ValidationRun> {
         val build = getBuild(buildId)
         securityService.checkProjectFunction(build.branch.project.id(), ProjectView::class.java)
-        return structureRepository.getValidationRunsForBuild(build, offset, count) { validationRunStatusService.getValidationRunStatus(it) }
+        return structureRepository.getValidationRunsForBuild(build, offset, count, sortingMode) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
     override fun getValidationRunsCountForBuild(buildId: ID): Int {

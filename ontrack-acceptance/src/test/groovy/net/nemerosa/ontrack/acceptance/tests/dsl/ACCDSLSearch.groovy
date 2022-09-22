@@ -3,12 +3,51 @@ package net.nemerosa.ontrack.acceptance.tests.dsl
 import net.nemerosa.ontrack.acceptance.AbstractACCDSL
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.v4.SearchResult
+import org.junit.Ignore
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
 @AcceptanceTestSuite
 class ACCDSLSearch extends AbstractACCDSL {
+
+    @Test
+    @Ignore("flaky")
+    void 'Searching for a build based on its release information'() {
+        def project = uid('P')
+        def value = uid('V')
+        ontrack.project(project) {
+            branch('test') {
+                build('1', 'Build 1') {
+                    config {
+                        label "${value}-1"
+                    }
+                }
+                build('2', 'Build 2') {
+                    config {
+                        label "${value}-2"
+                    }
+                }
+            }
+        }
+
+        def build1 = ontrack.build(project, 'test', '1')
+        def build2 = ontrack.build(project, 'test', '2')
+
+        // Checks that we find two build on exact match but with according scores
+        def results = ontrack.search("${value}-1")
+        def build1Result = results.find { it.title == "Build ${build1.project}/${build1.branch}/${build1.name}" }
+        assert build1Result: "Build 1 found"
+        def build2Result = results.find { it.title == "Build ${build2.project}/${build2.branch}/${build2.name}" }
+        assert build2Result: "Build 2 found"
+        assert build1Result.accuracy > build2Result.accuracy: "Build 1 has a better score than build 2"
+
+        // Checks that we find two builds on prefix match
+        results = ontrack.search(value)
+        assert results.find { it.title == "Build ${build1.project}/${build1.branch}/${build1.name}" }: "Build 1 found"
+        assert results.find { it.title == "Build ${build2.project}/${build2.branch}/${build2.name}" }: "Build 2 found"
+
+    }
 
     @Test
     void 'Searching for a build based on its release information after it has been deleted does not return any result'() {

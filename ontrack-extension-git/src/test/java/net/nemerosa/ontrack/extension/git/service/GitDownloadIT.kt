@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 /**
  * Integration tests for downloading a file
  */
-class GitDownloadIT : AbstractGitTestSupport() {
+class GitDownloadIT : AbstractGitTestJUnit4Support() {
 
     @Test
     fun `Download files`() {

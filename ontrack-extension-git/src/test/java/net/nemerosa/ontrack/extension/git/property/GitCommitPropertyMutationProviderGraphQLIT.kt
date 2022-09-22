@@ -1,12 +1,11 @@
 package net.nemerosa.ontrack.extension.git.property
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
-import org.junit.Assert
+import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class GitCommitPropertyMutationProviderGraphQLIT : AbstractGitTestSupport() {
+class GitCommitPropertyMutationProviderGraphQLIT : AbstractGitTestJUnit4Support() {
 
     @Test
     fun `Setting the Git build commit by ID`() {

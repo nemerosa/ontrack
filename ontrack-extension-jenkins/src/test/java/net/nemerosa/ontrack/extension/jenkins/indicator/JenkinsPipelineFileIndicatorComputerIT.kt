@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.jenkins.indicator
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
 import net.nemerosa.ontrack.extension.indicators.computing.*
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueType
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTypeConfig
@@ -11,7 +11,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class JenkinsPipelineFileIndicatorComputerIT : AbstractGitTestSupport() {
+class JenkinsPipelineFileIndicatorComputerIT : AbstractGitTestJUnit4Support() {
 
     @Autowired
     private lateinit var computer: JenkinsPipelineFileIndicatorComputer

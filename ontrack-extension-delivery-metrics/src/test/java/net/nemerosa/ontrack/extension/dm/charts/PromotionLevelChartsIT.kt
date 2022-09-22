@@ -259,12 +259,12 @@ internal class PromotionLevelChartsIT : AbstractDSLTestSupport() {
                     val now = Time.now()
                     val ref = now.minusDays(28)
                     val promotions = setOf(
-                        0L, 1, 2, 3, 5, // 1st week, 4 out of 7
+                        1L, 2, 3, 5, // 1st week, 4 out of 7
                         8, 13, // 2nd week, 2 out of 7
                         21, // 3rd week, 1 out of 7
                         // 4th week, 0 out of 7
                     )
-                    (0L..28).forEach { day ->
+                    (1L..28).forEach { day ->
                         val time = ref.plusDays(day)
                         val build = build(name = day.toString()) {
                             updateBuildSignature(time = time)

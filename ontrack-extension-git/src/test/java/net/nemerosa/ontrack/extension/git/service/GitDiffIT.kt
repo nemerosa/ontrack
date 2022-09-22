@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
-import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType
 import org.eclipse.jgit.diff.DiffFormatter
@@ -15,7 +15,7 @@ import kotlin.test.assertNotNull
 /**
  * Integration tests for getting a diff from a Git change log.
  */
-class GitDiffIT : AbstractGitTestSupport() {
+class GitDiffIT : AbstractGitTestJUnit4Support() {
 
     private lateinit var oldPrefix: String
     private lateinit var newPrefix: String

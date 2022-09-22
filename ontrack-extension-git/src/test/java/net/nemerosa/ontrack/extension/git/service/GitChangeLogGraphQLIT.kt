@@ -8,9 +8,8 @@ import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.test.assertJsonNotNull
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
@@ -23,7 +22,7 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
     @Autowired
     private lateinit var mockIssueServiceExtension: MockIssueServiceExtension
 
-    @Before
+    @BeforeEach
     fun before() {
         mockIssueServiceExtension.resetIssues()
     }
@@ -59,7 +58,8 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
     fun `Change log based on Git property`() {
         doTest { branch ->
             // Getting the change log between build 5 and 7
-            val data = run("""{
+            val data = run(
+                """{
                 branches(id: ${branch.id}) {
                     gitChangeLog(from: "5", to: "7") {
                         commits {
@@ -69,7 +69,8 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
                         }
                     }
                 }
-            }""")
+            }"""
+            )
             val messages = data["branches"][0]["gitChangeLog"]["commits"].map {
                 it["commit"]["shortMessage"].asText()
             }
@@ -108,7 +109,8 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
                     // Test
                     asUserWithView(this).execute {
                         // Getting the change log between build 1 and 5
-                        run("""{
+                        run(
+                            """{
                             branches(id: $id) {
                                 gitChangeLog(from: "1", to: "5") {
                                     issues {
@@ -132,7 +134,8 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
                                     }
                                 }
                             }
-                        }""").let { data ->
+                        }"""
+                        ).let { data ->
                             val issues = data.path("branches").path(0).path("gitChangeLog").path("issues")
                             assertJsonNotNull(issues) {
                                 val issueServiceConfiguration = path("issueServiceConfiguration")
@@ -191,7 +194,7 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
             exclude?.let {
                 args += """exclude: "$it""""
             }
-            "(request: {${ args.joinToString(",") }})"
+            "(request: {${args.joinToString(",")}})"
         } else {
             ""
         }
@@ -223,13 +226,15 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
                     // Test
                     asUserWithView(this).execute {
                         // Getting the change log between build 1 and 5
-                        run("""{
+                        run(
+                            """{
                             branches(id: $id) {
                                 gitChangeLog(from: "1", to: "6") {
                                     export$input
                                 }
                             }
-                        }""").let { data ->
+                        }"""
+                        ).let { data ->
                             val export = data.path("branches").path(0).path("gitChangeLog").path("export").asText()
                             assertEquals(
                                 expected.trim(),
@@ -244,27 +249,31 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
 
     @Test
     fun `Change log export of issues with default format`() {
-        doTestChangeLogExport("""
+        doTestChangeLogExport(
+            """
             |* #1 Issue #1
             |* #2 Issue #2
             |* #3 Issue #3
-        """.trimMargin())
+        """.trimMargin()
+        )
     }
 
     @Test
     fun `Change log export of issues with markdown format`() {
-        doTestChangeLogExport("""
+        doTestChangeLogExport(
+            """
             |* [#1](uri:issue/1) Issue #1
             |* [#2](uri:issue/2) Issue #2
             |* [#3](uri:issue/3) Issue #3
         """.trimMargin(),
-        format = "markdown"
+            format = "markdown"
         )
     }
 
     @Test
     fun `Change log export of issues with grouping`() {
-        doTestChangeLogExport("""
+        doTestChangeLogExport(
+            """
             |Bugs
             |
             |* #1 Issue #1
@@ -274,12 +283,14 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
             |* #2 Issue #2
             |* #3 Issue #3
         """.trimMargin(),
-        grouping = "Bugs=bug|Features=feature")
+            grouping = "Bugs=bug|Features=feature"
+        )
     }
 
     @Test
     fun `Change log export of issues with grouping and default alt group`() {
-        doTestChangeLogExport("""            |
+        doTestChangeLogExport(
+            """            |
             |Features
             |
             |* #2 Issue #2
@@ -289,12 +300,14 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
             |
             |* #1 Issue #1
         """.trimMargin(),
-        grouping = "Features=feature")
+            grouping = "Features=feature"
+        )
     }
 
     @Test
     fun `Change log export of issues with grouping and specific alt group`() {
-        doTestChangeLogExport("""            |
+        doTestChangeLogExport(
+            """            |
             |Features
             |
             |* #2 Issue #2
@@ -304,17 +317,19 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
             |
             |* #1 Issue #1
         """.trimMargin(),
-        grouping = "Features=feature", altGroup = "Misc")
+            grouping = "Features=feature", altGroup = "Misc"
+        )
     }
 
     @Test
-    @Ignore("flaky")
     fun `Change log export of issues without grouping and with exclusions`() {
-        doTestChangeLogExport("""            |
+        doTestChangeLogExport(
+            """            |
             |* #2 Issue #2
             |* #3 Issue #3
         """.trimMargin(),
-            exclude="bug")
+            exclude = "bug"
+        )
     }
 
     @Test
@@ -332,7 +347,8 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
                 "7"
             ).orElse(null).id()
             // Getting the change log between build 5 and 7
-            val data = run("""{
+            val data = run(
+                """{
                 gitChangeLog(from: $build5, to: $build7) {
                     commits {
                         commit {
@@ -340,7 +356,8 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
                         }
                     }
                 }
-            }""")
+            }"""
+            )
             val messages = data["gitChangeLog"]["commits"].map {
                 it["commit"]["shortMessage"].asText()
             }

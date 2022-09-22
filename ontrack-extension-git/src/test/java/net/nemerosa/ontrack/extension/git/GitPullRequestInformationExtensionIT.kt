@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurator
-import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Before
 import org.junit.Test
@@ -10,7 +9,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class GitPullRequestInformationExtensionIT : AbstractGitTestSupport() {
+class GitPullRequestInformationExtensionIT : AbstractGitTestJUnit4Support() {
 
     @Autowired
     private lateinit var gitMockingConfigurator: GitMockingConfigurator

@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.api.model.BuildValidationException
-import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles
  * Tests for #187 - validation of the build name
  */
 @ActiveProfiles(profiles = [RunProfile.UNIT_TEST, "git.mock"])
-class GitBuildValidationIT : AbstractGitTestSupport() {
+class GitBuildValidationIT : AbstractGitTestJUnit4Support() {
 
     /**
      * Validates a build according to the branch SCM policy.
