@@ -30,8 +30,8 @@ fun uid(prefix: String): String =
  */
 fun waitUntil(
     initial: Long = 0L,
-    timeout: Long = 60_000L,
-    interval: Long = 10_000L,
+    timeout: Long = 120_000L,
+    interval: Long = 15_000L,
     task: String? = null,
     onTimeout: (() -> Unit)? = null,
     condition: () -> Boolean,
