@@ -13,19 +13,21 @@ Manually, we can do this of course:
 
 * we update the version in the `parent`
 * we perform any needed post-processing like a resolution of locks
-* we commit and push the change. Voilà.
+* we commit and push the change.
+Voilà.
 
 If we put extra automation in the mix, you can define a perfectly valid auto versioning process.
 
-This becomes more complex whenever having a new version of the `module` is not enough of a criteria to have it used. This may be a release which has not been qualified yet by extra quality processes (long running ones maybe).
+This becomes more complex whenever having a new version of the `module` is not enough of a criteria to have it used.
+This may be a release which has not been qualified yet by extra quality processes (long running ones maybe).
 
 That's where the concept of <<model,promotion>> in Ontrack can play a very important rule:
 
 * the `module` is promoted
 * this starts the following process:
-  * Ontrack creates a pull request for the `parent` where the version of the `module` has been changed to the one being promoted
-  * any required post processing is performed on this PR
-  * when the PR is ready to be merged (with all its controls), it's merged automatically
+* Ontrack creates a pull request for the `parent` where the version of the `module` has been changed to the one being promoted
+* any required post processing is performed on this PR
+* when the PR is ready to be merged (with all its controls), it's merged automatically
 
 Result:
 
@@ -50,17 +52,20 @@ Auto versioning on promotion is however particularly well suited to deal with si
 [[auto-versioning-settings]]
 ==== General configuration
 
-Auto versioning is not enabled by default. This can be done in the _Settings > Auto Versioning_.
+Auto versioning is not enabled by default.
+This can be done in the _Settings > Auto Versioning_.
 
 Three parameters are available:
 
 * _Enabled_ - check to enable auto versioning
 * _Audit retention_ - maximum number of seconds to keep non-running audit entries for auto versioning requests (see <<auto-versioning-audit>> for more information)
-* _Audit cleanup_ - maximum number of seconds to keep audit entries for auto versioning requests. This time is counted after the retention period for the non-running entries  (see <<auto-versioning-audit>> for more information)
+* _Audit cleanup_ - maximum number of seconds to keep audit entries for auto versioning requests.
+This time is counted after the retention period for the non-running entries (see <<auto-versioning-audit>> for more information)
 
 [NOTE]
 ====
-These settings can also be <<casc,configured as code>>. For example using:
+These settings can also be <<casc,configured as code>>.
+For example using:
 
 [source,yaml]
 ----
@@ -79,9 +84,11 @@ ontrack:
 
 Ontrack uses queues in RabbitMQ to schedule and process auto versioning events.
 
-By default, one and only one queue, called `auto-versioning.default.1` is available. When the load becomes too important, you can use two mechanisms to scale the auto versioning:
+By default, one and only one queue, called `auto-versioning.default.1` is available.
+When the load becomes too important, you can use two mechanisms to scale the auto versioning:
 
-* increase the number of default queues. You can set the `ontrack.extension.auto-versioning.queue.scale` <<configuration-properties-auto-versioning,configuration property>> to a higher number than 1
+* increase the number of default queues.
+You can set the `ontrack.extension.auto-versioning.queue.scale` <<configuration-properties-auto-versioning,configuration property>> to a higher number than 1
 
 * create dedicated queues for some projects, see below.
 
@@ -90,7 +97,8 @@ By default, one and only one queue, called `auto-versioning.default.1` is availa
 
 For a given Ontrack <<model,project>>, you can setup a dedicated queue, which will be used exclusively for this project (whereas the default queues are shared between all projects).
 
-Use the `ontrack.extension.auto-versioning.queue.projects` <<configuration-properties-auto-versioning,configuration property>> to defined a comma-separated list of projects which must have dedicated queues. For example, using environment variables:
+Use the `ontrack.extension.auto-versioning.queue.projects` <<configuration-properties-auto-versioning,configuration property>> to defined a comma-separated list of projects which must have dedicated queues.
+For example, using environment variables:
 
 [source,bash]
 ----
@@ -106,7 +114,8 @@ The configuration of a branch for the auto versioning of its dependencies can be
 * <<auto-versioning-config-integrations-jenkins,Jenkins Ontrack pipeline library>> for Jenkins pipelines
 * <<auto-versioning-config-integrations-github,GitHub>> for the <<integration-github-ingestion,GitHub ingestion>>
 
-All these integrations rely on setting up a version of the _auto versioning model_ for a branch which contains a list of _auto versioning source configurations_. This can be represented as YAML using:
+All these integrations rely on setting up a version of the _auto versioning model_ for a branch which contains a list of _auto versioning source configurations_.
+This can be represented as YAML using:
 
 [source,yaml]
 ----
@@ -157,10 +166,8 @@ configurations:
     postProcessing: String?
     # Configuration of the post processing
     postProcessingConfig: JsonNode?
-    # If defined, will create a validation stamp in the target branch being upgraded. If this parameter
-    # is set to `auto`, the validation stamp name will be created automatically from the source project,
-    # with `auto-versioning-` as a prefix.
-    validationStamp: String
+    # See "Auto versioning checks"
+    validationStamp: String?
     # Auto approval mode
     autoApprovalMode: CLIENT | SCM
 ----
@@ -173,8 +180,7 @@ The auto versioning model for a branch, if set, is shown on the branch page.
 [[auto-versioning-config-branch]]
 ===== Targeting a series of branches
 
-In this scenario, the parent wants to be notified of a promotion on a series of branches,
-and Ontrack triggers the upgrade _only_ if the promotion has occurred on the _latest_ branch.
+In this scenario, the parent wants to be notified of a promotion on a series of branches, and Ontrack triggers the upgrade _only_ if the promotion has occurred on the _latest_ branch.
 
 Setup:
 
@@ -196,16 +202,20 @@ Con's:
 [[auto-versioning-config-type]]
 ===== Target files types
 
-Auto versioning, in the end, works by updating a _target file_, designed in the configuration by the `path` property. Typically, it'll be a `gradle.properties` or a `package.json` file but it could be anything else.
+Auto versioning, in the end, works by updating a _target file_, designed in the configuration by the `path` property.
+Typically, it'll be a `gradle.properties` or a `package.json` file but it could be anything else.
 
-A regular expression (`regex` parameter) can be used to identify the change. This expression is used to 1) identify the current version 2) replace the current version by a new one. In order for this to work, the regular expression must:
+A regular expression (`regex` parameter) can be used to identify the change.
+This expression is used to 1) identify the current version 2) replace the current version by a new one.
+In order for this to work, the regular expression must:
 
 * match the whole target line in the target file
 * have a capturing group in position 1 identifying the version to read or replace
 
 It is also possible to use a higher level of file type, by specifying a _propertyName_ and optionally a _propertyType_.
 
-The _propertyName_ designates a _property_ in the target file and the _propertyType_ designates the type of the file to replace. Two types are currently supported:
+The _propertyName_ designates a _property_ in the target file and the _propertyType_ designates the type of the file to replace.
+Two types are currently supported:
 
 * `properties` (default) - Java properties file, typically used for a `gradle.properties` file
 * `npm` - NPM package file, typically used for `package.json`
@@ -244,17 +254,17 @@ In order to get to the `repo/component:0.1.1` value, the path to set will be:
 #root.^[kind == 'Deployment' and metadata.name == 'my-app'].spec.template.spec.containers.^[name == 'component'].image
 ----
 
-See the https://docs.spring.io/spring/docs/4.3.25.RELEASE/spring-framework-reference/htmlsingle/#expressions[Spring Expression Language] reference
-for a complete reference but this expression already illustrates some key points:
+See the https://docs.spring.io/spring/docs/4.3.25.RELEASE/spring-framework-reference/htmlsingle/#expressions[Spring Expression Language] reference for a complete reference but this expression already illustrates some key points:
 
 * `#root` refers to the "root object", used to evaluate the expression, in our case, the list of YAML "documents", separated by `---`
-* `.^[<filter>]` is an operator for a list, evaluating the given filter for each element until one element is found. Only the found
-element is returned.
+* `.^[<filter>]` is an operator for a list, evaluating the given filter for each element until one element is found.
+Only the found element is returned.
 * `.name` returns the value of the `name` property on an object
 * literal strings are using single quotes, for example: `'Deployment'`
 
 If `property` is set to the expression mentioned above, the value being returned will be
-`repo/component:0.1.1`. However, we want to use `0.1.1`only.
+`repo/component:0.1.1`.
+However, we want to use `0.1.1`only.
 
 For this purpose, you need to specify also the `propertyRegex` and set it, for this example to:
 
@@ -344,7 +354,8 @@ To automatically update the `@test/module` in `package.json` to the latest versi
 [[auto-versioning-post-processing]]
 ==== Post processing
 
-In some cases, it's not enough to have only a version being updated into one file. Some additional post-processing may be needed.
+In some cases, it's not enough to have only a version being updated into one file.
+Some additional post-processing may be needed.
 
 For example, if using Gradle or NPM dependency locks, after the version is updated, you'd need to resolve and write the new dependency locks.
 
@@ -355,7 +366,8 @@ In the <<auto-versioning-config,branch configuration>>, you can set two properti
 * `postProcessing` - ID of the post-processing mechanism
 * `postProcessingConfig` - configuration for the post-processing mechanism
 
-As of now, only two post-processing mechanisms are supported. See the sections below for their respective configurations.
+As of now, only two post-processing mechanisms are supported.
+See the sections below for their respective configurations.
 
 [[auto-versioning-post-processing-github]]
 ===== GitHub post-processing
@@ -381,7 +393,8 @@ The `postProcessingConfig` <<auto-versioning-config,property>> at branch level m
 * `config` - GitHub configuration to use for the connection (optional, using defaults if not specified)
 * `workflow` - If defined, name of the workflow in _this_ repository containing the post-processing (like `post-processing.yml`)
 
-The `workflow` branch configuration property can be used to set the post-processing workflow to one in the very branch targeted by the auto versioning process. This would override the global settings.
+The `workflow` branch configuration property can be used to set the post-processing workflow to one in the very branch targeted by the auto versioning process.
+This would override the global settings.
 
 Example of a simple configuration relying on the global settings:
 
@@ -614,7 +627,8 @@ and the corresponding user must have at least the `Triage` role on the target re
 
 [IMPORTANT]
 ====
-This `autoMergeToken` must be linked to a user _which is not_ the user used by the GitHub configuration. It's because a user cannot approve their own pull requests.
+This `autoMergeToken` must be linked to a user _which is not_ the user used by the GitHub configuration.
+It's because a user cannot approve their own pull requests.
 ====
 
 [[auto-versioning-pr-client]]
@@ -633,6 +647,30 @@ There is some configuration to be done at SCM level.
 The target repository, the one defining the project being auto-versioned, must have the following settings:
 
 * the `Allow auto-merge` feature must be enabled in the repository
+
+[[auto-versioning-check]]
+==== Auto versioning checks
+
+While auto versioning is configured to automatically upgrade branches upon the promotion of some other projects, it's also possible to use this very configuration to check if a given build is up-to-date or not with the latest dependencies.
+
+By calling the `POST /extension/auto-versioning/build/{buildId}/check` end point, where `buildId` is the ID of the build to check, you create a <<model,validation run>> on this build:
+
+* it'll be PASSED if the dependencies are up-to-date
+* FAILED otherwise
+
+The name of the validation stamp is defined by the `validationStamp` parameter in the <<auto-versioning-config,configuration of the branch>>:
+
+* if defined, will use this name
+* if set to `auto`, the validation stamp name will be `auto-versioning-<project>`, with `<project>` being the name of the source project
+* if not set, no validation is created
+
+[NOTE]
+====
+You should seldom call this endpoint directly and rather use one of the existing integrations:
+
+* <<integration-github-ingestion,GitHub ingestion>>
+* <<feeding-jenkins-library,the Jenkins pipeline library>>
+====
 
 [[auto-versioning-audit]]
 ==== Audit logs
@@ -673,7 +711,8 @@ When the details are shown, the following information is available:
 [[auto-versioning-audit-cleanup]]
 ===== Audit cleanup
 
-To avoid accumulating audit log entries forever, a cleanup job is run every day to remove obsolete entries. The behaviour of the cleanup is controlled through the <<auto-versioning-settings,global settings>>.
+To avoid accumulating audit log entries forever, a cleanup job is run every day to remove obsolete entries.
+The behaviour of the cleanup is controlled through the <<auto-versioning-settings,global settings>>.
 
 [[auto-versioning-audit-metrics]]
 ===== Audit metrics

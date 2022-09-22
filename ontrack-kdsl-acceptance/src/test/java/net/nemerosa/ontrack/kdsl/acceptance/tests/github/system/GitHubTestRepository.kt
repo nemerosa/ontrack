@@ -255,11 +255,12 @@ class GitHubRepositoryContext(
             content: () -> String,
         ) {
             val expectedContent = content()
+            var actualContent: String?
             waitUntil(
                 timeout = timeout,
                 task = "Waiting for file $path on branch $branch to have a given content.",
                 onTimeout = {
-                    val actualContent = getFile(path, branch).joinToString("\n")
+                    actualContent = getFile(path, branch).joinToString("\n")
                     fail(
                         """
 Expected the following content for the $path file on the $branch branch:
@@ -273,8 +274,8 @@ $actualContent
                     )
                 }
             ) {
-                val actualContent = getFile(path, branch).joinToString("\n")
-                expectedContent in actualContent
+                actualContent = getFile(path, branch).joinToString("\n")
+                actualContent?.contains(expectedContent) ?: false
             }
         }
 

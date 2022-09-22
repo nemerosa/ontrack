@@ -115,7 +115,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         }
     }
 
-    protected fun <T> setProperty(projectEntity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>, data: T) {
+    fun <T> setProperty(projectEntity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>, data: T) {
         asUser().with(projectEntity, ProjectEdit::class.java).execute(Runnable {
             propertyService.editProperty(
                     projectEntity,
