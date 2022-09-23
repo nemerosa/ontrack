@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.av.settings
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APILabel
 import java.time.Duration
 
 @APIDescription("Auto versioning settings")
@@ -14,6 +15,9 @@ data class AutoVersioningSettings(
     @APIDescription("Maximum number of days to keep audit entries for all kinds of auto versioning requests (counted _after_ the audit retention)")
     @JsonDeserialize(using = AutoVersioningSettingsDurationDeserializer::class)
     val auditCleanupDuration: Duration = DEFAULT_AUDIT_CLEANUP_DURATION,
+    @APIDescription("Creation of the build link on auto version check")
+    @APILabel("Build links on auto versioning check")
+    val buildLinks: Boolean = DEFAULT_BUILD_LINKS,
 ) {
     companion object {
         /**
@@ -30,5 +34,10 @@ data class AutoVersioningSettings(
          * Default value for [AutoVersioningSettings.auditCleanupDuration]
          */
         val DEFAULT_AUDIT_CLEANUP_DURATION: Duration = Duration.ofDays(90)
+
+        /**
+         * Default value for [AutoVersioningSettings.buildLinks]
+         */
+        val DEFAULT_BUILD_LINKS: Boolean = true
     }
 }
