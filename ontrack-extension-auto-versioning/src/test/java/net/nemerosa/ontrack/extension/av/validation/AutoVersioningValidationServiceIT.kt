@@ -138,14 +138,20 @@ internal class AutoVersioningValidationServiceIT : AbstractAutoVersioningTestSup
                 val build = build()
                 build.linkTo(linkedBuild430)
 
-                val data = autoVersioningValidationService.checkAndValidate(build)
-
-                assertNotNull(data.firstOrNull(), "One validation") { validationData ->
-                    assertEquals(linkedBuild430.project.name, validationData.project)
-                    assertEquals("4.3.0", validationData.version)
-                    assertEquals("4.3.1", validationData.latestVersion)
-                    assertEquals("gradle.properties", validationData.path)
-                    assertTrue(validationData.time > 0)
+                run("""
+                    mutation {
+                        checkAutoVersioning(input: {
+                            project: "${build.project.name}",
+                            branch: "${build.branch.name}",
+                            build: "${build.name}",
+                        }) {
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                """) { data ->
+                    checkGraphQLUserErrors(data, "checkAutoVersioning")
                 }
 
                 val run =
@@ -159,6 +165,53 @@ internal class AutoVersioningValidationServiceIT : AbstractAutoVersioningTestSup
 
     @Test
     fun `Check and validate for up-to-date dependency read from the linked build with existing validation stamp`() {
+        val (linkedBuild430, linkedBuild431) = project<Pair<Build, Build>> {
+            branch<Pair<Build, Build>>("main") {
+                val gold = promotionLevel("GOLD")
+                val b430 = build("4.3.0")
+                b430.promote(gold)
+                val b431 = build("4.3.1")
+                b431.promote(gold)
+                b430 to b431
+            }
+        }
+
+        project {
+            branch {
+                val vs = validationStamp()
+                autoValidationStampProperty(project, autoCreateIfNotPredefined = true)
+                setAutoVersioning {
+                    autoVersioningConfig {
+                        project = linkedBuild430.project.name
+                        branch = linkedBuild430.branch.name
+                        promotion = "GOLD"
+                        validationStamp = vs.name
+                    }
+                }
+                val build = build()
+                build.linkTo(linkedBuild431)
+
+                val data = autoVersioningValidationService.checkAndValidate(build)
+
+                assertNotNull(data.firstOrNull(), "One validation") { validationData ->
+                    assertEquals(linkedBuild430.project.name, validationData.project)
+                    assertEquals("4.3.1", validationData.version)
+                    assertEquals("4.3.1", validationData.latestVersion)
+                    assertEquals("gradle.properties", validationData.path)
+                    assertTrue(validationData.time > 0)
+                }
+
+                val run =
+                    structureService.getValidationRunsForBuildAndValidationStamp(build.id, vs.id, 0, 1).firstOrNull()
+                assertNotNull(run, "Validation has been created") {
+                    assertEquals("PASSED", it.lastStatusId, "Validation passed")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Check and validate using GraphQL for up-to-date dependency read from the linked build with existing validation stamp`() {
         val (linkedBuild430, linkedBuild431) = project<Pair<Build, Build>> {
             branch<Pair<Build, Build>>("main") {
                 val gold = promotionLevel("GOLD")
