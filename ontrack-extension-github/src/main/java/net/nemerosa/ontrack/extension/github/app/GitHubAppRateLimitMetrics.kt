@@ -33,8 +33,8 @@ class GitHubAppRateLimitMetrics(
     override fun startupOrder(): Int = StartupService.JOB_REGISTRATION
 
     override fun start() {
-        gitHubConfigurationService.addConfigurationServiceListener(this)
         if (gitHubConfigurationProperties.metrics.enabled) {
+            gitHubConfigurationService.addConfigurationServiceListener(this)
             gitHubConfigurationService.configurations.forEach {
                 registerMetrics(it)
             }
