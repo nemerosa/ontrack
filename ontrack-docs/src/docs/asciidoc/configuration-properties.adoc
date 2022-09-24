@@ -240,6 +240,9 @@ ontrack.config.extension.git.indexation.cleanup.enabled = true
 
 [source,properties]
 ----
+# Set to `false` to disable the export of the GitHub API rate limit
+ontrack.extension.github.metrics.enabled = true
+
 # Set to `true` to disable the signature checks (OK for testing, NOT for production)
 ontrack.extension.github.ingestion.hook.signature.disabled = false
 

@@ -121,3 +121,19 @@ Branches can be <<usage-git,configured for Git>> independently.
 The <<scm-catalog,SCM Catalog>> feature requires some additional
 configuration for GitHub. See the specific <<scm-catalog-github,section>>
 for more information.
+
+[[integration-github-metrics]]
+==== GitHub metrics
+
+When Ontrack contains at least one GitHub configuration, the following metrics are exposed to signal how the rate limit currently is:
+
+* `ontrack_extension_github_ratelimit_core_limit`
+* `ontrack_extension_github_ratelimit_core_remaining`
+* `ontrack_extension_github_ratelimit_core_used`
+* `ontrack_extension_github_ratelimit_graphql_limit`
+* `ontrack_extension_github_ratelimit_graphql_remaining`
+* `ontrack_extension_github_ratelimit_graphql_used`
+
+All these metrics are tagged with `configuration`. The value of the tag is the name of the configuration in Ontrack.
+
+These metrics are enabled by default but can be disabled by setting the `ontrack.extension.github.metrics.enabled` <<configuration-properties,configuration property>> to `false`.
