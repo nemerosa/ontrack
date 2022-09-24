@@ -4,8 +4,11 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningTargetFileService
+import net.nemerosa.ontrack.extension.av.settings.AutoVersioningSettings
+import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,6 +23,7 @@ class AutoVersioningValidationServiceImpl(
     private val scmDetector: SCMDetector,
     private val autoVersioningTargetFileService: AutoVersioningTargetFileService,
     private val buildFilterService: BuildFilterService,
+    private val cachedSettingsService: CachedSettingsService,
 ) : AutoVersioningValidationService {
 
     override fun checkAndValidate(build: Build): List<AutoVersioningValidationData> {
@@ -70,6 +74,41 @@ class AutoVersioningValidationServiceImpl(
                     data = data
                 )
             )
+            // Creation of the build link
+            val settings = cachedSettingsService.getCachedSettings(AutoVersioningSettings::class.java)
+            if (settings.buildLinks && current != null && (config.buildLinkCreation == null || config.buildLinkCreation)) {
+                if (!structureService.isLinkedTo(build, config.sourceProject, "*")) {
+                    // Source project
+                    val sourceProject = structureService.findProjectByName(config.sourceProject).getOrNull()
+                    if (sourceProject != null) {
+                        // Looking for the target build based its name first
+                        val targetBuild = structureService.buildSearch(
+                            sourceProject.id,
+                            BuildSearchForm(
+                                maximumCount = 1,
+                                buildName = current,
+                                buildExactMatch = true,
+                            )
+                        ).firstOrNull()
+                        // ... then on its label
+                            ?: structureService.buildSearch(
+                                sourceProject.id,
+                                BuildSearchForm(
+                                    maximumCount = 1,
+                                    property = ReleasePropertyType::class.java.name,
+                                    propertyValue = current,
+                                )
+                            ).firstOrNull()
+                        // Creation of the link
+                        if (targetBuild != null) {
+                            structureService.addBuildLink(
+                                fromBuild = build,
+                                toBuild = targetBuild,
+                            )
+                        }
+                    }
+                }
+            }
             // OK
             data
         } else {

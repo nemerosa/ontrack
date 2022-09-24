@@ -555,7 +555,12 @@ pipeline {
             }
             steps {
                 // Merge to master
-                sshagent (credentials: ['SSH_JENKINS_GITHUB']) {
+                withCredentials([
+                        gitUsernamePassword(
+                                credentialsId: 'jenkins.nemerosa.net.scanning',
+                                gitToolName: 'Default'
+                        )
+                ]) {
                     sh '''
                         git config --local user.email "jenkins@nemerosa.net"
                         git config --local user.name "Jenkins"

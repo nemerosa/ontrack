@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.av.graphql
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
+import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationService
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component
 class AutoVersioningMutations(
     private val structureService: StructureService,
     private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
+    private val autoVersioningValidationService: AutoVersioningValidationService,
 ) : TypedMutationProvider() {
     override val mutations: List<Mutation> = listOf(
 
@@ -55,6 +57,21 @@ class AutoVersioningMutations(
             )
             branch
         },
+
+        unitMutation(
+            name = "checkAutoVersioning",
+            description = "Checks the status of the auto versioning compared to the latest versions and creates an appropriate validation",
+            input = CheckAutoVersioningInput::class,
+        ) { input ->
+            val build = structureService.findBuildByName(
+                input.project,
+                input.branch,
+                input.build
+            ).getOrNull()
+            if (build != null) {
+                autoVersioningValidationService.checkAndValidate(build)
+            }
+        }
 
     )
 }
