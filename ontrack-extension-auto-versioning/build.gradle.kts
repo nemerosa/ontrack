@@ -11,6 +11,7 @@ dependencies {
 
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-extension-scm"))
+    implementation(project(":ontrack-extension-general"))
     implementation(project(":ontrack-repository-support"))
     implementation(project(":ontrack-rabbitmq"))
     implementation("io.micrometer:micrometer-core")

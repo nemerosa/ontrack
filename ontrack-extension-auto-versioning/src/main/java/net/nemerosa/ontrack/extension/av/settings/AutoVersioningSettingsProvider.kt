@@ -32,6 +32,11 @@ class AutoVersioningSettingsProvider(
             ?.takeIf { it.isNotBlank() }
             ?.let { Duration.parse(it) }
             ?: AutoVersioningSettings.DEFAULT_AUDIT_CLEANUP_DURATION,
+        buildLinks = settingsRepository.getBoolean(
+            AutoVersioningSettings::class.java,
+            AutoVersioningSettings::buildLinks.name,
+            AutoVersioningSettings.DEFAULT_BUILD_LINKS
+        )
     )
 
     override fun getSettingsClass(): Class<AutoVersioningSettings> = AutoVersioningSettings::class.java

@@ -38,6 +38,9 @@ class AutoVersioningSettingsManager(
             AutoVersioningSettings::auditCleanupDuration.name,
             settings.auditCleanupDuration.toString()
         )
+
+        // Build links
+        settingsRepository.setBoolean<AutoVersioningSettings>(settings::buildLinks)
     }
 
     override fun getSettingsForm(settings: AutoVersioningSettings): Form = Form.create()
@@ -55,6 +58,10 @@ class AutoVersioningSettingsManager(
                 .label("Audit cleanup milliseconds")
                 .help("Maximum number of seconds to keep audit entries for auto versioning requests. This time is counted after the retention period for the non-running entries.")
                 .value(settings.auditCleanupDuration.toSeconds())
+        )
+        .yesNoField(
+            AutoVersioningSettings::buildLinks,
+            settings.buildLinks
         )
 
     override fun getId(): String = "auto-versioning"

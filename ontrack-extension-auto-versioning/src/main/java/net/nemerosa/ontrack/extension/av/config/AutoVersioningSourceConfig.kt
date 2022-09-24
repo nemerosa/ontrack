@@ -35,6 +35,8 @@ data class AutoVersioningSourceConfig(
     val validationStamp: String? = null,
     @APIDescription("Auto approval mode")
     val autoApprovalMode: AutoApprovalMode? = null,
+    @APIDescription("Build link creation. True by default.")
+    val buildLinkCreation: Boolean? = null,
 ) : AutoVersioningTargetConfig {
 
     /**
@@ -117,7 +119,8 @@ data class AutoVersioningSourceConfig(
             postProcessing = postProcessing,
             postProcessingConfig = postProcessingConfig?.takeIf { !it.isNull },
             validationStamp = validationStamp,
-            autoApprovalMode = autoApprovalMode
+            autoApprovalMode = autoApprovalMode,
+            buildLinkCreation = buildLinkCreation,
         )
 
 }
