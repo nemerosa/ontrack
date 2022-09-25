@@ -1,0 +1,13 @@
+licenses:
+  Starter:
+    ontrack-persistence-size: "5Gi"
+    ontrack-resources-cpu-limit: "800m"
+    ontrack-resources-cpu-request: "800m"
+    ontrack-resources-memory-limit: "2Gi"
+    ontrack-resources-memory-request: "1Gi"
+    do-database-size: "db-s-1vcpu-1gb"
+    do-database-count: 1
+groups:
+  nemerosa-demo:
+    chart-version: 0.7.1
+    version: 4.3.10
