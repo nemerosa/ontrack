@@ -48,10 +48,11 @@ import kotlin.concurrent.withLock
 class DefaultElasticMetricsClient(
     private val elasticMetricsConfigProperties: ElasticMetricsConfigProperties,
     private val defaultClient: RestHighLevelClient,
-    private val registry: MeterRegistry,
 ) : ElasticMetricsClient, MeterBinder {
 
     private val logger: Logger = LoggerFactory.getLogger(DefaultElasticMetricsClient::class.java)
+
+    private var registry: MeterRegistry? = null
 
     private fun debug(message: String) {
         if (elasticMetricsConfigProperties.debug && logger.isDebugEnabled) {
@@ -80,6 +81,7 @@ class DefaultElasticMetricsClient(
     private val bufferLock = ReentrantLock()
 
     override fun bindTo(registry: MeterRegistry) {
+        this.registry = registry
         // Size of the queue
         registry.gauge(ElasticMetricsClientMetrics.queue, this) {
             queueSize.get().toDouble()
@@ -200,12 +202,12 @@ class DefaultElasticMetricsClient(
                         request.add(IndexRequest(indexName).id(it.computeId()).source(source))
                     }
                     // Bulk request execution
-                    registry.time(ElasticMetricsClientMetrics.time) {
+                    registry?.time(ElasticMetricsClientMetrics.time) {
                         try {
                             client.bulk(request, RequestOptions.DEFAULT)
                         } catch (any: Exception) {
                             logger.error("Cannot export ${entries.size} metrics to ElasticSearch", any)
-                            registry.increment(ElasticMetricsClientMetrics.errors)
+                            registry?.increment(ElasticMetricsClientMetrics.errors)
                         }
                     }
                 } else {
