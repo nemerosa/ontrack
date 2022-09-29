@@ -136,7 +136,7 @@ class DefaultElasticMetricsClient(
         while (true) {
             val entry = queue.receive()
             queueSize.decrementAndGet()
-            // debug("Entry received")
+            debug("Entry received: $entry")
             runBlocking {
                 launch(Job()) {
                     processEvent(entry)
@@ -147,7 +147,7 @@ class DefaultElasticMetricsClient(
 
     private fun processEvent(entry: ECSEntry) {
         buffer.add(entry)
-        debug("Entry buffered (${buffer.size}/${elasticMetricsConfigProperties.queue.buffer})")
+        debug("Entry buffered (${buffer.size}/${elasticMetricsConfigProperties.queue.buffer}) $entry")
         if (buffer.size >= elasticMetricsConfigProperties.queue.buffer.toInt()) {
             // Flushing the buffer
             debug("Buffer flushing")
