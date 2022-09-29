@@ -146,13 +146,17 @@ class DefaultElasticMetricsClient(
      */
     private suspend fun receiveEvents() {
         while (true) {
-            val entry = queue.receive()
-            queueSize.decrementAndGet()
-            debug("Entry received: $entry")
-            runBlocking {
-                launch(Job()) {
-                    processEvent(entry)
+            try {
+                val entry = queue.receive()
+                queueSize.decrementAndGet()
+                debug("Entry received: $entry")
+                runBlocking {
+                    launch(Job()) {
+                        processEvent(entry)
+                    }
                 }
+            } catch (any: Exception) {
+                logger.error("Error on dequeuing an ECS entry", any)
             }
         }
     }
@@ -173,11 +177,15 @@ class DefaultElasticMetricsClient(
     private suspend fun flushEvents() {
         runBlocking {
             while (true) {
-                // Wait between each flushing session
-                delay(elasticMetricsConfigProperties.queue.flushing.toMillis())
-                // Flushing
-                debug("Timed flushing")
-                flushing()
+                try {
+                    // Wait between each flushing session
+                    delay(elasticMetricsConfigProperties.queue.flushing.toMillis())
+                    // Flushing
+                    debug("Timed flushing")
+                    flushing()
+                } catch (any: Exception) {
+                    logger.error("Error on timed flushing", any)
+                }
             }
         }
     }
