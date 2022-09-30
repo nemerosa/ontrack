@@ -12,11 +12,15 @@ import io.micrometer.core.instrument.Tag
  * @param code Code whose execution duration must be recorded
  * @return Value returned by the code being measured
  */
-fun <T> MeterRegistry.time(
+fun <T> MeterRegistry?.time(
         name: String,
         vararg tags: Pair<String, String>,
         code: () -> T
 ): T {
-    val timer = timer(name, tags.map { Tag.of(it.first, it.second) })
-    return timer.record(code)!!
+    if (this != null) {
+        val timer = timer(name, tags.map { Tag.of(it.first, it.second) })
+        return timer.record(code)!!
+    } else {
+        return code()
+    }
 }

@@ -25,4 +25,22 @@ class YamlAccessorTest {
         assertTrue("docker-delivery.repository.sample.io/test/listener:0.2.0" in newContent)
     }
 
+    @Test
+    fun `Reading and writing YAML using Spring EL expressions for a simple map access`() {
+        // Content as string
+        val content = TestUtils.resourceString("/samples/yaml/map.yaml")
+        // Accessor on this content
+        val accessor = YamlAccessor(content)
+        // Expression
+        val x = "#root[0].groups['nemerosa-demo'].version"
+        // Reading
+        val value = accessor.getValue(x)
+        assertEquals("4.3.10", value)
+        // Writing
+        accessor.setValue(x, "4.3.11")
+        // Writing as string
+        val newContent = accessor.write()
+        assertTrue("""version: "4.3.11"""" in newContent)
+    }
+
 }

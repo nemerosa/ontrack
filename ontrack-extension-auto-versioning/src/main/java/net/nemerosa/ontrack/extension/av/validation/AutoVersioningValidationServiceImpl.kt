@@ -55,7 +55,7 @@ class AutoVersioningValidationServiceImpl(
                 time = time
             )
             // Validation stamp creation with type
-            val validationStamp = structureService.getOrCreateValidationStamp(build.branch, validationStampName)
+            val validationStamp = setupValidationStamp(build.branch, validationStampName)
             if (validationStamp.dataType?.descriptor?.id != autoVersioningValidationDataType.descriptor.id) {
                 structureService.saveValidationStamp(
                     validationStamp.withDataType(
@@ -114,6 +114,19 @@ class AutoVersioningValidationServiceImpl(
         } else {
             null
         }
+    }
+
+    /**
+     * Ignoring the setup of the project for the automated creation of validation stamps here.
+     */
+    private fun setupValidationStamp(
+        branch: Branch,
+        validationStampName: String,
+    ): ValidationStamp {
+        val vs = structureService.findValidationStampByName(branch.project.name, branch.name, validationStampName).getOrNull()
+        return vs ?: structureService.newValidationStamp(
+            ValidationStamp.of(branch, NameDescription.nd(validationStampName, "Auto created for auto versioning check"))
+        )
     }
 
     private fun getActualValidationStampName(config: AutoVersioningSourceConfig): String? =

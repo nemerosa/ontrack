@@ -6,8 +6,10 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.toJsonMap
+import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.structure.SearchNodeResults
 import net.nemerosa.ontrack.model.structure.SearchResultNode
+import net.nemerosa.ontrack.model.support.time
 import org.apache.http.HttpHost
 import org.apache.http.auth.AuthScope
 import org.apache.http.auth.Credentials
@@ -30,7 +32,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 @DelicateCoroutinesApi
 @Component
@@ -46,6 +51,8 @@ class DefaultElasticMetricsClient(
 ) : ElasticMetricsClient, MeterBinder {
 
     private val logger: Logger = LoggerFactory.getLogger(DefaultElasticMetricsClient::class.java)
+
+    private var registry: MeterRegistry? = null
 
     private fun debug(message: String) {
         if (elasticMetricsConfigProperties.debug && logger.isDebugEnabled) {
@@ -68,13 +75,19 @@ class DefaultElasticMetricsClient(
      */
     private val buffer = ConcurrentLinkedQueue<ECSEntry>()
 
+    /**
+     * Buffer lock
+     */
+    private val bufferLock = ReentrantLock()
+
     override fun bindTo(registry: MeterRegistry) {
+        this.registry = registry
         // Size of the queue
-        registry.gauge("ontrack_extension_elastic_metrics_queue", this) {
+        registry.gauge(ElasticMetricsClientMetrics.queue, this) {
             queueSize.get().toDouble()
         }
         // Size of the buffer
-        registry.gauge("ontrack_extension_elastic_metrics_buffer", this) {
+        registry.gauge(ElasticMetricsClientMetrics.buffer, this) {
             buffer.size.toDouble()
         }
     }
@@ -98,7 +111,6 @@ class DefaultElasticMetricsClient(
                 runBlocking {
                     launch {
                         entries.forEach { entry ->
-                            // debug("Entry queued")
                             queueSize.incrementAndGet()
                             queue.send(entry)
                         }
@@ -106,7 +118,7 @@ class DefaultElasticMetricsClient(
                 }
             }
         } catch (ex: Throwable) {
-            logger.error("Cannot export ${entries.size} metrics to ElasticSearch", ex)
+            logger.error("Cannot queue ${entries.size} metrics for export to ElasticSearch", ex)
         }
     }
 
@@ -134,20 +146,24 @@ class DefaultElasticMetricsClient(
      */
     private suspend fun receiveEvents() {
         while (true) {
-            val entry = queue.receive()
-            queueSize.decrementAndGet()
-            // debug("Entry received")
-            runBlocking {
-                launch(Job()) {
-                    processEvent(entry)
+            try {
+                val entry = queue.receive()
+                queueSize.decrementAndGet()
+                debug("Entry received: $entry")
+                runBlocking {
+                    launch(Job()) {
+                        processEvent(entry)
+                    }
                 }
+            } catch (any: Exception) {
+                logger.error("Error on dequeuing an ECS entry", any)
             }
         }
     }
 
     private fun processEvent(entry: ECSEntry) {
         buffer.add(entry)
-        debug("Entry buffered (${buffer.size}/${elasticMetricsConfigProperties.queue.buffer})")
+        debug("Entry buffered (${buffer.size}/${elasticMetricsConfigProperties.queue.buffer}) $entry")
         if (buffer.size >= elasticMetricsConfigProperties.queue.buffer.toInt()) {
             // Flushing the buffer
             debug("Buffer flushing")
@@ -161,33 +177,56 @@ class DefaultElasticMetricsClient(
     private suspend fun flushEvents() {
         runBlocking {
             while (true) {
-                // Wait between each flushing session
-                delay(elasticMetricsConfigProperties.queue.flushing.toMillis())
-                // Flushing
-                debug("Timed flushing")
-                flushing()
+                try {
+                    // Wait between each flushing session
+                    delay(elasticMetricsConfigProperties.queue.flushing.toMillis())
+                    // Flushing
+                    debug("Timed flushing")
+                    flushing()
+                } catch (any: Exception) {
+                    logger.error("Error on timed flushing", any)
+                }
             }
         }
     }
 
     private fun flushing() {
-        if (buffer.isNotEmpty()) {
-            debug("Flushing all entries (${buffer.size})")
-            // Copy of the elements
-            val entries = buffer.toTypedArray()
-            // Flushing the buffer
-            buffer.clear()
-            // Creating the bulk request
-            val indexName = elasticMetricsConfigProperties.index.name
-            val request = BulkRequest()
-            entries.forEach {
-                val source = it.asJson().toJsonMap()
-                request.add(IndexRequest(indexName).id(it.computeId()).source(source))
+        debug("Trying to get lock on buffer")
+        bufferLock.withLock { }
+        if (bufferLock.tryLock(1, TimeUnit.MINUTES)) {
+            debug("Locked on the buffer")
+            try {
+                if (buffer.isNotEmpty()) {
+                    debug("Flushing all entries (${buffer.size})")
+                    // Copy of the elements
+                    val entries = buffer.toTypedArray()
+                    // Flushing the buffer
+                    buffer.clear()
+                    // Creating the bulk request
+                    val indexName = elasticMetricsConfigProperties.index.name
+                    val request = BulkRequest()
+                    entries.forEach {
+                        val source = it.asJson().toJsonMap()
+                        request.add(IndexRequest(indexName).id(it.computeId()).source(source))
+                    }
+                    // Bulk request execution
+                    registry?.time(ElasticMetricsClientMetrics.time) {
+                        try {
+                            client.bulk(request, RequestOptions.DEFAULT)
+                        } catch (any: Exception) {
+                            logger.error("Cannot export ${entries.size} metrics to ElasticSearch", any)
+                            registry?.increment(ElasticMetricsClientMetrics.errors)
+                        }
+                    }
+                } else {
+                    debug("Nothing to flush")
+                }
+            } finally {
+                bufferLock.unlock()
+                debug("Unlocking the buffer")
             }
-            // Bulk request execution
-            client.bulk(request, RequestOptions.DEFAULT)
         } else {
-            debug("Nothing to flush")
+            debug("Could not acquire lock. Skipping.")
         }
     }
 
