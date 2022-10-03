@@ -38,10 +38,6 @@ class SCMCatalogSyncSettingsManager(
                     .help("If synchronization of SCM catalog entries as Ontrack projects is enabled")
                     .value(settings?.syncEnabled ?: DEFAULT_SCM_CATALOG_SYNC_SETTINGS_ENABLED)
             )
-            .yesNoField(
-                SCMCatalogSyncSettings::orphanDisablingEnabled,
-                settings?.orphanDisablingEnabled ?: DEFAULT_SCM_CATALOG_SYNC_SETTINGS_ORPHAN_DISABLED
-            )
             .with(
                 Text.of(SCMCatalogSyncSettings::scm.name)
                     .label("SCM filter")
@@ -65,6 +61,10 @@ class SCMCatalogSyncSettingsManager(
                     .optional()
                     .value(settings?.repository ?: DEFAULT_SCM_CATALOG_SYNC_SETTINGS_REPOSITORY)
                     .visibleIf(SCMCatalogSyncSettings::syncEnabled.name)
+            )
+            .yesNoField(
+                SCMCatalogSyncSettings::orphanDisablingEnabled,
+                settings?.orphanDisablingEnabled ?: DEFAULT_SCM_CATALOG_SYNC_SETTINGS_ORPHAN_DISABLED
             )
 
     override fun getId(): String = "scm-catalog-sync"

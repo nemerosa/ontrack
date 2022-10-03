@@ -40,6 +40,14 @@ class SCMOrphanDisablingJobIT : AbstractDSLTestSupport() {
 
             assertFalse(job.isDisabled, "Job is enabled")
 
+            asAdmin {
+                settingsManagerService.saveSettings(
+                    SCMCatalogSyncSettings(syncEnabled = false, orphanDisablingEnabled = true)
+                )
+            }
+
+            assertFalse(job.isDisabled, "Job is enabled")
+
         }
     }
 

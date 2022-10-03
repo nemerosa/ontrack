@@ -1,14 +1,12 @@
 [[scm-catalog]]
 ==== SCM Catalog
 
-Ontrack allows to collect information about all registered SCMs
-and to correlate this information with the Ontrack <<model,projects>>.
+Ontrack allows to collect information about all registered SCMs and to correlate this information with the Ontrack <<model,projects>>.
 
 [[scm-catalog-model]]
 ===== Model
 
-A _SCM Catalog entry_ represents a physical SCM reposotory which
-is accessible by Ontrack. An entry contains the following information:
+A _SCM Catalog entry_ represents a physical SCM repository which is accessible by Ontrack. An entry contains the following information:
 
 * _SCM_ - type of SCM, like `github` or `bitbucket`.
 * _Configuration_ - associated configuration in Ontrack to access
@@ -104,6 +102,16 @@ image::images/scm-catalog-teams-project.png[Teams in project page]
 
 On this page, the role of the team for this project is also displayed, but usually, more details can be accessed by following the link to the SCM team page.
 
+[[scm-catalog-sync]]
+===== Catalog synchronization
+
+Synchronization between the SCM and Ontrack can be enabled:
+
+* creating an Ontrack project automatically from an SCM repository
+* disabling Ontrack projects when their repository is no longer present
+
+These two synchronizations are distinct and configured with their own flag in the _SCM Catalog Synchronization_ settings.
+
 [[scm-catalog-graphql]]
 ===== GraphQL schema
 
@@ -179,7 +187,7 @@ The following <<monitoring-metrics,metrics>> are available:
 ===== Administration
 
 This feature is enabled by default but can be controlled using
-some administrative <<admin-console-job,jobs>>:
+some administrative jobs:
 
 image::images/scm-catalog-jobs.png[SCM Catalog jobs]
 

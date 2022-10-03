@@ -296,7 +296,7 @@ file.bytes = promotionLevel.image.content
 [[dsl-usecases-changelogs]]
 ==== DSL Change logs
 
-When a branch is configured for a <<usage-scm,SCM>>, a
+When a branch is configured for a <<feature-scm,SCM>>, a
 <<changelogs,change log>> can be computed between two builds and following
 collections can be displayed:
 
@@ -423,7 +423,7 @@ NOTE: This covers only the common attributes provided by Ontrack - additional
 [[dsl-scm]]
 ==== DSL SCM extensions
 
-If a <<usage-scm,SCM>> is correctly configured on a branch, it is possible
+If a <<feature-scm,SCM>> is correctly configured on a branch, it is possible
 to download some files.
 
 IMPORTANT: This is allowed only for the project owner.

@@ -35,8 +35,6 @@ class SCMOrphanDisablingJob(
         override fun getDescription(): String = "Disabling all orphan projects"
 
         override fun isDisabled(): Boolean =
-            cachedSettingsService.getCachedSettings(SCMCatalogSyncSettings::class.java).run {
-                !syncEnabled || !orphanDisablingEnabled
-            }
+            !cachedSettingsService.getCachedSettings(SCMCatalogSyncSettings::class.java).orphanDisablingEnabled
     }
 }
