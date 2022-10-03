@@ -99,15 +99,21 @@ class GitServiceImpl(
     override fun collectJobRegistrations(): Stream<JobRegistration> {
         val jobs = ArrayList<JobRegistration>()
         // Indexation of repositories, based on projects actually linked
-        forEachConfiguredProject(BiConsumer { _, configuration -> jobs.add(getGitIndexationJobRegistration(configuration)) })
+        forEachConfiguredProject(BiConsumer { project, configuration ->
+            if (!project.isDisabled) {
+                jobs.add(getGitIndexationJobRegistration(configuration))
+            }
+        })
         // Synchronisation of branch builds with tags when applicable
         forEachConfiguredBranch(BiConsumer { branch, branchConfiguration ->
-            // Build/tag sync job
-            if (branchConfiguration.buildTagInterval > 0 && branchConfiguration.buildCommitLink?.link is IndexableBuildGitCommitLink<*>) {
-                jobs.add(
+            if (!branch.isDisabled && !branch.project.isDisabled) {
+                // Build/tag sync job
+                if (branchConfiguration.buildTagInterval > 0 && branchConfiguration.buildCommitLink?.link is IndexableBuildGitCommitLink<*>) {
+                    jobs.add(
                         JobRegistration.of(createBuildSyncJob(branch))
-                                .everyMinutes(branchConfiguration.buildTagInterval.toLong())
-                )
+                            .everyMinutes(branchConfiguration.buildTagInterval.toLong())
+                    )
+                }
             }
         })
         // OK
