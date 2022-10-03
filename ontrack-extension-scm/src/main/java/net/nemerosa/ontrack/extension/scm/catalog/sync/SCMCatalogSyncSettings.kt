@@ -15,7 +15,7 @@ class SCMCatalogSyncSettings(
     val syncEnabled: Boolean,
     @APIDescription("Automatically disables the projects which do not have a SCM entry any longer")
     @APILabel("Orphan disabling")
-    val orphanDisablingEnabled: Boolean,
+    val orphanDisablingEnabled: Boolean = DEFAULT_SCM_CATALOG_SYNC_SETTINGS_ORPHAN_DISABLED,
     val scm: String? = null,
     val config: String? = null,
     val repository: String? = null,

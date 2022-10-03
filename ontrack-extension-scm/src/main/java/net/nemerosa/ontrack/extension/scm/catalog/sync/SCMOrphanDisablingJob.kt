@@ -36,7 +36,7 @@ class SCMOrphanDisablingJob(
 
         override fun isDisabled(): Boolean =
             cachedSettingsService.getCachedSettings(SCMCatalogSyncSettings::class.java).run {
-                syncEnabled && orphanDisablingEnabled
+                !syncEnabled || !orphanDisablingEnabled
             }
     }
 }
