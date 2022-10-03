@@ -1,7 +1,7 @@
 [[changelogs]]
 === Change logs
 
-When working with <<usage-git,Git>> or any <<usage-scm,SCM>>, you
+When working with <<usage-git,Git>> or any <<feature-scm,SCM>>, you
 have the opportunity to get a change log between two <<usage-builds,builds>> of
 the same project.
 

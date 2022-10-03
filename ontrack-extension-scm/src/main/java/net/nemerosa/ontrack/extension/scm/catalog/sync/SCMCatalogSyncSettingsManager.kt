@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.scm.catalog.sync
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.form.YesNo
+import net.nemerosa.ontrack.model.form.yesNoField
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -23,6 +24,7 @@ class SCMCatalogSyncSettingsManager(
 ) {
     override fun doSaveSettings(settings: SCMCatalogSyncSettings) {
         settingsRepository.setBoolean<SCMCatalogSyncSettings>(settings::syncEnabled)
+        settingsRepository.setBoolean<SCMCatalogSyncSettings>(settings::orphanDisablingEnabled)
         settingsRepository.setString<SCMCatalogSyncSettings>(settings::scm)
         settingsRepository.setString<SCMCatalogSyncSettings>(settings::config)
         settingsRepository.setString<SCMCatalogSyncSettings>(settings::repository)
@@ -59,6 +61,10 @@ class SCMCatalogSyncSettingsManager(
                     .optional()
                     .value(settings?.repository ?: DEFAULT_SCM_CATALOG_SYNC_SETTINGS_REPOSITORY)
                     .visibleIf(SCMCatalogSyncSettings::syncEnabled.name)
+            )
+            .yesNoField(
+                SCMCatalogSyncSettings::orphanDisablingEnabled,
+                settings?.orphanDisablingEnabled ?: DEFAULT_SCM_CATALOG_SYNC_SETTINGS_ORPHAN_DISABLED
             )
 
     override fun getId(): String = "scm-catalog-sync"

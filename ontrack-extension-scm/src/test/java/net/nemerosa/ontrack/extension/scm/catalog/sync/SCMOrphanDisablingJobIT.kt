@@ -6,15 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class SCMCatalogImportJobIT : AbstractDSLTestSupport() {
+class SCMOrphanDisablingJobIT : AbstractDSLTestSupport() {
 
     @Autowired
-    private lateinit var scmCatalogImportJob: SCMCatalogImportJob
+    private lateinit var scmOrphanDisablingJob: SCMOrphanDisablingJob
 
     @Test
     fun `Checking that the state of the job depends on the settings`() {
         withSettings<SCMCatalogSyncSettings> {
-            val job = scmCatalogImportJob.startingJobs.first().job
+            val job = scmOrphanDisablingJob.startingJobs.first().job
 
             asAdmin {
                 settingsManagerService.saveSettings(
@@ -30,7 +30,23 @@ class SCMCatalogImportJobIT : AbstractDSLTestSupport() {
                 )
             }
 
-            assertFalse(job.isDisabled, "Job is enabled because sync settings are enabled")
+            assertTrue(job.isDisabled, "Job is disabled because sync settings are enabled but not the orphan disabling")
+
+            asAdmin {
+                settingsManagerService.saveSettings(
+                    SCMCatalogSyncSettings(syncEnabled = true, orphanDisablingEnabled = true)
+                )
+            }
+
+            assertFalse(job.isDisabled, "Job is enabled")
+
+            asAdmin {
+                settingsManagerService.saveSettings(
+                    SCMCatalogSyncSettings(syncEnabled = false, orphanDisablingEnabled = true)
+                )
+            }
+
+            assertFalse(job.isDisabled, "Job is enabled")
 
         }
     }
