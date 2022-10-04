@@ -32,23 +32,30 @@ open class OntrackChangeLog : AbstractOntrackTask() {
         val project = ontrack.project(ontrackProject)
         // Gets the last build on the branch to release
         logger.info("ontrackReleaseBranch = $ontrackReleaseBranch")
-        val lastBuild = project.search(mapOf("branchName" to ontrackReleaseBranch))[0]
+        val lastBuild = project.search(mapOf("branchName" to ontrackReleaseBranch)).firstOrNull()
+            ?: error("Cannot find the last build on branch $ontrackReleaseBranch")
         // Gets the last release
         val lastRelease = project.search(mapOf(
                 "branchName" to ontrackReleaseFilter,
-                "promotionName" to ontrackReleasePromotionLevel))[0]
-        // Gets the change log
-        val changeLog = lastBuild.getChangeLog(lastRelease)
-        // Exports the issues
-        this.changeLog = changeLog.exportIssues(mapOf(
-                "format" to "text",
-                "groups" to mapOf(
+                "promotionName" to ontrackReleasePromotionLevel)).firstOrNull()
+        if (lastRelease != null) {
+            // Gets the change log
+            val changeLog = lastBuild.getChangeLog(lastRelease)
+            // Exports the issues
+            this.changeLog = changeLog.exportIssues(
+                mapOf(
+                    "format" to "text",
+                    "groups" to mapOf(
                         "Features" to listOf("type: feature"),
                         "Enhancements" to listOf("type: enhancement"),
                         "Bugs" to listOf("type: bug")
-                ),
-                "exclude" to emptyList<String>()
-        ))
+                    ),
+                    "exclude" to emptyList<String>()
+                )
+            )
+        } else {
+            this.changeLog = ""
+        }
     }
 
 }
