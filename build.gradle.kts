@@ -682,30 +682,23 @@ val release by tasks.registering {
  * This means having a Site job in the pipeline, after the Publish one, calling the `site` task.
  */
 
-val siteOntrackLast2Releases by tasks.registering(OntrackLastReleases::class) {
-    releaseCount = 1
-    releaseBranchPattern = "2\\.[\\d]+"
-}
-
 val siteOntrackLast3Releases by tasks.registering(OntrackLastReleases::class) {
-    releaseCount = 2
+    releaseCount = 1
     releaseBranchPattern = "3\\.[\\d]+"
 }
 
 val siteOntrackLast4Releases by tasks.registering(OntrackLastReleases::class) {
-    releaseCount = 4
-    releaseBranchPattern = "4\\.[\\d]+(-rc|-beta)?"
+    releaseCount = 2
+    releaseBranchPattern = "4\\.[\\d]+"
 }
 
 val sitePagesDocJs by tasks.registering {
-    dependsOn(siteOntrackLast2Releases)
     dependsOn(siteOntrackLast3Releases)
     dependsOn(siteOntrackLast4Releases)
     outputs.file(project.file("ontrack-site/src/main/web/output/assets/web/assets/ontrack/doc.js"))
     doLast {
         val allReleases = siteOntrackLast4Releases.get().releases +
-                siteOntrackLast3Releases.get().releases +
-                siteOntrackLast2Releases.get().releases
+                siteOntrackLast3Releases.get().releases
         val allVersions = allReleases.joinToString(",") { "'${it.name}'" }
         project.file("ontrack-site/src/main/web/output/assets/web/assets/ontrack/doc.js").writeText(
                 """const releases = [$allVersions];"""
