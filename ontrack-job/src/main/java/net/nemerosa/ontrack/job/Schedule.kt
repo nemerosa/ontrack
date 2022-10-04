@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.job
 
 import org.apache.commons.lang3.StringUtils
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 data class Schedule(
@@ -17,8 +18,6 @@ data class Schedule(
             else -> "Every " + period + " " + unit.name.lowercase()
         }
 
-    fun toMiliseconds(): Long = TimeUnit.MILLISECONDS.convert(period, unit)
-
     fun after(initial: Int): Schedule {
         check(cron == null || cron.isBlank()) { "Setting an initial delay is not supported for cron schedules." }
         return Schedule(
@@ -26,6 +25,10 @@ data class Schedule(
                 period,
                 unit
         )
+    }
+
+    fun after(initial: Duration): Schedule {
+        return after(initial.toMillis().toInt())
     }
 
     companion object {

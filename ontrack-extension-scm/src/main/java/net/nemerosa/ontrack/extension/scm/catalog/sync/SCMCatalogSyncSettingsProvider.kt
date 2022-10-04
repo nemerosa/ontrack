@@ -19,6 +19,10 @@ class SCMCatalogSyncSettingsProvider(
             SCMCatalogSyncSettings::syncEnabled,
             DEFAULT_SCM_CATALOG_SYNC_SETTINGS_ENABLED
         ),
+        orphanDisablingEnabled = settingsRepository.getBoolean(
+            SCMCatalogSyncSettings::orphanDisablingEnabled,
+            DEFAULT_SCM_CATALOG_SYNC_SETTINGS_ORPHAN_DISABLED
+        ),
         scm = settingsRepository.getString(
             SCMCatalogSyncSettings::scm,
             DEFAULT_SCM_CATALOG_SYNC_SETTINGS_SCM
