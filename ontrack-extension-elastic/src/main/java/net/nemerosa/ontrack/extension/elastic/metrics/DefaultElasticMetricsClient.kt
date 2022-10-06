@@ -212,6 +212,7 @@ class DefaultElasticMetricsClient(
                     // Bulk request execution
                     registry?.time(ElasticMetricsClientMetrics.time) {
                         try {
+                            debug("Sending the bulk request (${request.numberOfActions()})")
                             client.bulk(request, RequestOptions.DEFAULT)
                         } catch (any: Exception) {
                             logger.error("Cannot export ${entries.size} metrics to ElasticSearch", any)
