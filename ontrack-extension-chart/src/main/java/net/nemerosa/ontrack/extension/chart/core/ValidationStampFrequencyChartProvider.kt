@@ -1,10 +1,14 @@
 package net.nemerosa.ontrack.extension.chart.core
 
+import com.fasterxml.jackson.databind.node.NullNode
+import net.nemerosa.ontrack.extension.chart.ChartDefinition
 import net.nemerosa.ontrack.extension.chart.GetChartOptions
 import net.nemerosa.ontrack.extension.chart.support.CountChart
 import net.nemerosa.ontrack.extension.chart.support.CountChartItemData
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.structure.ValidationRun
+import net.nemerosa.ontrack.model.structure.ValidationStamp
 import org.springframework.stereotype.Component
 
 @Component
@@ -25,5 +29,16 @@ class ValidationStampFrequencyChartProvider(
             },
             interval = options.actualInterval,
             period = options.period,
+        )
+
+    override fun getChartDefinition(subject: ValidationStamp): ChartDefinition? =
+        ChartDefinition(
+            id = name,
+            title = "Validation stamp frequency",
+            type = "count",
+            config = NullNode.instance,
+            parameters = mapOf(
+                "id" to subject.id()
+            ).asJson()
         )
 }
