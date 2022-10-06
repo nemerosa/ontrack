@@ -20,22 +20,10 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4">
-                    <ot-decorated-chart title="Validation stamp duration"
+                <div class="col-md-4" ng-repeat="chart in validationStamp.charts" id="chart-{{ chart.id }}">
+                    <ot-decorated-chart title="chart.title"
                                         chart-options="true"
-                                        chart="durationChart"
-                    ></ot-decorated-chart>
-                </div>
-                <div class="col-md-4">
-                    <ot-decorated-chart title="Validation stamp frequency"
-                                        chart-options="true"
-                                        chart="frequencyChart"
-                    ></ot-decorated-chart>
-                </div>
-                <div class="col-md-4">
-                    <ot-decorated-chart title="Validation stamp stability"
-                                        chart-options="true"
-                                        chart="stabilityChart"
+                                        chart="charts[chart.id]"
                     ></ot-decorated-chart>
                 </div>
             </div>

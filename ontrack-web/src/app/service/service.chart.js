@@ -431,6 +431,18 @@ angular.module('ot.service.chart', [
             });
         };
 
+        self.createGenericChart = (config) => {
+            switch (config.chartType) {
+                case 'duration':
+                    return self.createDurationChart(config);
+                case 'count':
+                    return self.createCountChart(config);
+                case 'percentage':
+                    config.name = config.chartConfig.name;
+                    return self.createPercentageChart(config);
+            }
+        };
+
         return self;
     })
 ;
