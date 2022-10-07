@@ -39,7 +39,7 @@ class ValidationStampDurationsChartProvider(
         ChartDefinition(
             id = name,
             title = "Validation stamp duration",
-            type = "duration",
+            type = DurationChart.TYPE,
             config = NullNode.instance,
             parameters = mapOf(
                 "id" to subject.id()

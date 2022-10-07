@@ -35,7 +35,7 @@ class ValidationStampFrequencyChartProvider(
         ChartDefinition(
             id = name,
             title = "Validation stamp frequency",
-            type = "count",
+            type = CountChart.TYPE,
             config = NullNode.instance,
             parameters = mapOf(
                 "id" to subject.id()
