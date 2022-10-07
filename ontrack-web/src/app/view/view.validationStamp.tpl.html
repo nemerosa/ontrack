@@ -20,10 +20,10 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4" ng-repeat="chart in validationStamp.charts" id="chart-{{ chart.id }}">
-                    <ot-decorated-chart title="chart.title"
+                <div class="col-md-4" ng-repeat="chart in charts" id="chart-{{ chart.id }}">
+                    <ot-decorated-chart title="{{ chart.title }}"
                                         chart-options="true"
-                                        chart="charts[chart.id]"
+                                        chart="chart.chart"
                     ></ot-decorated-chart>
                 </div>
             </div>

@@ -152,6 +152,7 @@ angular.module('ot.view.validationStamp', [
             otGraphqlService.pageGraphQLCall(query, queryVariables).then(function (data) {
                 const validationStamp = data.validationStamp;
                 $scope.validationStamp = validationStamp;
+                $scope.charts = [];
                 // View setup
                 if (!viewInitialised) {
                     // View title
@@ -227,28 +228,39 @@ angular.module('ot.view.validationStamp', [
                     });
 
                     // Initialization of the charts
-                    $scope.charts = validationStamp.charts.map(chart =>
-                        otChartService.createGenericChart({
-                            chartType: chart.type,
-                            chartConfig: chart.config,
-                            chartOptionsKey: "validation-stamp-charts",
-                            chartOptions: $scope.chartOptions,
-                            query: (chartOptions) => {
-                                return `
-                                    query Chart {
-                                        getChart(input: {
-                                            name: "${chart.id}",
-                                            options: {
-                                                interval: "${chartOptions.interval}",
-                                                period: "${chartOptions.period}"
-                                            },
-                                            parameters: ${JSON.stringify(chart.parameters)}
-                                        })
-                                    }
-                                `;
-                            }
-                        })
-                    );
+                    validationStamp.charts.forEach(chart => {
+                        $scope.charts.push({
+                            id: chart.id,
+                            title: chart.title,
+                            chart: otChartService.createGenericChart({
+                                chartType: chart.type,
+                                chartConfig: chart.config,
+                                chartOptionsKey: "validation-stamp-charts",
+                                chartOptions: $scope.chartOptions,
+                                query: (chartOptions) => {
+                                    return `
+                                        query Chart(
+                                            $parameters: JSON!,
+                                        ) {
+                                            getChart(input: {
+                                                name: "${chart.id}",
+                                                options: {
+                                                    interval: "${chartOptions.interval}",
+                                                    period: "${chartOptions.period}"
+                                                },
+                                                parameters: $parameters
+                                            })
+                                        }
+                                    `;
+                                },
+                                queryVariables: (chartOptions) => {
+                                    return {
+                                        parameters: chart.parameters
+                                    };
+                                }
+                            })
+                        });
+                    });
 
                     // View OK now
                     viewInitialised = true;

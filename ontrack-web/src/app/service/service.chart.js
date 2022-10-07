@@ -132,6 +132,7 @@ angular.module('ot.service.chart', [
          * @param config.chartOptions General chart options
          * @param config.query Function which takes some [GetChartOptions] as a parameter and returns a complete GraphQL query.
          * ---
+         * @param config.queryVariables Optional function which return the query variables as a map
          * @param config.chartData Initial empty data
          * @param config.legend True if a legend based on categories must be displayed
          * @param config.yAxis Y axis configuration
@@ -196,7 +197,11 @@ angular.module('ot.service.chart', [
             // Dynamic chart options
             chart.run = () => {
                 const query = config.query(chart.chartOptions);
-                return otGraphqlService.pageGraphQLCall(query).then(data => {
+                let queryVariables = {};
+                if (config.queryVariables) {
+                    queryVariables = config.queryVariables(chart.chartOptions);
+                }
+                return otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
                     config.onData(data, chart.chartData);
                     return chart.options;
                 });
@@ -250,6 +255,7 @@ angular.module('ot.service.chart', [
                 chartOptionsKey: config.chartOptionsKey,
                 chartOptions: config.chartOptions,
                 query: config.query,
+                queryVariables: config.queryVariables,
                 chartData: {
                     categories: [],
                     dates: [],
@@ -348,6 +354,7 @@ angular.module('ot.service.chart', [
                 chartOptionsKey: config.chartOptionsKey,
                 chartOptions: config.chartOptions,
                 query: config.query,
+                queryVariables: config.queryVariables,
                 chartData: {
                     categories: [],
                     dates: [],
@@ -397,6 +404,7 @@ angular.module('ot.service.chart', [
                 chartOptionsKey: config.chartOptionsKey,
                 chartOptions: config.chartOptions,
                 query: config.query,
+                queryVariables: config.queryVariables,
                 chartData: {
                     dates: [],
                     data: {
