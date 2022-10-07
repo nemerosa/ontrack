@@ -15,6 +15,8 @@ angular.module('ot.directive.decorated-chart', [
             },
             link: (scope, element) => {
 
+                let chartInitialized = false;
+
                 const initChart = () => {
                     const domChartContainer = angular.element(element[0].children[1]);
                     const domChart = element[0].children[1].children[0];
@@ -68,9 +70,9 @@ angular.module('ot.directive.decorated-chart', [
                 };
 
                 scope.$watch('chart', () => {
-                    if (scope.chart) {
-                        console.log("Init chart: ", scope.title);
+                    if (scope.chart && !chartInitialized) {
                         initChart();
+                        chartInitialized = true;
                     }
                 });
             }

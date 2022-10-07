@@ -203,6 +203,7 @@ angular.module('ot.service.chart', [
                 }
                 return otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
                     config.onData(data, chart.chartData);
+                    chart.options.series = config.series(config.chartData);
                     return chart.options;
                 });
             };
@@ -341,6 +342,74 @@ angular.module('ot.service.chart', [
         };
 
         /**
+         * Creating a chart service for a list of metrics.
+         *
+         * @param config.chartOptionsKey Storage key for the chart options
+         * @param config.chartOptions General chart options
+         * @param config.query Function which takes some [GetChartOptions] as a parameter and returns a complete GraphQL query.
+         * @return Chart object.
+         */
+        self.createMetricsChart = (config) => {
+
+            return abstractCreateChart({
+                chartOptionsKey: config.chartOptionsKey,
+                chartOptions: config.chartOptions,
+                query: config.query,
+                queryVariables: config.queryVariables,
+                chartData: {
+                    categories: [],
+                    dates: [],
+                    data: {}
+                },
+                legend: true,
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: 'Count',
+                        min: 0
+                    }
+                ],
+                series: (chartData) => {
+                    return chartData.categories.map(metric => {
+                        return {
+                            name: metric,
+                            type: 'line',
+                            data: chartData.data[metric]
+                        };
+                    });
+                },
+                onData: (data, chartData) => {
+                    chartData.categories.length = 0;
+                    const metricNames = data.getChart.metricNames;
+                    chartData.categories.push(...metricNames);
+
+                    metricNames.forEach(metricName => {
+                        if (chartData.data[metricName] !== undefined) {
+                            chartData.data[metricName].length = 0;
+                        } else {
+                            chartData.data[metricName] = [];
+                        }
+                    });
+
+                    chartData.dates.length = 0;
+                    chartData.dates.push(...data.getChart.dates);
+
+                    const metricValues = data.getChart.metricValues;
+
+                    metricValues.forEach(point => {
+                        metricNames.forEach(metricName => {
+                            let value = point[metricName];
+                            if (!value) {
+                                value = 0.0;
+                            }
+                            chartData.data[metricName].push(value);
+                        });
+                    });
+                }
+            });
+        };
+
+        /**
          * Creating a chart service for a count chart.
          *
          * @param config.chartOptionsKey Storage key for the chart options
@@ -445,6 +514,8 @@ angular.module('ot.service.chart', [
                     return self.createDurationChart(config);
                 case 'count':
                     return self.createCountChart(config);
+                case 'metrics':
+                    return self.createMetricsChart(config);
                 case 'percentage':
                     config.name = config.chartConfig.name;
                     return self.createPercentageChart(config);
