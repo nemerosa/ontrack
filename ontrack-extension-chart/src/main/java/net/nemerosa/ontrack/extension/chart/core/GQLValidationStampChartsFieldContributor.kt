@@ -23,7 +23,7 @@ class GQLValidationStampChartsFieldContributor(
         if (projectEntityType == ProjectEntityType.VALIDATION_STAMP) {
             listOf(
                 GraphQLFieldDefinition.newFieldDefinition()
-                    .name("chart")
+                    .name("charts")
                     .description("List of charts exposed by the validation stamp")
                     .type(listType(gqlTypeChartDefinition.typeRef))
                     .dataFetcher { env ->
