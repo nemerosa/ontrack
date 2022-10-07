@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.YesNo
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
+import net.nemerosa.ontrack.model.structure.NumericValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
 
@@ -18,7 +19,7 @@ class TestSummaryValidationDataType(
         extensionFeature: GeneralExtensionFeature
 ) : AbstractValidationDataType<TestSummaryValidationConfig, TestSummaryValidationData>(
         extensionFeature
-) {
+), NumericValidationDataType<TestSummaryValidationConfig, TestSummaryValidationData> {
 
     override val displayName: String = "Test summary"
 
@@ -95,4 +96,12 @@ class TestSummaryValidationDataType(
         )
     }
 
+    override fun getNumericMetrics(data: TestSummaryValidationData): Map<String, Double> {
+        return mapOf(
+            "passed" to data.passed.toDouble(),
+            "skipped" to data.skipped.toDouble(),
+            "failed" to data.failed.toDouble(),
+            "total" to data.total.toDouble()
+        )
+    }
 }
