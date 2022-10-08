@@ -20,7 +20,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4" ng-repeat="chart in charts" id="chart-{{ chart.id }}">
+                <div class="col-md-{{ chartColSize() }}" ng-repeat="chart in charts" id="chart-{{ chart.id }}">
                     <ot-decorated-chart title="{{ chart.title }}"
                                         chart-options="true"
                                         chart="chart.chart"

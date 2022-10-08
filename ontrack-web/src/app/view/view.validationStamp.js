@@ -296,5 +296,14 @@ angular.module('ot.view.validationStamp', [
             }
         };
 
+        $scope.chartColSize = () => {
+            const chartCount = $scope.validationStamp.charts.length;
+            if (chartCount <= 3) {
+                return 4;
+            } else {
+                return 6;
+            }
+        };
+
     })
 ;
