@@ -202,7 +202,7 @@ angular.module('ot.service.chart', [
                     queryVariables = config.queryVariables(chart.chartOptions);
                 }
                 return otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
-                    config.onData(data, chart.chartData);
+                    config.onData(data, chart.chartData, chart.options);
                     chart.options.series = config.series(config.chartData);
                     return chart.options;
                 });
@@ -378,10 +378,20 @@ angular.module('ot.service.chart', [
                         };
                     });
                 },
-                onData: (data, chartData) => {
+                onData: (data, chartData, options) => {
                     chartData.categories.length = 0;
                     const metricNames = data.getChart.metricNames;
                     chartData.categories.push(...metricNames);
+
+                    if (metricNames.length > 4) {
+                        options.legend.type = 'scroll';
+                        options.legend.pageButtonPosition = 'start';
+                        options.legend.selectedMode = 'multiple';
+                        options.legend.selector = ['all', 'inverse'];
+                        options.legend.selectorPosition = 'start';
+                    } else {
+                        options.legend.type = 'plain';
+                    }
 
                     metricNames.forEach(metricName => {
                         if (chartData.data[metricName] !== undefined) {
