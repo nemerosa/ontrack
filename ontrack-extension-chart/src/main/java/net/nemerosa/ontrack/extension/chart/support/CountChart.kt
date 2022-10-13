@@ -10,6 +10,8 @@ data class CountChart(
 
     companion object {
 
+        const val TYPE = "count"
+
         fun compute(items: List<CountChartItemData>, interval: Interval, period: String): CountChart {
             // Period based formatting
             val intervalPeriod = parseIntervalPeriod(period)

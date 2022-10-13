@@ -5,36 +5,38 @@ import com.fasterxml.jackson.databind.node.IntNode
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
 import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.structure.NumericValidationDataType
 import org.springframework.stereotype.Component
 
 @Component
 class ThresholdPercentageValidationDataType(
-        extensionFeature: GeneralExtensionFeature
+    extensionFeature: GeneralExtensionFeature,
 ) : AbstractThresholdConfigValidationDataType<Int>(
-        extensionFeature
-) {
+    extensionFeature
+), NumericValidationDataType<ThresholdConfig, Int> {
 
     override fun toJson(data: Int): JsonNode =
-            IntNode(data)
+        IntNode(data)
 
     override fun fromJson(node: JsonNode): Int? {
         if (node is IntNode) {
             return node.asInt()
         } else {
             throw ValidationRunDataInputException(
-                    "Data is expected to be an integer."
+                "Data is expected to be an integer."
             )
         }
     }
 
     override fun getForm(data: Int?): Form = Form.create()
-            .with(net.nemerosa.ontrack.model.form.Int
-                    .of("value")
-                    .label("Value (%)")
-                    .value(data)
-                    .min(0).max(100)
-                    .optional()
-            )
+        .with(
+            net.nemerosa.ontrack.model.form.Int
+                .of("value")
+                .label("Value (%)")
+                .value(data)
+                .min(0).max(100)
+                .optional()
+        )
 
     override fun fromForm(node: JsonNode?): Int? {
         if (node != null && node.has("value")) {
@@ -47,13 +49,17 @@ class ThresholdPercentageValidationDataType(
     override fun toIntValue(data: Int) = data
 
     override fun validateData(config: ThresholdConfig?, data: Int?) =
-            validateNotNull(data) {
-                validate(this >= 0, "Percentage must be >= 0")
-            }
+        validateNotNull(data) {
+            validate(this >= 0, "Percentage must be >= 0")
+        }
 
     override val displayName = "Percentage"
 
     override fun getMetrics(data: Int): Map<String, *>? {
         return mapOf("percentage" to data)
+    }
+
+    override fun getNumericMetrics(data: Int): Map<String, Double> {
+        return mapOf("percentage" to data.toDouble())
     }
 }

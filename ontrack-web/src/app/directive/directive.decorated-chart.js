@@ -14,55 +14,67 @@ angular.module('ot.directive.decorated-chart', [
                 chartOptions: '='
             },
             link: (scope, element) => {
-                const domChartContainer = angular.element(element[0].children[1]);
-                const domChart = element[0].children[1].children[0];
 
-                const eChart = echarts.init(domChart);
+                let chartInitialized = false;
 
-                let loaded = false;
+                const initChart = () => {
+                    const domChartContainer = angular.element(element[0].children[1]);
+                    const domChart = element[0].children[1].children[0];
 
-                // Loading the data
-                const loadData = () => {
-                    eChart.showLoading('default', { text: 'Loading data...' });
-                    scope.chart.run().then(options => {
-                        options = options || {};
-                        if (options.forceClear) eChart.clear();
-                        if (options.series && options.series.length) {
-                            eChart.hideLoading();
-                            eChart.setOption(options, options.notMerge);
-                            eChart.resize();
-                        } else {
-                            eChart.showLoading('default', options.errorMsg || { text: 'No data' });
+                    const eChart = echarts.init(domChart);
+
+                    let loaded = false;
+
+                    // Loading the data
+                    const loadData = () => {
+                        eChart.showLoading('default', { text: 'Loading data...' });
+                        scope.chart.run().then(options => {
+                            options = options || {};
+                            if (options.forceClear) eChart.clear();
+                            if (options.series && options.series.length) {
+                                eChart.hideLoading();
+                                eChart.setOption(options, options.notMerge);
+                                eChart.resize();
+                            } else {
+                                eChart.showLoading('default', options.errorMsg || { text: 'No data' });
+                            }
+                            loaded = true;
+                        });
+                    };
+
+                    // Watching the general chart options
+                    scope.$watch("chart.chartOptions", (newVal, oldVal) => {
+                        if (scope.chart.chartOptions) {
+                            if (loaded) {
+                                loadData();
+                            }
                         }
-                        loaded = true;
+                    }, /* objectEquality */ true);
+
+                    // Registers a listener
+                    scope.chart.addChartListener({
+                        onZoom: (zoomed) => {
+                            if (zoomed) {
+                                domChartContainer.removeClass('ot-chart-unzoomed');
+                                domChartContainer.addClass('ot-chart-zoomed');
+                            } else {
+                                domChartContainer.removeClass('ot-chart-zoomed');
+                                domChartContainer.addClass('ot-chart-unzoomed');
+                            }
+                            eChart.resize();
+                        }
                     });
+
+                    // Loads the data on first call
+                    loadData();
                 };
 
-                // Watching the general chart options
-                scope.$watch("chart.chartOptions", (newVal, oldVal) => {
-                    if (scope.chart.chartOptions) {
-                        if (loaded) {
-                            loadData();
-                        }
-                    }
-                }, /* objectEquality */ true);
-
-                // Registers a listener
-                scope.chart.addChartListener({
-                    onZoom: (zoomed) => {
-                        if (zoomed) {
-                            domChartContainer.removeClass('ot-chart-unzoomed');
-                            domChartContainer.addClass('ot-chart-zoomed');
-                        } else {
-                            domChartContainer.removeClass('ot-chart-zoomed');
-                            domChartContainer.addClass('ot-chart-unzoomed');
-                        }
-                        eChart.resize();
+                scope.$watch('chart', () => {
+                    if (scope.chart && !chartInitialized) {
+                        initChart();
+                        chartInitialized = true;
                     }
                 });
-
-                // Loads the data on first call
-                loadData();
             }
         };
     })

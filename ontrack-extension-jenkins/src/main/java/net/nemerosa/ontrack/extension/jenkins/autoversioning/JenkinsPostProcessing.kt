@@ -71,7 +71,7 @@ class JenkinsPostProcessing(
                     "COMMIT_MESSAGE" to (config.commitMessage ?: autoVersioningOrder.defaultCommitMessage),
                     "REPOSITORY_URI" to repositoryURI,
                     "UPGRADE_BRANCH" to upgradeBranch,
-                    "CREDENTIALS" to config.credentials.renderParameter(),
+                    "CREDENTIALS" to (config.credentials?.renderParameter() ?: ""),
                 ),
                 settings.retries,
                 settings.retriesDelaySeconds

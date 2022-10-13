@@ -4,30 +4,32 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.IntNode
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.structure.NumericValidationDataType
 import org.springframework.stereotype.Component
 
 @Component
 class ThresholdNumberValidationDataType(
-        extensionFeature: GeneralExtensionFeature
+    extensionFeature: GeneralExtensionFeature,
 ) : AbstractThresholdConfigValidationDataType<Int>(
-        extensionFeature
-) {
+    extensionFeature
+), NumericValidationDataType<ThresholdConfig, Int> {
 
     override fun toJson(data: Int): JsonNode = IntNode(data)
 
     override fun fromJson(node: JsonNode): Int? =
-            when (node) {
-                is IntNode -> node.asInt()
-                else -> null
-            }
+        when (node) {
+            is IntNode -> node.asInt()
+            else -> null
+        }
 
     override fun getForm(data: Int?): Form = Form.create()
-            .with(net.nemerosa.ontrack.model.form.Int
-                    .of("value")
-                    .label("Value")
-                    .value(data)
-                    .optional()
-            )
+        .with(
+            net.nemerosa.ontrack.model.form.Int
+                .of("value")
+                .label("Value")
+                .value(data)
+                .optional()
+        )
 
     override fun fromForm(node: JsonNode?): Int? {
         if (node != null && node.has("value")) {
@@ -40,11 +42,15 @@ class ThresholdNumberValidationDataType(
     override fun toIntValue(data: Int) = data
 
     override fun validateData(config: ThresholdConfig?, data: Int?) =
-            validateNotNull(data)
+        validateNotNull(data)
 
     override val displayName = "Numeric data"
 
     override fun getMetrics(data: Int): Map<String, *>? {
         return mapOf("value" to data)
+    }
+
+    override fun getNumericMetrics(data: Int): Map<String, Double> {
+        return mapOf("value" to data.toDouble())
     }
 }

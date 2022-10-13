@@ -57,6 +57,13 @@ angular.module('ot.view.validationStamp', [
                       }
                       config
                     }
+                    charts {
+                        id
+                        title
+                        type
+                        config
+                        parameters
+                    }
                     branch {
                       id
                       name
@@ -145,6 +152,7 @@ angular.module('ot.view.validationStamp', [
             otGraphqlService.pageGraphQLCall(query, queryVariables).then(function (data) {
                 const validationStamp = data.validationStamp;
                 $scope.validationStamp = validationStamp;
+                $scope.charts = [];
                 // View setup
                 if (!viewInitialised) {
                     // View title
@@ -212,6 +220,48 @@ angular.module('ot.view.validationStamp', [
                         ot.viewActionsCommand($scope.validationStamp.links._actions),
                         ot.viewCloseCommand('/branch/' + $scope.validationStamp.branch.id)
                     ];
+
+                    // General chart options
+                    $scope.chartOptions = otChartService.loadChartOptions("validation-stamp-charts", {
+                        interval: '1y',
+                        period: '1w'
+                    });
+
+                    // Initialization of the charts
+                    validationStamp.charts.forEach(chart => {
+                        $scope.charts.push({
+                            id: chart.id,
+                            title: chart.title,
+                            chart: otChartService.createGenericChart({
+                                chartType: chart.type,
+                                chartConfig: chart.config,
+                                chartOptionsKey: "validation-stamp-charts",
+                                chartOptions: $scope.chartOptions,
+                                query: (chartOptions) => {
+                                    return `
+                                        query Chart(
+                                            $parameters: JSON!,
+                                        ) {
+                                            getChart(input: {
+                                                name: "${chart.id}",
+                                                options: {
+                                                    interval: "${chartOptions.interval}",
+                                                    period: "${chartOptions.period}"
+                                                },
+                                                parameters: $parameters
+                                            })
+                                        }
+                                    `;
+                                },
+                                queryVariables: (chartOptions) => {
+                                    return {
+                                        parameters: chart.parameters
+                                    };
+                                }
+                            })
+                        });
+                    });
+
                     // View OK now
                     viewInitialised = true;
                 }
@@ -246,75 +296,14 @@ angular.module('ot.view.validationStamp', [
             }
         };
 
-        // General chart options
-        $scope.chartOptions = otChartService.loadChartOptions("validation-stamp-charts", {
-            interval: '1y',
-            period: '1w'
-        });
-
-        // Duration graph
-        $scope.durationChart = otChartService.createDurationChart({
-            chartOptionsKey: "validation-stamp-charts",
-            chartOptions: $scope.chartOptions,
-            query: (chartOptions) => {
-                return `
-                    query ValidationStampDuration {
-                        getChart(input: {
-                            name: "validation-stamp-durations",
-                            options: {
-                                interval: "${chartOptions.interval}",
-                                period: "${chartOptions.period}"
-                            },
-                            parameters: {
-                                id: ${validationStampId},
-                            }
-                        })
-                    }
-                `;
+        $scope.chartColSize = () => {
+            const chartCount = $scope.validationStamp.charts.length;
+            if (chartCount <= 3) {
+                return 4;
+            } else {
+                return 6;
             }
-        });
-
-        // Stability graph
-        $scope.stabilityChart = otChartService.createPercentageChart({
-            name: '% of success',
-            chartOptionsKey: "validation-stamp-charts",
-            chartOptions: $scope.chartOptions,
-            query: (chartOptions) => {
-                return `query ValidationStampStability {
-                    getChart(input: {
-                        name: "validation-stamp-stability",
-                        options: {
-                            interval: "${chartOptions.interval}",
-                            period: "${chartOptions.period}"
-                        },
-                        parameters: {
-                            id: ${validationStampId},
-                        }
-                    })
-                }`;
-            }
-        });
-
-        // Frequency graph
-        $scope.frequencyChart = otChartService.createCountChart({
-            name: '% of success',
-            chartOptionsKey: "validation-stamp-charts",
-            chartOptions: $scope.chartOptions,
-            query: (chartOptions) => {
-                return `query ValidationStampFrequency {
-                    getChart(input: {
-                        name: "validation-stamp-frequency",
-                        options: {
-                            interval: "${chartOptions.interval}",
-                            period: "${chartOptions.period}"
-                        },
-                        parameters: {
-                            id: ${validationStampId},
-                        }
-                    })
-                }`;
-            }
-        });
+        };
 
     })
 ;

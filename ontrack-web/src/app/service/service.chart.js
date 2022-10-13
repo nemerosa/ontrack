@@ -132,6 +132,7 @@ angular.module('ot.service.chart', [
          * @param config.chartOptions General chart options
          * @param config.query Function which takes some [GetChartOptions] as a parameter and returns a complete GraphQL query.
          * ---
+         * @param config.queryVariables Optional function which return the query variables as a map
          * @param config.chartData Initial empty data
          * @param config.legend True if a legend based on categories must be displayed
          * @param config.yAxis Y axis configuration
@@ -196,8 +197,13 @@ angular.module('ot.service.chart', [
             // Dynamic chart options
             chart.run = () => {
                 const query = config.query(chart.chartOptions);
-                return otGraphqlService.pageGraphQLCall(query).then(data => {
-                    config.onData(data, chart.chartData);
+                let queryVariables = {};
+                if (config.queryVariables) {
+                    queryVariables = config.queryVariables(chart.chartOptions);
+                }
+                return otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
+                    config.onData(data, chart.chartData, chart.options);
+                    chart.options.series = config.series(config.chartData);
                     return chart.options;
                 });
             };
@@ -250,6 +256,7 @@ angular.module('ot.service.chart', [
                 chartOptionsKey: config.chartOptionsKey,
                 chartOptions: config.chartOptions,
                 query: config.query,
+                queryVariables: config.queryVariables,
                 chartData: {
                     categories: [],
                     dates: [],
@@ -335,6 +342,84 @@ angular.module('ot.service.chart', [
         };
 
         /**
+         * Creating a chart service for a list of metrics.
+         *
+         * @param config.chartOptionsKey Storage key for the chart options
+         * @param config.chartOptions General chart options
+         * @param config.query Function which takes some [GetChartOptions] as a parameter and returns a complete GraphQL query.
+         * @return Chart object.
+         */
+        self.createMetricsChart = (config) => {
+
+            return abstractCreateChart({
+                chartOptionsKey: config.chartOptionsKey,
+                chartOptions: config.chartOptions,
+                query: config.query,
+                queryVariables: config.queryVariables,
+                chartData: {
+                    categories: [],
+                    dates: [],
+                    data: {}
+                },
+                legend: true,
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: 'Count',
+                        min: 0
+                    }
+                ],
+                series: (chartData) => {
+                    return chartData.categories.map(metric => {
+                        return {
+                            name: metric,
+                            type: 'line',
+                            data: chartData.data[metric]
+                        };
+                    });
+                },
+                onData: (data, chartData, options) => {
+                    chartData.categories.length = 0;
+                    const metricNames = data.getChart.metricNames;
+                    chartData.categories.push(...metricNames);
+
+                    if (metricNames.length > 4) {
+                        options.legend.type = 'scroll';
+                        options.legend.pageButtonPosition = 'start';
+                        options.legend.selectedMode = 'multiple';
+                        options.legend.selector = ['all', 'inverse'];
+                        options.legend.selectorPosition = 'start';
+                    } else {
+                        options.legend.type = 'plain';
+                    }
+
+                    metricNames.forEach(metricName => {
+                        if (chartData.data[metricName] !== undefined) {
+                            chartData.data[metricName].length = 0;
+                        } else {
+                            chartData.data[metricName] = [];
+                        }
+                    });
+
+                    chartData.dates.length = 0;
+                    chartData.dates.push(...data.getChart.dates);
+
+                    const metricValues = data.getChart.metricValues;
+
+                    metricValues.forEach(point => {
+                        metricNames.forEach(metricName => {
+                            let value = point[metricName];
+                            if (!value) {
+                                value = 0.0;
+                            }
+                            chartData.data[metricName].push(value);
+                        });
+                    });
+                }
+            });
+        };
+
+        /**
          * Creating a chart service for a count chart.
          *
          * @param config.chartOptionsKey Storage key for the chart options
@@ -348,6 +433,7 @@ angular.module('ot.service.chart', [
                 chartOptionsKey: config.chartOptionsKey,
                 chartOptions: config.chartOptions,
                 query: config.query,
+                queryVariables: config.queryVariables,
                 chartData: {
                     categories: [],
                     dates: [],
@@ -397,6 +483,7 @@ angular.module('ot.service.chart', [
                 chartOptionsKey: config.chartOptionsKey,
                 chartOptions: config.chartOptions,
                 query: config.query,
+                queryVariables: config.queryVariables,
                 chartData: {
                     dates: [],
                     data: {
@@ -429,6 +516,20 @@ angular.module('ot.service.chart', [
                     chartData.data.value.push(...data.getChart.data);
                 }
             });
+        };
+
+        self.createGenericChart = (config) => {
+            switch (config.chartType) {
+                case 'duration':
+                    return self.createDurationChart(config);
+                case 'count':
+                    return self.createCountChart(config);
+                case 'metrics':
+                    return self.createMetricsChart(config);
+                case 'percentage':
+                    config.name = config.chartConfig.name;
+                    return self.createPercentageChart(config);
+            }
         };
 
         return self;

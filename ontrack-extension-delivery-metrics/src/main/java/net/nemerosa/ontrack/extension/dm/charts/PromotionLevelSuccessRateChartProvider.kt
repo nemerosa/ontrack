@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.dm.charts
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.NullNode
+import net.nemerosa.ontrack.extension.chart.ChartDefinition
 import net.nemerosa.ontrack.extension.chart.ChartProvider
 import net.nemerosa.ontrack.extension.chart.GetChartOptions
 import net.nemerosa.ontrack.extension.chart.support.ChartUtils
@@ -8,13 +10,26 @@ import net.nemerosa.ontrack.extension.chart.support.PercentageChart
 import net.nemerosa.ontrack.extension.chart.support.PercentageChartItemData
 import net.nemerosa.ontrack.extension.dm.data.EndToEndPromotionFilter
 import net.nemerosa.ontrack.extension.dm.data.EndToEndPromotionsHelper
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.structure.PromotionLevel
 import org.springframework.stereotype.Component
+import kotlin.reflect.KClass
 
 @Component
 class PromotionLevelSuccessRateChartProvider(
     private val endToEndPromotionsHelper: EndToEndPromotionsHelper,
-) : ChartProvider<PromotionLevelChartParameters, PercentageChart> {
+) : ChartProvider<PromotionLevel, PromotionLevelChartParameters, PercentageChart> {
+
+    override val subjectClass: KClass<PromotionLevel> = PromotionLevel::class
+
+    override fun getChartDefinition(subject: PromotionLevel) = ChartDefinition(
+        id = name,
+        title = "Promotion success rate",
+        type = "percentage",
+        config = mapOf("name" to "% of success").asJson(),
+        parameters = mapOf("id" to subject.id()).asJson()
+    )
 
     override val name: String = "promotion-level-success-rate"
 

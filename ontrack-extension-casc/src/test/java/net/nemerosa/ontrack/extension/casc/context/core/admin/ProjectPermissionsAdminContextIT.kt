@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.casc.context.core.admin
 
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
-import net.nemerosa.ontrack.extension.casc.schema.cascString
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.security.PermissionInput
 import net.nemerosa.ontrack.model.security.PermissionTargetType
@@ -111,8 +110,10 @@ class ProjectPermissionsAdminContextIT : AbstractCascTestSupport() {
                 """.trimIndent()
             )
             // Checks the permissions have been set
-            val associations = accountService.getProjectPermissionsForAccountGroup(group).associate {
-                it.projectId to it.projectRole
+            val associations = asAdmin {
+                accountService.getProjectPermissionsForAccountGroup(group).associate {
+                    it.projectId to it.projectRole
+                }
             }
             assertEquals(Roles.PROJECT_OWNER, associations[p1.id()]?.id)
             assertEquals(Roles.PROJECT_OWNER, associations[p2.id()]?.id)
@@ -140,8 +141,10 @@ class ProjectPermissionsAdminContextIT : AbstractCascTestSupport() {
                 """.trimIndent()
             )
             // Checks the permissions have been set
-            val associations = accountService.getProjectPermissionsForAccountGroup(group).associate {
-                it.projectId to it.projectRole
+            val associations = asAdmin {
+                accountService.getProjectPermissionsForAccountGroup(group).associate {
+                    it.projectId to it.projectRole
+                }
             }
             assertEquals(1, associations.size)
             assertEquals(Roles.PROJECT_OWNER, associations[p1.id()]?.id)
@@ -193,8 +196,10 @@ class ProjectPermissionsAdminContextIT : AbstractCascTestSupport() {
                 """.trimIndent()
             )
             // Checks the permissions have been set
-            val associations = accountService.getProjectPermissionsForAccountGroup(group).associate {
-                it.projectId to it.projectRole
+            val associations = asAdmin {
+                accountService.getProjectPermissionsForAccountGroup(group).associate {
+                    it.projectId to it.projectRole
+                }
             }
             assertEquals(0, associations.size)
         }
@@ -221,8 +226,10 @@ class ProjectPermissionsAdminContextIT : AbstractCascTestSupport() {
                 """.trimIndent()
             )
             // Checks the permissions have been set
-            var associations = accountService.getProjectPermissionsForAccountGroup(group).associate {
-                it.projectId to it.projectRole
+            var associations = asAdmin {
+                accountService.getProjectPermissionsForAccountGroup(group).associate {
+                    it.projectId to it.projectRole
+                }
             }
             assertEquals(Roles.PROJECT_OWNER, associations[p1.id()]?.id)
             assertEquals(Roles.PROJECT_OWNER, associations[p2.id()]?.id)
@@ -239,8 +246,10 @@ class ProjectPermissionsAdminContextIT : AbstractCascTestSupport() {
                 """.trimIndent()
             )
             // Checks the permissions have been set
-            associations = accountService.getProjectPermissionsForAccountGroup(group).associate {
-                it.projectId to it.projectRole
+            associations = asAdmin {
+                accountService.getProjectPermissionsForAccountGroup(group).associate {
+                    it.projectId to it.projectRole
+                }
             }
             assertEquals(Roles.PROJECT_OWNER, associations[p1.id()]?.id)
             assertEquals(Roles.PROJECT_OWNER, associations[p2.id()]?.id)
@@ -270,8 +279,10 @@ class ProjectPermissionsAdminContextIT : AbstractCascTestSupport() {
                 """.trimIndent()
             )
             // Checks the permissions have been set
-            val associations = accountService.getProjectPermissionsForAccountGroup(group).associate {
-                it.projectId to it.projectRole
+            val associations = asAdmin {
+                accountService.getProjectPermissionsForAccountGroup(group).associate {
+                    it.projectId to it.projectRole
+                }
             }
             assertEquals(1, associations.size)
             assertEquals(Roles.PROJECT_VALIDATION_MANAGER, associations[p1.id()]?.id)

@@ -8,10 +8,14 @@ import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.structure.ValidationRun
+import net.nemerosa.ontrack.model.structure.ValidationStamp
+import kotlin.reflect.KClass
 
-abstract class AbstractValidationStampChartProvider<C: Chart>(
+abstract class AbstractValidationStampChartProvider<C : Chart>(
     protected val structureService: StructureService,
-) : ChartProvider<ValidationStampChartParameters,C> {
+) : ChartProvider<ValidationStamp, ValidationStampChartParameters, C> {
+
+    override val subjectClass: KClass<ValidationStamp> = ValidationStamp::class
 
     override fun parseParameters(data: JsonNode): ValidationStampChartParameters = data.parse()
 

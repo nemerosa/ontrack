@@ -16,6 +16,6 @@ class JenkinsPostProcessingConfig(
         val commitMessage: String?,
         val config: String?,
         val job: String?,
-        val credentials: List<JenkinsPostProcessingConfigCredentials>
+        val credentials: List<JenkinsPostProcessingConfigCredentials>?,
 )
 

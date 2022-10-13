@@ -13,6 +13,8 @@ data class DurationChart(
 
     companion object {
 
+        const val TYPE = "duration"
+
         fun compute(
             items: List<DurationChartItemData>,
             interval: Interval,
