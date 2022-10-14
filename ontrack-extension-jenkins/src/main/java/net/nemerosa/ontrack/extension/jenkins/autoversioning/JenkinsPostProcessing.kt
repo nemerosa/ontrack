@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService
 import net.nemerosa.ontrack.extension.jenkins.JenkinsExtensionFeature
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClientFactory
 import net.nemerosa.ontrack.extension.support.AbstractExtension
-import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
 
@@ -31,8 +30,7 @@ class JenkinsPostProcessing(
 
     override fun parseAndValidate(config: JsonNode?): JenkinsPostProcessingConfig {
         return if (config != null && !config.isNull) {
-            // Parsing
-            config.parse()
+            JenkinsPostProcessingConfig.parseJson(config)
         } else {
             throw PostProcessingMissingConfigException()
         }
