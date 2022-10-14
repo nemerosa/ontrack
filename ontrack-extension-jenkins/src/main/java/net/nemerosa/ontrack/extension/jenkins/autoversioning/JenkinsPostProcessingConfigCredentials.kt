@@ -25,10 +25,15 @@ data class JenkinsPostProcessingConfigCredentials(
          */
         fun parseLines(text: String): List<JenkinsPostProcessingConfigCredentials> {
             val lines = text.lines()
-            return lines.map { parseLine(it) }
+            return lines.flatMap { line ->
+                val tokens = line.split("|")
+                tokens.map { token ->
+                    parseToken(token)
+                }
+            }
         }
 
-        private fun parseLine(line: String): JenkinsPostProcessingConfigCredentials {
+        private fun parseToken(line: String): JenkinsPostProcessingConfigCredentials {
             // Tokenization
             val tokens = line.split(",").map { it.trim() }
             return if (tokens.size < 3) {
