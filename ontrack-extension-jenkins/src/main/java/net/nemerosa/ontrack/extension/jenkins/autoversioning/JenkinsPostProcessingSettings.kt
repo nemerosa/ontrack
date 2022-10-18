@@ -21,10 +21,10 @@ class JenkinsPostProcessingSettings(
     val job: String,
     @APILabel("Retries")
     @APIDescription("The amount of times we check for successful scheduling and completion of the post-processing job")
-    val retries: Int,
+    val retries: Int = DEFAULT_RETRIES,
     @APILabel("Retry internal")
     @APIDescription("The time (in seconds) between two checks for successful scheduling and completion of the post-processing job")
-    val retriesDelaySeconds: Int,
+    val retriesDelaySeconds: Int = DEFAULT_RETRIES_DELAY_SECONDS,
 ) {
     companion object {
         const val DEFAULT_RETRIES = 10
