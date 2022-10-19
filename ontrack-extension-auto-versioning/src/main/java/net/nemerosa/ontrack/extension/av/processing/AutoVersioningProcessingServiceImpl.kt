@@ -76,7 +76,7 @@ class AutoVersioningProcessingServiceImpl(
             val targetPathUpdated: List<Boolean> = try {
                 order.targetPaths.map { targetPath ->
                     // Gets the content of the target file
-                    val lines = scm.download(scmBranch, targetPath)
+                    val lines = scm.download(scmBranch, targetPath, retryOnNotFound = true)
                         ?.toString(Charsets.UTF_8)
                         ?.lines()
                         ?: emptyList()

@@ -455,8 +455,8 @@ class DefaultOntrackGitHubClient(
         }
     }
 
-    override fun getFileContent(repository: String, branch: String?, path: String): ByteArray? =
-        getFile(repository, branch, path)?.contentAsBinary()
+    override fun getFileContent(repository: String, branch: String?, path: String, retryOnNotFound: Boolean): ByteArray? =
+        getFile(repository, branch, path, retryOnNotFound)?.contentAsBinary()
 
     override fun getFile(repository: String, branch: String?, path: String, retryOnNotFound: Boolean): GitHubFile? {
         // Logging
