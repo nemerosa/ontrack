@@ -20,6 +20,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.HttpClientErrorException.NotFound
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForObject
@@ -47,7 +48,7 @@ class DefaultOntrackGitHubClient(
                     parse()
                 }
             }
-        } catch (_: HttpClientErrorException.NotFound) {
+        } catch (_: NotFound) {
             // Rate limit not supported
             null
         } catch (any: Exception) {
@@ -312,11 +313,12 @@ class DefaultOntrackGitHubClient(
 
     private operator fun <T> RestTemplate.invoke(
         message: String,
+        exceptionRetryCheck: (ex: Throwable) -> Boolean = { false },
         code: RestTemplate.() -> T,
     ): T {
         logger.debug("[github] {}", message)
         return try {
-            GitConnectionRetry.retry(message, retries, interval) {
+            GitConnectionRetry.retry(message, retries, interval, exceptionRetryCheck) {
                 code()
             }
         } catch (ex: RestClientResponseException) {
@@ -456,7 +458,7 @@ class DefaultOntrackGitHubClient(
     override fun getFileContent(repository: String, branch: String?, path: String): ByteArray? =
         getFile(repository, branch, path)?.contentAsBinary()
 
-    override fun getFile(repository: String, branch: String?, path: String): GitHubFile? {
+    override fun getFile(repository: String, branch: String?, path: String, retryOnNotFound: Boolean): GitHubFile? {
         // Logging
         logger.debug("[github] Getting file {}/{}@{}", repository, path, branch)
         // Getting a client
@@ -468,7 +470,10 @@ class DefaultOntrackGitHubClient(
             val restPath = "/repos/$owner/$name/contents/$path".runIf(branch != null) {
                 "$this?ref=$branch"
             }
-            client("Get file content $repository/$path@$branch") {
+            client(
+                message = "Get file content $repository/$path@$branch",
+                exceptionRetryCheck = { retryOnNotFound && it is NotFound },
+            ) {
                 getForObject<GitHubGetContentResponse>(restPath).let {
                     GitHubFile(
                         content = it.content,
@@ -476,12 +481,9 @@ class DefaultOntrackGitHubClient(
                     )
                 }
             }
-        } catch (ex: GitHubErrorsException) {
-            if (ex.status == 404) {
-                null
-            } else {
-                throw ex
-            }
+        } catch (ex: GitConnectionRetry.GitConnectionRetryTimeoutException) {
+            // Time when trying to get the file, returning a null content
+            null
         }
     }
 
