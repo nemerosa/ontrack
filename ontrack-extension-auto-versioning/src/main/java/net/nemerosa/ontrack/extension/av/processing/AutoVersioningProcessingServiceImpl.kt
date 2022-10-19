@@ -79,7 +79,7 @@ class AutoVersioningProcessingServiceImpl(
                     val lines = scm.download(scmBranch, targetPath, retryOnNotFound = true)
                         ?.toString(Charsets.UTF_8)
                         ?.lines()
-                        ?: emptyList()
+                        ?: throw AutoVersioningNoContentException(scmBranch, targetPath)
                     // Gets the current version in this file
                     val currentVersion: String = autoVersioningTargetFileService.readVersion(order, lines)
                         ?: throw AutoVersioningVersionNotFoundException(targetPath)
