@@ -116,7 +116,7 @@ interface OntrackGitHubClient {
      * @param repository Repository name, like `nemerosa/ontrack`
      * @param branch Name of the branch (without refs/heads) or null if the default branch must be used
      * @param path Path to the file
-     * @param retryOnNotFound If `true`, if the file is not found, we assume it's not available yet, and we'll try several times
+     * @param retryOnNotFound If the file is not found, should we retry until a timeout is reached?
      * @return Binary content of the file or null if the file cannot be found
      */
     fun getFileContent(repository: String, branch: String?, path: String, retryOnNotFound: Boolean = false): ByteArray?
@@ -128,7 +128,7 @@ interface OntrackGitHubClient {
      * @param branch Name of the branch (without refs/heads) or null if the default branch must be used
      * @param path Path to the file
      * @param retryOnNotFound If `true`, if the file is not found, we assume it's not available yet, and we'll try several times
-     * @return Raw content of the file
+     * @return Raw content of the file or null if not found
      */
     fun getFile(repository: String, branch: String?, path: String, retryOnNotFound: Boolean = false): GitHubFile?
 

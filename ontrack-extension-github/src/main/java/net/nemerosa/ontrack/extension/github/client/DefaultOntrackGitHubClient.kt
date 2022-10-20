@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.github.client
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.common.runIf
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
@@ -20,7 +22,6 @@ import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.HttpClientErrorException.NotFound
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForObject
@@ -37,6 +38,8 @@ class DefaultOntrackGitHubClient(
     private val timeout: Duration = Duration.ofSeconds(60),
     private val retries: UInt = 3u,
     private val interval: Duration = Duration.ofSeconds(30),
+    private val notFoundRetries: UInt = 6u,
+    private val notFoundInterval: Duration = Duration.ofSeconds(5),
 ) : OntrackGitHubClient {
 
     private val logger: Logger = LoggerFactory.getLogger(OntrackGitHubClient::class.java)
@@ -48,7 +51,7 @@ class DefaultOntrackGitHubClient(
                     parse()
                 }
             }
-        } catch (_: NotFound) {
+        } catch (_: HttpClientErrorException.NotFound) {
             // Rate limit not supported
             null
         } catch (any: Exception) {
@@ -313,12 +316,11 @@ class DefaultOntrackGitHubClient(
 
     private operator fun <T> RestTemplate.invoke(
         message: String,
-        exceptionRetryCheck: (ex: Throwable) -> Boolean = { false },
         code: RestTemplate.() -> T,
     ): T {
         logger.debug("[github] {}", message)
         return try {
-            GitConnectionRetry.retry(message, retries, interval, exceptionRetryCheck) {
+            GitConnectionRetry.retry(message, retries, interval) {
                 code()
             }
         } catch (ex: RestClientResponseException) {
@@ -455,35 +457,62 @@ class DefaultOntrackGitHubClient(
         }
     }
 
-    override fun getFileContent(repository: String, branch: String?, path: String, retryOnNotFound: Boolean): ByteArray? =
+    override fun getFileContent(
+        repository: String,
+        branch: String?,
+        path: String,
+        retryOnNotFound: Boolean,
+    ): ByteArray? =
         getFile(repository, branch, path, retryOnNotFound)?.contentAsBinary()
 
     override fun getFile(repository: String, branch: String?, path: String, retryOnNotFound: Boolean): GitHubFile? {
+
         // Logging
-        logger.debug("[github] Getting file {}/{}@{}", repository, path, branch)
+        logger.debug("[github] Getting file {}/{}@{} with retryOnNotFound=$retryOnNotFound", repository, path, branch)
         // Getting a client
         val client = createGitHubRestTemplate()
         // Gets the repository for this project
         val (owner, name) = getRepositoryParts(repository)
-        // Gets the issue
-        return try {
-            val restPath = "/repos/$owner/$name/contents/$path".runIf(branch != null) {
-                "$this?ref=$branch"
-            }
-            client(
-                message = "Get file content $repository/$path@$branch",
-                exceptionRetryCheck = { retryOnNotFound && it is NotFound },
-            ) {
-                getForObject<GitHubGetContentResponse>(restPath).let {
-                    GitHubFile(
-                        content = it.content,
-                        sha = it.sha,
-                    )
+
+        fun internalDownload(): GitHubFile? {
+            return try {
+                val restPath = "/repos/$owner/$name/contents/$path".runIf(branch != null) {
+                    "$this?ref=$branch"
+                }
+                client("Get file content $repository/$path@$branch") {
+                    getForObject<GitHubGetContentResponse>(restPath).let {
+                        GitHubFile(
+                            content = it.content,
+                            sha = it.sha,
+                        )
+                    }
+                }
+            } catch (ex: GitHubErrorsException) {
+                if (ex.status == 404) {
+                    null
+                } else {
+                    throw ex
                 }
             }
-        } catch (ex: GitConnectionRetry.GitConnectionRetryTimeoutException) {
-            // Time when trying to get the file, returning a null content
-            null
+        }
+
+        return if (retryOnNotFound) {
+            var file: GitHubFile? = null
+            var tries = 0u
+            runBlocking {
+                while (file == null && tries < notFoundRetries) {
+                    tries++
+                    logger.debug("[github] Getting file {}/{}@{} with tries $tries/$notFoundRetries", repository, path, branch)
+                    file = internalDownload()
+                    if (file == null) {
+                        // Waiting before the next retry
+                        delay(notFoundInterval.toMillis())
+                    }
+                }
+            }
+            file
+        } else {
+            internalDownload()
         }
     }
 

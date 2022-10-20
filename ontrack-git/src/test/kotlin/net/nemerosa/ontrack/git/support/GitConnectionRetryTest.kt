@@ -57,39 +57,6 @@ internal class GitConnectionRetryTest {
         }
     }
 
-    @Test
-    fun `Not found exception with check only for some time`() {
-        var count = 0
-        val result = GitConnectionRetry.retry(
-            message = "test",
-            retries = 10u,
-            interval = Duration.ofMillis(100),
-            exceptionRetryCheck = { it is NotFoundException }
-        ) {
-            count++
-            if (count <= 5) {
-                throw NotFoundException()
-            } else {
-                count
-            }
-        }
-        assertEquals(6, result)
-    }
-
-    @Test
-    fun `Always not found exception with check`() {
-        assertFailsWith<GitConnectionRetry.GitConnectionRetryTimeoutException> {
-            GitConnectionRetry.retry(
-                message = "test",
-                retries = 10u,
-                interval = Duration.ofMillis(100),
-                exceptionRetryCheck = { it is NotFoundException }
-            ) {
-                throw NotFoundException()
-            }
-        }
-    }
-
     private class NotFoundException : RuntimeException()
 
 }

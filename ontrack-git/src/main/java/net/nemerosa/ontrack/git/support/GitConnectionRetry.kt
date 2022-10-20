@@ -13,14 +13,10 @@ import java.time.Duration
  */
 object GitConnectionRetry {
 
-    /**
-     * @param exceptionRetryCheck This code must return `true` on an exception if this exception should trigger a new try.
-     */
     fun <T> retry(
         message: String,
         retries: UInt,
         interval: Duration,
-        exceptionRetryCheck: (ex: Throwable) -> Boolean = { false },
         code: () -> T
     ): T {
         var tries = 0u
@@ -31,7 +27,7 @@ object GitConnectionRetry {
                     result = code()
                 } catch (any: Exception) {
                     val root = ExceptionUtils.getRootCause(any)
-                    if (root is SocketException || root is InterruptedIOException || exceptionRetryCheck(root)) {
+                    if (root is SocketException || root is InterruptedIOException) {
                         tries++
                         GitConnectionMetrics.connectRetry()
                         delay(interval.toMillis())
@@ -50,10 +46,10 @@ object GitConnectionRetry {
         interval: Duration
     ): Nothing {
         GitConnectionMetrics.connectError()
-        throw GitConnectionRetryTimeoutException(message, retries, interval)
+        throw GitConnectionException(message, retries, interval)
     }
 
-    class GitConnectionRetryTimeoutException(
+    private class GitConnectionException(
         message: String,
         retries: UInt,
         interval: Duration
