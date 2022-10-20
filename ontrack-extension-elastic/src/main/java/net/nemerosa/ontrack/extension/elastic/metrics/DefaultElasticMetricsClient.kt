@@ -210,9 +210,15 @@ class DefaultElasticMetricsClient(
                         request.add(IndexRequest(indexName).id(it.computeId()).source(source))
                     }
                     // Bulk request execution
-                    registry?.time(ElasticMetricsClientMetrics.time) {
+                    registry?.time<Unit>(ElasticMetricsClientMetrics.time) {
                         try {
-                            client.bulk(request, RequestOptions.DEFAULT)
+                            debug("Sending the bulk request (${request.numberOfActions()})")
+                            val response = client.bulk(request, RequestOptions.DEFAULT)
+                            if (response.hasFailures()) {
+                                val errorMessage = response.buildFailureMessage()
+                                logger.error("Errors while exporting metrics to ElasticSearch. $errorMessage")
+                                registry?.increment(ElasticMetricsClientMetrics.errors)
+                            }
                         } catch (any: Exception) {
                             logger.error("Cannot export ${entries.size} metrics to ElasticSearch", any)
                             registry?.increment(ElasticMetricsClientMetrics.errors)
