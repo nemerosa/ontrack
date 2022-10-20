@@ -44,9 +44,10 @@ interface SCM {
      *
      * @param scmBranch Branch to download the file from
      * @param path Path to the file
+     * @param retryOnNotFound If the file is not found, should we retry until a timeout is reached?
      * @return Binary content of the file or null if non existing
      */
-    fun download(scmBranch: String, path: String): ByteArray?
+    fun download(scmBranch: String, path: String, retryOnNotFound: Boolean = false): ByteArray?
 
     /**
      * Uploads the content of a file to a branch.

@@ -72,8 +72,8 @@ class GitHubSCMExtension(
                 )
         }
 
-        override fun download(scmBranch: String, path: String): ByteArray? =
-            client.getFileContent(property.repository, scmBranch, path)
+        override fun download(scmBranch: String, path: String, retryOnNotFound: Boolean): ByteArray? =
+            client.getFileContent(property.repository, scmBranch, path, retryOnNotFound)
 
         override fun upload(scmBranch: String, commit: String, path: String, content: ByteArray) {
             // First, we need the SHA of the file

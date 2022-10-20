@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.av.properties.yaml
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class YamlAccessorTest {
@@ -14,7 +15,8 @@ class YamlAccessorTest {
         // Accessor on this content
         val accessor = YamlAccessor(content)
         // Expression
-        val x = "#root.^[kind == 'Deployment' and metadata.name == 'test-listener'].spec.template.spec.containers.^[name == 'listener-cnt'].image"
+        val x =
+            "#root.^[kind == 'Deployment' and metadata.name == 'test-listener'].spec.template.spec.containers.^[name == 'listener-cnt'].image"
         // Reading
         val value = accessor.getValue(x)
         assertEquals("docker-delivery.repository.sample.io/test/listener:0.1.1", value)
@@ -41,6 +43,34 @@ class YamlAccessorTest {
         // Writing as string
         val newContent = accessor.write()
         assertTrue("""version: "4.3.11"""" in newContent)
+    }
+
+    @Test
+    fun `Reading YAML property from an empty content`() {
+        // Content as string
+        val content = ""
+        // Accessor on this content
+        val accessor = YamlAccessor(content)
+        // Expression
+        val x = "#root[0].groups['nemerosa-demo'].version"
+        // Reading
+        assertFailsWith<YamlNoContentException> {
+            accessor.getValue(x)
+        }
+    }
+
+    @Test
+    fun `Reading YAML property using an invalid expression`() {
+        // Content as string
+        val content = TestUtils.resourceString("/samples/yaml/map.yaml")
+        // Accessor on this content
+        val accessor = YamlAccessor(content)
+        // Expression
+        val x = "#root[0].groups['nemerosa-demo'].fieldNotFound"
+        // Reading
+        assertFailsWith<YamlEvaluationException> {
+            accessor.getValue(x)
+        }
     }
 
 }

@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests
 
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
+import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.Branch
 import net.nemerosa.ontrack.kdsl.spec.Build
 import net.nemerosa.ontrack.kdsl.spec.Project
 import net.nemerosa.ontrack.kdsl.spec.admin.admin
-import kotlin.test.assertNotNull
 
 abstract class AbstractACCDSLTestSupport : AbstractACCTestSupport() {
 
@@ -79,14 +79,23 @@ abstract class AbstractACCDSLTestSupport : AbstractACCTestSupport() {
     /**
      * Checks that a given message has been logged as error in Ontrack.
      */
-    protected fun checkErrorMessageLogged(message: String) {
-        val entry = ontrack.admin.logEntries().find {
-            it.detailList.any { detail ->
-                val description = detail.description
-                detail.name == "message" && description != null && message in description
-            }
+    protected fun checkErrorMessageLogged(
+        message: String,
+        timeout: Long = 120_000L,
+        interval: Long = 5_000L,
+    ) {
+        waitUntil(
+            task = "Logged message = $message",
+            timeout = timeout,
+            interval = interval,
+        ) {
+            ontrack.admin.logEntries().find {
+                it.detailList.any { detail ->
+                    val description = detail.description
+                    detail.name == "message" && description != null && message in description
+                }
+            } != null
         }
-        assertNotNull(entry, "No log message logged with: $message")
     }
 
 }

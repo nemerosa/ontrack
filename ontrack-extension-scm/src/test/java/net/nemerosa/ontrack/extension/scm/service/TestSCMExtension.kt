@@ -40,7 +40,7 @@ class TestSCMExtension(
         override fun createBranch(sourceBranch: String, newBranch: String): String =
             uid("$newBranch-commit-")
 
-        override fun download(scmBranch: String, path: String): ByteArray? {
+        override fun download(scmBranch: String, path: String, retryOnNotFound: Boolean): ByteArray? {
             val file = config.files.find {
                 it.branch == scmBranch && it.path == path
             }
