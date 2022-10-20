@@ -81,7 +81,7 @@ abstract class AbstractACCDSLTestSupport : AbstractACCTestSupport() {
      */
     protected fun checkErrorMessageLogged(
         message: String,
-        timeout: Long = 20_000L,
+        timeout: Long = 120_000L,
         interval: Long = 5_000L,
     ) {
         waitUntil(
