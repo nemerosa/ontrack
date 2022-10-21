@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.github.client
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.common.runIf
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
@@ -36,6 +38,8 @@ class DefaultOntrackGitHubClient(
     private val timeout: Duration = Duration.ofSeconds(60),
     private val retries: UInt = 3u,
     private val interval: Duration = Duration.ofSeconds(30),
+    private val notFoundRetries: UInt = 6u,
+    private val notFoundInterval: Duration = Duration.ofSeconds(5),
 ) : OntrackGitHubClient {
 
     private val logger: Logger = LoggerFactory.getLogger(OntrackGitHubClient::class.java)
@@ -453,35 +457,62 @@ class DefaultOntrackGitHubClient(
         }
     }
 
-    override fun getFileContent(repository: String, branch: String?, path: String): ByteArray? =
-        getFile(repository, branch, path)?.contentAsBinary()
+    override fun getFileContent(
+        repository: String,
+        branch: String?,
+        path: String,
+        retryOnNotFound: Boolean,
+    ): ByteArray? =
+        getFile(repository, branch, path, retryOnNotFound)?.contentAsBinary()
 
-    override fun getFile(repository: String, branch: String?, path: String): GitHubFile? {
+    override fun getFile(repository: String, branch: String?, path: String, retryOnNotFound: Boolean): GitHubFile? {
+
         // Logging
-        logger.debug("[github] Getting file {}/{}@{}", repository, path, branch)
+        logger.debug("[github] Getting file {}/{}@{} with retryOnNotFound=$retryOnNotFound", repository, path, branch)
         // Getting a client
         val client = createGitHubRestTemplate()
         // Gets the repository for this project
         val (owner, name) = getRepositoryParts(repository)
-        // Gets the issue
-        return try {
-            val restPath = "/repos/$owner/$name/contents/$path".runIf(branch != null) {
-                "$this?ref=$branch"
-            }
-            client("Get file content $repository/$path@$branch") {
-                getForObject<GitHubGetContentResponse>(restPath).let {
-                    GitHubFile(
-                        content = it.content,
-                        sha = it.sha,
-                    )
+
+        fun internalDownload(): GitHubFile? {
+            return try {
+                val restPath = "/repos/$owner/$name/contents/$path".runIf(branch != null) {
+                    "$this?ref=$branch"
+                }
+                client("Get file content $repository/$path@$branch") {
+                    getForObject<GitHubGetContentResponse>(restPath).let {
+                        GitHubFile(
+                            content = it.content,
+                            sha = it.sha,
+                        )
+                    }
+                }
+            } catch (ex: GitHubErrorsException) {
+                if (ex.status == 404) {
+                    null
+                } else {
+                    throw ex
                 }
             }
-        } catch (ex: GitHubErrorsException) {
-            if (ex.status == 404) {
-                null
-            } else {
-                throw ex
+        }
+
+        return if (retryOnNotFound) {
+            var file: GitHubFile? = null
+            var tries = 0u
+            runBlocking {
+                while (file == null && tries < notFoundRetries) {
+                    tries++
+                    logger.debug("[github] Getting file {}/{}@{} with tries $tries/$notFoundRetries", repository, path, branch)
+                    file = internalDownload()
+                    if (file == null) {
+                        // Waiting before the next retry
+                        delay(notFoundInterval.toMillis())
+                    }
+                }
             }
+            file
+        } else {
+            internalDownload()
         }
     }
 

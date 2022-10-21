@@ -67,6 +67,69 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
     }
 
     @Test
+    fun `Auto versioning on file not found at all`() {
+        withTestGitHubRepository {
+            withAutoVersioning {
+                repositoryFile("gradle.properties") {
+                    """
+                        # Some comment
+                        some-property = some-value
+                        some-version = 1.0.0
+                    """.trimIndent()
+                }
+                val dependency = branchWithPromotion(promotion = "IRON")
+                project {
+                    branch {
+                        configuredForGitHubRepository(ontrack)
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "not-existing.properties",
+                                    targetProperty = "some-version",
+                                )
+                            )
+                        )
+
+                        dependency.apply {
+                            build(name = "2.0.0") {
+                                promote("IRON")
+                            }
+                        }
+
+                        waitForAutoVersioningCompletion()
+
+                        assertThatGitHubRepository {
+
+                            // File unchanged
+                            fileContains("gradle.properties") {
+                                """
+                                    # Some comment
+                                    some-property = some-value
+                                    some-version = 1.0.0
+                                """.trimIndent()
+                            }
+
+                            hasNoPR(to = "main")
+
+                        }
+
+                        checkErrorMessageLogged("""Path at not-existing.properties for branch main was not found or has no content.""")
+                        checkMostRecentStateOfAutoVersioningAuditForSourceAndTargetBranch(
+                            dependency.project,
+                            this,
+                            "ERROR"
+                        )
+
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Auto versioning on promotion for a release branch`() {
         withTestGitHubRepository {
             withAutoVersioning {

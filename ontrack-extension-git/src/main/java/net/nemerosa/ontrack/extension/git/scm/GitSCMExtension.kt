@@ -61,7 +61,7 @@ class GitSCMExtension(
             unsupported("createBranch")
         }
 
-        override fun download(scmBranch: String, path: String): ByteArray? {
+        override fun download(scmBranch: String, path: String, retryOnNotFound: Boolean): ByteArray? {
             unsupported("download")
         }
 
