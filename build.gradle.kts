@@ -443,18 +443,9 @@ if (hasProperty("documentation")) {
         into("build/site/release")
     }
 
-    val releaseDocCopyJavadoc by tasks.registering(Copy::class) {
-        dependsOn("javadocPackage")
-        from("build/distributions") {
-            include("ontrack-javadoc.zip")
-        }
-        into("build/site/release/")
-    }
-
     val releaseDocPrepare by tasks.registering {
         dependsOn(releaseDocCopyHtml)
         dependsOn(releaseDocCopyPdf)
-        dependsOn(releaseDocCopyJavadoc)
     }
 
     tasks.named("build") {
