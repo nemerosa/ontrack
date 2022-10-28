@@ -331,6 +331,9 @@ ontrack.extension.auto-versioning.queue.async = true
 # Number of default RabbitMQ queues to use
 ontrack.extension.auto-versioning.queue.scale = 1
 
+# Cancelling the previous orders for the same source and same target if a new order comes in
+ontrack.extension.auto-versioning.queue.cancelling = true
+
 # Comma-separated list of projects which must have dedicated queues
 # ontrack.extension.auto-versioning.queue.projects =
 ----
