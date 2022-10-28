@@ -99,6 +99,11 @@ class AutoVersioningAuditStoreJdbcHelper(
             jsonQueries += "S.json::jsonb->>'mostRecentState' = :state"
             params += "state" to it.name
         }
+        // Filter on state(s)
+        if (filter.states != null && filter.states.isNotEmpty()) {
+            val states = filter.states.joinToString(", ") { "'$it'" }
+            jsonQueries += "S.json::jsonb->>'mostRecentState' IN ($states)"
+        }
         // Filter on running state
         filter.running?.let { flag ->
             jsonQueries += "S.json::jsonb->>'running' = :running"

@@ -19,6 +19,7 @@ abstract class AbstractAutoVersioningAuditService(
     }
 
     override fun onQueuing(order: AutoVersioningOrder, routing: String) {
+        store.cancelQueuedOrders(order)
         store.create(order, routing)
     }
 
