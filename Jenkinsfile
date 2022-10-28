@@ -5,9 +5,6 @@ pipeline {
     environment {
         ONTRACK = credentials("ONTRACK_SERVICE_ACCOUNT")
         DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
-        CODECOV_TOKEN = credentials("CODECOV_TOKEN")
-        GPG_KEY = credentials("GPG_KEY")
-        GPG_KEY_RING = credentials("GPG_KEY_RING")
     }
 
     parameters {
@@ -103,15 +100,9 @@ pipeline {
                         test \\
                         build \\
                         integrationTest \\
-                        publishToMavenLocal \\
-                        osPackages \\
                         dockerBuild \\
-                        javadocPackage \\
                         -Pdocumentation \\
                         -PbowerOptions='--allow-root' \\
-                        -Psigning.keyId=${GPG_KEY_USR} \\
-                        -Psigning.password=${GPG_KEY_PSW} \\
-                        -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
                         -Dorg.gradle.jvmargs=-Xmx6144m \\
                         --stacktrace \\
                         --parallel \\
@@ -289,163 +280,30 @@ pipeline {
             }
         }
 
-        // We stop here for pull requests and feature branches
-
-        // OS tests
-
-//        stage('Platform tests') {
-//            when {
-//                anyOf {
-//                    branch 'release/*'
-//                }
-//            }
-//            stages {
-//                stage('CentOS7') {
-//                    steps {
-//                        timeout(time: 25, unit: 'MINUTES') {
-//                            sh '''
-//                                echo "Preparing environment..."
-//                                DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
-//                                rm -f ${DOCKER_DIR}/*.rpm
-//                                cp build/distributions/*rpm ${DOCKER_DIR}/ontrack.rpm
-//
-//                                echo "Launching test environment..."
-//                                cd ontrack-acceptance/src/main/compose
-//                                docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
-//
-//                                echo "Launching Ontrack in CentOS environment..."
-//                                CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
-//                                echo "... for container ${CONTAINER}"
-//                                docker container exec ${CONTAINER} /etc/init.d/ontrack start
-//
-//                                echo "Launching tests..."
-//                                docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
-//                            '''
-//                        }
-//                    }
-//                    post {
-//                        always {
-//                            sh '''
-//                                mkdir -p build
-//                                cp -r ontrack-acceptance/src/main/compose/build build/centos
-//                                '''
-//                            ontrackCliValidateTests(
-//                                    stamp: 'ACCEPTANCE.CENTOS.7',
-//                                    pattern: 'build/centos/*.xml',
-//                            )
-//                        }
-//                        cleanup {
-//                            sh '''
-//                                cd ontrack-acceptance/src/main/compose
-//                                docker-compose --project-name centos --file docker-compose-centos-7.yml down --volumes
-//                                '''
-//                        }
-//                    }
-//                }
-//                // Debian
-//                stage('Debian') {
-//                    steps {
-//                        timeout(time: 25, unit: 'MINUTES') {
-//                            sh '''
-//                                echo "Preparing environment..."
-//                                DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
-//                                rm -f ${DOCKER_DIR}/*.deb
-//                                cp build/distributions/*.deb ${DOCKER_DIR}/ontrack.deb
-//
-//                                echo "Launching test environment..."
-//                                cd ontrack-acceptance/src/main/compose
-//                                docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
-//
-//                                echo "Launching Ontrack in Debian environment..."
-//                                CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
-//                                echo "... for container ${CONTAINER}"
-//                                docker container exec ${CONTAINER} /etc/init.d/ontrack start
-//
-//                                echo "Launching tests..."
-//                                docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
-//                                '''
-//                        }
-//                    }
-//                    post {
-//                        always {
-//                            sh '''
-//                                mkdir -p build/debian
-//                                cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
-//                                '''
-//                            ontrackCliValidateTests(
-//                                    stamp: 'ACCEPTANCE.DEBIAN',
-//                                    pattern: 'build/debian/*.xml',
-//                            )
-//                        }
-//                        cleanup {
-//                            sh '''
-//                                cd ontrack-acceptance/src/main/compose
-//                                docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
-//                            '''
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
         // Publication
 
-        stage('Publication') {
+        stage('Docker Hub') {
             when {
                 anyOf {
                     branch 'release/*'
                     branch 'feature/*publication'
                 }
             }
-            stages {
-                stage('Docker Hub') {
-                    environment {
-                        DOCKER_HUB = credentials("DOCKER_HUB")
-                    }
-                    steps {
-                        echo "Docker push"
-                        sh '''
+            environment {
+                DOCKER_HUB = credentials("DOCKER_HUB")
+            }
+            steps {
+                echo "Docker push"
+                sh '''
                             echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
                             docker image push nemerosa/ontrack:${VERSION}
                         '''
-                    }
-                    post {
-                        always {
-                            ontrackCliValidate(
-                                    stamp: 'DOCKER.HUB'
-                            )
-                        }
-                    }
-                }
-                stage('Maven Central') {
-                    environment {
-                        OSSRH = credentials("OSSRH")
-                    }
-                    steps {
-                        sh '''
-                            git status
-                            ./gradlew \\
-                                publishToSonatype \\
-                                closeAndReleaseSonatypeStagingRepository \\
-                                -Pdocumentation \\
-                                -PbowerOptions='--allow-root' \\
-                                -Psigning.keyId=${GPG_KEY_USR} \\
-                                -Psigning.password=${GPG_KEY_PSW} \\
-                                -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
-                                -PossrhUsername=${OSSRH_USR} \\
-                                -PossrhPassword=${OSSRH_PSW} \\
-                                --info \\
-                                --console plain \\
-                                --stacktrace
-                        '''
-                    }
-                    post {
-                        always {
-                            ontrackCliValidate(
-                                    stamp: 'MAVEN.CENTRAL'
-                            )
-                        }
-                    }
+            }
+            post {
+                always {
+                    ontrackCliValidate(
+                            stamp: 'DOCKER.HUB'
+                    )
                 }
             }
         }

@@ -1,9 +1,6 @@
 import com.avast.gradle.dockercompose.ComposeExtension
 import com.avast.gradle.dockercompose.tasks.ComposeUp
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
-import com.netflix.gradle.plugins.deb.Deb
-import com.netflix.gradle.plugins.packaging.SystemPackagingTask
-import com.netflix.gradle.plugins.rpm.Rpm
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import net.nemerosa.ontrack.gradle.GitterAnnouncement
 import net.nemerosa.ontrack.gradle.OntrackChangeLog
@@ -14,7 +11,6 @@ import net.nemerosa.versioning.VersioningPlugin
 import org.ajoberstar.gradle.git.publish.GitPublishExtension
 import org.jetbrains.kotlin.allopen.gradle.AllOpenExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.redline_rpm.header.Os
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
@@ -32,22 +28,14 @@ val gitHubToken: String by project
 val gitHubOwner: String by project
 val gitHubRepo: String by project
 
-// Maven Central
-val ossrhUsername: String by project
-val ossrhPassword: String by project
-
 plugins {
     java
     id("net.nemerosa.versioning") version "2.8.2" apply false
-    id("nebula.deb") version "8.1.0"
-    id("nebula.rpm") version "8.1.0"
     id("org.sonarqube") version "2.5"
     id("com.avast.gradle.docker-compose") version "0.14.3"
     id("com.bmuschko.docker-remote-api") version "6.4.0"
     id("org.springframework.boot") version Versions.springBootVersion apply false
-    id("io.freefair.aggregate-javadoc") version "4.1.2"
     id("com.github.breadmoirai.github-release") version "2.2.11"
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     // Site
     id("org.ajoberstar.git-publish") version "2.1.1"
 }
@@ -357,81 +345,6 @@ configure(coreProjects) p@{
 }
 
 /**
- * Global Javadoc
- */
-
-tasks.named<Javadoc>("aggregateJavadoc") {
-    include("net/nemerosa/**")
-}
-
-if (project.hasProperty("documentation")) {
-
-    rootProject.tasks.register("javadocPackage", Zip::class) {
-        archiveClassifier.set("javadoc")
-        archiveFileName.set("ontrack-javadoc.zip")
-        dependsOn("aggregateJavadoc")
-        from(rootProject.file("${rootProject.buildDir}/docs/javadoc")) {
-            include("**")
-        }
-    }
-}
-
-/**
- * Packaging for OS
- *
- * The package version does not accept versions like the ones generated
- * from the Versioning plugin for the feature branches for example.
- */
-
-val packageVersion: String = if (version.toString().matches("\\d+\\.\\d+\\.\\d+".toRegex())) {
-    version.toString().replace("[^0-9\\.-_]".toRegex(), "")
-} else {
-    "0.0.0"
-}
-println("Using package version = $packageVersion")
-
-val debPackage by tasks.registering(Deb::class) {
-    dependsOn(":ontrack-ui:bootJar")
-
-    link("/etc/init.d/ontrack", "/opt/ontrack/bin/ontrack.sh")
-}
-
-val rpmPackage by tasks.registering(Rpm::class) {
-    dependsOn(":ontrack-ui:bootJar")
-
-    user = "ontrack"
-    link("/etc/init.d/ontrack", "/opt/ontrack/bin/ontrack.sh")
-}
-
-tasks.withType(SystemPackagingTask::class) {
-
-    packageName = "ontrack"
-    release = "1"
-    version = packageVersion
-    os = Os.LINUX // only applied to RPM
-
-    preInstall(file("gradle/os-package/preInstall.sh"))
-    postInstall(file("gradle/os-package/postInstall.sh"))
-
-    from(project(":ontrack-ui").file("build/libs"), closureOf<CopySpec> {
-        include("ontrack-ui-${project.version}-app.jar")
-        into("/opt/ontrack/lib")
-        rename(".*", "ontrack.jar")
-    })
-
-    from("gradle/os-package", closureOf<CopySpec> {
-        include("ontrack.sh")
-        into("/opt/ontrack/bin")
-        fileMode = 0x168 // 0550
-    })
-}
-
-val osPackages by tasks.registering {
-    dependsOn(rpmPackage)
-    dependsOn(debPackage)
-}
-
-/**
  * Docker tasks
  */
 
@@ -551,27 +464,6 @@ if (hasProperty("documentation")) {
 }
 
 /**
- * Maven Central staging
- */
-
-nexusPublishing {
-    packageGroup.set("net.nemerosa")
-    repositories {
-        sonatype {
-            username.set(ossrhUsername)
-            password.set(ossrhPassword)
-        }
-    }
-}
-
-val initializeSonatypeStagingRepository by tasks.existing
-configure(exportedProjects) p@ {
-    initializeSonatypeStagingRepository {
-        dependsOn(tasks.withType<Sign>())
-    }
-}
-
-/**
  * GitHub release
  */
 
@@ -593,14 +485,6 @@ val prepareGitHubRelease by tasks.registering(Copy::class) {
     from("ontrack-dsl-shell/build/libs") {
         include("ontrack-dsl-shell-${version}-executable.jar")
         rename { "ontrack-dsl-shell.jar" }
-    }
-    from("build/distributions") {
-        include("ontrack*.deb")
-        rename { "ontrack.deb" }
-    }
-    from("build/distributions") {
-        include("ontrack*.rpm")
-        rename { "ontrack.rpm" }
     }
     from("ontrack-ui/build") {
         include("graphql.json")
@@ -627,10 +511,7 @@ githubRelease {
     releaseAssets(
             "build/release/ontrack.jar",
             "build/release/ontrack-dsl-shell.jar",
-            "build/release/ontrack-postgresql-migration.jar",
             "build/release/ontrack.pdf",
-            "build/release/ontrack.deb",
-            "build/release/ontrack.rpm",
             "build/release/graphql.json"
     )
     body {
@@ -682,30 +563,30 @@ val release by tasks.registering {
  * This means having a Site job in the pipeline, after the Publish one, calling the `site` task.
  */
 
-val siteOntrackLast2Releases by tasks.registering(OntrackLastReleases::class) {
-    releaseCount = 1
-    releaseBranchPattern = "2\\.[\\d]+"
-}
-
 val siteOntrackLast3Releases by tasks.registering(OntrackLastReleases::class) {
     releaseCount = 2
     releaseBranchPattern = "3\\.[\\d]+"
 }
 
 val siteOntrackLast4Releases by tasks.registering(OntrackLastReleases::class) {
+    releaseCount = 2
+    releaseBranchPattern = "4\\.[\\d]+"
+}
+
+val siteOntrackLast5Releases by tasks.registering(OntrackLastReleases::class) {
     releaseCount = 4
-    releaseBranchPattern = "4\\.[\\d]+(-rc|-beta)?"
+    releaseBranchPattern = "5\\.[\\d]+(-rc|-beta)?"
 }
 
 val sitePagesDocJs by tasks.registering {
-    dependsOn(siteOntrackLast2Releases)
     dependsOn(siteOntrackLast3Releases)
     dependsOn(siteOntrackLast4Releases)
+    dependsOn(siteOntrackLast5Releases)
     outputs.file(project.file("ontrack-site/src/main/web/output/assets/web/assets/ontrack/doc.js"))
     doLast {
-        val allReleases = siteOntrackLast4Releases.get().releases +
-                siteOntrackLast3Releases.get().releases +
-                siteOntrackLast2Releases.get().releases
+        val allReleases = siteOntrackLast5Releases.get().releases +
+                siteOntrackLast4Releases.get().releases +
+                siteOntrackLast3Releases.get().releases
         val allVersions = allReleases.joinToString(",") { "'${it.name}'" }
         project.file("ontrack-site/src/main/web/output/assets/web/assets/ontrack/doc.js").writeText(
                 """const releases = [$allVersions];"""

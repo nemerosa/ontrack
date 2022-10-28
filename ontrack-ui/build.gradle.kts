@@ -1,7 +1,8 @@
 import net.nemerosa.versioning.VersioningExtension
-import org.apache.commons.lang3.time.DateFormatUtils
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 plugins {
     `java-library`
@@ -111,13 +112,13 @@ val generateVersionInfo by tasks.registering {
         // Version information
         val info = rootProject.extensions.getByName<VersioningExtension>("versioning").info
         // Current date
-        val timestamp = DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(System.currentTimeMillis())
+        val timestamp = LocalDateTime.now(ZoneOffset.UTC).toString()
         // Output file
         val file = project.file("src/main/resources/application.properties")
         file.writeText("""
             # This file is generated at build time to contain version information
             # Do not edit it, do not commit it
-            ontrack.ersion.date = $timestamp
+            ontrack.version.date = $timestamp
             ontrack.version.display = ${info.display}
             ontrack.version.full = ${info.full}
             ontrack.version.branch = ${info.branchId}

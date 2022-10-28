@@ -1,4 +1,0 @@
-# Remote shutdown enabled
-endpoints:
-  shutdown:
-    enabled: true
