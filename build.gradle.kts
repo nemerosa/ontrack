@@ -263,7 +263,7 @@ configure(coreProjects) p@{
             dependency("org.testcontainers:testcontainers:1.16.2")
             dependency("org.jetbrains.kotlin:kotlin-test:${Versions.kotlinVersion}")
             // Overrides from Spring Boot
-            dependency("org.postgresql:postgresql:9.4.1208")
+            dependency("org.postgresql:postgresql:42.5.0")
             // JWT
             dependency("io.jsonwebtoken:jjwt-api:${Versions.jjwtVersion}")
             dependency("io.jsonwebtoken:jjwt-impl:${Versions.jjwtVersion}")
