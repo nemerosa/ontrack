@@ -29,6 +29,7 @@ class AutoVersioningAuditMgt(connector: Connector) : Connected(connector) {
                 .source(source)
                 .project(project)
                 .branch(branch)
+                .version(version)
                 .build()
         )?.autoVersioningAuditEntries()?.pageItems()?.map { item ->
             AutoVersioningAuditEntry(
