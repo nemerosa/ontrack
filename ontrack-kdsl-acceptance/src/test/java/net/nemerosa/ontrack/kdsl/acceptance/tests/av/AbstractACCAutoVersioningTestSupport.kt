@@ -1,13 +1,17 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.kdsl.acceptance.tests.ACCProperties
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
+import net.nemerosa.ontrack.kdsl.acceptance.tests.github.gitHubClient
+import net.nemerosa.ontrack.kdsl.acceptance.tests.github.system.GitHubRepositoryContext
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.Branch
 import net.nemerosa.ontrack.kdsl.spec.Project
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSettings
 import net.nemerosa.ontrack.kdsl.spec.extension.av.autoVersioning
 import net.nemerosa.ontrack.kdsl.spec.settings.settings
+import java.util.*
 
 abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport() {
 
@@ -85,6 +89,46 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
                     false
                 }
             } ?: false
+        }
+    }
+
+    protected fun withTestGitHubPostProcessingRepository(
+        code: GitHubRepositoryContext.() -> Unit,
+    ) {
+        // Unique name for the repository
+        val uuid = UUID.randomUUID().toString()
+        val repo = "ontrack-auto-versioning-test-$uuid"
+
+        // Forking the sample repository
+        gitHubClient.postForLocation(
+            "/repos/${ACCProperties.GitHub.AutoVersioning.PostProcessing.Sample.org}/${ACCProperties.GitHub.AutoVersioning.PostProcessing.Sample.repository}/forks",
+            mapOf(
+                "organization" to ACCProperties.GitHub.organization
+            )
+        )
+
+        // Rename the repository
+        gitHubClient.patchForObject(
+            "/repos/${ACCProperties.GitHub.organization}/${ACCProperties.GitHub.AutoVersioning.PostProcessing.Sample.repository}",
+            mapOf(
+                "name" to repo
+            ),
+            JsonNode::class.java
+        )
+
+        // Working with this repository
+        try {
+
+            // Context
+            val context = GitHubRepositoryContext(repo)
+
+            // Running the code
+            context.code()
+
+
+        } finally {
+            // Deleting the repository
+            gitHubClient.delete("/repos/${ACCProperties.GitHub.organization}/$repo")
         }
     }
 

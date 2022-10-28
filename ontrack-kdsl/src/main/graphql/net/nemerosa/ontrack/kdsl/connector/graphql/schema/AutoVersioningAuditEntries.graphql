@@ -4,6 +4,7 @@ query AutoVersioningAuditEntries(
     $source: String = null,
     $project: String = null,
     $branch: String = null,
+    $version: String = null,
 ) {
     autoVersioningAuditEntries(
         offset: $offset,
@@ -12,6 +13,7 @@ query AutoVersioningAuditEntries(
             source: $source,
             project: $project,
             branch: $branch,
+            version: $version,
         }
     ) {
         pageInfo {
