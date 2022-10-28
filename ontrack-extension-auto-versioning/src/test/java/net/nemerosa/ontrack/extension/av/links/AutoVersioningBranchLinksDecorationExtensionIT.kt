@@ -28,7 +28,7 @@ class AutoVersioningBranchLinksDecorationExtensionIT : AbstractAutoVersioningTes
                     }
                 }
                 createOrder(sourceProject = project("component").name, targetVersion = "2.0.0").apply {
-                    autoVersioningAuditService.onQueuing(this, "routing")
+                    autoVersioningAuditService.onQueuing(this, "routing", cancelling = false)
                     autoVersioningAuditService.onReceived(this, "queue")
                 }
 
@@ -70,7 +70,7 @@ class AutoVersioningBranchLinksDecorationExtensionIT : AbstractAutoVersioningTes
                     }
                 }
                 createOrder(sourceProject = project("component").name, targetVersion = "2.0.0").apply {
-                    autoVersioningAuditService.onQueuing(this, "routing")
+                    autoVersioningAuditService.onQueuing(this, "routing", cancelling = false)
                     autoVersioningAuditService.onReceived(this, "queue")
                 }
 

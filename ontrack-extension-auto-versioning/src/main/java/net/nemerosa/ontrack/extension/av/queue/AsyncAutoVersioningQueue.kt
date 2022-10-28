@@ -29,7 +29,7 @@ class AsyncAutoVersioningQueue(
     override fun queue(order: AutoVersioningOrder) {
         val routingKey = AsyncAutoVersioningQueueConfig.getRoutingKey(autoVersioningConfigProperties, order)
         // Audit
-        autoVersioningAuditService.onQueuing(order, routingKey)
+        autoVersioningAuditService.onQueuing(order, routingKey, cancelling = autoVersioningConfigProperties.queue.cancelling)
         // Metrics
         metrics.onQueuing(order, routingKey)
         // Raw message to post

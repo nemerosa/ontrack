@@ -18,8 +18,10 @@ abstract class AbstractAutoVersioningAuditService(
             ExceptionUtils.getStackFrames(error).take(MAX_STACK_HEIGHT).joinToString("\n")
     }
 
-    override fun onQueuing(order: AutoVersioningOrder, routing: String) {
-        store.cancelQueuedOrders(order)
+    override fun onQueuing(order: AutoVersioningOrder, routing: String, cancelling: Boolean) {
+        if (cancelling) {
+            store.cancelQueuedOrders(order)
+        }
         store.create(order, routing)
     }
 
