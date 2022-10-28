@@ -4,7 +4,7 @@ services:
 
   # Database
   postgres:
-    image: postgres:11
+    image: postgres:13
     environment:
       POSTGRES_DB: ontrack
       POSTGRES_USER: ontrack
