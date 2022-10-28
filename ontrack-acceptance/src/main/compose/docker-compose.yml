@@ -3,7 +3,7 @@ version: "2.1"
 services:
 
    postgres:
-    image: postgres:11
+    image: postgres:15
     environment:
       POSTGRES_DB: ontrack
       POSTGRES_USER: ontrack

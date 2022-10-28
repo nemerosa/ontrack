@@ -4,7 +4,7 @@ services:
 
   # Database
   db:
-    image: postgres:11
+    image: postgres:15
     command: postgres -c 'max_connections=200'
     environment:
       POSTGRES_DB      : ontrack

@@ -6,7 +6,7 @@ services:
 
   # Ontrack container
   ontrack:
-    image: nemerosa/ontrack:${ONTRACK_VERSION:-4}
+    image: nemerosa/ontrack:${ONTRACK_VERSION:-5}
     restart: always
     environment:
       PROFILE: prod
@@ -34,7 +34,7 @@ services:
 
   # Postgresql database
   postgres:
-    image: postgres:11
+    image: postgres:15
     restart: always
     environment:
       POSTGRES_DB: ${ONTRACK_POSTGRES_DB:-ontrack}
