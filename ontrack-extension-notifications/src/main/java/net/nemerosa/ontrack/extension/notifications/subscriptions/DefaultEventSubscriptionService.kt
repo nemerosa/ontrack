@@ -174,6 +174,17 @@ class DefaultEventSubscriptionService(
         }
     }
 
+    override fun deleteSubscriptionsByEntity(projectEntity: ProjectEntity) {
+        securityService.checkProjectFunction(projectEntity, ProjectView::class.java)
+        securityService.checkProjectFunction(projectEntity, ProjectSubscriptionsWrite::class.java)
+        entityDataStore.deleteByFilter(
+            EntityDataStoreFilter(
+                entity = projectEntity,
+                category = ENTITY_STORE,
+            )
+        )
+    }
+
     override fun disableSubscriptionById(projectEntity: ProjectEntity?, id: String): SavedEventSubscription =
         disableSubscriptionById(projectEntity, id, disabled = true)
 
