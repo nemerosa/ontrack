@@ -22,6 +22,6 @@ data class SubscriptionsCascContextData(
         keywords = keywords,
         channel = channel,
         channelConfig = channelConfig,
-        disabled = disabled,
+        disabled = disabled ?: false,
     )
 }
