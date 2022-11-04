@@ -9,16 +9,12 @@ import net.nemerosa.ontrack.model.structure.toProjectEntityID
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
+import kotlin.test.*
 
 class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
 
     @Autowired
     private lateinit var cascService: CascService
-
-    // TODO Deleting an entity
 
     @Test
     fun `Subscription for a project`() {
@@ -65,6 +61,122 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                             it.first()
                         )
                     }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Bad subscription format`() {
+        val target = uid("t")
+        project {
+            assertFailsWith<IllegalStateException> {
+                casc(
+                    """
+                    ontrack:
+                        extensions:
+                            notifications:
+                                entity-subscriptions:
+                                    - entity:
+                                        project: $name
+                                        build: 1
+                                      subscriptions:
+                                        - events:
+                                            - new_promotion_run
+                                          keywords: ""
+                                          channel: mock
+                                          channel-config:
+                                            target: "$target"
+                """
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Promotions and validations are not valid`() {
+        val target = uid("t")
+        project {
+            branch {
+                assertFailsWith<IllegalStateException> {
+                    casc(
+                        """
+                            ontrack:
+                                extensions:
+                                    notifications:
+                                        entity-subscriptions:
+                                            - entity:
+                                                project: ${project.name}
+                                                branch: $name
+                                                promotion: PL
+                                                validation: VS
+                                              subscriptions:
+                                                - events:
+                                                    - new_promotion_run
+                                                  keywords: ""
+                                                  channel: mock
+                                                  channel-config:
+                                                    target: "$target"
+                        """
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Promotions need a branch`() {
+        val target = uid("t")
+        project {
+            branch {
+                assertFailsWith<IllegalStateException> {
+                    casc(
+                        """
+                            ontrack:
+                                extensions:
+                                    notifications:
+                                        entity-subscriptions:
+                                            - entity:
+                                                project: ${project.name}
+                                                promotion: PL
+                                              subscriptions:
+                                                - events:
+                                                    - new_promotion_run
+                                                  keywords: ""
+                                                  channel: mock
+                                                  channel-config:
+                                                    target: "$target"
+                        """
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Validations need a branch`() {
+        val target = uid("t")
+        project {
+            branch {
+                assertFailsWith<IllegalStateException> {
+                    casc(
+                        """
+                            ontrack:
+                                extensions:
+                                    notifications:
+                                        entity-subscriptions:
+                                            - entity:
+                                                project: ${project.name}
+                                                validation: VS
+                                              subscriptions:
+                                                - events:
+                                                    - new_promotion_run
+                                                  keywords: ""
+                                                  channel: mock
+                                                  channel-config:
+                                                    target: "$target"
+                        """
+                    )
                 }
             }
         }
@@ -146,6 +258,72 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                 assertEquals(
                     setOf("PLATINUM", "SILVER"),
                     subscriptions.toSet()
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Deleting an entity from the list of subscriptions`() {
+        val target = uid("t")
+        project {
+            // Initial subscriptions
+            casc(
+                """
+                    ontrack:
+                        extensions:
+                            notifications:
+                                entity-subscriptions:
+                                    - entity:
+                                        project: $name
+                                      subscriptions:
+                                        - events:
+                                            - new_promotion_run
+                                          keywords: "GOLD"
+                                          channel: mock
+                                          channel-config:
+                                            target: "$target"
+                                        - events:
+                                            - new_promotion_run
+                                          keywords: "SILVER"
+                                          channel: mock
+                                          channel-config:
+                                            target: "$target"
+                """
+            )
+            // Checks that we can find these subscriptions
+            asAdmin {
+                val subscriptions = eventSubscriptionService.filterSubscriptions(
+                    EventSubscriptionFilter(
+                        entity = this.toProjectEntityID(),
+                        channel = "mock",
+                    )
+                ).pageItems.map { it.data.keywords }
+                assertEquals(
+                    setOf("GOLD", "SILVER"),
+                    subscriptions.toSet()
+                )
+            }
+            // Removing the entity-level
+            casc(
+                """
+                    ontrack:
+                        extensions:
+                            notifications:
+                                entity-subscriptions: []
+                """
+            )
+            // Checks that we cannot find these subscriptions any longer
+            asAdmin {
+                val subscriptions = eventSubscriptionService.filterSubscriptions(
+                    EventSubscriptionFilter(
+                        entity = this.toProjectEntityID(),
+                        channel = "mock",
+                    )
+                ).pageItems
+                assertTrue(
+                    subscriptions.isEmpty(),
+                    "Subscriptions are gone"
                 )
             }
         }

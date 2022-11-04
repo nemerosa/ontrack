@@ -132,10 +132,7 @@ class EntitySubscriptionsCascContext(
                     subscribe(entity, item)
                 }
                 onModification { item, cached ->
-                    val existingId = entitySubscriptions[cached.normalized()]
-                    if (existingId != null) {
-                        eventSubscriptionService.deleteSubscriptionById(entity, existingId)
-                    }
+                    // Resubscribing is enough
                     subscribe(entity, item)
                 }
                 onDeletion { cached ->
