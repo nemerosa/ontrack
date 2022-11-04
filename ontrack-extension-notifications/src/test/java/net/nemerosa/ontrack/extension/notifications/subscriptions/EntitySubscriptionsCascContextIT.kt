@@ -16,6 +16,9 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
     @Autowired
     private lateinit var cascService: CascService
 
+    @Autowired
+    private lateinit var entitySubscriptionsCascContext: EntitySubscriptionsCascContext
+
     @Test
     fun `Subscription for a project`() {
         val target = uid("t")
@@ -179,6 +182,71 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                     )
                 }
             }
+        }
+    }
+
+    @Test
+    fun rendering() {
+        val target = uid("t")
+        project {
+            casc(
+                """
+                    ontrack:
+                        extensions:
+                            notifications:
+                                entity-subscriptions:
+                                    - entity:
+                                        project: $name
+                                      subscriptions:
+                                        - events:
+                                            - new_promotion_run
+                                          keywords: "SILVER"
+                                          channel: mock
+                                          channel-config:
+                                            target: "$target-silver"
+                                        - events:
+                                            - new_promotion_run
+                                          keywords: "GOLD"
+                                          channel: mock
+                                          channel-config:
+                                            target: "$target-gold"
+                """
+            )
+            // Rendering
+            val json = entitySubscriptionsCascContext.render()
+            assertEquals(
+                listOf(
+                    mapOf(
+                        "entity" to mapOf(
+                            "project" to name,
+                            "branch" to null,
+                            "promotion" to null,
+                            "validation" to null,
+                        ),
+                        "subscriptions" to listOf(
+                            mapOf(
+                                "events" to listOf("new_promotion_run"),
+                                "keywords" to "SILVER",
+                                "channel" to "mock",
+                                "channel-config" to mapOf(
+                                    "target" to "$target-silver"
+                                ),
+                                "disabled" to null,
+                            ),
+                            mapOf(
+                                "events" to listOf("new_promotion_run"),
+                                "keywords" to "GOLD",
+                                "channel" to "mock",
+                                "channel-config" to mapOf(
+                                    "target" to "$target-gold"
+                                ),
+                                "disabled" to null,
+                            ),
+                        )
+                    )
+                ).asJson(),
+                json
+            )
         }
     }
 
