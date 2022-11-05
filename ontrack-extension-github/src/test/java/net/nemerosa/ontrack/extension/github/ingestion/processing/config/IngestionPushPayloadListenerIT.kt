@@ -4,6 +4,9 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.ConfigParsingException
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionCascBranchConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionCascConfig
 import net.nemerosa.ontrack.extension.stale.StalePropertyType
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -49,8 +52,8 @@ internal class IngestionPushPayloadListenerIT : AbstractIngestionTestSupport() {
             onlyOneGitHubConfig()
             val repository = uid("r")
             ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
-                casc = IngestionCascConfig(
-                    project = IngestionCascBranchConfig(
+                casc = OldIngestionCascConfig(
+                    project = OldIngestionCascBranchConfig(
                         casc = mapOf(
                             "properties" to mapOf(
                                 "staleProperty" to mapOf(
@@ -94,8 +97,8 @@ internal class IngestionPushPayloadListenerIT : AbstractIngestionTestSupport() {
             onlyOneGitHubConfig()
             val repository = uid("r")
             ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
-                casc = IngestionCascConfig(
-                    project = IngestionCascBranchConfig(
+                casc = OldIngestionCascConfig(
+                    project = OldIngestionCascBranchConfig(
                         casc = mapOf(
                             "properties" to mapOf(
                                 "buildLinkDisplayProperty" to mapOf(
@@ -131,8 +134,8 @@ internal class IngestionPushPayloadListenerIT : AbstractIngestionTestSupport() {
             onlyOneGitHubConfig()
             val repository = uid("r")
             ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
-                casc = IngestionCascConfig(
-                    project = IngestionCascBranchConfig(
+                casc = OldIngestionCascConfig(
+                    project = OldIngestionCascBranchConfig(
                         casc = mapOf(
                             "properties" to mapOf(
                                 "staleProperty" to mapOf(
@@ -168,8 +171,8 @@ internal class IngestionPushPayloadListenerIT : AbstractIngestionTestSupport() {
             onlyOneGitHubConfig()
             val repository = uid("r")
             ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
-                casc = IngestionCascConfig(
-                    project = IngestionCascBranchConfig(
+                casc = OldIngestionCascConfig(
+                    project = OldIngestionCascBranchConfig(
                         includes = "main|release-.*",
                         excludes = "release-1\\..*",
                         casc = mapOf(

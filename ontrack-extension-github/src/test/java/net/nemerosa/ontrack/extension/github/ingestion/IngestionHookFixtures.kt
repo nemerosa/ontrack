@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStatus
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfig
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfigGeneral
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionConfigGeneral
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayload
@@ -234,7 +234,7 @@ object IngestionHookFixtures {
     )
 
     fun sampleIngestionConfig() = IngestionConfig(
-        general = IngestionConfigGeneral(
+        general = OldIngestionConfigGeneral(
             skipJobs = true,
         )
     )

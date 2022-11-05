@@ -5,6 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.INGESTION_CONFIG_FILE_PATH
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayloadListenerCheck
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.model.structure.Branch

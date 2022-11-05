@@ -2,6 +2,9 @@ package net.nemerosa.ontrack.extension.github.ingestion.ui
 
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionConfigGeneral
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldJobConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldStepConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.json.asJson
 import org.junit.Test
@@ -19,11 +22,11 @@ class GQLGitHubIngestionConfigBranchFieldContributorIT : AbstractIngestionTestJU
             branch {
                 configService.saveConfig(
                     this, IngestionConfig(
-                        general = IngestionConfigGeneral(
+                        general = OldIngestionConfigGeneral(
                             skipJobs = false,
                         ),
                         steps = listOf(
-                            StepConfig(
+                            OldStepConfig(
                                 name = "Publishing",
                                 validation = "docker-publication",
                                 validationJobPrefix = false,
@@ -31,7 +34,7 @@ class GQLGitHubIngestionConfigBranchFieldContributorIT : AbstractIngestionTestJU
                             ),
                         ),
                         jobs = listOf(
-                            JobConfig(
+                            OldJobConfig(
                                 name = "build",
                                 validation = "build",
                                 description = "Main build",

@@ -12,6 +12,6 @@ class IngestionConfigValidation(
     val validation: String? = null,
     @APIDescription("Description for the validation stamp")
     val description: String? = null,
-    @APIDescription("Must we use the job name as a prefix to the validation stamp?")
-    val validationJobPrefix: Boolean? = null,
+    @APIDescription("Must we use the job/step name as a prefix to the validation stamp?")
+    val validationPrefix: Boolean? = null,
 )

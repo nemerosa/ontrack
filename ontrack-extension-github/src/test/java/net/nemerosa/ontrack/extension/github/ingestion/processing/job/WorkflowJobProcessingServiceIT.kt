@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionConfigGeneral
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
@@ -126,7 +127,7 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
         ConfigLoaderServiceITMockConfig.customIngestionConfig(
             configLoaderService,
             IngestionConfig(
-                general = IngestionConfigGeneral(
+                general = OldIngestionConfigGeneral(
                     skipJobs = false,
                 ),
             )

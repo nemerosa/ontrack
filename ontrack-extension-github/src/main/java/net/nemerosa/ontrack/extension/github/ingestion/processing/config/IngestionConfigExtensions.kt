@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldJobConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldStepConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
 
@@ -8,7 +10,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionS
  */
 private fun IngestionConfig.mustUseValidationJobPrefix(
     job: String,
-    stepConfig: StepConfig?,
+    stepConfig: OldStepConfig?,
     settings: GitHubIngestionSettings,
 ): Boolean =
     stepConfig?.validationJobPrefix // Trying at step config level
@@ -76,7 +78,7 @@ fun IngestionConfig.getValidationStampDescription(job: String, step: String?): S
  * @param step Exact name of the step
  * @return Step configuration or null if not configured
  */
-fun IngestionConfig.findStepConfig(step: String): StepConfig? =
+fun IngestionConfig.findStepConfig(step: String): OldStepConfig? =
     steps.find { it.name == step }
 
 /**
@@ -86,7 +88,7 @@ fun IngestionConfig.findStepConfig(step: String): StepConfig? =
  * @param job Exact name of the job
  * @return Job configuration or null if not configured
  */
-fun IngestionConfig.findJobConfig(job: String): JobConfig? =
+fun IngestionConfig.findJobConfig(job: String): OldJobConfig? =
     jobs.find { it.name == job }
 
 /**

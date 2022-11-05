@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.ui
 import net.nemerosa.ontrack.extension.api.EntityInformationExtension
 import net.nemerosa.ontrack.extension.api.model.EntityInformation
 import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigParser
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.ConfigParser
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigService
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.structure.Branch

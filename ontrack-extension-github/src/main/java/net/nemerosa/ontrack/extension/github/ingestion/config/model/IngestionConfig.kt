@@ -16,6 +16,8 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
  * @property tagging Configuration for the tag ingestion
  */
 data class IngestionConfig(
+    @APIDescription("Version of the configuration")
+    val version: String,
     @APIDescription("Configuration for the ingestion of the workflows")
     val workflows: IngestionConfigWorkflows = IngestionConfigWorkflows(),
     @APIDescription("Configuration for the ingestion of the jobs")

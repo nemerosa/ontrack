@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 import net.nemerosa.ontrack.extension.casc.entities.CascEntityService
 import net.nemerosa.ontrack.extension.general.AutoPromotionProperty
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionCascBranchConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionCascConfig
 import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.model.structure.Branch
@@ -86,12 +88,12 @@ class DefaultConfigService(
         }
     }
 
-    private fun casc(branch: Branch, cascConfig: IngestionCascConfig) {
+    private fun casc(branch: Branch, cascConfig: OldIngestionCascConfig) {
         casc(branch.project, branch.name, cascConfig.project)
         casc(branch, branch.name, cascConfig.branch)
     }
 
-    private fun casc(entity: ProjectEntity, branchName: String, cascConfig: IngestionCascBranchConfig) {
+    private fun casc(entity: ProjectEntity, branchName: String, cascConfig: OldIngestionCascBranchConfig) {
         if (!cascConfig.casc.isNull && FilterHelper.includes(branchName, cascConfig.includes, cascConfig.excludes)) {
             cascEntityService.apply(entity, cascConfig.casc)
         }

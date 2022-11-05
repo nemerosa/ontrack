@@ -1,6 +1,12 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.model.structure.Branch
+
+/**
+ * Default path for the ingestion file
+ */
+const val INGESTION_CONFIG_FILE_PATH = ".github/ontrack/ingestion.yml"
 
 /**
  * Management of ingestion configurations.

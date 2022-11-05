@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.job
 
 import net.nemerosa.ontrack.extension.git.model.GitBranchNotConfiguredException
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.INGESTION_CONFIG_FILE_PATH
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInfo
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*

@@ -7,6 +7,8 @@ import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionRunConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionWorkflowConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
@@ -149,7 +151,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
         asAdmin {
             withGitHubIngestionSettings(runValidations = true) {
                 ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
-                    runs = IngestionRunConfig(enabled = false),
+                    runs = OldIngestionRunConfig(enabled = false),
                 ))
                 workflowRunValidationTest(expectValidation = false)
             }
@@ -176,7 +178,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
         asAdmin {
             withGitHubIngestionSettings(runValidations = false) {
                 ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
-                    runs = IngestionRunConfig(enabled = true),
+                    runs = OldIngestionRunConfig(enabled = true),
                 ))
                 workflowRunValidationTest()
             }
@@ -447,7 +449,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
             onlyOneGitHubConfig()
             withGitHubIngestionSettings {
                 ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
-                    workflows = IngestionWorkflowConfig(
+                    workflows = OldIngestionWorkflowConfig(
                         filter = FilterConfig(
                             includes = ".*",
                             excludes = ".*ignored.*",

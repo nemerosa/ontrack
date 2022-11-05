@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.ConfigParser
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.ConfigParsingException
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldJobConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldStepConfig
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -70,10 +74,10 @@ class ConfigParserTest {
         val yaml = ConfigParser.toYaml(
             IngestionConfig(
                 steps = listOf(
-                    StepConfig(name = "Some step", validation = "some-validation"),
+                    OldStepConfig(name = "Some step", validation = "some-validation"),
                 ),
                 jobs = listOf(
-                    JobConfig(name = "Some job", validation = "some-job"),
+                    OldJobConfig(name = "Some job", validation = "some-job"),
                 )
             )
         )

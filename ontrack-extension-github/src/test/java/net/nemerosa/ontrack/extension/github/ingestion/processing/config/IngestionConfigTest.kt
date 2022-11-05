@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionConfigGeneral
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldJobConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldStepConfig
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -23,7 +26,7 @@ class IngestionConfigTest {
             "job",
             IngestionConfig(
                 jobs = listOf(
-                    JobConfig(name = "job"),
+                    OldJobConfig(name = "job"),
                 )
             ).getValidationStampName(settings(), "job", null)
         )
@@ -35,7 +38,7 @@ class IngestionConfigTest {
             "job-validation",
             IngestionConfig(
                 jobs = listOf(
-                    JobConfig(name = "job", validation = "job-validation"),
+                    OldJobConfig(name = "job", validation = "job-validation"),
                 )
             ).getValidationStampName(settings(), "job", null)
         )
@@ -55,7 +58,7 @@ class IngestionConfigTest {
             "job-name-step-validation",
             IngestionConfig(
                 steps = listOf(
-                    StepConfig(name = "Step name", validation = "step-validation"),
+                    OldStepConfig(name = "Step name", validation = "step-validation"),
                 )
             ).getValidationStampName(settings(), "Job name", "Step name")
         )
@@ -67,10 +70,10 @@ class IngestionConfigTest {
             "job-validation-step-validation",
             IngestionConfig(
                 steps = listOf(
-                    StepConfig(name = "Step name", validation = "step-validation"),
+                    OldStepConfig(name = "Step name", validation = "step-validation"),
                 ),
                 jobs = listOf(
-                    JobConfig(name = "Job name", validation = "job-validation")
+                    OldJobConfig(name = "Job name", validation = "job-validation")
                 ),
             ).getValidationStampName(settings(), "Job name", "Step name")
         )
@@ -82,7 +85,7 @@ class IngestionConfigTest {
             "step-validation",
             IngestionConfig(
                 steps = listOf(
-                    StepConfig(name = "Step name", validation = "step-validation", validationJobPrefix = false),
+                    OldStepConfig(name = "Step name", validation = "step-validation", validationJobPrefix = false),
                 )
             ).getValidationStampName(settings(), "Job name", "Step name")
         )
@@ -94,7 +97,7 @@ class IngestionConfigTest {
             "step-name",
             IngestionConfig(
                 steps = listOf(
-                    StepConfig(name = "Step name", validationJobPrefix = false),
+                    OldStepConfig(name = "Step name", validationJobPrefix = false),
                 )
             ).getValidationStampName(settings(), "Job name", "Step name")
         )
@@ -114,7 +117,7 @@ class IngestionConfigTest {
             "Job name",
             IngestionConfig(
                 jobs = listOf(
-                    JobConfig(name = "Job name"),
+                    OldJobConfig(name = "Job name"),
                 )
             ).getValidationStampDescription("Job name", null)
         )
@@ -126,7 +129,7 @@ class IngestionConfigTest {
             "Job description",
             IngestionConfig(
                 jobs = listOf(
-                    JobConfig(name = "Job name", description = "Job description"),
+                    OldJobConfig(name = "Job name", description = "Job description"),
                 )
             ).getValidationStampDescription("Job name", null)
         )
@@ -146,7 +149,7 @@ class IngestionConfigTest {
             "Step name",
             IngestionConfig(
                 steps = listOf(
-                    StepConfig(name = "Step name"),
+                    OldStepConfig(name = "Step name"),
                 )
             ).getValidationStampDescription("Job name", "Step name")
         )
@@ -158,7 +161,7 @@ class IngestionConfigTest {
             "Step description",
             IngestionConfig(
                 steps = listOf(
-                    StepConfig(name = "Step name", description = "Step description"),
+                    OldStepConfig(name = "Step name", description = "Step description"),
                 )
             ).getValidationStampDescription("Job name", "Step name")
         )
@@ -184,7 +187,7 @@ class IngestionConfigTest {
             "job-name-step-name",
             IngestionConfig(
                 steps = listOf(
-                    StepConfig(name = "Step name"),
+                    OldStepConfig(name = "Step name"),
                 )
             ).getValidationStampName(settings(validationJobPrefix = true), "Job name", "Step name")
         )
@@ -196,7 +199,7 @@ class IngestionConfigTest {
             "step-name",
             IngestionConfig(
                 steps = listOf(
-                    StepConfig(name = "Step name"),
+                    OldStepConfig(name = "Step name"),
                 )
             ).getValidationStampName(settings(validationJobPrefix = false), "Job name", "Step name")
         )
@@ -207,11 +210,11 @@ class IngestionConfigTest {
         assertEquals(
             "job-name-step-name",
             IngestionConfig(
-                general = IngestionConfigGeneral(
+                general = OldIngestionConfigGeneral(
                     validationJobPrefix = true
                 ),
                 steps = listOf(
-                    StepConfig(name = "Step name"),
+                    OldStepConfig(name = "Step name"),
                 )
             ).getValidationStampName(settings(validationJobPrefix = false), "Job name", "Step name")
         )
@@ -222,14 +225,14 @@ class IngestionConfigTest {
         assertEquals(
             "job-name-step-name",
             IngestionConfig(
-                general = IngestionConfigGeneral(
+                general = OldIngestionConfigGeneral(
                     validationJobPrefix = false
                 ),
                 steps = listOf(
-                    StepConfig(name = "Step name"),
+                    OldStepConfig(name = "Step name"),
                 ),
                 jobs = listOf(
-                    JobConfig(name = "Job name", validationJobPrefix = true)
+                    OldJobConfig(name = "Job name", validationJobPrefix = true)
                 )
             ).getValidationStampName(settings(validationJobPrefix = false), "Job name", "Step name")
         )
@@ -240,14 +243,14 @@ class IngestionConfigTest {
         assertEquals(
             "job-name-step-name",
             IngestionConfig(
-                general = IngestionConfigGeneral(
+                general = OldIngestionConfigGeneral(
                     validationJobPrefix = false
                 ),
                 steps = listOf(
-                    StepConfig(name = "Step name", validationJobPrefix = true),
+                    OldStepConfig(name = "Step name", validationJobPrefix = true),
                 ),
                 jobs = listOf(
-                    JobConfig(name = "Job name", validationJobPrefix = false)
+                    OldJobConfig(name = "Job name", validationJobPrefix = false)
                 )
             ).getValidationStampName(settings(validationJobPrefix = false), "Job name", "Step name")
         )
@@ -258,14 +261,14 @@ class IngestionConfigTest {
         assertEquals(
             "step-name",
             IngestionConfig(
-                general = IngestionConfigGeneral(
+                general = OldIngestionConfigGeneral(
                     validationJobPrefix = true
                 ),
                 steps = listOf(
-                    StepConfig(name = "Step name", validationJobPrefix = false),
+                    OldStepConfig(name = "Step name", validationJobPrefix = false),
                 ),
                 jobs = listOf(
-                    JobConfig(name = "Job name", validationJobPrefix = true)
+                    OldJobConfig(name = "Job name", validationJobPrefix = true)
                 )
             ).getValidationStampName(settings(validationJobPrefix = true), "Job name", "Step name")
         )

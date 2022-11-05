@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldPromotionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
@@ -52,11 +53,11 @@ class AutoPromotionIT : AbstractIngestionTestSupport() {
             configLoaderService,
             IngestionConfig(
                 promotions = listOf(
-                    PromotionConfig(
+                    OldPromotionConfig(
                         name = "BRONZE",
                         validations = listOf("$job-build", "$job-unit-test"),
                     ),
-                    PromotionConfig(
+                    OldPromotionConfig(
                         name = "SILVER",
                         validations = listOf("$job-integration-test"),
                         promotions = listOf("BRONZE"),
