@@ -4,14 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig.Companion.V1_VERSION
 import net.nemerosa.ontrack.json.getTextField
-import net.nemerosa.ontrack.json.parse
 
 object ConfigParser {
 
     private const val FIELD_VERSION = "version"
-
-    private const val V1_VERSION = "v1"
 
     private val yamlFactory = YAMLFactory().apply {
         enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE)

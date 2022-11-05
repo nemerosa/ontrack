@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldJobConfig
 import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldStepConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
@@ -8,15 +9,16 @@ import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionS
 /**
  *
  */
+@Deprecated("Use the new model")
 private fun IngestionConfig.mustUseValidationJobPrefix(
     job: String,
     stepConfig: OldStepConfig?,
     settings: GitHubIngestionSettings,
-): Boolean =
-    stepConfig?.validationJobPrefix // Trying at step config level
-        ?: findJobConfig(job)?.validationJobPrefix // Trying at job level
-        ?: general.validationJobPrefix // Trying at general level
-        ?: settings.validationJobPrefix // Using the settings
+): Boolean = TODO()
+//    stepConfig?.validationJobPrefix // Trying at step config level
+//        ?: findJobConfig(job)?.validationJobPrefix // Trying at job level
+//        ?: general.validationJobPrefix // Trying at general level
+//        ?: settings.validationJobPrefix // Using the settings
 
 /**
  * Mapping of a step into a validation stamp name.
@@ -27,6 +29,7 @@ private fun IngestionConfig.mustUseValidationJobPrefix(
  * @param step The exact name of the step in the workflow (null when dealing with the job level)
  * @return Name of the validation stamp to use
  */
+@Deprecated("Use the new model")
 fun IngestionConfig.getValidationStampName(settings: GitHubIngestionSettings, job: String, step: String?): String =
     if (step == null) {
         val jobConfig = findJobConfig(job)
@@ -62,6 +65,7 @@ fun IngestionConfig.getValidationStampName(settings: GitHubIngestionSettings, jo
  * @param step The exact name of the step in the workflow (null when dealing with the job level)
  * @return Description of the validation stamp to use
  */
+@Deprecated("Use the new model")
 fun IngestionConfig.getValidationStampDescription(job: String, step: String?): String =
     if (step == null) {
         val jobConfig = findJobConfig(job)
@@ -78,8 +82,9 @@ fun IngestionConfig.getValidationStampDescription(job: String, step: String?): S
  * @param step Exact name of the step
  * @return Step configuration or null if not configured
  */
-fun IngestionConfig.findStepConfig(step: String): OldStepConfig? =
-    steps.find { it.name == step }
+@Deprecated("Use the new model")
+fun IngestionConfig.findStepConfig(step: String): OldStepConfig? = TODO()
+// steps.find { it.name == step }
 
 /**
  * Getting (if any) the configuration for a specific job using its exact name
@@ -88,8 +93,9 @@ fun IngestionConfig.findStepConfig(step: String): OldStepConfig? =
  * @param job Exact name of the job
  * @return Job configuration or null if not configured
  */
-fun IngestionConfig.findJobConfig(job: String): OldJobConfig? =
-    jobs.find { it.name == job }
+@Deprecated("Use the new model")
+fun IngestionConfig.findJobConfig(job: String): OldJobConfig? = TODO()
+// jobs.find { it.name == job }
 
 /**
  * Checking if a job must be included.
@@ -98,8 +104,9 @@ fun IngestionConfig.findJobConfig(job: String): OldJobConfig? =
  * @param job Exact name of the job
  * @return True if the job must be processed
  */
-fun IngestionConfig.filterJob(job: String): Boolean =
-    jobsFilter.includes(job)
+@Deprecated("Use the new model")
+fun IngestionConfig.filterJob(job: String): Boolean = TODO()
+// jobsFilter.includes(job)
 
 /**
  * Checking if a step must be included.
@@ -108,6 +115,7 @@ fun IngestionConfig.filterJob(job: String): Boolean =
  * @param step Exact name of the step
  * @return True if the step must be processed
  */
-fun IngestionConfig.filterStep(step: String): Boolean =
-    stepsFilter.includes(step)
+@Deprecated("Use the new model")
+fun IngestionConfig.filterStep(step: String): Boolean = TODO()
+// stepsFilter.includes(step)
 

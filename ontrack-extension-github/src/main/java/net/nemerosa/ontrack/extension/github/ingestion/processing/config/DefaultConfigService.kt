@@ -3,8 +3,8 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 import net.nemerosa.ontrack.extension.casc.entities.CascEntityService
 import net.nemerosa.ontrack.extension.general.AutoPromotionProperty
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
-import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionCascBranchConfig
-import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionCascConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigCascSetup
 import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.model.structure.Branch
@@ -39,7 +39,7 @@ class DefaultConfigService(
     }
 
     private fun validations(branch: Branch, config: IngestionConfig) {
-        config.validations.forEach { validationConfig ->
+        config.setup.validations.forEach { validationConfig ->
             ingestionModelAccessService.setupValidationStamp(
                 branch = branch,
                 vsName = validationConfig.name,
@@ -53,11 +53,11 @@ class DefaultConfigService(
 
     private fun autoPromotions(branch: Branch, config: IngestionConfig) {
         // Making sure all validations are created
-        val validations = config.promotions.flatMap { it.validations }.distinct().associateWith { validation ->
+        val validations = config.setup.promotions.flatMap { it.validations }.distinct().associateWith { validation ->
             ingestionModelAccessService.setupValidationStamp(branch, validation, null)
         }
         // Creating all promotions - first pass
-        val promotions = config.promotions.associate { plConfig ->
+        val promotions = config.setup.promotions.associate { plConfig ->
             plConfig.name to ingestionModelAccessService.setupPromotionLevel(
                 branch,
                 plConfig.name,
@@ -66,7 +66,7 @@ class DefaultConfigService(
             )
         }
         // Configuring all promotions - second pass
-        config.promotions.forEach { plConfig ->
+        config.setup.promotions.forEach { plConfig ->
             val promotion = promotions[plConfig.name]
             if (promotion != null) {
                 val existingAutoPromotionProperty: AutoPromotionProperty? =
@@ -88,17 +88,6 @@ class DefaultConfigService(
         }
     }
 
-    private fun casc(branch: Branch, cascConfig: OldIngestionCascConfig) {
-        casc(branch.project, branch.name, cascConfig.project)
-        casc(branch, branch.name, cascConfig.branch)
-    }
-
-    private fun casc(entity: ProjectEntity, branchName: String, cascConfig: OldIngestionCascBranchConfig) {
-        if (!cascConfig.casc.isNull && FilterHelper.includes(branchName, cascConfig.includes, cascConfig.excludes)) {
-            cascEntityService.apply(entity, cascConfig.casc)
-        }
-    }
-
     override fun saveConfig(branch: Branch, config: IngestionConfig) {
         // Storing the configuration
         config.store(branch)
@@ -107,7 +96,14 @@ class DefaultConfigService(
         // Auto promotions
         autoPromotions(branch, config)
         // Applying Casc configuration nodes
-        casc(branch, config.casc)
+        casc(branch.project, branch.name, config.setup.project)
+        casc(branch, branch.name, config.setup.branch)
+    }
+
+    private fun casc(entity: ProjectEntity, branchName: String, cascConfig: IngestionConfigCascSetup) {
+        if (!cascConfig.casc.isNull && FilterHelper.includes(branchName, cascConfig.includes, cascConfig.excludes)) {
+            cascEntityService.apply(entity, cascConfig.casc)
+        }
     }
 
     private fun IngestionConfig.store(ontrackBranch: Branch) {

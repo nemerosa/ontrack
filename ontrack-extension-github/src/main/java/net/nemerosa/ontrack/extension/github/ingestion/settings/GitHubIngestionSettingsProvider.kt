@@ -33,22 +33,6 @@ class GitHubIngestionSettingsProvider(
             GitHubIngestionSettings::repositoryExcludes,
             GitHubIngestionSettings.DEFAULT_REPOSITORY_EXCLUDES,
         ),
-        jobIncludes = settingsRepository.getString(
-            GitHubIngestionSettings::jobIncludes,
-            GitHubIngestionSettings.DEFAULT_JOB_INCLUDES,
-        ),
-        jobExcludes = settingsRepository.getString(
-            GitHubIngestionSettings::jobExcludes,
-            GitHubIngestionSettings.DEFAULT_JOB_EXCLUDES,
-        ),
-        stepIncludes = settingsRepository.getString(
-            GitHubIngestionSettings::stepIncludes,
-            GitHubIngestionSettings.DEFAULT_STEP_INCLUDES,
-        ),
-        stepExcludes = settingsRepository.getString(
-            GitHubIngestionSettings::stepExcludes,
-            GitHubIngestionSettings.DEFAULT_STEP_EXCLUDES,
-        ),
         issueServiceIdentifier = settingsRepository.getString(
             GitHubIngestionSettings::issueServiceIdentifier,
             GitHubIngestionSettings.DEFAULT_ISSUE_SERVICE_IDENTIFIER,
@@ -56,14 +40,6 @@ class GitHubIngestionSettingsProvider(
         enabled = settingsRepository.getBoolean(
             GitHubIngestionSettings::enabled,
             GitHubIngestionSettings.DEFAULT_ENABLED,
-        ),
-        validationJobPrefix = settingsRepository.getBoolean(
-            GitHubIngestionSettings::validationJobPrefix,
-            GitHubIngestionSettings.DEFAULT_VALIDATION_JOB_PREFIX,
-        ),
-        runValidations = settingsRepository.getBoolean(
-            GitHubIngestionSettings::runValidations,
-            GitHubIngestionSettings.DEFAULT_RUN_VALIDATION,
         ),
     )
 

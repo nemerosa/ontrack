@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import net.nemerosa.ontrack.extension.github.ingestion.FileLoaderService
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.config.parser.ConfigParser
 import net.nemerosa.ontrack.model.structure.Branch
 import org.springframework.stereotype.Component
