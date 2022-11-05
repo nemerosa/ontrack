@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.structure.displayName
 
 fun Event.matchesKeywords(keywords: String?) =
-    if (keywords != null) {
+    if (!keywords.isNullOrBlank()) {
         val tokens = keywords.split(" ").map { it.trim().lowercase() }.toSet()
         tokens.all { matchesKeyword(it) }
     } else {

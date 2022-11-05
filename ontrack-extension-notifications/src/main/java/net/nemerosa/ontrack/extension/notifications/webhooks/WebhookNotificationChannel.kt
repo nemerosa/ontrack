@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.selectionOfString
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
 
@@ -15,6 +16,7 @@ class WebhookNotificationChannel(
     private val webhookAdminService: WebhookAdminService,
     private val webhookExecutionService: WebhookExecutionService,
     private val cachedSettingsService: CachedSettingsService,
+    private val securityService: SecurityService,
 ) : AbstractNotificationChannel<WebhookNotificationChannelConfig>(WebhookNotificationChannelConfig::class) {
 
     override fun publish(config: WebhookNotificationChannelConfig, event: Event): NotificationResult {
@@ -44,7 +46,9 @@ class WebhookNotificationChannel(
     override fun getForm(c: WebhookNotificationChannelConfig?): Form = Form.create()
         .selectionOfString(
             WebhookNotificationChannelConfig::name,
-            webhookAdminService.webhooks.map { it.name }.sorted(),
+            securityService.asAdmin {
+                webhookAdminService.webhooks.map { it.name }.sorted()
+            },
             c?.name
         )
 

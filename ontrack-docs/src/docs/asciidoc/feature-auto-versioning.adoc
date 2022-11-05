@@ -732,6 +732,25 @@ The auto versioning feature integrates with the <<notifications>> framework by e
 * `auto-versioning-error` - whenever an auto versioning process finishes with an error
 * `auto-versioning-pr-merge-timeout-error` - whenever an auto versioning process cannot merge a pull request because of a timeout on its merge condition (only when `autoApprovalMode` is set to `CLIENT` - see <<auto-versioning-pr>>)
 
+[[auto-versioning-cancellations]]
+==== Cancellations
+
+By default, when auto versioning requests pile up for a given source and target, all the intermediary processing requests are cancelled.
+
+For example, given the following scenario, for a given source project and a given target branch:
+
+* (1) auto versioning to version 1.0.1
+* auto versioning to version 1.0.2 while (1) is still processed
+* auto versioning to version 1.0.3 while (1) is still processed
+* auto versioning to version 1.0.4 while (1) is finished
+
+In this scenario, the processing of 1.0.1 and 1.0.4 will have been processed and completed while 1.0.2 and 1.0.3 would have been cancelled.
+
+[NOTE]
+====
+The auto cancellation can be disabled by setting the `ontrack.extension.auto-versioning.queue.cancelling` <<configuration-properties-auto-versioning,configuration property>> to `false`.
+====
+
 [[auto-versioning-metrics]]
 ==== Metrics
 

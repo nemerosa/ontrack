@@ -32,6 +32,13 @@ interface EventSubscriptionService {
     fun deleteSubscriptionById(projectEntity: ProjectEntity?, id: String)
 
     /**
+     * Deletes all subscriptions for a given entity
+     *
+     * @param entity Entity to delete the subscriptions for
+     */
+    fun deleteSubscriptionsByEntity(projectEntity: ProjectEntity)
+
+    /**
      * Disables a subscription using its ID
      *
      * @param projectEntity Entity to look for
@@ -55,7 +62,7 @@ interface EventSubscriptionService {
      * * global filters first, entity-scoped subscriptions next
      * * creation date (most the most recent to the oldest)
      *
-     * @param filter Subscritption filter
+     * @param filter Subscription filter
      * @return Paginated list of subscriptions
      */
     fun filterSubscriptions(filter: EventSubscriptionFilter): PaginatedList<SavedEventSubscription>

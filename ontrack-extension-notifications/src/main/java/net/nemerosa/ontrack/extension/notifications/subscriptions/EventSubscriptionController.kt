@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
-import net.nemerosa.ontrack.graphql.support.getPropertyDescription
+import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.MultiSelection

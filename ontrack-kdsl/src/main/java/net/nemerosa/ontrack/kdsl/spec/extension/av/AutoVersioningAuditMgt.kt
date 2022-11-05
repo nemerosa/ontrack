@@ -20,6 +20,7 @@ class AutoVersioningAuditMgt(connector: Connector) : Connected(connector) {
         source: String? = null,
         project: String,
         branch: String? = null,
+        version: String? = null,
     ): List<AutoVersioningAuditEntry> =
         graphqlConnector.query(
             AutoVersioningAuditEntriesQuery.builder()
@@ -28,6 +29,7 @@ class AutoVersioningAuditMgt(connector: Connector) : Connected(connector) {
                 .source(source)
                 .project(project)
                 .branch(branch)
+                .version(version)
                 .build()
         )?.autoVersioningAuditEntries()?.pageItems()?.map { item ->
             AutoVersioningAuditEntry(

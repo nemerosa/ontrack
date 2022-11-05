@@ -117,6 +117,7 @@ class AutoVersioningBranchLinksDecorationExtension(
             AutoVersioningAuditState.PR_TIMEOUT -> "timeout"
 
             AutoVersioningAuditState.PROCESSING_ABORTED -> "aborted"
+            AutoVersioningAuditState.PROCESSING_CANCELLED -> "cancelled"
         }
 
 }

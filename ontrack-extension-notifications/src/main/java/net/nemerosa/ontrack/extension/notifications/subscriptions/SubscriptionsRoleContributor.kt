@@ -20,6 +20,10 @@ class SubscriptionsRoleContributor : RoleContributor {
     )
 
     override fun getGlobalFunctionContributionsForGlobalRoles(): Map<String, List<Class<out GlobalFunction>>> = mapOf(
+        Roles.GLOBAL_ADMINISTRATOR to listOf(
+            GlobalSubscriptionsManage::class.java,
+            NotificationRecordingAccess::class.java,
+        ),
         GLOBAL_SUBSCRIPTIONS_MANAGER to listOf(
             GlobalSubscriptionsManage::class.java,
             NotificationRecordingAccess::class.java,
@@ -28,6 +32,10 @@ class SubscriptionsRoleContributor : RoleContributor {
 
     override fun getProjectFunctionContributionsForGlobalRoles(): Map<String, List<Class<out ProjectFunction>>> =
         mapOf(
+            Roles.GLOBAL_ADMINISTRATOR to listOf(
+                ProjectSubscriptionsRead::class.java,
+                ProjectSubscriptionsWrite::class.java,
+            ),
             Roles.GLOBAL_PARTICIPANT to listOf(
                 ProjectSubscriptionsRead::class.java
             )

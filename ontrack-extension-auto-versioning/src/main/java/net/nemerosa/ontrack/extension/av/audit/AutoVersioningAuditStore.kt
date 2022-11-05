@@ -10,6 +10,12 @@ import java.time.LocalDateTime
 interface AutoVersioningAuditStore {
 
     /**
+     * Cancelling all current orders whose processing has not started yet. Only requests
+     * targetting the exact same [branch][AutoVersioningOrder.branch] are cancelled.
+     */
+    fun cancelQueuedOrders(order: AutoVersioningOrder)
+
+    /**
      * Creates a new entry
      *
      * @param order Audit entry to create

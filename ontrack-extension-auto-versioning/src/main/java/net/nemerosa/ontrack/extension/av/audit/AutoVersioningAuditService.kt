@@ -25,8 +25,9 @@ interface AutoVersioningAuditService {
      *
      * @param order Auto versioning order
      * @param routing Queue routing key being used
+     * @param cancelling If the previous orders from the same source to the same target must be cancelled
      */
-    fun onQueuing(order: AutoVersioningOrder, routing: String)
+    fun onQueuing(order: AutoVersioningOrder, routing: String, cancelling: Boolean)
 
     /**
      * The [order] was received on the queue and is ready for processing

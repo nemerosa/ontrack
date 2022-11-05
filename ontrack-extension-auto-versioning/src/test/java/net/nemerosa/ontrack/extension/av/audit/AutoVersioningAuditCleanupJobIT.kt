@@ -39,7 +39,7 @@ class AutoVersioningAuditCleanupJobIT : AbstractAutoVersioningTestSupport() {
                     withSignatureDaysOlder(14) {
                         (1..5).map {
                             createOrder(sourceProject = source.name, targetVersion = "1.0.$it").apply {
-                                autoVersioningAuditService.onQueuing(this, "routing")
+                                autoVersioningAuditService.onQueuing(this, "routing", cancelling = false)
                                 autoVersioningAuditService.onReceived(this, "queue")
                                 autoVersioningAuditService.onPRMerged(this, "branch", "#1", "uri:1")
                             }
@@ -49,7 +49,7 @@ class AutoVersioningAuditCleanupJobIT : AbstractAutoVersioningTestSupport() {
                     withSignatureDaysOlder(5) {
                         (1..5).map {
                             createOrder(sourceProject = source.name, targetVersion = "2.0.$it").apply {
-                                autoVersioningAuditService.onQueuing(this, "routing")
+                                autoVersioningAuditService.onQueuing(this, "routing", cancelling = false)
                                 autoVersioningAuditService.onReceived(this, "queue")
                                 autoVersioningAuditService.onPRMerged(this, "branch", "#1", "uri:1")
                             }
@@ -95,7 +95,7 @@ class AutoVersioningAuditCleanupJobIT : AbstractAutoVersioningTestSupport() {
                     withSignatureDaysOlder(14) {
                         (1..5).map {
                             createOrder(sourceProject = source.name, targetVersion = "1.0.$it").apply {
-                                autoVersioningAuditService.onQueuing(this, "routing")
+                                autoVersioningAuditService.onQueuing(this, "routing", cancelling = false)
                                 autoVersioningAuditService.onReceived(this, "queue")
                                 autoVersioningAuditService.onPRMerged(this, "branch", "#1", "uri:1")
                             }
@@ -105,7 +105,7 @@ class AutoVersioningAuditCleanupJobIT : AbstractAutoVersioningTestSupport() {
                     withSignatureDaysOlder(14) {
                         (1..5).map {
                             createOrder(sourceProject = source.name, targetVersion = "2.0.$it").apply {
-                                autoVersioningAuditService.onQueuing(this, "routing")
+                                autoVersioningAuditService.onQueuing(this, "routing", cancelling = false)
                                 autoVersioningAuditService.onReceived(this, "queue")
                                 // Still processing
                             }
@@ -151,7 +151,7 @@ class AutoVersioningAuditCleanupJobIT : AbstractAutoVersioningTestSupport() {
                     withSignatureDaysOlder(14) {
                         (1..5).map {
                             createOrder(sourceProject = source.name, targetVersion = "1.0.$it").apply {
-                                autoVersioningAuditService.onQueuing(this, "routing")
+                                autoVersioningAuditService.onQueuing(this, "routing", cancelling = false)
                                 autoVersioningAuditService.onReceived(this, "queue")
                                 autoVersioningAuditService.onPRMerged(this, "branch", "#1", "uri:1")
                             }
@@ -161,7 +161,7 @@ class AutoVersioningAuditCleanupJobIT : AbstractAutoVersioningTestSupport() {
                     withSignatureDaysOlder(20) {
                         (1..5).map {
                             createOrder(sourceProject = source.name, targetVersion = "2.0.$it").apply {
-                                autoVersioningAuditService.onQueuing(this, "routing")
+                                autoVersioningAuditService.onQueuing(this, "routing", cancelling = false)
                                 autoVersioningAuditService.onReceived(this, "queue")
                                 // Still processing
                             }
@@ -171,7 +171,7 @@ class AutoVersioningAuditCleanupJobIT : AbstractAutoVersioningTestSupport() {
                     withSignatureDaysOlder(30) {
                         (1..5).map {
                             createOrder(sourceProject = source.name, targetVersion = "3.0.$it").apply {
-                                autoVersioningAuditService.onQueuing(this, "routing")
+                                autoVersioningAuditService.onQueuing(this, "routing", cancelling = false)
                                 autoVersioningAuditService.onReceived(this, "queue")
                                 // Still processing
                             }

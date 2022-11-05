@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.av.queue
 
 import net.nemerosa.ontrack.extension.av.AutoVersioningConfigProperties
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditQueryService
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditService
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.metrics.AutoVersioningMetricsService
@@ -12,6 +13,8 @@ import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
 import org.apache.commons.lang3.exception.ExceptionUtils
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.amqp.core.AmqpAdmin
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.core.MessageListener
@@ -27,11 +30,14 @@ class AsyncAutoVersioningQueueListener(
     private val autoVersioningConfigProperties: AutoVersioningConfigProperties,
     private val autoVersioningProcessingService: AutoVersioningProcessingService,
     private val autoVersioningAuditService: AutoVersioningAuditService,
+    private val autoVersioningAuditQueryService: AutoVersioningAuditQueryService,
     private val securityService: SecurityService,
     private val applicationLogService: ApplicationLogService,
     private val metrics: AutoVersioningMetricsService,
     private val amqpAdmin: AmqpAdmin,
 ) : RabbitListenerConfigurer, AutoVersioningQueueStats {
+
+    private val logger: Logger = LoggerFactory.getLogger(AsyncAutoVersioningQueueListener::class.java)
 
     private val listener = MessageListener(::onMessage)
 
@@ -93,6 +99,16 @@ class AsyncAutoVersioningQueueListener(
         var order: AutoVersioningOrder? = null
         try {
             order = body.parseAsJson().parse<AutoVersioningOrder>()
+
+            // Gets the current state of the order
+            val entry = autoVersioningAuditQueryService.findByUUID(order.branch, order.uuid)
+            if (entry == null) {
+                error("No audit entry found upon receiving the processing order")
+            } else if (!entry.mostRecentState.state.isRunning) {
+                logger.debug("Cancelled order, not processing. $entry")
+                return
+            }
+
             val queue = message.messageProperties.consumerQueue
             metrics.onReceiving(order, queue)
             securityService.asAdmin {

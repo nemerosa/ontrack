@@ -76,46 +76,4 @@ class ACCAutoVersioningPostProcessing : AbstractACCAutoVersioningTestSupport() {
         }
     }
 
-    private fun withTestGitHubPostProcessingRepository(
-        code: GitHubRepositoryContext.() -> Unit,
-    ) {
-        // Unique name for the repository
-        val uuid = UUID.randomUUID().toString()
-        val repo = "ontrack-auto-versioning-test-$uuid"
-
-        // Forking the sample repository
-        gitHubClient.postForLocation(
-            "/repos/${ACCProperties.GitHub.AutoVersioning.PostProcessing.Sample.org}/${ACCProperties.GitHub.AutoVersioning.PostProcessing.Sample.repository}/forks",
-            mapOf(
-                "organization" to ACCProperties.GitHub.organization
-            )
-        )
-
-        // TODO Waiting until the repository is created
-
-        // Rename the repository
-        gitHubClient.patchForObject(
-            "/repos/${ACCProperties.GitHub.organization}/${ACCProperties.GitHub.AutoVersioning.PostProcessing.Sample.repository}",
-            mapOf(
-                "name" to repo
-            ),
-            JsonNode::class.java
-        )
-
-        // Working with this repository
-        try {
-
-            // Context
-            val context = GitHubRepositoryContext(repo)
-
-            // Running the code
-            context.code()
-
-
-        } finally {
-            // Deleting the repository
-            gitHubClient.delete("/repos/${ACCProperties.GitHub.organization}/$repo")
-        }
-    }
-
 }
