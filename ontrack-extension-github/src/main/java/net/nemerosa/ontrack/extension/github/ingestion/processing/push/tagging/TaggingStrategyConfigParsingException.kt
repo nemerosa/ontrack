@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.push.tagging
 
 import net.nemerosa.ontrack.common.BaseException
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionTaggingStrategyConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging.IngestionTaggingStrategyConfig
 
 class TaggingStrategyConfigParsingException(
     config: IngestionTaggingStrategyConfig,

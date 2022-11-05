@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.github.ingestion.processing.config
+package net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.model.annotations.APIDescription

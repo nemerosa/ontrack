@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.ui
 
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.json.asJson
 import org.junit.Test

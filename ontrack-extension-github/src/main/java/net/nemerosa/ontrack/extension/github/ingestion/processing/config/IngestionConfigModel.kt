@@ -2,7 +2,8 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
-import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging.IngestionTaggingConfig
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIName
 
@@ -85,23 +86,6 @@ data class IngestionWorkflowConfig(
     @APIDescription("Filter on the workflow names")
     val filter: FilterConfig = FilterConfig(),
 )
-
-/**
- * Filter rule
- *
- * @param includes Regular expression to include the items
- * @param excludes Regular expression to exclude the items (empty = no exclusion)
- */
-@APIName("GitHubIngestionFilterConfig")
-@APIDescription("Filter rule")
-data class FilterConfig(
-    @APIDescription("Regular expression to include the items")
-    val includes: String = ".*",
-    @APIDescription("Regular expression to exclude the items (empty = no exclusion)")
-    val excludes: String = "",
-) {
-    fun includes(name: String) = FilterHelper.includes(name, includes, excludes)
-}
 
 /**
  * Step configuration

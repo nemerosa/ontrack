@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
-import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 
 /**
  *
@@ -110,12 +109,3 @@ fun IngestionConfig.filterJob(job: String): Boolean =
 fun IngestionConfig.filterStep(step: String): Boolean =
     stepsFilter.includes(step)
 
-/**
- * Inclusion filter based on the [FilterConfig].
- *
- * @receiver The filter config
- * @param name The value to filter
- * @receiver True if the [name] must be included
- */
-fun FilterConfig.includes(name: String) =
-    FilterHelper.includes(name, includes, excludes)
