@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.github.ingestion.ui
 
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.config.parser.ConfigParser
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigService
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfig
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription

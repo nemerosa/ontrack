@@ -13,5 +13,5 @@ data class IngestionConfigSteps(
     @APIDescription("Filter on the steps names")
     val filter: FilterConfig = FilterConfig.none,
     @APIDescription("Mapping between step names and validation stamps")
-    val mappings: List<IngestionConfigValidation> = emptyList(),
+    val mappings: List<StepIngestionConfigValidation> = emptyList(),
 )

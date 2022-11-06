@@ -12,8 +12,4 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 data class IngestionConfigWorkflows(
     @APIDescription("Filter on the workflow names")
     val filter: FilterConfig = FilterConfig.all,
-    @APIDescription("Using the workflow name as a prefix for the validation stamps")
-    val validationPrefix: Boolean = true,
-    @APIDescription("Mapping between workflow names and validation stamps")
-    val mappings: List<IngestionConfigValidation> = emptyList(),
 )

@@ -2,20 +2,17 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.job
 
 import net.nemerosa.ontrack.extension.git.model.GitBranchNotConfiguredException
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
-import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.INGESTION_CONFIG_FILE_PATH
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInfo
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
-import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
-import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobProperty
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobPropertyType
-import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -27,7 +24,6 @@ import java.time.LocalDateTime
 class DefaultWorkflowJobProcessingService(
     private val structureService: StructureService,
     private val propertyService: PropertyService,
-    private val cachedSettingsService: CachedSettingsService,
     private val runInfoService: RunInfoService,
     private val configService: ConfigService,
     private val ingestionModelAccessService: IngestionModelAccessService,
@@ -48,23 +44,15 @@ class DefaultWorkflowJobProcessingService(
         // Gets the build or does not do anything
         val build = ingestionModelAccessService.findBuildByRunId(repository, runId)
             ?: return IngestionEventProcessingResultDetails.ignored("No build with workflow run ID $runId.")
-        // Settings
-        val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
         // Gets the ingestion configuration
         val ingestionConfig = getOrLoadIngestionConfig(build.branch)
-        // Skipping job or not, depending on the configuration
-        if (step == null && ingestionConfig.general.skipJobs) {
-            return IngestionEventProcessingResultDetails.ignored(
-                """$job job not processed as a step because filtered out by general "skip jobs" configuration."""
-            )
-        }
         // Filtering on jobs and steps
-        if (ignoreJob(job, settings, ingestionConfig)) {
+        if (ignoreJob(job, ingestionConfig)) {
             return IngestionEventProcessingResultDetails.ignored(
                 """$job job not processed as a step because filtered out by the configuration."""
             )
         }
-        if (step != null && ignoreStep(step, settings, ingestionConfig)) {
+        if (step != null && ignoreStep(step, ingestionConfig)) {
             return IngestionEventProcessingResultDetails.ignored(
                 """$step step not processed because filtered out by the configuration."""
             )
@@ -73,8 +61,8 @@ class DefaultWorkflowJobProcessingService(
         val runProperty = propertyService.getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java).value
             ?: error("Cannot find workflow run property on build")
         // Name & description of the validation stamp
-        val vsName = getValidationStampName(settings, ingestionConfig, job, step)
-        val vsDescription = getValidationStampDescription(ingestionConfig, job, step)
+        val vsName = ingestionConfig.getValidationStampName(job, step)
+        val vsDescription = ingestionConfig.getValidationStampDescription(job, step)
         // Gets or creates a validation stamp for the branch
         val vs = ingestionModelAccessService.setupValidationStamp(build.branch, vsName, vsDescription)
         // Gets or creates the validation run based on the job number
@@ -120,13 +108,11 @@ class DefaultWorkflowJobProcessingService(
         }
     }
 
-    private fun ignoreJob(job: String, settings: GitHubIngestionSettings, ingestionConfig: IngestionConfig): Boolean =
-        FilterHelper.excludes(job, settings.jobIncludes, settings.jobExcludes) ||
-                !ingestionConfig.filterJob(job)
+    private fun ignoreJob(job: String, ingestionConfig: IngestionConfig): Boolean =
+        !ingestionConfig.jobs.filter.includes(job)
 
-    private fun ignoreStep(step: String, settings: GitHubIngestionSettings, ingestionConfig: IngestionConfig): Boolean =
-        FilterHelper.excludes(step, settings.stepIncludes, settings.stepExcludes) ||
-                !ingestionConfig.filterStep(step)
+    private fun ignoreStep(step: String, ingestionConfig: IngestionConfig): Boolean =
+        !ingestionConfig.steps.filter.includes(step)
 
     private fun getOrLoadIngestionConfig(branch: Branch): IngestionConfig {
         val gitBranchProperty =
@@ -184,16 +170,5 @@ class DefaultWorkflowJobProcessingService(
             }
             else -> null
         }
-
-    private fun getValidationStampName(
-        settings: GitHubIngestionSettings,
-        ingestionConfig: IngestionConfig,
-        job: String,
-        step: String?,
-    ): String =
-        ingestionConfig.getValidationStampName(settings, job, step)
-
-    private fun getValidationStampDescription(ingestionConfig: IngestionConfig, job: String, step: String?): String =
-        ingestionConfig.getValidationStampDescription(job, step)
 
 }

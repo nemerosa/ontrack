@@ -50,25 +50,22 @@ data class IngestionConfigOld(
         version = "V0",
         workflows = IngestionConfigWorkflows(
             filter = workflows.filter,
-            validationPrefix = false,
-            mappings = emptyList(),
         ),
         jobs = IngestionConfigJobs(
             filter = jobsFilter,
             validationPrefix = general.validationJobPrefix ?: true,
             mappings = jobs.map { old ->
-                IngestionConfigValidation(
+                JobIngestionConfigValidation(
                     name = old.name,
                     validation = old.validation,
                     description = old.description,
-                    validationPrefix = old.validationJobPrefix,
                 )
             }
         ),
         steps = IngestionConfigSteps(
             filter = stepsFilter,
             mappings = steps.map { old ->
-                IngestionConfigValidation(
+                StepIngestionConfigValidation(
                     name = old.name,
                     validation = old.validation,
                     description = old.description,

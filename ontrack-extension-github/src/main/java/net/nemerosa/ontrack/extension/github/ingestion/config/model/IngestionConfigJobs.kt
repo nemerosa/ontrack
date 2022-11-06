@@ -13,5 +13,5 @@ data class IngestionConfigJobs(
     @APIDescription("Using the job name as a prefix for the validation stamps")
     val validationPrefix: Boolean = true,
     @APIDescription("Mapping between job names and validation stamps")
-    val mappings: List<IngestionConfigValidation> = emptyList(),
+    val mappings: List<JobIngestionConfigValidation> = emptyList(),
 )
