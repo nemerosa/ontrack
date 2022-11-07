@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 import net.nemerosa.ontrack.extension.casc.CascService
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.structure.toProjectEntityID
@@ -750,6 +751,68 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                 Duplicate entities in the notifications:
                  * $name
             """.trimIndent(), ex.message)
+        }
+    }
+
+    @Test
+    fun `Subscription for a project changing only the channel configuration`() {
+        val target = uid("t")
+        val newTarget = uid("nt")
+        project {
+            // Initial subscription
+            casc(
+                """
+                    ontrack:
+                        extensions:
+                            notifications:
+                                entity-subscriptions:
+                                    - entity:
+                                        project: $name
+                                      subscriptions:
+                                        - events:
+                                            - new_promotion_run
+                                          keywords: ""
+                                          channel: mock
+                                          channel-config:
+                                            target: "$target"
+                """
+            )
+            // Checks that we can find this subscription
+            asAdmin {
+                val subscriptions = eventSubscriptionService.filterSubscriptions(
+                    EventSubscriptionFilter(
+                        entity = this.toProjectEntityID(),
+                    )
+                ).pageItems.map { it.data.channelConfig.getRequiredTextField("target") }
+                assertEquals(listOf(target), subscriptions)
+            }
+            // Changing only the target channel
+            casc(
+                """
+                    ontrack:
+                        extensions:
+                            notifications:
+                                entity-subscriptions:
+                                    - entity:
+                                        project: $name
+                                      subscriptions:
+                                        - events:
+                                            - new_promotion_run
+                                          keywords: ""
+                                          channel: mock
+                                          channel-config:
+                                            target: "$newTarget"
+                """
+            )
+            // Checks that we can find this subscription and only this one
+            asAdmin {
+                val subscriptions = eventSubscriptionService.filterSubscriptions(
+                    EventSubscriptionFilter(
+                        entity = this.toProjectEntityID(),
+                    )
+                ).pageItems.map { it.data.channelConfig.getRequiredTextField("target") }
+                assertEquals(listOf(newTarget), subscriptions)
+            }
         }
     }
 
