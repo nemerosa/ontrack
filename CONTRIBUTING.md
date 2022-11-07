@@ -7,3 +7,5 @@ You can submit new features/bug fixes by forking this repository and submitting 
 - Make an individual pull request for each suggestion.
 - Check your spelling and grammar.
 - Update the documentation at need.
+
+See the [development quick start documentation](DEVELOPMENT.md) for starting the development of Ontrack locally.
