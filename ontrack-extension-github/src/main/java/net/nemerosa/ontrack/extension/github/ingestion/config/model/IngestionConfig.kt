@@ -44,7 +44,7 @@ data class IngestionConfig(
             // Step contribution
             val stepValidation = stepConfig?.validation ?: step
             // Job contribution
-            val jobContribution = if (stepConfig?.validationPrefix != false) {
+            val jobContribution = if (jobs.validationPrefix || stepConfig?.validationPrefix != false) {
                 val jobConfig = findJobValidationConfig(job)
                 val jobValidation = jobConfig?.validation ?: job
                 "$jobValidation-$stepValidation"

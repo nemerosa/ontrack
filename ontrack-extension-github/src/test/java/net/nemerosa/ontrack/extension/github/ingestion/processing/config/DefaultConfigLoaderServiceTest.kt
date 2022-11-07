@@ -4,7 +4,6 @@ import io.mockk.every
 import io.mockk.mockk
 import net.nemerosa.ontrack.extension.github.ingestion.FileLoaderService
 import net.nemerosa.ontrack.extension.github.ingestion.config.parser.ConfigParsingException
-import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.INGESTION_CONFIG_FILE_PATH
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project

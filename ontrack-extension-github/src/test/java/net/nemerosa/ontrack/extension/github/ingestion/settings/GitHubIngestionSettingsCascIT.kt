@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.github.ingestion.settings
 
-import net.nemerosa.ontrack.extension.casc.AbstractCascTestJUnit4Support
-import org.junit.Test
+import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class GitHubIngestionSettingsCascIT : AbstractCascTestJUnit4Support() {
+class GitHubIngestionSettingsCascIT : AbstractCascTestSupport() {
 
     @Test
     fun `Minimal parameters`() {
@@ -34,14 +34,8 @@ class GitHubIngestionSettingsCascIT : AbstractCascTestJUnit4Support() {
                 assertEquals(30, settings.indexationInterval)
                 assertEquals(".*", settings.repositoryIncludes)
                 assertEquals("", settings.repositoryExcludes)
-                assertEquals(".*", settings.jobIncludes)
-                assertEquals("", settings.jobExcludes)
-                assertEquals(".*", settings.stepIncludes)
-                assertEquals("", settings.stepExcludes)
                 assertEquals("self", settings.issueServiceIdentifier)
                 assertEquals(true, settings.enabled)
-                assertEquals(true, settings.validationJobPrefix)
-                assertEquals(false, settings.runValidations)
             }
         }
     }
@@ -71,13 +65,7 @@ class GitHubIngestionSettingsCascIT : AbstractCascTestJUnit4Support() {
                                     indexationInterval: 60
                                     repositoryIncludes: "ontrack-.*"
                                     repositoryExcludes: ".*pro.*"
-                                    jobIncludes: ".*"
-                                    jobExcludes: ".*prod.*"
-                                    stepIncludes: ".*"
-                                    stepExcludes: ".*ontrack.*"
                                     issueServiceIdentifier: "jira//config"
-                                    validationJobPrefix: false
-                                    runValidations: true
                 """.trimIndent()
                 )
                 val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
@@ -87,14 +75,8 @@ class GitHubIngestionSettingsCascIT : AbstractCascTestJUnit4Support() {
                 assertEquals(60, settings.indexationInterval)
                 assertEquals("ontrack-.*", settings.repositoryIncludes)
                 assertEquals(".*pro.*", settings.repositoryExcludes)
-                assertEquals(".*", settings.jobIncludes)
-                assertEquals(".*prod.*", settings.jobExcludes)
-                assertEquals(".*", settings.stepIncludes)
-                assertEquals(".*ontrack.*", settings.stepExcludes)
                 assertEquals("jira//config", settings.issueServiceIdentifier)
                 assertEquals(false, settings.enabled)
-                assertEquals(false, settings.validationJobPrefix)
-                assertEquals(true, settings.runValidations)
             }
         }
     }

@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.github.ingestion.ui
 
-import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStatus
 import org.junit.Test
 import kotlin.test.assertEquals

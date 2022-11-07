@@ -2,8 +2,8 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import io.mockk.every
 import io.mockk.mockk
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.config.parser.ConfigParsingException
-import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.INGESTION_CONFIG_FILE_PATH
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 

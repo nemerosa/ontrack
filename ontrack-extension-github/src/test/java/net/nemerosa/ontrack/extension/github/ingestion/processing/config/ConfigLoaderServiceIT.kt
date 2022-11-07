@@ -3,9 +3,12 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 import net.nemerosa.ontrack.extension.github.TestOnGitHub
 import net.nemerosa.ontrack.extension.github.githubTestEnv
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
-import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.INGESTION_CONFIG_FILE_PATH
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigWorkflows
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertFalse
 
@@ -23,7 +26,14 @@ class ConfigLoaderServiceIT : AbstractIngestionTestSupport() {
                 gitRealConfig()
                 val config = configLoaderService.loadConfig(this, INGESTION_CONFIG_FILE_PATH)
                 assertNotNull(config, "Ingestion configuration was loaded") {
-                    assertFalse(it.general.skipJobs, "Skip jobs property has been set to false")
+                    assertEquals(
+                        IngestionConfig(
+                            workflows = IngestionConfigWorkflows(
+                                filter = FilterConfig(includes = "build")
+                            )
+                        ),
+                        it
+                    )
                 }
             }
         }
@@ -38,7 +48,14 @@ class ConfigLoaderServiceIT : AbstractIngestionTestSupport() {
                 gitRealConfig(branch = prName)
                 val config = configLoaderService.loadConfig(this, INGESTION_CONFIG_FILE_PATH)
                 assertNotNull(config, "Ingestion configuration was loaded") {
-                    assertFalse(it.general.skipJobs, "Skip jobs property has been set to false")
+                    assertEquals(
+                        IngestionConfig(
+                            workflows = IngestionConfigWorkflows(
+                                filter = FilterConfig(includes = "build")
+                            )
+                        ),
+                        it
+                    )
                 }
             }
         }

@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging.IngestionTaggingConfig
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging.IngestionTaggingStrategyConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*

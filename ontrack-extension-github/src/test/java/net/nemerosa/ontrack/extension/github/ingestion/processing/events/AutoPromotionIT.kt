@@ -5,7 +5,9 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
-import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldPromotionConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigCascPromotion
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigSetup
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
@@ -52,16 +54,18 @@ class AutoPromotionIT : AbstractIngestionTestSupport() {
         ConfigLoaderServiceITMockConfig.customIngestionConfig(
             configLoaderService,
             IngestionConfig(
-                promotions = listOf(
-                    OldPromotionConfig(
-                        name = "BRONZE",
-                        validations = listOf("$job-build", "$job-unit-test"),
-                    ),
-                    OldPromotionConfig(
-                        name = "SILVER",
-                        validations = listOf("$job-integration-test"),
-                        promotions = listOf("BRONZE"),
-                    ),
+                setup = IngestionConfigSetup(
+                    promotions = listOf(
+                        IngestionConfigCascPromotion(
+                            name = "BRONZE",
+                            validations = listOf("$job-build", "$job-unit-test"),
+                        ),
+                        IngestionConfigCascPromotion(
+                            name = "SILVER",
+                            validations = listOf("$job-integration-test"),
+                            promotions = listOf("BRONZE"),
+                        ),
+                    )
                 )
             )
         )

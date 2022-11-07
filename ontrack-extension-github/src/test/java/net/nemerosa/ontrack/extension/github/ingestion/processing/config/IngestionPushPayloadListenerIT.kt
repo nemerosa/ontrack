@@ -4,6 +4,10 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigCascSetup
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigSetup
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigSteps
 import net.nemerosa.ontrack.extension.github.ingestion.config.parser.ConfigParsingException
 import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionCascBranchConfig
 import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionCascConfig
@@ -51,23 +55,25 @@ internal class IngestionPushPayloadListenerIT : AbstractIngestionTestSupport() {
         asAdmin {
             onlyOneGitHubConfig()
             val repository = uid("r")
-            ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
-                casc = OldIngestionCascConfig(
-                    project = OldIngestionCascBranchConfig(
-                        casc = mapOf(
-                            "properties" to mapOf(
-                                "staleProperty" to mapOf(
-                                    "disablingDuration" to 30,
-                                    "deletingDuration" to 0,
-                                    "promotionsToKeep" to listOf("GOLD"),
-                                    "includes" to "release/.*",
-                                    "excludes" to "release/1\\..*",
+            ConfigLoaderServiceITMockConfig.customIngestionConfig(
+                configLoaderService, IngestionConfig(
+                    setup = IngestionConfigSetup(
+                        project = IngestionConfigCascSetup(
+                            casc = mapOf(
+                                "properties" to mapOf(
+                                    "staleProperty" to mapOf(
+                                        "disablingDuration" to 30,
+                                        "deletingDuration" to 0,
+                                        "promotionsToKeep" to listOf("GOLD"),
+                                        "includes" to "release/.*",
+                                        "excludes" to "release/1\\..*",
+                                    )
                                 )
-                            )
-                        ).asJson()
-                    )
+                            ).asJson()
+                        )
+                    ),
                 )
-            ))
+            )
             ingestionPushPayloadListener.process(
                 payload = IngestionHookFixtures.samplePushPayload(
                     repoName = repository,
@@ -76,11 +82,15 @@ internal class IngestionPushPayloadListenerIT : AbstractIngestionTestSupport() {
                 ),
                 configuration = null
             )
-            assertNotNull(structureService.findBranchByName(repository, "main").getOrNull(),
-                "Branch has been created") { branch ->
+            assertNotNull(
+                structureService.findBranchByName(repository, "main").getOrNull(),
+                "Branch has been created"
+            ) { branch ->
                 // Gets its stale property
-                assertNotNull(getProperty(branch.project, StalePropertyType::class.java),
-                    "Stale property has been set on the project") { property ->
+                assertNotNull(
+                    getProperty(branch.project, StalePropertyType::class.java),
+                    "Stale property has been set on the project"
+                ) { property ->
                     assertEquals(30, property.disablingDuration)
                     assertEquals(0, property.deletingDuration)
                     assertEquals(listOf("GOLD"), property.promotionsToKeep)
@@ -96,19 +106,21 @@ internal class IngestionPushPayloadListenerIT : AbstractIngestionTestSupport() {
         asAdmin {
             onlyOneGitHubConfig()
             val repository = uid("r")
-            ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
-                casc = OldIngestionCascConfig(
-                    project = OldIngestionCascBranchConfig(
-                        casc = mapOf(
-                            "properties" to mapOf(
-                                "buildLinkDisplayProperty" to mapOf(
-                                    "useLabel" to true
+            ConfigLoaderServiceITMockConfig.customIngestionConfig(
+                configLoaderService, IngestionConfig(
+                    setup = IngestionConfigSetup(
+                        project = IngestionConfigCascSetup(
+                            casc = mapOf(
+                                "properties" to mapOf(
+                                    "buildLinkDisplayProperty" to mapOf(
+                                        "useLabel" to true
+                                    )
                                 )
-                            )
-                        ).asJson()
+                            ).asJson()
+                        )
                     )
                 )
-            ))
+            )
             ingestionPushPayloadListener.process(
                 payload = IngestionHookFixtures.samplePushPayload(
                     repoName = repository,
@@ -117,11 +129,15 @@ internal class IngestionPushPayloadListenerIT : AbstractIngestionTestSupport() {
                 ),
                 configuration = null
             )
-            assertNotNull(structureService.findBranchByName(repository, "main").getOrNull(),
-                "Branch has been created") { branch ->
+            assertNotNull(
+                structureService.findBranchByName(repository, "main").getOrNull(),
+                "Branch has been created"
+            ) { branch ->
                 // Gets its build link display property
-                assertNotNull(getProperty(branch.project, BuildLinkDisplayPropertyType::class.java),
-                    "Build link display property has been set on the project") { property ->
+                assertNotNull(
+                    getProperty(branch.project, BuildLinkDisplayPropertyType::class.java),
+                    "Build link display property has been set on the project"
+                ) { property ->
                     assertEquals(true, property.useLabel)
                 }
             }
@@ -133,21 +149,23 @@ internal class IngestionPushPayloadListenerIT : AbstractIngestionTestSupport() {
         asAdmin {
             onlyOneGitHubConfig()
             val repository = uid("r")
-            ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
-                casc = OldIngestionCascConfig(
-                    project = OldIngestionCascBranchConfig(
-                        casc = mapOf(
-                            "properties" to mapOf(
-                                "staleProperty" to mapOf(
-                                    "disablingDuration" to 30,
-                                    "deletingDuration" to 0,
-                                    "promotionsToKeep" to listOf("GOLD"),
+            ConfigLoaderServiceITMockConfig.customIngestionConfig(
+                configLoaderService, IngestionConfig(
+                    setup = IngestionConfigSetup(
+                        project = IngestionConfigCascSetup(
+                            casc = mapOf(
+                                "properties" to mapOf(
+                                    "staleProperty" to mapOf(
+                                        "disablingDuration" to 30,
+                                        "deletingDuration" to 0,
+                                        "promotionsToKeep" to listOf("GOLD"),
+                                    )
                                 )
-                            )
-                        ).asJson()
+                            ).asJson()
+                        )
                     )
                 )
-            ))
+            )
             ingestionPushPayloadListener.process(
                 payload = IngestionHookFixtures.samplePushPayload(
                     repoName = repository,
@@ -156,11 +174,15 @@ internal class IngestionPushPayloadListenerIT : AbstractIngestionTestSupport() {
                 ),
                 configuration = null
             )
-            assertNotNull(structureService.findBranchByName(repository, "feature-not-main").getOrNull(),
-                "Branch has been created") { branch ->
+            assertNotNull(
+                structureService.findBranchByName(repository, "feature-not-main").getOrNull(),
+                "Branch has been created"
+            ) { branch ->
                 // Gets its stale property --> not created since branch is excluded
-                assertNull(getProperty(branch.project, StalePropertyType::class.java),
-                    "Stale property has not been set on the project")
+                assertNull(
+                    getProperty(branch.project, StalePropertyType::class.java),
+                    "Stale property has not been set on the project"
+                )
             }
         }
     }
@@ -170,25 +192,27 @@ internal class IngestionPushPayloadListenerIT : AbstractIngestionTestSupport() {
         asAdmin {
             onlyOneGitHubConfig()
             val repository = uid("r")
-            ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
-                casc = OldIngestionCascConfig(
-                    project = OldIngestionCascBranchConfig(
-                        includes = "main|release-.*",
-                        excludes = "release-1\\..*",
-                        casc = mapOf(
-                            "properties" to mapOf(
-                                "staleProperty" to mapOf(
-                                    "disablingDuration" to 30,
-                                    "deletingDuration" to 0,
-                                    "promotionsToKeep" to listOf("GOLD"),
-                                    "includes" to "release/.*",
-                                    "excludes" to "release/1\\..*",
+            ConfigLoaderServiceITMockConfig.customIngestionConfig(
+                configLoaderService, IngestionConfig(
+                    setup = IngestionConfigSetup(
+                        project = IngestionConfigCascSetup(
+                            includes = "main|release-.*",
+                            excludes = "release-1\\..*",
+                            casc = mapOf(
+                                "properties" to mapOf(
+                                    "staleProperty" to mapOf(
+                                        "disablingDuration" to 30,
+                                        "deletingDuration" to 0,
+                                        "promotionsToKeep" to listOf("GOLD"),
+                                        "includes" to "release/.*",
+                                        "excludes" to "release/1\\..*",
+                                    )
                                 )
-                            )
-                        ).asJson()
+                            ).asJson()
+                        )
                     )
                 )
-            ))
+            )
             ingestionPushPayloadListener.process(
                 payload = IngestionHookFixtures.samplePushPayload(
                     repoName = repository,
@@ -197,11 +221,15 @@ internal class IngestionPushPayloadListenerIT : AbstractIngestionTestSupport() {
                 ),
                 configuration = null
             )
-            assertNotNull(structureService.findBranchByName(repository, "release-1.0").getOrNull(),
-                "Branch has been created") { branch ->
+            assertNotNull(
+                structureService.findBranchByName(repository, "release-1.0").getOrNull(),
+                "Branch has been created"
+            ) { branch ->
                 // Gets its stale property --> not created since branch is excluded
-                assertNull(getProperty(branch.project, StalePropertyType::class.java),
-                    "Stale property has not been set on the project")
+                assertNull(
+                    getProperty(branch.project, StalePropertyType::class.java),
+                    "Stale property has not been set on the project"
+                )
             }
         }
     }
