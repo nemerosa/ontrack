@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.casc.schema
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.casc.CascContext
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIIgnore
 import net.nemerosa.ontrack.model.annotations.getPropertyName
 import java.time.Duration
 import kotlin.reflect.KClass
@@ -23,6 +24,8 @@ class CascObject(
     description: String,
 ) : CascType(description) {
     override val __type: String = "object"
+
+    fun findFieldByName(name: String) = fields.find { it.name == name }
 }
 
 class CascArray(
@@ -136,8 +139,12 @@ fun cascField(
 fun cascObject(type: KClass<*>): CascType {
     val description = type.findAnnotation<APIDescription>()?.value ?: type.java.simpleName
     return CascObject(
-        type.memberProperties.map { property ->
-            cascField(property)
+        type.memberProperties.mapNotNull { property ->
+            if (!property.hasAnnotation<APIIgnore>()) {
+                cascField(property)
+            } else {
+                null
+            }
         },
         description
     )
