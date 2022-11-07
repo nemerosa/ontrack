@@ -1,16 +1,15 @@
 package net.nemerosa.ontrack.extension.github.ingestion.ui
 
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
-import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionConfigGeneral
-import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldJobConfig
-import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldStepConfig
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigService
 import net.nemerosa.ontrack.json.asJson
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class GQLGitHubIngestionConfigBranchFieldContributorIT : AbstractIngestionTestJUnit4Support() {
+class GQLGitHubIngestionConfigBranchFieldContributorIT : AbstractIngestionTestSupport() {
 
     @Autowired
     private lateinit var configService: ConfigService
