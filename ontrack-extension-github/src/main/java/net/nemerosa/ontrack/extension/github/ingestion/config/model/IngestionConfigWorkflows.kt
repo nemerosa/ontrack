@@ -12,4 +12,6 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 data class IngestionConfigWorkflows(
     @APIDescription("Filter on the workflow names")
     val filter: FilterConfig = FilterConfig.all,
+    @APIDescription("Creation of validation runs at the workflow level")
+    val validations: IngestionConfigWorkflowValidations = IngestionConfigWorkflowValidations(),
 )

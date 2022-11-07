@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInfo
@@ -99,16 +100,16 @@ class WorkflowRunIngestionEventProcessor(
         // Run as a validation
         val config = configService.getOrLoadConfig(build.branch, INGESTION_CONFIG_FILE_PATH)
         val runName = payload.workflowRun.name
-        if (config.workflows.filter.includes(runName)) {
-            setupWorkflowValidation(build, payload.workflowRun, runInfo)
+        if (config.workflows.validations.enabled && config.workflows.validations.filter.includes(runName)) {
+            setupWorkflowValidation(config, build, payload.workflowRun, runInfo)
         }
         // OK
         return IngestionEventProcessingResultDetails.processed()
     }
 
-    private fun setupWorkflowValidation(build: Build, workflowRun: WorkflowRun, runInfo: RunInfoInput) {
+    private fun setupWorkflowValidation(config: IngestionConfig, build: Build, workflowRun: WorkflowRun, runInfo: RunInfoInput) {
         // Gets the validation name from the run name
-        val validationStampName = "workflow-${normalizeName(workflowRun.name)}"
+        val validationStampName = normalizeName("${config.workflows.validations.prefix}${workflowRun.name}${config.workflows.validations.suffix}")
         // Gets or creates the validation stamp
         val vs = ingestionModelAccessService.setupValidationStamp(
             build.branch, validationStampName, "${workflowRun.name} workflow"
