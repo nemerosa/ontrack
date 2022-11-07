@@ -714,6 +714,45 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
         }
     }
 
+    @Test
+    fun `Duplicated entity`() {
+        val target = uid("t")
+        project {
+            val ex = assertFails {
+                casc(
+                    """
+                    ontrack:
+                        extensions:
+                            notifications:
+                                entity-subscriptions:
+                                    - entity:
+                                        project: $name
+                                      subscriptions:
+                                        - events:
+                                            - new_promotion_run
+                                          keywords: ""
+                                          channel: mock
+                                          channel-config:
+                                            target: "$target"
+                                    - entity:
+                                        project: $name
+                                      subscriptions:
+                                        - events:
+                                            - new_promotion_run
+                                          keywords: "GOLD"
+                                          channel: mock
+                                          channel-config:
+                                            target: "$target"
+                    """
+                )
+            }
+            assertEquals("""
+                Duplicate entities in the notifications:
+                 * $name
+            """.trimIndent(), ex.message)
+        }
+    }
+
     /**
      * Runs a CasC from a series of YAML texts
      */

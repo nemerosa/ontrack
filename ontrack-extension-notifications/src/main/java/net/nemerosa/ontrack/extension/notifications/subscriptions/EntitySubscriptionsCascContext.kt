@@ -72,8 +72,24 @@ class EntitySubscriptionsCascContext(
             }
         }
         // Checks all incoming items
+        val entities = mutableSetOf<EntitySubscriptionData>()
+        val duplicatedEntities = mutableListOf<EntitySubscriptionData>()
         items.forEachIndexed { index, item ->
             checkEntity(item.entity, paths, index)
+            if (entities.contains(item.entity)) {
+                duplicatedEntities += item.entity
+            } else {
+                entities += item.entity
+            }
+        }
+        // Checks that entities entries are not duplicated
+        if (duplicatedEntities.isNotEmpty()) {
+            error(
+                "Duplicate entities in the notifications:\n" +
+                        duplicatedEntities.joinToString("\n", prefix = " * ") {
+                            it.storageKey
+                        }
+            )
         }
         // Gets the list of already saved items
         val existing = cachedCascEntitySubscriptions()
@@ -141,7 +157,7 @@ class EntitySubscriptionsCascContext(
                     logger.info("Subscribing to ${existing.entity}: $item")
                     subscribe(entity, item)
                 }
-                onModification { item, cached ->
+                onModification { item, _ ->
                     // Resubscribing is enough
                     logger.info("Subscribing to ${existing.entity}: $item")
                     subscribe(entity, item)
