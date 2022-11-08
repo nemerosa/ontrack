@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.ui
 
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
-import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.*
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigService
 import net.nemerosa.ontrack.json.asJson
@@ -20,31 +20,32 @@ class GQLGitHubIngestionConfigBranchFieldContributorIT : AbstractIngestionTestSu
             branch {
                 configService.saveConfig(
                     this, IngestionConfig(
-                        general = OldIngestionConfigGeneral(
-                            skipJobs = false,
-                        ),
-                        steps = listOf(
-                            OldStepConfig(
-                                name = "Publishing",
-                                validation = "docker-publication",
-                                validationJobPrefix = false,
-                                description = "Publication into the Docker repository",
+                        steps = IngestionConfigSteps(
+                            filter = FilterConfig(
+                                includes = ".*",
+                                excludes = "ontrack.*",
+                            ),
+                            mappings = listOf(
+                                StepIngestionConfigValidation(
+                                    name = "Publishing",
+                                    validation = "docker-publication",
+                                    validationPrefix = false,
+                                    description = "Publication into the Docker repository",
+                                )
                             ),
                         ),
-                        jobs = listOf(
-                            OldJobConfig(
-                                name = "build",
-                                validation = "build",
-                                description = "Main build",
+                        jobs = IngestionConfigJobs(
+                            filter = FilterConfig(
+                                includes = ".*",
+                                excludes = "ontrack.*",
+                            ),
+                            mappings = listOf(
+                                JobIngestionConfigValidation(
+                                    name = "build",
+                                    validation = "build",
+                                    description = "Main build",
+                                )
                             )
-                        ),
-                        jobsFilter = FilterConfig(
-                            includes = ".*",
-                            excludes = "ontrack.*",
-                        ),
-                        stepsFilter = FilterConfig(
-                            includes = ".*",
-                            excludes = "ontrack.*",
                         ),
                     )
                 )
@@ -53,27 +54,28 @@ class GQLGitHubIngestionConfigBranchFieldContributorIT : AbstractIngestionTestSu
                     {
                         branches(id: $id) {
                             gitHubIngestionConfig {
-                                general {
-                                    skipJobs
-                                }
                                 steps {
-                                    name
-                                    validation
-                                    validationJobPrefix
-                                    description
+                                    filter {
+                                        includes
+                                        excludes
+                                    }
+                                    mappings {
+                                        name
+                                        validation
+                                        validationPrefix
+                                        description
+                                    }
                                 }
                                 jobs {
-                                    name
-                                    validation
-                                    description
-                                }
-                                jobsFilter {
-                                    includes
-                                    excludes
-                                }
-                                stepsFilter {
-                                    includes
-                                    excludes
+                                    filter {
+                                        includes
+                                        excludes
+                                    }
+                                    mappings {
+                                        name
+                                        validation
+                                        description
+                                    }
                                 }
                             }
                         }
@@ -85,31 +87,32 @@ class GQLGitHubIngestionConfigBranchFieldContributorIT : AbstractIngestionTestSu
                             "branches" to listOf(
                                 mapOf(
                                     "gitHubIngestionConfig" to mapOf(
-                                        "general" to mapOf(
-                                            "skipJobs" to false,
-                                        ),
-                                        "steps" to listOf(
-                                            mapOf(
-                                                "name" to "Publishing",
-                                                "validation" to "docker-publication",
-                                                "validationJobPrefix" to false,
-                                                "description" to "Publication into the Docker repository",
+                                        "steps" to mapOf(
+                                            "filter" to mapOf(
+                                                "includes" to ".*",
+                                                "excludes" to "ontrack.*",
                                             ),
+                                            "mappings" to listOf(
+                                                mapOf(
+                                                    "name" to "Publishing",
+                                                    "validation" to "docker-publication",
+                                                    "validationPrefix" to false,
+                                                    "description" to "Publication into the Docker repository",
+                                                ),
+                                            )
                                         ),
-                                        "jobs" to listOf(
-                                            mapOf(
-                                                "name" to "build",
-                                                "validation" to "build",
-                                                "description" to "Main build",
+                                        "jobs" to mapOf(
+                                            "filter" to mapOf(
+                                                "includes" to ".*",
+                                                "excludes" to "ontrack.*",
                                             ),
-                                        ),
-                                        "jobsFilter" to mapOf(
-                                            "includes" to ".*",
-                                            "excludes" to "ontrack.*",
-                                        ),
-                                        "stepsFilter" to mapOf(
-                                            "includes" to ".*",
-                                            "excludes" to "ontrack.*",
+                                            "mappings" to listOf(
+                                                mapOf(
+                                                    "name" to "build",
+                                                    "validation" to "build",
+                                                    "description" to "Main build",
+                                                ),
+                                            ),
                                         ),
                                     )
                                 )
