@@ -180,7 +180,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
             ) { branch ->
                 if (expectValidation) {
                     assertNotNull(
-                        structureService.findValidationStampByName(branch.project.name, branch.name, "ci-run")
+                        structureService.findValidationStampByName(branch.project.name, branch.name, "workflow-ci")
                             .getOrNull()
                     ) { vs ->
                         assertNotNull(
@@ -195,7 +195,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                     }
                 } else {
                     assertNull(
-                        structureService.findValidationStampByName(branch.project.name, branch.name, "ci-run")
+                        structureService.findValidationStampByName(branch.project.name, branch.name, "workflow-ci")
                             .getOrNull()
                     )
                 }
