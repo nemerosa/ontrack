@@ -1,2 +1,4 @@
-general:
-  skipJobs: true
+version: v1
+jobs:
+  validationPrefix: false
+

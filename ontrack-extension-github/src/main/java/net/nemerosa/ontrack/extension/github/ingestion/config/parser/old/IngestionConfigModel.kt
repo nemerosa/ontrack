@@ -47,7 +47,7 @@ data class IngestionConfigOld(
     val tagging: IngestionTaggingConfig = IngestionTaggingConfig(),
 ) {
     fun convert() = IngestionConfig(
-        version = "V0",
+        version = "v0",
         workflows = IngestionConfigWorkflows(
             filter = workflows.filter,
         ),

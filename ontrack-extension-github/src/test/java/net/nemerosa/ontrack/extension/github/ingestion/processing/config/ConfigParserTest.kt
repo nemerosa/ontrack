@@ -9,64 +9,71 @@ import kotlin.test.assertFailsWith
 
 class ConfigParserTest {
 
-//    @Test
-//    fun `Complete configuration`() {
-//        test(
-//            """
-//                general:
-//                    skipJobs: false
-//                steps:
-//                    - name: Step name
-//                      validation: my-validation
-//                      validationJobPrefix: false
-//                      description: My description
-//                jobs:
-//                    - name: Job name
-//                      validation: my-job
-//                      description: My description
-//            """
-//        ) {
-//            assertEquals(false, it.general.skipJobs)
-//
-//            assertEquals(1, it.steps.size)
-//            assertEquals("Step name", it.steps.first().name)
-//            assertEquals("my-validation", it.steps.first().validation)
-//            assertEquals(false, it.steps.first().validationJobPrefix)
-//            assertEquals("My description", it.steps.first().description)
-//
-//            assertEquals(1, it.jobs.size)
-//            assertEquals("Job name", it.jobs.first().name)
-//            assertEquals("my-job", it.jobs.first().validation)
-//            assertEquals("My description", it.jobs.first().description)
-//        }
-//    }
-//
-//    @Test
-//    fun `Partial configuration with default values`() {
-//        test(
-//            """
-//                steps:
-//                    - name: Step name
-//                jobs:
-//                    - name: Job name
-//            """
-//        ) {
-//            assertEquals(true, it.general.skipJobs)
-//            assertEquals(null, it.general.validationJobPrefix)
-//
-//            assertEquals(1, it.steps.size)
-//            assertEquals("Step name", it.steps.first().name)
-//            assertEquals(null, it.steps.first().validation)
-//            assertEquals(null, it.steps.first().validationJobPrefix)
-//            assertEquals(null, it.steps.first().description)
-//
-//            assertEquals(1, it.jobs.size)
-//            assertEquals("Job name", it.jobs.first().name)
-//            assertEquals(null, it.jobs.first().validation)
-//            assertEquals(null, it.jobs.first().validationJobPrefix)
-//            assertEquals(null, it.jobs.first().description)
-//        }
-//    }
+    @Test
+    fun `V1 configuration`() {
+        test(
+            """
+                version: v1
+                jobs:
+                    validationPrefix: false
+                    mappings:
+                        - name: Job name
+                          validation: my-job
+                          description: My description
+                steps:
+                    mappings:
+                        - name: Step name
+                          validation: my-validation
+                          validationPrefix: false
+                          description: My description
+            """
+        ) {
+            assertEquals("v1", it.version)
+
+            assertEquals(false, it.jobs.validationPrefix)
+            assertEquals(1, it.jobs.mappings.size)
+            assertEquals("Job name", it.jobs.mappings.first().name)
+            assertEquals("my-job", it.jobs.mappings.first().validation)
+            assertEquals("My description", it.jobs.mappings.first().description)
+
+            assertEquals(1, it.steps.mappings.size)
+            assertEquals("Step name", it.steps.mappings.first().name)
+            assertEquals("my-validation", it.steps.mappings.first().validation)
+            assertEquals(false, it.steps.mappings.first().validationPrefix)
+            assertEquals("My description", it.steps.mappings.first().description)
+        }
+    }
+
+    @Test
+    fun `V0 configuration`() {
+        test(
+            """
+                jobs:
+                    - name: Job name
+                      validation: my-job
+                      description: My description
+                steps:
+                    - name: Step name
+                      validation: my-validation
+                      validationJobPrefix: false
+                      description: My description
+            """
+        ) {
+            assertEquals("v0", it.version)
+
+            assertEquals(true, it.jobs.validationPrefix)
+            assertEquals(1, it.jobs.mappings.size)
+            assertEquals("Job name", it.jobs.mappings.first().name)
+            assertEquals("my-job", it.jobs.mappings.first().validation)
+            assertEquals("My description", it.jobs.mappings.first().description)
+
+            assertEquals(1, it.steps.mappings.size)
+            assertEquals("Step name", it.steps.mappings.first().name)
+            assertEquals("my-validation", it.steps.mappings.first().validation)
+            assertEquals(false, it.steps.mappings.first().validationPrefix)
+            assertEquals("My description", it.steps.mappings.first().description)
+        }
+    }
 
     @Test
     fun `Rendering a configuration as Yaml`() {

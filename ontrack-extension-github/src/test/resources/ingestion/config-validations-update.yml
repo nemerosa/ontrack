@@ -1,3 +1,4 @@
+version: v1
 validations:
   - name: unit-tests
     description: Running all unit tests
