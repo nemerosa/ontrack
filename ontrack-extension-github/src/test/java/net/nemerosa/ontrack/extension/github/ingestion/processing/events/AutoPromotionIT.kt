@@ -8,6 +8,8 @@ import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigCascPromotion
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigSetup
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigSteps
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
@@ -54,6 +56,9 @@ class AutoPromotionIT : AbstractIngestionTestSupport() {
         ConfigLoaderServiceITMockConfig.customIngestionConfig(
             configLoaderService,
             IngestionConfig(
+                steps = IngestionConfigSteps(
+                    filter = FilterConfig.all // Steps are not included by default
+                ),
                 setup = IngestionConfigSetup(
                     promotions = listOf(
                         IngestionConfigCascPromotion(

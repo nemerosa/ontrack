@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.config.model
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging.IngestionTaggingConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIName
 
 /**
  * Configuration for the ingestion.
@@ -13,6 +14,7 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
  * @property setup Setup of Ontrack resources
  * @property tagging Configuration for the tag ingestion
  */
+@APIName("GitHubIngestionConfig")
 data class IngestionConfig(
     @APIDescription("Version of the configuration")
     val version: String = V1_VERSION,
@@ -44,7 +46,10 @@ data class IngestionConfig(
             // Step contribution
             val stepValidation = stepConfig?.validation ?: step
             // Job contribution
-            val jobContribution = if (jobs.validationPrefix || stepConfig?.validationPrefix != false) {
+            // The configuration at job level always takes precedence unless overridden at step level
+            val jobContribution = if ((jobs.validationPrefix && stepConfig?.validationPrefix != false) ||
+                (!jobs.validationPrefix && stepConfig?.validationPrefix == true)
+            ) {
                 val jobConfig = findJobValidationConfig(job)
                 val jobValidation = jobConfig?.validation ?: job
                 "$jobValidation-$stepValidation"

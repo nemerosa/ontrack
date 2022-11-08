@@ -93,37 +93,39 @@ class ConfigParserTest {
         assertEquals(
             """
                 ---
-                general:
-                  skipJobs: true
-                  validationJobPrefix: null
-                steps:
-                - name: "Some step"
-                  validation: "some-validation"
-                  validationJobPrefix: null
-                  description: null
-                jobs:
-                - name: "Some job"
-                  validation: "some-job"
-                  description: null
-                  validationJobPrefix: null
-                jobsFilter:
-                  includes: ".*"
-                  excludes: ""
-                stepsFilter:
-                  includes: ".*"
-                  excludes: ""
-                validations: []
-                promotions: []
-                runs:
-                  enabled: null
-                  filter:
-                    includes: ".*"
-                    excludes: ""
+                version: "v1"
                 workflows:
                   filter:
                     includes: ".*"
                     excludes: ""
-                casc:
+                  validations:
+                    enabled: true
+                    filter:
+                      includes: ".*"
+                      excludes: ""
+                    prefix: "workflow-"
+                    suffix: ""
+                jobs:
+                  filter:
+                    includes: ".*"
+                    excludes: ""
+                  validationPrefix: true
+                  mappings:
+                  - name: "Some job"
+                    validation: "some-job"
+                    description: null
+                steps:
+                  filter:
+                    includes: ""
+                    excludes: ".*"
+                  mappings:
+                  - name: "Some step"
+                    validation: "some-validation"
+                    description: null
+                    validationPrefix: null
+                setup:
+                  validations: []
+                  promotions: []
                   project:
                     includes: "main"
                     excludes: ""
