@@ -38,7 +38,7 @@ val ossrhPassword: String by project
 
 plugins {
     java
-    id("net.nemerosa.versioning") version "2.8.2" apply false
+    id("net.nemerosa.versioning") version "3.0.0" apply false
     id("nebula.deb") version "8.1.0"
     id("nebula.rpm") version "8.1.0"
     id("org.sonarqube") version "2.5"
