@@ -17,4 +17,6 @@ data class EventSubscriptionPayload(
     val keywords: String?,
     @APIDescription("If this subscription is disabled")
     val disabled: Boolean,
+    @APIDescription("Origin of the subscription (used for filtering)")
+    val origin: String,
 )

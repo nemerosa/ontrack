@@ -22,6 +22,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = this,
                 keywords = null,
+                origin = "test",
                 EventFactory.NEW_PROMOTION_RUN
             )
             // Query
@@ -73,6 +74,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = this,
                 keywords = null,
+                origin = "test",
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
@@ -80,6 +82,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 channelConfig = MockNotificationChannelConfig("#two"),
                 projectEntity = this,
                 keywords = null,
+                origin = "test",
                 EventFactory.NEW_VALIDATION_RUN
             )
             // Query
@@ -132,6 +135,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = null,
                 keywords = null,
+                origin = "test",
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
@@ -139,6 +143,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 channelConfig = MockNotificationChannelConfig("#two"),
                 projectEntity = null,
                 keywords = null,
+                origin = "test",
                 EventFactory.NEW_VALIDATION_RUN
             )
             // Query

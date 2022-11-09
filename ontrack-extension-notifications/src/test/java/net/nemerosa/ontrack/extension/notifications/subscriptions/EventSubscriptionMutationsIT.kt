@@ -21,6 +21,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                     channelConfig = MockNotificationChannelConfig("#target"),
                     projectEntity = this,
                     keywords = null,
+                    origin = "test",
                     EventFactory.NEW_PROMOTION_RUN,
                 )
                 // Disabling
@@ -92,6 +93,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 channelConfig = MockNotificationChannelConfig("#target"),
                 projectEntity = null,
                 keywords = null,
+                origin = "test",
                 EventFactory.NEW_PROMOTION_RUN,
             )
             // Disabling
@@ -207,6 +209,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 channelConfig = MockNotificationChannelConfig("#main"),
                 projectEntity = null,
                 keywords = null,
+                origin = "test",
                 EventFactory.NEW_PROMOTION_RUN,
             )
             run("""
@@ -234,6 +237,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                     channelConfig = MockNotificationChannelConfig("#main"),
                     projectEntity = this,
                     keywords = null,
+                    origin = "test",
                     EventFactory.NEW_PROMOTION_RUN,
                 )
                 run("""

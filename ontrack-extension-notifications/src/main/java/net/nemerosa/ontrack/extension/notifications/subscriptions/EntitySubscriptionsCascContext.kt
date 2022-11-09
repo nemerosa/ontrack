@@ -147,6 +147,7 @@ class EntitySubscriptionsCascContext(
                     channel = it.data.channel,
                     channelConfig = it.data.channelConfig,
                     disabled = it.data.disabled,
+                    origin = it.data.origin,
                 ) to it.id
             }
             syncForward(
@@ -201,6 +202,7 @@ class EntitySubscriptionsCascContext(
                 channel = subscription.channel,
                 channelConfig = subscription.channelConfig,
                 disabled = subscription.disabled ?: false,
+                origin = EventSubscriptionOrigins.CASC,
             )
         )
     }

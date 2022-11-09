@@ -16,6 +16,8 @@ data class SubscriptionsCascContextData(
     val channelConfig: JsonNode,
     @APIDescription("Is this channel disabled?")
     val disabled: Boolean? = null,
+    @APIDescription("Origin of the subscription (used for filtering)")
+    val origin: String,
 ) {
     fun normalized() = SubscriptionsCascContextData(
         events = events.sorted(),
@@ -23,5 +25,6 @@ data class SubscriptionsCascContextData(
         channel = channel,
         channelConfig = channelConfig,
         disabled = disabled ?: false,
+        origin = origin,
     )
 }

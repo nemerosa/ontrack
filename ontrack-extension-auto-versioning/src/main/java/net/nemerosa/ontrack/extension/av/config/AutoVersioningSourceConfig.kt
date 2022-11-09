@@ -37,6 +37,8 @@ data class AutoVersioningSourceConfig(
     val autoApprovalMode: AutoApprovalMode? = null,
     @APIDescription("Build link creation. True by default.")
     val buildLinkCreation: Boolean? = null,
+    @APIDescription("List of notifications subscriptions to setup for this auto versioning")
+    val notifications: List<AutoVersioningNotification> = emptyList(),
 ) : AutoVersioningTargetConfig {
 
     /**
@@ -121,6 +123,7 @@ data class AutoVersioningSourceConfig(
             validationStamp = validationStamp,
             autoApprovalMode = autoApprovalMode,
             buildLinkCreation = buildLinkCreation,
+            notifications = notifications,
         )
 
 }

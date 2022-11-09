@@ -31,16 +31,19 @@ data class EventSubscriptionFilter(
     val creator: String? = null,
     @APIDescription("Event type")
     val eventType: String? = null,
+    @APIDescription("Origin")
+    val origin: String? = null,
 ) {
     fun withPage(offset: Int, size: Int) = EventSubscriptionFilter(
-        offset,
-        size,
-        entity,
-        recursive,
-        channel,
-        channelConfig,
-        createdBefore,
-        creator,
-        eventType
+        offset = offset,
+        size = size,
+        entity = entity,
+        recursive = recursive,
+        channel = channel,
+        channelConfig = channelConfig,
+        createdBefore = createdBefore,
+        creator = creator,
+        eventType = eventType,
+        origin = origin,
     )
 }
