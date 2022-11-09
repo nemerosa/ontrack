@@ -544,39 +544,39 @@ pipeline {
 
         // Merge to master (for latest release only)
 
-        stage('Merge to master') {
-            when {
-                allOf {
-                    branch "release/4.*"
-                    expression {
-                        ontrackCliLastBranch(pattern: 'release-4\\..*') == ONTRACK_BRANCH_NAME
-                    }
-                }
-            }
-            steps {
-                // Merge to master
-                withCredentials([
-                        gitUsernamePassword(
-                                credentialsId: 'jenkins.nemerosa.net.scanning',
-                                gitToolName: 'Default'
-                        )
-                ]) {
-                    sh '''
-                        git config --local user.email "jenkins@nemerosa.net"
-                        git config --local user.name "Jenkins"
-                        git checkout -b master
-                        git pull origin master
-                        git merge $BRANCH_NAME
-                        git push origin master
-                    '''
-                }
-            }
-            post {
-                always {
-                    ontrackCliValidate(stamp: 'MERGE')
-                }
-            }
-        }
+        // stage('Merge to master') {
+        //     when {
+        //         allOf {
+        //             branch "release/4.*"
+        //             expression {
+        //                 ontrackCliLastBranch(pattern: 'release-4\\..*') == ONTRACK_BRANCH_NAME
+        //             }
+        //         }
+        //     }
+        //     steps {
+        //         // Merge to master
+        //         withCredentials([
+        //                 gitUsernamePassword(
+        //                         credentialsId: 'jenkins.nemerosa.net.scanning',
+        //                         gitToolName: 'Default'
+        //                 )
+        //         ]) {
+        //             sh '''
+        //                 git config --local user.email "jenkins@nemerosa.net"
+        //                 git config --local user.name "Jenkins"
+        //                 git checkout -b master
+        //                 git pull origin master
+        //                 git merge $BRANCH_NAME
+        //                 git push origin master
+        //             '''
+        //         }
+        //     }
+        //     post {
+        //         always {
+        //             ontrackCliValidate(stamp: 'MERGE')
+        //         }
+        //     }
+        // }
 
         // Master setup
 
