@@ -6,6 +6,11 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 object EventSubscriptionOrigins {
 
     /**
+     * Unknown origin (for backward compatibility)
+     */
+    const val UNKNOWN = "unknown"
+
+    /**
      * Subscription added though CasC.
      */
     const val CASC = "casc"

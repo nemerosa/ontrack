@@ -530,7 +530,7 @@ class DefaultEventSubscriptionService(
         val events: Set<String>,
         val keywords: String?,
         val disabled: Boolean,
-        val origin: String,
+        val origin: String = EventSubscriptionOrigins.UNKNOWN,
     ) {
         fun disabled(disabled: Boolean) =
             SignedSubscriptionRecord(signature, channel, channelConfig, events, keywords, disabled, origin)
