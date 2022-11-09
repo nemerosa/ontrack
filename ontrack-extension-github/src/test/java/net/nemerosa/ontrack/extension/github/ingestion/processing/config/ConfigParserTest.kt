@@ -112,6 +112,8 @@ class ConfigParserTest {
                       excludes: ""
                     prefix: "workflow-"
                     suffix: ""
+                  events:
+                  - "push"
                 jobs:
                   filter:
                     includes: ".*"

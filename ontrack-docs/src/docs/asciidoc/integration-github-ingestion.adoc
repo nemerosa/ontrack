@@ -120,6 +120,10 @@ version: v1
     # prefix: "workflow-"
     # Optional: Suffix to use for the validation stamp
     # suffix: ""
+  # Optional: List of events to accept for the processing of a workflow
+  # Default value: `push` event only
+  # events:
+  #   - push
 # Optional: Configuration for the ingestion of the jobs
 # jobs:
     # Optional: Filter on the jobs names

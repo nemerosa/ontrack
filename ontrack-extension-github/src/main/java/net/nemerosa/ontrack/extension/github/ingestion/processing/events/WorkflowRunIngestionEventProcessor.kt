@@ -81,9 +81,18 @@ class WorkflowRunIngestionEventProcessor(
         val config = configService.getOrLoadConfig(branch, INGESTION_CONFIG_FILE_PATH)
         // Filter on the workflow name
         return if (config.workflows.filter.includes(payload.workflowRun.name)) {
-            when (payload.action) {
-                WorkflowRunAction.requested -> startBuild(payload, configuration)
-                WorkflowRunAction.completed -> endBuild(payload, configuration)
+            // Filtering on the event
+            if (!config.workflows.events.contains(payload.workflowRun.event)) {
+                IngestionEventProcessingResultDetails.ignored(
+                    """"${payload.workflowRun.event}" is not configured for processing."""
+                )
+            }
+            // OK to process
+            else {
+                when (payload.action) {
+                    WorkflowRunAction.requested -> startBuild(payload, configuration)
+                    WorkflowRunAction.completed -> endBuild(payload, configuration)
+                }
             }
         } else {
             // Workflow is ignored

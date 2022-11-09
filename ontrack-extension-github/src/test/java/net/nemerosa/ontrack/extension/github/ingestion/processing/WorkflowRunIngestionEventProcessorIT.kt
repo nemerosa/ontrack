@@ -457,6 +457,32 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
         }
     }
 
+    @Test
+    fun `Only push is supported by default, subsequent jobs and steps are ignored`() {
+        asAdmin {
+            onlyOneGitHubConfig()
+            withGitHubIngestionSettings {
+                ConfigLoaderServiceITMockConfig.customIngestionConfig(
+                    configLoaderService, IngestionConfig()
+                )
+                val repoName = uid("r")
+                val payload: WorkflowRunPayload = IngestionHookFixtures.sampleWorkflowRunPayload(
+                    repoName = repoName,
+                    event = "workflow_dispatch", // Workflow triggered manually ignoring
+                )
+                assertEquals(
+                    IngestionEventProcessingResult.IGNORED,
+                    processor.process(payload, null).result
+                )
+                // Checks the project & the branch have not been created
+                assertNull(
+                    structureService.findProjectByName(repoName).getOrNull(),
+                    "Project has not been created"
+                )
+            }
+        }
+    }
+
     private fun basicTest(
         config: GitHubEngineConfiguration?,
         htmlUrl: String = "https://github.com/nemerosa/github-ingestion-poc/actions/runs/1395528922",
