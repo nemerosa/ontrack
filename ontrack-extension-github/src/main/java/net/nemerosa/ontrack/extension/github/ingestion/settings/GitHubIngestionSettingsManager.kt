@@ -42,14 +42,8 @@ class GitHubIngestionSettingsManager(
         settingsRepository.setInt<GitHubIngestionSettings>(settings::indexationInterval)
         settingsRepository.setString<GitHubIngestionSettings>(settings::repositoryIncludes)
         settingsRepository.setString<GitHubIngestionSettings>(settings::repositoryExcludes)
-        settingsRepository.setString<GitHubIngestionSettings>(settings::jobIncludes)
-        settingsRepository.setString<GitHubIngestionSettings>(settings::jobExcludes)
-        settingsRepository.setString<GitHubIngestionSettings>(settings::stepIncludes)
-        settingsRepository.setString<GitHubIngestionSettings>(settings::stepExcludes)
         settingsRepository.setString<GitHubIngestionSettings>(settings::issueServiceIdentifier)
         settingsRepository.setBoolean<GitHubIngestionSettings>(settings::enabled)
-        settingsRepository.setBoolean<GitHubIngestionSettings>(settings::validationJobPrefix)
-        settingsRepository.setBoolean<GitHubIngestionSettings>(settings::runValidations)
     }
 
     override fun getSettingsForm(settings: GitHubIngestionSettings?): Form =
@@ -100,48 +94,10 @@ class GitHubIngestionSettingsManager(
                     .value(settings?.repositoryExcludes ?: GitHubIngestionSettings.DEFAULT_REPOSITORY_EXCLUDES)
             )
             .with(
-                Text.of(GitHubIngestionSettings::jobIncludes.name)
-                    .label(getPropertyLabel(GitHubIngestionSettings::jobIncludes))
-                    .help(getPropertyDescription(GitHubIngestionSettings::jobIncludes))
-                    .value(settings?.jobIncludes ?: GitHubIngestionSettings.DEFAULT_JOB_INCLUDES)
-            )
-            .with(
-                Text.of(GitHubIngestionSettings::jobExcludes.name)
-                    .label(getPropertyLabel(GitHubIngestionSettings::jobExcludes))
-                    .help(getPropertyDescription(GitHubIngestionSettings::jobExcludes))
-                    .optional()
-                    .value(settings?.jobExcludes ?: GitHubIngestionSettings.DEFAULT_JOB_EXCLUDES)
-            )
-            .with(
-                Text.of(GitHubIngestionSettings::stepIncludes.name)
-                    .label(getPropertyLabel(GitHubIngestionSettings::stepIncludes))
-                    .help(getPropertyDescription(GitHubIngestionSettings::stepIncludes))
-                    .value(settings?.stepIncludes ?: GitHubIngestionSettings.DEFAULT_STEP_INCLUDES)
-            )
-            .with(
-                Text.of(GitHubIngestionSettings::stepExcludes.name)
-                    .label(getPropertyLabel(GitHubIngestionSettings::stepExcludes))
-                    .help(getPropertyDescription(GitHubIngestionSettings::stepExcludes))
-                    .optional()
-                    .value(settings?.stepExcludes ?: GitHubIngestionSettings.DEFAULT_STEP_EXCLUDES)
-            )
-            .with(
                 Text.of(GitHubIngestionSettings::issueServiceIdentifier.name)
                     .label(getPropertyLabel(GitHubIngestionSettings::issueServiceIdentifier))
                     .help(getPropertyDescription(GitHubIngestionSettings::issueServiceIdentifier))
                     .value(settings?.issueServiceIdentifier ?: GitHubIngestionSettings.DEFAULT_ISSUE_SERVICE_IDENTIFIER)
-            )
-            .with(
-                YesNo.of(GitHubIngestionSettings::validationJobPrefix.name)
-                    .label(getPropertyLabel(GitHubIngestionSettings::validationJobPrefix))
-                    .help(getPropertyDescription(GitHubIngestionSettings::validationJobPrefix))
-                    .value(settings?.validationJobPrefix ?: GitHubIngestionSettings.DEFAULT_VALIDATION_JOB_PREFIX)
-            )
-            .with(
-                YesNo.of(GitHubIngestionSettings::runValidations.name)
-                    .label(getPropertyLabel(GitHubIngestionSettings::runValidations))
-                    .help(getPropertyDescription(GitHubIngestionSettings::runValidations))
-                    .value(settings?.runValidations ?: GitHubIngestionSettings.DEFAULT_RUN_VALIDATION)
             )
 
     override fun getId(): String = "github-ingestion"

@@ -1,10 +1,9 @@
 package net.nemerosa.ontrack.extension.github.ingestion
 
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStatus
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfig
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfigGeneral
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayload
@@ -17,7 +16,7 @@ object IngestionHookFixtures {
     /**
      * Run name
      */
-    val sampleRunName = "CI"
+    const val sampleRunName = "CI"
 
     /**
      * Workflow run payload
@@ -233,11 +232,7 @@ object IngestionHookFixtures {
         gitHubHookInstallationTargetType = "repository",
     )
 
-    fun sampleIngestionConfig() = IngestionConfig(
-        general = IngestionConfigGeneral(
-            skipJobs = true,
-        )
-    )
+    fun sampleIngestionConfig() = IngestionConfig()
 
     /**
      * Sample pull request

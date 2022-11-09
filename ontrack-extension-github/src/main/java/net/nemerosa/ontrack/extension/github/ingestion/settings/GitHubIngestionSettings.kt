@@ -13,13 +13,7 @@ import net.nemerosa.ontrack.model.annotations.APILabel
  * @property indexationInterval Default indexation interval when configuring the GitHub projects
  * @property repositoryIncludes Regular expression to include repositories
  * @property repositoryExcludes Regular expression to exclude repositories
- * @property jobIncludes Regular expression to include jobs
- * @property jobExcludes Regular expression to exclude jobs
- * @property stepIncludes Regular expression to include steps
- * @property stepExcludes Regular expression to exclude steps
  * @property enabled Is the ingestion of the GitHub events enabled?
- * @property validationJobPrefix Must we use the job name as a prefix to the validation stamp?
- * @property runValidations Must workflow runs be shown at validations?
  */
 class GitHubIngestionSettings(
     @APIDescription("Secret token sent by the GitHub hook and signing the payload")
@@ -36,30 +30,12 @@ class GitHubIngestionSettings(
     @APILabel("Exclude repositories")
     @APIDescription("Regular expression to exclude repositories")
     val repositoryExcludes: String = DEFAULT_REPOSITORY_EXCLUDES,
-    @APILabel("Include jobs")
-    @APIDescription("Regular expression to include jobs")
-    val jobIncludes: String = DEFAULT_JOB_INCLUDES,
-    @APILabel("Exclude jobs")
-    @APIDescription("Regular expression to exclude jobs")
-    val jobExcludes: String = DEFAULT_JOB_EXCLUDES,
-    @APILabel("Include steps")
-    @APIDescription("Regular expression to include steps")
-    val stepIncludes: String = DEFAULT_STEP_INCLUDES,
-    @APILabel("Exclude steps")
-    @APIDescription("Regular expression to exclude steps")
-    val stepExcludes: String = DEFAULT_STEP_EXCLUDES,
     @APILabel("Default issue service identifier")
     @APIDescription("Identifier of the issue service to use by default. For example `self` for GitHub issues or `jira//config`.")
     val issueServiceIdentifier: String = DEFAULT_ISSUE_SERVICE_IDENTIFIER,
     @APILabel("Ingestion enabled")
     @APIDescription("Is the ingestion of the GitHub events enabled?")
     val enabled: Boolean = DEFAULT_ENABLED,
-    @APILabel("Using job name as validation name prefix")
-    @APIDescription("Must we use the job name as a prefix to the validation stamp?")
-    val validationJobPrefix: Boolean = DEFAULT_VALIDATION_JOB_PREFIX,
-    @APILabel("Runs as validations")
-    @APIDescription("Must workflow runs be shown at validations?")
-    val runValidations: Boolean = DEFAULT_RUN_VALIDATION,
 ) {
     companion object {
         /**
@@ -88,26 +64,6 @@ class GitHubIngestionSettings(
         const val DEFAULT_REPOSITORY_EXCLUDES = ""
 
         /**
-         * By default, including all jobs
-         */
-        const val DEFAULT_JOB_INCLUDES = ".*"
-
-        /**
-         * By default, not excluding any job
-         */
-        const val DEFAULT_JOB_EXCLUDES = ""
-
-        /**
-         * By default, including all steps
-         */
-        const val DEFAULT_STEP_INCLUDES = ".*"
-
-        /**
-         * By default, not excluding any step
-         */
-        const val DEFAULT_STEP_EXCLUDES = ""
-
-        /**
          * By default, using the GitHub issues.
          */
         const val DEFAULT_ISSUE_SERVICE_IDENTIFIER = IssueServiceConfigurationRepresentation.SELF_ID
@@ -116,15 +72,5 @@ class GitHubIngestionSettings(
          * By default, enabling the ingestion
          */
         const val DEFAULT_ENABLED = true
-
-        /**
-         * By default, using the job name as a prefix for the validation stamps
-         */
-        const val DEFAULT_VALIDATION_JOB_PREFIX = true
-
-        /**
-         * By default, workflow runs are not created as validations
-         */
-        const val DEFAULT_RUN_VALIDATION = false
     }
 }

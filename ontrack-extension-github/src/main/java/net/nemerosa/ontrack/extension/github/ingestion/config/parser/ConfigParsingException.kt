@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.github.ingestion.processing.config
+package net.nemerosa.ontrack.extension.github.ingestion.config.parser
 
 import net.nemerosa.ontrack.common.BaseException
 

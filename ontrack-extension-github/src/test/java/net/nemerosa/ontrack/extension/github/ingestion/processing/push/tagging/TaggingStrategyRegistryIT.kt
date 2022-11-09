@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.push.tagging
 
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionTaggingConfig
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionTaggingStrategyConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging.IngestionTaggingConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging.IngestionTaggingStrategyConfig
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.jupiter.api.Test
