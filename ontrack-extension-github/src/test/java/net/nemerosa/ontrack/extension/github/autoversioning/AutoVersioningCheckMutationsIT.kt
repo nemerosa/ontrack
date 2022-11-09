@@ -59,6 +59,7 @@ internal class AutoVersioningCheckMutationsIT : AbstractIngestionTestSupport() {
                                 name = "some-workflow",
                                 runNumber = 1,
                                 running = true,
+                                event = "push",
                             )
                         )
                         build.linkTo(linkedBuild431)

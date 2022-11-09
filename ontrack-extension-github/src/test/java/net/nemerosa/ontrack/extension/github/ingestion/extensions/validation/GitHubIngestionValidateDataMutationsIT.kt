@@ -57,6 +57,7 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                                     name = "some-workflow",
                                     runNumber = 1,
                                     running = true,
+                                    event = "push",
                                 )
                             )
                             asAuth {
@@ -136,6 +137,7 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                                     name = "some-workflow",
                                     runNumber = 1,
                                     running = true,
+                                    event = "push",
                                 )
                             )
                             run("""
@@ -193,6 +195,7 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                                     name = "some-workflow",
                                     runNumber = 1,
                                     running = true,
+                                    event = "push",
                                 )
                             )
                             run("""
@@ -262,6 +265,7 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                                     name = "some-workflow",
                                     runNumber = 1,
                                     running = true,
+                                    event = "push",
                                 )
                             )
                             setProperty(this, ReleasePropertyType::class.java,
@@ -338,6 +342,7 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                                     name = "some-workflow",
                                     runNumber = 1,
                                     running = true,
+                                    event = "push",
                                 ))
                             run("""
                                 mutation {
@@ -400,6 +405,7 @@ internal class GitHubIngestionValidateDataMutationsIT : AbstractIngestionTestSup
                                     name = "some-workflow",
                                     runNumber = 1,
                                     running = true,
+                                    event = "push",
                                 ))
                             // Existing validation (without any data)
                             validate(vs)

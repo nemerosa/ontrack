@@ -153,6 +153,7 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
                                     name = "some-workflow",
                                     runNumber = 1,
                                     running = true,
+                                    event = "push",
                                 )
                             )
                             if (buildIdentification == BuildIdentification.BUILD_LABEL) {

@@ -70,6 +70,7 @@ class ValidationRunGitHubWorkflowJobPropertyType(
                     .help("Is the workflow still running?")
                     .value(value?.running ?: false)
             )
+            .textField(ValidationRunGitHubWorkflowJobProperty::event, value?.event)
 
     override fun fromClient(node: JsonNode): ValidationRunGitHubWorkflowJobProperty = node.parse()
 

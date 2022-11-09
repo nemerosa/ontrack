@@ -390,6 +390,7 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
                     name = "run-name",
                     runNumber = 1,
                     running = true,
+                    event = "push",
                 )
             )
             workflowJobProcessingService.setupValidation(

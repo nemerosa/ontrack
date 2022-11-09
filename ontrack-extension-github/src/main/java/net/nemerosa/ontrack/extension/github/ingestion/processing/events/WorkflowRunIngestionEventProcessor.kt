@@ -190,6 +190,7 @@ class WorkflowRunIngestionEventProcessor(
                 name = payload.workflowRun.name,
                 runNumber = payload.workflowRun.runNumber,
                 running = running,
+                event = payload.workflowRun.event,
             )
         )
         // Git commit property

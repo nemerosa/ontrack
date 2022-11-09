@@ -97,6 +97,7 @@ class DefaultWorkflowJobProcessingService(
                     runNumber = runProperty.runNumber,
                     job = job,
                     running = false, // Run won't be created until finished
+                    event = runProperty.event,
                 )
             )
         }

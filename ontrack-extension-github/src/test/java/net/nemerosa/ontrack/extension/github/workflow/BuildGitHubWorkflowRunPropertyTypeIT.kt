@@ -18,6 +18,7 @@ class BuildGitHubWorkflowRunPropertyTypeIT : AbstractGitHubTestJUnit4Support() {
                         name = "ci",
                         runNumber = 1,
                         running = false,
+                        event = "push",
                     ))
                     assertNotNull(
                         getProperty(this, BuildGitHubWorkflowRunPropertyType::class.java)

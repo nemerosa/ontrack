@@ -64,6 +64,7 @@ class BuildGitHubWorkflowRunPropertyType(
                     .help("Is the workflow still running?")
                     .value(value?.running ?: false)
             )
+            .textField(BuildGitHubWorkflowRunProperty::event, value?.event)
 
     override fun fromClient(node: JsonNode): BuildGitHubWorkflowRunProperty = node.parse()
 
