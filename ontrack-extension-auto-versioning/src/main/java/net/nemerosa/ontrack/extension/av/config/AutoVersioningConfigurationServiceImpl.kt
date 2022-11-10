@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.av.config
 
 import net.nemerosa.ontrack.common.syncForward
-import net.nemerosa.ontrack.extension.av.event.AutoVersioningEvents
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscription
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionFilter
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionService
@@ -62,9 +61,9 @@ class AutoVersioningConfigurationServiceImpl(
             ).pageItems
             // New subscriptions
             val newSubscriptions = config.configurations.flatMap { source ->
-                source.notifications.map { notification ->
+                source.notifications?.map { notification ->
                     AVConfigSubscription(source, notification)
-                }
+                } ?: emptyList()
             }
 
             // Subscription

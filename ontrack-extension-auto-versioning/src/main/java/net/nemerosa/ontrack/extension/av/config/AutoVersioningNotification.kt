@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.av.config
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.graphql.support.ListRef
 
 /**
  * Subscription to an auto versioning event.
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode
 data class AutoVersioningNotification(
     val channel: String,
     val config: JsonNode,
+    @ListRef
     val scope: List<AutoVersioningNotificationScope> = listOf(AutoVersioningNotificationScope.ALL),
 ) {
     companion object {

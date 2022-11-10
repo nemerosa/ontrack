@@ -386,7 +386,7 @@ class DefaultEventSubscriptionService(
         }
         // Filter: origin
         if (!filter.origin.isNullOrBlank()) {
-            jsonFilters += """data::jsonb->>'origin' = :origin"""
+            jsonFilters += """json::jsonb->>'origin' = :origin"""
             jsonCriteria["origin"] = filter.origin
         }
         // Filter: event type

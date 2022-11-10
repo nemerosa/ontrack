@@ -91,6 +91,11 @@ object GraphQLBeanConverter {
                                     val rootType = getScalarType(elementType)
                                         ?: if (listRef.embedded) {
                                             getOrCreateEmbeddedInputType(elementType, listRef.suffix, dictionary)
+                                        } else if (elementType.isEnum) {
+                                            // For an Enum, we assume this has been declared elsewhere as a GraphQL type
+                                            // with its name equal to the simple Java type name
+                                            val enumType = GraphQLTypeReference(elementType.simpleName)
+                                            enumType
                                         } else {
                                             val refName = if (listRef.suffix.isNotBlank()) {
                                                 "${elementType.simpleName}${listRef.suffix}"
@@ -102,7 +107,7 @@ object GraphQLBeanConverter {
                                     fields += GraphQLInputObjectField.newInputObjectField()
                                         .name(name)
                                         .description(description)
-                                        .type(listInputType(rootType))
+                                        .type(listInputType(rootType, nullable = property.returnType.isMarkedNullable))
                                         .build()
                                 } else {
                                     throw IllegalStateException("Only list elements being Java classes are supported")

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.av.config
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.apache.commons.codec.digest.DigestUtils
 
@@ -38,7 +39,8 @@ data class AutoVersioningSourceConfig(
     @APIDescription("Build link creation. True by default.")
     val buildLinkCreation: Boolean? = null,
     @APIDescription("List of notifications subscriptions to setup for this auto versioning")
-    val notifications: List<AutoVersioningNotification> = emptyList(),
+    @ListRef(embedded = true, suffix = "Input")
+    val notifications: List<AutoVersioningNotification>? = null,
 ) : AutoVersioningTargetConfig {
 
     /**
