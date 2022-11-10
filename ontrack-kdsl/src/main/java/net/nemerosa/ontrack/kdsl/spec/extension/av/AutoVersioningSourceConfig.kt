@@ -17,4 +17,5 @@ data class AutoVersioningSourceConfig(
     val postProcessingConfig: JsonNode? = null,
     val validationStamp: String? = null,
     val autoApprovalMode: AutoApprovalMode? = AutoApprovalMode.CLIENT,
+    val notifications: List<AutoVersioningNotification>? = null,
 )

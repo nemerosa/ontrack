@@ -13,4 +13,5 @@ fun Event.matchesKeywords(keywords: String?) =
 
 private fun Event.matchesKeyword(keyword: String) =
     entities.values.any { entity -> entity.displayName.lowercase() == keyword }
+            || extraEntities.values.any { entity -> entity.displayName.lowercase() == keyword }
             || values.values.any { it.value.lowercase() == keyword }

@@ -116,11 +116,6 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
     }
 
     @Test
-    fun `Firing notifications on auto-versioning`() {
-        TODO()
-    }
-
-    @Test
     fun `Changing the notifications for AV`() {
         TODO()
     }

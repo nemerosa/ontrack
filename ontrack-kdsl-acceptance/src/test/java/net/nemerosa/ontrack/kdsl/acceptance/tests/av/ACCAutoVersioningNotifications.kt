@@ -199,12 +199,4 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
         }
     }
 
-    private fun displayNotifications(group: String): () -> Unit = {
-        println("Notifications for group $group:")
-        ontrack.notifications.inMemory.group(group).forEach {
-            println("--------------")
-            println(it)
-        }
-    }
-
 }

@@ -67,7 +67,7 @@ class AutoVersioningEventServiceImpl(
             .with("message", close(message))
             .with("pr-name", pr.name)
             .with("pr-link", pr.link)
-            .get()
+            .build()
 
     internal fun error(
         order: AutoVersioningOrder,
@@ -80,7 +80,7 @@ class AutoVersioningEventServiceImpl(
             .with("version", order.targetVersion)
             .with("message", close(message))
             .with("error", close(error.message ?: error::class.java.name))
-            .get()
+            .build()
 
     internal fun prMergeTimeoutError(
         order: AutoVersioningOrder,
@@ -92,7 +92,7 @@ class AutoVersioningEventServiceImpl(
             .with("version", order.targetVersion)
             .with("pr-name", pr.name)
             .with("pr-link", pr.link)
-            .get()
+            .build()
 
     private fun sourceProject(order: AutoVersioningOrder) =
         structureService.findProjectByName(order.sourceProject)
