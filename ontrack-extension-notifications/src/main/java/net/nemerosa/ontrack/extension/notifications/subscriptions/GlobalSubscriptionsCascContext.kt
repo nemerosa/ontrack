@@ -48,7 +48,7 @@ class GlobalSubscriptionsCascContext(
                     channel = subscription.channel,
                     channelConfig = subscription.channelConfig,
                     disabled = subscription.disabled ?: false,
-                    origin = EventSubscriptionOrigins.API,
+                    origin = EventSubscriptionOrigins.CASC,
                 )
             )
         }
@@ -66,7 +66,6 @@ class GlobalSubscriptionsCascContext(
                 channel = it.data.channel,
                 channelConfig = it.data.channelConfig,
                 disabled = it.data.disabled,
-                origin = it.data.origin,
             )
         }.asJson()
 
