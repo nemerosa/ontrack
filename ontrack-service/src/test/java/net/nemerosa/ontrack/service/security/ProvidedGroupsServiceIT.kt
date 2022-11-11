@@ -1,14 +1,15 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.AuthenticationSource
 import net.nemerosa.ontrack.model.security.ProvidedGroupsService
-import org.junit.Test
+import net.nemerosa.ontrack.test.TestUtils.uid
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ProvidedGroupsServiceIT : AbstractDSLTestJUnit4Support() {
+class ProvidedGroupsServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var providedGroupsService: ProvidedGroupsService
@@ -22,14 +23,18 @@ class ProvidedGroupsServiceIT : AbstractDSLTestJUnit4Support() {
             // Saves some groups
             providedGroupsService.saveProvidedGroups(account.id(), AuthenticationSource.none(), setOf("admin", "user"))
             assertEquals(
-                    setOf("admin", "user"),
-                    providedGroupsService.getProvidedGroups(account.id(), AuthenticationSource.none())
+                setOf("admin", "user"),
+                providedGroupsService.getProvidedGroups(account.id(), AuthenticationSource.none())
             )
             // Changes the groups
-            providedGroupsService.saveProvidedGroups(account.id(), AuthenticationSource.none(), setOf("user", "manager"))
+            providedGroupsService.saveProvidedGroups(
+                account.id(),
+                AuthenticationSource.none(),
+                setOf("user", "manager")
+            )
             assertEquals(
-                    setOf("user", "manager"),
-                    providedGroupsService.getProvidedGroups(account.id(), AuthenticationSource.none())
+                setOf("user", "manager"),
+                providedGroupsService.getProvidedGroups(account.id(), AuthenticationSource.none())
             )
         }
     }
@@ -39,10 +44,52 @@ class ProvidedGroupsServiceIT : AbstractDSLTestJUnit4Support() {
         val account = doCreateAccount()
         asAdmin {
             val longGroupName = "g".repeat(81)
-            providedGroupsService.saveProvidedGroups(account.id(), AuthenticationSource.none(), setOf(longGroupName, "user"))
+            providedGroupsService.saveProvidedGroups(
+                account.id(),
+                AuthenticationSource.none(),
+                setOf(longGroupName, "user")
+            )
             assertEquals(
-                    setOf("user"),
-                    providedGroupsService.getProvidedGroups(account.id(), AuthenticationSource.none())
+                setOf("user"),
+                providedGroupsService.getProvidedGroups(account.id(), AuthenticationSource.none())
+            )
+        }
+    }
+
+    @Test
+    fun `Getting distinct suggested groups`() {
+        val groupPrefix = uid("group-")
+        val accounts = (0..5).map { doCreateAccount() }
+        asAdmin {
+            // Saving the provided groups
+            (0..2).forEach { no ->
+                val account = accounts[no]
+                providedGroupsService.saveProvidedGroups(
+                    account.id(),
+                    AuthenticationSource.none(),
+                    setOf("$groupPrefix-1")
+                )
+            }
+            (3..4).forEach { no ->
+                val account = accounts[no]
+                providedGroupsService.saveProvidedGroups(
+                    account.id(),
+                    AuthenticationSource.none(),
+                    setOf("$groupPrefix-2")
+                )
+            }
+            (5..5).forEach { no ->
+                val account = accounts[no]
+                providedGroupsService.saveProvidedGroups(
+                    account.id(),
+                    AuthenticationSource.none(),
+                    setOf("$groupPrefix-3")
+                )
+            }
+            // Getting the suggested groups for this prefix
+            assertEquals(
+                (1..3).map { "$groupPrefix-$it" },
+                providedGroupsService.getSuggestedGroups(AuthenticationSource.none(), groupPrefix)
             )
         }
     }
