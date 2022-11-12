@@ -45,6 +45,19 @@ interface IngestionModelAccessService {
     ): Branch
 
     /**
+     * Gets a branch from a payload if it exists.
+     *
+     * @param repository Repository
+     * @param headBranch Git branch
+     * @param pullRequest Pull request (if any)
+     */
+    fun getBranchIfExists(
+        repository: Repository,
+        headBranch: String,
+        pullRequest: IPullRequest?,
+    ): Branch?
+
+    /**
      * Finds a project from a repository.
      */
     fun findProjectFromRepository(repository: Repository): Project?

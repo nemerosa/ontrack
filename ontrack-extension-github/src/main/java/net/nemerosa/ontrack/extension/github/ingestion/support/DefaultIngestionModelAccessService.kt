@@ -134,20 +134,50 @@ class DefaultIngestionModelAccessService(
         return structureService.findBranchByName(project.name, branchName).getOrNull()
     }
 
+    override fun getBranchIfExists(
+        repository: Repository,
+        headBranch: String,
+        pullRequest: IPullRequest?,
+    ): Branch? {
+        val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
+        val name = getProjectName(
+            owner = repository.owner.login,
+            repository = repository.name,
+            orgProjectPrefix = settings.orgProjectPrefix,
+        )
+        val project = structureService.findProjectByName(name).getOrNull()
+        return if (project != null) {
+            val (branchName, gitBranch) = getBranchNames(headBranch, pullRequest)
+            structureService.findBranchByName(project.name, branchName).getOrNull()
+        } else {
+            null
+        }
+    }
+
+    private data class BranchNames(
+        val name: String,
+        val gitBranch: String,
+    )
+
+    private fun getBranchNames(
+        headBranch: String,
+        pullRequest: IPullRequest?,
+    ): BranchNames = if (pullRequest != null) {
+        val key = "PR-${pullRequest.number}"
+        BranchNames(key, key)
+    } else if (headBranch.startsWith(REFS_TAGS_PREFIX)) {
+        error("Creating branch from tag is not supported: $headBranch")
+    } else {
+        val branchName = NameDescription.escapeName(headBranch).take(Branch.NAME_MAX_LENGTH)
+        BranchNames(branchName, headBranch)
+    }
+
     override fun getOrCreateBranch(
         project: Project,
         headBranch: String,
         pullRequest: IPullRequest?,
     ): Branch {
-        val (branchName, gitBranch) = if (pullRequest != null) {
-            val key = "PR-${pullRequest.number}"
-            key to key
-        } else if (headBranch.startsWith(REFS_TAGS_PREFIX)) {
-            error("Creating branch from tag is not supported: $headBranch")
-        } else {
-            val branchName = NameDescription.escapeName(headBranch).take(Branch.NAME_MAX_LENGTH)
-            branchName to headBranch
-        }
+        val (branchName, gitBranch) = getBranchNames(headBranch, pullRequest)
         val branch = structureService.findBranchByName(project.name, branchName)
             .getOrNull()
             ?: structureService.newBranch(

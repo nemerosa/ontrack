@@ -74,19 +74,28 @@ class WorkflowRunIngestionEventProcessor(
     }
 
     override fun process(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResultDetails {
-        // TODO If the branch already exists
-        // Gets the GH configuration
-        val ghConfig = ingestionModelAccessService.findGitHubEngineConfiguration(
+        // Gets the ingestion configuration
+        val config = ingestionModelAccessService.getBranchIfExists(
             repository = payload.repository,
-            configurationName = configuration,
+            headBranch = payload.workflowRun.headBranch,
+            pullRequest = payload.workflowRun.pullRequests.firstOrNull(),
         )
-        // Loads the configuration from GH
-        val config = configService.loadConfig(
-            configuration = ghConfig,
-            repository = payload.repository.fullName,
-            branch = payload.workflowRun.headBranch, // Even for a PR
-            path = INGESTION_CONFIG_FILE_PATH,
-        )
+            ?.let { branch ->
+                // Using the branch cache if possible
+                configService.loadAndSaveConfig(branch, INGESTION_CONFIG_FILE_PATH)
+            }
+        // Loading the ingestion config directly from GH
+            ?: ingestionModelAccessService.findGitHubEngineConfiguration(
+                repository = payload.repository,
+                configurationName = configuration,
+            ).let { ghConfig ->
+                configService.loadConfig(
+                    configuration = ghConfig,
+                    repository = payload.repository.fullName,
+                    branch = payload.workflowRun.headBranch, // Even for a PR
+                    path = INGESTION_CONFIG_FILE_PATH,
+                )
+            }
         // Filter on the workflow name
         return if (config.workflows.filter.includes(payload.workflowRun.name)) {
             // Filtering on the event
@@ -124,9 +133,15 @@ class WorkflowRunIngestionEventProcessor(
         return IngestionEventProcessingResultDetails.processed()
     }
 
-    private fun setupWorkflowValidation(config: IngestionConfig, build: Build, workflowRun: WorkflowRun, runInfo: RunInfoInput) {
+    private fun setupWorkflowValidation(
+        config: IngestionConfig,
+        build: Build,
+        workflowRun: WorkflowRun,
+        runInfo: RunInfoInput,
+    ) {
         // Gets the validation name from the run name
-        val validationStampName = normalizeName("${config.workflows.validations.prefix}${workflowRun.name}${config.workflows.validations.suffix}")
+        val validationStampName =
+            normalizeName("${config.workflows.validations.prefix}${workflowRun.name}${config.workflows.validations.suffix}")
         // Gets or creates the validation stamp
         val vs = ingestionModelAccessService.setupValidationStamp(
             build.branch, validationStampName, "${workflowRun.name} workflow"
