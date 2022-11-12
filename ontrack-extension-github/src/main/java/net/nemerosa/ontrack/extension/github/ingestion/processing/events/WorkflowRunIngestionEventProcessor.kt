@@ -74,11 +74,19 @@ class WorkflowRunIngestionEventProcessor(
     }
 
     override fun process(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResultDetails {
-        // Gets the branch
-        val project = getOrCreateProject(payload, configuration)
-        val branch = getOrCreateBranch(project, payload)
-        // Gets the ingestion configuration
-        val config = configService.getOrLoadConfig(branch, INGESTION_CONFIG_FILE_PATH)
+        // TODO If the branch already exists
+        // Gets the GH configuration
+        val ghConfig = ingestionModelAccessService.findGitHubEngineConfiguration(
+            repository = payload.repository,
+            configurationName = configuration,
+        )
+        // Loads the configuration from GH
+        val config = configService.loadConfig(
+            configuration = ghConfig,
+            repository = payload.repository.fullName,
+            branch = payload.workflowRun.headBranch, // Even for a PR
+            path = INGESTION_CONFIG_FILE_PATH,
+        )
         // Filter on the workflow name
         return if (config.workflows.filter.includes(payload.workflowRun.name)) {
             // Filtering on the event

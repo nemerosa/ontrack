@@ -16,6 +16,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.model.IPullReq
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.getProjectName
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
+import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
@@ -69,40 +70,7 @@ class DefaultIngestionModelAccessService(
         configurationName: String?,
     ) {
         if (!propertyService.hasProperty(project, GitHubProjectConfigurationPropertyType::class.java)) {
-            val configuration = if (!configurationName.isNullOrBlank()) {
-                gitHubConfigurationService.findConfiguration(configurationName)
-                    ?: throw GitHubConfigProvidedNameNotFoundException(configurationName)
-            } else {
-                // Gets the list of GH configs
-                val configurations = gitHubConfigurationService.configurations
-                // If no configuration, error
-                if (configurations.isEmpty()) {
-                    throw NoGitHubConfigException()
-                }
-                // If only 1 config, use it
-                else if (configurations.size == 1) {
-                    val candidate = configurations.first()
-                    // Checks the URL
-                    if (repository.htmlUrl.startsWith(candidate.url)) {
-                        candidate
-                    } else {
-                        throw GitHubConfigURLMismatchException(repository.htmlUrl)
-                    }
-                }
-                // If several configurations, select it based on the URL
-                else {
-                    val candidates = configurations.filter {
-                        repository.htmlUrl.startsWith(it.url)
-                    }
-                    if (candidates.isEmpty()) {
-                        throw GitHubConfigURLNoMatchException(repository.htmlUrl)
-                    } else if (candidates.size == 1) {
-                        candidates.first()
-                    } else {
-                        throw GitHubConfigURLSeveralMatchesException(repository.htmlUrl)
-                    }
-                }
-            }
+            val configuration = findGitHubEngineConfiguration(repository, configurationName)
             // Project property if not already defined
             propertyService.editProperty(
                 project,
@@ -114,6 +82,44 @@ class DefaultIngestionModelAccessService(
                     issueServiceConfigurationIdentifier = settings.issueServiceIdentifier,
                 )
             )
+        }
+    }
+
+    override fun findGitHubEngineConfiguration(
+        repository: Repository,
+        configurationName: String?,
+    ): GitHubEngineConfiguration = if (!configurationName.isNullOrBlank()) {
+        gitHubConfigurationService.findConfiguration(configurationName)
+            ?: throw GitHubConfigProvidedNameNotFoundException(configurationName)
+    } else {
+        // Gets the list of GH configs
+        val configurations = gitHubConfigurationService.configurations
+        // If no configuration, error
+        if (configurations.isEmpty()) {
+            throw NoGitHubConfigException()
+        }
+        // If only 1 config, use it
+        else if (configurations.size == 1) {
+            val candidate = configurations.first()
+            // Checks the URL
+            if (repository.htmlUrl.startsWith(candidate.url)) {
+                candidate
+            } else {
+                throw GitHubConfigURLMismatchException(repository.htmlUrl)
+            }
+        }
+        // If several configurations, select it based on the URL
+        else {
+            val candidates = configurations.filter {
+                repository.htmlUrl.startsWith(it.url)
+            }
+            if (candidates.isEmpty()) {
+                throw GitHubConfigURLNoMatchException(repository.htmlUrl)
+            } else if (candidates.size == 1) {
+                candidates.first()
+            } else {
+                throw GitHubConfigURLSeveralMatchesException(repository.htmlUrl)
+            }
         }
     }
 

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.support
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.IPullRequest
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
+import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.model.structure.*
 
 /**
@@ -10,6 +11,14 @@ import net.nemerosa.ontrack.model.structure.*
  * the ingestion.
  */
 interface IngestionModelAccessService {
+
+    /**
+     * Gets the GitHub configuration for a given repository.
+     */
+    fun findGitHubEngineConfiguration(
+        repository: Repository,
+        configurationName: String?,
+    ): GitHubEngineConfiguration
 
     /**
      * Gets or creates a project for the given repository.

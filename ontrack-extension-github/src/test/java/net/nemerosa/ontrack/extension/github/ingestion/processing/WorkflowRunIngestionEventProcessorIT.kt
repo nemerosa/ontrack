@@ -143,7 +143,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                         workflows = IngestionConfigWorkflows(filter = FilterConfig.none)
                     )
                 )
-                workflowRunValidationTest(expectValidation = false)
+                workflowRunValidationTest(expectProject = false)
             }
         }
     }
@@ -164,6 +164,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
     }
 
     private fun workflowRunValidationTest(
+        expectProject: Boolean = true,
         expectValidation: Boolean = true,
     ) {
         val payload = payload(
@@ -174,32 +175,36 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
             payload,
             null
         )
-        assertNotNull(structureService.findProjectByName(payload.repository.name).getOrNull()) { project ->
-            assertNotNull(
-                structureService.findBranchByName(project.name, payload.workflowRun.headBranch).getOrNull()
-            ) { branch ->
-                if (expectValidation) {
-                    assertNotNull(
-                        structureService.findValidationStampByName(branch.project.name, branch.name, "workflow-ci")
-                            .getOrNull()
-                    ) { vs ->
+        if (expectProject) {
+            assertNotNull(structureService.findProjectByName(payload.repository.name).getOrNull()) { project ->
+                assertNotNull(
+                    structureService.findBranchByName(project.name, payload.workflowRun.headBranch).getOrNull()
+                ) { branch ->
+                    if (expectValidation) {
                         assertNotNull(
-                            structureService.findBuildByName(project.name, branch.name, "ci-1").getOrNull()
-                        ) { build ->
-                            val runs =
-                                structureService.getValidationRunsForBuildAndValidationStamp(build.id, vs.id, 0, 10)
-                            assertEquals(1, runs.size)
-                            val run = runs.first()
-                            assertEquals(ValidationRunStatusID.STATUS_PASSED, run.lastStatus.statusID)
+                            structureService.findValidationStampByName(branch.project.name, branch.name, "workflow-ci")
+                                .getOrNull()
+                        ) { vs ->
+                            assertNotNull(
+                                structureService.findBuildByName(project.name, branch.name, "ci-1").getOrNull()
+                            ) { build ->
+                                val runs =
+                                    structureService.getValidationRunsForBuildAndValidationStamp(build.id, vs.id, 0, 10)
+                                assertEquals(1, runs.size)
+                                val run = runs.first()
+                                assertEquals(ValidationRunStatusID.STATUS_PASSED, run.lastStatus.statusID)
+                            }
                         }
+                    } else {
+                        assertNull(
+                            structureService.findValidationStampByName(branch.project.name, branch.name, "workflow-ci")
+                                .getOrNull()
+                        )
                     }
-                } else {
-                    assertNull(
-                        structureService.findValidationStampByName(branch.project.name, branch.name, "workflow-ci")
-                            .getOrNull()
-                    )
                 }
             }
+        } else {
+            assertNull(structureService.findProjectByName(payload.repository.name).getOrNull(), "Project has not been created")
         }
     }
 
@@ -445,14 +450,11 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                     IngestionEventProcessingResult.IGNORED,
                     processor.process(payload, null).result
                 )
-                // Checks the project & the branch have been created
-                assertNotNull(
-                    structureService.findBranchByName(repoName, "main").getOrNull(),
-                    "Branch has been created"
-                ) { branch ->
-                    // Checks that NO build has been created
-                    assertEquals(0, structureService.getBuildCount(branch), "No build has been created")
-                }
+                // Checks the project has not been created
+                assertNull(
+                    structureService.findProjectByName(repoName,).getOrNull(),
+                    "Project has not been created"
+                )
             }
         }
     }
