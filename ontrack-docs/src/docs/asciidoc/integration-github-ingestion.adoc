@@ -124,6 +124,12 @@ version: v1
   # Default value: `push` event only
   # events:
   #   - push
+  # Optional: Filter on the Git branch names
+  # branchFilter:
+  #     includes: ".*"
+  #     excludes: ""
+  # Optional: Filtering the pull requests
+  # includePRs: true
 # Optional: Configuration for the ingestion of the jobs
 # jobs:
     # Optional: Filter on the jobs names
