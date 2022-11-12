@@ -75,7 +75,7 @@ class WorkflowRunIngestionEventProcessor(
 
     override fun process(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResultDetails {
         // Gets the ingestion configuration
-        val config = ingestionModelAccessService.getBranchIfExists(
+        val ingestionConfig = ingestionModelAccessService.getBranchIfExists(
             repository = payload.repository,
             headBranch = payload.workflowRun.headBranch,
             pullRequest = payload.workflowRun.pullRequests.firstOrNull(),
@@ -97,21 +97,21 @@ class WorkflowRunIngestionEventProcessor(
                 )
             }
         // Filter on the workflow name
-        return if (config.workflows.filter.includes(payload.workflowRun.name)) {
+        return if (ingestionConfig.workflows.filter.includes(payload.workflowRun.name)) {
             // Filtering on the event
-            if (!config.workflows.events.contains(payload.workflowRun.event)) {
+            if (!ingestionConfig.workflows.events.contains(payload.workflowRun.event)) {
                 IngestionEventProcessingResultDetails.ignored(
                     """"${payload.workflowRun.event}" is not configured for ingestion."""
                 )
             }
             // Filtering on the PR type
-            else if (payload.workflowRun.pullRequests.isNotEmpty() && !config.workflows.includePRs) {
+            else if (payload.workflowRun.pullRequests.isNotEmpty() && !ingestionConfig.workflows.includePRs) {
                 IngestionEventProcessingResultDetails.ignored(
                     """PRs are not configured for ingestion."""
                 )
             }
             // Filtering on the Git branch name
-            else if (!config.workflows.branchFilter.includes(payload.workflowRun.headBranch)) {
+            else if (!ingestionConfig.workflows.branchFilter.includes(payload.workflowRun.headBranch)) {
                 IngestionEventProcessingResultDetails.ignored(
                     """"${payload.workflowRun.headBranch}" is not configured for ingestion."""
                 )
@@ -119,8 +119,8 @@ class WorkflowRunIngestionEventProcessor(
             // OK to process
             else {
                 when (payload.action) {
-                    WorkflowRunAction.requested -> startBuild(payload, configuration)
-                    WorkflowRunAction.completed -> endBuild(payload, configuration)
+                    WorkflowRunAction.requested -> startBuild(payload, configuration, ingestionConfig)
+                    WorkflowRunAction.completed -> endBuild(payload, configuration, ingestionConfig)
                 }
             }
         } else {
@@ -129,9 +129,9 @@ class WorkflowRunIngestionEventProcessor(
         }
     }
 
-    private fun endBuild(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResultDetails {
+    private fun endBuild(payload: WorkflowRunPayload, configuration: String?, ingestionConfig: IngestionConfig): IngestionEventProcessingResultDetails {
         // Build creation & setup
-        val build = getOrCreateBuild(payload, running = false, configuration = configuration)
+        val build = getOrCreateBuild(payload, running = false, configuration = configuration, ingestionConfig = ingestionConfig)
         // Setting the run info
         val runInfo = collectRunInfo(payload)
         runInfoService.setRunInfo(build, runInfo)
@@ -190,19 +190,20 @@ class WorkflowRunIngestionEventProcessor(
         )
     }
 
-    private fun startBuild(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResultDetails {
+    private fun startBuild(payload: WorkflowRunPayload, configuration: String?, ingestionConfig: IngestionConfig): IngestionEventProcessingResultDetails {
         // Build creation & setup
-        getOrCreateBuild(payload, running = true, configuration = configuration)
+        getOrCreateBuild(payload, running = true, configuration = configuration, ingestionConfig = ingestionConfig)
         // OK
         return IngestionEventProcessingResultDetails.processed()
     }
 
-    private fun getOrCreateBuild(payload: WorkflowRunPayload, running: Boolean, configuration: String?): Build {
+    private fun getOrCreateBuild(payload: WorkflowRunPayload, running: Boolean, configuration: String?, ingestionConfig: IngestionConfig): Build {
         // Gets or creates the project
         val project = getOrCreateProject(payload, configuration)
         // Branch creation & setup
         val branch = getOrCreateBranch(project, payload)
         // Build creation & setup
+        // TODO Build identification strategy
         val buildName = normalizeName(
             "${payload.workflowRun.name}-${payload.workflowRun.runNumber}"
         )
