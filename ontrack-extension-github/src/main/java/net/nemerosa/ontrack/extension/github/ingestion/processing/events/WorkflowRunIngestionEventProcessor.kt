@@ -101,7 +101,19 @@ class WorkflowRunIngestionEventProcessor(
             // Filtering on the event
             if (!config.workflows.events.contains(payload.workflowRun.event)) {
                 IngestionEventProcessingResultDetails.ignored(
-                    """"${payload.workflowRun.event}" is not configured for processing."""
+                    """"${payload.workflowRun.event}" is not configured for ingestion."""
+                )
+            }
+            // Filtering on the PR type
+            else if (payload.workflowRun.pullRequests.isNotEmpty() && !config.workflows.includePRs) {
+                IngestionEventProcessingResultDetails.ignored(
+                    """PRs are not configured for ingestion."""
+                )
+            }
+            // Filtering on the Git branch name
+            else if (!config.workflows.branchFilter.includes(payload.workflowRun.headBranch)) {
+                IngestionEventProcessingResultDetails.ignored(
+                    """"${payload.workflowRun.headBranch}" is not configured for ingestion."""
                 )
             }
             // OK to process

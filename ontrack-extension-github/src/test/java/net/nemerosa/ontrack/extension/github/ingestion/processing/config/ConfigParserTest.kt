@@ -114,6 +114,10 @@ class ConfigParserTest {
                     suffix: ""
                   events:
                   - "push"
+                  branchFilter:
+                    includes: ".*"
+                    excludes: ""
+                  includePRs: true
                 jobs:
                   filter:
                     includes: ".*"

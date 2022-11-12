@@ -10,10 +10,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionCon
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigWorkflows
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
-import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
-import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
-import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunIngestionEventProcessor
-import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunPayload
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
@@ -149,6 +146,51 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
     }
 
     @Test
+    fun `No validation for the workflow run using exclusion of branches in the configuration`() {
+        // Only one GitHub configuration
+        onlyOneGitHubConfig()
+        // Starting the run
+        asAdmin {
+            withGitHubIngestionSettings {
+                ConfigLoaderServiceITMockConfig.customIngestionConfig(
+                    configLoaderService, IngestionConfig(
+                        workflows = IngestionConfigWorkflows(
+                            branchFilter = FilterConfig(excludes = "main")
+                        )
+                    )
+                )
+                workflowRunValidationTest(expectProject = false)
+            }
+        }
+    }
+
+    @Test
+    fun `No validation for the workflow run using exclusion of pull requests in the configuration`() {
+        // Only one GitHub configuration
+        onlyOneGitHubConfig()
+        // Starting the run
+        asAdmin {
+            withGitHubIngestionSettings {
+                ConfigLoaderServiceITMockConfig.customIngestionConfig(
+                    configLoaderService, IngestionConfig(
+                        workflows = IngestionConfigWorkflows(
+                            includePRs = false,
+                        )
+                    )
+                )
+                workflowRunValidationTest(
+                    pullRequests = listOf(
+                        IngestionHookFixtures.sampleWorkflowRunPR(
+                            repoName = IngestionHookFixtures.sampleRepository,
+                        )
+                    ),
+                    expectProject = false,
+                )
+            }
+        }
+    }
+
+    @Test
     fun `Validation for the workflow run using the ingestion configuration`() {
         // Only one GitHub configuration
         onlyOneGitHubConfig()
@@ -166,10 +208,12 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
     private fun workflowRunValidationTest(
         expectProject: Boolean = true,
         expectValidation: Boolean = true,
+        pullRequests: List<WorkflowRunPullRequest> = emptyList(),
     ) {
         val payload = payload(
             status = WorkflowJobStepStatus.completed,
             conclusion = WorkflowJobStepConclusion.success,
+            pullRequests = pullRequests,
         )
         processor.process(
             payload,
@@ -204,7 +248,10 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                 }
             }
         } else {
-            assertNull(structureService.findProjectByName(payload.repository.name).getOrNull(), "Project has not been created")
+            assertNull(
+                structureService.findProjectByName(payload.repository.name).getOrNull(),
+                "Project has not been created"
+            )
         }
     }
 
@@ -452,7 +499,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                 )
                 // Checks the project has not been created
                 assertNull(
-                    structureService.findProjectByName(repoName,).getOrNull(),
+                    structureService.findProjectByName(repoName).getOrNull(),
                     "Project has not been created"
                 )
             }
@@ -583,13 +630,14 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
         repoUrl: String = "https://github.com/$owner/$repoName",
         status: WorkflowJobStepStatus = WorkflowJobStepStatus.in_progress,
         conclusion: WorkflowJobStepConclusion? = null,
+        pullRequests: List<WorkflowRunPullRequest> = emptyList(),
     ) = WorkflowRunPayload(
         action = action,
         workflowRun = WorkflowRun(
             id = runId,
             name = runName,
             runNumber = runNumber,
-            pullRequests = emptyList(),
+            pullRequests = pullRequests,
             headBranch = headBranch,
             headSha = commit,
             createdAtDate = createdAtDate,
