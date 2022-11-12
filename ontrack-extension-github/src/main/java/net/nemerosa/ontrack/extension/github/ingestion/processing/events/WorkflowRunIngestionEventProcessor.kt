@@ -217,18 +217,20 @@ class WorkflowRunIngestionEventProcessor(
                 )
             )
         // Link between the build and the workflow
-        propertyService.editProperty(
-            build,
-            BuildGitHubWorkflowRunPropertyType::class.java,
-            BuildGitHubWorkflowRunProperty(
-                runId = payload.workflowRun.id,
-                url = payload.workflowRun.htmlUrl,
-                name = payload.workflowRun.name,
-                runNumber = payload.workflowRun.runNumber,
-                running = running,
-                event = payload.workflowRun.event,
+        if (!propertyService.hasProperty(build, BuildGitHubWorkflowRunPropertyType::class.java)) {
+            propertyService.editProperty(
+                build,
+                BuildGitHubWorkflowRunPropertyType::class.java,
+                BuildGitHubWorkflowRunProperty(
+                    runId = payload.workflowRun.id,
+                    url = payload.workflowRun.htmlUrl,
+                    name = payload.workflowRun.name,
+                    runNumber = payload.workflowRun.runNumber,
+                    running = running,
+                    event = payload.workflowRun.event,
+                )
             )
-        )
+        }
         // Git commit property
         if (!propertyService.hasProperty(build, GitCommitPropertyType::class.java)) {
             propertyService.editProperty(
