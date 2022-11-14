@@ -4,13 +4,11 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.common.BaseException
-import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
-import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInfo
+import net.nemerosa.ontrack.extension.github.ingestion.processing.buildid.BuildIdStrategyRegistry
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.INGESTION_CONFIG_FILE_PATH
 import net.nemerosa.ontrack.extension.github.ingestion.processing.job.WorkflowJobProcessingService
@@ -37,6 +35,7 @@ class WorkflowRunIngestionEventProcessor(
     private val ingestionModelAccessService: IngestionModelAccessService,
     private val configService: ConfigService,
     private val workflowJobProcessingService: WorkflowJobProcessingService,
+    private val buildIdStrategyRegistry: BuildIdStrategyRegistry,
 ) : AbstractRepositoryIngestionEventProcessor<WorkflowRunPayload>(
     structureService
 ) {
@@ -129,9 +128,14 @@ class WorkflowRunIngestionEventProcessor(
         }
     }
 
-    private fun endBuild(payload: WorkflowRunPayload, configuration: String?, ingestionConfig: IngestionConfig): IngestionEventProcessingResultDetails {
+    private fun endBuild(
+        payload: WorkflowRunPayload,
+        configuration: String?,
+        ingestionConfig: IngestionConfig,
+    ): IngestionEventProcessingResultDetails {
         // Build creation & setup
-        val build = getOrCreateBuild(payload, running = false, configuration = configuration, ingestionConfig = ingestionConfig)
+        val build =
+            getOrCreateBuild(payload, running = false, configuration = configuration, ingestionConfig = ingestionConfig)
         // Setting the run info
         val runInfo = collectRunInfo(payload)
         runInfoService.setRunInfo(build, runInfo)
@@ -190,29 +194,42 @@ class WorkflowRunIngestionEventProcessor(
         )
     }
 
-    private fun startBuild(payload: WorkflowRunPayload, configuration: String?, ingestionConfig: IngestionConfig): IngestionEventProcessingResultDetails {
+    private fun startBuild(
+        payload: WorkflowRunPayload,
+        configuration: String?,
+        ingestionConfig: IngestionConfig,
+    ): IngestionEventProcessingResultDetails {
         // Build creation & setup
         getOrCreateBuild(payload, running = true, configuration = configuration, ingestionConfig = ingestionConfig)
         // OK
         return IngestionEventProcessingResultDetails.processed()
     }
 
-    private fun getOrCreateBuild(payload: WorkflowRunPayload, running: Boolean, configuration: String?, ingestionConfig: IngestionConfig): Build {
+    private fun getOrCreateBuild(
+        payload: WorkflowRunPayload,
+        running: Boolean,
+        configuration: String?,
+        ingestionConfig: IngestionConfig,
+    ): Build {
         // Gets or creates the project
         val project = getOrCreateProject(payload, configuration)
         // Branch creation & setup
         val branch = getOrCreateBranch(project, payload)
-        // Build creation & setup
-        // TODO Build identification strategy
-        val buildName = normalizeName(
-            "${payload.workflowRun.name}-${payload.workflowRun.runNumber}"
+        // Build identification strategy
+        val strategy = buildIdStrategyRegistry.getBuildIdStrategy(ingestionConfig.workflows.buildIdStrategy.id)
+        // Gets the build using this strategy
+        val build = strategy.findBuild(
+            payload.workflowRun,
+            ingestionConfig.workflows.buildIdStrategy.config,
         )
-        val build = structureService.findBuildByName(project.name, branch.name, buildName)
-            .getOrNull()
+        // If not found, creates it
             ?: structureService.newBuild(
                 Build.of(
                     branch,
-                    nd(buildName, ""),
+                    nd(
+                        strategy.getBuildName(payload.workflowRun, ingestionConfig.workflows.buildIdStrategy.config),
+                        ""
+                    ),
                     Signature.of(payload.workflowRun.createdAtDate, payload.sender?.login ?: "hook")
                 )
             )
@@ -231,14 +248,8 @@ class WorkflowRunIngestionEventProcessor(
                 )
             )
         }
-        // Git commit property
-        if (!propertyService.hasProperty(build, GitCommitPropertyType::class.java)) {
-            propertyService.editProperty(
-                build,
-                GitCommitPropertyType::class.java,
-                GitCommitProperty(payload.workflowRun.headSha)
-            )
-        }
+        // Build id strategy setup
+        strategy.setupBuild(build, payload.workflowRun, ingestionConfig.workflows.buildIdStrategy.config)
         // OK
         return build
     }

@@ -20,4 +20,6 @@ data class IngestionConfigWorkflows(
     val branchFilter: FilterConfig = FilterConfig.all,
     @APIDescription("Filtering the pull requests")
     val includePRs: Boolean = true,
+    @APIDescription("Build identification strategy")
+    val buildIdStrategy: IngestionConfigBuildIdStategy = IngestionConfigBuildIdStategy(),
 )
