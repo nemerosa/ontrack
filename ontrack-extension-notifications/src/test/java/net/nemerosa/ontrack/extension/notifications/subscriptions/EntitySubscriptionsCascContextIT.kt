@@ -46,8 +46,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                 val subscriptions = eventSubscriptionService.filterSubscriptions(
                     EventSubscriptionFilter(
                         entity = this.toProjectEntityID(),
-                        channel = "mock",
-                        channelConfig = target
+                        origin = "casc",
                     )
                 )
                 assertEquals(1, subscriptions.pageItems.size)
@@ -284,7 +283,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                 val subscriptions = eventSubscriptionService.filterSubscriptions(
                     EventSubscriptionFilter(
                         entity = this.toProjectEntityID(),
-                        channel = "mock",
+                        origin = "casc",
                     )
                 ).pageItems.map { it.data.keywords }
                 assertEquals(
@@ -321,7 +320,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                 val subscriptions = eventSubscriptionService.filterSubscriptions(
                     EventSubscriptionFilter(
                         entity = this.toProjectEntityID(),
-                        channel = "mock",
+                        origin = "casc",
                     )
                 ).pageItems.map { it.data.keywords }
                 assertEquals(
@@ -365,7 +364,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                 val subscriptions = eventSubscriptionService.filterSubscriptions(
                     EventSubscriptionFilter(
                         entity = this.toProjectEntityID(),
-                        channel = "mock",
+                        origin = "casc",
                     )
                 ).pageItems.map { it.data.keywords }
                 assertEquals(
@@ -387,7 +386,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                 val subscriptions = eventSubscriptionService.filterSubscriptions(
                     EventSubscriptionFilter(
                         entity = this.toProjectEntityID(),
-                        channel = "mock",
+                        origin = "casc",
                     )
                 ).pageItems
                 assertTrue(
@@ -426,8 +425,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                     val subscriptions = eventSubscriptionService.filterSubscriptions(
                         EventSubscriptionFilter(
                             entity = this.toProjectEntityID(),
-                            channel = "mock",
-                            channelConfig = target
+                            origin = "casc",
                         )
                     )
                     assertEquals(1, subscriptions.pageItems.size)
@@ -479,8 +477,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                     val subscriptions = eventSubscriptionService.filterSubscriptions(
                         EventSubscriptionFilter(
                             entity = vs.toProjectEntityID(),
-                            channel = "mock",
-                            channelConfig = target
+                            origin = "casc",
                         )
                     )
                     assertEquals(1, subscriptions.pageItems.size)
@@ -531,8 +528,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                     val subscriptions = eventSubscriptionService.filterSubscriptions(
                         EventSubscriptionFilter(
                             entity = vs.toProjectEntityID(),
-                            channel = "mock",
-                            channelConfig = target
+                            origin = "casc",
                         )
                     )
                     assertEquals(1, subscriptions.pageItems.size)
@@ -591,6 +587,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                 val subscriptions = eventSubscriptionService.filterSubscriptions(
                     EventSubscriptionFilter(
                         entity = this.toProjectEntityID(),
+                        origin = "casc",
                     )
                 )
                 assertEquals(0, subscriptions.pageItems.size)
@@ -618,8 +615,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                 val subscriptions = eventSubscriptionService.filterSubscriptions(
                     EventSubscriptionFilter(
                         entity = this.toProjectEntityID(),
-                        channel = "mock",
-                        channelConfig = target
+                        origin = "casc",
                     )
                 )
                 assertEquals(1, subscriptions.pageItems.size)
@@ -672,8 +668,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                     val subscriptions = eventSubscriptionService.filterSubscriptions(
                         EventSubscriptionFilter(
                             entity = pl.toProjectEntityID(),
-                            channel = "mock",
-                            channelConfig = target
+                            origin = "casc",
                         )
                     )
                     assertEquals(1, subscriptions.pageItems.size)
@@ -782,6 +777,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                 val subscriptions = eventSubscriptionService.filterSubscriptions(
                     EventSubscriptionFilter(
                         entity = this.toProjectEntityID(),
+                        origin = "casc",
                     )
                 ).pageItems.map { it.data.channelConfig.getRequiredTextField("target") }
                 assertEquals(listOf(target), subscriptions)
@@ -809,6 +805,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                 val subscriptions = eventSubscriptionService.filterSubscriptions(
                     EventSubscriptionFilter(
                         entity = this.toProjectEntityID(),
+                        origin = "casc",
                     )
                 ).pageItems.map { it.data.channelConfig.getRequiredTextField("target") }
                 assertEquals(listOf(newTarget), subscriptions)
