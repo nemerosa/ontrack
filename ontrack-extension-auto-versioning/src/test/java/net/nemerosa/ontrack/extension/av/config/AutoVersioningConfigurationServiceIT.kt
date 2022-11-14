@@ -11,7 +11,6 @@ import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscript
 import net.nemerosa.ontrack.extension.notifications.subscriptions.subscribe
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.security.Roles
-import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.toProjectEntityID
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
@@ -63,19 +62,25 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
 
     @Test
     fun `Registering notifications for AV`() {
-        asAdmin {
-            registerAVNotifications()
+        registerAVNotifications { code ->
+            asAdmin {
+                code()
+            }
         }
     }
 
     @Test
     fun `Registering notifications for non super admin`() {
-        asAccountWithGlobalRole(Roles.GLOBAL_AUTOMATION) {
-            registerAVNotifications()
+        registerAVNotifications { code ->
+            asAccountWithGlobalRole(Roles.GLOBAL_AUTOMATION) {
+                code()
+            }
         }
     }
 
-    private fun registerAVNotifications() {
+    private fun registerAVNotifications(
+        roleFn: (() -> Unit) -> Unit,
+    ) {
         val target = uid("t")
         val source = project {
             branch("main")
@@ -99,7 +104,10 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                         )
                     )
                 )
-                autoVersioningConfigurationService.setupAutoVersioning(this, config)
+
+                roleFn {
+                    autoVersioningConfigurationService.setupAutoVersioning(this, config)
+                }
 
                 // Checks that the subscriptions are saved
                 val subscriptions = eventSubscriptionService.filterSubscriptions(

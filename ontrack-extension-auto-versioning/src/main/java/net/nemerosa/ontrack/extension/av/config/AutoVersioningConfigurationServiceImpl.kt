@@ -24,10 +24,14 @@ class AutoVersioningConfigurationServiceImpl(
     override fun setupAutoVersioning(branch: Branch, config: AutoVersioningConfig?) {
         securityService.checkProjectFunction(branch, ProjectConfig::class.java)
         if (config != null) {
-            setupNotifications(branch, config)
+            securityService.asAdmin {
+                setupNotifications(branch, config)
+            }
             entityDataService.store(branch, STORE, config)
         } else {
-            setupNotifications(branch, null)
+            securityService.asAdmin {
+                setupNotifications(branch, null)
+            }
             entityDataService.delete(branch, STORE)
         }
     }
@@ -82,7 +86,7 @@ class AutoVersioningConfigurationServiceImpl(
                 onCreation { item ->
                     subscribe(item)
                 }
-                onModification { item, existing ->
+                onModification { item, _ ->
                     subscribe(item)
                 }
                 onDeletion { existing ->
