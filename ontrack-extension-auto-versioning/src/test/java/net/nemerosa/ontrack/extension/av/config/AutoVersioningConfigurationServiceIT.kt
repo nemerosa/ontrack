@@ -10,6 +10,8 @@ import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscript
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionService
 import net.nemerosa.ontrack.extension.notifications.subscriptions.subscribe
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.security.Roles
+import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.toProjectEntityID
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
@@ -62,59 +64,70 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
     @Test
     fun `Registering notifications for AV`() {
         asAdmin {
-            val target = uid("t")
-            val source = project {
-                branch("main")
-            }
-            project {
-                branch {
-                    // Setting an AV configuration with notifications
-                    val config = AutoVersioningConfig(
-                        listOf(
-                            AutoVersioningTestFixtures.sourceConfig(
-                                sourceProject = source.name,
-                                sourceBranch = "main",
-                                notifications = listOf(
-                                    AutoVersioningNotification(
-                                        channel = "mock",
-                                        config = mapOf(
-                                            "target" to target
-                                        ).asJson()
-                                    )
+            registerAVNotifications()
+        }
+    }
+
+    @Test
+    fun `Registering notifications for non super admin`() {
+        asAccountWithGlobalRole(Roles.GLOBAL_AUTOMATION) {
+            registerAVNotifications()
+        }
+    }
+
+    private fun registerAVNotifications() {
+        val target = uid("t")
+        val source = project {
+            branch("main")
+        }
+        project {
+            branch {
+                // Setting an AV configuration with notifications
+                val config = AutoVersioningConfig(
+                    listOf(
+                        AutoVersioningTestFixtures.sourceConfig(
+                            sourceProject = source.name,
+                            sourceBranch = "main",
+                            notifications = listOf(
+                                AutoVersioningNotification(
+                                    channel = "mock",
+                                    config = mapOf(
+                                        "target" to target
+                                    ).asJson()
                                 )
                             )
                         )
                     )
-                    autoVersioningConfigurationService.setupAutoVersioning(this, config)
+                )
+                autoVersioningConfigurationService.setupAutoVersioning(this, config)
 
-                    // Checks that the subscriptions are saved
-                    val subscriptions = eventSubscriptionService.filterSubscriptions(
-                        EventSubscriptionFilter(
-                            entity = toProjectEntityID(),
-                            origin = "auto-versioning",
-                        )
-                    ).pageItems.map { it.data }
-                    assertEquals(
-                        listOf(
-                            EventSubscription(
-                                projectEntity = this,
-                                events = setOf(
-                                    "auto-versioning-error",
-                                    "auto-versioning-success",
-                                    "auto-versioning-pr-merge-timeout-error",
-                                ),
-                                keywords = "${source.name} ${project.name} $name",
-                                channel = "mock",
-                                channelConfig = mapOf(
-                                    "target" to target,
-                                ).asJson(),
-                                disabled = false,
-                                origin = "auto-versioning"
-                            )
-                        ),
-                        subscriptions
+                // Checks that the subscriptions are saved
+                val subscriptions = eventSubscriptionService.filterSubscriptions(
+                    EventSubscriptionFilter(
+                        entity = toProjectEntityID(),
+                        origin = "auto-versioning",
                     )
-                }
+                ).pageItems.map { it.data }
+                assertEquals(
+                    listOf(
+                        EventSubscription(
+                            projectEntity = this,
+                            events = setOf(
+                                "auto-versioning-error",
+                                "auto-versioning-success",
+                                "auto-versioning-pr-merge-timeout-error",
+                            ),
+                            keywords = "${source.name} ${project.name} $name",
+                            channel = "mock",
+                            channelConfig = mapOf(
+                                "target" to target,
+                            ).asJson(),
+                            disabled = false,
+                            origin = "auto-versioning"
+                        )
+                    ),
+                    subscriptions
+                )
             }
         }
     }
