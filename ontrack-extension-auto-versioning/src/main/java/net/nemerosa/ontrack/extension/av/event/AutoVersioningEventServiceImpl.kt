@@ -2,6 +2,9 @@ package net.nemerosa.ontrack.extension.av.event
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.av.event.AutoVersioningEvents.AUTO_VERSIONING_ERROR
+import net.nemerosa.ontrack.extension.av.event.AutoVersioningEvents.AUTO_VERSIONING_PR_MERGE_TIMEOUT_ERROR
+import net.nemerosa.ontrack.extension.av.event.AutoVersioningEvents.AUTO_VERSIONING_SUCCESS
 import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.model.events.*
 import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
@@ -64,7 +67,7 @@ class AutoVersioningEventServiceImpl(
             .with("message", close(message))
             .with("pr-name", pr.name)
             .with("pr-link", pr.link)
-            .get()
+            .build()
 
     internal fun error(
         order: AutoVersioningOrder,
@@ -77,7 +80,7 @@ class AutoVersioningEventServiceImpl(
             .with("version", order.targetVersion)
             .with("message", close(message))
             .with("error", close(error.message ?: error::class.java.name))
-            .get()
+            .build()
 
     internal fun prMergeTimeoutError(
         order: AutoVersioningOrder,
@@ -89,7 +92,7 @@ class AutoVersioningEventServiceImpl(
             .with("version", order.targetVersion)
             .with("pr-name", pr.name)
             .with("pr-link", pr.link)
-            .get()
+            .build()
 
     private fun sourceProject(order: AutoVersioningOrder) =
         structureService.findProjectByName(order.sourceProject)
@@ -100,43 +103,6 @@ class AutoVersioningEventServiceImpl(
         message
     } else {
         "$message."
-    }
-
-    companion object {
-
-        private val AUTO_VERSIONING_SUCCESS: EventType = SimpleEventType.of(
-            "auto-versioning-success",
-            """
-                Auto versioning of ${'$'}{PROJECT}/${'$'}{BRANCH} for dependency ${'$'}{X_PROJECT} version "${'$'}{:version}" has been done.
-                
-                ${'$'}{:message}
-                
-                Pull request ${'$'}{:pr-name:pr-link}
-            """.trimIndent()
-        )
-
-        private val AUTO_VERSIONING_ERROR: EventType = SimpleEventType.of(
-            "auto-versioning-error",
-            """
-                Auto versioning of ${'$'}{PROJECT}/${'$'}{BRANCH} for dependency ${'$'}{X_PROJECT} version "${'$'}{:version}" has failed.
-                
-                ${'$'}{:message}
-                
-                Error: ${'$'}{:error}
-            """.trimIndent()
-        )
-
-        private val AUTO_VERSIONING_PR_MERGE_TIMEOUT_ERROR: EventType = SimpleEventType.of(
-            "auto-versioning-pr-merge-timeout-error",
-            """
-                Auto versioning of ${'$'}{PROJECT}/${'$'}{BRANCH} for dependency ${'$'}{X_PROJECT} version "${'$'}{:version}" has failed.
-                
-                Timeout while waiting for the PR to be ready to be merged.
-                
-                Pull request ${'$'}{:pr-name:pr-link}
-            """.trimIndent()
-        )
-
     }
 
 }

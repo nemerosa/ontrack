@@ -38,6 +38,7 @@ class EventSubscriptionMutations(
                     projectEntity = projectEntity,
                     keywords = input.keywords,
                     disabled = false,
+                    origin = EventSubscriptionOrigins.API,
                 )
             )
             EventSubscriptionPayload(
@@ -47,6 +48,7 @@ class EventSubscriptionMutations(
                 events = record.data.events.toList(),
                 keywords = record.data.keywords,
                 disabled = record.data.disabled,
+                origin = record.data.origin,
             )
         },
 
@@ -79,6 +81,7 @@ class EventSubscriptionMutations(
                 events = record.data.events.toList(),
                 keywords = record.data.keywords,
                 disabled = record.data.disabled,
+                origin = record.data.origin,
             )
         },
 
@@ -101,6 +104,7 @@ class EventSubscriptionMutations(
                 events = record.data.events.toList(),
                 keywords = record.data.keywords,
                 disabled = record.data.disabled,
+                origin = record.data.origin,
             )
         },
     )

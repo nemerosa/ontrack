@@ -48,6 +48,7 @@ class GlobalSubscriptionsCascContext(
                     channel = subscription.channel,
                     channelConfig = subscription.channelConfig,
                     disabled = subscription.disabled ?: false,
+                    origin = EventSubscriptionOrigins.CASC,
                 )
             )
         }

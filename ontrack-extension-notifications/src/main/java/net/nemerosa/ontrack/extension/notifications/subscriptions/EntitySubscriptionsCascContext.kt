@@ -139,7 +139,12 @@ class EntitySubscriptionsCascContext(
             logger.debug("Modifying subscriptions for entity ${existing.entity}")
             // Gets the existing subscriptions for this entity
             val entitySubscriptions = eventSubscriptionService.filterSubscriptions(
-                EventSubscriptionFilter(size = Int.MAX_VALUE, entity = entity.toProjectEntityID(), recursive = false)
+                EventSubscriptionFilter(
+                    size = Int.MAX_VALUE,
+                    entity = entity.toProjectEntityID(),
+                    recursive = false,
+                    origin = EventSubscriptionOrigins.CASC,
+                )
             ).pageItems.associate {
                 SubscriptionsCascContextData(
                     events = it.data.events.toList().sorted(),
@@ -201,6 +206,7 @@ class EntitySubscriptionsCascContext(
                 channel = subscription.channel,
                 channelConfig = subscription.channelConfig,
                 disabled = subscription.disabled ?: false,
+                origin = EventSubscriptionOrigins.CASC,
             )
         )
     }

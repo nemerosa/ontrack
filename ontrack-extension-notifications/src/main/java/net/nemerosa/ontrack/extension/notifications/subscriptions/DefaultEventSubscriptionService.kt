@@ -110,6 +110,7 @@ class DefaultEventSubscriptionService(
                     events = subscription.events,
                     keywords = subscription.keywords,
                     disabled = subscription.disabled,
+                    origin = subscription.origin,
                 )
                 storageService.store(
                     GLOBAL_STORE,
@@ -128,6 +129,7 @@ class DefaultEventSubscriptionService(
         events,
         keywords,
         disabled,
+        origin,
     )
 
     override fun findSubscriptionById(projectEntity: ProjectEntity?, id: String): EventSubscription? =
@@ -161,6 +163,7 @@ class DefaultEventSubscriptionService(
         events = events.toSet(),
         keywords = keywords,
         disabled = disabled,
+        origin = origin,
     )
 
     override fun deleteSubscriptionById(projectEntity: ProjectEntity?, id: String) {
@@ -294,7 +297,11 @@ class DefaultEventSubscriptionService(
                 jsonFilters += """data::jsonb->'channelConfig' @> '$criteria'"""
             }
         }
-
+        // Filter: origin
+        if (!filter.origin.isNullOrBlank()) {
+            jsonFilters += """data::jsonb->>'origin' = :origin"""
+            jsonCriteria["origin"] = filter.origin
+        }
         // Filter: event type
         if (!filter.eventType.isNullOrBlank()) {
             contextList += "left join jsonb_array_elements_text(data::jsonb->'events') as events on true"
@@ -343,6 +350,7 @@ class DefaultEventSubscriptionService(
                     events = record.events.toSet(),
                     keywords = record.keywords,
                     disabled = record.disabled,
+                    origin = record.origin,
                 )
             )
         }
@@ -375,6 +383,11 @@ class DefaultEventSubscriptionService(
                 val criteria = channel.toSearchCriteria(filter.channelConfig).format()
                 jsonFilters += """json::jsonb->'channelConfig' @> '$criteria'::jsonb"""
             }
+        }
+        // Filter: origin
+        if (!filter.origin.isNullOrBlank()) {
+            jsonFilters += """json::jsonb->>'origin' = :origin"""
+            jsonCriteria["origin"] = filter.origin
         }
         // Filter: event type
         if (!filter.eventType.isNullOrBlank()) {
@@ -462,6 +475,7 @@ class DefaultEventSubscriptionService(
                     events = record.events.toSet(),
                     keywords = record.keywords,
                     disabled = record.disabled,
+                    origin = record.origin,
                 )
             )
             if (event.matchesKeywords(subscription.data.keywords)) {
@@ -489,6 +503,7 @@ class DefaultEventSubscriptionService(
                 events = it.events.toSet(),
                 keywords = it.keywords,
                 disabled = it.disabled,
+                origin = it.origin,
             )
         )
     }
@@ -502,6 +517,7 @@ class DefaultEventSubscriptionService(
         val events: Set<String>,
         val keywords: String?,
         val disabled: Boolean,
+        val origin: String,
     )
 
     /**
@@ -514,9 +530,10 @@ class DefaultEventSubscriptionService(
         val events: Set<String>,
         val keywords: String?,
         val disabled: Boolean,
+        val origin: String = EventSubscriptionOrigins.UNKNOWN,
     ) {
         fun disabled(disabled: Boolean) =
-            SignedSubscriptionRecord(signature, channel, channelConfig, events, keywords, disabled)
+            SignedSubscriptionRecord(signature, channel, channelConfig, events, keywords, disabled, origin)
     }
 
 }
