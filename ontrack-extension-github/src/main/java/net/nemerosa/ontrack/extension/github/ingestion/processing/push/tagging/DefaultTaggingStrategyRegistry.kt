@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.push.tagging
 
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionTaggingConfig
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionTaggingStrategyConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging.IngestionTaggingConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging.IngestionTaggingStrategyConfig
 import org.springframework.stereotype.Component
 
 @Component

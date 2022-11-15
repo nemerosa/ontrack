@@ -1,4 +1,6 @@
-promotions:
-  - name: iron
-    description: All basics
-    image: #path
+version: v1
+setup:
+  promotions:
+    - name: iron
+      description: All basics
+      image: #path

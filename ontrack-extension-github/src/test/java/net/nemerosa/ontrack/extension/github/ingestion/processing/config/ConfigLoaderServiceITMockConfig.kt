@@ -2,6 +2,10 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import io.mockk.every
 import io.mockk.mockk
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigSteps
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.ConfigParsingException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 
@@ -14,7 +18,11 @@ class ConfigLoaderServiceITMockConfig {
     fun configLoaderService(): ConfigLoaderService = configLoaderService
 
     companion object {
-        private val defaultIngestionConfig = IngestionConfig()
+        private val defaultIngestionConfig = IngestionConfig(
+            steps = IngestionConfigSteps(
+                filter = FilterConfig.all
+            )
+        )
         fun defaultIngestionConfig(configLoaderService: ConfigLoaderService) {
             customIngestionConfig(configLoaderService, defaultIngestionConfig)
         }

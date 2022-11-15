@@ -32,9 +32,14 @@ class CascServiceImpl(
         run(parsed)
     }
 
-    override fun renderAsJson() = mapOf(
-        ROOT to ontrackContext.render()
-    ).asJson()
+    override fun renderAsJson(): JsonNode {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
+        return securityService.asAdmin {
+            mapOf(
+                ROOT to ontrackContext.render()
+            ).asJson()
+        }
+    }
 
     override fun renderAsYaml(): String = mapper.writeValueAsString(
         renderAsJson()

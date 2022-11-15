@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.kdsl.spec.Branch
 import net.nemerosa.ontrack.kdsl.spec.Project
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSettings
 import net.nemerosa.ontrack.kdsl.spec.extension.av.autoVersioning
+import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
 import net.nemerosa.ontrack.kdsl.spec.settings.settings
 import java.util.*
 
@@ -129,6 +130,14 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
         } finally {
             // Deleting the repository
             gitHubClient.delete("/repos/${ACCProperties.GitHub.organization}/$repo")
+        }
+    }
+
+    protected fun displayNotifications(group: String): () -> Unit = {
+        println("Notifications for group $group:")
+        ontrack.notifications.inMemory.group(group).forEach {
+            println("--------------")
+            println(it)
         }
     }
 

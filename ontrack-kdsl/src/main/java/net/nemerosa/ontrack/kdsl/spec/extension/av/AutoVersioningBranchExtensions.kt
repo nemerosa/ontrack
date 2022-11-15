@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.kdsl.spec.extension.av
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.GetBranchAutoVersioningConfigQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.SetAutoVersioningConfigMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoVersioningNotificationInput
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoVersioningNotificationScope
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoVersioningSourceConfigInput
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.spec.Branch
@@ -35,6 +37,18 @@ fun Branch.setAutoVersioningConfig(
                     .targetRegex(it.targetRegex)
                     .upgradeBranchPattern(it.upgradeBranchPattern)
                     .validationStamp(it.validationStamp)
+                    //.buildLinkCreation(it.buildLinkCreation)
+                    .notifications(
+                        it.notifications?.map { n ->
+                            AutoVersioningNotificationInput.builder()
+                                .channel(n.channel)
+                                .config(n.config)
+                                .scope(n.scope.map { s ->
+                                    AutoVersioningNotificationScope.valueOf(s.name)
+                                })
+                                .build()
+                        }
+                    )
                     .build()
             }
         )

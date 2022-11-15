@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningNotification
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.model.structure.Branch
@@ -51,6 +52,7 @@ object AutoVersioningTestFixtures {
         postProcessing: String? = null,
         postProcessingConfig: JsonNode? = null,
         autoApprovalMode: AutoApprovalMode? = null,
+        notifications: List<AutoVersioningNotification>? = null,
     ) = AutoVersioningSourceConfig(
         sourceProject = sourceProject,
         sourceBranch = sourceBranch,
@@ -66,6 +68,7 @@ object AutoVersioningTestFixtures {
         postProcessingConfig = postProcessingConfig,
         validationStamp = null,
         autoApprovalMode = autoApprovalMode,
+        notifications = notifications,
     )
 
 }

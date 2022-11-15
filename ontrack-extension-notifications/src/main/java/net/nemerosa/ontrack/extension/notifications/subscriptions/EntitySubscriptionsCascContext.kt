@@ -11,11 +11,14 @@ import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIIgnore
 import net.nemerosa.ontrack.model.exceptions.InputException
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.structure.toProjectEntityID
 import net.nemerosa.ontrack.model.support.StorageService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
@@ -24,6 +27,8 @@ class EntitySubscriptionsCascContext(
     private val storageService: StorageService,
     private val structureService: StructureService,
 ) : AbstractCascContext(), NotificationsSubCascContext {
+
+    private val logger: Logger = LoggerFactory.getLogger(EntitySubscriptionsCascContext::class.java)
 
     override val field: String = "entity-subscriptions"
 
@@ -67,8 +72,24 @@ class EntitySubscriptionsCascContext(
             }
         }
         // Checks all incoming items
+        val entities = mutableSetOf<EntitySubscriptionData>()
+        val duplicatedEntities = mutableListOf<EntitySubscriptionData>()
         items.forEachIndexed { index, item ->
             checkEntity(item.entity, paths, index)
+            if (entities.contains(item.entity)) {
+                duplicatedEntities += item.entity
+            } else {
+                entities += item.entity
+            }
+        }
+        // Checks that entities entries are not duplicated
+        if (duplicatedEntities.isNotEmpty()) {
+            error(
+                "Duplicate entities in the notifications:\n" +
+                        duplicatedEntities.joinToString("\n", prefix = " * ") {
+                            it.storageKey
+                        }
+            )
         }
         // Gets the list of already saved items
         val existing = cachedCascEntitySubscriptions()
@@ -102,7 +123,10 @@ class EntitySubscriptionsCascContext(
     private fun deleteSubscriptions(existing: EntitySubscriptionCascContextData) {
         val entity = findEntity(existing.entity)
         if (entity != null) {
+            logger.debug("Deleting subscriptions for entity ${existing.entity}")
             eventSubscriptionService.deleteSubscriptionsByEntity(entity)
+        } else {
+            logger.info("Cannot find entity ${existing.entity}. Not deleting its subscriptions.")
         }
     }
 
@@ -112,9 +136,15 @@ class EntitySubscriptionsCascContext(
     ) {
         val entity = findEntity(existing.entity)
         if (entity != null) {
+            logger.debug("Modifying subscriptions for entity ${existing.entity}")
             // Gets the existing subscriptions for this entity
             val entitySubscriptions = eventSubscriptionService.filterSubscriptions(
-                EventSubscriptionFilter(size = Int.MAX_VALUE, entity = entity.toProjectEntityID(), recursive = false)
+                EventSubscriptionFilter(
+                    size = Int.MAX_VALUE,
+                    entity = entity.toProjectEntityID(),
+                    recursive = false,
+                    origin = EventSubscriptionOrigins.CASC,
+                )
             ).pageItems.associate {
                 SubscriptionsCascContextData(
                     events = it.data.events.toList().sorted(),
@@ -129,28 +159,38 @@ class EntitySubscriptionsCascContext(
                 to = existing.subscriptions
             ) {
                 onCreation { item ->
+                    logger.info("Subscribing to ${existing.entity}: $item")
                     subscribe(entity, item)
                 }
-                onModification { item, cached ->
+                onModification { item, _ ->
                     // Resubscribing is enough
+                    logger.info("Subscribing to ${existing.entity}: $item")
                     subscribe(entity, item)
                 }
                 onDeletion { cached ->
                     val existingId = entitySubscriptions[cached.normalized()]
                     if (existingId != null) {
                         eventSubscriptionService.deleteSubscriptionById(entity, existingId)
+                    } else {
+                        logger.info("Cannot find a subscription for ${item.entity}: not deleting it.")
                     }
                 }
             }
+        } else {
+            logger.info("Cannot find entity ${item.entity}. Not modifying its subscriptions.")
         }
     }
 
     private fun createSubscriptions(item: EntitySubscriptionCascContextData) {
         val entity = findEntity(item.entity)
         if (entity != null) {
+            logger.debug("Creating subscriptions for entity ${item.entity}")
             item.subscriptions.forEach { subscription ->
+                logger.info("Subscribing to ${item.entity}: $subscription")
                 subscribe(entity, subscription)
             }
+        } else {
+            logger.info("Cannot find entity ${item.entity}. Not creating the subscriptions.")
         }
     }
 
@@ -166,6 +206,7 @@ class EntitySubscriptionsCascContext(
                 channel = subscription.channel,
                 channelConfig = subscription.channelConfig,
                 disabled = subscription.disabled ?: false,
+                origin = EventSubscriptionOrigins.CASC,
             )
         )
     }
@@ -236,6 +277,7 @@ class EntitySubscriptionsCascContext(
             }
 
         @get:JsonIgnore
+        @APIIgnore
         val storageKey: String by lazy {
             if (promotion != null) {
                 "$project/$branch/pl:$promotion"

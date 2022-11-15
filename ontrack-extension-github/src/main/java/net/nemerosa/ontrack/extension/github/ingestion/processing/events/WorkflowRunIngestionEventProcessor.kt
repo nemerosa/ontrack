@@ -7,8 +7,8 @@ import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
-import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInfo
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigService
@@ -16,14 +16,11 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.config.INGESTI
 import net.nemerosa.ontrack.extension.github.ingestion.processing.job.WorkflowJobProcessingService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
-import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
-import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.extension.github.ingestion.support.REFS_TAGS_PREFIX
 import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
-import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
@@ -40,7 +37,6 @@ class WorkflowRunIngestionEventProcessor(
     private val ingestionModelAccessService: IngestionModelAccessService,
     private val configService: ConfigService,
     private val workflowJobProcessingService: WorkflowJobProcessingService,
-    private val cachedSettingsService: CachedSettingsService,
 ) : AbstractRepositoryIngestionEventProcessor<WorkflowRunPayload>(
     structureService
 ) {
@@ -102,22 +98,18 @@ class WorkflowRunIngestionEventProcessor(
         val runInfo = collectRunInfo(payload)
         runInfoService.setRunInfo(build, runInfo)
         // Run as a validation
-        val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
         val config = configService.getOrLoadConfig(build.branch, INGESTION_CONFIG_FILE_PATH)
-        val runValidationEnabled = config.runs.enabled ?: settings.runValidations
-        if (runValidationEnabled) {
-            val runName = payload.workflowRun.name
-            if (FilterHelper.includes(runName, config.runs.filter.includes, config.runs.filter.excludes)) {
-                setupRunValidation(build, payload.workflowRun, runInfo)
-            }
+        val runName = payload.workflowRun.name
+        if (config.workflows.validations.enabled && config.workflows.validations.filter.includes(runName)) {
+            setupWorkflowValidation(config, build, payload.workflowRun, runInfo)
         }
         // OK
         return IngestionEventProcessingResultDetails.processed()
     }
 
-    private fun setupRunValidation(build: Build, workflowRun: WorkflowRun, runInfo: RunInfoInput) {
+    private fun setupWorkflowValidation(config: IngestionConfig, build: Build, workflowRun: WorkflowRun, runInfo: RunInfoInput) {
         // Gets the validation name from the run name
-        val validationStampName = normalizeName(workflowRun.name) + "-run"
+        val validationStampName = normalizeName("${config.workflows.validations.prefix}${workflowRun.name}${config.workflows.validations.suffix}")
         // Gets or creates the validation stamp
         val vs = ingestionModelAccessService.setupValidationStamp(
             build.branch, validationStampName, "${workflowRun.name} workflow"

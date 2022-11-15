@@ -1,2 +1,5 @@
-general:
-  skip-jobs: true
+version: v1
+jobs:
+  # Incorrect: should be validationPrefix
+  validation-prefix: false
+

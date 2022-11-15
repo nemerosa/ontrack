@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.github.ingestion.settings
 
-import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestJUnit4Support
-import org.junit.Test
+import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class GitHubIngestionSettingsIT : AbstractIngestionTestJUnit4Support() {
+class GitHubIngestionSettingsIT : AbstractIngestionTestSupport() {
 
     @Test
     fun `Saving settings`() {
@@ -17,8 +17,6 @@ class GitHubIngestionSettingsIT : AbstractIngestionTestJUnit4Support() {
                         orgProjectPrefix = false,
                         indexationInterval = 60,
                         issueServiceIdentifier = "jira//config",
-                        validationJobPrefix = false,
-                        runValidations = true,
                     )
                 )
                 cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java).apply {
@@ -26,8 +24,6 @@ class GitHubIngestionSettingsIT : AbstractIngestionTestJUnit4Support() {
                     assertEquals(10, retentionDays)
                     assertEquals(60, indexationInterval)
                     assertEquals("jira//config", issueServiceIdentifier)
-                    assertEquals(false, validationJobPrefix)
-                    assertEquals(true, runValidations)
                 }
             }
         }

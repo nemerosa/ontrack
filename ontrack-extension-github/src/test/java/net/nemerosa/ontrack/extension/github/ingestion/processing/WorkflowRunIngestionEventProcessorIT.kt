@@ -6,6 +6,9 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigWorkflows
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
@@ -16,7 +19,6 @@ import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunDecorator
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
-import net.nemerosa.ontrack.model.structure.RunInfoService
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.BeforeEach
@@ -130,40 +132,18 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
     }
 
     @Test
-    fun `No validation for the workflow run using the ingestion settings`() {
-        // Only one GitHub configuration
-        onlyOneGitHubConfig()
-        // Starting the run
-        asAdmin {
-            withGitHubIngestionSettings(runValidations = false) {
-                workflowRunValidationTest(expectValidation = false)
-            }
-        }
-    }
-
-    @Test
     fun `No validation for the workflow run using the ingestion configuration`() {
         // Only one GitHub configuration
         onlyOneGitHubConfig()
         // Starting the run
         asAdmin {
-            withGitHubIngestionSettings(runValidations = true) {
-                ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
-                    runs = IngestionRunConfig(enabled = false),
-                ))
+            withGitHubIngestionSettings {
+                ConfigLoaderServiceITMockConfig.customIngestionConfig(
+                    configLoaderService, IngestionConfig(
+                        workflows = IngestionConfigWorkflows(filter = FilterConfig.none)
+                    )
+                )
                 workflowRunValidationTest(expectValidation = false)
-            }
-        }
-    }
-
-    @Test
-    fun `Validation for the workflow run using the ingestion settings`() {
-        // Only one GitHub configuration
-        onlyOneGitHubConfig()
-        // Starting the run
-        asAdmin {
-            withGitHubIngestionSettings(runValidations = true) {
-                workflowRunValidationTest()
             }
         }
     }
@@ -174,10 +154,10 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
         onlyOneGitHubConfig()
         // Starting the run
         asAdmin {
-            withGitHubIngestionSettings(runValidations = false) {
-                ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
-                    runs = IngestionRunConfig(enabled = true),
-                ))
+            withGitHubIngestionSettings {
+                ConfigLoaderServiceITMockConfig.customIngestionConfig(
+                    configLoaderService, IngestionConfig()
+                )
                 workflowRunValidationTest()
             }
         }
@@ -200,7 +180,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
             ) { branch ->
                 if (expectValidation) {
                     assertNotNull(
-                        structureService.findValidationStampByName(branch.project.name, branch.name, "ci-run")
+                        structureService.findValidationStampByName(branch.project.name, branch.name, "workflow-ci")
                             .getOrNull()
                     ) { vs ->
                         assertNotNull(
@@ -215,7 +195,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                     }
                 } else {
                     assertNull(
-                        structureService.findValidationStampByName(branch.project.name, branch.name, "ci-run")
+                        structureService.findValidationStampByName(branch.project.name, branch.name, "workflow-ci")
                             .getOrNull()
                     )
                 }
@@ -446,14 +426,16 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
         asAdmin {
             onlyOneGitHubConfig()
             withGitHubIngestionSettings {
-                ConfigLoaderServiceITMockConfig.customIngestionConfig(configLoaderService, IngestionConfig(
-                    workflows = IngestionWorkflowConfig(
-                        filter = FilterConfig(
-                            includes = ".*",
-                            excludes = ".*ignored.*",
+                ConfigLoaderServiceITMockConfig.customIngestionConfig(
+                    configLoaderService, IngestionConfig(
+                        workflows = IngestionConfigWorkflows(
+                            filter = FilterConfig(
+                                includes = ".*",
+                                excludes = ".*ignored.*",
+                            )
                         )
                     )
-                ))
+                )
                 val repoName = uid("r")
                 val payload: WorkflowRunPayload = IngestionHookFixtures.sampleWorkflowRunPayload(
                     repoName = repoName,
@@ -464,8 +446,10 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                     processor.process(payload, null).result
                 )
                 // Checks the project & the branch have been created
-                assertNotNull(structureService.findBranchByName(repoName, "main").getOrNull(),
-                    "Branch has been created") { branch ->
+                assertNotNull(
+                    structureService.findBranchByName(repoName, "main").getOrNull(),
+                    "Branch has been created"
+                ) { branch ->
                     // Checks that NO build has been created
                     assertEquals(0, structureService.getBuildCount(branch), "No build has been created")
                 }

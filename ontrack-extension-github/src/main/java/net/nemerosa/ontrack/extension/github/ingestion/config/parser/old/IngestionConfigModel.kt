@@ -1,15 +1,12 @@
-package net.nemerosa.ontrack.extension.github.ingestion.processing.config
+package net.nemerosa.ontrack.extension.github.ingestion.config.parser.old
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
-import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.*
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging.IngestionTaggingConfig
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIName
-
-/**
- * Default path for the ingestion file
- */
-const val INGESTION_CONFIG_FILE_PATH = ".github/ontrack/ingestion.yml"
 
 /**
  * Configuration for the ingestion.
@@ -24,30 +21,97 @@ const val INGESTION_CONFIG_FILE_PATH = ".github/ontrack/ingestion.yml"
  */
 @APIName("GitHubIngestionConfig")
 @APIDescription("Configuration for the ingestion of GitHub Actions workflows.")
-data class IngestionConfig(
+@Deprecated("Use the V1 model")
+data class IngestionConfigOld(
     @APIDescription("General settings")
-    val general: IngestionConfigGeneral = IngestionConfigGeneral(),
+    val general: OldIngestionConfigGeneral = OldIngestionConfigGeneral(),
     @APIDescription("List of specific step configurations")
-    val steps: List<StepConfig> = emptyList(),
+    val steps: List<OldStepConfig> = emptyList(),
     @APIDescription("List of specific job configurations")
-    val jobs: List<JobConfig> = emptyList(),
+    val jobs: List<OldJobConfig> = emptyList(),
     @APIDescription("Filtering on the jobs")
     val jobsFilter: FilterConfig = FilterConfig(),
     @APIDescription("Filtering on the steps")
     val stepsFilter: FilterConfig = FilterConfig(),
     @APIDescription("Validation stamps configuration")
-    val validations: List<ValidationConfig> = emptyList(),
+    val validations: List<OldValidationConfig> = emptyList(),
     @APIDescription("Auto promotion configuration")
-    val promotions: List<PromotionConfig> = emptyList(),
+    val promotions: List<OldPromotionConfig> = emptyList(),
     @APIDescription("Run validations")
-    val runs: IngestionRunConfig = IngestionRunConfig(),
+    val runs: OldIngestionRunConfig = OldIngestionRunConfig(),
     @APIDescription("Workflows ingestion")
-    val workflows: IngestionWorkflowConfig = IngestionWorkflowConfig(),
+    val workflows: OldIngestionWorkflowConfig = OldIngestionWorkflowConfig(),
     @APIDescription("Casc configurations")
-    val casc: IngestionCascConfig = IngestionCascConfig(),
+    val casc: OldIngestionCascConfig = OldIngestionCascConfig(),
     @APIDescription("Tagging configuration")
     val tagging: IngestionTaggingConfig = IngestionTaggingConfig(),
-)
+) {
+    fun convert() = IngestionConfig(
+        version = "v0",
+        workflows = IngestionConfigWorkflows(
+            filter = workflows.filter,
+        ),
+        jobs = IngestionConfigJobs(
+            filter = jobsFilter,
+            validationPrefix = general.validationJobPrefix ?: true,
+            mappings = jobs.map { old ->
+                JobIngestionConfigValidation(
+                    name = old.name,
+                    validation = old.validation,
+                    description = old.description,
+                )
+            }
+        ),
+        steps = IngestionConfigSteps(
+            filter = stepsFilter,
+            mappings = steps.map { old ->
+                StepIngestionConfigValidation(
+                    name = old.name,
+                    validation = old.validation,
+                    description = old.description,
+                    validationPrefix = old.validationJobPrefix,
+                )
+            }
+        ),
+        setup = IngestionConfigSetup(
+            validations = validations.map { old ->
+                IngestionConfigCascValidation(
+                    name = old.name,
+                    description = old.description,
+                    dataType = old.dataType?.run {
+                        IngestionConfigCascValidationType(
+                            type = type,
+                            config = config,
+                        )
+                    },
+                    image = old.image,
+                )
+            },
+            promotions = promotions.map { old ->
+                IngestionConfigCascPromotion(
+                    name = old.name,
+                    description = old.description,
+                    validations = old.validations,
+                    promotions = old.promotions,
+                    include = old.include,
+                    exclude = old.exclude,
+                    image = old.image,
+                )
+            },
+            project = IngestionConfigCascSetup(
+                includes = casc.project.includes,
+                excludes = casc.project.excludes,
+                casc = casc.project.casc,
+            ),
+            branch = IngestionConfigCascSetup(
+                includes = casc.branch.includes,
+                excludes = casc.branch.excludes,
+                casc = casc.branch.casc,
+            )
+        ),
+        tagging = tagging,
+    )
+}
 
 /**
  * General settings
@@ -57,7 +121,8 @@ data class IngestionConfig(
  */
 @APIName("GitHubIngestionConfigGeneral")
 @APIDescription("General settings")
-data class IngestionConfigGeneral(
+@Deprecated("Use the V1 model")
+data class OldIngestionConfigGeneral(
     @APIDescription("Must jobs be considered as validations?")
     val skipJobs: Boolean = true,
     @APIDescription("Must we use the job name as a prefix to the validation stamp?")
@@ -69,7 +134,8 @@ data class IngestionConfigGeneral(
  */
 @APIName("GitHubIngestionConfigRun")
 @APIDescription("Settings for the workflow run level")
-data class IngestionRunConfig(
+@Deprecated("Use the V1 model")
+data class OldIngestionRunConfig(
     @APIDescription("Should we consider the runs to create a validation run?")
     val enabled: Boolean? = null,
     @APIDescription("Filter on the run names")
@@ -81,27 +147,11 @@ data class IngestionRunConfig(
  */
 @APIName("GitHubIngestionConfigWorkflow")
 @APIDescription("Settings for the workflows ingestion")
-data class IngestionWorkflowConfig(
+@Deprecated("Use the V1 model")
+data class OldIngestionWorkflowConfig(
     @APIDescription("Filter on the workflow names")
     val filter: FilterConfig = FilterConfig(),
 )
-
-/**
- * Filter rule
- *
- * @param includes Regular expression to include the items
- * @param excludes Regular expression to exclude the items (empty = no exclusion)
- */
-@APIName("GitHubIngestionFilterConfig")
-@APIDescription("Filter rule")
-data class FilterConfig(
-    @APIDescription("Regular expression to include the items")
-    val includes: String = ".*",
-    @APIDescription("Regular expression to exclude the items (empty = no exclusion)")
-    val excludes: String = "",
-) {
-    fun includes(name: String) = FilterHelper.includes(name, includes, excludes)
-}
 
 /**
  * Step configuration
@@ -112,7 +162,8 @@ data class FilterConfig(
  * @param description Description for the validation stamp
  */
 @APIName("GitHubIngestionStepConfig")
-data class StepConfig(
+@Deprecated("Use the V1 model")
+data class OldStepConfig(
     @APIDescription("Exact name of the step in the workflow")
     val name: String,
     @APIDescription("Name of the validation stamp to use (instead of a generated one)")
@@ -132,7 +183,8 @@ data class StepConfig(
  * @param validationJobPrefix Must we use the job name as a prefix to the validation stamp?
  */
 @APIName("GitHubIngestionJobConfig")
-data class JobConfig(
+@Deprecated("Use the V1 model")
+data class OldJobConfig(
     @APIDescription("Exact name of the job in the workflow")
     val name: String,
     @APIDescription("Name of the validation stamp to use (instead of a generated one)")
@@ -147,13 +199,14 @@ data class JobConfig(
  * Validation stamp configuration.
  */
 @APIName("GitHubIngestionValidationConfig")
-data class ValidationConfig(
+@Deprecated("Use the V1 model")
+data class OldValidationConfig(
     @APIDescription("Unique name for the validation stamp in the branch")
     val name: String,
     @APIDescription("Optional description")
     val description: String? = null,
     @APIDescription("Data type")
-    val dataType: ValidationTypeConfig? = null,
+    val dataType: OldValidationTypeConfig? = null,
     @APIDescription("Reference to the image to set")
     val image: String? = null,
 )
@@ -162,7 +215,8 @@ data class ValidationConfig(
  * Data type for a validation.
  */
 @APIName("GitHubIngestionValidationTypeConfig")
-data class ValidationTypeConfig(
+@Deprecated("Use the V1 model")
+data class OldValidationTypeConfig(
     @APIDescription("FQCN or shortcut for the data type")
     val type: String,
     @APIDescription("Data type configuration")
@@ -175,7 +229,8 @@ data class ValidationTypeConfig(
  * @param name Unique name for the promotion in the branch
  */
 @APIName("GitHubIngestionPromotionConfig")
-data class PromotionConfig(
+@Deprecated("Use the V1 model")
+data class OldPromotionConfig(
     @APIDescription("Unique name for the promotion in the branch")
     val name: String,
     @APIDescription("Optional description")
@@ -196,18 +251,20 @@ data class PromotionConfig(
  * List of CasC nodes for the projects & branches
  */
 @APIDescription("List of CasC nodes for the projects & branches")
-data class IngestionCascConfig(
+@Deprecated("Use the V1 model")
+data class OldIngestionCascConfig(
     @APIDescription("Casc for the project")
-    val project: IngestionCascBranchConfig = IngestionCascBranchConfig(),
+    val project: OldIngestionCascBranchConfig = OldIngestionCascBranchConfig(),
     @APIDescription("Casc for the branch")
-    val branch: IngestionCascBranchConfig = IngestionCascBranchConfig(),
+    val branch: OldIngestionCascBranchConfig = OldIngestionCascBranchConfig(),
 )
 
 /**
  * CasC node for the project
  */
 @APIDescription("CasC node for the project")
-data class IngestionCascBranchConfig(
+@Deprecated("Use the V1 model")
+data class OldIngestionCascBranchConfig(
     @APIDescription("Regular expression for the branches which can setup the entity")
     val includes: String = "main",
     @APIDescription("Regular expression to exclude branches")

@@ -1,4 +1,6 @@
-validations:
-  - name: site
-    description: Site generation
-    image: #path
+version: v1
+setup:
+  validations:
+    - name: site
+      description: Site generation
+      image: #path

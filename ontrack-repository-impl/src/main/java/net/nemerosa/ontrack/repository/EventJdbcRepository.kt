@@ -34,7 +34,7 @@ class EventJdbcRepository(
         for (type in event.extraEntities.keys) {
             sql.append(", X_").append(type.name)
         }
-        sql.append(") VALUES (:eventValues, :eventTime, :eventUser, :eventType, :ref")
+        sql.append(") VALUES (CAST(:eventValues as JSONB), :eventTime, :eventUser, :eventType, :ref")
         for ((type, entity) in event.entities) {
             val typeEntry = type.name.lowercase(Locale.getDefault())
             sql.append(", :").append(typeEntry)

@@ -18,6 +18,7 @@ fun <C> EventSubscriptionService.subscribe(
     channelConfig: C,
     projectEntity: ProjectEntity?,
     keywords: String?,
+    origin: String,
     vararg eventTypes: EventType,
 ) = subscribe(
     EventSubscription(
@@ -27,6 +28,7 @@ fun <C> EventSubscriptionService.subscribe(
         events = eventTypes.map { it.id }.toSet(),
         keywords = keywords,
         disabled = false,
+        origin = origin,
     )
 )
 

@@ -100,109 +100,122 @@ This file is taken into account automatically, on push or when the ingestion con
 
 [source,yaml]
 ----
-# General settings
-general:
-  #  Must jobs be considered as validations?
-  skipJobs: true
-  # Must we use the job name as a prefix to the validation stamp?
-  # Default value: using the global Ontrack settings
-  validationJobPrefix: null
-# Configuration of the ingestion of the workflows
-workflows:
-  # Filter on which workflows must be ingested or not
-  filter:
-    # By default, all workflows are eligible for ingestion
-    includes: ".*"
-    # By default, no workflow is excluded
-    excludes: ""
-# Configuration at workflow run level
-runs:
-  # Set to true or false to enable (or not) the creation of validations for the complete workflow run
-  # By default, it's defined using the general Ontrack settings
-  enabled: null
-  # Filter on the workflow run name, using include/exclude regular expressions
-  filter:
-    # All run names by default
-    includes: .*
-    # No run name is excluded by default
-    excludes: ""
-# List of specific step configurations
-steps:
-  # Exact name of the step in the workflow (required)
-  - name: The step name
-    # Name of the validation stamp to use (instead of a generated one)
-    # Default value: the name of the step,
-    # adjusted for the Ontrack naming constraints & conventions
-    validation: the-step-name
-    # Must we use the job name as a prefix to the validation stamp?
-    # Default value: using the settings at job level
-    validationJobPrefix: null
-    # Description for the validation stamp
-    # Default value: the name of the step
-    description: The step name
-# List of specific job configurations
-jobs:
-  # Exact name of the job in the workflow (required)
-  - name: Job name
-    # Name of the validation stamp to use (instead of a generated one)
-    # Default value: the name of the job,
-    # adjusted for Ontrack naming constraints & conventions
-    validation: job-name
-    # Must we use the job name as a prefix to the validation stamp?
-    # Default value: using the settings at general level
-    validationJobPrefix: null
-    # Description for the validation stamp
-    # Default value: the name of the job
-    description: Job name
-# Filter for the jobs
-jobsFilter:
-  # Inclusion rule (by default, all jobs are included)
-  includes: ".*"
-  # Exclusion rule (by default, no job is excluded)
-  excludes: ""
-# Filter for the steps
-stepsFilter:
-  # Inclusion rule (by default, all steps are included)
-  includes: ".*"
-  # Exclusion rule (by default, no step is excluded)
-  excludes: ""
-# Auto promotion configuration
-promotions:
-  # One item per promotion to define
-  - name: promotion-name
-    # Optional description
-    description: Promotion description
-    # List of validations triggering this promotion
-    # Important: these names are the names of the validations after step name resolution
-    validations:
-      - validation-1
-      - validation-2
-    # List of promotions triggering this promotion
-    promotions:
-      - other-promotion
-    # Regular expression to include validation stamps by name
-    # include:
-    # Regular expression to exclude validation stamps by name
-    # exclude:
-# Configuration as code (CasC) for the project & branch
-# This feature is highly experimental for now
-casc:
-  # CasC for the project
-  project:
-    # Branches which can participate into the configuration of the project (regular expression)
-    includes: main
-    # Branches which are excluded from the configuration of the project (regular expression)
-    excludes: ""
-    # Casc configuration node (see below)
-    # casc: {}
-  # CasC for the branch
-  branch:
-    # Branches which can participate into their own configuration (regular expression)
-    includes: main
-    # Branches which are excluded from their own configuration (regular expression)
-    excludes: ""
-    # Casc configuration node (see below)
-    # casc: {}
+# Version of the configuration (required)
+version: v1
+# Optional: Configuration for the ingestion of the workflows
+# workflows:
+  # Optional: Filter on the workflow names
+  # filter:
+  #   includes: ".*"
+  #   excludes: ""
+  # Optional: Creation of validation runs at the workflow level
+  # validations:
+    # Optional: Is the creation of validation runs for workflows enabled?
+    # enabled: true
+    # Optional: Filter on workflows to select the ones for which a validation must be created
+    # filter:
+    #     includes: ".*"
+    #     excludes: ""
+    # Optional: Prefix to use for the validation stamp
+    # prefix: "workflow-"
+    # Optional: Suffix to use for the validation stamp
+    # suffix: ""
+# Optional: Configuration for the ingestion of the jobs
+# jobs:
+    # Optional: Filter on the jobs names
+    # filter:
+    #   includes: ".*"
+    #   excludes: ""
+    # Optional: Using the job name as a prefix for the validation stamps
+    # validationPrefix: true
+    # Optional: Mappings between job names and validation stamps
+    # mappings:
+      # Required: Name of the job
+      # - name: ...
+      # Optional: Name of the validation stamp
+      # Default value: Name of the job
+      #   validation: ...
+      # Optional: Must we use the job name as a prefix to the validation stamp?
+      # Default value: same than "jobs.validationPrefix"
+      #   validationPrefix:
+      # Optional: Description of the validation stamp
+      # Default value: Name of the job
+      #   description: ...
+# Optional: Configuration for the ingestion of the steps
+# steps:
+    # Optional: Filter on the steps names
+    # By default, no step is ingested
+    # filter:
+    #   includes: ""
+    #   excludes: ".*"
+    # Optional: Mapping between step names and validation stamps
+    # mappings:
+      # Required: Name of the step
+      # - name: ...
+      # Optional: Name of the validation stamp
+      # Default value: Name of the step
+      #   validation: ...
+      # Optional: Description of the validation stamp
+      # Default value: Name of the steo
+      #   description: ...
+# Optional: Setup of Ontrack resources
+# setup:
+    # Optional: Configuration of the validation stamps
+    # validations:
+      # Required: Unique name for the validation stamp in the branch
+      # - name: ...
+      # Optional: Description of the validation stamp
+      #   description: ...
+      # Optional: Data type for the validation stamp
+      #   dataType:
+            # Required: FQCN or shortcut for the data type
+            # type: ...
+            # Optional: JSON data type configuration
+            # config: ...
+      # Optional: Reference to the image to set
+      #   image: ...
+    # Optional: Configuration of the promotion levels
+    # promotions:
+      # Required: Unique name for the promotion in the branch
+      # - name: ...
+      # Optional: Description of the promotion
+      #   description: String
+      # Optional: List of validations triggering this promotion. Important: these names are the names of the validations after step name resolution.
+      #   validations: []
+      # Optional: List of promotions triggering this promotion
+      #   promotions: []
+      # Optional: Regular expression to include validation stamps by name
+      #   include: ""
+      # Optional: Regular expression to exclude validation stamps by name
+      # exclude: ""
+      # Optional: Reference to the image to set
+      #   image: ...
+    # Optional: Casc for the project
+    # project:
+      # Optional: Regular expression for the branches which can setup the entity
+      #   includes: "main"
+      # Optional: Regular expression to exclude branches
+      #   excludes: ""
+      # Optional: JSON Casc configuration for the entity
+      #   casc: {}
+    # Optional: Casc for the branch
+    # branch:
+      # Optional: Regular expression for the branches which can setup the entity
+      #   includes: "main"
+      # Optional: Regular expression to exclude branches
+      #   excludes: ""
+      # Optional: JSON Casc configuration for the entity
+      #   casc: {}
+# Optional: Configuration for the tag ingestion
+# tagging:
+  # Optional: If the commit property strategy must be applied. True by default.
+  # commitProperty: true
+  # Optional: List of tagging strategies to apply
+  # strategies: []
+    # Required: ID of the tagging strategy
+    # type: ...
+    # Required: JSON configuration of the tagging strategy
+    # config: {}
 ----
 
 For example, if we want to associate the validation stamp `unit-tests` to the step `Runs unit tests` in the `build` job, we can use:
@@ -210,12 +223,17 @@ For example, if we want to associate the validation stamp `unit-tests` to the st
 [source,yaml]
 ----
 steps:
+  filter:
+    # Steps are excluded by default
+    includes: ".*"
+    excludes: ""
+  mappings:
   - name: Runs unit tests
     validation: unit-tests
     validationJobPrefix: false
 ----
 
-The ingestion configuration is saved together with the branch and is visible in the UI as an extra information:
+The ingestion configuration is saved together with the branch and is visible in the UI as extra information:
 
 image::images/integration-github-ingestion-branch-config.png[Branch ingestion configuration,50%]
 
@@ -226,30 +244,13 @@ This information is also available programmatically using a GraphQL query:
 {
   branches(id: 589) {
     gitHubIngestionConfig {
-      general {
-        skipJobs
-        validationJobPrefix
-      }
       steps {
-        name
-        validation
-        validationJobPrefix
-        description
+        filter {
+          includes
+          excludes
+        }
       }
-      jobs {
-        name
-        validation
-        validationJobPrefix
-        description
-      }
-      jobsFilter {
-        includes
-        excludes
-      }
-      stepsFilter {
-        includes
-        excludes
-      }
+      # ...
     }
   }
 }
@@ -262,26 +263,27 @@ To configure auto-promotions:
 
 [source,yaml]
 ----
-validations:
-  - name: unit-tests
-    description: Running all unit tests
-    dataType:
-      type: test-summary
-      config:
-        warningIfSkipped: true
-promotions:
-  - name: BRONZE
-    description: Basic build is OK.
-    validations:
-      - build
-      - unit-tests
-  - name: SILVER
-    description: End to end tests are OK.
-    validations:
-      - ui-acceptance
-      - api-acceptance
-    promotions:
-      - BRONZE
+setup:
+  validations:
+    - name: unit-tests
+      description: Running all unit tests
+      dataType:
+        type: test-summary
+        config:
+          warningIfSkipped: true
+  promotions:
+    - name: BRONZE
+      description: Basic build is OK.
+      validations:
+        - build
+        - unit-tests
+    - name: SILVER
+      description: End to end tests are OK.
+      validations:
+        - ui-acceptance
+        - api-acceptance
+      promotions:
+        - BRONZE
 ----
 
 [[integration-github-ingestion-customization-validations]]
@@ -295,26 +297,28 @@ Additionally, a data type can be set. The FQCN of the data type can be used but 
 
 [source,yaml]
 ----
-validations:
-  - name: unit-tests
-    description: Running all unit tests
-    dataType:
-      type: test-summary
-      config:
-        warningIfSkipped: true
+setup:
+  validations:
+    - name: unit-tests
+      description: Running all unit tests
+      dataType:
+        type: test-summary
+        config:
+          warningIfSkipped: true
 ----
 
 and
 
 [source,yaml]
 ----
-validations:
-  - name: unit-tests
-    description: Running all unit tests
-    dataType:
-      type: net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
-      config:
-        warningIfSkipped: true
+setup:
+  validations:
+    - name: unit-tests
+      description: Running all unit tests
+      dataType:
+        type: net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
+        config:
+          warningIfSkipped: true
 ----
 
 The following shortcuts are supported:
@@ -340,7 +344,7 @@ Example - configuring the stale property at project level from the `main` branch
 
 [source,yaml]
 ----
-casc:
+setup:
   project:
     properties:
       staleProperty:
@@ -365,11 +369,7 @@ In the _Settings > GitHub workflow ingestion_ section, you can configure the fol
 * if the organization name must be used as a prefix for the generated project names
 * the default Git indexation interval to use for the projects
 * inclusion/exclusion rules for the repositories to be ingested
-* inclusion/exclusion rules for the jobs to be ingested
-* inclusion/exclusion rules for the steps to be ingested
 * the identifier of the issue service to use by default. For example `self` for GitHub issues or `jira//config`.
-* if the job name must be used as a prefix for the validation stamp names
-* if workflow runs must be associated by default to a validation (can be overridden at the ingestion configuration level)
 
 [[integration-github-ingestion-validations]]
 ==== Validation stamp names
@@ -381,8 +381,9 @@ The validation stamp name can be specified in the <<integration-github-ingestion
 [source,yaml]
 ----
 steps:
-  - name: My step
-    validation: unit-tests
+  mappings:
+    - name: My step
+      validation: unit-tests
 ----
 
 The job prefix (`my-job` in our example) is added by default, and is computed from the job name, and can also be configured using the `validation` field in the <<integration-github-ingestion-customization,job configuration>>.
@@ -391,15 +392,11 @@ Configuring the addition or not of the job as a prefix to the general validation
 
 * at the step ingestion configuration level
 * at the job ingestion configuration level
-* at the general ingestion configuration level
-* in the general <<integration-github-ingestion-settings,ingestion settings>>
 
 When facing the naming of a step, how to decide if the job prefix must be used or not?
 
 * if defined at step level, use this value
 * if defined at job level, use this value
-* if defined at general level, use this value
-* use the settings value (defaults to true)
 
 [[integration-github-ingestion-pr]]
 ==== Support for pull requests

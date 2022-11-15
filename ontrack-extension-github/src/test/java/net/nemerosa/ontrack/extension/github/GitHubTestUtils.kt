@@ -49,7 +49,7 @@ val githubTestEnv: GitHubTestEnv by lazy {
         appId = getEnv("ontrack.test.extension.github.app.id"),
         appPrivateKey = getEnv("ontrack.test.extension.github.app.pem"),
         appInstallationAccountName = getOptionalEnv("ontrack.test.extension.github.app.installation"),
-        branch = getOptionalEnv("ontrack.test.extension.github.branch.name") ?: "main",
+        branch = getOptionalEnv("ontrack.test.extension.github.branch.name") ?: "v1",
         readme = getOptionalEnv("ontrack.test.extension.github.branch.readme") ?: "README.md",
         paths = GitHubTestEnvKnownPaths(
             images = GitHubTestEnvKnownImagesPaths(

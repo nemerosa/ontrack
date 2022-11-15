@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.*
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.ConfigParser
+import net.nemerosa.ontrack.extension.github.ingestion.config.parser.ConfigParsingException
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -7,61 +10,68 @@ import kotlin.test.assertFailsWith
 class ConfigParserTest {
 
     @Test
-    fun `Complete configuration`() {
+    fun `V1 configuration`() {
         test(
             """
-                general:
-                    skipJobs: false
+                version: v1
+                jobs:
+                    validationPrefix: false
+                    mappings:
+                        - name: Job name
+                          validation: my-job
+                          description: My description
+                steps:
+                    mappings:
+                        - name: Step name
+                          validation: my-validation
+                          validationPrefix: false
+                          description: My description
+            """
+        ) {
+            assertEquals("v1", it.version)
+
+            assertEquals(false, it.jobs.validationPrefix)
+            assertEquals(1, it.jobs.mappings.size)
+            assertEquals("Job name", it.jobs.mappings.first().name)
+            assertEquals("my-job", it.jobs.mappings.first().validation)
+            assertEquals("My description", it.jobs.mappings.first().description)
+
+            assertEquals(1, it.steps.mappings.size)
+            assertEquals("Step name", it.steps.mappings.first().name)
+            assertEquals("my-validation", it.steps.mappings.first().validation)
+            assertEquals(false, it.steps.mappings.first().validationPrefix)
+            assertEquals("My description", it.steps.mappings.first().description)
+        }
+    }
+
+    @Test
+    fun `V0 configuration`() {
+        test(
+            """
+                jobs:
+                    - name: Job name
+                      validation: my-job
+                      description: My description
                 steps:
                     - name: Step name
                       validation: my-validation
                       validationJobPrefix: false
                       description: My description
-                jobs:
-                    - name: Job name
-                      validation: my-job
-                      description: My description
             """
         ) {
-            assertEquals(false, it.general.skipJobs)
+            assertEquals("v0", it.version)
 
-            assertEquals(1, it.steps.size)
-            assertEquals("Step name", it.steps.first().name)
-            assertEquals("my-validation", it.steps.first().validation)
-            assertEquals(false, it.steps.first().validationJobPrefix)
-            assertEquals("My description", it.steps.first().description)
+            assertEquals(true, it.jobs.validationPrefix)
+            assertEquals(1, it.jobs.mappings.size)
+            assertEquals("Job name", it.jobs.mappings.first().name)
+            assertEquals("my-job", it.jobs.mappings.first().validation)
+            assertEquals("My description", it.jobs.mappings.first().description)
 
-            assertEquals(1, it.jobs.size)
-            assertEquals("Job name", it.jobs.first().name)
-            assertEquals("my-job", it.jobs.first().validation)
-            assertEquals("My description", it.jobs.first().description)
-        }
-    }
-
-    @Test
-    fun `Partial configuration with default values`() {
-        test(
-            """
-                steps:
-                    - name: Step name
-                jobs:
-                    - name: Job name
-            """
-        ) {
-            assertEquals(true, it.general.skipJobs)
-            assertEquals(null, it.general.validationJobPrefix)
-
-            assertEquals(1, it.steps.size)
-            assertEquals("Step name", it.steps.first().name)
-            assertEquals(null, it.steps.first().validation)
-            assertEquals(null, it.steps.first().validationJobPrefix)
-            assertEquals(null, it.steps.first().description)
-
-            assertEquals(1, it.jobs.size)
-            assertEquals("Job name", it.jobs.first().name)
-            assertEquals(null, it.jobs.first().validation)
-            assertEquals(null, it.jobs.first().validationJobPrefix)
-            assertEquals(null, it.jobs.first().description)
+            assertEquals(1, it.steps.mappings.size)
+            assertEquals("Step name", it.steps.mappings.first().name)
+            assertEquals("my-validation", it.steps.mappings.first().validation)
+            assertEquals(false, it.steps.mappings.first().validationPrefix)
+            assertEquals("My description", it.steps.mappings.first().description)
         }
     }
 
@@ -69,48 +79,60 @@ class ConfigParserTest {
     fun `Rendering a configuration as Yaml`() {
         val yaml = ConfigParser.toYaml(
             IngestionConfig(
-                steps = listOf(
-                    StepConfig(name = "Some step", validation = "some-validation"),
+                steps = IngestionConfigSteps(
+                    mappings = listOf(
+                        StepIngestionConfigValidation(
+                            name = "Some step",
+                            validation = "some-validation"
+                        )
+                    )
                 ),
-                jobs = listOf(
-                    JobConfig(name = "Some job", validation = "some-job"),
-                )
+                jobs = IngestionConfigJobs(
+                    mappings = listOf(
+                        JobIngestionConfigValidation(
+                            name = "Some job",
+                            validation = "some-job"
+                        )
+                    )
+                ),
             )
         )
         assertEquals(
             """
                 ---
-                general:
-                  skipJobs: true
-                  validationJobPrefix: null
-                steps:
-                - name: "Some step"
-                  validation: "some-validation"
-                  validationJobPrefix: null
-                  description: null
-                jobs:
-                - name: "Some job"
-                  validation: "some-job"
-                  description: null
-                  validationJobPrefix: null
-                jobsFilter:
-                  includes: ".*"
-                  excludes: ""
-                stepsFilter:
-                  includes: ".*"
-                  excludes: ""
-                validations: []
-                promotions: []
-                runs:
-                  enabled: null
-                  filter:
-                    includes: ".*"
-                    excludes: ""
+                version: "v1"
                 workflows:
                   filter:
                     includes: ".*"
                     excludes: ""
-                casc:
+                  validations:
+                    enabled: true
+                    filter:
+                      includes: ".*"
+                      excludes: ""
+                    prefix: "workflow-"
+                    suffix: ""
+                jobs:
+                  filter:
+                    includes: ".*"
+                    excludes: ""
+                  validationPrefix: true
+                  mappings:
+                  - name: "Some job"
+                    validation: "some-job"
+                    description: null
+                steps:
+                  filter:
+                    includes: ""
+                    excludes: ".*"
+                  mappings:
+                  - name: "Some step"
+                    validation: "some-validation"
+                    description: null
+                    validationPrefix: null
+                setup:
+                  validations: []
+                  promotions: []
                   project:
                     includes: "main"
                     excludes: ""

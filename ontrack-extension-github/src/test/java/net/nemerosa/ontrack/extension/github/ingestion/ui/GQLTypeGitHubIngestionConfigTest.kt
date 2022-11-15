@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.ui
 
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.IngestionConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter
 import org.junit.Test

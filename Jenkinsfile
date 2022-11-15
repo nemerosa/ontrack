@@ -78,8 +78,9 @@ pipeline {
                 ONTRACK_TEST_EXTENSION_GITHUB_TOKEN = credentials('ONTRACK_TEST_EXTENSION_GITHUB_TOKEN')
                 ONTRACK_TEST_EXTENSION_GITHUB_ORGANIZATION = 'nemerosa'
                 ONTRACK_TEST_EXTENSION_GITHUB_REPOSITORY = 'ontrack-github-integration-test'
+                ONTRACK_TEST_EXTENSION_GITHUB_BRANCH = 'v1'
                 ONTRACK_TEST_EXTENSION_GITHUB_ISSUE = '1'
-                ONTRACK_TEST_EXTENSION_GITHUB_PR = '2'
+                ONTRACK_TEST_EXTENSION_GITHUB_PR = '3'
                 ONTRACK_TEST_EXTENSION_GITHUB_TEAM = 'ontrack-integration-tests'
                 ONTRACK_TEST_EXTENSION_GITHUB_APP_ID = '143291'
                 ONTRACK_TEST_EXTENSION_GITHUB_APP_PEM = credentials('ONTRACK_TEST_EXTENSION_GITHUB_APP_PEM')
@@ -544,39 +545,39 @@ pipeline {
 
         // Merge to master (for latest release only)
 
-        stage('Merge to master') {
-            when {
-                allOf {
-                    branch "release/4.*"
-                    expression {
-                        ontrackCliLastBranch(pattern: 'release-4\\..*') == ONTRACK_BRANCH_NAME
-                    }
-                }
-            }
-            steps {
-                // Merge to master
-                withCredentials([
-                        gitUsernamePassword(
-                                credentialsId: 'jenkins.nemerosa.net.scanning',
-                                gitToolName: 'Default'
-                        )
-                ]) {
-                    sh '''
-                        git config --local user.email "jenkins@nemerosa.net"
-                        git config --local user.name "Jenkins"
-                        git checkout -b master
-                        git pull origin master
-                        git merge $BRANCH_NAME
-                        git push origin master
-                    '''
-                }
-            }
-            post {
-                always {
-                    ontrackCliValidate(stamp: 'MERGE')
-                }
-            }
-        }
+        // stage('Merge to master') {
+        //     when {
+        //         allOf {
+        //             branch "release/4.*"
+        //             expression {
+        //                 ontrackCliLastBranch(pattern: 'release-4\\..*') == ONTRACK_BRANCH_NAME
+        //             }
+        //         }
+        //     }
+        //     steps {
+        //         // Merge to master
+        //         withCredentials([
+        //                 gitUsernamePassword(
+        //                         credentialsId: 'jenkins.nemerosa.net.scanning',
+        //                         gitToolName: 'Default'
+        //                 )
+        //         ]) {
+        //             sh '''
+        //                 git config --local user.email "jenkins@nemerosa.net"
+        //                 git config --local user.name "Jenkins"
+        //                 git checkout -b master
+        //                 git pull origin master
+        //                 git merge $BRANCH_NAME
+        //                 git push origin master
+        //             '''
+        //         }
+        //     }
+        //     post {
+        //         always {
+        //             ontrackCliValidate(stamp: 'MERGE')
+        //         }
+        //     }
+        // }
 
         // Master setup
 

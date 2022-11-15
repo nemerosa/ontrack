@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.casc
 
 import net.nemerosa.ontrack.extension.casc.context.core.admin.MockAdminContext
+import net.nemerosa.ontrack.model.security.GlobalSettings
+import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.model.settings.HomePageSettings
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -44,28 +46,48 @@ class CascServiceIT : AbstractCascTestSupport() {
             .resolve("my-mock")
             .createDirectories()
             .resolve("key")
-            .writeText("""
+            .writeText(
+                """
                 Secret
                 on multiple
                 lines
-            """.trimIndent())
+            """.trimIndent()
+            )
         cascConfigurationProperties.secrets.directory = secretsRootDir.absolutePathString()
     }
 
     @Test
     fun `Rendering as YAML`() {
         asAdmin {
-            withSettings<HomePageSettings> {
-                settingsManagerService.saveSettings(
-                    HomePageSettings(
-                        maxBranches = 2,
-                        maxProjects = 200,
-                    )
+            renderAsYaml()
+        }
+    }
+
+    @Test
+    fun `Rendering as YAML allowed for users with global settings`() {
+        asUser().with(GlobalSettings::class.java).call {
+            renderAsYaml()
+        }
+    }
+
+    @Test
+    fun `Rendering as YAML allowed for admin users`() {
+        asAccountWithGlobalRole(Roles.GLOBAL_ADMINISTRATOR) {
+            renderAsYaml()
+        }
+    }
+
+    private fun renderAsYaml() {
+        withSettings<HomePageSettings> {
+            settingsManagerService.saveSettings(
+                HomePageSettings(
+                    maxBranches = 2,
+                    maxProjects = 200,
                 )
-                val yaml = cascService.renderAsYaml()
-                assertTrue("maxBranches: 2" in yaml)
-                assertTrue("maxProjects: 200" in yaml)
-            }
+            )
+            val yaml = cascService.renderAsYaml()
+            assertTrue("maxBranches: 2" in yaml)
+            assertTrue("maxProjects: 200" in yaml)
         }
     }
 
@@ -80,10 +102,14 @@ class CascServiceIT : AbstractCascTestSupport() {
                     )
                 )
                 val json = cascService.renderAsJson()
-                assertEquals(2,
-                    json.path("ontrack").path("config").path("settings").path("home-page").path("maxBranches").asInt())
-                assertEquals(200,
-                    json.path("ontrack").path("config").path("settings").path("home-page").path("maxProjects").asInt())
+                assertEquals(
+                    2,
+                    json.path("ontrack").path("config").path("settings").path("home-page").path("maxBranches").asInt()
+                )
+                assertEquals(
+                    200,
+                    json.path("ontrack").path("config").path("settings").path("home-page").path("maxProjects").asInt()
+                )
             }
         }
     }
@@ -92,13 +118,15 @@ class CascServiceIT : AbstractCascTestSupport() {
     fun `Rendering with secrets`() {
         asAdmin {
             mockAdminContext.data = null
-            casc("""
+            casc(
+                """
                 ontrack:
                     admin:
                         mock:
                             username: my-user
                             password: {{ secret.my-mock.password }}
-            """.trimIndent())
+            """.trimIndent()
+            )
             assertEquals("my-user", mockAdminContext.data?.username)
             assertEquals("my-password", mockAdminContext.data?.password)
         }
@@ -108,20 +136,24 @@ class CascServiceIT : AbstractCascTestSupport() {
     fun `Rendering with multiline secrets`() {
         asAdmin {
             mockAdminContext.data = null
-            casc("""
+            casc(
+                """
                 ontrack:
                     admin:
                         mock:
                             username: my-user
                             password: |-
                                 {{ secret.my-mock.key }}
-            """.trimIndent())
+            """.trimIndent()
+            )
             assertEquals("my-user", mockAdminContext.data?.username)
-            assertEquals("""
+            assertEquals(
+                """
                 Secret
                 on multiple
                 lines
-            """.trimIndent(), mockAdminContext.data?.password)
+            """.trimIndent(), mockAdminContext.data?.password
+            )
         }
     }
 
