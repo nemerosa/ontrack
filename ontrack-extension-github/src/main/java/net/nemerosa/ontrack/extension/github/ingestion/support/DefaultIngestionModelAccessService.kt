@@ -21,6 +21,7 @@ import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
+import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRun
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -228,17 +229,23 @@ class DefaultIngestionModelAccessService(
         build: Build,
         workflowRun: WorkflowRun,
     ) {
-        if (!propertyService.hasProperty(build, BuildGitHubWorkflowRunPropertyType::class.java)) {
+        val link = BuildGitHubWorkflowRun(
+            runId = workflowRun.id,
+            url = workflowRun.htmlUrl,
+            name = workflowRun.name,
+            runNumber = workflowRun.runNumber,
+            running = workflowRun.conclusion != null,
+            event = workflowRun.event,
+        )
+        val property = propertyService.getPropertyValue(build, BuildGitHubWorkflowRunPropertyType::class.java)
+        if (property != null) {
+
+        } else {
             propertyService.editProperty(
                 build,
                 BuildGitHubWorkflowRunPropertyType::class.java,
                 BuildGitHubWorkflowRunProperty(
-                    runId = workflowRun.id,
-                    url = workflowRun.htmlUrl,
-                    name = workflowRun.name,
-                    runNumber = workflowRun.runNumber,
-                    running = workflowRun.conclusion != null,
-                    event = workflowRun.event,
+                    workflows = listOf(link),
                 )
             )
         }

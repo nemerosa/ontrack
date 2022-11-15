@@ -58,7 +58,8 @@ class DefaultWorkflowJobProcessingService(
             )
         }
         // Gets the run property
-        val runProperty = propertyService.getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java).value
+        val runProperty = propertyService.getPropertyValue(build, BuildGitHubWorkflowRunPropertyType::class.java)
+            ?.findRun(runId)
             ?: error("Cannot find workflow run property on build")
         // Name & description of the validation stamp
         val vsName = ingestionConfig.getValidationStampName(job, step)
