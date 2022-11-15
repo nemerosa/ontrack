@@ -219,6 +219,7 @@ class WorkflowRunIngestionEventProcessor(
         val strategy = buildIdStrategyRegistry.getBuildIdStrategy(ingestionConfig.workflows.buildIdStrategy.id)
         // Gets the build using this strategy
         val build = strategy.findBuild(
+            branch,
             payload.workflowRun,
             ingestionConfig.workflows.buildIdStrategy.config,
         )
