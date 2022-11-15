@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.support
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.IPullRequest
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
@@ -68,6 +69,17 @@ interface IngestionModelAccessService {
     fun findBranchByRef(project: Project,
                         ref: String,
                         pullRequest: IPullRequest?,): Branch?
+
+    /**
+     * Sets a workflow run ID on a build.
+     *
+     * @param build Build to set
+     * @param workflowRun Run to register
+     */
+    fun setBuildRunId(
+        build: Build,
+        workflowRun: WorkflowRun,
+    )
 
     /**
      * Finds a build using its workflow run ID.

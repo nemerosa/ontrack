@@ -17,8 +17,6 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.extension.github.ingestion.support.REFS_TAGS_PREFIX
 import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
-import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
-import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
@@ -30,7 +28,6 @@ import kotlin.reflect.KClass
 @Component
 class WorkflowRunIngestionEventProcessor(
     structureService: StructureService,
-    private val propertyService: PropertyService,
     private val runInfoService: RunInfoService,
     private val ingestionModelAccessService: IngestionModelAccessService,
     private val configService: ConfigService,
@@ -135,7 +132,7 @@ class WorkflowRunIngestionEventProcessor(
     ): IngestionEventProcessingResultDetails {
         // Build creation & setup
         val build =
-            getOrCreateBuild(payload, running = false, configuration = configuration, ingestionConfig = ingestionConfig)
+            getOrCreateBuild(payload, configuration = configuration, ingestionConfig = ingestionConfig)
         // Setting the run info
         val runInfo = collectRunInfo(payload)
         runInfoService.setRunInfo(build, runInfo)
@@ -200,14 +197,13 @@ class WorkflowRunIngestionEventProcessor(
         ingestionConfig: IngestionConfig,
     ): IngestionEventProcessingResultDetails {
         // Build creation & setup
-        getOrCreateBuild(payload, running = true, configuration = configuration, ingestionConfig = ingestionConfig)
+        getOrCreateBuild(payload, configuration = configuration, ingestionConfig = ingestionConfig)
         // OK
         return IngestionEventProcessingResultDetails.processed()
     }
 
     private fun getOrCreateBuild(
         payload: WorkflowRunPayload,
-        running: Boolean,
         configuration: String?,
         ingestionConfig: IngestionConfig,
     ): Build {
@@ -235,20 +231,7 @@ class WorkflowRunIngestionEventProcessor(
                 )
             )
         // Link between the build and the workflow
-        if (!propertyService.hasProperty(build, BuildGitHubWorkflowRunPropertyType::class.java)) {
-            propertyService.editProperty(
-                build,
-                BuildGitHubWorkflowRunPropertyType::class.java,
-                BuildGitHubWorkflowRunProperty(
-                    runId = payload.workflowRun.id,
-                    url = payload.workflowRun.htmlUrl,
-                    name = payload.workflowRun.name,
-                    runNumber = payload.workflowRun.runNumber,
-                    running = running,
-                    event = payload.workflowRun.event,
-                )
-            )
-        }
+        ingestionModelAccessService.setBuildRunId(build, payload.workflowRun)
         // Build id strategy setup
         strategy.setupBuild(build, payload.workflowRun, ingestionConfig.workflows.buildIdStrategy.config)
         // OK

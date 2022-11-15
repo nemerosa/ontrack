@@ -14,7 +14,11 @@ import org.springframework.stereotype.Component
 class CommitBuildIdStrategy(
     private val propertyService: PropertyService,
     private val structureService: StructureService,
-) : AbstractBuildIdStrategy("commit") {
+) : AbstractBuildIdStrategy(ID) {
+
+    companion object {
+        const val ID = "commit"
+    }
 
     override fun findBuild(branch: Branch, workflowRun: WorkflowRun, config: JsonNode): Build? =
         propertyService.findBuildByBranchAndSearchkey(

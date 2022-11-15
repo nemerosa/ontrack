@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
 import net.nemerosa.ontrack.extension.github.ingestion.processing.*
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.IPullRequest
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.getProjectName
@@ -20,6 +21,7 @@ import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
+import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
@@ -220,6 +222,26 @@ class DefaultIngestionModelAccessService(
         )
         // Getting the project using its name
         return structureService.findProjectByName(projectName).getOrNull()
+    }
+
+    override fun setBuildRunId(
+        build: Build,
+        workflowRun: WorkflowRun,
+    ) {
+        if (!propertyService.hasProperty(build, BuildGitHubWorkflowRunPropertyType::class.java)) {
+            propertyService.editProperty(
+                build,
+                BuildGitHubWorkflowRunPropertyType::class.java,
+                BuildGitHubWorkflowRunProperty(
+                    runId = workflowRun.id,
+                    url = workflowRun.htmlUrl,
+                    name = workflowRun.name,
+                    runNumber = workflowRun.runNumber,
+                    running = workflowRun.conclusion != null,
+                    event = workflowRun.event,
+                )
+            )
+        }
     }
 
     override fun findBuildByRunId(repository: Repository, runId: Long): Build? {
