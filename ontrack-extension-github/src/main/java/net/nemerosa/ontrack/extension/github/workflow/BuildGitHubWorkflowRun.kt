@@ -13,10 +13,15 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
  * @property event Event having led to the creation of this build
  */
 data class BuildGitHubWorkflowRun(
+    @APIDescription("ID of the run")
     val runId: Long,
+    @APIDescription("Link to the GitHub Workflow run")
     val url: String,
+    @APIDescription("Name of the workflow")
     val name: String,
+    @APIDescription("Number of the run")
     val runNumber: Int,
+    @APIDescription("True if the run is still flagged as running")
     val running: Boolean,
     @APIDescription("Event having led to the creation of this build")
     val event: String?,

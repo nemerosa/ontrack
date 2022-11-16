@@ -1,9 +1,12 @@
-<a href="{{ decoration.data.url }}"><img ng-if="decoration.data.running"
-        src="extension/github/decoration/github-running.png"
-        class="ot-icon"
-        title="GitHub workflow run: {{ decoration.data.name }}#{{ decoration.data.runNumber }} (running)"
-/><img  ng-if="!decoration.data.running"
-        src="extension/github/decoration/github.png"
-        class="ot-icon"
-        title="GitHub workflow run: {{ decoration.data.name }}#{{ decoration.data.runNumber }}"
-/></a>
+<span ng-repeat="run in decoration.data.workflows">
+    <a href="{{ run.url }}"><img ng-if="run.running"
+            src="extension/github/decoration/github-running.png"
+            class="ot-icon"
+            title="GitHub workflow run: {{ run.name }}#{{ run.runNumber }} (running)"
+    /><img  ng-if="!run.running"
+            src="extension/github/decoration/github.png"
+            class="ot-icon"
+            title="GitHub workflow run: {{ run.name }}#{{ run.runNumber }}"
+    /></a>
+    &nbsp;
+</span>

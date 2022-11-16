@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.form.*
-import net.nemerosa.ontrack.model.form.Int
 import net.nemerosa.ontrack.model.security.BuildConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -33,38 +32,18 @@ class BuildGitHubWorkflowRunPropertyType(
 
     override fun getEditionForm(entity: ProjectEntity, value: BuildGitHubWorkflowRunProperty?): Form =
         Form.create()
-            .with(
-                Int.of(BuildGitHubWorkflowRunProperty::runId.name)
-                    .label("ID")
-                    .help("Unique ID of the workflow run")
-                    .value(value?.runId)
-            )
-            .with(
-                Url.of(BuildGitHubWorkflowRunProperty::url.name)
-                    .label("URL")
-                    .help("Link to the GitHub Workflow run")
-                    .value(value?.url)
-            )
-            .with(
-                Text.of(BuildGitHubWorkflowRunProperty::name.name)
-                    .label("Name")
-                    .help("Name of the workflow")
-                    .value(value?.name)
-            )
-            .with(
-                Int.of(BuildGitHubWorkflowRunProperty::runNumber.name)
-                    .label("Number")
-                    .help("Run number")
-                    .min(1)
-                    .value(value?.runNumber)
-            )
-            .with(
-                YesNo.of(BuildGitHubWorkflowRunProperty::running.name)
-                    .label("Running")
-                    .help("Is the workflow still running?")
-                    .value(value?.running ?: false)
-            )
-            .textField(BuildGitHubWorkflowRunProperty::event, value?.event)
+            .multiform(
+                BuildGitHubWorkflowRunProperty::workflows,
+                value?.workflows
+            ) {
+                Form.create()
+                    .longField(BuildGitHubWorkflowRun::runId, null)
+                    .urlField(BuildGitHubWorkflowRun::url, null)
+                    .textField(BuildGitHubWorkflowRun::name, null)
+                    .intField(BuildGitHubWorkflowRun::runNumber, null)
+                    .yesNoField(BuildGitHubWorkflowRun::running, null)
+                    .textField(BuildGitHubWorkflowRun::event, null)
+            }
 
     override fun fromClient(node: JsonNode): BuildGitHubWorkflowRunProperty = node.parse()
 

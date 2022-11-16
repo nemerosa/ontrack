@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.Filt
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderServiceITMockConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
+import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRun
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobPropertyType
@@ -385,12 +386,16 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
                 this,
                 BuildGitHubWorkflowRunPropertyType::class.java,
                 BuildGitHubWorkflowRunProperty(
-                    runId = runId,
-                    url = "",
-                    name = "run-name",
-                    runNumber = 1,
-                    running = true,
-                    event = "push",
+                    workflows = listOf(
+                        BuildGitHubWorkflowRun(
+                            runId = runId,
+                            url = "",
+                            name = "run-name",
+                            runNumber = 1,
+                            running = true,
+                            event = "push",
+                        )
+                    )
                 )
             )
             workflowJobProcessingService.setupValidation(

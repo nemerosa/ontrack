@@ -286,7 +286,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                 "Build created"
             ) { build ->
                 assertNotNull(
-                    getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java),
+                    getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java)?.workflows?.firstOrNull(),
                     "GitHub Workflow link set"
                 ) { link ->
                     assertTrue(link.running, "Workflow is running")
@@ -311,7 +311,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                 "Build created"
             ) { build ->
                 assertNotNull(
-                    getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java),
+                    getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java)?.workflows?.firstOrNull(),
                     "GitHub Workflow link set"
                 ) { link ->
                     assertFalse(link.running, "Workflow is not running")
@@ -586,7 +586,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                     ) { build ->
                         // Build link to the run
                         assertNotNull(
-                            getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java),
+                            getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java)?.workflows?.firstOrNull(),
                             "GitHub workflow run URL"
                         ) {
                             assertEquals(htmlUrl, it.url)
@@ -596,10 +596,10 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                         // Build link to the run as a decoration
                         val decorations = buildGitHubWorkflowRunDecorator.getDecorations(build)
                         assertEquals(1, decorations.size)
-                        val decoration = decorations.first()
-                        assertEquals(htmlUrl, decoration.data.url)
-                        assertEquals("CI", decoration.data.name)
-                        assertEquals(1, decoration.data.runNumber)
+                        val decoration = decorations.first().data.workflows.first()
+                        assertEquals(htmlUrl, decoration.url)
+                        assertEquals("CI", decoration.name)
+                        assertEquals(1, decoration.runNumber)
                         // Build commit property
                         assertNotNull(
                             getProperty(build, GitCommitPropertyType::class.java),
