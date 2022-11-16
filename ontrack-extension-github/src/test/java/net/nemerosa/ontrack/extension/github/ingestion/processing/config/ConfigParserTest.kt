@@ -118,6 +118,9 @@ class ConfigParserTest {
                     includes: ".*"
                     excludes: ""
                   includePRs: true
+                  buildIdStrategy:
+                    id: null
+                    config: null
                 jobs:
                   filter:
                     includes: ".*"
