@@ -225,7 +225,7 @@ class WorkflowRunIngestionEventProcessor(
                     branch,
                     nd(
                         strategy.getBuildName(payload.workflowRun, ingestionConfig.workflows.buildIdStrategy.config),
-                        ""
+                        "Created by GitHub workflow ${payload.workflowRun.name}"
                     ),
                     Signature.of(payload.workflowRun.createdAtDate, payload.sender?.login ?: "hook")
                 )
