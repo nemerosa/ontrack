@@ -41,6 +41,9 @@ class DefaultWorkflowJobProcessingService(
         startedAt: LocalDateTime?,
         completedAt: LocalDateTime?,
     ): IngestionEventProcessingResultDetails {
+        // NOTE: There is no need to filter on the workflows because if the workflow is not
+        // run, its run ID is not stored in the build and no build will be found in the
+        // following `findBuildByRunId` call.
         // Gets the build or does not do anything
         val build = ingestionModelAccessService.findBuildByRunId(repository, runId)
             ?: return IngestionEventProcessingResultDetails.ignored("No build with workflow run ID $runId.")
