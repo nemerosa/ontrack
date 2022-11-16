@@ -9,12 +9,13 @@ import net.nemerosa.ontrack.model.security.BuildConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
+import net.nemerosa.ontrack.model.structure.PropertySearchArguments
 import org.springframework.stereotype.Component
 import java.util.function.Function
 
 @Component
 class BuildGitHubWorkflowRunPropertyType(
-    extensionFeature: GitHubExtensionFeature
+    extensionFeature: GitHubExtensionFeature,
 ) : AbstractPropertyType<BuildGitHubWorkflowRunProperty>(
     extensionFeature
 ) {
@@ -51,7 +52,24 @@ class BuildGitHubWorkflowRunPropertyType(
 
     override fun replaceValue(
         value: BuildGitHubWorkflowRunProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: Function<String, String>,
     ): BuildGitHubWorkflowRunProperty = value
 
+    override fun getSearchArguments(token: String?): PropertySearchArguments? =
+        if (!token.isNullOrBlank()) {
+            try {
+                val value = token.toLong()
+                PropertySearchArguments(
+                    jsonContext = "jsonb_array_elements(pp.json->'workflows') as workflow",
+                    jsonCriteria = "(workflow->>'runId')::bigint = :value",
+                    criteriaParams = mapOf(
+                        "value" to value
+                    )
+                )
+            } catch (_: NumberFormatException) {
+                null
+            }
+        } else {
+            null
+        }
 }

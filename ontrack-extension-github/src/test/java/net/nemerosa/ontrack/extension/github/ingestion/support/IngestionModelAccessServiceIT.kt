@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.support
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
+import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.processing.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Owner
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
@@ -19,6 +20,57 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
 
     @Autowired
     private lateinit var ingestionModelAccessService: IngestionModelAccessService
+
+    @Test
+    fun `Setting a new build run ID`() {
+        asAdmin {
+            project {
+                branch {
+                    val payload = IngestionHookFixtures.sampleWorkflowRunPayload(
+                        repoName = project.name,
+                        runId = 1
+                    )
+                    val build = build {
+                        // Setting the run ID
+                        ingestionModelAccessService.setBuildRunId(
+                            this,
+                            payload.workflowRun
+                        )
+                    }
+                    // Looking for this build using the run ID
+                    assertEquals(
+                        build,
+                        ingestionModelAccessService.findBuildByRunId(payload.repository, 1L)
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Adding a new build run ID`() {
+        TODO("Set two run IDs on a build")
+        asAdmin {
+            project {
+                branch {
+                    val build = build {
+                        // Setting the run ID
+                        ingestionModelAccessService.setBuildRunId(
+                            this,
+                            IngestionHookFixtures.sampleWorkflowRunPayload(
+                                runId = 1
+                            ).workflowRun
+                        )
+                    }
+                    // Looking for this build using the run ID
+                    assertEquals(
+                        build,
+                        ingestionModelAccessService.findBuildByRunId(IngestionHookFixtures.sampleRepository(), 1L)
+                    )
+                }
+            }
+        }
+    }
 
     @Test
     fun `Find a project from a repository`() {

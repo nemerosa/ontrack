@@ -41,6 +41,7 @@ class DefaultIngestionModelAccessService(
     private val gitCommitPropertyCommitLink: GitCommitPropertyCommitLink,
     private val validationDataTypeService: ValidationDataTypeService,
     private val ingestionImageService: IngestionImageService,
+    private val buildGitHubWorkflowRunPropertyType: BuildGitHubWorkflowRunPropertyType,
 ) : IngestionModelAccessService {
 
     override fun getOrCreateProject(repository: Repository, configuration: String?): Project {
@@ -150,7 +151,7 @@ class DefaultIngestionModelAccessService(
         )
         val project = structureService.findProjectByName(name).getOrNull()
         return if (project != null) {
-            val (branchName, gitBranch) = getBranchNames(headBranch, pullRequest)
+            val (branchName, _) = getBranchNames(headBranch, pullRequest)
             structureService.findBranchByName(project.name, branchName).getOrNull()
         } else {
             null
@@ -239,7 +240,17 @@ class DefaultIngestionModelAccessService(
         )
         val property = propertyService.getPropertyValue(build, BuildGitHubWorkflowRunPropertyType::class.java)
         if (property != null) {
-
+            val workflows = property.workflows.toMutableList()
+            val changed = BuildGitHubWorkflowRun.edit(workflows, link)
+            if (changed) {
+                propertyService.editProperty(
+                    build,
+                    BuildGitHubWorkflowRunPropertyType::class.java,
+                    BuildGitHubWorkflowRunProperty(
+                        workflows = workflows,
+                    )
+                )
+            }
         } else {
             propertyService.editProperty(
                 build,
@@ -258,13 +269,7 @@ class DefaultIngestionModelAccessService(
         return propertyService.findByEntityTypeAndSearchArguments(
             ProjectEntityType.BUILD,
             BuildGitHubWorkflowRunPropertyType::class,
-            PropertySearchArguments(
-                jsonContext = null,
-                jsonCriteria = "(pp.json->>'runId')::bigint = :runId",
-                criteriaParams = mapOf(
-                    "runId" to runId,
-                )
-            )
+            buildGitHubWorkflowRunPropertyType.getSearchArguments(runId.toString()),
         ).map {
             structureService.getBuild(it)
         }.firstOrNull {
@@ -307,7 +312,7 @@ class DefaultIngestionModelAccessService(
         image: String?,
     ): ValidationStamp {
         // Data type
-        val actualDataTypeConfig: ValidationDataTypeConfig<Any>? = if (dataType != null && dataType.isNotBlank()) {
+        val actualDataTypeConfig: ValidationDataTypeConfig<Any>? = if (!dataType.isNullOrBlank()) {
             // Shortcut resolution
             val dataTypeId: String = when (dataType) {
                 "test-summary" -> TestSummaryValidationDataType::class.java.name

@@ -77,7 +77,7 @@ class ReleasePropertyType(
             }
 
     override fun getSearchArguments(token: String): PropertySearchArguments? {
-        return if (!token.isBlank()) {
+        return if (token.isNotBlank()) {
             if ("*" in token) {
                 PropertySearchArguments(
                         null,

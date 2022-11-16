@@ -137,6 +137,7 @@ object IngestionHookFixtures {
      * Sample payload
      */
     fun sampleWorkflowRunPayload(
+        runId: Long = 1,
         runName: String = sampleRunName,
         runNumber: Int = 1,
         repoName: String = sampleRepository,
@@ -144,6 +145,7 @@ object IngestionHookFixtures {
         event: String = "push",
         pullRequest: WorkflowRunPullRequest? = null,
     ) = workflowRunPayload(
+        runId = runId,
         action = WorkflowRunAction.requested,
         runNumber = runNumber,
         runName = runName,
