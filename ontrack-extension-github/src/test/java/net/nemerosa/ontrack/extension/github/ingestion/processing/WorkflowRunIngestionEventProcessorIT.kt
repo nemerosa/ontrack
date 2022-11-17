@@ -271,6 +271,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
             processor.process(
                 payload(
                     action = WorkflowRunAction.requested,
+                    conclusion = null,
                     runNumber = 1,
                     headBranch = "release/1.0",
                     repoName = repoName,
@@ -296,6 +297,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
             processor.process(
                 payload(
                     action = WorkflowRunAction.completed,
+                    conclusion = WorkflowJobStepConclusion.success,
                     runNumber = 1,
                     headBranch = "release/1.0",
                     repoName = repoName,

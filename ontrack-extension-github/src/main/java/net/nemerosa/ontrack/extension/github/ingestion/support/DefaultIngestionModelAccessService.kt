@@ -235,7 +235,7 @@ class DefaultIngestionModelAccessService(
             url = workflowRun.htmlUrl,
             name = workflowRun.name,
             runNumber = workflowRun.runNumber,
-            running = workflowRun.conclusion != null,
+            running = workflowRun.conclusion == null,
             event = workflowRun.event,
         )
         val property = propertyService.getPropertyValue(build, BuildGitHubWorkflowRunPropertyType::class.java)

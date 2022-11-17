@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfiguration
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
@@ -49,23 +50,35 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
 
     @Test
     fun `Adding a new build run ID`() {
-        TODO("Set two run IDs on a build")
         asAdmin {
             project {
                 branch {
+                    // Payloads
+                    val payload1 = IngestionHookFixtures.sampleWorkflowRunPayload(
+                        repoName = project.name,
+                        runName = "one",
+                        runId = Random.nextLong()
+                    )
+                    val payload2 = IngestionHookFixtures.sampleWorkflowRunPayload(
+                        repoName = project.name,
+                        runName = "second",
+                        runId = Random.nextLong()
+                    )
                     val build = build {
-                        // Setting the run ID
-                        ingestionModelAccessService.setBuildRunId(
-                            this,
-                            IngestionHookFixtures.sampleWorkflowRunPayload(
-                                runId = 1
-                            ).workflowRun
-                        )
+                        // Setting the run ID, once
+                        ingestionModelAccessService.setBuildRunId(this, payload1.workflowRun)
+                        // Setting the run ID, twice
+                        ingestionModelAccessService.setBuildRunId(this, payload2.workflowRun)
                     }
-                    // Looking for this build using the run ID
+                    // Looking for this build using the first run ID
                     assertEquals(
                         build,
-                        ingestionModelAccessService.findBuildByRunId(IngestionHookFixtures.sampleRepository(), 1L)
+                        ingestionModelAccessService.findBuildByRunId(payload1.repository, payload1.workflowRun.id)
+                    )
+                    // Looking for this build using the second run ID
+                    assertEquals(
+                        build,
+                        ingestionModelAccessService.findBuildByRunId(payload1.repository, payload2.workflowRun.id)
                     )
                 }
             }
@@ -258,7 +271,7 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
         }
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `Setup validation stamp when non existing`() {
         project {
             branch {
@@ -271,7 +284,7 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
         }
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `Setup validation stamp when existing with null input description`() {
         project {
             branch {
@@ -286,7 +299,7 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
         }
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `Setup validation stamp when existing with new input description`() {
         project {
             branch {
@@ -302,7 +315,7 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
         }
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `Setup promotion level when non existing`() {
         project {
             branch {
@@ -315,7 +328,7 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
         }
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `Setup promotion level when existing with null input description`() {
         project {
             branch {
@@ -330,7 +343,7 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
         }
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `Setup promotion level when existing with new input description`() {
         project {
             branch {
