@@ -48,7 +48,14 @@ class BuildGitHubWorkflowRunPropertyType(
 
     override fun fromClient(node: JsonNode): BuildGitHubWorkflowRunProperty = node.parse()
 
-    override fun fromStorage(node: JsonNode): BuildGitHubWorkflowRunProperty = node.parse()
+    override fun fromStorage(node: JsonNode): BuildGitHubWorkflowRunProperty =
+        if (node.has(BuildGitHubWorkflowRunProperty::workflows.name)) {
+            node.parse()
+        } else {
+            // Legacy
+            val workflow = node.parse<BuildGitHubWorkflowRun>()
+            BuildGitHubWorkflowRunProperty(workflows = listOf(workflow))
+        }
 
     override fun replaceValue(
         value: BuildGitHubWorkflowRunProperty,

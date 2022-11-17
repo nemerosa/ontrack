@@ -1,12 +1,51 @@
 package net.nemerosa.ontrack.extension.github.workflow
 
 import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.structure.ProjectEntityType
+import net.nemerosa.ontrack.repository.PropertyRepository
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class BuildGitHubWorkflowRunPropertyTypeIT : AbstractGitHubTestSupport() {
+
+    @Autowired
+    private lateinit var propertyRepository: PropertyRepository
+
+    @Test
+    fun `Backward compatibility with the single run property`() {
+        val buildGitHubWorkflowRun = BuildGitHubWorkflowRun(
+            runId = 1,
+            url = "uri:ci/1",
+            name = "ci",
+            runNumber = 1,
+            running = true,
+            event = "push",
+        )
+        project {
+            branch {
+                build {
+                    // Saving an old style property
+                    propertyRepository.saveProperty(
+                        typeName = BuildGitHubWorkflowRunPropertyType::class.java.name,
+                        entityType = ProjectEntityType.BUILD,
+                        entityId = id,
+                        data = buildGitHubWorkflowRun.asJson(),
+                    )
+                    // Getting the property
+                    assertNotNull(getProperty(this, BuildGitHubWorkflowRunPropertyType::class.java)) {
+                        assertEquals(
+                            BuildGitHubWorkflowRunProperty(workflows = listOf(buildGitHubWorkflowRun)),
+                            it
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     @Test
     fun `Searching for a build using its run IDs`() {
