@@ -3,11 +3,13 @@ package net.nemerosa.ontrack.extension.jenkins.indicator
 import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputedCategory
 import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputedType
 import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputedValue
-import net.nemerosa.ontrack.extension.indicators.model.*
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorSource
+import net.nemerosa.ontrack.extension.indicators.model.createSource
 import net.nemerosa.ontrack.extension.jenkins.JenkinsExtensionFeature
 import net.nemerosa.ontrack.extension.scm.indicator.AbstractSCMIndicatorComputer
 import net.nemerosa.ontrack.extension.scm.service.SCMService
 import net.nemerosa.ontrack.extension.scm.service.SCMServiceDetector
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.Project
 import org.springframework.stereotype.Component
 
@@ -17,6 +19,7 @@ class JenkinsPipelineLibraryIndicatorComputer(
     scmServiceDetector: SCMServiceDetector,
     jenkinsPipelineLibraryIndicatorSourceProvider: JenkinsPipelineLibraryIndicatorSourceProvider,
     private val jenkinsPipelineLibraryIndicatorValueType: JenkinsPipelineLibraryIndicatorValueType,
+    private val cachedSettingsService: CachedSettingsService,
 ) : AbstractSCMIndicatorComputer(extension, scmServiceDetector) {
 
     /**
@@ -31,7 +34,7 @@ class JenkinsPipelineLibraryIndicatorComputer(
     override fun computeSCMIndicators(
         project: Project,
         scmService: SCMService,
-        scmBranch: String
+        scmBranch: String,
     ): List<IndicatorComputedValue<*, *>> {
         // Gets the content of the Jenkinsfile (or returns no indicator)
         val jenkinsfile = scmService.download(project, scmBranch, "Jenkinsfile") ?: return emptyList()
@@ -50,19 +53,21 @@ class JenkinsPipelineLibraryIndicatorComputer(
             comment = null,
         )
 
-    private fun getIndicatorType(library: JenkinsPipelineLibrary) =
-        IndicatorComputedType(
+    private fun getIndicatorType(library: JenkinsPipelineLibrary): IndicatorComputedType<JenkinsPipelineLibraryVersion?, JenkinsPipelineLibraryIndicatorValueTypeConfig> {
+        val settings = cachedSettingsService.getCachedSettings(JenkinsPipelineLibraryIndicatorSettings::class.java)
+        val librarySettings = settings.findLibrarySettings(library.name)
+            ?: JenkinsPipelineLibraryIndicatorLibrarySettings(library = library.name)
+        return IndicatorComputedType(
             category = indicatorCategory,
             id = library.name,
             name = "Using the ${library.name} Jenkins pipeline library",
             link = null,
             valueType = jenkinsPipelineLibraryIndicatorValueType,
             valueConfig = JenkinsPipelineLibraryIndicatorValueTypeConfig(
-                // TODO Makes the configuration configurable per library (settings)
-                versionRequired = false,
-                versionMinimum = null,
+                settings = librarySettings
             ),
         )
+    }
 
     private val indicatorCategory = IndicatorComputedCategory(
         id = "jenkins-pipeline-library",

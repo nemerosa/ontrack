@@ -2,8 +2,6 @@ package net.nemerosa.ontrack.extension.jenkins.indicator
 
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.multiform
-import net.nemerosa.ontrack.model.form.textField
-import net.nemerosa.ontrack.model.form.yesNoField
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -35,12 +33,7 @@ class JenkinsPipelineLibraryIndicatorSettingsManager(
             JenkinsPipelineLibraryIndicatorSettings::libraryVersions,
             settings.libraryVersions
         ) {
-            Form.create()
-                .textField(JenkinsPipelineLibraryIndicatorLibrarySettings::library, null)
-                .yesNoField(JenkinsPipelineLibraryIndicatorLibrarySettings::required, null)
-                .textField(JenkinsPipelineLibraryIndicatorLibrarySettings::lastSupported, null)
-                .textField(JenkinsPipelineLibraryIndicatorLibrarySettings::lastDeprecated, null)
-                .textField(JenkinsPipelineLibraryIndicatorLibrarySettings::lastUnsupported, null)
+            JenkinsPipelineLibraryIndicatorLibrarySettings.getForm(null)
         }
 
     override fun getId(): String = "jenkins-pipeline-libraries-indicators"

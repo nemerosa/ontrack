@@ -4,6 +4,9 @@ import net.nemerosa.ontrack.common.Version
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
+import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.textField
+import net.nemerosa.ontrack.model.form.yesNoField
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
@@ -39,16 +42,16 @@ data class JenkinsPipelineLibraryIndicatorLibrarySettings(
     val library: String,
     @APIDescription("Is the library required?")
     @APILabel("Required")
-    val required: Boolean,
+    val required: Boolean = false,
     @APIDescription("Last supported version")
     @APILabel("Last supported version")
-    val lastSupported: String?,
+    val lastSupported: String? = null,
     @APIDescription("Last deprecated version")
     @APILabel("Last deprecated version")
-    val lastDeprecated: String?,
+    val lastDeprecated: String? = null,
     @APIDescription("Last unsupported version")
     @APILabel("Last unsupported version")
-    val lastUnsupported: String?,
+    val lastUnsupported: String? = null,
 ) {
     fun compliance(version: Version?) = IndicatorCompliance(complianceAsInt(version))
 
@@ -84,5 +87,13 @@ data class JenkinsPipelineLibraryIndicatorLibrarySettings(
 
     companion object {
         private const val NOT_APPLICABLE = 100
+
+        fun getForm(settings: JenkinsPipelineLibraryIndicatorLibrarySettings?) =
+            Form.create()
+                .textField(JenkinsPipelineLibraryIndicatorLibrarySettings::library, settings?.library)
+                .yesNoField(JenkinsPipelineLibraryIndicatorLibrarySettings::required, settings?.required)
+                .textField(JenkinsPipelineLibraryIndicatorLibrarySettings::lastSupported, settings?.lastSupported)
+                .textField(JenkinsPipelineLibraryIndicatorLibrarySettings::lastDeprecated, settings?.lastDeprecated)
+                .textField(JenkinsPipelineLibraryIndicatorLibrarySettings::lastUnsupported, settings?.lastUnsupported)
     }
 }

@@ -12,4 +12,6 @@ data class JenkinsPipelineLibraryIndicatorSettings(
     @APIDescription("List of libraries and their version requirements")
     @APILabel("Library versions")
     val libraryVersions: List<JenkinsPipelineLibraryIndicatorLibrarySettings>,
-)
+) {
+    fun findLibrarySettings(name: String) = libraryVersions.find { it.library == name }
+}
