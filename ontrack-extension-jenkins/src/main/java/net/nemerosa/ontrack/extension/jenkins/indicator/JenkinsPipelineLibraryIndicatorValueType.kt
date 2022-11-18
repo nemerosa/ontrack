@@ -112,6 +112,15 @@ class JenkinsPipelineLibraryIndicatorValueType(
         config.asJson()
 
     override fun fromConfigStoredJson(config: JsonNode): JenkinsPipelineLibraryIndicatorValueTypeConfig =
-        // TODO Backward compatibility
-        config.parse()
+        if (config.has(JenkinsPipelineLibraryIndicatorValueTypeConfig::settings.name)) {
+            config.parse()
+        }
+        // Backward compatibility ==> starting from scratch
+        else {
+            JenkinsPipelineLibraryIndicatorValueTypeConfig(
+                settings = JenkinsPipelineLibraryIndicatorLibrarySettings(
+                    library = "n/a"
+                )
+            )
+        }
 }
