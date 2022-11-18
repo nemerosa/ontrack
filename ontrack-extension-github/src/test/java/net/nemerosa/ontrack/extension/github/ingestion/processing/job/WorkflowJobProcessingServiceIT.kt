@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionCon
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigJobs
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigSteps
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
+import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderServiceITMockConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
@@ -415,6 +416,38 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
                 startedAt = ref.minusMinutes(1),
                 completedAt = ref,
             )
+        }
+    }
+
+    @Test
+    fun `No job being processed when the workflow is ignored`() {
+        asAdmin {
+            project {
+                branch {
+                    // Job payload on a run ID which was never assigned
+                    val details = workflowJobProcessingService.setupValidation(
+                        repository = Repository(
+                            name = project.name,
+                            description = null,
+                            htmlUrl = "https://github.com/nemerosa/${project.name}",
+                            owner = Owner(login = "nemerosa"),
+                        ),
+                        runId = 10L,
+                        runAttempt = 1,
+                        job = "build",
+                        jobUrl = "uri:job",
+                        step = null,
+                        status = WorkflowJobStepStatus.in_progress,
+                        conclusion = null,
+                        startedAt = Time.now(),
+                        completedAt = null,
+                    )
+                    // Not processed
+                    assertEquals(IngestionEventProcessingResult.IGNORED, details.result, "Job not processed")
+                    // No build created
+                    assertEquals(0, structureService.getBuildCount(this), "No build created")
+                }
+            }
         }
     }
 
