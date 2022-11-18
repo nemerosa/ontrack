@@ -133,6 +133,7 @@ class WorkflowRunIngestionEventProcessor(
         // Build creation & setup
         val build =
             getOrCreateBuild(payload, configuration = configuration, ingestionConfig = ingestionConfig)
+                ?: return IngestionEventProcessingResultDetails.ignored("Build strategy does not allow the creation of a build for this workflow run.")
         // Setting the run info
         val runInfo = collectRunInfo(payload)
         runInfoService.setRunInfo(build, runInfo)
@@ -197,16 +198,19 @@ class WorkflowRunIngestionEventProcessor(
         ingestionConfig: IngestionConfig,
     ): IngestionEventProcessingResultDetails {
         // Build creation & setup
-        getOrCreateBuild(payload, configuration = configuration, ingestionConfig = ingestionConfig)
-        // OK
-        return IngestionEventProcessingResultDetails.processed()
+        val build = getOrCreateBuild(payload, configuration = configuration, ingestionConfig = ingestionConfig)
+        return if (build != null) {
+            IngestionEventProcessingResultDetails.processed("Build ${build.name} created.")
+        } else {
+            IngestionEventProcessingResultDetails.ignored("Build strategy does not allow the creation of a build for this workflow run.")
+        }
     }
 
     private fun getOrCreateBuild(
         payload: WorkflowRunPayload,
         configuration: String?,
         ingestionConfig: IngestionConfig,
-    ): Build {
+    ): Build? {
         // Gets or creates the project
         val project = getOrCreateProject(payload, configuration)
         // Branch creation & setup
@@ -214,22 +218,34 @@ class WorkflowRunIngestionEventProcessor(
         // Build identification strategy
         val strategy = buildIdStrategyRegistry.getBuildIdStrategy(ingestionConfig.workflows.buildIdStrategy.id)
         // Gets the build using this strategy
+        // If not found, checks if the strategy allows for the creation of a build
         val build = strategy.findBuild(
             branch,
             payload.workflowRun,
             ingestionConfig.workflows.buildIdStrategy.config,
         )
-        // If not found, creates it
-            ?: structureService.newBuild(
-                Build.of(
+            ?: if (strategy.canCreateBuild(
                     branch,
-                    nd(
-                        strategy.getBuildName(payload.workflowRun, ingestionConfig.workflows.buildIdStrategy.config),
-                        "Created by GitHub workflow ${payload.workflowRun.name}"
-                    ),
-                    Signature.of(payload.workflowRun.createdAtDate, payload.sender?.login ?: "hook")
+                    payload.workflowRun,
+                    ingestionConfig.workflows.buildIdStrategy.config
                 )
-            )
+            ) {
+                structureService.newBuild(
+                    Build.of(
+                        branch,
+                        nd(
+                            strategy.getBuildName(
+                                payload.workflowRun,
+                                ingestionConfig.workflows.buildIdStrategy.config
+                            ),
+                            "Created by GitHub workflow ${payload.workflowRun.name}"
+                        ),
+                        Signature.of(payload.workflowRun.createdAtDate, payload.sender?.login ?: "hook")
+                    )
+                )
+            } else {
+                return null // <- not creating a build not reusing a build
+            }
         // Link between the build and the workflow
         ingestionModelAccessService.setBuildRunId(build, payload.workflowRun)
         // Build id strategy setup

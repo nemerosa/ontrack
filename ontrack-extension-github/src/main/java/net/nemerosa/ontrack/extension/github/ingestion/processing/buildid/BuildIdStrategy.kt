@@ -18,4 +18,9 @@ interface BuildIdStrategy {
         "${workflowRun.name}-${workflowRun.runNumber}"
     )
 
+    /**
+     * Checking if a build can be created using this strategy.
+     */
+    fun canCreateBuild(branch: Branch, workflowRun: WorkflowRun, config: JsonNode): Boolean
+
 }

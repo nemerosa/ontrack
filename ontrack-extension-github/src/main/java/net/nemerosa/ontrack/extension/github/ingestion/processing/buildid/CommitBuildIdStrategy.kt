@@ -20,6 +20,9 @@ class CommitBuildIdStrategy(
         const val ID = "commit"
     }
 
+    override fun canCreateBuild(branch: Branch, workflowRun: WorkflowRun, config: JsonNode): Boolean =
+        workflowRun.headSha.isNotBlank()
+
     override fun findBuild(branch: Branch, workflowRun: WorkflowRun, config: JsonNode): Build? =
         propertyService.findBuildByBranchAndSearchkey(
             branch.id,

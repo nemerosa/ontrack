@@ -324,6 +324,34 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
     }
 
     @Test
+    fun `Default commit build id strategy not creating a build if Git commit is absent`() {
+        // Only one GitHub configuration
+        onlyOneGitHubConfig()
+        // For a given project & branch
+        asAdmin {
+            project {
+                branch("main") {
+                    processor.process(
+                        payload(
+                            repoName = project.name,
+                            runName = "build",
+                            runNumber = 20,
+                            runId = 10L,
+                            commit = "", // <- no commit
+                        ),
+                        configuration = null
+                    )
+                    // Checks the build has NOT been created
+                    assertNull(
+                        structureService.findBuildByName(project.name, name, "build-20").orElse(null),
+                        "Build not created because no commit"
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Build workflow run link running state`() {
         // Only one GitHub configuration
         onlyOneGitHubConfig()
