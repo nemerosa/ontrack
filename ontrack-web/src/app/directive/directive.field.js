@@ -38,7 +38,6 @@ angular.module('ot.directive.field', [
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.fieldValue.tpl.html',
-            transclude: true,
             scope: {
                 field: '='
             }

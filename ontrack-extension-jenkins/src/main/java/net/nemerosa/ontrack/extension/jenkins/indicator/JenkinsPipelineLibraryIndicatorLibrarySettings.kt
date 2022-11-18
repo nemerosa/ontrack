@@ -35,8 +35,10 @@ import kotlin.math.roundToInt
  */
 data class JenkinsPipelineLibraryIndicatorLibrarySettings(
     @APIDescription("Name of the library")
+    @APILabel("Library")
     val library: String,
     @APIDescription("Is the library required?")
+    @APILabel("Required")
     val required: Boolean,
     @APIDescription("Last supported version")
     @APILabel("Last supported version")

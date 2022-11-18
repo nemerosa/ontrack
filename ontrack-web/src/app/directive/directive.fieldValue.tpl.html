@@ -47,3 +47,13 @@
 
 <!-- Type: int -->
 <span ng-if="field.type == 'int'" class="ot-field-value">{{field.value}}</span>
+
+<!-- Type: multiform -->
+<div ng-if="field.type == 'multi-form'">
+    <p class="ot-description">{{ field.help }}</p>
+    <div class="well" ng-repeat="item in field.value">
+        <ot-field-multi-form-entry-value
+            item="item"
+            form="field.form"></ot-field-multi-form-entry-value>
+    </div>
+</div>
