@@ -256,6 +256,74 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
     }
 
     @Test
+    fun `Same build targeted by two worflows based on Git commit`() {
+        // Only one GitHub configuration
+        onlyOneGitHubConfig()
+        // For a given project & branch
+        asAdmin {
+            project {
+                branch("main") {
+                    val commit = uid("commit-")
+                    // First workflow with a given commit will create the build and
+                    // link the workflow to it (and the Git commit)
+                    processor.process(
+                        payload(
+                            repoName = project.name,
+                            runName = "build",
+                            runNumber = 20,
+                            runId = 10L,
+                            commit = commit,
+                        ),
+                        configuration = null
+                    )
+                    // Checks the build has been created
+                    val build = structureService.findBuildByName(project.name, name, "build-20").orElse(null)
+                        ?: fail("Build created by first workflow")
+                    // Checks the run ID has been set on the build
+                    assertNotNull(
+                        getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java),
+                        "Workflow run property set on the build"
+                    ) {
+                        assertNotNull(it.findRun(10L), "First workflow run ID set on the build")
+                    }
+                    // Checks the Git commit has been set
+                    assertNotNull(
+                        getProperty(build, GitCommitPropertyType::class.java),
+                        "Git commit property set on the build"
+                    ) {
+                        assertEquals(commit, it.commit)
+                    }
+
+                    // TODO Second workflow with the same commit will reuse the previous build and
+                    // link the new workflow to it
+                    processor.process(
+                        payload(
+                            repoName = project.name,
+                            runName = "tests",
+                            runNumber = 15,
+                            runId = 25L,
+                            commit = commit, // <-- same commit
+                        ),
+                        configuration = null
+                    )
+                    // Checks the new run ID has been set on the build
+                    assertNotNull(
+                        getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java),
+                        "New workflow run property set on the build"
+                    ) {
+                        assertNotNull(it.findRun(25L), "Second workflow run ID set on the build")
+                    }
+                    // Checks that no other build was created
+                    assertNull(
+                        structureService.findBuildByName(project.name, name, "tests-25").orElse(null),
+                        "Second workflow did not create any build"
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Build workflow run link running state`() {
         // Only one GitHub configuration
         onlyOneGitHubConfig()
@@ -588,7 +656,10 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                     ) { build ->
                         // Build link to the run
                         assertNotNull(
-                            getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java)?.workflows?.firstOrNull(),
+                            getProperty(
+                                build,
+                                BuildGitHubWorkflowRunPropertyType::class.java
+                            )?.workflows?.firstOrNull(),
                             "GitHub workflow run URL"
                         ) {
                             assertEquals(htmlUrl, it.url)
