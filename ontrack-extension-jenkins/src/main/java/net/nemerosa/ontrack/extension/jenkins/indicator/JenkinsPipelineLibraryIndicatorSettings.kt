@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.jenkins.indicator
 
-import net.nemerosa.ontrack.model.support.NameValue
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APILabel
 
 /**
  * Global settings for the [JenkinsPipelineLibraryIndicatorComputer].
@@ -8,5 +9,7 @@ import net.nemerosa.ontrack.model.support.NameValue
  * @see JenkinsPipelineLibraryIndicatorValueTypeConfig
  */
 data class JenkinsPipelineLibraryIndicatorSettings(
-    val libraryVersions: List<NameValue>,
+    @APIDescription("List of libraries and their version requirements")
+    @APILabel("Library versions")
+    val libraryVersions: List<JenkinsPipelineLibraryIndicatorLibrarySettings>,
 )

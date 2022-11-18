@@ -66,9 +66,9 @@ internal class JenkinsPipelineLibraryIndicatorLibrarySettingsTest {
     ) = JenkinsPipelineLibraryIndicatorLibrarySettings(
         library = uid("lib-"),
         required = required,
-        lastSupported = parseVersion(lastSupported),
-        lastDeprecated = parseVersion(lastDeprecated),
-        lastUnsupported = parseVersion(lastUnsupported),
+        lastSupported = lastSupported,
+        lastDeprecated = lastDeprecated,
+        lastUnsupported = lastUnsupported,
     )
 
 }

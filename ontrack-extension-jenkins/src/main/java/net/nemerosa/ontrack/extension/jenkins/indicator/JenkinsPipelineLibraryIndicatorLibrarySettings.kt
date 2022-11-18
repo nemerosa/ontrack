@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.jenkins.indicator
 
 import net.nemerosa.ontrack.common.Version
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APILabel
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
@@ -32,11 +34,19 @@ import kotlin.math.roundToInt
  * @property lastUnsupported Latest version unsupported
  */
 data class JenkinsPipelineLibraryIndicatorLibrarySettings(
+    @APIDescription("Name of the library")
     val library: String,
+    @APIDescription("Is the library required?")
     val required: Boolean,
-    val lastSupported: Version?,
-    val lastDeprecated: Version?,
-    val lastUnsupported: Version?,
+    @APIDescription("Last supported version")
+    @APILabel("Last supported version")
+    val lastSupported: String?,
+    @APIDescription("Last deprecated version")
+    @APILabel("Last deprecated version")
+    val lastDeprecated: String?,
+    @APIDescription("Last unsupported version")
+    @APILabel("Last unsupported version")
+    val lastUnsupported: String?,
 ) {
     fun compliance(version: Version?) = IndicatorCompliance(complianceAsInt(version))
 
@@ -48,7 +58,13 @@ data class JenkinsPipelineLibraryIndicatorLibrarySettings(
                 NOT_APPLICABLE
             }
         } else {
-            val versions = listOfNotNull(lastSupported, lastDeprecated, lastUnsupported).sortedDescending()
+            val versions = listOf(
+                lastSupported,
+                lastDeprecated,
+                lastUnsupported
+            )
+                .mapNotNull { Version.parseVersion(it) }
+                .sortedDescending()
             if (versions.isEmpty()) {
                 NOT_APPLICABLE
             } else {
