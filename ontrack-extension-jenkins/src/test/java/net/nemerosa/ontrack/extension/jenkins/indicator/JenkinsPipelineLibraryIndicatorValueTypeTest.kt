@@ -176,6 +176,19 @@ class JenkinsPipelineLibraryIndicatorValueTypeTest {
         )
     }
 
+    @Test
+    fun `Backward compatible config stored JSON with null values`() {
+        assertEquals(
+            config(false, null, library = "n/a"),
+            type.fromConfigStoredJson(
+                mapOf(
+                    "versionRequired" to null,
+                    "versionMinimum" to null,
+                ).asJson(),
+            )
+        )
+    }
+
     private fun version(value: String) = JenkinsPipelineLibraryVersion(value)
 
     private fun config(
