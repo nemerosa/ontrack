@@ -9,6 +9,8 @@ import net.nemerosa.ontrack.extension.indicators.model.IndicatorValueType
 import net.nemerosa.ontrack.extension.jenkins.JenkinsExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.getRequiredBooleanField
+import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Text
@@ -117,9 +119,13 @@ class JenkinsPipelineLibraryIndicatorValueType(
         }
         // Backward compatibility ==> starting from scratch
         else {
+            val required = config.getRequiredBooleanField("versionRequired")
+            val version = config.getRequiredTextField("versionMinimum")
             JenkinsPipelineLibraryIndicatorValueTypeConfig(
                 settings = JenkinsPipelineLibraryIndicatorLibrarySettings(
-                    library = "n/a"
+                    library = "n/a",
+                    required = required,
+                    lastSupported = version,
                 )
             )
         }
