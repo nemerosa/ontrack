@@ -25,12 +25,12 @@ data class Version(
 
     companion object {
 
-        private val PATTERN = "^([\\d]+)(\\.([\\d]+)(\\.([\\d]+))?)?.*$".toRegex()
+        private val PATTERN = "^(\\d+)(\\.(\\d+)(\\.(\\d+))?)?.*$".toRegex()
 
         val NONE = Version()
 
         fun parseVersion(value: String?): Version? {
-            return if (value != null && value.isNotBlank()) {
+            return if (!value.isNullOrBlank()) {
                 val matcher = PATTERN.matchEntire(value)
                 return if (matcher != null) {
                     val majorValue = matcher.groupValues[1]

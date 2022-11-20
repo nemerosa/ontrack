@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.support;
 
+import java.util.Map;
 import java.util.function.Function;
 
 public interface SettingsRepository {
@@ -12,6 +13,8 @@ public interface SettingsRepository {
      * @param category Category to delete.
      */
     void deleteAll(Class<?> category);
+
+    Map<String, String> getAllValues(Class<?> category);
 
     boolean getBoolean(Class<?> category, String name, boolean defaultValue);
 
