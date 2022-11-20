@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class MessagePropertyTypeIT : AbstractPropertyTypeIT() {
+class MessagePropertyTypeIT : AbstractPropertyTypeTestJUnit4Support() {
 
     @Autowired
     private lateinit var messagePropertyType: MessagePropertyType

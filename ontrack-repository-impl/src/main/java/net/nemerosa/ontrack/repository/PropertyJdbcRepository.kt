@@ -123,11 +123,11 @@ class PropertyJdbcRepository(
     override fun findBuildByBranchAndSearchkey(branchId: ID, typeName: String, searchArguments: PropertySearchArguments?): ID? {
         val tables = StringBuilder(
                 "SELECT b.ID " +
-                        "FROM PROPERTIES p " +
-                        "INNER JOIN BUILDS b ON p.BUILD = b.ID "
+                        "FROM PROPERTIES pp " +
+                        "INNER JOIN BUILDS b ON pp.BUILD = b.ID "
         )
         val criteria = StringBuilder(
-                "WHERE p.TYPE = :type " + "AND b.BRANCHID = :branchId"
+                "WHERE pp.TYPE = :type " + "AND b.BRANCHID = :branchId"
         )
         val params = params("type", typeName)
                 .addValue("branchId", branchId.value)

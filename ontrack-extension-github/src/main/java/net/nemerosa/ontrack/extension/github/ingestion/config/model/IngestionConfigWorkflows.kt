@@ -14,4 +14,12 @@ data class IngestionConfigWorkflows(
     val filter: FilterConfig = FilterConfig.all,
     @APIDescription("Creation of validation runs at the workflow level")
     val validations: IngestionConfigWorkflowValidations = IngestionConfigWorkflowValidations(),
+    @APIDescription("List of events to accept for the processing of a workflow")
+    val events: List<String> = listOf("push"),
+    @APIDescription("Filter on the Git branch names")
+    val branchFilter: FilterConfig = FilterConfig.all,
+    @APIDescription("Filtering the pull requests")
+    val includePRs: Boolean = true,
+    @APIDescription("Build identification strategy")
+    val buildIdStrategy: IngestionConfigBuildIdStategy = IngestionConfigBuildIdStategy(),
 )

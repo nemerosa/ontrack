@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.general
 
 import org.junit.Test
 
-class LinkPropertyTypeIT : AbstractPropertyTypeIT() {
+class LinkPropertyTypeIT : AbstractPropertyTypeTestJUnit4Support() {
 
     @Test
     fun `Search by link`() {

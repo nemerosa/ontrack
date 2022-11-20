@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.general.ReleaseProperty
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.extension.general.autoValidationStampProperty
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
+import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRun
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.json.getRequiredTextField
@@ -54,11 +55,16 @@ internal class AutoVersioningCheckMutationsIT : AbstractIngestionTestSupport() {
                             build,
                             BuildGitHubWorkflowRunPropertyType::class.java,
                             BuildGitHubWorkflowRunProperty(
-                                runId = 1,
-                                url = "",
-                                name = "some-workflow",
-                                runNumber = 1,
-                                running = true,
+                                workflows = listOf(
+                                    BuildGitHubWorkflowRun(
+                                        runId = 1,
+                                        url = "",
+                                        name = "some-workflow",
+                                        runNumber = 1,
+                                        running = true,
+                                        event = "push",
+                                    )
+                                )
                             )
                         )
                         build.linkTo(linkedBuild431)

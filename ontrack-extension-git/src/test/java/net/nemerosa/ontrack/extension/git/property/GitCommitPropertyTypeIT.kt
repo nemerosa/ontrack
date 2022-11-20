@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.git.property
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
+import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.model.structure.BuildSearchForm
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class GitCommitPropertyTypeIT : AbstractGitTestJUnit4Support() {
+class GitCommitPropertyTypeIT : AbstractGitTestSupport() {
 
     @Test
     fun `Build filter on commit`() {
@@ -64,6 +64,34 @@ class GitCommitPropertyTypeIT : AbstractGitTestJUnit4Support() {
                     assertEquals(
                         listOf("3"),
                         builds.map { it.name }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Build branch search on commit`() {
+        createRepo {
+            commits(5)
+        } and { repo, commits ->
+            project {
+                gitProject(repo)
+                branch {
+                    gitBranch {
+                        commitAsProperty()
+                    }
+                    val builds = (1..5).map { index ->
+                        build(index.toString()) {
+                            gitCommitProperty(commits.getValue(index))
+                        }
+                    }
+                    // Looks for commit n°3 at branch level
+                    val build = propertyService.findBuildByBranchAndSearchkey(id, GitCommitPropertyType::class.java, commits.getValue(3))
+                    assertEquals(
+                        builds[2].id,
+                        build,
+                        "Found build by commit"
                     )
                 }
             }

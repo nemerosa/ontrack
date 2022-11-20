@@ -112,6 +112,15 @@ class ConfigParserTest {
                       excludes: ""
                     prefix: "workflow-"
                     suffix: ""
+                  events:
+                  - "push"
+                  branchFilter:
+                    includes: ".*"
+                    excludes: ""
+                  includePRs: true
+                  buildIdStrategy:
+                    id: null
+                    config: null
                 jobs:
                   filter:
                     includes: ".*"

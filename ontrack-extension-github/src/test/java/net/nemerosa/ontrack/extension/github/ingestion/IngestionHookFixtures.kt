@@ -33,6 +33,7 @@ object IngestionHookFixtures {
         owner: String,
         sender: String,
         commit: String,
+        event: String = "push",
         htmlUrl: String = "https://github.com/nemerosa/github-ingestion-poc/actions/runs/1395528922",
         pullRequest: WorkflowRunPullRequest? = null,
     ) = WorkflowRunPayload(
@@ -47,7 +48,7 @@ object IngestionHookFixtures {
             createdAtDate = createdAtDate,
             updatedAtDate = null,
             htmlUrl = htmlUrl,
-            event = "push",
+            event = event,
             status = WorkflowJobStepStatus.in_progress,
             conclusion = null,
         ),
@@ -136,12 +137,15 @@ object IngestionHookFixtures {
      * Sample payload
      */
     fun sampleWorkflowRunPayload(
+        runId: Long = 1,
         runName: String = sampleRunName,
         runNumber: Int = 1,
         repoName: String = sampleRepository,
         headBranch: String = sampleBranch,
+        event: String = "push",
         pullRequest: WorkflowRunPullRequest? = null,
     ) = workflowRunPayload(
+        runId = runId,
         action = WorkflowRunAction.requested,
         runNumber = runNumber,
         runName = runName,
@@ -150,6 +154,7 @@ object IngestionHookFixtures {
         owner = sampleOwner,
         sender = "my-sender",
         commit = "01234567890",
+        event = event,
         pullRequest = pullRequest,
     )
 

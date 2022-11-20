@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionCon
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigCascSetup
 import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
+import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.EntityDataService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -23,6 +24,15 @@ class DefaultConfigService(
     private val propertyService: PropertyService,
     private val cascEntityService: CascEntityService,
 ) : ConfigService {
+
+    override fun loadConfig(
+        configuration: GitHubEngineConfiguration,
+        repository: String,
+        branch: String,
+        path: String,
+    ): IngestionConfig =
+        configLoaderService.loadConfig(configuration, repository, branch, path)
+            ?: IngestionConfig()
 
     override fun getOrLoadConfig(branch: Branch, path: String): IngestionConfig {
         return load(branch)
