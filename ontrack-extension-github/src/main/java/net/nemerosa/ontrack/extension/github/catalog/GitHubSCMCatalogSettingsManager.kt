@@ -55,6 +55,6 @@ class GitHubSCMCatalogSettingsManager(
             )
             .longField(
                 GitHubSCMCatalogSettings::autoMergeInterval,
-                settings.autoMergeTimeout
+                settings.autoMergeInterval
             )
 }

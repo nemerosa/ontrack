@@ -25,6 +25,7 @@ const ontrack = angular.module('ontrack', [
         'ot.directive.yes-no',
         'ot.directive.chart',
         'ot.directive.decorated-chart',
+        'ot.directive.fieldMultiFormEntryValue',
         // Dialogs
         'ot.dialog.applicationInfo',
         // Services

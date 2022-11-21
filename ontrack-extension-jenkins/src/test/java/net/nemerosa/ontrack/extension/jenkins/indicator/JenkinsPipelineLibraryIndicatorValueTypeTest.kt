@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.node.IntNode
 import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.TextNode
 import net.nemerosa.ontrack.extension.indicators.IndicatorsExtensionFeature
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 import net.nemerosa.ontrack.extension.jenkins.JenkinsExtensionFeature
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.json.asJson
@@ -30,44 +29,6 @@ class JenkinsPipelineLibraryIndicatorValueTypeTest {
         assertNotNull(field) {
             assertEquals("1.0.0", it.value)
         }
-    }
-
-    @Test
-    fun `Status when version is not required and without a minimum`() {
-        val config = config(false, null)
-        assertEquals(IndicatorCompliance.HIGHEST, type.status(config, null))
-        assertEquals(IndicatorCompliance.HIGHEST, type.status(config, version("1.0.0")))
-        assertEquals(IndicatorCompliance.HIGHEST, type.status(config, version("2.0.0")))
-        assertEquals(IndicatorCompliance.HIGHEST, type.status(config, version("3.0.0")))
-    }
-
-    @Test
-    fun `Status when version is required and without a minimum`() {
-        val config = config(true, null)
-        assertEquals(IndicatorCompliance.LOWEST, type.status(config, null))
-        assertEquals(IndicatorCompliance.HIGHEST, type.status(config, version("1.0.0")))
-        assertEquals(IndicatorCompliance.HIGHEST, type.status(config, version("2.0.0")))
-        assertEquals(IndicatorCompliance.HIGHEST, type.status(config, version("3.0.0")))
-    }
-
-    @Test
-    fun `Status when version is not required and with a minimum`() {
-        val config = config(false, "2.0.3")
-        assertEquals(IndicatorCompliance.HIGHEST, type.status(config, null))
-        assertEquals(IndicatorCompliance.MEDIUM, type.status(config, version("1.0.0")))
-        assertEquals(IndicatorCompliance.MEDIUM, type.status(config, version("2.0.0")))
-        assertEquals(IndicatorCompliance.HIGHEST, type.status(config, version("2.0.3")))
-        assertEquals(IndicatorCompliance.HIGHEST, type.status(config, version("3.0.0")))
-    }
-
-    @Test
-    fun `Status when version is required and with a minimum`() {
-        val config = config(true, "2.0.3")
-        assertEquals(IndicatorCompliance.LOWEST, type.status(config, null))
-        assertEquals(IndicatorCompliance.MEDIUM, type.status(config, version("1.0.0")))
-        assertEquals(IndicatorCompliance.MEDIUM, type.status(config, version("2.0.0")))
-        assertEquals(IndicatorCompliance.HIGHEST, type.status(config, version("2.0.3")))
-        assertEquals(IndicatorCompliance.HIGHEST, type.status(config, version("3.0.0")))
     }
 
     @Test
@@ -115,14 +76,23 @@ class JenkinsPipelineLibraryIndicatorValueTypeTest {
     @Test
     fun `Config form`() {
         val form = type.configForm(config(true, "1.0.1"))
-        assertEquals(true, form.getField("versionRequired")?.value)
-        assertEquals("1.0.1", form.getField("versionMinimum")?.value)
+        assertEquals("library", form.getField("library")?.value)
+        assertEquals(true, form.getField("required")?.value)
+        assertEquals("1.0.1", form.getField("lastSupported")?.value)
+        assertEquals(null, form.getField("lastDeprecated")?.value)
+        assertEquals(null, form.getField("lastUnsupported")?.value)
     }
 
     @Test
     fun `To config form`() {
         assertEquals(
-            mapOf("versionRequired" to true, "versionMinimum" to "1.1.0").asJson(),
+            mapOf(
+                "library" to "library",
+                "required" to true,
+                "lastSupported" to "1.1.0",
+                "lastDeprecated" to null,
+                "lastUnsupported" to null,
+            ).asJson(),
             type.toConfigForm(config(true, "1.1.0"))
         )
     }
@@ -131,14 +101,30 @@ class JenkinsPipelineLibraryIndicatorValueTypeTest {
     fun `From config form`() {
         assertEquals(
             config(true, "1.1.0"),
-            type.fromConfigForm(mapOf("versionRequired" to true, "versionMinimum" to "1.1.0").asJson())
+            type.fromConfigForm(
+                mapOf(
+                    "library" to "library",
+                    "required" to true,
+                    "lastSupported" to "1.1.0",
+                    "lastDeprecated" to null,
+                    "lastUnsupported" to null,
+                ).asJson()
+            )
         )
     }
 
     @Test
     fun `To config client JSON`() {
         assertEquals(
-            mapOf("versionRequired" to true, "versionMinimum" to mapOf("value" to "1.1.0")).asJson(),
+            mapOf(
+                "settings" to mapOf(
+                    "library" to "library",
+                    "required" to true,
+                    "lastSupported" to "1.1.0",
+                    "lastDeprecated" to null,
+                    "lastUnsupported" to null,
+                )
+            ).asJson(),
             type.toConfigClientJson(config(true, "1.1.0"))
         )
     }
@@ -146,7 +132,15 @@ class JenkinsPipelineLibraryIndicatorValueTypeTest {
     @Test
     fun `To config stored JSON`() {
         assertEquals(
-            mapOf("versionRequired" to true, "versionMinimum" to mapOf("value" to "1.1.0")).asJson(),
+            mapOf(
+                "settings" to mapOf(
+                    "library" to "library",
+                    "required" to true,
+                    "lastSupported" to "1.1.0",
+                    "lastDeprecated" to null,
+                    "lastUnsupported" to null,
+                )
+            ).asJson(),
             type.toConfigStoredJson(config(true, "1.1.0"))
         )
     }
@@ -155,7 +149,43 @@ class JenkinsPipelineLibraryIndicatorValueTypeTest {
     fun `From config stored JSON`() {
         assertEquals(
             config(true, "1.1.0"),
-            type.fromConfigStoredJson(mapOf("versionRequired" to true, "versionMinimum" to mapOf("value" to "1.1.0")).asJson())
+            type.fromConfigStoredJson(
+                mapOf(
+                    "settings" to mapOf(
+                        "library" to "library",
+                        "required" to true,
+                        "lastSupported" to "1.1.0",
+                        "lastDeprecated" to null,
+                        "lastUnsupported" to null,
+                    )
+                ).asJson(),
+            )
+        )
+    }
+
+    @Test
+    fun `Backward compatible config stored JSON`() {
+        assertEquals(
+            config(true, "2.0.0", library = "n/a"),
+            type.fromConfigStoredJson(
+                mapOf(
+                    "versionRequired" to true,
+                    "versionMinimum" to "2.0.0",
+                ).asJson(),
+            )
+        )
+    }
+
+    @Test
+    fun `Backward compatible config stored JSON with null values`() {
+        assertEquals(
+            config(false, null, library = "n/a"),
+            type.fromConfigStoredJson(
+                mapOf(
+                    "versionRequired" to null,
+                    "versionMinimum" to null,
+                ).asJson(),
+            )
         )
     }
 
@@ -163,11 +193,15 @@ class JenkinsPipelineLibraryIndicatorValueTypeTest {
 
     private fun config(
         versionRequired: Boolean = false,
-        versionMinimum: String? = null
+        versionMinimum: String? = null,
+        library: String = "library",
     ) =
         JenkinsPipelineLibraryIndicatorValueTypeConfig(
-            versionRequired,
-            versionMinimum?.let { JenkinsPipelineLibraryVersion(it) }
+            JenkinsPipelineLibraryIndicatorLibrarySettings(
+                library = library,
+                required = versionRequired,
+                lastSupported = versionMinimum,
+            )
         )
 
 }

@@ -1,18 +1,18 @@
 package net.nemerosa.ontrack.extension.github.workflow
 
+import net.nemerosa.ontrack.model.annotations.APIDescription
+
 /**
- * Property which links a GitHub Workflow run to an Ontrack build.
+ * Links between GitHub Workflow runs and an Ontrack build.
  *
- * @property runId ID of the run
- * @property url Link to the GitHub Workflow run
- * @property name Name of the workflow
- * @property runNumber Number of the run
- * @property running True if the run is still flagged as running
+ * @property workflows All workflows associated to a build.
  */
-class BuildGitHubWorkflowRunProperty(
-    val runId: Long,
-    val url: String,
-    val name: String,
-    val runNumber: Int,
-    val running: Boolean,
-)
+data class BuildGitHubWorkflowRunProperty(
+    @APIDescription("All workflows associated to a build.")
+    val workflows: List<BuildGitHubWorkflowRun>,
+) {
+    /**
+     * Gets a workflow run using its [run id][BuildGitHubWorkflowRun.runId].
+     */
+    fun findRun(runId: Long): BuildGitHubWorkflowRun? = workflows.find { it.runId == runId }
+}

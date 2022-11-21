@@ -8,6 +8,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 @Repository
@@ -34,6 +36,22 @@ public class SettingsJdbcRepository extends AbstractJdbcRepository implements Se
                 "DELETE FROM SETTINGS WHERE CATEGORY = :category",
                 params
         );
+    }
+
+    @Override
+    public Map<String, String> getAllValues(Class<?> category) {
+        MapSqlParameterSource params = params("category", category.getName());
+        Map<String, String> result = new HashMap<>();
+        getNamedParameterJdbcTemplate().query(
+                "SELECT NAME, VALUE FROM SETTINGS WHERE CATEGORY = :category",
+                params,
+                rs -> {
+                    String name = rs.getString("name");
+                    String value = rs.getString("value");
+                    result.put(name, value);
+                }
+        );
+        return result;
     }
 
     @Override

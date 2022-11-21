@@ -25,7 +25,9 @@ class GitHubSCMCatalogSettingsContext(
             cascArray(
                 "List of GitHub organizations to collect.",
                 cascString
-            )
-        )
+            ),
+        ),
+        cascField(GitHubSCMCatalogSettings::autoMergeTimeout),
+        cascField(GitHubSCMCatalogSettings::autoMergeInterval),
     )
 }

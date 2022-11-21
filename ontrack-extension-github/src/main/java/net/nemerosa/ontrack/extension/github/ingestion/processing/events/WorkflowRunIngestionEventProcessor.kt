@@ -4,13 +4,11 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.common.BaseException
-import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
-import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.processing.WorkflowRunInfo
+import net.nemerosa.ontrack.extension.github.ingestion.processing.buildid.BuildIdStrategyRegistry
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigService
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.INGESTION_CONFIG_FILE_PATH
 import net.nemerosa.ontrack.extension.github.ingestion.processing.job.WorkflowJobProcessingService
@@ -19,8 +17,6 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.model.User
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
 import net.nemerosa.ontrack.extension.github.ingestion.support.REFS_TAGS_PREFIX
 import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
-import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
-import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
@@ -32,11 +28,11 @@ import kotlin.reflect.KClass
 @Component
 class WorkflowRunIngestionEventProcessor(
     structureService: StructureService,
-    private val propertyService: PropertyService,
     private val runInfoService: RunInfoService,
     private val ingestionModelAccessService: IngestionModelAccessService,
     private val configService: ConfigService,
     private val workflowJobProcessingService: WorkflowJobProcessingService,
+    private val buildIdStrategyRegistry: BuildIdStrategyRegistry,
 ) : AbstractRepositoryIngestionEventProcessor<WorkflowRunPayload>(
     structureService
 ) {
@@ -74,16 +70,54 @@ class WorkflowRunIngestionEventProcessor(
     }
 
     override fun process(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResultDetails {
-        // Gets the branch
-        val project = getOrCreateProject(payload, configuration)
-        val branch = getOrCreateBranch(project, payload)
         // Gets the ingestion configuration
-        val config = configService.getOrLoadConfig(branch, INGESTION_CONFIG_FILE_PATH)
+        val ingestionConfig = ingestionModelAccessService.getBranchIfExists(
+            repository = payload.repository,
+            headBranch = payload.workflowRun.headBranch,
+            pullRequest = payload.workflowRun.pullRequests.firstOrNull(),
+        )
+            ?.let { branch ->
+                // Using the branch cache if possible
+                configService.loadAndSaveConfig(branch, INGESTION_CONFIG_FILE_PATH)
+            }
+        // Loading the ingestion config directly from GH
+            ?: ingestionModelAccessService.findGitHubEngineConfiguration(
+                repository = payload.repository,
+                configurationName = configuration,
+            ).let { ghConfig ->
+                configService.loadConfig(
+                    configuration = ghConfig,
+                    repository = payload.repository.fullName,
+                    branch = payload.workflowRun.headBranch, // Even for a PR
+                    path = INGESTION_CONFIG_FILE_PATH,
+                )
+            }
         // Filter on the workflow name
-        return if (config.workflows.filter.includes(payload.workflowRun.name)) {
-            when (payload.action) {
-                WorkflowRunAction.requested -> startBuild(payload, configuration)
-                WorkflowRunAction.completed -> endBuild(payload, configuration)
+        return if (ingestionConfig.workflows.filter.includes(payload.workflowRun.name)) {
+            // Filtering on the event
+            if (!ingestionConfig.workflows.events.contains(payload.workflowRun.event)) {
+                IngestionEventProcessingResultDetails.ignored(
+                    """"${payload.workflowRun.event}" is not configured for ingestion."""
+                )
+            }
+            // Filtering on the PR type
+            else if (payload.workflowRun.pullRequests.isNotEmpty() && !ingestionConfig.workflows.includePRs) {
+                IngestionEventProcessingResultDetails.ignored(
+                    """PRs are not configured for ingestion."""
+                )
+            }
+            // Filtering on the Git branch name
+            else if (!ingestionConfig.workflows.branchFilter.includes(payload.workflowRun.headBranch)) {
+                IngestionEventProcessingResultDetails.ignored(
+                    """"${payload.workflowRun.headBranch}" is not configured for ingestion."""
+                )
+            }
+            // OK to process
+            else {
+                when (payload.action) {
+                    WorkflowRunAction.requested -> startBuild(payload, configuration, ingestionConfig)
+                    WorkflowRunAction.completed -> endBuild(payload, configuration, ingestionConfig)
+                }
             }
         } else {
             // Workflow is ignored
@@ -91,9 +125,15 @@ class WorkflowRunIngestionEventProcessor(
         }
     }
 
-    private fun endBuild(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResultDetails {
+    private fun endBuild(
+        payload: WorkflowRunPayload,
+        configuration: String?,
+        ingestionConfig: IngestionConfig,
+    ): IngestionEventProcessingResultDetails {
         // Build creation & setup
-        val build = getOrCreateBuild(payload, running = false, configuration = configuration)
+        val build =
+            getOrCreateBuild(payload, configuration = configuration, ingestionConfig = ingestionConfig)
+                ?: return IngestionEventProcessingResultDetails.ignored("Build strategy does not allow the creation of a build for this workflow run.")
         // Setting the run info
         val runInfo = collectRunInfo(payload)
         runInfoService.setRunInfo(build, runInfo)
@@ -107,9 +147,15 @@ class WorkflowRunIngestionEventProcessor(
         return IngestionEventProcessingResultDetails.processed()
     }
 
-    private fun setupWorkflowValidation(config: IngestionConfig, build: Build, workflowRun: WorkflowRun, runInfo: RunInfoInput) {
+    private fun setupWorkflowValidation(
+        config: IngestionConfig,
+        build: Build,
+        workflowRun: WorkflowRun,
+        runInfo: RunInfoInput,
+    ) {
         // Gets the validation name from the run name
-        val validationStampName = normalizeName("${config.workflows.validations.prefix}${workflowRun.name}${config.workflows.validations.suffix}")
+        val validationStampName =
+            normalizeName("${config.workflows.validations.prefix}${workflowRun.name}${config.workflows.validations.suffix}")
         // Gets or creates the validation stamp
         val vs = ingestionModelAccessService.setupValidationStamp(
             build.branch, validationStampName, "${workflowRun.name} workflow"
@@ -146,51 +192,64 @@ class WorkflowRunIngestionEventProcessor(
         )
     }
 
-    private fun startBuild(payload: WorkflowRunPayload, configuration: String?): IngestionEventProcessingResultDetails {
+    private fun startBuild(
+        payload: WorkflowRunPayload,
+        configuration: String?,
+        ingestionConfig: IngestionConfig,
+    ): IngestionEventProcessingResultDetails {
         // Build creation & setup
-        getOrCreateBuild(payload, running = true, configuration = configuration)
-        // OK
-        return IngestionEventProcessingResultDetails.processed()
+        val build = getOrCreateBuild(payload, configuration = configuration, ingestionConfig = ingestionConfig)
+        return if (build != null) {
+            IngestionEventProcessingResultDetails.processed("Build ${build.name} created.")
+        } else {
+            IngestionEventProcessingResultDetails.ignored("Build strategy does not allow the creation of a build for this workflow run.")
+        }
     }
 
-    private fun getOrCreateBuild(payload: WorkflowRunPayload, running: Boolean, configuration: String?): Build {
+    private fun getOrCreateBuild(
+        payload: WorkflowRunPayload,
+        configuration: String?,
+        ingestionConfig: IngestionConfig,
+    ): Build? {
         // Gets or creates the project
         val project = getOrCreateProject(payload, configuration)
         // Branch creation & setup
         val branch = getOrCreateBranch(project, payload)
-        // Build creation & setup
-        val buildName = normalizeName(
-            "${payload.workflowRun.name}-${payload.workflowRun.runNumber}"
+        // Build identification strategy
+        val strategy = buildIdStrategyRegistry.getBuildIdStrategy(ingestionConfig.workflows.buildIdStrategy.id)
+        // Gets the build using this strategy
+        // If not found, checks if the strategy allows for the creation of a build
+        val build = strategy.findBuild(
+            branch,
+            payload.workflowRun,
+            ingestionConfig.workflows.buildIdStrategy.config,
         )
-        val build = structureService.findBuildByName(project.name, branch.name, buildName)
-            .getOrNull()
-            ?: structureService.newBuild(
-                Build.of(
+            ?: if (strategy.canCreateBuild(
                     branch,
-                    nd(buildName, ""),
-                    Signature.of(payload.workflowRun.createdAtDate, payload.sender?.login ?: "hook")
+                    payload.workflowRun,
+                    ingestionConfig.workflows.buildIdStrategy.config
                 )
-            )
+            ) {
+                structureService.newBuild(
+                    Build.of(
+                        branch,
+                        nd(
+                            strategy.getBuildName(
+                                payload.workflowRun,
+                                ingestionConfig.workflows.buildIdStrategy.config
+                            ),
+                            "Created by GitHub workflow ${payload.workflowRun.name}"
+                        ),
+                        Signature.of(payload.workflowRun.createdAtDate, payload.sender?.login ?: "hook")
+                    )
+                )
+            } else {
+                return null // <- not creating a build not reusing a build
+            }
         // Link between the build and the workflow
-        propertyService.editProperty(
-            build,
-            BuildGitHubWorkflowRunPropertyType::class.java,
-            BuildGitHubWorkflowRunProperty(
-                runId = payload.workflowRun.id,
-                url = payload.workflowRun.htmlUrl,
-                name = payload.workflowRun.name,
-                runNumber = payload.workflowRun.runNumber,
-                running = running,
-            )
-        )
-        // Git commit property
-        if (!propertyService.hasProperty(build, GitCommitPropertyType::class.java)) {
-            propertyService.editProperty(
-                build,
-                GitCommitPropertyType::class.java,
-                GitCommitProperty(payload.workflowRun.headSha)
-            )
-        }
+        ingestionModelAccessService.setBuildRunId(build, payload.workflowRun)
+        // Build id strategy setup
+        strategy.setupBuild(build, payload.workflowRun, ingestionConfig.workflows.buildIdStrategy.config)
         // OK
         return build
     }

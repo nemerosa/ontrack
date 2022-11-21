@@ -71,6 +71,20 @@ fun Form.selectionOfString(
             .value(value)
     )
 
+/**
+ * Multiform field
+ */
+fun <T> Form.multiform(
+    property: KProperty1<*, List<T>>,
+    items: List<T>?,
+    formCreation: () -> Form,
+): Form = with(
+    MultiForm.of(property.name, formCreation())
+        .label(getPropertyLabel(property))
+        .help(getPropertyDescription(property))
+        .value(items ?: emptyList<T>())
+)
+
 inline fun <reified E : Enum<E>> Form.enumField(
     property: KProperty1<*, E?>,
     value: E?,

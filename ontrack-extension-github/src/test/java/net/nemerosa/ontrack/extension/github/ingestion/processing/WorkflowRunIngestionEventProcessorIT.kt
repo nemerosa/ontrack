@@ -10,10 +10,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionCon
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigWorkflows
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
-import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
-import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunAction
-import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunIngestionEventProcessor
-import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRunPayload
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
@@ -143,7 +140,52 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                         workflows = IngestionConfigWorkflows(filter = FilterConfig.none)
                     )
                 )
-                workflowRunValidationTest(expectValidation = false)
+                workflowRunValidationTest(expectProject = false)
+            }
+        }
+    }
+
+    @Test
+    fun `No validation for the workflow run using exclusion of branches in the configuration`() {
+        // Only one GitHub configuration
+        onlyOneGitHubConfig()
+        // Starting the run
+        asAdmin {
+            withGitHubIngestionSettings {
+                ConfigLoaderServiceITMockConfig.customIngestionConfig(
+                    configLoaderService, IngestionConfig(
+                        workflows = IngestionConfigWorkflows(
+                            branchFilter = FilterConfig(excludes = "main")
+                        )
+                    )
+                )
+                workflowRunValidationTest(expectProject = false)
+            }
+        }
+    }
+
+    @Test
+    fun `No validation for the workflow run using exclusion of pull requests in the configuration`() {
+        // Only one GitHub configuration
+        onlyOneGitHubConfig()
+        // Starting the run
+        asAdmin {
+            withGitHubIngestionSettings {
+                ConfigLoaderServiceITMockConfig.customIngestionConfig(
+                    configLoaderService, IngestionConfig(
+                        workflows = IngestionConfigWorkflows(
+                            includePRs = false,
+                        )
+                    )
+                )
+                workflowRunValidationTest(
+                    pullRequests = listOf(
+                        IngestionHookFixtures.sampleWorkflowRunPR(
+                            repoName = IngestionHookFixtures.sampleRepository,
+                        )
+                    ),
+                    expectProject = false,
+                )
             }
         }
     }
@@ -164,39 +206,145 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
     }
 
     private fun workflowRunValidationTest(
+        expectProject: Boolean = true,
         expectValidation: Boolean = true,
+        pullRequests: List<WorkflowRunPullRequest> = emptyList(),
     ) {
         val payload = payload(
             status = WorkflowJobStepStatus.completed,
             conclusion = WorkflowJobStepConclusion.success,
+            pullRequests = pullRequests,
         )
         processor.process(
             payload,
             null
         )
-        assertNotNull(structureService.findProjectByName(payload.repository.name).getOrNull()) { project ->
-            assertNotNull(
-                structureService.findBranchByName(project.name, payload.workflowRun.headBranch).getOrNull()
-            ) { branch ->
-                if (expectValidation) {
-                    assertNotNull(
-                        structureService.findValidationStampByName(branch.project.name, branch.name, "workflow-ci")
-                            .getOrNull()
-                    ) { vs ->
+        if (expectProject) {
+            assertNotNull(structureService.findProjectByName(payload.repository.name).getOrNull()) { project ->
+                assertNotNull(
+                    structureService.findBranchByName(project.name, payload.workflowRun.headBranch).getOrNull()
+                ) { branch ->
+                    if (expectValidation) {
                         assertNotNull(
-                            structureService.findBuildByName(project.name, branch.name, "ci-1").getOrNull()
-                        ) { build ->
-                            val runs =
-                                structureService.getValidationRunsForBuildAndValidationStamp(build.id, vs.id, 0, 10)
-                            assertEquals(1, runs.size)
-                            val run = runs.first()
-                            assertEquals(ValidationRunStatusID.STATUS_PASSED, run.lastStatus.statusID)
+                            structureService.findValidationStampByName(branch.project.name, branch.name, "workflow-ci")
+                                .getOrNull()
+                        ) { vs ->
+                            assertNotNull(
+                                structureService.findBuildByName(project.name, branch.name, "ci-1").getOrNull()
+                            ) { build ->
+                                val runs =
+                                    structureService.getValidationRunsForBuildAndValidationStamp(build.id, vs.id, 0, 10)
+                                assertEquals(1, runs.size)
+                                val run = runs.first()
+                                assertEquals(ValidationRunStatusID.STATUS_PASSED, run.lastStatus.statusID)
+                            }
                         }
+                    } else {
+                        assertNull(
+                            structureService.findValidationStampByName(branch.project.name, branch.name, "workflow-ci")
+                                .getOrNull()
+                        )
                     }
-                } else {
+                }
+            }
+        } else {
+            assertNull(
+                structureService.findProjectByName(payload.repository.name).getOrNull(),
+                "Project has not been created"
+            )
+        }
+    }
+
+    @Test
+    fun `Same build targeted by two worflows based on Git commit`() {
+        // Only one GitHub configuration
+        onlyOneGitHubConfig()
+        // For a given project & branch
+        asAdmin {
+            project {
+                branch("main") {
+                    val commit = uid("commit-")
+                    // First workflow with a given commit will create the build and
+                    // link the workflow to it (and the Git commit)
+                    processor.process(
+                        payload(
+                            repoName = project.name,
+                            runName = "build",
+                            runNumber = 20,
+                            runId = 10L,
+                            commit = commit,
+                        ),
+                        configuration = null
+                    )
+                    // Checks the build has been created
+                    val build = structureService.findBuildByName(project.name, name, "build-20").orElse(null)
+                        ?: fail("Build created by first workflow")
+                    // Checks the run ID has been set on the build
+                    assertNotNull(
+                        getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java),
+                        "Workflow run property set on the build"
+                    ) {
+                        assertNotNull(it.findRun(10L), "First workflow run ID set on the build")
+                    }
+                    // Checks the Git commit has been set
+                    assertNotNull(
+                        getProperty(build, GitCommitPropertyType::class.java),
+                        "Git commit property set on the build"
+                    ) {
+                        assertEquals(commit, it.commit)
+                    }
+
+                    // TODO Second workflow with the same commit will reuse the previous build and
+                    // link the new workflow to it
+                    processor.process(
+                        payload(
+                            repoName = project.name,
+                            runName = "tests",
+                            runNumber = 15,
+                            runId = 25L,
+                            commit = commit, // <-- same commit
+                        ),
+                        configuration = null
+                    )
+                    // Checks the new run ID has been set on the build
+                    assertNotNull(
+                        getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java),
+                        "New workflow run property set on the build"
+                    ) {
+                        assertNotNull(it.findRun(25L), "Second workflow run ID set on the build")
+                    }
+                    // Checks that no other build was created
                     assertNull(
-                        structureService.findValidationStampByName(branch.project.name, branch.name, "workflow-ci")
-                            .getOrNull()
+                        structureService.findBuildByName(project.name, name, "tests-25").orElse(null),
+                        "Second workflow did not create any build"
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Default commit build id strategy not creating a build if Git commit is absent`() {
+        // Only one GitHub configuration
+        onlyOneGitHubConfig()
+        // For a given project & branch
+        asAdmin {
+            project {
+                branch("main") {
+                    processor.process(
+                        payload(
+                            repoName = project.name,
+                            runName = "build",
+                            runNumber = 20,
+                            runId = 10L,
+                            commit = "", // <- no commit
+                        ),
+                        configuration = null
+                    )
+                    // Checks the build has NOT been created
+                    assertNull(
+                        structureService.findBuildByName(project.name, name, "build-20").orElse(null),
+                        "Build not created because no commit"
                     )
                 }
             }
@@ -219,6 +367,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
             processor.process(
                 payload(
                     action = WorkflowRunAction.requested,
+                    conclusion = null,
                     runNumber = 1,
                     headBranch = "release/1.0",
                     repoName = repoName,
@@ -234,7 +383,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                 "Build created"
             ) { build ->
                 assertNotNull(
-                    getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java),
+                    getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java)?.workflows?.firstOrNull(),
                     "GitHub Workflow link set"
                 ) { link ->
                     assertTrue(link.running, "Workflow is running")
@@ -244,6 +393,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
             processor.process(
                 payload(
                     action = WorkflowRunAction.completed,
+                    conclusion = WorkflowJobStepConclusion.success,
                     runNumber = 1,
                     headBranch = "release/1.0",
                     repoName = repoName,
@@ -259,7 +409,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                 "Build created"
             ) { build ->
                 assertNotNull(
-                    getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java),
+                    getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java)?.workflows?.firstOrNull(),
                     "GitHub Workflow link set"
                 ) { link ->
                     assertFalse(link.running, "Workflow is not running")
@@ -445,14 +595,37 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                     IngestionEventProcessingResult.IGNORED,
                     processor.process(payload, null).result
                 )
-                // Checks the project & the branch have been created
-                assertNotNull(
-                    structureService.findBranchByName(repoName, "main").getOrNull(),
-                    "Branch has been created"
-                ) { branch ->
-                    // Checks that NO build has been created
-                    assertEquals(0, structureService.getBuildCount(branch), "No build has been created")
-                }
+                // Checks the project has not been created
+                assertNull(
+                    structureService.findProjectByName(repoName).getOrNull(),
+                    "Project has not been created"
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Only push is supported by default, subsequent jobs and steps are ignored`() {
+        asAdmin {
+            onlyOneGitHubConfig()
+            withGitHubIngestionSettings {
+                ConfigLoaderServiceITMockConfig.customIngestionConfig(
+                    configLoaderService, IngestionConfig()
+                )
+                val repoName = uid("r")
+                val payload: WorkflowRunPayload = IngestionHookFixtures.sampleWorkflowRunPayload(
+                    repoName = repoName,
+                    event = "workflow_dispatch", // Workflow triggered manually ignoring
+                )
+                assertEquals(
+                    IngestionEventProcessingResult.IGNORED,
+                    processor.process(payload, null).result
+                )
+                // Checks the project & the branch have not been created
+                assertNull(
+                    structureService.findProjectByName(repoName).getOrNull(),
+                    "Project has not been created"
+                )
             }
         }
     }
@@ -511,7 +684,10 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                     ) { build ->
                         // Build link to the run
                         assertNotNull(
-                            getProperty(build, BuildGitHubWorkflowRunPropertyType::class.java),
+                            getProperty(
+                                build,
+                                BuildGitHubWorkflowRunPropertyType::class.java
+                            )?.workflows?.firstOrNull(),
                             "GitHub workflow run URL"
                         ) {
                             assertEquals(htmlUrl, it.url)
@@ -521,10 +697,10 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                         // Build link to the run as a decoration
                         val decorations = buildGitHubWorkflowRunDecorator.getDecorations(build)
                         assertEquals(1, decorations.size)
-                        val decoration = decorations.first()
-                        assertEquals(htmlUrl, decoration.data.url)
-                        assertEquals("CI", decoration.data.name)
-                        assertEquals(1, decoration.data.runNumber)
+                        val decoration = decorations.first().data.workflows.first()
+                        assertEquals(htmlUrl, decoration.url)
+                        assertEquals("CI", decoration.name)
+                        assertEquals(1, decoration.runNumber)
                         // Build commit property
                         assertNotNull(
                             getProperty(build, GitCommitPropertyType::class.java),
@@ -555,13 +731,14 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
         repoUrl: String = "https://github.com/$owner/$repoName",
         status: WorkflowJobStepStatus = WorkflowJobStepStatus.in_progress,
         conclusion: WorkflowJobStepConclusion? = null,
+        pullRequests: List<WorkflowRunPullRequest> = emptyList(),
     ) = WorkflowRunPayload(
         action = action,
         workflowRun = WorkflowRun(
             id = runId,
             name = runName,
             runNumber = runNumber,
-            pullRequests = emptyList(),
+            pullRequests = pullRequests,
             headBranch = headBranch,
             headSha = commit,
             createdAtDate = createdAtDate,

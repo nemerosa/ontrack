@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.general
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class ReleasePropertyTypeIT : AbstractPropertyTypeIT() {
+class ReleasePropertyTypeIT : AbstractPropertyTypeTestSupport() {
 
     @Autowired
     private lateinit var releasePropertyType: ReleasePropertyType
@@ -105,6 +105,27 @@ class ReleasePropertyTypeIT : AbstractPropertyTypeIT() {
                 build {
                     val form = releasePropertyType.getEditionForm(this, ReleaseProperty("test"))
                     assertEquals("test", form.getField("name")?.value)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Build branch search on release property`() {
+        project {
+            branch {
+                val builds = (0..5).map {
+                    build(it.toString()) {
+                        setProperty(
+                            this,
+                            ReleasePropertyType::class.java,
+                            ReleaseProperty(name = "1.0.$it")
+                        )
+                    }
+                }
+                (0..5).forEach {
+                    val build = propertyService.findBuildByBranchAndSearchkey(id, ReleasePropertyType::class.java, "1.0.$it")
+                    assertEquals(builds[it].id, build, "Build found using its release property")
                 }
             }
         }

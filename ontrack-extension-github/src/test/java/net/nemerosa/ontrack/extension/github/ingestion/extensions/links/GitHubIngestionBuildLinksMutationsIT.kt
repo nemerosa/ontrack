@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.extensions.links
 import net.nemerosa.ontrack.extension.general.ReleaseProperty
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
+import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRun
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.json.getRequiredTextField
@@ -148,11 +149,16 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
                             setProperty(
                                 this, BuildGitHubWorkflowRunPropertyType::class.java,
                                 BuildGitHubWorkflowRunProperty(
-                                    runId = runIdProperty,
-                                    url = "",
-                                    name = "some-workflow",
-                                    runNumber = 1,
-                                    running = true,
+                                    workflows = listOf(
+                                        BuildGitHubWorkflowRun(
+                                            runId = runIdProperty,
+                                            url = "",
+                                            name = "some-workflow",
+                                            runNumber = 1,
+                                            running = true,
+                                            event = "push",
+                                        )
+                                    )
                                 )
                             )
                             if (buildIdentification == BuildIdentification.BUILD_LABEL) {

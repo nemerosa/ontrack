@@ -30,8 +30,16 @@ class ConfigLoaderServiceITMockConfig {
         fun customIngestionConfig(configLoaderService: ConfigLoaderService, config: IngestionConfig) {
             every {
                 configLoaderService.loadConfig(
-                    any(),
-                    INGESTION_CONFIG_FILE_PATH
+                    configuration = any(),
+                    repository = any(),
+                    branch = any(),
+                    path = INGESTION_CONFIG_FILE_PATH
+                )
+            } returns config
+            every {
+                configLoaderService.loadConfig(
+                    branch = any(),
+                    path = INGESTION_CONFIG_FILE_PATH
                 )
             } returns config
         }
@@ -39,8 +47,16 @@ class ConfigLoaderServiceITMockConfig {
         fun failedIngestionConfig(configLoaderService: ConfigLoaderService) {
             every {
                 configLoaderService.loadConfig(
-                    any(),
-                    INGESTION_CONFIG_FILE_PATH
+                    configuration = any(),
+                    repository = any(),
+                    branch = any(),
+                    path = INGESTION_CONFIG_FILE_PATH
+                )
+            } throws ConfigParsingException(RuntimeException("Parsing error"))
+            every {
+                configLoaderService.loadConfig(
+                    branch = any(),
+                    path = INGESTION_CONFIG_FILE_PATH
                 )
             } throws ConfigParsingException(RuntimeException("Parsing error"))
         }

@@ -5,17 +5,17 @@ import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.form.*
-import net.nemerosa.ontrack.model.form.Int
 import net.nemerosa.ontrack.model.security.BuildConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
+import net.nemerosa.ontrack.model.structure.PropertySearchArguments
 import org.springframework.stereotype.Component
 import java.util.function.Function
 
 @Component
 class BuildGitHubWorkflowRunPropertyType(
-    extensionFeature: GitHubExtensionFeature
+    extensionFeature: GitHubExtensionFeature,
 ) : AbstractPropertyType<BuildGitHubWorkflowRunProperty>(
     extensionFeature
 ) {
@@ -33,45 +33,50 @@ class BuildGitHubWorkflowRunPropertyType(
 
     override fun getEditionForm(entity: ProjectEntity, value: BuildGitHubWorkflowRunProperty?): Form =
         Form.create()
-            .with(
-                Int.of(BuildGitHubWorkflowRunProperty::runId.name)
-                    .label("ID")
-                    .help("Unique ID of the workflow run")
-                    .value(value?.runId)
-            )
-            .with(
-                Url.of(BuildGitHubWorkflowRunProperty::url.name)
-                    .label("URL")
-                    .help("Link to the GitHub Workflow run")
-                    .value(value?.url)
-            )
-            .with(
-                Text.of(BuildGitHubWorkflowRunProperty::name.name)
-                    .label("Name")
-                    .help("Name of the workflow")
-                    .value(value?.name)
-            )
-            .with(
-                Int.of(BuildGitHubWorkflowRunProperty::runNumber.name)
-                    .label("Number")
-                    .help("Run number")
-                    .min(1)
-                    .value(value?.runNumber)
-            )
-            .with(
-                YesNo.of(BuildGitHubWorkflowRunProperty::running.name)
-                    .label("Running")
-                    .help("Is the workflow still running?")
-                    .value(value?.running ?: false)
-            )
+            .multiform(
+                BuildGitHubWorkflowRunProperty::workflows,
+                value?.workflows
+            ) {
+                Form.create()
+                    .longField(BuildGitHubWorkflowRun::runId, null)
+                    .urlField(BuildGitHubWorkflowRun::url, null)
+                    .textField(BuildGitHubWorkflowRun::name, null)
+                    .intField(BuildGitHubWorkflowRun::runNumber, null)
+                    .yesNoField(BuildGitHubWorkflowRun::running, null)
+                    .textField(BuildGitHubWorkflowRun::event, null)
+            }
 
     override fun fromClient(node: JsonNode): BuildGitHubWorkflowRunProperty = node.parse()
 
-    override fun fromStorage(node: JsonNode): BuildGitHubWorkflowRunProperty = node.parse()
+    override fun fromStorage(node: JsonNode): BuildGitHubWorkflowRunProperty =
+        if (node.has(BuildGitHubWorkflowRunProperty::workflows.name)) {
+            node.parse()
+        } else {
+            // Legacy
+            val workflow = node.parse<BuildGitHubWorkflowRun>()
+            BuildGitHubWorkflowRunProperty(workflows = listOf(workflow))
+        }
 
     override fun replaceValue(
         value: BuildGitHubWorkflowRunProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: Function<String, String>,
     ): BuildGitHubWorkflowRunProperty = value
 
+    override fun getSearchArguments(token: String?): PropertySearchArguments? =
+        if (!token.isNullOrBlank()) {
+            try {
+                val value = token.toLong()
+                PropertySearchArguments(
+                    jsonContext = "jsonb_array_elements(pp.json->'workflows') as workflow",
+                    jsonCriteria = "(workflow->>'runId')::bigint = :value",
+                    criteriaParams = mapOf(
+                        "value" to value
+                    )
+                )
+            } catch (_: NumberFormatException) {
+                null
+            }
+        } else {
+            null
+        }
 }

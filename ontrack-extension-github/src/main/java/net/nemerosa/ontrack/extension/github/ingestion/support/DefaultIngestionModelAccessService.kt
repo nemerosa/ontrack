@@ -12,13 +12,17 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
 import net.nemerosa.ontrack.extension.github.ingestion.processing.*
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.IPullRequest
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.getProjectName
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
+import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
+import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRun
+import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProperty
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
@@ -37,6 +41,7 @@ class DefaultIngestionModelAccessService(
     private val gitCommitPropertyCommitLink: GitCommitPropertyCommitLink,
     private val validationDataTypeService: ValidationDataTypeService,
     private val ingestionImageService: IngestionImageService,
+    private val buildGitHubWorkflowRunPropertyType: BuildGitHubWorkflowRunPropertyType,
 ) : IngestionModelAccessService {
 
     override fun getOrCreateProject(repository: Repository, configuration: String?): Project {
@@ -69,40 +74,7 @@ class DefaultIngestionModelAccessService(
         configurationName: String?,
     ) {
         if (!propertyService.hasProperty(project, GitHubProjectConfigurationPropertyType::class.java)) {
-            val configuration = if (!configurationName.isNullOrBlank()) {
-                gitHubConfigurationService.findConfiguration(configurationName)
-                    ?: throw GitHubConfigProvidedNameNotFoundException(configurationName)
-            } else {
-                // Gets the list of GH configs
-                val configurations = gitHubConfigurationService.configurations
-                // If no configuration, error
-                if (configurations.isEmpty()) {
-                    throw NoGitHubConfigException()
-                }
-                // If only 1 config, use it
-                else if (configurations.size == 1) {
-                    val candidate = configurations.first()
-                    // Checks the URL
-                    if (repository.htmlUrl.startsWith(candidate.url)) {
-                        candidate
-                    } else {
-                        throw GitHubConfigURLMismatchException(repository.htmlUrl)
-                    }
-                }
-                // If several configurations, select it based on the URL
-                else {
-                    val candidates = configurations.filter {
-                        repository.htmlUrl.startsWith(it.url)
-                    }
-                    if (candidates.isEmpty()) {
-                        throw GitHubConfigURLNoMatchException(repository.htmlUrl)
-                    } else if (candidates.size == 1) {
-                        candidates.first()
-                    } else {
-                        throw GitHubConfigURLSeveralMatchesException(repository.htmlUrl)
-                    }
-                }
-            }
+            val configuration = findGitHubEngineConfiguration(repository, configurationName)
             // Project property if not already defined
             propertyService.editProperty(
                 project,
@@ -117,6 +89,44 @@ class DefaultIngestionModelAccessService(
         }
     }
 
+    override fun findGitHubEngineConfiguration(
+        repository: Repository,
+        configurationName: String?,
+    ): GitHubEngineConfiguration = if (!configurationName.isNullOrBlank()) {
+        gitHubConfigurationService.findConfiguration(configurationName)
+            ?: throw GitHubConfigProvidedNameNotFoundException(configurationName)
+    } else {
+        // Gets the list of GH configs
+        val configurations = gitHubConfigurationService.configurations
+        // If no configuration, error
+        if (configurations.isEmpty()) {
+            throw NoGitHubConfigException()
+        }
+        // If only 1 config, use it
+        else if (configurations.size == 1) {
+            val candidate = configurations.first()
+            // Checks the URL
+            if (repository.htmlUrl.startsWith(candidate.url)) {
+                candidate
+            } else {
+                throw GitHubConfigURLMismatchException(repository.htmlUrl)
+            }
+        }
+        // If several configurations, select it based on the URL
+        else {
+            val candidates = configurations.filter {
+                repository.htmlUrl.startsWith(it.url)
+            }
+            if (candidates.isEmpty()) {
+                throw GitHubConfigURLNoMatchException(repository.htmlUrl)
+            } else if (candidates.size == 1) {
+                candidates.first()
+            } else {
+                throw GitHubConfigURLSeveralMatchesException(repository.htmlUrl)
+            }
+        }
+    }
+
     override fun findBranchByRef(project: Project, ref: String, pullRequest: IPullRequest?): Branch? {
         val branchName = if (pullRequest != null) {
             "PR-${pullRequest.number}"
@@ -128,20 +138,50 @@ class DefaultIngestionModelAccessService(
         return structureService.findBranchByName(project.name, branchName).getOrNull()
     }
 
+    override fun getBranchIfExists(
+        repository: Repository,
+        headBranch: String,
+        pullRequest: IPullRequest?,
+    ): Branch? {
+        val settings = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java)
+        val name = getProjectName(
+            owner = repository.owner.login,
+            repository = repository.name,
+            orgProjectPrefix = settings.orgProjectPrefix,
+        )
+        val project = structureService.findProjectByName(name).getOrNull()
+        return if (project != null) {
+            val (branchName, _) = getBranchNames(headBranch, pullRequest)
+            structureService.findBranchByName(project.name, branchName).getOrNull()
+        } else {
+            null
+        }
+    }
+
+    private data class BranchNames(
+        val name: String,
+        val gitBranch: String,
+    )
+
+    private fun getBranchNames(
+        headBranch: String,
+        pullRequest: IPullRequest?,
+    ): BranchNames = if (pullRequest != null) {
+        val key = "PR-${pullRequest.number}"
+        BranchNames(key, key)
+    } else if (headBranch.startsWith(REFS_TAGS_PREFIX)) {
+        error("Creating branch from tag is not supported: $headBranch")
+    } else {
+        val branchName = NameDescription.escapeName(headBranch).take(Branch.NAME_MAX_LENGTH)
+        BranchNames(branchName, headBranch)
+    }
+
     override fun getOrCreateBranch(
         project: Project,
         headBranch: String,
         pullRequest: IPullRequest?,
     ): Branch {
-        val (branchName, gitBranch) = if (pullRequest != null) {
-            val key = "PR-${pullRequest.number}"
-            key to key
-        } else if (headBranch.startsWith(REFS_TAGS_PREFIX)) {
-            error("Creating branch from tag is not supported: $headBranch")
-        } else {
-            val branchName = NameDescription.escapeName(headBranch).take(Branch.NAME_MAX_LENGTH)
-            branchName to headBranch
-        }
+        val (branchName, gitBranch) = getBranchNames(headBranch, pullRequest)
         val branch = structureService.findBranchByName(project.name, branchName)
             .getOrNull()
             ?: structureService.newBranch(
@@ -186,6 +226,42 @@ class DefaultIngestionModelAccessService(
         return structureService.findProjectByName(projectName).getOrNull()
     }
 
+    override fun setBuildRunId(
+        build: Build,
+        workflowRun: WorkflowRun,
+    ) {
+        val link = BuildGitHubWorkflowRun(
+            runId = workflowRun.id,
+            url = workflowRun.htmlUrl,
+            name = workflowRun.name,
+            runNumber = workflowRun.runNumber,
+            running = workflowRun.conclusion == null,
+            event = workflowRun.event,
+        )
+        val property = propertyService.getPropertyValue(build, BuildGitHubWorkflowRunPropertyType::class.java)
+        if (property != null) {
+            val workflows = property.workflows.toMutableList()
+            val changed = BuildGitHubWorkflowRun.edit(workflows, link)
+            if (changed) {
+                propertyService.editProperty(
+                    build,
+                    BuildGitHubWorkflowRunPropertyType::class.java,
+                    BuildGitHubWorkflowRunProperty(
+                        workflows = workflows,
+                    )
+                )
+            }
+        } else {
+            propertyService.editProperty(
+                build,
+                BuildGitHubWorkflowRunPropertyType::class.java,
+                BuildGitHubWorkflowRunProperty(
+                    workflows = listOf(link),
+                )
+            )
+        }
+    }
+
     override fun findBuildByRunId(repository: Repository, runId: Long): Build? {
         // Gets the project
         val project = findProjectFromRepository(repository) ?: return null
@@ -193,13 +269,7 @@ class DefaultIngestionModelAccessService(
         return propertyService.findByEntityTypeAndSearchArguments(
             ProjectEntityType.BUILD,
             BuildGitHubWorkflowRunPropertyType::class,
-            PropertySearchArguments(
-                jsonContext = null,
-                jsonCriteria = "(pp.json->>'runId')::bigint = :runId",
-                criteriaParams = mapOf(
-                    "runId" to runId,
-                )
-            )
+            buildGitHubWorkflowRunPropertyType.getSearchArguments(runId.toString()),
         ).map {
             structureService.getBuild(it)
         }.firstOrNull {
@@ -242,7 +312,7 @@ class DefaultIngestionModelAccessService(
         image: String?,
     ): ValidationStamp {
         // Data type
-        val actualDataTypeConfig: ValidationDataTypeConfig<Any>? = if (dataType != null && dataType.isNotBlank()) {
+        val actualDataTypeConfig: ValidationDataTypeConfig<Any>? = if (!dataType.isNullOrBlank()) {
             // Shortcut resolution
             val dataTypeId: String = when (dataType) {
                 "test-summary" -> TestSummaryValidationDataType::class.java.name

@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.github.ingestion.support
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.github.ingestion.processing.events.WorkflowRun
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.IPullRequest
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
+import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.model.structure.*
 
 /**
@@ -10,6 +12,14 @@ import net.nemerosa.ontrack.model.structure.*
  * the ingestion.
  */
 interface IngestionModelAccessService {
+
+    /**
+     * Gets the GitHub configuration for a given repository.
+     */
+    fun findGitHubEngineConfiguration(
+        repository: Repository,
+        configurationName: String?,
+    ): GitHubEngineConfiguration
 
     /**
      * Gets or creates a project for the given repository.
@@ -36,6 +46,19 @@ interface IngestionModelAccessService {
     ): Branch
 
     /**
+     * Gets a branch from a payload if it exists.
+     *
+     * @param repository Repository
+     * @param headBranch Git branch
+     * @param pullRequest Pull request (if any)
+     */
+    fun getBranchIfExists(
+        repository: Repository,
+        headBranch: String,
+        pullRequest: IPullRequest?,
+    ): Branch?
+
+    /**
      * Finds a project from a repository.
      */
     fun findProjectFromRepository(repository: Repository): Project?
@@ -46,6 +69,17 @@ interface IngestionModelAccessService {
     fun findBranchByRef(project: Project,
                         ref: String,
                         pullRequest: IPullRequest?,): Branch?
+
+    /**
+     * Sets a workflow run ID on a build.
+     *
+     * @param build Build to set
+     * @param workflowRun Run to register
+     */
+    fun setBuildRunId(
+        build: Build,
+        workflowRun: WorkflowRun,
+    )
 
     /**
      * Finds a build using its workflow run ID.

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
+import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.model.structure.Branch
 
 /**
@@ -15,4 +16,14 @@ interface ConfigLoaderService {
      * @return The parsed configuration or null if the target file cannot be found.
      */
     fun loadConfig(branch: Branch, path: String): IngestionConfig?
+
+    /**
+     * Low-level loading
+     */
+    fun loadConfig(
+        configuration: GitHubEngineConfiguration,
+        repository: String,
+        branch: String,
+        path: String,
+    ): IngestionConfig?
 }
