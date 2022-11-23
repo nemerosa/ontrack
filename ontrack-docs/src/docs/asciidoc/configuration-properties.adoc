@@ -337,3 +337,16 @@ ontrack.extension.auto-versioning.queue.cancelling = true
 # Comma-separated list of projects which must have dedicated queues
 # ontrack.extension.auto-versioning.queue.projects =
 ----
+
+[[configuration-properties-indicators]]
+==== Indicators Configuration properties
+
+[source,properties]
+----
+# When a category/type does not exist any longer for a given import ID, must it be deleted?
+ontrack.extension.indicators.importing.deleting = false
+# Enabling the scheduled export of metrics (a manual job is always available)
+ontrack.extension.indicators.metrics.enabled = true
+# Cron for the scheduled export of metrucs
+ontrack.extension.indicators.metrics.cron = @daily
+----

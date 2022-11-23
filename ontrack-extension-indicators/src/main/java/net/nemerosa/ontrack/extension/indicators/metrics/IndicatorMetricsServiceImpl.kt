@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.metrics
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.indicators.model.Indicator
 import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.model.structure.Project
@@ -24,7 +25,7 @@ class IndicatorMetricsServiceImpl(
                     fields = mapOf(
                             "value" to indicator.compliance.value.toDouble()
                     ),
-                    timestamp = indicator.signature.time
+                    timestamp = Time.now() // Metric timestamp = time of the current value
             )
         }
     }

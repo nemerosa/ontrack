@@ -20,7 +20,7 @@ class IndicatorMetricsServiceIT : AbstractIndicatorsTestSupport() {
     private lateinit var metricsExportService: MetricsExportService
 
     @Autowired
-    private lateinit var indicatorMetricsRestorationJob: IndicatorMetricsRestorationJob
+    private lateinit var indicatorMetricsRestorationJob: IndicatorMetricsExportJob
 
     @Test
     fun `Setting indicators sends some metrics`() {
