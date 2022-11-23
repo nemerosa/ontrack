@@ -23,28 +23,7 @@ class IndicatorMetricsServiceIT : AbstractIndicatorsTestSupport() {
     private lateinit var indicatorMetricsRestorationJob: IndicatorMetricsExportJob
 
     @Test
-    fun `Setting indicators sends some metrics`() {
-        val type = category().booleanType()
-        project {
-            indicator(type, true)
-            // Checks the metrics have been sent
-            verify(metricsExportService).exportMetrics(
-                    metric = eq("ontrack_indicator"),
-                    tags = eq(mapOf(
-                            "project" to name,
-                            "category" to type.category.id,
-                            "type" to type.id
-                    )),
-                    fields = eq(mapOf(
-                            "value" to 100.0
-                    )),
-                    timestamp = any()
-            )
-        }
-    }
-
-    @Test
-    fun `Metrics restoration`() {
+    fun `Metrics export`() {
         val type = category().booleanType(required = false)
         // Generates a stream of metrics in the past
         val now = Time.now()
