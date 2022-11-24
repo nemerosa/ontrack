@@ -123,6 +123,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                             events = setOf(
                                 "auto-versioning-error",
                                 "auto-versioning-success",
+                                "auto-versioning-post-processing-error",
                                 "auto-versioning-pr-merge-timeout-error",
                             ),
                             keywords = "${source.name} ${project.name} $name",
@@ -212,6 +213,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                 projectEntity = this,
                                 events = setOf(
                                     "auto-versioning-error",
+                                    "auto-versioning-post-processing-error",
                                 ),
                                 keywords = "${source.name} ${project.name} $name",
                                 channel = "mock",
@@ -304,6 +306,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                 projectEntity = this,
                                 events = setOf(
                                     "auto-versioning-error",
+                                    "auto-versioning-post-processing-error",
                                 ),
                                 keywords = "${source.name} ${project.name} $name",
                                 channel = "mock",
@@ -376,6 +379,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                 events = setOf(
                                     "auto-versioning-error",
                                     "auto-versioning-success",
+                                    "auto-versioning-post-processing-error",
                                     "auto-versioning-pr-merge-timeout-error",
                                 ),
                                 keywords = "${source.name} ${project.name} $name",
@@ -458,6 +462,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                 events = setOf(
                                     "auto-versioning-error",
                                     "auto-versioning-success",
+                                    "auto-versioning-post-processing-error",
                                     "auto-versioning-pr-merge-timeout-error",
                                 ),
                                 keywords = "${source.name} ${project.name} $name",

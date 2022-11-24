@@ -18,13 +18,17 @@ enum class AutoVersioningNotificationScope {
                         AutoVersioningEvents.AUTO_VERSIONING_SUCCESS.id,
                         AutoVersioningEvents.AUTO_VERSIONING_PR_MERGE_TIMEOUT_ERROR.id,
                         AutoVersioningEvents.AUTO_VERSIONING_ERROR.id,
+                        AutoVersioningEvents.AUTO_VERSIONING_POST_PROCESSING_ERROR.id,
                     )
 
                     SUCCESS -> result += AutoVersioningEvents.AUTO_VERSIONING_SUCCESS.id
 
                     PR_TIMEOUT -> result += AutoVersioningEvents.AUTO_VERSIONING_PR_MERGE_TIMEOUT_ERROR.id
 
-                    ERROR -> result += AutoVersioningEvents.AUTO_VERSIONING_ERROR.id
+                    ERROR -> result += setOf(
+                        AutoVersioningEvents.AUTO_VERSIONING_ERROR.id,
+                        AutoVersioningEvents.AUTO_VERSIONING_POST_PROCESSING_ERROR.id,
+                    )
 
                 }
             }
