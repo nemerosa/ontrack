@@ -60,37 +60,29 @@ class JenkinsPostProcessing(
         val jenkinsClient = jenkinsClientFactory.getClient(jenkinsConfig)
 
         // Launches the job and waits for its completion
-        try {
-            val jenkinsBuild = jenkinsClient.runJob(
-                jenkinsJobPath,
-                mapOf(
-                    "DOCKER_IMAGE" to config.dockerImage,
-                    "DOCKER_COMMAND" to config.dockerCommand,
-                    "COMMIT_MESSAGE" to (config.commitMessage ?: autoVersioningOrder.defaultCommitMessage),
-                    "REPOSITORY_URI" to repositoryURI,
-                    "UPGRADE_BRANCH" to upgradeBranch,
-                    "CREDENTIALS" to (config.credentials?.renderParameter() ?: ""),
-                ),
-                settings.retries,
-                settings.retriesDelaySeconds
-            )
+        val jenkinsBuild = jenkinsClient.runJob(
+            jenkinsJobPath,
+            mapOf(
+                "DOCKER_IMAGE" to config.dockerImage,
+                "DOCKER_COMMAND" to config.dockerCommand,
+                "COMMIT_MESSAGE" to (config.commitMessage ?: autoVersioningOrder.defaultCommitMessage),
+                "REPOSITORY_URI" to repositoryURI,
+                "UPGRADE_BRANCH" to upgradeBranch,
+                "CREDENTIALS" to (config.credentials?.renderParameter() ?: ""),
+            ),
+            settings.retries,
+            settings.retriesDelaySeconds
+        )
 
-            // Check for success
-            if (!jenkinsBuild.successful) {
-                throw JenkinsPostProcessingJobFailureException(
-                    jenkins = jenkinsConfig.url,
-                    job = jenkinsJobPath,
-                    build = jenkinsBuild.id,
-                    buildUrl = jenkinsBuild.url,
-                    result = jenkinsBuild.result
-                )
-            }
-        } catch (e: Exception) {
-            if (e !is JenkinsPostProcessingJobFailureException) {
-                // Feedback already provided from inside the jenkins build
-                // TODO autoVersioningNotificationService.sendErrorNotification(prCreationOrder, "Failed to create post-processing build for ontrack auto-upgrade: ${e.message}")
-            }
-            throw e
+        // Check for success
+        if (!jenkinsBuild.successful) {
+            throw JenkinsPostProcessingJobFailureException(
+                jenkins = jenkinsConfig.url,
+                job = jenkinsJobPath,
+                build = jenkinsBuild.id,
+                buildUrl = jenkinsBuild.url,
+                result = jenkinsBuild.result
+            )
         }
     }
 

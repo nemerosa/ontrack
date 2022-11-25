@@ -27,6 +27,15 @@ object AutoVersioningEvents {
             """.trimIndent()
     )
 
+    val AUTO_VERSIONING_POST_PROCESSING_ERROR: EventType = SimpleEventType.of(
+        "auto-versioning-post-processing-error",
+        """
+                Auto versioning post-processing of ${'$'}{PROJECT}/${'$'}{BRANCH} for dependency ${'$'}{X_PROJECT} version "${'$'}{:version}" has failed.
+
+                ${'$'}{:message:link}
+            """.trimIndent()
+    )
+
     val AUTO_VERSIONING_PR_MERGE_TIMEOUT_ERROR: EventType = SimpleEventType.of(
         "auto-versioning-pr-merge-timeout-error",
         """

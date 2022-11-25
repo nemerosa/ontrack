@@ -8,13 +8,13 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-class IndicatorMetricsRestorationServiceImpl(
+class IndicatorMetricsExportServiceImpl(
         private val structureService: StructureService,
         private val indicatorService: IndicatorService,
         private val indicatorMetricsService: IndicatorMetricsService
-) : IndicatorMetricsRestorationService {
+) : IndicatorMetricsExportService {
 
-    override fun restore(logger: (String) -> Unit) {
+    override fun export(logger: (String) -> Unit) {
         structureService.projectList.forEach {
             restore(it, logger)
         }

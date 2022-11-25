@@ -3,8 +3,10 @@ package net.nemerosa.ontrack.extension.av.event
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.event.AutoVersioningEvents.AUTO_VERSIONING_ERROR
+import net.nemerosa.ontrack.extension.av.event.AutoVersioningEvents.AUTO_VERSIONING_POST_PROCESSING_ERROR
 import net.nemerosa.ontrack.extension.av.event.AutoVersioningEvents.AUTO_VERSIONING_PR_MERGE_TIMEOUT_ERROR
 import net.nemerosa.ontrack.extension.av.event.AutoVersioningEvents.AUTO_VERSIONING_SUCCESS
+import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingFailureException
 import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.model.events.*
 import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
@@ -52,6 +54,7 @@ class AutoVersioningEventServiceImpl(
     override fun start() {
         eventFactory.register(AUTO_VERSIONING_SUCCESS)
         eventFactory.register(AUTO_VERSIONING_ERROR)
+        eventFactory.register(AUTO_VERSIONING_POST_PROCESSING_ERROR)
         eventFactory.register(AUTO_VERSIONING_PR_MERGE_TIMEOUT_ERROR)
     }
 
@@ -73,7 +76,15 @@ class AutoVersioningEventServiceImpl(
         order: AutoVersioningOrder,
         message: String,
         error: Exception,
-    ): Event =
+    ): Event = if (error is PostProcessingFailureException) {
+        Event.of(AUTO_VERSIONING_POST_PROCESSING_ERROR)
+            .withBranch(order.branch)
+            .withExtraProject(sourceProject(order))
+            .with("version", order.targetVersion)
+            .with("message", close(message))
+            .with("link", error.link)
+            .build()
+    } else {
         Event.of(AUTO_VERSIONING_ERROR)
             .withBranch(order.branch)
             .withExtraProject(sourceProject(order))
@@ -81,6 +92,7 @@ class AutoVersioningEventServiceImpl(
             .with("message", close(message))
             .with("error", close(error.message ?: error::class.java.name))
             .build()
+    }
 
     internal fun prMergeTimeoutError(
         order: AutoVersioningOrder,

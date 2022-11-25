@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorEdit
-import net.nemerosa.ontrack.extension.indicators.metrics.IndicatorMetricsService
 import net.nemerosa.ontrack.extension.indicators.store.IndicatorStore
 import net.nemerosa.ontrack.extension.indicators.store.StoredIndicator
 import net.nemerosa.ontrack.model.Ack
@@ -22,7 +21,6 @@ class IndicatorServiceImpl(
         private val securityService: SecurityService,
         private val indicatorStore: IndicatorStore,
         private val indicatorTypeService: IndicatorTypeService,
-        private val indicatorMetricsService: IndicatorMetricsService
 ) : IndicatorService, IndicatorTypeListener {
 
     init {
@@ -113,8 +111,6 @@ class IndicatorServiceImpl(
                 signature = signature
         ))
         val indicator = loadIndicator(project, type)
-        // Metrics
-        indicatorMetricsService.saveMetrics(project, indicator)
         // OK
         return indicator
     }
