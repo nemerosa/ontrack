@@ -97,7 +97,7 @@ class GQLTypeProject(
                                 .argument {
                                     it.name(ARG_BRANCHES_ORDER)
                                         .description("If set to true, the branches will be ordered from the most recent build activity.")
-                                        .type(GraphQLInt)
+                                        .type(GraphQLBoolean)
                                 }
                                 .dataFetcher(projectBranchesFetcher())
                                 .build()
@@ -179,7 +179,7 @@ class GQLTypeProject(
                     order = order ?: false,
                 )
                 // Filtered list
-                val branches = structureService.filterBranchesForProject(source.id, filter)
+                val branches = structureService.filterBranchesForProject(source, filter)
                 // Final matching on the model
                 val finalList = if (useModel != null && useModel) {
                     val branchModelMatcher = branchModelMatcherService.getBranchModelMatcher(source)

@@ -56,7 +56,7 @@ interface StructureService {
 
     fun getBranchesForProject(projectId: ID): List<Branch>
 
-    fun filterBranchesForProject(projectId: ID, filter: BranchFilter): List<Branch>
+    fun filterBranchesForProject(project: Project, filter: BranchFilter): List<Branch>
 
     fun newBranch(branch: Branch): Branch
 
