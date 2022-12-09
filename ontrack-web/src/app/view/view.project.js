@@ -24,10 +24,14 @@ angular.module('ot.view.project', [
             name: ""
         };
 
+        $scope.filterBranchesOnName = () => {
+            loadProject();
+        };
+
         // Loading the project and its whole information
         function loadProject() {
             $scope.loadingBranches = true;
-            otGraphqlService.pageGraphQLCall(`query ProjectView($projectId: Int) {
+            otGraphqlService.pageGraphQLCall(`query ProjectView($projectId: Int, $branchName: String = null) {
               projects(id: $projectId) {
                 id
                 name
@@ -110,7 +114,7 @@ angular.module('ot.view.project', [
                     }
                   }
                 }
-                branches(count: 20, order: true) {
+                branches(name: $branchName, count: 20, order: true) {
                   id
                   name
                   disabled
@@ -139,7 +143,10 @@ angular.module('ot.view.project', [
               feature {
                 id
               }
-            }`, {projectId: projectId}).then(function (data) {
+            }`, {
+                projectId: projectId,
+                branchName: $scope.branchFilter.name ? $scope.branchFilter.name : null,
+            }).then(function (data) {
                 $scope.project = data.projects[0];
                 // View commands
                 view.commands = [

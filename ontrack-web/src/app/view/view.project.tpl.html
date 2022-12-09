@@ -121,14 +121,15 @@
                          ng-show="project.branches.length > 5">
                         <input class="form-control"
                                ng-model="branchFilter.name"
+                               title="Filter on branch names using a regular expression."
                                placeholder="Filter on branch names"/>
-                        <span class="input-group-addon"><span class="fa fa-search"></span></span>
+                        <span class="input-group-addon ot-action" ng-click="filterBranchesOnName()"><span class="fa fa-search"></span></span>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-3"
-                     ng-repeat="branch in project.branches | filter:{name: branchFilter.name}"
+                     ng-repeat="branch in project.branches"
                      ng-show="showDisabled || !branch.disabled">
                     <div class="ot-project-branch" ng-class="{'ot-entity-disabled': branch.disabled}">
                         <span
