@@ -4,18 +4,18 @@ import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.extension.api.DecorationExtension
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.Decoration
-import net.nemerosa.ontrack.model.structure.DecorationService
-import net.nemerosa.ontrack.model.structure.Decorator
-import net.nemerosa.ontrack.model.structure.ProjectEntity
+import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.ApplicationLogEntry
+import net.nemerosa.ontrack.model.support.ApplicationLogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
 class DecorationServiceImpl(
-        private val extensionManager: ExtensionManager,
-        private val securityService: SecurityService
+    private val extensionManager: ExtensionManager,
+    private val securityService: SecurityService,
+    private val applicationLogService: ApplicationLogService,
 ) : DecorationService {
 
     override fun getDecorations(entity: ProjectEntity): List<Decoration<*>> {
@@ -32,10 +32,19 @@ class DecorationServiceImpl(
     /**
      * Gets the decoration for an entity, and returns an "error" decoration in case of problem.
      */
-    fun <T> getDecorations(entity: ProjectEntity?, decorator: Decorator<T>): List<Decoration<*>> {
+    fun <T> getDecorations(entity: ProjectEntity, decorator: Decorator<T>): List<Decoration<*>> {
         return try {
             decorator.getDecorations(entity)
         } catch (ex: Exception) {
+            applicationLogService.log(
+                ApplicationLogEntry.error(
+                    ex,
+                    NameDescription.nd("decoration-error", "Decoration error"),
+                    "Error while getting decoration ${decorator::class.java.simpleName} on ${entity.displayName}"
+                )
+                    .withDetail("entity", entity.entityDisplayName)
+                    .withDetail("decorator", decorator::class.java.simpleName)
+            )
             listOf(
                     Decoration.error(decorator, getErrorMessage(ex))
             )
