@@ -40,7 +40,7 @@ class DecorationServiceImpl(
                 ApplicationLogEntry.error(
                     ex,
                     NameDescription.nd("decoration-error", "Decoration error"),
-                    "Error while getting decoration ${decorator::class.java.simpleName} on ${entity.displayName}"
+                    "Error while getting decoration ${decorator::class.java.simpleName} on ${entity.entityDisplayName}"
                 )
                     .withDetail("entity", entity.entityDisplayName)
                     .withDetail("decorator", decorator::class.java.simpleName)
