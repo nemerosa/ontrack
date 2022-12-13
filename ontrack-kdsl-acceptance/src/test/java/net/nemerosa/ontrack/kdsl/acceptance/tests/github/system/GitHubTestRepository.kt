@@ -222,7 +222,7 @@ class GitHubRepositoryContext(
             var pr: GitHubPR? = null
             waitUntil(
                 task = "Checking the PR from $from to $to",
-                timeout = 120_000L,
+                timeout = ACCProperties.GitHub.Timeouts.general,
                 interval = 20_000L,
             ) {
                 pr = getPR(from, to)
