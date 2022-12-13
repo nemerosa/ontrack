@@ -324,7 +324,6 @@ class DefaultOntrackGitHubClient(
                 code()
             }
         } catch (ex: RestClientResponseException) {
-            @Suppress("UNNECESSARY_SAFE_CALL")
             val contentType: Any? = ex.responseHeaders?.contentType
             if (contentType != null && contentType is MediaType && contentType.includes(MediaType.APPLICATION_JSON)) {
                 val json = ex.responseBodyAsString
@@ -576,19 +575,45 @@ class DefaultOntrackGitHubClient(
         val client = createGitHubRestTemplate()
         // Gets the repository for this project
         val (owner, name) = getRepositoryParts(repository)
-        // Call
-        return client("Creating PR from $head to $base") {
-            postForObject(
-                "/repos/$owner/$name/pulls",
-                mapOf(
-                    "title" to title,
-                    "head" to head,
-                    "base" to base,
-                    "body" to body
-                ),
-                GitHubPullRequestResponse::class.java
-            )
-        }?.run {
+
+        fun internalCreatePR(): GitHubPullRequestResponse? {
+            return try {
+                client("Creating PR from $head to $base") {
+                    postForObject(
+                        "/repos/$owner/$name/pulls",
+                        mapOf(
+                            "title" to title,
+                            "head" to head,
+                            "base" to base,
+                            "body" to body
+                        ),
+                        GitHubPullRequestResponse::class.java
+                    )
+                }
+            } catch (ex: GitHubErrorsException) {
+                if (ex.status == 404) {
+                    null
+                } else {
+                    throw ex
+                }
+            }
+        }
+
+        var pr: GitHubPullRequestResponse? = null
+        var tries = 0u
+        runBlocking {
+            while (pr == null && tries < retries) {
+                tries++
+                logger.debug("[github] Creating PR from $head to $base tries $tries/$notFoundRetries")
+                pr = internalCreatePR()
+                if (pr == null) {
+                    // Waiting before the next retry
+                    delay(interval.toMillis())
+                }
+            }
+        }
+
+        return pr?.run {
             GitHubPR(
                 number = number,
                 mergeable = mergeable,

@@ -170,10 +170,14 @@ class GitHubRepositoryContext(
         if (to != null) {
             url += "&base=$to"
         }
-        return gitHubClient.getForObject(
-            url,
-            JsonNode::class.java
-        )?.firstOrNull()?.parse()
+        return try {
+            gitHubClient.getForObject(
+                url,
+                JsonNode::class.java
+            )?.firstOrNull()?.parse()
+        } catch (_: NotFound) {
+            null
+        }
     }
 
     private fun getPRReviews(pr: GitHubPR): List<GitHubPRReview> =
