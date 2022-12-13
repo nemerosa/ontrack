@@ -46,7 +46,7 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
     }
 
     protected fun waitForAutoVersioningCompletion(
-        timeout: Long = 60_000L,
+        timeout: Long = ACCProperties.GitHub.Timeouts.autoVersioningCompletion,
     ) {
         waitUntil(
             initial = 1_000L,

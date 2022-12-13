@@ -253,7 +253,7 @@ class GitHubRepositoryContext(
         fun fileContains(
             path: String,
             branch: String = "main",
-            timeout: Long = 60_000L,
+            timeout: Long = ACCProperties.GitHub.Timeouts.general,
             content: () -> String,
         ) {
             val expectedContent = content()
