@@ -50,13 +50,13 @@ class BranchJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(data
         // Filter: order
         if (filter.order) {
             tables += """
-                JOIN (
+                LEFT JOIN (
                 	SELECT DISTINCT ON (BRANCHID) BRANCHID, CREATION
                 	FROM BUILDS
                 	ORDER BY BRANCHID, CREATION DESC
                 ) LAST_BUILD ON LAST_BUILD.BRANCHID = B.ID
             """.trimIndent()
-            orderClause = "ORDER BY LAST_BUILD.CREATION DESC"
+            orderClause = "ORDER BY COALESCE(LAST_BUILD.CREATION, B.CREATION) DESC"
         }
 
         // Filter: Count

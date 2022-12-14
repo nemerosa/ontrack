@@ -18,6 +18,98 @@ import kotlin.test.assertTrue
  */
 class StructureServiceNewIT : AbstractDSLTestSupport() {
 
+    /**
+     * Making sure that branches without a build (yet) are still returned when getting
+     * the list of branches for a project.
+     */
+    @Test
+    fun `Getting branches for a project when there is no build`() {
+        project {
+            // Creating a branch without a build
+            val branch = branch {}
+            // Getting the list of branches (as asked by the project page)
+            val branches = structureService.filterBranchesForProject(project, BranchFilter(
+                count = 20,
+                order = true,
+            ))
+            // Checks the branch is there
+            assertEquals(
+                listOf(branch),
+                branches
+            )
+        }
+    }
+
+    /**
+     * Branches can be sorted by most recent builds
+     */
+    @Test
+    fun `Sorting branches for a project by most recent build`() {
+        project {
+            val ref = Time.now()
+            // Creating three branches
+            val (branch0, branch1, branch2) = (0..2).map {
+                branch("branch-$it") {
+                    updateBranchSignature(time = ref.minusHours(10))
+                }
+            }
+            // Creating some builds at different times
+            branch1.build {
+                // Oldest
+                updateBuildSignature(time = ref.minusHours(5))
+            }
+            branch0.build {
+                // Middle
+                updateBuildSignature(time = ref.minusHours(4))
+            }
+            branch2.build {
+                // Most recent
+                updateBuildSignature(time = ref.minusHours(3))
+            }
+            // Getting the list of branches (as asked by the project page)
+            val list = structureService.filterBranchesForProject(project, BranchFilter(
+                count = 20,
+                order = true,
+            ))
+            // Checks the branch is there
+            assertEquals(
+                listOf(branch2, branch0, branch1).map { it.name },
+                list.map { it.name }
+            )
+        }
+    }
+
+    @Test
+    fun `Getting mix of branches for a project with builds and no build`() {
+        project {
+            val ref = Time.now()
+            // Creating an older branch without a build
+            branch("old-without-build") {
+                updateBranchSignature(time = ref.minusHours(3))
+            }
+            // Creating a branch with a build
+            branch("with-build") {
+                build {
+                    updateBuildSignature(time = ref.minusHours(2))
+                }
+            }
+            // Creating a branch without a build (after the build)
+            branch("recent-without-build") {
+                updateBranchSignature(time = ref.minusHours(1))
+            }
+            // Getting the list of branches (as asked by the project page)
+            val branches = structureService.filterBranchesForProject(project, BranchFilter(
+                count = 20,
+                order = true,
+            ))
+            // Checks the branches are both there, with the one without a build in front
+            assertEquals(
+                listOf("recent-without-build", "with-build", "old-without-build"),
+                branches.map { it.name }
+            )
+        }
+    }
+
     @Test
     fun `Creating a link twice must not fail`() {
         val target = project<Build> {
