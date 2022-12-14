@@ -21,6 +21,7 @@ import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityDefined
 import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityNew
 import net.nemerosa.ontrack.model.support.UserTransaction
+import net.nemerosa.ontrack.repository.BranchRepository
 import net.nemerosa.ontrack.repository.CoreBuildFilterRepository
 import net.nemerosa.ontrack.repository.StatsRepository
 import net.nemerosa.ontrack.repository.StructureRepository
@@ -44,6 +45,7 @@ class StructureServiceImpl(
         private val validationRunStatusService: ValidationRunStatusService,
         private val validationDataTypeService: ValidationDataTypeService,
         private val structureRepository: StructureRepository,
+        private val branchRepository: BranchRepository,
         private val extensionManager: ExtensionManager,
         private val propertyService: PropertyService,
         private val predefinedPromotionLevelService: PredefinedPromotionLevelService,
@@ -145,6 +147,14 @@ class StructureServiceImpl(
     override fun getBranchesForProject(projectId: ID): List<Branch> {
         securityService.checkProjectFunction(projectId.value, ProjectView::class.java)
         return structureRepository.getBranchesForProject(projectId)
+    }
+
+    override fun filterBranchesForProject(project: Project, filter: BranchFilter): List<Branch> {
+        securityService.checkProjectFunction(project, ProjectView::class.java)
+        // Getting the current user (used for the favorite filter)
+        val user = securityService.currentAccount?.account?.id
+        // Specific query
+        return branchRepository.filterBranchesForProject(project, user, filter)
     }
 
     override fun newBranch(branch: Branch): Branch {

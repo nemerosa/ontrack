@@ -31,7 +31,7 @@
             <ot-section-title><span class="fa fa-star"></span> Favorite branches</ot-section-title>
             <table class="ot-project-branches">
                 <tbody>
-                <tr ng-repeat="branch in project.favouriteBranches | orderBy:getBranchTime:true"
+                <tr ng-repeat="branch in project.favouriteBranches"
                     ng-show="showDisabled || !branch.disabled">
                     <td class="ot-project-branch-name ot-decoration-list"
                         ng-class="{'ot-entity-disabled': branch.disabled}">
@@ -121,14 +121,15 @@
                          ng-show="project.branches.length > 5">
                         <input class="form-control"
                                ng-model="branchFilter.name"
+                               title="Filter on branch names using a regular expression."
                                placeholder="Filter on branch names"/>
-                        <span class="input-group-addon"><span class="fa fa-search"></span></span>
+                        <span class="input-group-addon ot-action" ng-click="filterBranchesOnName()"><span class="fa fa-search"></span></span>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-3"
-                     ng-repeat="branch in project.branches | filter:{name: branchFilter.name} | orderBy:getBranchTime:true"
+                     ng-repeat="branch in project.branches"
                      ng-show="showDisabled || !branch.disabled">
                     <div class="ot-project-branch" ng-class="{'ot-entity-disabled': branch.disabled}">
                         <span

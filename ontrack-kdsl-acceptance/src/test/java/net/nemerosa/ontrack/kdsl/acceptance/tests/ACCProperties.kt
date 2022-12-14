@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests
 import net.nemerosa.ontrack.kdsl.connector.support.DefaultConnector
 import java.util.*
 import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
 
 object ACCProperties {
@@ -36,6 +37,13 @@ object ACCProperties {
         val organization: String? by optionalFromEnv()
         val token: String? by optionalFromEnv()
         val autoMergeToken: String? by optionalFromEnv()
+
+        object Timeouts {
+            @DefaultValue("120000") // 2 minutes
+            val general: Long by longFromEnv()
+            @DefaultValue("120000") // 2 minutes
+            val autoVersioningCompletion: Long by longFromEnv()
+        }
 
         object AutoVersioning {
 
@@ -124,26 +132,50 @@ object ACCProperties {
                 ?: error("No system property not environment variable found for $property in $thisRef.")
         }
 
+    private fun longFromEnv(): ReadOnlyProperty<Any, Long> =
+        ReadOnlyProperty { thisRef, property ->
+            optionalLongFromEnv().getValue(thisRef, property)
+                ?: error("No system property not environment variable found for $property in $thisRef.")
+        }
+
     private fun optionalFromEnv(): ReadOnlyProperty<Any, String?> =
         ReadOnlyProperty { thisRef, property ->
-            val className = thisRef::class.qualifiedName ?: error("Expecting a full class name")
-            val finalName = className.replace(ACCProperties::class.java.name, "ontrack.acceptance")
-            val propName = property.name
-            val sysProperty = "$finalName.$propName".lowercase()
-            val sysValue = System.getProperty(sysProperty)
-            if (!sysValue.isNullOrBlank()) {
-                sysValue
-            } else {
-                val envProperty = sysProperty.replace(".", "_").uppercase()
-                val envValue = System.getenv(envProperty)
-                if (!envValue.isNullOrBlank()) {
-                    envValue
-                } else {
-                    property.findAnnotation<DefaultValue>()
-                        ?.value
-                        ?.takeIf { it != DefaultValue.NONE }
-                }
+            getValue(thisRef, property) {
+                it
             }
         }
+
+    private fun optionalLongFromEnv(): ReadOnlyProperty<Any, Long?> =
+        ReadOnlyProperty { thisRef, property ->
+            getValue(thisRef, property) {
+                it.toLong()
+            }
+        }
+
+    private fun <T> getValue(
+        thisRef: Any,
+        property: KProperty<*>,
+        conversion: (String) -> T,
+    ): T? {
+        val className = thisRef::class.qualifiedName ?: error("Expecting a full class name")
+        val finalName = className.replace(ACCProperties::class.java.name, "ontrack.acceptance")
+        val propName = property.name
+        val sysProperty = "$finalName.$propName".lowercase()
+        val sysValue = System.getProperty(sysProperty)
+        return if (!sysValue.isNullOrBlank()) {
+            conversion(sysValue)
+        } else {
+            val envProperty = sysProperty.replace(".", "_").uppercase()
+            val envValue = System.getenv(envProperty)
+            if (!envValue.isNullOrBlank()) {
+                conversion(envValue)
+            } else {
+                property.findAnnotation<DefaultValue>()
+                    ?.value
+                    ?.takeIf { it != DefaultValue.NONE }
+                    ?.let { conversion(it) }
+            }
+        }
+    }
 
 }

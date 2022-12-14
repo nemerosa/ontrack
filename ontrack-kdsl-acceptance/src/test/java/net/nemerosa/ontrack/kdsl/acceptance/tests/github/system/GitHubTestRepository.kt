@@ -170,10 +170,14 @@ class GitHubRepositoryContext(
         if (to != null) {
             url += "&base=$to"
         }
-        return gitHubClient.getForObject(
-            url,
-            JsonNode::class.java
-        )?.firstOrNull()?.parse()
+        return try {
+            gitHubClient.getForObject(
+                url,
+                JsonNode::class.java
+            )?.firstOrNull()?.parse()
+        } catch (_: NotFound) {
+            null
+        }
     }
 
     private fun getPRReviews(pr: GitHubPR): List<GitHubPRReview> =
@@ -222,7 +226,7 @@ class GitHubRepositoryContext(
             var pr: GitHubPR? = null
             waitUntil(
                 task = "Checking the PR from $from to $to",
-                timeout = 120_000L,
+                timeout = ACCProperties.GitHub.Timeouts.general,
                 interval = 20_000L,
             ) {
                 pr = getPR(from, to)
@@ -253,7 +257,7 @@ class GitHubRepositoryContext(
         fun fileContains(
             path: String,
             branch: String = "main",
-            timeout: Long = 60_000L,
+            timeout: Long = ACCProperties.GitHub.Timeouts.general,
             content: () -> String,
         ) {
             val expectedContent = content()

@@ -705,8 +705,19 @@ class GitServiceImpl(
                     getGitConfiguratorAndConfiguration(branch.project)
                             ?.let { (configurator, configuration) ->
                                 configurator.toPullRequestID(gitBranchConfigurationProperty.branch)?.let { prId ->
-                                    configurator.getPullRequest(configuration, prId)
+                                    try {
+                                        configurator.getPullRequest(configuration, prId)
                                             ?: GitPullRequest.invalidPR(prId, configurator.toPullRequestKey(prId))
+                                    } catch (any: Exception) {
+                                        ApplicationLogEntry.error(
+                                            any,
+                                            NameDescription.nd("git-pr-error", "Git PR error"),
+                                            "Error while getting PR info for ${branch.entityDisplayName}"
+                                        )
+                                            .withDetail("branch", branch.entityDisplayName)
+                                        // Not returning a PR
+                                        null
+                                    }
                                 }
                             }
                 }

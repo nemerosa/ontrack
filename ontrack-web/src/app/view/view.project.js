@@ -24,10 +24,14 @@ angular.module('ot.view.project', [
             name: ""
         };
 
+        $scope.filterBranchesOnName = () => {
+            loadProject();
+        };
+
         // Loading the project and its whole information
         function loadProject() {
             $scope.loadingBranches = true;
-            otGraphqlService.pageGraphQLCall(`query ProjectView($projectId: Int) {
+            otGraphqlService.pageGraphQLCall(`query ProjectView($projectId: Int, $branchName: String = null) {
               projects(id: $projectId) {
                 id
                 name
@@ -79,7 +83,7 @@ angular.module('ot.view.project', [
                   _labelFromToken
                   _labelsCreate
                 }
-                favouriteBranches: branches(favourite: true) {
+                favouriteBranches: branches(favourite: true, order: true) {
                   id
                   name
                   disabled
@@ -97,13 +101,6 @@ angular.module('ot.view.project', [
                     _unfavourite
                     _favourite
                   }
-                  latestBuild: builds(count: 1) {
-                    id
-                    name
-                    creation {
-                        time
-                    }
-                  }
                   promotionLevels {
                     id
                     name
@@ -117,7 +114,7 @@ angular.module('ot.view.project', [
                     }
                   }
                 }
-                branches {
+                branches(name: $branchName, count: 20, order: true) {
                   id
                   name
                   disabled
@@ -126,11 +123,6 @@ angular.module('ot.view.project', [
                   }
                   creation {
                     time
-                  }
-                  latestBuild: builds(count: 1) {
-                    creation {
-                        time
-                    }
                   }
                   links {
                     _page
@@ -151,7 +143,10 @@ angular.module('ot.view.project', [
               feature {
                 id
               }
-            }`, {projectId: projectId}).then(function (data) {
+            }`, {
+                projectId: projectId,
+                branchName: $scope.branchFilter.name ? $scope.branchFilter.name : null,
+            }).then(function (data) {
                 $scope.project = data.projects[0];
                 // View commands
                 view.commands = [
@@ -338,15 +333,6 @@ angular.module('ot.view.project', [
                 $scope.project.annotatedDescription = data.project.annotatedDescription;
                 $scope.project.disabled = data.project.disabled;
             });
-        };
-
-        // Time to use for sorting branches
-        $scope.getBranchTime = function (branch) {
-            if (branch.latestBuild && branch.latestBuild.length > 0) {
-                return branch.latestBuild[0].creation.time;
-            } else {
-                return branch.creation.time;
-            }
         };
 
         // Sets a branch as favourite

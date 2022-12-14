@@ -77,7 +77,7 @@ class GitHubSCMExtension(
 
         override fun upload(scmBranch: String, commit: String, path: String, content: ByteArray) {
             // First, we need the SHA of the file
-            val sha = client.getFile(property.repository, scmBranch, path)
+            val sha = client.getFile(property.repository, scmBranch, path, retryOnNotFound = true)
                 ?.sha
                 ?: error("Cannot find file at $path for branch $scmBranch")
             client.setFileContent(property.repository, scmBranch, sha, path, content)

@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService;
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.repository.BranchRepository;
 import net.nemerosa.ontrack.repository.CoreBuildFilterRepository;
 import net.nemerosa.ontrack.repository.StatsRepository;
 import net.nemerosa.ontrack.repository.StructureRepository;
@@ -34,6 +35,7 @@ public class StructureServiceImplTest {
         SecurityService securityService = mock(SecurityService.class);
         ValidationRunStatusService validationRunStatusService = mock(ValidationRunStatusService.class);
         structureRepository = mock(StructureRepository.class);
+        BranchRepository branchRepository = mock(BranchRepository.class);
         EventPostService eventService = mock(EventPostService.class);
         EventFactory eventFactory = mock(EventFactory.class);
         ExtensionManager extensionManager = mock(ExtensionManager.class);
@@ -50,7 +52,9 @@ public class StructureServiceImplTest {
                 eventService,
                 eventFactory,
                 validationRunStatusService,
-                validationDataTypeService, structureRepository,
+                validationDataTypeService,
+                structureRepository,
+                branchRepository,
                 extensionManager,
                 propertyService,
                 predefinedPromotionLevelService,

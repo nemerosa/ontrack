@@ -94,6 +94,11 @@ class GQLTypeProject(
                                         .description("Maximum number of branches to return. No limit if not specified.")
                                         .type(GraphQLInt)
                                 }
+                                .argument {
+                                    it.name(ARG_BRANCHES_ORDER)
+                                        .description("If set to true, the branches will be ordered from the most recent build activity.")
+                                        .type(GraphQLBoolean)
+                                }
                                 .dataFetcher(projectBranchesFetcher())
                                 .build()
                 )
@@ -165,29 +170,29 @@ class GQLTypeProject(
                 val favorite: Boolean? = environment.getArgument(GRAPHQL_BRANCHES_FAVORITE_ARG)
                 val useModel: Boolean? = environment.getArgument(GRAPHQL_PROJECT_BRANCHES_USE_MODEL_ARG)
                 val count: Int? = environment.getArgument(ARG_BRANCHES_COUNT)
-                // Combined filter
-                var filter: (Branch) -> Boolean = { true }
-                // Name criteria
-                if (name != null) {
-                    val nameFilter = Pattern.compile(name)
-                    filter = filter.and { branch -> nameFilter.matcher(branch.name).matches() }
-                }
-                // Favourite
-                if (favorite != null && favorite) {
-                    filter = filter and { branchFavouriteService.isBranchFavourite(it) }
-                }
-                // Matching the branching model
-                if (useModel != null && useModel) {
+                val order: Boolean? = environment.getArgument(ARG_BRANCHES_ORDER)
+                // Using a filter
+                val filter = BranchFilter(
+                    name = name,
+                    favorite = favorite,
+                    count = count,
+                    order = order ?: false,
+                )
+                // Filtered list
+                val branches = structureService.filterBranchesForProject(source, filter)
+                // Final matching on the model
+                val finalList = if (useModel != null && useModel) {
                     val branchModelMatcher = branchModelMatcherService.getBranchModelMatcher(source)
                     if (branchModelMatcher != null) {
-                        filter = filter and { branchModelMatcher.matches(it) }
+                        branches.filter { branchModelMatcher.matches(it) }
+                    } else {
+                        branches
                     }
+                } else {
+                    branches
                 }
                 // Result
-                structureService
-                        .getBranchesForProject(source.id)
-                        .filter(filter)
-                        .take(count ?: Int.MAX_VALUE)
+                finalList
             } else {
                 emptyList()
             }
@@ -205,6 +210,10 @@ class GQLTypeProject(
          * Maximum number of branches to return
          */
         const val ARG_BRANCHES_COUNT = "count"
+        /**
+         * Ordering the branches by decreasing build activity
+         */
+        const val ARG_BRANCHES_ORDER = "order"
     }
 
 }

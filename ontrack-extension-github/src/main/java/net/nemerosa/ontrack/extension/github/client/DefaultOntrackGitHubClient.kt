@@ -324,7 +324,6 @@ class DefaultOntrackGitHubClient(
                 code()
             }
         } catch (ex: RestClientResponseException) {
-            @Suppress("UNNECESSARY_SAFE_CALL")
             val contentType: Any? = ex.responseHeaders?.contentType
             if (contentType != null && contentType is MediaType && contentType.includes(MediaType.APPLICATION_JSON)) {
                 val json = ex.responseBodyAsString
@@ -356,12 +355,15 @@ class DefaultOntrackGitHubClient(
                     GitHubAuthenticationType.PASSWORD -> {
                         basicAuthentication(configuration.user, configuration.password)
                     }
+
                     GitHubAuthenticationType.USER_TOKEN -> {
                         basicAuthentication(configuration.user, configuration.oauth2Token)
                     }
+
                     GitHubAuthenticationType.TOKEN -> {
                         defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${configuration.oauth2Token}")
                     }
+
                     GitHubAuthenticationType.APP -> {
                         defaultHeader(
                             HttpHeaders.AUTHORIZATION,
@@ -502,7 +504,12 @@ class DefaultOntrackGitHubClient(
             runBlocking {
                 while (file == null && tries < notFoundRetries) {
                     tries++
-                    logger.debug("[github] Getting file {}/{}@{} with tries $tries/$notFoundRetries", repository, path, branch)
+                    logger.debug(
+                        "[github] Getting file {}/{}@{} with tries $tries/$notFoundRetries",
+                        repository,
+                        path,
+                        branch
+                    )
                     file = internalDownload()
                     if (file == null) {
                         // Waiting before the next retry
@@ -516,13 +523,48 @@ class DefaultOntrackGitHubClient(
         }
     }
 
-    override fun getBranchLastCommit(repository: String, branch: String): String? {
-        // Getting a client
+    private fun <T> retryOnNotFound(
+        message: String,
+        call: RestTemplate.() -> T?,
+    ): T? {
         val client = createGitHubRestTemplate()
+
+        fun internalCall(): T? {
+            return try {
+                client(message) {
+                    call()
+                }
+            } catch (ex: GitHubErrorsException) {
+                if (ex.status == 404) {
+                    null
+                } else {
+                    throw ex
+                }
+            }
+        }
+
+        var result: T? = null
+        var tries = 0u
+        runBlocking {
+            while (result == null && tries < retries) {
+                tries++
+                logger.debug("$message - tries $tries/$retries")
+                result = internalCall()
+                if (result == null) {
+                    // Waiting before the next retry
+                    delay(interval.toMillis())
+                }
+            }
+        }
+
+        return result
+    }
+
+    override fun getBranchLastCommit(repository: String, branch: String): String? {
         // Gets the repository for this project
         val (owner, name) = getRepositoryParts(repository)
-        // Call
-        return client("Get last commit for $branch") {
+        // Retries
+        return retryOnNotFound("Get last commit for $branch") {
             getForObject(
                 "/repos/${owner}/${name}/git/ref/heads/${branch}",
                 GitHubGetRefResponse::class.java
@@ -533,13 +575,11 @@ class DefaultOntrackGitHubClient(
     override fun createBranch(repository: String, source: String, destination: String): String? {
         // Gets the last commit of the source branch
         val sourceCommit = getBranchLastCommit(repository, source) ?: return null
-        // Getting a client
-        val client = createGitHubRestTemplate()
         // Gets the repository for this project
         val (owner, name) = getRepositoryParts(repository)
-        // Creating the branch
-        return client("Create branch $destination from $source") {
-            val response = postForObject(
+        // Retries
+        return retryOnNotFound("Create branch $destination from $source (source commit = $sourceCommit)") {
+            postForObject(
                 "/repos/${owner}/${name}/git/refs",
                 mapOf(
                     "ref" to "refs/heads/$destination",
@@ -547,9 +587,7 @@ class DefaultOntrackGitHubClient(
                 ),
                 GitHubGetRefResponse::class.java
             )
-            // Returns the new commit
-            response?.`object`?.sha
-        }
+        }?.`object`?.sha
     }
 
     override fun setFileContent(repository: String, branch: String, sha: String, path: String, content: ByteArray) {
@@ -572,12 +610,10 @@ class DefaultOntrackGitHubClient(
     }
 
     override fun createPR(repository: String, title: String, head: String, base: String, body: String): GitHubPR {
-        // Getting a client
-        val client = createGitHubRestTemplate()
         // Gets the repository for this project
         val (owner, name) = getRepositoryParts(repository)
-        // Call
-        return client("Creating PR from $head to $base") {
+        // Retries
+        return retryOnNotFound("Creating PR from $head to $base") {
             postForObject(
                 "/repos/$owner/$name/pulls",
                 mapOf(

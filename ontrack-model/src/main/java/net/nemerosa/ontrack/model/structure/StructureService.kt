@@ -56,6 +56,8 @@ interface StructureService {
 
     fun getBranchesForProject(projectId: ID): List<Branch>
 
+    fun filterBranchesForProject(project: Project, filter: BranchFilter): List<Branch>
+
     fun newBranch(branch: Branch): Branch
 
     fun getBranchStatusViews(projectId: ID): List<BranchStatusView>

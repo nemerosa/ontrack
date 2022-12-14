@@ -16,7 +16,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.text.SimpleDateFormat
-import java.util.concurrent.TimeUnit
+import java.time.Duration
 import java.util.concurrent.atomic.AtomicLong
 import java.util.function.Consumer
 import java.util.logging.Level
@@ -50,7 +50,7 @@ class Configuration {
         driver = initDriver(config)
         driver.manage().deleteAllCookies()
         driver.manage().window().setSize(new Dimension(1024, 768))
-        driver.manage().timeouts().implicitlyWait(implicitWait, TimeUnit.SECONDS)
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(implicitWait))
     }
 
     AcceptanceConfig getAcceptanceConfig() {
@@ -59,10 +59,6 @@ class Configuration {
 
     WebDriver getDriver() {
         return driver
-    }
-
-    String getBaseUrl() {
-        return baseUrl
     }
 
     void closeConfiguration() {
@@ -81,8 +77,8 @@ class Configuration {
 
     WebElement findElement(By by, int waitingTime) {
         new FluentWait<WebDriver>(driver)
-                .withTimeout(waitingTime, TimeUnit.SECONDS)
-                .pollingEvery(1, TimeUnit.SECONDS)
+                .withTimeout(Duration.ofSeconds(waitingTime))
+                .pollingEvery(Duration.ofSeconds(1))
                 .ignoring(NoSuchElementException.class)
                 .ignoring(StaleElementReferenceException.class)
                 .until { driver -> driver.findElement(by) }
@@ -90,8 +86,8 @@ class Configuration {
 
     Collection<WebElement> findElements(By by) {
         new FluentWait<WebDriver>(driver)
-                .withTimeout(implicitWait, TimeUnit.SECONDS)
-                .pollingEvery(1, TimeUnit.SECONDS)
+                .withTimeout(Duration.ofSeconds(implicitWait))
+                .pollingEvery(Duration.ofSeconds(1))
                 .ignoring(NoSuchElementException.class)
                 .ignoring(StaleElementReferenceException.class)
                 .until { driver -> driver.findElements(by) }
@@ -107,7 +103,7 @@ class Configuration {
 
     void waitUntil(String message, int seconds, Closure<Boolean> closure) {
         try {
-            new WebDriverWait(driver, seconds).until { driver -> closure() }
+            new WebDriverWait(driver, Duration.ofSeconds(seconds)).until { driver -> closure() }
         } catch (TimeoutException ex) {
             // Takes a screenshot
             screenshot("timeout")
@@ -134,8 +130,10 @@ class Configuration {
         try {
             def logEntries = driver.manage().logs().get(LogType.BROWSER)
             logFile.withWriter { writer ->
-                logEntries.filter(Level.FINE).each { entry ->
-                    writer.println(entry.toString())
+                logEntries.each { entry ->
+                    if (entry.level == Level.FINE) {
+                        writer.println(entry.toString())
+                    }
                 }
             }
         } catch (UnsupportedCommandException ignored) {
