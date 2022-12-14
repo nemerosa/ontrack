@@ -9,7 +9,7 @@ plugins {
 apply(plugin = "org.springframework.boot")
 apply(plugin = "com.bmuschko.docker-remote-api")
 
-val seleniumVersion = "3.141.59"
+val seleniumVersion = "4.7.2"
 
 dependencies {
     implementation("org.codehaus.groovy:groovy")
