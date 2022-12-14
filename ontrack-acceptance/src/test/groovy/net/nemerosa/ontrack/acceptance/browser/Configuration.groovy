@@ -130,8 +130,10 @@ class Configuration {
         try {
             def logEntries = driver.manage().logs().get(LogType.BROWSER)
             logFile.withWriter { writer ->
-                logEntries.filter(Level.FINE).each { entry ->
-                    writer.println(entry.toString())
+                logEntries.each { entry ->
+                    if (entry.level == Level.FINE) {
+                        writer.println(entry.toString())
+                    }
                 }
             }
         } catch (UnsupportedCommandException ignored) {
