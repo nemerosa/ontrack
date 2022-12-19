@@ -146,10 +146,10 @@ class GitConfigProperties {
         var enabled: Boolean = true
 
         /**
-         * Duration for the cache
+         * Duration for the persistent cache
          */
         @DurationUnit(ChronoUnit.MINUTES)
-        var duration: Duration = Duration.ofMinutes(30)
+        var duration: Duration = Duration.ofHours(6)
     }
 
 }
