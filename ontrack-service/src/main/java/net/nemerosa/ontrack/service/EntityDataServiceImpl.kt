@@ -65,6 +65,8 @@ class EntityDataServiceImpl(
         }
     }
 
+    override fun countByKey(key: String): Int = repository.countByKey(key)
+
     protected fun <T> retrieve(entity: ProjectEntity, key: String, parser: (String) -> T?): T? {
         securityService.checkProjectFunction(entity, ProjectView::class.java)
         val text = repository.retrieve(entity, key)

@@ -84,3 +84,22 @@ after 1 day and deleted after further 7 days.
 
 This behavior (enablement and durations) is configurable through
 <<configuration-properties,configuration properties>>.
+
+
+[[git-pull-requests-metrics]]
+==== PR cache metrics
+
+A cache is used internally to avoid calling the remote SCM each time Ontrack needs some information about a PR.
+
+[NOTE]
+====
+For the parameters of this cache, check <<configuration-properties-git>>.
+====
+
+In order to tune this cache, the following metrics are exposed:
+
+* `ontrack_extension_git_pr_cache_count` - total number of PR entries being cached
+* `ontrack_extension_git_pr_cache_hits` - number of calls to the cache where the PR entry is actually cached and valid
+* `ontrack_extension_git_pr_cache_miss` - number of calls to the cache where the PR must be refreshed from the SCM
+* `ontrack_extension_git_pr_cache_time_scm` - time it takes to refresh a PR from the SCM
+* `ontrack_extension_git_pr_cache_time_all` - total time it takes to get and/or refresh a PR using the cache
