@@ -213,16 +213,17 @@ ontrack.config.extension.git.pullrequests.enabled = true
 # Caching enabled for pull requests
 ontrack.config.extension.git.pullrequests.cache.enabled = true
 
-# Caching duration for pull requests
+# Caching duration for pull requests. Time before a new connection is needed to get information
+# about the PR from the SCM.
 ontrack.config.extension.git.pullrequests.cache.duration = 6h
 
 # Auto cleanup of pull requests
 ontrack.config.extension.git.pullrequests.cleanup.enabled = true
 
-# Days before disabling
+# Days before disabling a PR branch after it's been closed or merged
 ontrack.config.extension.git.pullrequests.cleanup.disabling = 1
 
-# Days before deleting
+# Days before deleting a PR branch after it's been closed or merged
 ontrack.config.extension.git.pullrequests.cleanup.deleting = 7
 
 # Timeout for the Git indexations

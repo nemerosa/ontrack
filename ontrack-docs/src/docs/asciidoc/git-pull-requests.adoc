@@ -17,11 +17,10 @@ When an Ontrack branch points to a pull request, its behavior and its features r
 
 Support for pull requests is enabled by default in Ontrack.
 
-The `ontrack.config.extension.git.pull-requests.enabled` <<configuration-properties,configuration property>>
+The `ontrack.config.extension.git.pullrequests.enabled` <<configuration-properties,configuration property>>
 can be set to `false` to disable the support for pull requests.
 
-Other <<configuration-properties,configuration properties>> can be set to control the support for
-pull requests.
+Other <<configuration-properties,configuration properties>> can be set to control the maintenance and performances for pull requests.
 
 [[git-pull-requests-branch]]
 ==== Enabling a branch as a pull request
