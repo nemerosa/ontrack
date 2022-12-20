@@ -51,6 +51,18 @@
                    ng-model="filter.version"/>
         </div>
         <div class="form-group">
+            <label for="filterRouting" class="col-sm-1 control-label">Routing</label>
+            <input class="form-control col-sm-2"
+                   id="filterRouting"
+                   type="text"
+                   ng-model="filter.routing"/>
+            <label for="filterQueue" class="col-sm-1 control-label">Queue</label>
+            <input class="form-control col-sm-2"
+                   id="filterQueue"
+                   type="text"
+                   ng-model="filter.queue"/>
+        </div>
+        <div class="form-group">
             <label class="col-sm-1 control-label"></label>
             <button type="submit" class="btn btn-primary" ng-disabled="runningQuery" id="filterSearch">
                 <i class="fa fa-search"></i>
