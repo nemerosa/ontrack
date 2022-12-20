@@ -16,10 +16,12 @@ import java.time.LocalDateTime
 class DefaultGitPullRequestCache(
     private val entityDataService: EntityDataService,
     private val gitConfigProperties: GitConfigProperties,
-    private val meterRegistry: MeterRegistry,
 ) : GitPullRequestCache, MeterBinder {
 
+    private lateinit var meterRegistry: MeterRegistry
+
     override fun bindTo(registry: MeterRegistry) {
+        this.meterRegistry = registry
         registry.gauge(GitPullRequestCacheMetrics.git_pr_cache_count, this) {
             entityDataService.countByKey(GitPullRequest::class.java.name).toDouble()
         }
