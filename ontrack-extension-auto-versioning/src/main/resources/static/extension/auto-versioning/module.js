@@ -100,6 +100,8 @@ angular.module('ontrack.extension.auto-versioning', [
                             state
                             data
                         }
+                        routing
+                        queue
                         order {
                             uuid
                             sourceProject
