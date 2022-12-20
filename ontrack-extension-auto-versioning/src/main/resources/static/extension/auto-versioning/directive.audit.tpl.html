@@ -230,10 +230,13 @@
                 </tbody>
             </table>
         </td>
-        <!-- Order -->
+        <!-- Routing & Order -->
         <td colspan="3">
-            Order
             <dl>
+                <dt>routing</dt>
+                <dd>{{ item.routing }}</dd>
+                <dt ng-if="item.queue">queue</dt>
+                <dd ng-if="item.queue">{{ item.queue }}</dd>
                 <dt ng-repeat-start="(name, value) in item.order">
                     {{ name }}
                 </dt>
