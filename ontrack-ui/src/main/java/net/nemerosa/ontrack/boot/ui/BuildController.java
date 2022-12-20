@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -162,6 +163,18 @@ public class BuildController extends AbstractResourceController {
         }
         // OK
         return build;
+    }
+
+    /**
+     * Looking for a build using its exact name on a branch.
+     */
+    @GetMapping("branches/{branchId}/builds/{name:[A-Za-z0-9_.-]+}")
+    public Build getBuildByBranchAndName(@PathVariable ID branchId, @PathVariable String name) {
+        // Gets the holding branch
+        Branch branch = structureService.getBranch(branchId);
+        // Gets the build by name
+        return structureService.findBuildByName(branch.getProject().getName(), branch.getName(), name)
+                .orElseThrow(() -> new BuildNotFoundException(branch.getProject().getName(), branch.getName(), name));
     }
 
     @RequestMapping(value = "builds/{buildId}/update", method = RequestMethod.GET)
