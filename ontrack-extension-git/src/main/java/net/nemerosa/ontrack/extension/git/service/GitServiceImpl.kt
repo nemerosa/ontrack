@@ -22,6 +22,7 @@ import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService
 import net.nemerosa.ontrack.extension.scm.service.SCMUtilsService
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
+import net.nemerosa.ontrack.git.exceptions.GitRepositoryNoRemoteException
 import net.nemerosa.ontrack.git.exceptions.GitRepositorySyncException
 import net.nemerosa.ontrack.git.model.*
 import net.nemerosa.ontrack.job.*
@@ -100,7 +101,7 @@ class GitServiceImpl(
         // Indexation of repositories, based on projects actually linked
         forEachConfiguredProject(BiConsumer { project, configuration ->
             if (!project.isDisabled) {
-                jobs.add(getGitIndexationJobRegistration(configuration))
+                jobs.add(getGitIndexationJobRegistration(configuration, project))
             }
         })
         // Synchronisation of branch builds with tags when applicable
@@ -810,14 +811,14 @@ class GitServiceImpl(
         return GIT_INDEXATION_JOB.getKey(config.gitRepository.id)
     }
 
-    private fun createIndexationJob(config: GitConfiguration): Job {
+    private fun createIndexationJob(config: GitConfiguration, project: Project): Job {
         return object : Job {
             override fun getKey(): JobKey {
                 return getGitIndexationJobKey(config)
             }
 
             override fun getTask(): JobRun {
-                return JobRun { runListener -> index(config, runListener) }
+                return JobRun { runListener -> index(config, project, runListener) }
             }
 
             override fun getDescription(): String {
@@ -906,17 +907,25 @@ class GitServiceImpl(
         }
     }
 
-    private fun index(config: GitConfiguration, listener: JobRunListener) {
+    private fun index(config: GitConfiguration, project: Project, listener: JobRunListener) {
         listener.message("Git sync for %s", config.name)
         // Gets the client for this configuration
         val client = gitRepositoryClientFactory.getClient(config.gitRepository)
         // Launches the synchronisation
-        client.sync(listener.logger())
+        try {
+            client.sync(listener.logger())
+            // TODO Reset the counter for the project
+        } catch (ex: GitRepositoryNoRemoteException) {
+            // Remote was mentioned as not existing
+            // TODO Gets the counter for the project
+            // TODO If < threshold, just increment the counter
+            // TODO If >= threshold, disable the project and logs the incident
+        }
     }
 
-    private fun getGitIndexationJobRegistration(configuration: GitConfiguration): JobRegistration {
+    private fun getGitIndexationJobRegistration(configuration: GitConfiguration, project: Project): JobRegistration {
         return JobRegistration
-                .of(createIndexationJob(configuration))
+                .of(createIndexationJob(configuration, project))
                 .everyMinutes(configuration.indexationInterval.toLong())
     }
 
