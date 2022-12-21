@@ -119,6 +119,16 @@ class AutoVersioningAuditStoreJdbcHelper(
             jsonQueries += "S.json::jsonb->>'targetVersion' = :version"
             params += "version" to it
         }
+        // Filter on routing
+        filter.routing?.takeIf { it.isNotBlank() }?.let {
+            jsonQueries += "S.json::jsonb->>'routing' = :routing"
+            params += "routing" to it
+        }
+        // Filter on queue
+        filter.queue?.takeIf { it.isNotBlank() }?.let {
+            jsonQueries += "S.json::jsonb->>'queue' = :queue"
+            params += "queue" to it
+        }
         // JSON filter
         if (jsonQueries.isNotEmpty()) {
             query += " AND ${jsonQueries.joinToString(" AND ")}"

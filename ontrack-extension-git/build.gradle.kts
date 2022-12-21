@@ -19,6 +19,7 @@ dependencies {
     implementation("org.springframework:spring-tx")
     implementation("commons-io:commons-io")
     implementation("org.apache.commons:commons-lang3")
+    implementation("io.micrometer:micrometer-core")
 
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))

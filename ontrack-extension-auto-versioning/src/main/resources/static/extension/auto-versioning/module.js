@@ -100,6 +100,8 @@ angular.module('ontrack.extension.auto-versioning', [
                             state
                             data
                         }
+                        routing
+                        queue
                         order {
                             uuid
                             sourceProject
@@ -149,7 +151,9 @@ angular.module('ontrack.extension.auto-versioning', [
                     state: "",
                     running: "",
                     source: "",
-                    version: ""
+                    version: "",
+                    routing: "",
+                    queue: ""
                 };
 
                 otGraphqlService.pageGraphQLCall(parametersQuery).then(data => {
@@ -218,6 +222,20 @@ angular.module('ontrack.extension.auto-versioning', [
                         version = null;
                     }
 
+                    let routing;
+                    if ($scope.filter.routing) {
+                        routing = $scope.filter.routing;
+                    } else {
+                        routing = null;
+                    }
+
+                    let queue;
+                    if ($scope.filter.queue) {
+                        queue = $scope.filter.queue;
+                    } else {
+                        queue = null;
+                    }
+
                     if (reset) {
                         offset = 0;
                         size = 20;
@@ -232,7 +250,9 @@ angular.module('ontrack.extension.auto-versioning', [
                             state: state,
                             running: running,
                             source: source,
-                            version: version
+                            version: version,
+                            routing: routing,
+                            queue: queue
                         },
                         projectName: projectName,
                         projectVisible: projectVisible
@@ -265,6 +285,8 @@ angular.module('ontrack.extension.auto-versioning', [
                     $scope.filter.running = "";
                     $scope.filter.source = "";
                     $scope.filter.version = "";
+                    $scope.filter.routing = "";
+                    $scope.filter.queue = "";
                     onSearch(true);
                 };
 

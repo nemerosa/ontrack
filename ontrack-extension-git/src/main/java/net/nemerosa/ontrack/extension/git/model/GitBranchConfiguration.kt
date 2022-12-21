@@ -15,11 +15,6 @@ constructor(
         val branch: String,
 
         /**
-         * Pull request information
-         */
-        val pullRequest: GitPullRequest?,
-
-        /**
          * Configured link
          */
         val buildCommitLink: ConfiguredBuildGitCommitLink<*>? = null,

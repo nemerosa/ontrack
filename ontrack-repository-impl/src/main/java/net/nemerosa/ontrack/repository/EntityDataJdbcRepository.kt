@@ -63,6 +63,13 @@ class EntityDataJdbcRepository(
         ).map { this.readJson(it) }.orElse(null)
     }
 
+    override fun countByKey(key: String): Int =
+        namedParameterJdbcTemplate!!.queryForObject(
+            "SELECT COUNT(ID) FROM ENTITY_DATA WHERE NAME = :name",
+            mapOf("name" to key),
+            Int::class.java
+        ) ?: 0
+
     override fun hasEntityValue(entity: ProjectEntity, key: String): Boolean {
         return namedParameterJdbcTemplate!!.queryForList(
             """

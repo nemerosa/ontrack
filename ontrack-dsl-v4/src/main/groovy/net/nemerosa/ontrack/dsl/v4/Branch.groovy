@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.dsl.v4
 
 import net.nemerosa.ontrack.dsl.v4.doc.DSL
 import net.nemerosa.ontrack.dsl.v4.doc.DSLMethod
+import net.nemerosa.ontrack.dsl.v4.http.OTNotFoundException
 import net.nemerosa.ontrack.dsl.v4.properties.BranchProperties
 
 @DSL
@@ -131,22 +132,25 @@ class Branch extends AbstractProjectResource {
 
     @DSLMethod(value = "Creates a build for the branch", count = 3)
     Build build(String name, String description = '', boolean getIfExists = false) {
-        def builds = ontrack.project(this.project).search(branchName: this.name, buildName: name)
-        if (builds.empty) {
-            new Build(
+        try {
+            def existing = new Build(
+                    ontrack,
+                    ontrack.get("rest/structure/branches/${id}/builds/${name}")
+            )
+            if (getIfExists) {
+                return existing
+            } else {
+                throw new ObjectAlreadyExistsException("Build ${name} already exists.")
+            }
+        } catch (OTNotFoundException ignored) {
+            // Creating the build
+            return new Build(
                     ontrack,
                     ontrack.post(link('createBuild'), [
                             name       : name,
                             description: description
                     ])
             )
-        } else if (getIfExists) {
-            new Build(
-                    ontrack,
-                    ontrack.get(builds[0].node._self)
-            )
-        } else {
-            throw new ObjectAlreadyExistsException("Build ${name} already exists.")
         }
     }
 

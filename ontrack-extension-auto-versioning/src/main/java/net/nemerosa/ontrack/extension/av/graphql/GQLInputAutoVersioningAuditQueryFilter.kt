@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditQueryFilter
 import net.nemerosa.ontrack.graphql.schema.GQLInputType
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import org.springframework.stereotype.Component
 
 @Component
@@ -52,6 +53,16 @@ class GQLInputAutoVersioningAuditQueryFilter : GQLInputType<AutoVersioningAuditQ
             .field {
                 it.name(AutoVersioningAuditQueryFilter::version.name)
                     .description("Target version of the auto versioning processing order")
+                    .type(GraphQLString)
+            }
+            .field {
+                it.name(AutoVersioningAuditQueryFilter::routing.name)
+                    .description(getPropertyDescription(AutoVersioningAuditQueryFilter::routing))
+                    .type(GraphQLString)
+            }
+            .field {
+                it.name(AutoVersioningAuditQueryFilter::queue.name)
+                    .description(getPropertyDescription(AutoVersioningAuditQueryFilter::queue))
                     .type(GraphQLString)
             }
             .build()

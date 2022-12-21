@@ -39,7 +39,6 @@ import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
 import java.lang.String.format
-import java.time.Duration
 import java.util.*
 import java.util.concurrent.Future
 import java.util.function.BiConsumer
@@ -746,13 +745,10 @@ class GitServiceImpl(
                 }
                 override = branchConfigurationProperty.isOverride
                 buildTagInterval = branchConfigurationProperty.buildTagInterval
-                // Pull request information
-                val gitPullRequest = getBranchAsPullRequest(branch, branchConfigurationProperty)
                 // OK
                 return GitBranchConfiguration(
                         configuration,
                         gitBranch,
-                        gitPullRequest,
                         buildCommitLink,
                         override,
                         buildTagInterval

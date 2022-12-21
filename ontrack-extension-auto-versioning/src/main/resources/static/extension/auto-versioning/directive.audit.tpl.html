@@ -51,6 +51,18 @@
                    ng-model="filter.version"/>
         </div>
         <div class="form-group">
+            <label for="filterRouting" class="col-sm-1 control-label">Routing</label>
+            <input class="form-control col-sm-2"
+                   id="filterRouting"
+                   type="text"
+                   ng-model="filter.routing"/>
+            <label for="filterQueue" class="col-sm-1 control-label">Queue</label>
+            <input class="form-control col-sm-2"
+                   id="filterQueue"
+                   type="text"
+                   ng-model="filter.queue"/>
+        </div>
+        <div class="form-group">
             <label class="col-sm-1 control-label"></label>
             <button type="submit" class="btn btn-primary" ng-disabled="runningQuery" id="filterSearch">
                 <i class="fa fa-search"></i>
@@ -91,6 +103,7 @@
         <th>Approval</th>
         <th>Running</th>
         <th>State</th>
+        <th>Queuing</th>
         <th title="Link to pull request (if any)">PR</th>
         <th>Time</th>
         <th>Duration</th>
@@ -136,8 +149,8 @@
         </td>
         <!-- Running -->
         <td>
-            <span ng-if="item.running"><i class="fa fa-play"></i>&nbsp;Running</span>
-            <span ng-if="!item.running"><i class="fa fa-pause"></i>&nbsp;Stopped</span>
+            <span ng-if="item.running" title="Still running"><i class="fa fa-play"></i>&nbsp;Running</span>
+            <span ng-if="!item.running" title="Not running any longer"><i class="fa fa-pause"></i>&nbsp;Stopped</span>
         </td>
         <!-- State -->
         <td>
@@ -149,6 +162,13 @@
             <span ng-if="item.mostRecentState.state == 'PR_CREATED'"><i class="fa fa-check text-success" title="The PR was created by Ontrack"></i></span>
             <span ng-if="item.mostRecentState.state == 'PR_APPROVED'"><i class="fa fa-check text-success" title="The PR has created and approved by Ontrack"></i></span>
             <span class="auto-versioning-audit-entry-state">{{ item.mostRecentState.state }}</span>
+        </td>
+        <!-- Queuing information -->
+        <td>
+            <span>{{ item.routing }}</span>
+            <span ng-if="item.queue">
+                <i class="fa fa-arrow-right"></i>&nbsp;{{ item.queue }}
+            </span>
         </td>
         <!-- PR -->
         <td>
@@ -210,10 +230,13 @@
                 </tbody>
             </table>
         </td>
-        <!-- Order -->
+        <!-- Routing & Order -->
         <td colspan="3">
-            Order
             <dl>
+                <dt>routing</dt>
+                <dd>{{ item.routing }}</dd>
+                <dt ng-if="item.queue">queue</dt>
+                <dd ng-if="item.queue">{{ item.queue }}</dd>
                 <dt ng-repeat-start="(name, value) in item.order">
                     {{ name }}
                 </dt>
