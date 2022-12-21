@@ -207,6 +207,10 @@ ontrack.config.extension.git.remote.retries = 3
 # and set to 30 seconds by default).
 ontrack.config.extension.git.remote.interval = 30s
 
+# Number of times we accept a "no remote" exception is thrown before deactivating the project in Ontrack.
+# If <= 0, we always retry and never disable the project.
+ontrack.config.extension.git.remote.maxNoRemote = 3
+
 # Enabling pull requests
 ontrack.config.extension.git.pullrequests.enabled = true
 

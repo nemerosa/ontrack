@@ -63,6 +63,7 @@ class GitServiceImpl(
     private val entityDataService: EntityDataService,
     private val gitConfigProperties: GitConfigProperties,
     private val gitPullRequestCache: DefaultGitPullRequestCache,
+    private val gitNoRemoteCounter: GitNoRemoteCounter,
     transactionManager: PlatformTransactionManager
 ) : AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue>(structureService, propertyService), GitService, JobOrchestratorSupplier {
 
@@ -914,12 +915,22 @@ class GitServiceImpl(
         // Launches the synchronisation
         try {
             client.sync(listener.logger())
-            // TODO Reset the counter for the project
+            // Reset the counter for the project
+            gitNoRemoteCounter.resetNoRemoteCount(project.name)
         } catch (ex: GitRepositoryNoRemoteException) {
             // Remote was mentioned as not existing
-            // TODO Gets the counter for the project
-            // TODO If < threshold, just increment the counter
-            // TODO If >= threshold, disable the project and logs the incident
+            // Gets the counter for the project
+            val count = gitNoRemoteCounter.getNoRemoteCount(project.name)
+            // If < threshold, just increment the counter
+            if (gitConfigProperties.remote.maxNoRemote > 0 && count < gitConfigProperties.remote.maxNoRemote) {
+                gitNoRemoteCounter.incNoRemoteCount(project.name)
+            } else {
+                // If >= threshold, disable the project and logs the incident
+                securityService.asAdmin {
+                    structureService.disableProject(project)
+                }
+                logger.info("Indexation of Git repository for project ${project.name} failed because of no remote ${gitConfigProperties.remote.maxNoRemote} times in a row. Disabling the project.")
+            }
         }
     }
 

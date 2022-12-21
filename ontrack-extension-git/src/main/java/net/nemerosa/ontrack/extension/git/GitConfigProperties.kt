@@ -94,6 +94,13 @@ class GitConfigProperties {
         @DurationUnit(ChronoUnit.SECONDS)
         var interval: Duration = Duration.ofSeconds(30)
 
+        /**
+         * Number of times we accept a "no remote" exception is thrown before deactivating the project in Ontrack.
+         *
+         * If <= 0, we always retry and never disable the project.
+         */
+        var maxNoRemote: Int = 3
+
     }
 
     /**
