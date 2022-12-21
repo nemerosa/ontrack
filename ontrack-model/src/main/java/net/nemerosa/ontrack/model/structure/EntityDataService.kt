@@ -54,6 +54,11 @@ interface EntityDataService {
     fun <T> retrieve(entity: ProjectEntity, key: String, type: Class<T>): T?
 
     /**
+     * Gets the number of entries for a given key
+     */
+    fun countByKey(key: String): Int
+
+    /**
      * Checks if the given [entity] has a value associated with the [key]
      */
     fun hasEntityValue(entity: ProjectEntity, key: String): Boolean
