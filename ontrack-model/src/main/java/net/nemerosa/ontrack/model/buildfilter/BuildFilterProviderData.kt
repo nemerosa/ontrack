@@ -3,12 +3,11 @@ package net.nemerosa.ontrack.model.buildfilter
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
-import java.beans.ConstructorProperties
 
 /**
  * [BuildFilterProvider] with its associated data.
  *
- * @param <T> Type of date for the filter provider
+ * @param <T> Type of data for the filter provider
  */
 class BuildFilterProviderData<T>(
     /**
@@ -18,7 +17,7 @@ class BuildFilterProviderData<T>(
     /**
      * Data
      */
-    val data: T,
+    val data: T?,
 ) {
 
     /**
