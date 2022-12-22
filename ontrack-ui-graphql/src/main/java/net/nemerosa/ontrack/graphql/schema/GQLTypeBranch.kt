@@ -1,225 +1,175 @@
-package net.nemerosa.ontrack.graphql.schema;
+package net.nemerosa.ontrack.graphql.schema
 
-import graphql.schema.DataFetcher;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLTypeReference;
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
-import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static graphql.Scalars.*;
-import static graphql.schema.GraphQLArgument.newArgument;
-import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
-import static graphql.schema.GraphQLObjectType.newObject;
-import static net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList;
+import graphql.Scalars
+import graphql.schema.*
+import net.nemerosa.ontrack.graphql.support.GraphqlUtils
+import net.nemerosa.ontrack.graphql.support.disabledField
+import net.nemerosa.ontrack.graphql.support.listType
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
+import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
+import java.util.function.Function
 
 @Component
-public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
+class GQLTypeBranch(
+    private val structureService: StructureService,
+    private val buildFilterService: BuildFilterService,
+    creation: GQLTypeCreation,
+    private val build: GQLTypeBuild,
+    private val promotionLevel: GQLTypePromotionLevel,
+    private val validationStamp: GQLTypeValidationStamp,
+    private val inputBuildStandardFilter: GQLInputBuildStandardFilter,
+    projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
+    private val inputBuildGenericFilter: GQLInputBuildGenericFilter,
+    private val projectEntityInterface: GQLProjectEntityInterface,
+    freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>,
+) : AbstractGQLProjectEntity<Branch>(
+    Branch::class.java,
+    ProjectEntityType.BRANCH,
+    projectEntityFieldContributors,
+    creation,
+    freeTextAnnotatorContributors
+) {
 
-    public static final String BRANCH = "Branch";
+    override fun getTypeName(): String = BRANCH
 
-    private final StructureService structureService;
-    private final BuildFilterService buildFilterService;
-    private final GQLTypeBuild build;
-    private final GQLTypePromotionLevel promotionLevel;
-    private final GQLTypeValidationStamp validationStamp;
-    private final GQLInputBuildStandardFilter inputBuildStandardFilter;
-    private final GQLInputBuildGenericFilter inputBuildGenericFilter;
-    private final GQLProjectEntityInterface projectEntityInterface;
+    override fun createType(cache: GQLTypeCache): GraphQLObjectType = GraphQLObjectType.newObject()
+        .name(BRANCH)
+        .withInterface(projectEntityInterface.typeRef)
+        .fields(projectEntityInterfaceFields())
+        .field(disabledField())
+        .field(
+            GraphQLFieldDefinition.newFieldDefinition()
+                .name("project")
+                .description("Reference to project")
+                .type(GraphQLTypeReference(GQLTypeProject.PROJECT))
+                .build()
+        ) // Promotion levels
+        .field(
+            GraphQLFieldDefinition.newFieldDefinition()
+                .name("promotionLevels")
+                .type(listType(promotionLevel.typeRef))
+                .dataFetcher(branchPromotionLevelsFetcher())
+                .build()
+        ) // Validation stamps
+        .field(
+            GraphQLFieldDefinition.newFieldDefinition()
+                .name("validationStamps")
+                .type(listType(validationStamp.typeRef))
+                .argument { arg: GraphQLArgument.Builder ->
+                    arg.name("name")
+                        .description("Filters on the validation stamp")
+                        .type(Scalars.GraphQLString)
+                }
+                .dataFetcher(branchValidationStampsFetcher())
+                .build()
+        ) // Builds for the branch
+        .field(
+            GraphQLFieldDefinition.newFieldDefinition()
+                .name("builds")
+                .type(listType(build.typeRef)) // Last builds
+                .argument(
+                    GraphQLArgument.newArgument()
+                        .name("count")
+                        .description("Maximum number of builds to return")
+                        .type(Scalars.GraphQLInt)
+                        .build()
+                ) // Last promotion filter
+                .argument(
+                    GraphQLArgument.newArgument()
+                        .name("lastPromotions")
+                        .description("Filter which returns the last promoted builds")
+                        .type(Scalars.GraphQLBoolean)
+                        .build()
+                ) // Standard filter
+                .argument(
+                    GraphQLArgument.newArgument()
+                        .name("filter")
+                        .description("Filter based on build promotions, validations, properties, ...")
+                        .type(inputBuildStandardFilter.typeRef)
+                        .build()
+                ) // Generic filter
+                .argument(
+                    GraphQLArgument.newArgument()
+                        .name("generic")
+                        .description("Generic filter based on a configured filter")
+                        .type(inputBuildGenericFilter.typeRef)
+                        .build()
+                ) // Query
+                .dataFetcher(branchBuildsFetcher())
+                .build()
+        ) // OK
+        .build()
 
-    @Autowired
-    public GQLTypeBranch(StructureService structureService,
-                         BuildFilterService buildFilterService,
-                         GQLTypeCreation creation,
-                         GQLTypeBuild build,
-                         GQLTypePromotionLevel promotionLevel,
-                         GQLTypeValidationStamp validationStamp,
-                         GQLInputBuildStandardFilter inputBuildStandardFilter,
-                         List<GQLProjectEntityFieldContributor> projectEntityFieldContributors,
-                         GQLInputBuildGenericFilter inputBuildGenericFilter,
-                         GQLProjectEntityInterface projectEntityInterface,
-                         List<FreeTextAnnotatorContributor> freeTextAnnotatorContributors
-    ) {
-        super(Branch.class, ProjectEntityType.BRANCH, projectEntityFieldContributors, creation, freeTextAnnotatorContributors);
-        this.structureService = structureService;
-        this.buildFilterService = buildFilterService;
-        this.build = build;
-        this.promotionLevel = promotionLevel;
-        this.validationStamp = validationStamp;
-        this.inputBuildStandardFilter = inputBuildStandardFilter;
-        this.inputBuildGenericFilter = inputBuildGenericFilter;
-        this.projectEntityInterface = projectEntityInterface;
-    }
-
-    @Override
-    public String getTypeName() {
-        return BRANCH;
-    }
-
-    @Override
-    public GraphQLObjectType createType(GQLTypeCache cache) {
-        return newObject()
-                .name(BRANCH)
-                .withInterface(projectEntityInterface.getTypeRef())
-                .fields(projectEntityInterfaceFields())
-                .field(GraphqlUtils.disabledField())
-                // Ref to project
-                .field(
-                        newFieldDefinition()
-                                .name("project")
-                                .description("Reference to project")
-                                .type(new GraphQLTypeReference(GQLTypeProject.PROJECT))
-                                .build()
-                )
-                // Promotion levels
-                .field(
-                        newFieldDefinition()
-                                .name("promotionLevels")
-                                .type(stdList(promotionLevel.getTypeRef()))
-                                .dataFetcher(branchPromotionLevelsFetcher())
-                                .build()
-                )
-                // Validation stamps
-                .field(
-                        newFieldDefinition()
-                                .name("validationStamps")
-                                .type(stdList(validationStamp.getTypeRef()))
-                                .argument(arg -> arg.name("name")
-                                        .description("Filters on the validation stamp")
-                                        .type(GraphQLString)
-                                )
-                                .dataFetcher(branchValidationStampsFetcher())
-                                .build()
-                )
-                // Builds for the branch
-                .field(
-                        newFieldDefinition()
-                                .name("builds")
-                                .type(GraphqlUtils.stdList(build.getTypeRef()))
-                                // Last builds
-                                .argument(
-                                        newArgument()
-                                                .name("count")
-                                                .description("Maximum number of builds to return")
-                                                .type(GraphQLInt)
-                                                .build()
-                                )
-                                // Last promotion filter
-                                .argument(
-                                        newArgument()
-                                                .name("lastPromotions")
-                                                .description("Filter which returns the last promoted builds")
-                                                .type(GraphQLBoolean)
-                                                .build()
-                                )
-                                // Standard filter
-                                .argument(
-                                        newArgument()
-                                                .name("filter")
-                                                .description("Filter based on build promotions, validations, properties, ...")
-                                                .type(inputBuildStandardFilter.getTypeRef())
-                                                .build()
-                                )
-                                // Generic filter
-                                .argument(
-                                        newArgument()
-                                                .name("generic")
-                                                .description("Generic filter based on a configured filter")
-                                                .type(inputBuildGenericFilter.getTypeRef())
-                                                .build()
-                                )
-                                // Query
-                                .dataFetcher(branchBuildsFetcher())
-                                .build()
-                )
-                // OK
-                .build();
-
-    }
-
-    private DataFetcher branchBuildsFetcher() {
-        return environment -> {
-            Object source = environment.getSource();
-            if (source instanceof Branch) {
-                Branch branch = (Branch) source;
+    private fun branchBuildsFetcher(): DataFetcher<*> {
+        return DataFetcher { environment: DataFetchingEnvironment ->
+            val source = environment.getSource<Any>()
+            if (source is Branch) {
                 // Count
-                int count = GraphqlUtils.getIntArgument(environment, "count").orElse(10);
-                Object filter = environment.getArgument("filter");
-                Object genericFilter = environment.getArgument("generic");
-                boolean lastPromotions = GraphqlUtils.getBooleanArgument(environment, "lastPromotions", false);
+                val count = environment.getArgument("count") ?: 10
+                val filter = environment.getArgument<Any>("filter")
+                val genericFilter = environment.getArgument<Any>("generic")
+                val lastPromotions = environment.getArgument<Boolean>("lastPromotions") ?: false
                 // Filter to use
-                BuildFilterProviderData<?> buildFilter;
                 // Last promotion filter
-                if (lastPromotions) {
-                    buildFilter = buildFilterService.lastPromotedBuildsFilterData();
-                }
-                // Standard filter
-                else if (filter != null) {
-                    buildFilter = inputBuildStandardFilter.convert(filter);
-                }
-                // Generic filter
-                else if (genericFilter != null) {
-                    buildFilter = inputBuildGenericFilter.convert(genericFilter);
-                }
-                // Default filter
-                else {
-                    buildFilter = buildFilterService.standardFilterProviderData(count).build();
+                val buildFilter: BuildFilterProviderData<*> = if (lastPromotions) {
+                    buildFilterService.lastPromotedBuildsFilterData()
+                } else if (filter != null) {
+                    inputBuildStandardFilter.convert(filter)
+                } else if (genericFilter != null) {
+                    inputBuildGenericFilter.convert(genericFilter)
+                } else {
+                    buildFilterService.standardFilterProviderData(count).build()
                 }
                 // Result
-                return buildFilter.filterBranchBuilds(branch);
+                return@DataFetcher buildFilter.filterBranchBuilds(source)
             } else {
-                return Collections.emptyList();
+                return@DataFetcher emptyList<Any>()
             }
-        };
+        }
     }
 
-    private DataFetcher branchPromotionLevelsFetcher() {
-        return environment -> {
-            Object source = environment.getSource();
-            if (source instanceof Branch) {
-                Branch branch = (Branch) source;
-                return structureService.getPromotionLevelListForBranch(branch.getId());
+    private fun branchPromotionLevelsFetcher(): DataFetcher<*> {
+        return DataFetcher { environment: DataFetchingEnvironment ->
+            val source = environment.getSource<Any>()
+            if (source is Branch) {
+                val (id) = source
+                return@DataFetcher structureService.getPromotionLevelListForBranch(id)
             } else {
-                return Collections.emptyList();
+                return@DataFetcher emptyList<Any>()
             }
-        };
+        }
     }
 
-    private DataFetcher branchValidationStampsFetcher() {
-        return environment -> {
-            Object source = environment.getSource();
-            Optional<String> name = GraphqlUtils.getStringArgument(environment, "name");
-            if (source instanceof Branch) {
-                Branch branch = (Branch) source;
-                if (name.isPresent()) {
-                    return structureService.findValidationStampByName(
-                            branch.getProject().getName(), branch.getName(), name.get()
+    private fun branchValidationStampsFetcher(): DataFetcher<*> {
+        return DataFetcher { environment: DataFetchingEnvironment ->
+            val source = environment.getSource<Any>()
+            val name: String? = environment.getArgument<String>("name")
+            if (source is Branch) {
+                val (id, name1, _, _, project) = source
+                if (name != null) {
+                    return@DataFetcher structureService.findValidationStampByName(
+                        project.name, name1, name
                     )
-                            .map(Collections::singletonList)
-                            .orElse(Collections.emptyList());
+                        .map { o: ValidationStamp -> listOf(o) }
+                        .orElse(emptyList())
                 } else {
-                    return structureService.getValidationStampListForBranch(branch.getId());
+                    return@DataFetcher structureService.getValidationStampListForBranch(id)
                 }
             } else {
-                return Collections.emptyList();
+                return@DataFetcher emptyList<Any>()
             }
-        };
+        }
     }
 
-    @Nullable
-    @Override
-    protected Signature getSignature(@NotNull Branch entity) {
-        return entity.getSignature();
+    override fun getSignature(entity: Branch): Signature? {
+        return entity.signature
     }
 
+    companion object {
+        const val BRANCH = "Branch"
+    }
 }
