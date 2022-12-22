@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository
 
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.*
 import java.util.Optional
 import java.util.function.Function
@@ -15,6 +16,14 @@ interface CoreBuildFilterRepository {
     fun projectSearch(project: Project, form: BuildSearchForm, propertyTypeAccessor: (String) -> PropertyType<*>): List<Build>
 
     fun standardFilter(branch: Branch, data: StandardBuildFilterData, propertyTypeAccessor: (String) -> PropertyType<*>): List<Build>
+
+    fun standardFilterPagination(
+        branch: Branch,
+        data: StandardBuildFilterData,
+        offset: Int,
+        size: Int,
+        propertyTypeAccessor: (String) -> PropertyType<*>,
+    ): PaginatedList<Build>
 
     fun nameFilter(branch: Branch, fromBuild: String?, toBuild: String?, withPromotionLevel: String?, count: Int): List<Build>
 

@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.form.Date
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Selection
 import net.nemerosa.ontrack.model.form.Text
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.repository.CoreBuildFilterRepository
 import org.springframework.stereotype.Component
@@ -31,6 +32,19 @@ class StandardBuildFilterProvider(
         coreBuildFilterRepository.standardFilter(
             branch,
             data ?: StandardBuildFilterData.of(10)
+        ) { type -> propertyService.getPropertyTypeByName<Any>(type) }
+
+    override fun filterBranchBuildsWithPagination(
+        branch: Branch,
+        data: StandardBuildFilterData?,
+        offset: Int,
+        size: Int,
+    ): PaginatedList<Build> =
+        coreBuildFilterRepository.standardFilterPagination(
+            branch,
+            data ?: StandardBuildFilterData.of(size),
+            offset,
+            size
         ) { type -> propertyService.getPropertyTypeByName<Any>(type) }
 
     override fun blankForm(branchId: ID): Form {
