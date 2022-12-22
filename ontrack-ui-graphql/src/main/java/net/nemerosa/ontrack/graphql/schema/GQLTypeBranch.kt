@@ -2,16 +2,14 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars
 import graphql.schema.*
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.disabledField
 import net.nemerosa.ontrack.graphql.support.listType
+import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 @Component
 class GQLTypeBranch(
@@ -26,6 +24,7 @@ class GQLTypeBranch(
     private val inputBuildGenericFilter: GQLInputBuildGenericFilter,
     private val projectEntityInterface: GQLProjectEntityInterface,
     freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>,
+    private val gqlPaginatedListFactory: GQLPaginatedListFactory,
 ) : AbstractGQLProjectEntity<Branch>(
     Branch::class.java,
     ProjectEntityType.BRANCH,
@@ -66,11 +65,48 @@ class GQLTypeBranch(
                 }
                 .dataFetcher(branchValidationStampsFetcher())
                 .build()
-        ) // Builds for the branch
+        )
+        // Builds for the branch (paginated)
+        .field(
+            gqlPaginatedListFactory.createPaginatedField<Branch, Build>(
+                cache = cache,
+                fieldName = "buildsPaginated",
+                fieldDescription = "Gets a list of paginated builds for this branch.",
+                itemType = build,
+                arguments = listOf(
+                    // Standard filter
+                    GraphQLArgument.newArgument()
+                        .name(ARG_FILTER)
+                        .description("Filter based on build promotions, validations, properties, ...")
+                        .type(inputBuildStandardFilter.typeRef)
+                        .build(),
+                    // Generic filter
+                    GraphQLArgument.newArgument()
+                        .name(ARG_GENERIC)
+                        .description("Generic filter based on a configured filter")
+                        .type(inputBuildGenericFilter.typeRef)
+                        .build(),
+                ),
+                itemPaginatedListProvider = { environment, source, offset, size ->
+                    val filter = environment.getArgument<Any>(ARG_FILTER)
+                    val genericFilter = environment.getArgument<Any>(ARG_GENERIC)
+                    val buildFilter: BuildFilterProviderData<*> = if (filter != null) {
+                        inputBuildStandardFilter.convert(filter)
+                    } else if (genericFilter != null) {
+                        inputBuildGenericFilter.convert(genericFilter)
+                    } else {
+                        buildFilterService.standardFilterProviderData(size).build()
+                    }
+                    buildFilter.filterBranchBuildsWithPagination(source, offset, size)
+                },
+            )
+        )
+        // Builds for the branch (non paginated)
         .field(
             GraphQLFieldDefinition.newFieldDefinition()
                 .name("builds")
-                .type(listType(build.typeRef)) // Last builds
+                .description("Gets a list of builds for this branch. Use `buildsPaginated` to get a list of paginated builds.")
+                .type(listType(build.typeRef))
                 .argument(
                     GraphQLArgument.newArgument()
                         .name("count")
@@ -87,14 +123,14 @@ class GQLTypeBranch(
                 ) // Standard filter
                 .argument(
                     GraphQLArgument.newArgument()
-                        .name("filter")
+                        .name(ARG_FILTER)
                         .description("Filter based on build promotions, validations, properties, ...")
                         .type(inputBuildStandardFilter.typeRef)
                         .build()
                 ) // Generic filter
                 .argument(
                     GraphQLArgument.newArgument()
-                        .name("generic")
+                        .name(ARG_GENERIC)
                         .description("Generic filter based on a configured filter")
                         .type(inputBuildGenericFilter.typeRef)
                         .build()
@@ -110,8 +146,8 @@ class GQLTypeBranch(
             if (source is Branch) {
                 // Count
                 val count = environment.getArgument("count") ?: 10
-                val filter = environment.getArgument<Any>("filter")
-                val genericFilter = environment.getArgument<Any>("generic")
+                val filter = environment.getArgument<Any>(ARG_FILTER)
+                val genericFilter = environment.getArgument<Any>(ARG_GENERIC)
                 val lastPromotions = environment.getArgument<Boolean>("lastPromotions") ?: false
                 // Filter to use
                 // Last promotion filter
@@ -171,5 +207,8 @@ class GQLTypeBranch(
 
     companion object {
         const val BRANCH = "Branch"
+
+        const val ARG_FILTER = "filter"
+        const val ARG_GENERIC = "generic"
     }
 }

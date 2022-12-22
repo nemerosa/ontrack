@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.buildfilter;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.model.pagination.PaginatedList;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
@@ -46,6 +47,13 @@ public interface BuildFilterProvider<T> {
      */
     default List<Build> filterBranchBuilds(Branch branch, T data) {
         throw new UnsupportedOperationException("Filter branch builds must be implemented for " + this.getClass());
+    }
+
+    /**
+     * Performs the filtering with some pagination
+     */
+    default PaginatedList<Build> filterBranchBuildsWithPagination(Branch branch, T data, int offset, int size) {
+        throw new UnsupportedOperationException("Filter branch builds with pagination must be implemented for " + this.getClass());
     }
 
     /**

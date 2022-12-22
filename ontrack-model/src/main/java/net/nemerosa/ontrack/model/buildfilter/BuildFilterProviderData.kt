@@ -1,40 +1,52 @@
-package net.nemerosa.ontrack.model.buildfilter;
+package net.nemerosa.ontrack.model.buildfilter
 
-import lombok.Data;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Build;
-
-import java.util.List;
+import net.nemerosa.ontrack.model.pagination.PaginatedList
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Build
+import java.beans.ConstructorProperties
 
 /**
- * {@link BuildFilterProvider} with its associated data.
+ * [BuildFilterProvider] with its associated data.
  *
  * @param <T> Type of date for the filter provider
  */
-@Data
-public class BuildFilterProviderData<T> {
-
+class BuildFilterProviderData<T>(
     /**
      * Provider service
      */
-    private final BuildFilterProvider<T> provider;
-
+    val provider: BuildFilterProvider<T>,
     /**
      * Data
      */
-    private final T data;
-
-    /**
-     * Builder
-     */
-    public static <T> BuildFilterProviderData<T> of(BuildFilterProvider<T> provider, T data) {
-        return new BuildFilterProviderData<>(provider, data);
-    }
+    val data: T,
+) {
 
     /**
      * Launches the filter
      */
-    public List<Build> filterBranchBuilds(Branch branch) {
-        return provider.filterBranchBuilds(branch, data);
+    fun filterBranchBuilds(branch: Branch): List<Build> {
+        return provider.filterBranchBuilds(branch, data)
+    }
+
+    /**
+     * Filter with pagination
+     */
+    fun filterBranchBuildsWithPagination(branch: Branch, offset: Int, size: Int): PaginatedList<Build> {
+        return provider.filterBranchBuildsWithPagination(branch, data, offset, size)
+    }
+
+    companion object {
+        /**
+         * Builder
+         */
+        @Deprecated(
+            "Use the constructor directly", ReplaceWith(
+                "BuildFilterProviderData(provider, data)",
+            )
+        )
+        @JvmStatic
+        fun <T> of(provider: BuildFilterProvider<T>, data: T): BuildFilterProviderData<T> {
+            return BuildFilterProviderData(provider, data)
+        }
     }
 }
