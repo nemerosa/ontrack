@@ -176,7 +176,7 @@ interface GitService : SCMService {
     fun projectSync(project: Project, request: GitSynchronisationRequest): Ack
 
     /**
-     * Synchronises the Git repository attached to this configuration.
+     * Synchronises the Git repository attached to this configuration using an asynchronous job.
      *
      * @param gitConfiguration Configuration to sync
      * @param request          Sync request
@@ -184,6 +184,18 @@ interface GitService : SCMService {
      * synchronisation was actually launched.
      */
     fun sync(gitConfiguration: GitConfiguration, request: GitSynchronisationRequest): Future<*>?
+
+    /**
+     * Synchronises the Git repository attached to this configuration in a synchronous way. Same than [sync]
+     * but without using a background job.
+     *
+     * This method is mostly used for testing.
+     *
+     * @param config Configuration to sync
+     * @param project Associated project
+     * @param listener Logger
+     */
+    fun syncProjectRepository(config: GitConfiguration, project: Project, listener: (message: String) -> Unit = { println(it) })
 
     /**
      * Gets the Git synchronisation information.

@@ -13,6 +13,7 @@ import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringUtils
 import org.eclipse.jgit.api.*
 import org.eclipse.jgit.api.errors.GitAPIException
+import org.eclipse.jgit.api.errors.InvalidRemoteException
 import org.eclipse.jgit.api.errors.NoHeadException
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.diff.DiffFormatter
@@ -222,8 +223,6 @@ class GitRepositoryClientImpl(
                     // Clone
                     cloneRemote(logger)
                 }
-            } catch (noRemote: NoRemoteRepositoryException) {
-                throw GitRepositoryNoRemoteException(repository.remote)
             } finally {
                 sync.unlock()
             }
@@ -232,11 +231,25 @@ class GitRepositoryClientImpl(
         }
     }
 
+    private fun catchRemote(
+        code: () -> Unit,
+    ) {
+        try {
+            code()
+        } catch (noRemote: InvalidRemoteException) {
+            throw GitRepositoryNoRemoteException(repository.remote)
+        } catch (noRemote: NoRemoteRepositoryException) {
+            throw GitRepositoryNoRemoteException(repository.remote)
+        }
+    }
+
     @Synchronized
     private fun fetch(logger: Consumer<String>) {
         logger.accept(format("[git] Pulling %s", repository.remote))
         try {
-            git.fetch().invoke("Fetching ${repository.remote}")
+            catchRemote {
+                git.fetch().invoke("Fetching ${repository.remote}")
+            }
         } catch (e: GitAPIException) {
             throw GitRepositoryAPIException(repository.remote, e)
         }
@@ -248,10 +261,12 @@ class GitRepositoryClientImpl(
     private fun cloneRemote(logger: Consumer<String>) {
         logger.accept(format("[git] Cloning %s", repository.remote))
         try {
-            CloneCommand()
-                .setDirectory(repositoryDir)
-                .setURI(repository.remote)
-                .invoke("Cloning ${repository.remote}")
+            catchRemote {
+                CloneCommand()
+                    .setDirectory(repositoryDir)
+                    .setURI(repository.remote)
+                    .invoke("Cloning ${repository.remote}")
+            }
         } catch (e: GitAPIException) {
             throw GitRepositoryAPIException(repository.remote, e)
         }
