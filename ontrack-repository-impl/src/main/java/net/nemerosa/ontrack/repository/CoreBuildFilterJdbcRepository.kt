@@ -313,9 +313,12 @@ class CoreBuildFilterJdbcRepository(
 
         // sinceValidationStamp
         val sinceValidationStamp = data.sinceValidationStamp
-        if (isNotBlank(sinceValidationStamp)) {
+        if (!sinceValidationStamp.isNullOrBlank()) {
             // Gets the validation stamp ID
-            val validationStampId = getValidationStampId(branch, sinceValidationStamp)!!
+            val validationStampId = getValidationStampId(branch, sinceValidationStamp)
+                ?: throw CoreBuildFilterInvalidException(
+                    "Could not find validation stamp $sinceValidationStamp."
+                )
             // Gets the last build having this validation stamp and the validation status
             val id = findLastBuildWithValidationStamp(validationStampId, data.sinceValidationStampStatus)
             if (id != null) {
@@ -329,7 +332,7 @@ class CoreBuildFilterJdbcRepository(
 
         // withValidationStamp
         val withValidationStamp = data.withValidationStamp
-        if (isNotBlank(withValidationStamp)) {
+        if (!withValidationStamp.isNullOrBlank()) {
             tables.append(
                 "  LEFT JOIN (" +
                         " SELECT R.BUILDID,  R.VALIDATIONSTAMPID, VRS.VALIDATIONRUNSTATUSID " +
@@ -339,7 +342,10 @@ class CoreBuildFilterJdbcRepository(
                         " ) S ON S.BUILDID = B.ID"
             )
             // Gets the validation stamp ID
-            val validationStampId = getValidationStampId(branch, withValidationStamp)!!
+            val validationStampId = getValidationStampId(branch, withValidationStamp)
+                ?: throw CoreBuildFilterInvalidException(
+                    "Could not find validation stamp $withValidationStamp."
+                )
             criteria.append(" AND (S.VALIDATIONSTAMPID = :validationStampId")
             params.addValue("validationStampId", validationStampId)
             // withValidationStampStatus
@@ -353,7 +359,7 @@ class CoreBuildFilterJdbcRepository(
 
         // withProperty
         val withProperty = data.withProperty
-        if (isNotBlank(withProperty)) {
+        if (!withProperty.isNullOrBlank()) {
             tables.append(" LEFT JOIN PROPERTIES PP ON PP.BUILD = B.ID")
             criteria.append(" AND PP.TYPE = :withProperty")
             params.addValue("withProperty", withProperty)
@@ -383,7 +389,7 @@ class CoreBuildFilterJdbcRepository(
 
         // sinceProperty
         val sinceProperty = data.sinceProperty
-        if (isNotBlank(sinceProperty)) {
+        if (!sinceProperty.isNullOrBlank()) {
             val sincePropertyValue = data.sincePropertyValue
             val id = findLastBuildWithPropertyValue(branch, sinceProperty, sincePropertyValue, propertyTypeAccessor)
             if (id != null) {
@@ -681,8 +687,8 @@ class CoreBuildFilterJdbcRepository(
     private fun getValidationStampId(branch: Branch, validationStampName: String): Int? {
         return structureRepository
             .getValidationStampByName(branch, validationStampName)
-            .map { it.id() }
-            .orElse(-1)
+            .orElse(null)
+            ?.id()
     }
 
     private fun findLastBuildWithValidationStamp(validationStampId: Int, status: String?): Int? {
