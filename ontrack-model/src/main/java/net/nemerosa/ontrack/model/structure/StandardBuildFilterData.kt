@@ -376,6 +376,7 @@ data class StandardBuildFilterData(
     }
 
     companion object {
+        @JvmStatic
         fun of(count: Int): StandardBuildFilterData {
             return StandardBuildFilterData(
                 count,
