@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.service
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.getIntField
+import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException
 import net.nemerosa.ontrack.model.form.Date
 import net.nemerosa.ontrack.model.form.Form
@@ -205,8 +207,8 @@ class StandardBuildFilterProvider(
     }
 
     override fun parse(data: JsonNode): StandardBuildFilterData? =
-        StandardBuildFilterData.of(JsonUtils.getInt(data, "count", 10))
-            .withSincePromotionLevel(JsonUtils.get(data, "sincePromotionLevel", null))
+        StandardBuildFilterData.of(data.getIntField("count") ?: 10)
+            .withSincePromotionLevel(data.getTextField("sincePromotionLevel"))
             .withWithPromotionLevel(JsonUtils.get(data, "withPromotionLevel", null))
             .withAfterDate(JsonUtils.getDate(data, "afterDate", null))
             .withBeforeDate(JsonUtils.getDate(data, "beforeDate", null))

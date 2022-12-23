@@ -23,7 +23,7 @@ data class StandardBuildFilterData(
     val linkedToPromotion: String? = null
 ) : StandardFilterDataBuilder<StandardBuildFilterData> {
 
-    override fun withSincePromotionLevel(sincePromotionLevel: String): StandardBuildFilterData {
+    override fun withSincePromotionLevel(sincePromotionLevel: String?): StandardBuildFilterData {
         return if (this.sincePromotionLevel === sincePromotionLevel) this else StandardBuildFilterData(
             count,
             sincePromotionLevel,
@@ -45,7 +45,7 @@ data class StandardBuildFilterData(
         )
     }
 
-    override fun withWithPromotionLevel(withPromotionLevel: String): StandardBuildFilterData {
+    override fun withWithPromotionLevel(withPromotionLevel: String?): StandardBuildFilterData {
         return if (this.withPromotionLevel === withPromotionLevel) this else StandardBuildFilterData(
             count,
             sincePromotionLevel,
@@ -67,7 +67,7 @@ data class StandardBuildFilterData(
         )
     }
 
-    override fun withAfterDate(afterDate: LocalDate): StandardBuildFilterData {
+    override fun withAfterDate(afterDate: LocalDate?): StandardBuildFilterData {
         return if (this.afterDate === afterDate) this else StandardBuildFilterData(
             count,
             sincePromotionLevel,
@@ -89,7 +89,7 @@ data class StandardBuildFilterData(
         )
     }
 
-    override fun withBeforeDate(beforeDate: LocalDate): StandardBuildFilterData {
+    override fun withBeforeDate(beforeDate: LocalDate?): StandardBuildFilterData {
         return if (this.beforeDate === beforeDate) this else StandardBuildFilterData(
             count,
             sincePromotionLevel,
@@ -111,7 +111,7 @@ data class StandardBuildFilterData(
         )
     }
 
-    override fun withSinceValidationStamp(sinceValidationStamp: String): StandardBuildFilterData {
+    override fun withSinceValidationStamp(sinceValidationStamp: String?): StandardBuildFilterData {
         return if (this.sinceValidationStamp === sinceValidationStamp) this else StandardBuildFilterData(
             count,
             sincePromotionLevel,
@@ -133,7 +133,7 @@ data class StandardBuildFilterData(
         )
     }
 
-    override fun withSinceValidationStampStatus(sinceValidationStampStatus: String): StandardBuildFilterData {
+    override fun withSinceValidationStampStatus(sinceValidationStampStatus: String?): StandardBuildFilterData {
         return if (this.sinceValidationStampStatus === sinceValidationStampStatus) this else StandardBuildFilterData(
             count,
             sincePromotionLevel,
@@ -155,7 +155,7 @@ data class StandardBuildFilterData(
         )
     }
 
-    override fun withWithValidationStamp(withValidationStamp: String): StandardBuildFilterData {
+    override fun withWithValidationStamp(withValidationStamp: String?): StandardBuildFilterData {
         return if (this.withValidationStamp === withValidationStamp) this else StandardBuildFilterData(
             count,
             sincePromotionLevel,
@@ -177,7 +177,7 @@ data class StandardBuildFilterData(
         )
     }
 
-    override fun withWithValidationStampStatus(withValidationStampStatus: String): StandardBuildFilterData {
+    override fun withWithValidationStampStatus(withValidationStampStatus: String?): StandardBuildFilterData {
         return if (this.withValidationStampStatus === withValidationStampStatus) this else StandardBuildFilterData(
             count,
             sincePromotionLevel,
@@ -199,7 +199,7 @@ data class StandardBuildFilterData(
         )
     }
 
-    override fun withWithProperty(withProperty: String): StandardBuildFilterData {
+    override fun withWithProperty(withProperty: String?): StandardBuildFilterData {
         return if (this.withProperty === withProperty) this else StandardBuildFilterData(
             count,
             sincePromotionLevel,
@@ -221,7 +221,7 @@ data class StandardBuildFilterData(
         )
     }
 
-    override fun withWithPropertyValue(withPropertyValue: String): StandardBuildFilterData {
+    override fun withWithPropertyValue(withPropertyValue: String?): StandardBuildFilterData {
         return if (this.withPropertyValue === withPropertyValue) this else StandardBuildFilterData(
             count,
             sincePromotionLevel,
@@ -243,7 +243,7 @@ data class StandardBuildFilterData(
         )
     }
 
-    override fun withSinceProperty(sinceProperty: String): StandardBuildFilterData {
+    override fun withSinceProperty(sinceProperty: String?): StandardBuildFilterData {
         return if (this.sinceProperty === sinceProperty) this else StandardBuildFilterData(
             count,
             sincePromotionLevel,
@@ -265,7 +265,7 @@ data class StandardBuildFilterData(
         )
     }
 
-    override fun withSincePropertyValue(sincePropertyValue: String): StandardBuildFilterData {
+    override fun withSincePropertyValue(sincePropertyValue: String?): StandardBuildFilterData {
         return if (this.sincePropertyValue === sincePropertyValue) this else StandardBuildFilterData(
             count,
             sincePromotionLevel,
@@ -287,7 +287,7 @@ data class StandardBuildFilterData(
         )
     }
 
-    override fun withLinkedFrom(linkedFrom: String): StandardBuildFilterData {
+    override fun withLinkedFrom(linkedFrom: String?): StandardBuildFilterData {
         return if (this.linkedFrom === linkedFrom) this else StandardBuildFilterData(
             count,
             sincePromotionLevel,
@@ -309,7 +309,7 @@ data class StandardBuildFilterData(
         )
     }
 
-    override fun withLinkedFromPromotion(linkedFromPromotion: String): StandardBuildFilterData {
+    override fun withLinkedFromPromotion(linkedFromPromotion: String?): StandardBuildFilterData {
         return if (this.linkedFromPromotion === linkedFromPromotion) this else StandardBuildFilterData(
             count,
             sincePromotionLevel,
@@ -331,7 +331,7 @@ data class StandardBuildFilterData(
         )
     }
 
-    override fun withLinkedTo(linkedTo: String): StandardBuildFilterData {
+    override fun withLinkedTo(linkedTo: String?): StandardBuildFilterData {
         return if (this.linkedTo === linkedTo) this else StandardBuildFilterData(
             count,
             sincePromotionLevel,
@@ -353,7 +353,7 @@ data class StandardBuildFilterData(
         )
     }
 
-    override fun withLinkedToPromotion(linkedToPromotion: String): StandardBuildFilterData {
+    override fun withLinkedToPromotion(linkedToPromotion: String?): StandardBuildFilterData {
         return if (this.linkedToPromotion === linkedToPromotion) this else StandardBuildFilterData(
             count,
             sincePromotionLevel,
