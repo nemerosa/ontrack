@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.structure.*
 import org.junit.jupiter.api.BeforeEach
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 abstract class AbstractBuildFilterTestSupport : AbstractDSLTestSupport() {
 
@@ -138,6 +139,10 @@ abstract class AbstractBuildFilterTestSupport : AbstractDSLTestSupport() {
         val actualNames = builds
                 .map { it.name }
         assertEquals(expectedNames, actualNames)
+    }
+
+    protected fun checkListIsEmpty(builds: List<Build>) {
+        assertTrue(builds.isEmpty(), "Build list is empty")
     }
 
     protected fun checkList(builds: List<Build>, vararg expectedNames: String) {

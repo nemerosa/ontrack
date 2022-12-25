@@ -324,8 +324,8 @@ class StandardBuildFilterIT : AbstractBuildFilterTestSupport() {
                 .build()
         // Filtering
         val builds = filter.filterBranchBuilds(branch)
-        // Checks the list
-        checkList(builds, 2, 1)
+        // Checks the list is empty
+        checkListIsEmpty(builds)
     }
 
     /**
