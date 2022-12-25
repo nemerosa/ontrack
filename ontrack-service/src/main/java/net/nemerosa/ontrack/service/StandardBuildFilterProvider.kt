@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.model.form.Selection
 import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.repository.CoreBuildFilterInvalidException
 import net.nemerosa.ontrack.repository.CoreBuildFilterRepository
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -31,23 +32,30 @@ class StandardBuildFilterProvider(
     override val isPredefined: Boolean = false
 
     override fun filterBranchBuilds(branch: Branch, data: StandardBuildFilterData?): List<Build> =
-        coreBuildFilterRepository.standardFilter(
-            branch,
-            data ?: StandardBuildFilterData.of(10)
-        ) { type -> propertyService.getPropertyTypeByName<Any>(type) }
+            try {
+                coreBuildFilterRepository.standardFilter(
+                        branch,
+                        data ?: StandardBuildFilterData.of(10)
+                ) { type -> propertyService.getPropertyTypeByName<Any>(type) }
+            } catch (_: CoreBuildFilterInvalidException) {
+                emptyList()
+            }
 
     override fun filterBranchBuildsWithPagination(
         branch: Branch,
         data: StandardBuildFilterData?,
         offset: Int,
         size: Int,
-    ): PaginatedList<Build> =
+    ): PaginatedList<Build> = try {
         coreBuildFilterRepository.standardFilterPagination(
-            branch,
-            data ?: StandardBuildFilterData.of(size),
-            offset,
-            size
+                branch,
+                data ?: StandardBuildFilterData.of(size),
+                offset,
+                size
         ) { type -> propertyService.getPropertyTypeByName<Any>(type) }
+    } catch (_: CoreBuildFilterInvalidException) {
+        PaginatedList.empty()
+    }
 
     override fun blankForm(branchId: ID): Form {
         // Promotion levels for this branch
