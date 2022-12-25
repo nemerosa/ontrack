@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.service
 
 import org.junit.Test
 
-class PromotionLevelBuildFilterIT : AbstractBuildFilterIT() {
+class PromotionLevelBuildFilterIT : AbstractBuildFilterJUnit4IT() {
 
     /**
      * Tests the following sequence:
