@@ -73,7 +73,6 @@ angular.module('ot.view.branch', [
             builds.forEach(build => {
                 const statuses = {};
                 build.validations.forEach(validation => {
-                    const name = validation.validationStamp.name;
                     if (validation.validationRuns.length > 0) {
                         const statusID = validation.validationRuns[0].validationRunStatuses[0].statusID;
                         const group = statuses[statusID.id];
@@ -108,7 +107,14 @@ angular.module('ot.view.branch', [
 
         function callBuildView(filterType, filterData) {
             $scope.loadingBuildView = true;
-            otGraphqlService.pageGraphQLCall(`query BranchView($branchId: Int!, $filterType: String, $filterData: String) {
+            // TODO Offset & size as variables
+            otGraphqlService.pageGraphQLCall(`query BranchView(
+                $branchId: Int!, 
+                $filterType: String,
+                $filterData: String,
+                $offset: Int! = 0,
+                $size: Int! = 10, 
+            ) {
               validationRunStatusIDList {
                 id
                 name
@@ -160,61 +166,76 @@ angular.module('ot.view.branch', [
                     config
                   }
                 }
-                builds(generic: {type: $filterType, data: $filterData}) {
-                  id
-                  name
-                  runInfo {
-                    sourceType
-                    sourceUri 
-                    triggerType
-                    triggerData
-                    runTime
+                buildsPaginated(offset: $offset, size: $size, generic: {type: $filterType, data: $filterData}) {
+                  pageInfo {
+                    totalSize
+                    currentOffset
+                    currentSize
+                    previousPage {
+                        offset
+                        size
+                    }
+                    nextPage {
+                        offset
+                        size
+                    }
                   }
-                  decorations {
-                    ...decorationContent
-                  }
-                  creation {
-                    time
-                  }
-                  promotionRuns(lastPerLevel: true) {
+                  pageItems {
+                    id
+                    name
+                    runInfo {
+                      sourceType
+                      sourceUri 
+                      triggerType
+                      triggerData
+                      runTime
+                    }
+                    decorations {
+                      ...decorationContent
+                    }
                     creation {
                       time
                     }
-                    promotionLevel {
-                      id
-                      name
-                      image
-                      _image
-                    }
-                  }
-                  validations {
-                    validationStamp {
-                      id
-                      name
-                      image
-                      _image
-                      dataType {
-                        descriptor {
-                          id
-                        }
-                        config
+                    promotionRuns(lastPerLevel: true) {
+                      creation {
+                        time
+                      }
+                      promotionLevel {
+                        id
+                        name
+                        image
+                        _image
                       }
                     }
-                    validationRuns(count: 1) {
-                      validationRunStatuses {
-                        statusID {
-                          id
-                          name
+                    validations {
+                      validationStamp {
+                        id
+                        name
+                        image
+                        _image
+                        dataType {
+                          descriptor {
+                            id
+                          }
+                          config
                         }
-                        description
-                        creation {
-                          user
+                      }
+                      validationRuns(count: 1) {
+                        validationRunStatuses {
+                          statusID {
+                            id
+                            name
+                          }
+                          description
+                          creation {
+                            user
+                          }
                         }
                       }
                     }
-                  }
-                  links {
-                    _validate
+                    links {
+                      _validate
+                    }
                   }
                 }
               }
@@ -234,7 +255,7 @@ angular.module('ot.view.branch', [
                 }
             ).then(function (data) {
                 $scope.branchView = data.branches[0];
-                $scope.builds = data.branches[0].builds;
+                $scope.builds = data.branches[0].buildsPaginated.pageItems;
                 // Groups of validation stamps per status
                 if ($rootScope.user.preferences.branchViewVsGroups) {
                     computeGroupedValidations($scope.builds, data.validationRunStatusIDList);
