@@ -65,9 +65,14 @@ angular.module('ot.view.branch', [
         const gqlBuilds = `
             query LoadBuilds(
                 $branchId: Int!,
+                $offset: Int!,
+                $size: Int!,
             ) {
                 branches(id: $branchId) {
-                    buildsPaginated {
+                    buildsPaginated(
+                        offset: $offset,
+                        size: $size,
+                    ) {
                         pageInfo {
                             totalSize
                             nextPage {
@@ -118,18 +123,33 @@ angular.module('ot.view.branch', [
                 });
         };
 
-        // Loading the list of builds
-        const loadBuilds = () => {
+        // Pagination status
+        const pagination = {
+            offset: 0,
+            size: 10,
+        };
+
+        /**
+         * Loading the list of builds
+         * @param reset True if the list of builds must be reset
+         */
+        const loadBuilds = (reset) => {
             $scope.loadingBuilds = true;
             const gqlVariables = {
                 branchId,
+                offset: pagination.offset,
+                size: pagination.size,
             };
             otGraphqlService.pageGraphQLCall(gqlBuilds, gqlVariables)
                 .then(data => {
                     const dataBranch = data.branches[0];
                     const dataBuilds = dataBranch.buildsPaginated;
-                    $scope.builds = dataBuilds.pageItems;
                     $scope.buildsPageInfo = dataBuilds.pageInfo;
+                    if (reset) {
+                        $scope.builds = dataBuilds.pageItems;
+                    } else {
+                        $scope.builds.push(...dataBuilds.pageItems);
+                    }
                 })
                 .finally(() => {
                     $scope.loadingBuilds = false;
@@ -142,8 +162,17 @@ angular.module('ot.view.branch', [
         // Loading the builds AFTER the branch is loaded
         $scope.$watch('branch', (value) => {
             if (value) {
-                loadBuilds();
+                loadBuilds(true);
             }
         });
+
+        // Pagination: loading more builds
+        $scope.loadMoreBuilds = () => {
+            if ($scope.buildsPageInfo.nextPage) {
+                pagination.offset = $scope.buildsPageInfo.nextPage.offset;
+                pagination.size = $scope.buildsPageInfo.nextPage.size;
+                loadBuilds(false);
+            }
+        };
     })
 ;
