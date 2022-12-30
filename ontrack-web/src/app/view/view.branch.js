@@ -48,6 +48,9 @@ angular.module('ot.view.branch', [
                     decorations {
                       ...decorationContent
                     }
+                    links {
+                        _update
+                    }
                 }
             }
             
@@ -124,6 +127,20 @@ angular.module('ot.view.branch', [
                     if (!viewInitialized) {
                         view.breadcrumbs = ot.projectBreadcrumbs($scope.branch.project);
                         view.commands = [
+                            {
+                                condition: function () {
+                                    return $scope.branch.links._update;
+                                },
+                                id: 'updateBranch',
+                                name: "Update branch",
+                                cls: 'ot-command-branch-update',
+                                action: function () {
+                                    otStructureService.update(
+                                        $scope.branch.links._update,
+                                        "Update branch"
+                                    ).then(loadBranch);
+                                }
+                            },
                             ot.viewCloseCommand('/project/' + $scope.branch.project.id),
                         ];
                         viewInitialized = true;
