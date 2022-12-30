@@ -190,6 +190,10 @@ angular.module('ot.view.branch', [
         $scope.autoRefresh = localStorage.getItem('autoRefresh') === 'true';
         const refreshTaskName = 'Branch builds reloading';
         const refreshBuildView = () => {
+            // Resetting the pagination
+            pagination.offset = 0;
+            pagination.size = 10;
+            // Reloading
             loadBuilds(true);
         };
         $scope.$watch('autoRefresh', () => {
