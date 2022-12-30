@@ -23,6 +23,7 @@ angular.module('ot.view.branch', [
                                         ot, otFormService, otStructureService, otAlertService, otTaskService, otNotificationService, otCopyService,
                                         otBuildFilterService, otGraphqlService, otUserService) {
         const view = ot.view();
+        let viewInitialized = false;
         // Branch's id
         const branchId = $stateParams.branchId;
 
@@ -65,6 +66,10 @@ angular.module('ot.view.branch', [
             otGraphqlService.pageGraphQLCall(gqlBranch, {branchId})
                 .then(data => {
                     $scope.branch = data.branches[0];
+                    if (!viewInitialized) {
+                        view.breadcrumbs = ot.projectBreadcrumbs($scope.branch.project);
+                        viewInitialized = true;
+                    }
                 })
                 .finally(() => {
                     $scope.loadingBranch = false;
