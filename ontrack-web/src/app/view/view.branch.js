@@ -68,6 +68,9 @@ angular.module('ot.view.branch', [
                     $scope.branch = data.branches[0];
                     if (!viewInitialized) {
                         view.breadcrumbs = ot.projectBreadcrumbs($scope.branch.project);
+                        view.commands = [
+                            ot.viewCloseCommand('/project/' + $scope.branch.project.id),
+                        ];
                         viewInitialized = true;
                     }
                 })
