@@ -52,6 +52,11 @@ angular.module('ot.view.branch', [
                         _actions
                         _update
                     }
+                    otherBranches {
+                        id
+                        name
+                        disabled
+                    }
                 }
             }
             
@@ -143,6 +148,19 @@ angular.module('ot.view.branch', [
                                 }
                             },
                             ot.viewActionsCommand($scope.branch.links._actions, []),
+                            {
+                                id: 'switch-branch',
+                                name: "Switch",
+                                cls: 'ot-command-switch',
+                                group: true,
+                                actions: $scope.branch.otherBranches
+                                    .filter(theBranch => !theBranch.disabled)
+                                    .map(theBranch => ({
+                                        id: 'switch-' + theBranch.id,
+                                        name: theBranch.name,
+                                        uri: 'branch/' + theBranch.id
+                                    }))
+                            },
                             ot.viewCloseCommand('/project/' + $scope.branch.project.id),
                         ];
                         viewInitialized = true;
