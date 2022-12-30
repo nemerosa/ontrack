@@ -16,4 +16,26 @@
         </div>
     </div>
 
+    <table class="ot-branch-build-view" ng-if="builds">
+        <tbody>
+        <tr ng-repeat="build in builds">
+            <td>
+                <!-- Build name and link -->
+                <a href="#/build/{{build.id}}" class="ot-branch-build-view-build-name">
+                    {{build.name}}
+                </a>
+                <!-- Build decorations -->
+                <span class="ot-decoration-list">
+                    <ot-entity-embedded-decorations decorations="build.decorations"></ot-entity-embedded-decorations>
+                </span>
+                <!-- Signature, without the creator in the overview -->
+                <div class="ot-branch-build-view-build-signature">
+                    {{build.creation.time | date:'mediumDate'}}
+                    {{build.creation.time | date:'shortTime'}}
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
 </ot-view>
