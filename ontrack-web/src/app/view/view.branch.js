@@ -68,6 +68,13 @@ angular.module('ot.view.branch', [
             ) {
                 branches(id: $branchId) {
                     buildsPaginated {
+                        pageInfo {
+                            totalSize
+                            nextPage {
+                                offset
+                                size
+                            }
+                        }
                         pageItems {
                             id
                             name
@@ -122,6 +129,7 @@ angular.module('ot.view.branch', [
                     const dataBranch = data.branches[0];
                     const dataBuilds = dataBranch.buildsPaginated;
                     $scope.builds = dataBuilds.pageItems;
+                    $scope.buildsPageInfo = dataBuilds.pageInfo;
                 })
                 .finally(() => {
                     $scope.loadingBuilds = false;
