@@ -17,6 +17,14 @@
     </div>
 
     <table class="ot-branch-build-view" ng-if="builds">
+        <thead>
+        <td>
+            <button ng-show="loadingBuilds" class="btn btn-default" disabled="disabled">
+                <span class="ot-loading-indicator"></span>
+                Loading builds...
+            </button>
+        </td>
+        </thead>
         <tbody>
         <tr ng-repeat="build in builds">
             <td>
