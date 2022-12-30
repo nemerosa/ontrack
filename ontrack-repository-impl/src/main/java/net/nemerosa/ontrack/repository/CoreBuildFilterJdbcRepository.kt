@@ -212,7 +212,7 @@ class CoreBuildFilterJdbcRepository(
         size: Int,
         propertyTypeAccessor: (String) -> PropertyType<*>,
     ): PaginatedList<Build> {
-        val count = minOf(size, data.count, ontrackConfigProperties.buildFilterCountMax)
+        val count = minOf(size, ontrackConfigProperties.buildFilterCountMax)
         val params = MapSqlParameterSource()
 
         val base = buildStandardFilterQuery(branch, data, params, propertyTypeAccessor)
