@@ -1,0 +1,108 @@
+<ot-view>
+
+    <div class="row">
+        <div class="col-md-12 ot-view-title">
+            <span id="ot-view-title">{{branch.name}}</span>
+            <ot-entity-decorations entity="branch"></ot-entity-decorations>
+            <div ng-if="branch.description" class="ot-description" ng-bind-html="branchView.annotatedDescription"></div>
+        </div>
+    </div>
+
+    <ot-entity-disabled entity="branch" callback="reloadBranch()">
+        The branch is disabled.
+    </ot-entity-disabled>
+
+    <div class="row" ng-show="builds.length > 0">
+        <div class="col-md-12">
+            <ng-include src="'app/view/fragment.branchBuildView.tpl.html'"></ng-include>
+        </div>
+    </div>
+
+    <div class="row" ng-show="builds && builds.length == 0">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                No build has been created for this branch or the filter is too restrictive.
+                <button ng-show="currentBuildFilterResource" class="btn btn-sm btn-default pull-right" ng-click="buildFilterErase()">
+                    Reset filter
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-show="(!branch) && loadingBuildView">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                <span class="fa fa-spinner fa-spin"></span>
+                Loading the builds...
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <ot-section-title>Promotion levels</ot-section-title>
+            <ot-noentry list="promotionLevels">
+                No promotion level has been created yet.
+            </ot-noentry>
+            <div ng-if="promotionLevels" class="ot-entity-sortable-list"
+                    ui-sortable="promotionLevelSortOptions" ng-model="promotionLevels">
+                <div ng-repeat="promotionLevel in promotionLevels" class="ot-entity-sortable-list-item ot-decoration-list">
+                    <span class="ot-entity-sortable-list-handle"
+                          ng-if="branchView.links._reorderPromotionLevels"
+                          title="Move this to reorder the promotion levels">&nbsp;</span>
+                    <span class="ot-entity-sortable-list-image">
+                        <ot-entity-image entity="promotionLevel" link="#/promotionLevel/{{promotionLevel.id}}"></ot-entity-image>
+                    </span>
+                    <a href="#/promotionLevel/{{promotionLevel.id}}" class="ot-entity-sortable-list-link">
+                        {{promotionLevel.name}}
+                    </a>
+                    <ot-entity-embedded-decorations decorations="promotionLevel.decorations"></ot-entity-embedded-decorations>
+                </div>
+            </div>
+            <button ng-if="branch._createPromotionLevel" type="button" class="btn btn-default"
+                    ng-click="createPromotionLevel()">New promotion level
+            </button>
+        </div>
+        <div class="col-md-4">
+            <ot-section-title>Validation stamps</ot-section-title>
+            <ot-noentry list="validationStamps">
+                No validation stamp has been created yet.
+            </ot-noentry>
+            <div ng-if="validationStamps" class="ot-entity-sortable-list"
+                 ui-sortable="validationStampSortOptions" ng-model="validationStamps">
+                <div ng-repeat="validationStamp in validationStamps" class="ot-entity-sortable-list-item">
+                    <span class="ot-entity-sortable-list-handle"
+                          ng-if="branch._reorderValidationStamps"
+                          title="Move this to reorder the validation stamps">&nbsp;</span>
+                    <span class="ot-entity-sortable-list-image">
+                        <ot-entity-image entity="validationStamp" link="#/validationStamp/{{validationStamp.id}}"></ot-entity-image>
+                    </span>
+                    <a href="#/validationStamp/{{validationStamp.id}}" class="ot-entity-sortable-list-link">
+                        {{validationStamp.name}}
+                    </a>
+                    <span ng-if="validationStamp.dataType">
+                        <ot-validation-data-type-decoration value="validationStamp.dataType"></ot-validation-data-type-decoration>
+                    </span>
+                </div>
+            </div>
+            <button ng-if="branch._createValidationStamp" type="button" class="btn btn-default"
+                    ng-click="createValidationStamp()">New validation stamp
+            </button>
+        </div>
+        <div class="col-md-4">
+            <ot-section-title>Properties</ot-section-title>
+            <div class="row">
+                <div class="col-md-12">
+                    <ot-entity-properties entity="branch"></ot-entity-properties>
+                </div>
+            </div>
+            <ot-section-title>Extra information</ot-section-title>
+            <div class="row">
+                <div class="col-md-12">
+                    <ot-entity-extra entity="{_extra: branchView.links._extra}"></ot-entity-extra>
+                </div>
+            </div>
+            <ot-entity-events entity="branch"></ot-entity-events>
+        </div>
+    </div>
+</ot-view>
