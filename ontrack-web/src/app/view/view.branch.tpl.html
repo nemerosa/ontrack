@@ -1,5 +1,13 @@
 <ot-view>
 
+    <div class="row" ng-show="loadingBranch">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                Loading the branch...
+            </div>
+        </div>
+    </div>
+
     <div class="row" ng-if="branch">
         <div class="col-md-12 ot-view-title">
             <span id="ot-view-title">{{branch.name}}</span>
