@@ -256,6 +256,7 @@ angular.module('ot.view.branch', [
             ).then(function (data) {
                 $scope.branchView = data.branches[0];
                 $scope.builds = data.branches[0].buildsPaginated.pageItems;
+                $scope.buildsPageInfo = data.branches[0].buildsPaginated.pageInfo;
                 // Groups of validation stamps per status
                 if ($rootScope.user.preferences.branchViewVsGroups) {
                     computeGroupedValidations($scope.builds, data.validationRunStatusIDList);
