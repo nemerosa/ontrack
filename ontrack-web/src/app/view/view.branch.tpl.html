@@ -1,2 +1,11 @@
 <ot-view>
+
+    <div class="row" ng-if="branch">
+        <div class="col-md-12 ot-view-title">
+            <span id="ot-view-title">{{branch.name}}</span>
+            <ot-entity-embedded-decorations decorations="branch.decorations"></ot-entity-embedded-decorations>
+            <div ng-if="branch.description" class="ot-description" ng-bind-html="branch.description"></div>
+        </div>
+    </div>
+
 </ot-view>

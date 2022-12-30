@@ -25,5 +25,53 @@ angular.module('ot.view.branch', [
         const view = ot.view();
         // Branch's id
         const branchId = $stateParams.branchId;
+
+        // Loading indicators
+        $scope.loadingBranch = true;
+
+        // Query: loading the branch
+        const gqlBranch = `
+            query LoadBranch(
+                $branchId: Int!,
+            ) {
+                branches(id: $branchId) {
+                    id
+                    name
+                    description
+                    annotatedDescription
+                    project {
+                        id
+                        name
+                    }
+                    decorations {
+                      ...decorationContent
+                    }
+                }
+            }
+            
+            fragment decorationContent on Decoration {
+                decorationType
+                error
+                data
+                feature {
+                    id
+                }
+            }
+        `;
+
+        // Loading the branch
+        const loadBranch = () => {
+            $scope.loadingBranch = true;
+            otGraphqlService.pageGraphQLCall(gqlBranch, {branchId})
+                .then(data => {
+                    $scope.branch = data.branches[0];
+                })
+                .finally(() => {
+                    $scope.loadingBranch = false;
+                });
+        };
+
+        // Starts by loading the branch
+        loadBranch();
     })
 ;
