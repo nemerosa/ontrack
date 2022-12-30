@@ -29,6 +29,7 @@ angular.module('ot.view.branch', [
 
         // Loading indicators
         $scope.loadingBranch = true;
+        $scope.loadingBuilds = false;
 
         // Query: loading the branch
         const gqlBranch = `
@@ -46,6 +47,37 @@ angular.module('ot.view.branch', [
                     }
                     decorations {
                       ...decorationContent
+                    }
+                }
+            }
+            
+            fragment decorationContent on Decoration {
+                decorationType
+                error
+                data
+                feature {
+                    id
+                }
+            }
+        `;
+
+        // Query: loading the builds
+        const gqlBuilds = `
+            query LoadBuilds(
+                $branchId: Int!,
+            ) {
+                branches(id: $branchId) {
+                    buildsPaginated {
+                        pageItems {
+                            id
+                            name
+                            creation {
+                              time
+                            }
+                            decorations {
+                              ...decorationContent
+                            }
+                        }
                     }
                 }
             }
@@ -79,7 +111,31 @@ angular.module('ot.view.branch', [
                 });
         };
 
+        // Loading the list of builds
+        const loadBuilds = () => {
+            $scope.loadingBuilds = true;
+            const gqlVariables = {
+                branchId,
+            };
+            otGraphqlService.pageGraphQLCall(gqlBuilds, gqlVariables)
+                .then(data => {
+                    const dataBranch = data.branches[0];
+                    const dataBuilds = dataBranch.buildsPaginated;
+                    $scope.builds = dataBuilds.pageItems;
+                })
+                .finally(() => {
+                    $scope.loadingBuilds = false;
+                });
+        };
+
         // Starts by loading the branch
         loadBranch();
+
+        // Loading the builds AFTER the branch is loaded
+        $scope.$watch('branch', (value) => {
+            if (value) {
+                loadBuilds();
+            }
+        });
     })
 ;
