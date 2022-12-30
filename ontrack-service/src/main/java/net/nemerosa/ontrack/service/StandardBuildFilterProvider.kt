@@ -72,13 +72,6 @@ class StandardBuildFilterProvider(
         // Form
         return Form.create()
             .with(
-                net.nemerosa.ontrack.model.form.Int.of("count")
-                    .label("Maximum count")
-                    .help("Maximum number of builds to display")
-                    .min(1)
-                    .value(10)
-            )
-            .with(
                 Selection.of("sincePromotionLevel")
                     .label("Since promotion level")
                     .help("Builds since the last one which was promoted to this level")
@@ -196,7 +189,6 @@ class StandardBuildFilterProvider(
 
     override fun fill(form: Form, data: StandardBuildFilterData): Form {
         return form
-            .fill("count", data.count)
             .fill("sincePromotionLevel", data.sincePromotionLevel)
             .fill("withPromotionLevel", data.withPromotionLevel)
             .fill("afterDate", data.afterDate)

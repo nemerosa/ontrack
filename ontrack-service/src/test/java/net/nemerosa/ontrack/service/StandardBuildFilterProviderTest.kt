@@ -31,6 +31,28 @@ class StandardBuildFilterProviderTest {
     }
 
     @Test
+    fun `Parsing default`() {
+        val data = provider.parse(
+                emptyMap<String,String>().asJson()
+        )
+        assertNotNull(data) {
+            assertEquals(10, it.count)
+        }
+    }
+
+    @Test
+    fun `Parsing without count`() {
+        val data = provider.parse(
+                mapOf(
+                        "withPromotionLevel" to "IRON",
+                ).asJson()
+        )
+        assertNotNull(data) {
+            assertEquals(10, it.count)
+            assertEquals("IRON", it.withPromotionLevel)
+        }
+    }
+    @Test
     fun parse_count_only() {
         val data = provider.parse(
             mapOf("count" to 5).asJson()
