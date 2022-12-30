@@ -89,6 +89,17 @@ angular.module('ot.view.branch', [
                             decorations {
                               ...decorationContent
                             }
+                            promotionRuns(lastPerLevel: true) {
+                              creation {
+                                time
+                              }
+                              promotionLevel {
+                                id
+                                name
+                                image
+                                _image
+                              }
+                            }
                         }
                     }
                 }

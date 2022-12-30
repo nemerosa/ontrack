@@ -18,15 +18,18 @@
 
     <table class="ot-branch-build-view" ng-if="builds">
         <thead>
-        <td>
-            <button ng-show="loadingBuilds" class="btn btn-default" disabled="disabled">
-                <span class="ot-loading-indicator"></span>
-                Loading builds...
-            </button>
-        </td>
+        <tr>
+            <td colspan="0">
+                <button ng-show="loadingBuilds" class="btn btn-default" disabled="disabled">
+                    <span class="ot-loading-indicator"></span>
+                    Loading builds...
+                </button>
+            </td>
+        </tr>
         </thead>
         <tbody>
         <tr ng-repeat="build in builds">
+            <!-- Build name column -->
             <td>
                 <!-- Build name and link -->
                 <a href="#/build/{{build.id}}" class="ot-branch-build-view-build-name">
@@ -42,9 +45,22 @@
                     {{build.creation.time | date:'shortTime'}}
                 </div>
             </td>
+            <!-- Promotion runs -->
+            <td>
+                <span ng-repeat="promotionRun in build.promotionRuns">
+                    <span class="ot-promotion-run">
+                        <span class="ot-action"
+                              ng-click="displayPromotionRuns(build, promotionRun)">
+                            <ot-entity-image
+                                    title="{{promotionRun.promotionLevel.name}} - {{promotionRun.creation.time | date:'shortDate'}}"
+                                    entity="promotionRun.promotionLevel"></ot-entity-image>
+                        </span>
+                    </span>
+                </span>
+            </td>
         </tr>
         <tr ng-if="buildsPageInfo.nextPage">
-            <td>
+            <td colspan="0">
                 <button type="button" class="ot-branch-build-view-more" title="Displays more builds." ng-click="loadMoreBuilds()">
                     More...
                 </button>
