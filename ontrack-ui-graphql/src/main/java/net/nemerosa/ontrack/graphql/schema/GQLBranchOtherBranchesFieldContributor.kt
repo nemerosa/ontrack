@@ -3,10 +3,7 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.listType
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.structure.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -28,8 +25,13 @@ constructor(
                     .type(listType(GraphQLTypeReference(GQLTypeBranch.BRANCH)))
                     .dataFetcher { env ->
                         val branch: Branch = env.getSource()
-                        structureService.getBranchesForProject(branch.project.id)
-                            .filter { it.id != branch.id }
+                        structureService.filterBranchesForProject(
+                                project = branch.project,
+                                filter = BranchFilter(
+                                        order = true,
+                                        count = 10,
+                                )
+                        ).filter { it.id != branch.id }
                     }
                     .build()
             )
