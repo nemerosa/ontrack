@@ -20,6 +20,17 @@
         <thead>
         <tr>
             <td colspan="0">
+                <!-- Auto refresh flag -->
+                <button class="ot-branch-build-view-auto-refresh"
+                        ng-class="{
+                            'ot-branch-build-view-auto-refresh-enabled': autoRefresh,
+                            'ot-branch-build-view-auto-refresh-disabled': !autoRefresh
+                            }"
+                        title="{{autoRefresh ? 'Auto refresh is enabled' : 'Auto refresh is disabled'}}"
+                        ng-click="toggleAutoRefresh()">
+                    <span class="fa fa-refresh"></span>
+                </button>
+                <!-- Loading indicator for the builds -->
                 <button ng-show="loadingBuilds" class="btn btn-default" disabled="disabled">
                     <span class="ot-loading-indicator"></span>
                     Loading builds...

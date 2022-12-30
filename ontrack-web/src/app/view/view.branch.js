@@ -185,5 +185,24 @@ angular.module('ot.view.branch', [
                 loadBuilds(false);
             }
         };
+
+        // Auto refresh management
+        $scope.autoRefresh = localStorage.getItem('autoRefresh') === 'true';
+        const refreshTaskName = 'Branch builds reloading';
+        const refreshBuildView = () => {
+            loadBuilds(true);
+        };
+        $scope.$watch('autoRefresh', () => {
+            if ($scope.autoRefresh) {
+                // 1 minute interval
+                otTaskService.register(refreshTaskName, refreshBuildView, 60 * 1000);
+            } else {
+                otTaskService.stop(refreshTaskName);
+            }
+        });
+        $scope.toggleAutoRefresh = () => {
+            $scope.autoRefresh = !$scope.autoRefresh;
+            localStorage.setItem('autoRefresh', $scope.autoRefresh);
+        };
     })
 ;
