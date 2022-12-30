@@ -49,6 +49,7 @@ angular.module('ot.view.branch', [
                       ...decorationContent
                     }
                     links {
+                        _actions
                         _update
                     }
                 }
@@ -141,6 +142,7 @@ angular.module('ot.view.branch', [
                                     ).then(loadBranch);
                                 }
                             },
+                            ot.viewActionsCommand($scope.branch.links._actions, []),
                             ot.viewCloseCommand('/project/' + $scope.branch.project.id),
                         ];
                         viewInitialized = true;
