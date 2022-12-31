@@ -4,7 +4,6 @@ angular.module('ot.view.branch', [
     'ot.service.task',
     'ot.service.form',
     'ot.service.structure',
-    'ot.service.buildfilter',
     'ot.service.copy',
     'ot.dialog.validationStampRunView',
     'ot.dialog.validationStampRunGroup',
@@ -21,7 +20,7 @@ angular.module('ot.view.branch', [
     })
     .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location, $rootScope,
                                         ot, otFormService, otStructureService, otAlertService, otTaskService, otNotificationService, otCopyService,
-                                        otBuildFilterService, otGraphqlService, otUserService) {
+                                        otGraphqlService, otUserService) {
         const view = ot.view();
         let viewInitialized = false;
         // Branch's id

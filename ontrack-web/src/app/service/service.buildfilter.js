@@ -15,16 +15,16 @@ angular.module('ot.service.buildfilter', [
          * Additionally, fetches the available filter forms for the branch.
          */
         self.loadFilters = function (branch) {
-            var d = $q.defer();
+            const d = $q.defer();
             // Loads the local filters for this branch
-            var store = self.getStoreForBranch(branch.id);
+            const store = self.getStoreForBranch(branch.id);
             // Loads the remote filters & the filter forms for this branch
             ot.call($http.get(branch._buildFilterResources)).then(function (buildFilterResources) {
                 angular.forEach(buildFilterResources.resources, function (buildFilterResource) {
                     store[buildFilterResource.name] = buildFilterResource;
                 });
                 // Flatten the values for the store
-                var flatBuildFilterResources = [];
+                const flatBuildFilterResources = [];
                 angular.forEach(store, function (value) {
                     flatBuildFilterResources.push(value);
                 });
