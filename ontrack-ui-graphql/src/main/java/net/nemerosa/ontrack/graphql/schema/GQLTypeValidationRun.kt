@@ -5,6 +5,7 @@ import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.graphql.support.booleanArgument
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.RunInfoService
@@ -65,9 +66,21 @@ class GQLTypeValidationRun(
                                 .name("validationRunStatuses")
                                 .description("List of validation statuses")
                                 .type(listType(validationRunStatus.typeRef))
+                                .argument(
+                                        booleanArgument(
+                                                "lastOnly",
+                                                "True to get only the last status only."
+                                        )
+                                )
                                 .dataFetcher { environment ->
                                     val validationRun = environment.getSource<ValidationRun>()
-                                    validationRun.validationRunStatuses.map { status ->
+                                    val lastOnly = environment.getArgument<Boolean>("lastOnly") ?: false
+                                    val statuses = if (lastOnly) {
+                                        validationRun.validationRunStatuses.take(1)
+                                    } else {
+                                        validationRun.validationRunStatuses
+                                    }
+                                    statuses.map { status ->
                                         GQLTypeValidationRunStatus.Data(
                                                 validationRun,
                                                 status

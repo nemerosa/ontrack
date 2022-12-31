@@ -57,6 +57,13 @@ angular.module('ot.view.branch', [
                         name
                         disabled
                     }
+                    validationStamps {
+                      id
+                      name
+                      description
+                      image
+                      _image
+                    }
                 }
             }
             
@@ -109,6 +116,20 @@ angular.module('ot.view.branch', [
                                 _image
                               }
                             }
+                            validations {
+                              validationStamp {
+                                id
+                                name
+                              }
+                              validationRuns(count: 1) {
+                                validationRunStatuses(lastOnly: true) {
+                                  statusID {
+                                    id
+                                    name
+                                  }
+                                }
+                              }
+                            }
                         }
                     }
                 }
@@ -130,6 +151,7 @@ angular.module('ot.view.branch', [
             otGraphqlService.pageGraphQLCall(gqlBranch, {branchId})
                 .then(data => {
                     $scope.branch = data.branches[0];
+                    $scope.validationStamps = $scope.branch.validationStamps;
                     if (!viewInitialized) {
                         view.breadcrumbs = ot.projectBreadcrumbs($scope.branch.project);
                         view.commands = [
@@ -244,6 +266,30 @@ angular.module('ot.view.branch', [
         $scope.toggleAutoRefresh = () => {
             $scope.autoRefresh = !$scope.autoRefresh;
             localStorage.setItem('autoRefresh', $scope.autoRefresh);
+        };
+
+
+        /**
+         * Checks if a given validation stamp must be displayed or not.
+         *
+         * A validation stamp is displayed if:
+         *
+         * * there is a selected validation stamp filter (VSF), then
+         *   * the VSF is being edited
+         *   * OR the VSF contains the validation stamp
+         * * there is no selected VSF, then
+         *   * NOT if groups are displayed
+         * @param validationStamp Validation stamp to check
+         * @returns {boolean|boolean|*} `true` if the validation must be displayed.
+         */
+        $scope.validationStampFilterFn = function (validationStamp) {
+            return true;
+            // TODO Filter implementation
+            // if ($scope.validationStampFilter) {
+            //     return $scope.validationStampFilterEdition || $scope.validationStampFilter.vsNames.indexOf(validationStamp.name) >= 0;
+            // } else {
+            //     return !$rootScope.user.preferences.branchViewVsGroups;
+            // }
         };
     })
 ;
