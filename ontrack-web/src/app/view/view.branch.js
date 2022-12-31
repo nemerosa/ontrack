@@ -130,6 +130,9 @@ angular.module('ot.view.branch', [
                                 }
                               }
                             }
+                            links {
+                                _validate
+                            }
                         }
                     }
                 }
@@ -290,6 +293,10 @@ angular.module('ot.view.branch', [
             // } else {
             //     return !$rootScope.user.preferences.branchViewVsGroups;
             // }
+        };
+
+        $scope.validationStampRunViewFilter = function (validation) {
+            return $scope.validationStampFilterFn(validation.validationStamp);
         };
     })
 ;
