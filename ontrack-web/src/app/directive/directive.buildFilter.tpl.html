@@ -1,0 +1,15 @@
+<div class="btn-group">
+    <button type="button" class="btn dropdown-toggle" data-toggle="dropdown"
+            ng-class="{
+                        'btn-warning': currentBuildFilterResource,
+                        'btn-default': !currentBuildFilterResource || loadingFilters
+                        }">
+        <span ng-if="loadingFilters" title="Loading the filters...">
+            <span class="ot-loading-indicator"></span>
+        </span>
+        <span ng-if="!loadingFilters">
+            Filter<span ng-show="currentBuildFilterResource.name">: {{currentBuildFilterResource.name}}</span>
+            <span class="caret"></span>
+        </span>
+    </button>
+</div>
