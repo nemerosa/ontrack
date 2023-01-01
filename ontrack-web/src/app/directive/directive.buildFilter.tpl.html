@@ -29,11 +29,21 @@
                 </span>
             </a>
         </li>
+        <!-- Current filter commands -->
         <li class="divider" ng-if="buildFilterResources"></li>
         <li ng-if="currentBuildFilterResource">
             <a ng-click="buildFilterErase()" title="Do not use any filter for the builds.">
                 <span class="fa fa-eraser"></span>
                 Remove filter
+            </a>
+        </li>
+        <!-- New filters -->
+        <li role="presentation" class="dropdown-header">New filter:</li>
+        <li ng-repeat="buildFilterForm in buildFilterForms | filter:{isPredefined:false}">
+            <a>
+                <span ng-click="buildFilterNew(buildFilterForm)">
+                    <span>{{buildFilterForm.typeName}}...</span>
+                </span>
             </a>
         </li>
     </ul>
