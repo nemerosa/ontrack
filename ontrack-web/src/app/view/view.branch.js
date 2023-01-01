@@ -218,7 +218,8 @@ angular.module('ot.view.branch', [
                 offset: pagination.offset,
                 size: pagination.size,
                 filterType: currentBuildFilter.type,
-                filterData: currentBuildFilter.data
+                // GraphQL type for the filter data is expected to be a string
+                filterData: JSON.stringify(currentBuildFilter.data)
             };
             otGraphqlService.pageGraphQLCall(gqlBuilds, gqlVariables)
                 .then(data => {
