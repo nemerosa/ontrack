@@ -69,9 +69,9 @@ angular.module('ot.service.buildfilter', [
          * @return Promise with the created filter
          */
         self.createBuildFilter = function (config) {
-            if (config.buildFilterForm.predefined) {
-                var d = $q.defer();
-                var buildFilterResource = {
+            if (config.buildFilterForm.isPredefined) {
+                const d = $q.defer();
+                const buildFilterResource = {
                     name: config.buildFilterForm.typeName,
                     type: config.buildFilterForm.type,
                     data: {}
@@ -84,9 +84,9 @@ angular.module('ot.service.buildfilter', [
                     title: "New filter",
                     form: config.buildFilterForm.form,
                     submit: function (data) {
-                        var name = data.name;
+                        const name = data.name;
                         delete data.name;
-                        var buildFilterResource = {
+                        const buildFilterResource = {
                             name: name,
                             type: config.buildFilterForm.type,
                             data: data
