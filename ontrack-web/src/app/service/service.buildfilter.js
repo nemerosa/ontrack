@@ -3,7 +3,32 @@ angular.module('ot.service.buildfilter', [
     'ot.service.form'
 ])
     .service('otBuildFilterService', function (ot, $q, $http, otFormService, otNotificationService) {
-        var self = {};
+        const self = {};
+
+        /**
+         * Merges the list of available filters from two sources:
+         * - the server filters for the current user
+         * - the local filters
+         *
+         * The remote filters have priority over the local ones.
+         *
+         * Additionally, fetches the available filter forms for the branch.
+         */
+        self.mergeRemoteAndLocalFilters = (branchId, remoteFilters) => {
+            // Loads the local filters for this branch
+            const store = self.getStoreForBranch(branchId);
+            // Adding the remote filters
+            angular.forEach(remoteFilters, buildFilter => {
+                store[buildFilter.name] = buildFilter;
+            });
+            // Flatten the values for the store
+            const flatBuildFilterResources = [];
+            angular.forEach(store, function (value) {
+                flatBuildFilterResources.push(value);
+            });
+            // OK
+            return flatBuildFilterResources;
+        };
 
         /**
          * Loads the list of available filters from two sources:
@@ -13,6 +38,8 @@ angular.module('ot.service.buildfilter', [
          * The remote filters have priority over the local ones.
          *
          * Additionally, fetches the available filter forms for the branch.
+         *
+         * @deprecated Not loading using REST any longer
          */
         self.loadFilters = function (branch) {
             const d = $q.defer();

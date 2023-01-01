@@ -18,8 +18,9 @@ angular.module('ot.directive.buildFilter', [
                     ) {
                         branches(id: $branchId) {
                             buildFilterForms {
+                                type
                                 typeName
-                                predefined
+                                isPredefined
                                 form
                             }
                             buildFilterResources {
@@ -35,24 +36,15 @@ angular.module('ot.directive.buildFilter', [
 
                 const loadBuildFilters = () => {
                     $scope.loadingFilters = true;
-                    let branch;
                     otGraphqlService
                         .pageGraphQLCall(gqlBranchFilters, {branchId: $scope.branchId})
                         .then(data => {
-                            branch = data.branches[0];
-                            const buildFilterFormsUri = branch.links._buildFilterForms;
-                            return ot.call($http.get(buildFilterFormsUri));
-                        })
-                        .then(buildFilterForms => {
-                            $scope.buildFilterForms = buildFilterForms;
-                            // Loads existing filters
-                            return otBuildFilterService.loadFilters({
-                                id: $scope.branchId,
-                                _buildFilterResources: branch.links._buildFilterResources,
-                            });
-                        })
-                        .then(buildFilterResources => {
-                            $scope.buildFilterResources = buildFilterResources;
+                            const branch = data.branches[0];
+                            $scope.buildFilterForms = branch.buildFilterForms;
+                            $scope.buildFilterResources = otBuildFilterService.mergeRemoteAndLocalFilters(
+                                $scope.branchId,
+                                branch.buildFilterResources
+                            );
                         })
                         .finally(() => {
                             $scope.loadingFilters = false;
