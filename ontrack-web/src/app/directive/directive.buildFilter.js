@@ -40,6 +40,10 @@ angular.module('ot.directive.buildFilter', [
                     // console.log("setFilter", filter);
                     $scope.setFilter()(filter);
                 };
+                const unsetCurrentBuildFilter = () => {
+                    $scope.currentBuildFilterResource = undefined;
+                    setCurrentBuildFilter({type: undefined, data: undefined});
+                };
 
                 const loadCurrentBuildFilter = () => {
                     // Local data
@@ -83,7 +87,7 @@ angular.module('ot.directive.buildFilter', [
                                 // Removes current filter
                                 otBuildFilterService.eraseCurrent($scope.branchId);
                                 // Setting the default filter
-                                setCurrentBuildFilter({type: undefined, data: undefined});
+                                unsetCurrentBuildFilter();
                             } else {
                                 // No validation issue, calling the view call
                                 setCurrentBuildFilter(filter);
@@ -91,7 +95,7 @@ angular.module('ot.directive.buildFilter', [
                         });
                     } else {
                         // Direct actual branch view call
-                        setCurrentBuildFilter({type: undefined, data: undefined});
+                        unsetCurrentBuildFilter();
                     }
                 };
 
@@ -136,6 +140,15 @@ angular.module('ot.directive.buildFilter', [
                         $scope.currentBuildFilterResource = filter;
                         setCurrentBuildFilter(filter);
                     });
+                };
+
+                /**
+                 * Removing the current filter
+                 */
+                $scope.buildFilterErase = () => {
+                    otBuildFilterService.eraseCurrent($scope.branchId);
+                    $scope.invalidBuildFilterResource = undefined;
+                    unsetCurrentBuildFilter();
                 };
             }
         };
