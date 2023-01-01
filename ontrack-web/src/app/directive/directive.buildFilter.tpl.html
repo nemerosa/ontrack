@@ -12,4 +12,22 @@
             <span class="caret"></span>
         </span>
     </button>
+    <ul class="dropdown-menu ot-buildfilter-list" role="menu">
+        <!-- Predefined filters -->
+        <li role="presentation" class="dropdown-header">Predefined filters:</li>
+        <li ng-repeat="buildFilterForm in buildFilterForms | filter:{isPredefined:true}">
+            <a>
+                <!-- Filter selection -->
+                <span class="fa fa-check" ng-show="currentBuildFilterResource.name == buildFilterForm.typeName"></span>
+                <!-- Filter name -->
+                <span ng-click="buildFilterNew(buildFilterForm)">
+                    <span class="ot-buildfilter-remote"
+                          title="This filter does not need any configuration">
+                        {{buildFilterForm.typeName}}
+                        <span class="fa fa-star"></span>
+                    </span>
+                </span>
+            </a>
+        </li>
+    </ul>
 </div>
