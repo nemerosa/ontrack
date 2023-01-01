@@ -270,6 +270,15 @@ angular.module('ot.view.branch', [
             localStorage.setItem('autoRefresh', $scope.autoRefresh);
         };
 
+        // =================================================
+        // Management of the build filters
+        // =================================================
+
+        // Callback from the build filter component
+        $scope.setBuildFilter = () => (filter) => {
+            console.log("setBuildFilter", filter);
+        };
+
 
         /**
          * Checks if a given validation stamp must be displayed or not.

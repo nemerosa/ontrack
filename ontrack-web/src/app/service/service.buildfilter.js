@@ -155,7 +155,7 @@ angular.module('ot.service.buildfilter', [
         };
 
         self.getCurrentFilter = function (branchId) {
-            var json = localStorage.getItem('build_filter_' + branchId + '_current');
+            const json = localStorage.getItem('build_filter_' + branchId + '_current');
             if (json) {
                 return JSON.parse(json);
             } else {
