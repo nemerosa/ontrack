@@ -239,13 +239,6 @@ angular.module('ot.view.branch', [
         // Starts by loading the branch
         loadBranch();
 
-        // Loading the builds AFTER the branch is loaded
-        $scope.$watch('branch', (value) => {
-            if (value) {
-                loadBuilds(true);
-            }
-        });
-
         // Pagination: loading more builds
         $scope.loadMoreBuilds = () => {
             if ($scope.buildsPageInfo.nextPage) {
