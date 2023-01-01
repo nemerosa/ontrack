@@ -56,7 +56,7 @@ angular.module('ot.directive.buildFilter', [
                     if (currentBuildFilterResource) {
                         filter.type = currentBuildFilterResource.type;
                         if (currentBuildFilterResource.data) {
-                            filter.data = JSON.stringify(currentBuildFilterResource.data);
+                            filter.data = JSON.parse(currentBuildFilterResource.data);
                         }
                         $scope.currentBuildFilterResource = currentBuildFilterResource;
                     } else {
