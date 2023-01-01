@@ -29,6 +29,26 @@
                 </span>
             </a>
         </li>
+        <!-- Existing filters -->
+        <li role="presentation" class="dropdown-header" ng-if="buildFilterResources">Existing filters:</li>
+        <li ng-repeat="buildFilterResource in buildFilterResources">
+            <a>
+                <!-- Filter selection -->
+                <span class="fa fa-check" ng-show="currentBuildFilterResource.name == buildFilterResource.name"></span>
+                <!-- Filter name -->
+                <span ng-click="buildFilterApply(buildFilterResource)"
+                      ng-class="{
+                        'ot-buildfilter-local': !buildFilterResource.links._update,
+                        'ot-buildfilter-remote': buildFilterResource.links._update,
+                        'ot-buildfilter-invalid': !!buildFilterResource.error
+                      }"
+                      title="{{getBuildFilterTooltip(buildFilterResource)}}"
+                >
+                    {{buildFilterResource.name}}
+                    <span ng-if="!buildFilterResource.links._update"> (local)</span>
+                </span>
+            </a>
+        </li>
         <!-- Current filter commands -->
         <li class="divider" ng-if="buildFilterResources"></li>
         <li ng-if="currentBuildFilterResource">
