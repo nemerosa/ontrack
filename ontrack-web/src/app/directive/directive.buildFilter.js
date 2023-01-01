@@ -37,12 +37,12 @@ angular.module('ot.directive.buildFilter', [
                 `;
 
                 const setCurrentBuildFilter = (filter) => {
-                    // console.log("setFilter", filter);
+                    $scope.currentBuildFilterResource = filter;
                     $scope.setFilter()(filter);
                 };
                 const unsetCurrentBuildFilter = () => {
-                    $scope.currentBuildFilterResource = undefined;
                     setCurrentBuildFilter({type: undefined, data: undefined});
+                    $scope.currentBuildFilterResource = undefined;
                 };
 
                 const loadCurrentBuildFilter = () => {
@@ -137,7 +137,6 @@ angular.module('ot.directive.buildFilter', [
                             loadBuildFilters();
                         }
                         // Sets the build filter
-                        $scope.currentBuildFilterResource = filter;
                         setCurrentBuildFilter(filter);
                     });
                 };
@@ -149,6 +148,16 @@ angular.module('ot.directive.buildFilter', [
                     otBuildFilterService.eraseCurrent($scope.branchId);
                     $scope.invalidBuildFilterResource = undefined;
                     unsetCurrentBuildFilter();
+                };
+
+                /**
+                 * Applying a filter
+                 */
+                $scope.buildFilterApply = buildFilterResource => {
+                    if (!buildFilterResource.removing) {
+                        otBuildFilterService.storeCurrent($scope.branchId, buildFilterResource);
+                        setCurrentBuildFilter(buildFilterResource);
+                    }
                 };
             }
         };
