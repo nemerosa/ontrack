@@ -17,9 +17,17 @@ angular.module('ot.directive.buildFilter', [
                         $branchId: Int!,
                     ) {
                         branches(id: $branchId) {
-                            links {
-                                _buildFilterForms
-                                _buildFilterResources
+                            buildFilterForms {
+                                typeName
+                                predefined
+                                form
+                            }
+                            buildFilterResources {
+                                isShared
+                                name
+                                type
+                                data
+                                error
                             }
                         }
                     }

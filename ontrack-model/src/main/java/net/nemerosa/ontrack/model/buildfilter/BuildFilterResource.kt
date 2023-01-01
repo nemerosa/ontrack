@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.buildfilter
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.Branch
 
 /**
@@ -14,12 +15,17 @@ import net.nemerosa.ontrack.model.structure.Branch
  * @property data Specific data for this filter
  * @property error Error message if this filter is not valid
  */
-class BuildFilterResource<T>(
+data class BuildFilterResource<T>(
         @JsonIgnore
         val branch: Branch,
+        @APIDescription("Is this filter shared?")
         val isShared: Boolean,
+        @APIDescription("Name for this filter")
         val name: String,
+        @APIDescription("FQCN of the build filter provider")
         val type: String,
+        @APIDescription("Data for this filter")
         val data: T,
-        val error: String?
+        @APIDescription("Filter error if any")
+        val error: String?,
 )
