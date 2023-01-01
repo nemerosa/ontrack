@@ -82,11 +82,17 @@ angular.module('ot.view.branch', [
                 $branchId: Int!,
                 $offset: Int!,
                 $size: Int!,
+                $filterType: String,
+                $filterData: String,
             ) {
                 branches(id: $branchId) {
                     buildsPaginated(
                         offset: $offset,
                         size: $size,
+                        generic: {
+                            type: $filterType,
+                            data: $filterData
+                        }
                     ) {
                         pageInfo {
                             totalSize
@@ -211,6 +217,8 @@ angular.module('ot.view.branch', [
                 branchId,
                 offset: pagination.offset,
                 size: pagination.size,
+                filterType: currentBuildFilter.type,
+                filterData: currentBuildFilter.data
             };
             otGraphqlService.pageGraphQLCall(gqlBuilds, gqlVariables)
                 .then(data => {
@@ -274,9 +282,16 @@ angular.module('ot.view.branch', [
         // Management of the build filters
         // =================================================
 
+        // Current build filter
+        let currentBuildFilter = {
+            type: undefined,
+            data: undefined
+        };
+
         // Callback from the build filter component
         $scope.setBuildFilter = () => (filter) => {
-            console.log("setBuildFilter", filter);
+            currentBuildFilter = filter;
+            refreshBuildView();
         };
 
 
