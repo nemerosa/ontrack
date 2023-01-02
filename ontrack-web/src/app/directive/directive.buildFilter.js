@@ -147,7 +147,6 @@ angular.module('ot.directive.buildFilter', [
                         branchId: $scope.branchId,
                         buildFilterForm: buildFilterForm
                     }).then(filter => {
-                        console.log("filter", filter);
                         // Reloads the filters (only if not a predefined filter)
                         if (!buildFilterForm.isPredefined) {
                             loadBuildFilters();
