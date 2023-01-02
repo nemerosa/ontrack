@@ -23,6 +23,13 @@
             <th colspan="3">
                 <!-- Build filter -->
                 <ot-build-filter branch-id="branch.id" set-filter="setBuildFilter()"></ot-build-filter>
+                <!-- Build diff extension commands -->
+                <button ng-repeat="action in branch.buildDiffActions" class="btn btn-default"
+                        ng-disabled="!selectedBuilds.first || !selectedBuilds.second"
+                        id="{{action.id}}"
+                        ng-click="buildDiff(action)">
+                    {{action.name}}
+                </button>
                 <!-- Auto refresh flag -->
                 <button class="ot-branch-build-view-auto-refresh"
                         ng-class="{

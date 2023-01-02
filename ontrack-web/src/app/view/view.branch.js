@@ -51,6 +51,12 @@ angular.module('ot.view.branch', [
                         _actions
                         _update
                     }
+                    buildDiffActions {
+                        id
+                        name
+                        type
+                        uri
+                    }
                     otherBranches {
                         id
                         name
@@ -278,6 +284,19 @@ angular.module('ot.view.branch', [
 
         // Selected builds
         $scope.selectedBuilds = {};
+
+        /**
+         * Build diff action
+         */
+        $scope.buildDiff = action => {
+            if ($scope.selectedBuilds.first && $scope.selectedBuilds.second) {
+                $state.go(action.id, {
+                    branch: branchId,
+                    from: $scope.selectedBuilds.first.id,
+                    to: $scope.selectedBuilds.second.id
+                });
+            }
+        };
 
         // =================================================
         // Management of the build filters
