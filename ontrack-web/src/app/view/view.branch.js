@@ -8,8 +8,7 @@ angular.module('ot.view.branch', [
     'ot.dialog.validationStampRunView',
     'ot.dialog.validationStampRunGroup',
     'ot.dialog.promotionRuns',
-    'ot.service.graphql',
-    'ot.service.user'
+    'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('branch', {
@@ -20,7 +19,7 @@ angular.module('ot.view.branch', [
     })
     .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location, $rootScope,
                                         ot, otFormService, otStructureService, otAlertService, otTaskService, otNotificationService, otCopyService,
-                                        otGraphqlService, otUserService) {
+                                        otGraphqlService) {
         const view = ot.view();
         let viewInitialized = false;
         // Branch's id
@@ -160,6 +159,19 @@ angular.module('ot.view.branch', [
             }
         `;
 
+        // Query: validation stamp data type information
+        const gqlValidationStampData = `
+            query ValidationStampData(
+                $id: Int!,
+            ) {
+              validationStamp(id: $id) {
+                dataType {
+                  config
+                }
+              }
+            }
+        `;
+
         // Loading the branch
         const loadBranch = () => {
             $scope.loadingBranch = true;
@@ -293,6 +305,39 @@ angular.module('ot.view.branch', [
         };
 
         // =================================================
+        // Validation runs
+        // =================================================
+
+        /**
+         * Creating a validation run
+         */
+        $scope.createValidationRun = (build, validationStamp) => {
+            // Loads the validation stamp data config
+            otGraphqlService.pageGraphQLCall(gqlValidationStampData, {id: validationStamp.id})
+                .then(data => {
+                    return otStructureService.create(
+                        build.links._validate,
+                        'Validation for the build',
+                        {
+                            postForm: function (form) {
+                                return otFormService.updateFieldValue(
+                                    form,
+                                    'validationStampData',
+                                    {
+                                        id: validationStamp.name,
+                                        data: data.validationStamp.dataType ? data.validationStamp.dataType.config : undefined
+                                    }
+                                );
+                            }
+                        }
+                    );
+                })
+                .then(() => {
+                    loadBuilds(false);
+                });
+        };
+
+        // =================================================
         // Management of selected builds
         // =================================================
 
@@ -329,6 +374,9 @@ angular.module('ot.view.branch', [
             refreshBuildView();
         };
 
+        // =================================================
+        // Validation stamps filters
+        // =================================================
 
         /**
          * Checks if a given validation stamp must be displayed or not.
