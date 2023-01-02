@@ -205,9 +205,11 @@ angular.module('ot.directive.buildFilter', [
                         branch: $scope.branch,
                         buildFilterResource: buildFilterResource,
                         buildFilterForms: $scope.buildFilterForms
-                    }).then(() => {
+                    }).then(filter => {
                         // Reloads the filters
                         loadBuildFilters();
+                        // Select the filter
+                        setCurrentBuildFilter(filter);
                     });
                 };
             }

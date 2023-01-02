@@ -133,22 +133,22 @@ angular.module('ot.service.buildfilter', [
                 return self.createBuildFilter({
                     branchId: config.branch.id,
                     buildFilterForm: resourceBuildFilterForm
-                }).then(function () {
-                    // Loads the current filter
-                    const currentFilter = self.getCurrentFilter(config.branch.id);
+                }).then(filter => {
                     // Storing if saved under the same name
-                    if (buildFilterResource._update && buildFilterResource.name === currentFilter.name) {
-                        self.saveFilter(config.branch, currentFilter);
+                    if (buildFilterResource._update && buildFilterResource.name === filter.name) {
+                        self.saveFilter(config.branch, filter);
                     }
                     // Sharing if saved under the same name
-                    if (buildFilterResource.shared && config.branch._buildFilterShare && buildFilterResource.name === currentFilter.name) {
-                        self.shareFilter(config.branch, currentFilter);
+                    if (buildFilterResource.shared && config.branch._buildFilterShare && buildFilterResource.name === filter.name) {
+                        self.shareFilter(config.branch, filter);
                     }
+                    // Returning the filter
+                    return filter;
                 });
             } else {
                 otNotificationService.error("The type of this filter appears not to be supported: " + type + ". " +
                     "Consider to delete it.");
-                var d = $q.defer();
+                const d = $q.defer();
                 d.reject();
                 return d.promise;
             }
