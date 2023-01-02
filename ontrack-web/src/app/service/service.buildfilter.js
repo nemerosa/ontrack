@@ -112,18 +112,18 @@ angular.module('ot.service.buildfilter', [
          * @return Promise with the created/editer filter
          */
         self.editBuildFilter = function (config) {
-            var buildFilterResource = config.buildFilterResource;
+            const buildFilterResource = config.buildFilterResource;
             // Looking for the edition form
-            var resourceBuildFilterForm;
-            var type = buildFilterResource.type;
-            angular.forEach(config.buildFilterForms.resources, function (buildFilterForm) {
-                if (buildFilterForm.type == type) {
+            let resourceBuildFilterForm;
+            const type = buildFilterResource.type;
+            angular.forEach(config.buildFilterForms, buildFilterForm => {
+                if (buildFilterForm.type === type) {
                     resourceBuildFilterForm = buildFilterForm;
                 }
             });
             // Checks for the form
             if (resourceBuildFilterForm) {
-                // Copy of the fiter's form
+                // Copy of the filter's form
                 resourceBuildFilterForm = angular.copy(resourceBuildFilterForm);
                 // Name
                 buildFilterResource.data.name = buildFilterResource.name;
@@ -135,13 +135,13 @@ angular.module('ot.service.buildfilter', [
                     buildFilterForm: resourceBuildFilterForm
                 }).then(function () {
                     // Loads the current filter
-                    var currentFilter = self.getCurrentFilter(config.branch.id);
+                    const currentFilter = self.getCurrentFilter(config.branch.id);
                     // Storing if saved under the same name
-                    if (buildFilterResource._update && buildFilterResource.name == currentFilter.name) {
+                    if (buildFilterResource._update && buildFilterResource.name === currentFilter.name) {
                         self.saveFilter(config.branch, currentFilter);
                     }
                     // Sharing if saved under the same name
-                    if (buildFilterResource.shared && config.branch._buildFilterShare && buildFilterResource.name == currentFilter.name) {
+                    if (buildFilterResource.shared && config.branch._buildFilterShare && buildFilterResource.name === currentFilter.name) {
                         self.shareFilter(config.branch, currentFilter);
                     }
                 });
@@ -225,7 +225,7 @@ angular.module('ot.service.buildfilter', [
 
         self.saveFilter = function (branch, buildFilterResource) {
             return ot.call(
-                $http.post(branch._buildFilterSave, {
+                $http.post(branch.links._buildFilterSave, {
                     name: buildFilterResource.name,
                     shared: buildFilterResource.isShared,
                     type: buildFilterResource.type,
@@ -237,7 +237,7 @@ angular.module('ot.service.buildfilter', [
         self.shareFilter = (branch, buildFilterResource) => {
             buildFilterResource.shared = true;
             return ot.call(
-                $http.post(branch._buildFilterShare, {
+                $http.post(branch.links._buildFilterShare, {
                     name: buildFilterResource.name,
                     shared: true,
                     type: buildFilterResource.type,

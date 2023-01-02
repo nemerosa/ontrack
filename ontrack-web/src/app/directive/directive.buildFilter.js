@@ -19,6 +19,7 @@ angular.module('ot.directive.buildFilter', [
                         $branchId: Int!,
                     ) {
                         branches(id: $branchId) {
+                            id
                             links {
                                 _buildFilterSave
                                 _buildFilterShare
@@ -178,18 +179,14 @@ angular.module('ot.directive.buildFilter', [
                  * Saving a local filter
                  */
                 $scope.buildFilterSave = buildFilterResource => {
-                    otBuildFilterService.saveFilter({
-                        _buildFilterSave: $scope.branch.links._buildFilterSave
-                    }, buildFilterResource).then(loadBuildFilters);
+                    otBuildFilterService.saveFilter($scope.branch, buildFilterResource).then(loadBuildFilters);
                 };
 
                 /**
                  * Sharing a saved filter
                  */
                 $scope.buildFilterShare = buildFilterResource => {
-                    otBuildFilterService.shareFilter({
-                        _buildFilterShare: $scope.branch.links._buildFilterShare
-                    }, buildFilterResource).then(loadBuildFilters);
+                    otBuildFilterService.shareFilter($scope.branch, buildFilterResource).then(loadBuildFilters);
                 };
 
                 /**
@@ -197,9 +194,21 @@ angular.module('ot.directive.buildFilter', [
                  */
                 $scope.buildFilterRemove = buildFilterResource => {
                     buildFilterResource.removing = true;
-                    otBuildFilterService.removeFilter({
-                        id: $scope.branchId
-                    }, buildFilterResource).then(loadBuildFilters);
+                    otBuildFilterService.removeFilter($scope.branch, buildFilterResource).then(loadBuildFilters);
+                };
+
+                /**
+                 * Editing a filter
+                 */
+                $scope.buildFilterEdit = buildFilterResource => {
+                    otBuildFilterService.editBuildFilter({
+                        branch: $scope.branch,
+                        buildFilterResource: buildFilterResource,
+                        buildFilterForms: $scope.buildFilterForms
+                    }).then(() => {
+                        // Reloads the filters
+                        loadBuildFilters();
+                    });
                 };
             }
         };

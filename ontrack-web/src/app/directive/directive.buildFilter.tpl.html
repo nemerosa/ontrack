@@ -63,10 +63,10 @@
                 <span class="fa fa-group ot-command" ng-if="buildFilterResource.isShared"
                       title="This filter has been shared for use in the branch."
                       ng-click="buildFilterApply(buildFilterResource)"></span>
-                <!-- TODO Edition -->
+                <!-- Edition -->
                 <span class="ot-command-update ot-command"
                       title="Edit this filter"
-                      ng-if="!buildFilterResource.shared || branch._buildFilterShare"
+                      ng-if="!buildFilterResource.isShared || branch.links._buildFilterShare"
                       ng-click="buildFilterEdit(buildFilterResource)"></span>
                 <!-- Deletion always available, but for the shared filters -->
                 <span class="ot-command-delete ot-command"
