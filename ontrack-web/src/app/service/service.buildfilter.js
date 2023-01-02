@@ -227,7 +227,7 @@ angular.module('ot.service.buildfilter', [
             return ot.call(
                 $http.post(branch._buildFilterSave, {
                     name: buildFilterResource.name,
-                    shared: buildFilterResource.shared,
+                    shared: buildFilterResource.isShared,
                     type: buildFilterResource.type,
                     data: buildFilterResource.data
                 })

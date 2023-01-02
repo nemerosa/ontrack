@@ -19,6 +19,9 @@ angular.module('ot.directive.buildFilter', [
                         $branchId: Int!,
                     ) {
                         branches(id: $branchId) {
+                            links {
+                                _buildFilterSave
+                            }
                             buildFilterForms {
                                 type
                                 typeName
@@ -110,6 +113,7 @@ angular.module('ot.directive.buildFilter', [
                         .pageGraphQLCall(gqlBranchFilters, {branchId: $scope.branchId})
                         .then(data => {
                             const branch = data.branches[0];
+                            $scope.branch = branch;
                             $scope.buildFilterForms = branch.buildFilterForms;
                             $scope.buildFilterResources = otBuildFilterService.mergeRemoteAndLocalFilters(
                                 $scope.branchId,
@@ -163,6 +167,15 @@ angular.module('ot.directive.buildFilter', [
                         otBuildFilterService.storeCurrent($scope.branchId, buildFilterResource);
                         setCurrentBuildFilter(buildFilterResource);
                     }
+                };
+
+                /**
+                 * Saving a local filter
+                 */
+                $scope.buildFilterSave = function (buildFilterResource) {
+                    otBuildFilterService.saveFilter({
+                        _buildFilterSave: $scope.branch.links._buildFilterSave
+                    }, buildFilterResource).then(loadBuildFilters);
                 };
             }
         };
