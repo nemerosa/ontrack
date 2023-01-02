@@ -104,7 +104,7 @@ angular.module('ot.directive.buildFilter', [
                                 unsetCurrentBuildFilter();
                             } else {
                                 // No validation issue, calling the view call
-                                setCurrentBuildFilter(filter);
+                                setCurrentBuildFilter($scope.currentBuildFilterResource);
                             }
                         });
                     } else {
