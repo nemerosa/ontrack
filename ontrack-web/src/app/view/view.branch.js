@@ -333,7 +333,7 @@ angular.module('ot.view.branch', [
                     );
                 })
                 .then(() => {
-                    loadBuilds(false);
+                    loadBuilds(true);
                 });
         };
 
