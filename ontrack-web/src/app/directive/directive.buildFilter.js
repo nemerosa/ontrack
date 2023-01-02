@@ -65,7 +65,11 @@ angular.module('ot.directive.buildFilter', [
                     if (currentBuildFilterResource) {
                         filter.type = currentBuildFilterResource.type;
                         if (currentBuildFilterResource.data) {
-                            filter.data = JSON.parse(currentBuildFilterResource.data);
+                            if (typeof currentBuildFilterResource.data === 'string' || currentBuildFilterResource.data instanceof String) {
+                                filter.data = JSON.parse(currentBuildFilterResource.data);
+                            } else {
+                                filter.data = currentBuildFilterResource.data;
+                            }
                         }
                         $scope.currentBuildFilterResource = currentBuildFilterResource;
                     } else {
@@ -84,7 +88,7 @@ angular.module('ot.directive.buildFilter', [
                         `, {
                             branchId: $scope.branchId,
                             filterType: filter.type,
-                            filterData: filter.data
+                            filterData: JSON.stringify(filter.data)
                         }).then(data => {
                             const message = data.buildFilterValidation.error;
                             if (message) {
