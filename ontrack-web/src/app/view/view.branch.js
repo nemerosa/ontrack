@@ -285,6 +285,7 @@ angular.module('ot.view.branch', [
         // Callback from the build filter component
         $scope.setBuildFilter = () => (filter) => {
             currentBuildFilter = filter;
+            // console.log("currentBuildFilter", currentBuildFilter);
             refreshBuildView();
         };
 

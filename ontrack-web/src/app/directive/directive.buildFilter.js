@@ -125,8 +125,6 @@ angular.module('ot.directive.buildFilter', [
                                 $scope.branchId,
                                 branch.buildFilterResources
                             );
-                            // Current selected filter
-                            loadCurrentBuildFilter();
                         })
                         .finally(() => {
                             $scope.loadingFilters = false;
@@ -136,6 +134,8 @@ angular.module('ot.directive.buildFilter', [
                 $scope.$watch('branchId', (value) => {
                     if (value) {
                         loadBuildFilters();
+                        // Current selected filter
+                        loadCurrentBuildFilter();
                     }
                 });
 
@@ -147,6 +147,7 @@ angular.module('ot.directive.buildFilter', [
                         branchId: $scope.branchId,
                         buildFilterForm: buildFilterForm
                     }).then(filter => {
+                        console.log("filter", filter);
                         // Reloads the filters (only if not a predefined filter)
                         if (!buildFilterForm.isPredefined) {
                             loadBuildFilters();
