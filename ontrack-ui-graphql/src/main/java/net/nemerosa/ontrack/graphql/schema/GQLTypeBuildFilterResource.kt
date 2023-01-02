@@ -11,7 +11,9 @@ import org.springframework.stereotype.Component
  * GraphQL type for [BuildFilterResource].
  */
 @Component
-class GQLTypeBuildFilterResource : GQLType {
+class GQLTypeBuildFilterResource(
+        private val fieldContributors: List<GQLFieldContributor>,
+) : GQLType {
     override fun getTypeName(): String = BuildFilterResource::class.java.simpleName
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType = GraphQLObjectType.newObject()
@@ -22,5 +24,8 @@ class GQLTypeBuildFilterResource : GQLType {
             .stringField(BuildFilterResource<Any>::name)
             .stringField(BuildFilterResource<Any>::error)
             .jsonField(BuildFilterResource<Any>::data)
+            // Links
+            .fields(BuildFilterResource::class.java.graphQLFieldContributions(fieldContributors))
+            // OK
             .build()
 }

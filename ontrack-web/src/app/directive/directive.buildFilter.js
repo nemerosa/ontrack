@@ -31,6 +31,11 @@ angular.module('ot.directive.buildFilter', [
                                 type
                                 data
                                 error
+                                links {
+                                    _update
+                                    _share
+                                    _delete
+                                }
                             }
                         }
                     }
