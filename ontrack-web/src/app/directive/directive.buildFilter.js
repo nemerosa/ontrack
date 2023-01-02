@@ -3,7 +3,7 @@ angular.module('ot.directive.buildFilter', [
     'ot.service.core',
     'ot.service.graphql',
 ])
-    .directive('otBuildFilter', function ($http, ot, otBuildFilterService, otGraphqlService) {
+    .directive('otBuildFilter', function ($http, $location, ot, otBuildFilterService, otGraphqlService) {
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.buildFilter.tpl.html',
@@ -211,6 +211,16 @@ angular.module('ot.directive.buildFilter', [
                         // Select the filter
                         setCurrentBuildFilter(filter);
                     });
+                };
+
+                /**
+                 * Permalink to the current filter
+                 */
+                $scope.buildFilterLink = () => {
+                    if ($scope.currentBuildFilterResource) {
+                        const jsonFilter = JSON.stringify($scope.currentBuildFilterResource);
+                        $location.hash(jsonFilter);
+                    }
                 };
             }
         };

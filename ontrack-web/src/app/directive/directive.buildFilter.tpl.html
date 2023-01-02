@@ -89,6 +89,12 @@
                 Remove filter
             </a>
         </li>
+        <li ng-if="currentBuildFilterResource">
+            <a ng-click="buildFilterLink()">
+                <span class="fa fa-link"></span>
+                Permalink
+            </a>
+        </li>
         <!-- New filters -->
         <li class="divider"></li>
         <li role="presentation" class="dropdown-header">New filter:</li>
