@@ -337,6 +337,25 @@ angular.module('ot.view.branch', [
                 });
         };
 
+        /**
+         * Displaying the validation runs
+         */
+        $scope.displayValidationRuns = (build, validationStamp) => {
+            $modal.open({
+                templateUrl: 'app/dialog/dialog.validationStampRunView.tpl.html',
+                controller: 'otDialogValidationStampRunView',
+                resolve: {
+                    config: () => ({
+                        build: build,
+                        validationStamp: validationStamp,
+                        callbackOnStatusChange: () => {
+                            loadBuilds(true);
+                        }
+                    })
+                }
+            });
+        };
+
         // =================================================
         // Management of selected builds
         // =================================================
