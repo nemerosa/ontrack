@@ -273,6 +273,13 @@ angular.module('ot.view.branch', [
         };
 
         // =================================================
+        // Management of selected builds
+        // =================================================
+
+        // Selected builds
+        $scope.selectedBuilds = {};
+
+        // =================================================
         // Management of the build filters
         // =================================================
 
