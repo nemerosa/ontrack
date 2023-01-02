@@ -97,8 +97,8 @@ angular.module('ot.service.buildfilter', [
                         }
                         // Stores locally as current
                         self.storeCurrent(config.branchId, buildFilterResource);
-                        // OK
-                        return true;
+                        // Filter as a result
+                        return buildFilterResource;
                     }
                 });
             }
