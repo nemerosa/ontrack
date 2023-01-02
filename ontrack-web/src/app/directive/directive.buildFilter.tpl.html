@@ -47,12 +47,12 @@
                     {{buildFilterResource.name}}
                     <span ng-if="!buildFilterResource.links._update"> (local)</span>
                 </span>
-                <!-- TODO Saving only if local and logged -->
+                <!-- Saving only if local and logged -->
                 <span class="fa fa-save ot-command" ng-if="!buildFilterResource.links._update"
                       title="Save this filter in your preferences"
                       ng-click="buildFilterSave(buildFilterResource)"></span>
-                <!-- TODO Sharing -->
-                <span class="fa fa-share ot-command" ng-if="!buildFilterResource.shared && branch._buildFilterShare"
+                <!-- Sharing -->
+                <span class="fa fa-share ot-command" ng-if="!buildFilterResource.isShared && branch.links._buildFilterShare"
                       title="Saves this filter and makes it available for all users in the branch"
                       ng-click="buildFilterShare(buildFilterResource)"></span>
                 <!-- TODO Saved filter -->

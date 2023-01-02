@@ -21,6 +21,7 @@ angular.module('ot.directive.buildFilter', [
                         branches(id: $branchId) {
                             links {
                                 _buildFilterSave
+                                _buildFilterShare
                             }
                             buildFilterForms {
                                 type
@@ -172,9 +173,18 @@ angular.module('ot.directive.buildFilter', [
                 /**
                  * Saving a local filter
                  */
-                $scope.buildFilterSave = function (buildFilterResource) {
+                $scope.buildFilterSave = buildFilterResource => {
                     otBuildFilterService.saveFilter({
                         _buildFilterSave: $scope.branch.links._buildFilterSave
+                    }, buildFilterResource).then(loadBuildFilters);
+                };
+
+                /**
+                 * Sharing a saved filter
+                 */
+                $scope.buildFilterShare = buildFilterResource => {
+                    otBuildFilterService.shareFilter({
+                        _buildFilterShare: $scope.branch.links._buildFilterShare
                     }, buildFilterResource).then(loadBuildFilters);
                 };
             }

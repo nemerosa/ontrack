@@ -234,7 +234,7 @@ angular.module('ot.service.buildfilter', [
             );
         };
 
-        self.shareFilter = function (branch, buildFilterResource) {
+        self.shareFilter = (branch, buildFilterResource) => {
             buildFilterResource.shared = true;
             return ot.call(
                 $http.post(branch._buildFilterShare, {
