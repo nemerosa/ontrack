@@ -3,7 +3,7 @@ angular.module('ot.directive.buildFilter', [
     'ot.service.core',
     'ot.service.graphql',
 ])
-    .directive('otBuildFilter', function ($http, $location, ot, otBuildFilterService, otGraphqlService) {
+    .directive('otBuildFilter', function ($http, $location, ot, otBuildFilterService, otGraphqlService, otNotificationService) {
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.buildFilter.tpl.html',
@@ -55,7 +55,28 @@ angular.module('ot.directive.buildFilter', [
                     $scope.currentBuildFilterResource = undefined;
                 };
 
+                /**
+                 * Loading the permalink at startup
+                 */
+                const loadPermalink = () => {
+                    const jsonFilter = $location.hash();
+                    if (jsonFilter) {
+                        // Parsing the JSON
+                        try {
+                            const json = JSON.parse(jsonFilter);
+                            // Applies the filter
+                            otBuildFilterService.storeCurrent($scope.branchId, json);
+                            // Removes the hash after use
+                            $location.hash('');
+                        } catch (e) {
+                            otNotificationService.error("Cannot get the filter from the permalink.");
+                        }
+                    }
+                };
+
                 const loadCurrentBuildFilter = () => {
+                    // Loads any permalink
+                    loadPermalink();
                     // Local data
                     const filter = {
                         type: undefined,
