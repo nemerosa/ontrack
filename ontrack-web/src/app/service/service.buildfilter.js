@@ -209,7 +209,7 @@ angular.module('ot.service.buildfilter', [
             // What about the current filter?
             // If selected, stores only its content, not its name
             var currentBuildFilterResource = self.getCurrentFilter(branch.id);
-            if (currentBuildFilterResource && currentBuildFilterResource.name && currentBuildFilterResource.name == buildFilterResource.name) {
+            if (currentBuildFilterResource && currentBuildFilterResource.name && currentBuildFilterResource.name === buildFilterResource.name) {
                 currentBuildFilterResource.name = '';
                 self.storeCurrent(branch.id, currentBuildFilterResource);
             }

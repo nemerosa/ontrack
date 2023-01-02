@@ -187,6 +187,16 @@ angular.module('ot.directive.buildFilter', [
                         _buildFilterShare: $scope.branch.links._buildFilterShare
                     }, buildFilterResource).then(loadBuildFilters);
                 };
+
+                /**
+                 * Removing an existing filter
+                 */
+                $scope.buildFilterRemove = buildFilterResource => {
+                    buildFilterResource.removing = true;
+                    otBuildFilterService.removeFilter({
+                        id: $scope.branchId
+                    }, buildFilterResource).then(loadBuildFilters);
+                };
             }
         };
     })

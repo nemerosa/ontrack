@@ -68,10 +68,10 @@
                       title="Edit this filter"
                       ng-if="!buildFilterResource.shared || branch._buildFilterShare"
                       ng-click="buildFilterEdit(buildFilterResource)"></span>
-                <!-- TODO Deletion always available, but for the shared filters -->
+                <!-- Deletion always available, but for the shared filters -->
                 <span class="ot-command-delete ot-command"
                       title="Delete this filter"
-                      ng-if="!buildFilterResource.shared || branch._buildFilterShare"
+                      ng-if="!buildFilterResource.isShared || branch.links._buildFilterShare"
                       ng-click="buildFilterRemove(buildFilterResource)"></span>
             </a>
         </li>
