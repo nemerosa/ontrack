@@ -55,8 +55,8 @@
                 <span class="fa fa-share ot-command" ng-if="!buildFilterResource.isShared && branch.links._buildFilterShare"
                       title="Saves this filter and makes it available for all users in the branch"
                       ng-click="buildFilterShare(buildFilterResource)"></span>
-                <!-- TODO Saved filter -->
-                <span class="fa fa-user ot-command" ng-if="buildFilterResource._update && !buildFilterResource.shared"
+                <!-- Saved filter -->
+                <span class="fa fa-user ot-command" ng-if="buildFilterResource.links._update && !buildFilterResource.isShared"
                       title="This filter has been saved in your preferences"
                       ng-click="buildFilterApply(buildFilterResource)"></span>
                 <!-- TODO Shared filter -->
