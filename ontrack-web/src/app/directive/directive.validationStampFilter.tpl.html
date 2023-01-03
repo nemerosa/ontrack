@@ -51,11 +51,11 @@
 <!--                      title="Edit this filter"-->
 <!--                      ng-if="vsf._update"-->
 <!--                      ng-click="editBranchValidationStampFilter(vsf)"></span>-->
-                <!-- TODO Deleting -->
-<!--                <span class="ot-command-delete ot-command"-->
-<!--                      title="Delete this filter"-->
-<!--                      ng-if="vsf._delete"-->
-<!--                      ng-click="deleteBranchValidationStampFilter(vsf)"></span>-->
+                <!-- Deleting -->
+                <span class="ot-command-delete ot-command"
+                      title="Delete this filter"
+                      ng-if="vsf.links._delete"
+                      ng-click="deleteBranchValidationStampFilter(vsf)"></span>
             </a>
         </li>
         <li ng-if="!loadingFilters && validationStampFilters.length == 0" role="presentation"

@@ -12,7 +12,9 @@ import net.nemerosa.ontrack.model.structure.ValidationStampFilter
 import org.springframework.stereotype.Component
 
 @Component
-class GQLTypeValidationStampFilter : GQLType {
+class GQLTypeValidationStampFilter(
+        private val fieldContributors: List<GQLFieldContributor>,
+) : GQLType {
 
     override fun getTypeName(): String = ValidationStampFilter::class.java.simpleName
 
@@ -27,5 +29,8 @@ class GQLTypeValidationStampFilter : GQLType {
                         .type(listType(GraphQLString))
             }
             .enumField(ValidationStampFilter::scope)
+            // Links
+            .fields(ValidationStampFilter::class.java.graphQLFieldContributions(fieldContributors))
+            // OK
             .build()
 }

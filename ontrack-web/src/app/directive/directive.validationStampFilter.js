@@ -4,7 +4,7 @@ angular.module('ot.directive.validationStampFilter', [
     'ot.service.graphql',
     'ot.service.user'
 ])
-    .directive('otValidationStampFilter', function ($location, $rootScope, ot, otFormService, otGraphqlService, otUserService) {
+    .directive('otValidationStampFilter', function ($http, $location, $rootScope, ot, otAlertService, otFormService, otGraphqlService, otUserService) {
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.validationStampFilter.tpl.html',
@@ -31,6 +31,9 @@ angular.module('ot.directive.validationStampFilter', [
                                 name
                                 vsNames
                                 scope
+                                links {
+                                    _delete
+                                }
                             }
                         }
                     }
@@ -114,6 +117,22 @@ angular.module('ot.directive.validationStampFilter', [
                                 // Enter in edition mode immediately
                                 // TODO $scope.validationStampFilterEdition = true;
                             });
+                    }
+                };
+
+                // Deleting an existing filter
+                $scope.deleteBranchValidationStampFilter = validationStampFilter => {
+                    if (validationStampFilter.links._delete) {
+                        $scope.validationStampFilterEdition = false;
+                        otAlertService.confirm({
+                            title: "Validation stamp filter deletion",
+                            message: `Do you really want to delete the ${validationStampFilter.name} validation stamp filter?`
+                        }).then(() => {
+                            ot.pageCall($http.delete(validationStampFilter.links._delete)).then(function () {
+                                loadFilters();
+                                $scope.selectBranchValidationStampFilter(undefined);
+                            });
+                        });
                     }
                 };
 
