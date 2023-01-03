@@ -13,6 +13,23 @@ angular.module('ot.directive.validationStampFilter', [
             },
             controller: ($scope) => {
 
+                // Query: list of validation stamp filters
+                const gqlValidationStampFilters = `
+                    query ValidationStampFilters(
+                        $branchId: Int!,
+                    ) {
+                        branches(id: $branchId) {
+                            validationStampFilters(all: true) {
+                                id
+                                name
+                                vsNames
+                                project { id } 
+                                branch { id }
+                            }
+                        }
+                    }
+                `;
+
                 // Selected validation stamp filter
                 $scope.validationStampFilter = undefined;
 
@@ -23,6 +40,13 @@ angular.module('ot.directive.validationStampFilter', [
                 // Loading the filters
                 const loadFilters = () => {
                     $scope.loadingFilters = true;
+                    otGraphqlService.pageGraphQLCall(gqlValidationStampFilters, {
+                        branchId: $scope.branchId
+                    }).then(data => {
+
+                    }).finally(() => {
+                        $scope.loadingFilters = false;
+                    });
                 };
 
                 // Loading the filters when branch ID is ready

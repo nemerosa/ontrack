@@ -6,8 +6,13 @@
                             'btn-default': !validationStampFilter
                         }"
     >
-        <span class="fa fa-filter"></span>
-        <span class="caret"></span>
+        <span ng-show="loadingFilters">
+            <span class="ot-loading-indicator" title="Loading the filters..."></span>
+        </span>
+        <span ng-hide="loadingFilters">
+            <span class="fa fa-filter"></span>
+            <span class="caret"></span>
+        </span>
     </button>
     <ul class="dropdown-menu ot-validationstampfilter-list" role="menu">
         <!-- Validation stamps preferences -->
