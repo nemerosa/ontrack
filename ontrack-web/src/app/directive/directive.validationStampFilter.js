@@ -43,7 +43,7 @@ angular.module('ot.directive.validationStampFilter', [
                     otGraphqlService.pageGraphQLCall(gqlValidationStampFilters, {
                         branchId: $scope.branchId
                     }).then(data => {
-
+                        $scope.validationStampFilters = data.branches[0].validationStampFilters;
                     }).finally(() => {
                         $scope.loadingFilters = false;
                     });

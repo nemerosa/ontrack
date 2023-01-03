@@ -15,6 +15,52 @@
         </span>
     </button>
     <ul class="dropdown-menu ot-validationstampfilter-list" role="menu">
+        <!-- List of filters -->
+        <li ng-repeat="vsf in validationStampFilters">
+            <a>
+                <!-- Selected? -->
+                <span class="fa fa-check"
+                      ng-show="validationStampFilter && validationStampFilter.id == vsf.id"></span>
+                <!-- Name -->
+                <span ng-click="selectBranchValidationStampFilter(vsf)">{{vsf.name}}</span>
+                <!-- TODO Show filter type: branch, project or global -->
+<!--                <b title="Global scope" ng-if="vsf.scope == 'GLOBAL'">[G]</b>-->
+<!--                <b title="Project scope - {{branch.project.name}}" ng-if="vsf.scope == 'PROJECT'">[P]</b>-->
+                <!-- TODO Sharing to project -->
+<!--                <span class="ot-command fa fa-share"-->
+<!--                      title="Share this filter at project level"-->
+<!--                      ng-if="vsf._shareAtProject"-->
+<!--                      ng-click="shareValidationStampFilterAtProject(vsf)"></span>-->
+                <!-- TODO Sharing to global -->
+<!--                <span class="ot-command fa fa-share-square"-->
+<!--                      title="Share this filter at global level"-->
+<!--                      ng-if="vsf._shareAtGlobal"-->
+<!--                      ng-click="shareValidationStampFilterAtGlobal(vsf)"></span>-->
+                <!-- TODO Edition mode: ON -->
+<!--                <span class="ot-command fa fa-eye"-->
+<!--                      title="Edit this filter using the current view"-->
+<!--                      ng-if="vsf._update && !validationStampFilterEdition"-->
+<!--                      ng-click="directEditValidationStampFilter(vsf)"></span>-->
+                <!-- TODO Edition mode: OFF -->
+<!--                <span class="ot-command fa fa-eye-slash"-->
+<!--                      title="Stop editing this filter using the current view"-->
+<!--                      ng-if="vsf._update && validationStampFilterEdition && validationStampFilter.id == vsf.id"-->
+<!--                      ng-click="stopDirectEditValidationStampFilter(vsf)"></span>-->
+                <!-- TODO Editing -->
+<!--                <span class="ot-command-update ot-command"-->
+<!--                      title="Edit this filter"-->
+<!--                      ng-if="vsf._update"-->
+<!--                      ng-click="editBranchValidationStampFilter(vsf)"></span>-->
+                <!-- TODO Deleting -->
+<!--                <span class="ot-command-delete ot-command"-->
+<!--                      title="Delete this filter"-->
+<!--                      ng-if="vsf._delete"-->
+<!--                      ng-click="deleteBranchValidationStampFilter(vsf)"></span>-->
+            </a>
+        </li>
+        <li ng-if="!loadingFilters && validationStampFilters.length == 0" role="presentation"
+            class="dropdown-header">No validation stamp filter is available
+        </li>
         <!-- Validation stamps preferences -->
         <li class="divider"></li>
         <li>
