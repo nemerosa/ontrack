@@ -522,12 +522,11 @@ angular.module('ot.view.branch', [
          * @returns {boolean|boolean|*} `true` if the validation must be displayed.
          */
         $scope.validationStampFilterFn = function (validationStamp) {
-            // TODO Filter implementation
-            // if ($scope.validationStampFilter) {
-            //     return $scope.validationStampFilterEdition || $scope.validationStampFilter.vsNames.indexOf(validationStamp.name) >= 0;
-            // } else {
+            if ($scope.validationStampFilter) {
+                return $scope.validationStampFilterEdition || $scope.validationStampFilter.vsNames.indexOf(validationStamp.name) >= 0;
+            } else {
                return !$rootScope.user.preferences.branchViewVsGroups;
-            // }
+            }
         };
 
         $scope.validationStampRunViewFilter = function (validation) {
