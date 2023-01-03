@@ -19,12 +19,14 @@ angular.module('ot.directive.validationStampFilter', [
                         $branchId: Int!,
                     ) {
                         branches(id: $branchId) {
+                            project {
+                                name
+                            }
                             validationStampFilters(all: true) {
                                 id
                                 name
                                 vsNames
-                                project { id } 
-                                branch { id }
+                                scope
                             }
                         }
                     }
@@ -43,7 +45,8 @@ angular.module('ot.directive.validationStampFilter', [
                     otGraphqlService.pageGraphQLCall(gqlValidationStampFilters, {
                         branchId: $scope.branchId
                     }).then(data => {
-                        $scope.validationStampFilters = data.branches[0].validationStampFilters;
+                        $scope.branch = data.branches[0];
+                        $scope.validationStampFilters = $scope.branch.validationStampFilters;
                         loadCurrentFilter();
                     }).finally(() => {
                         $scope.loadingFilters = false;

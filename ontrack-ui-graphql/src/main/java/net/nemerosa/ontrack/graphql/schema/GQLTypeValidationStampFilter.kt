@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
-import net.nemerosa.ontrack.graphql.support.field
+import net.nemerosa.ontrack.graphql.support.enumField
 import net.nemerosa.ontrack.graphql.support.idField
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.stringField
@@ -26,7 +26,6 @@ class GQLTypeValidationStampFilter : GQLType {
                         .description(getPropertyDescription(ValidationStampFilter::vsNames))
                         .type(listType(GraphQLString))
             }
-            .field(ValidationStampFilter::project, GQLTypeProject.PROJECT)
-            .field(ValidationStampFilter::branch, GQLTypeBranch.BRANCH)
+            .enumField(ValidationStampFilter::scope)
             .build()
 }

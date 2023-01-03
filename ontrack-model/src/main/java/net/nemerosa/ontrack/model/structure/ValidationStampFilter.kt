@@ -65,6 +65,7 @@ class ValidationStampFilter(
         )
     }
 
+    @APIDescription("Scope of the filter")
     val scope: ValidationStampFilterScope
         get() = when {
             branch != null -> ValidationStampFilterScope.BRANCH
