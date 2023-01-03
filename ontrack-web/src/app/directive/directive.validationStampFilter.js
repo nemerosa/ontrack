@@ -33,6 +33,8 @@ angular.module('ot.directive.validationStampFilter', [
                                 scope
                                 links {
                                     _delete
+                                    _shareAtProject
+                                    _shareAtGlobal
                                 }
                             }
                         }
@@ -117,6 +119,16 @@ angular.module('ot.directive.validationStampFilter', [
                                 // Enter in edition mode immediately
                                 // TODO $scope.validationStampFilterEdition = true;
                             });
+                    }
+                };
+
+                $scope.shareValidationStampFilterAtProject = validationStampFilter => {
+                    if (validationStampFilter.links._shareAtProject) {
+                        // TODO $scope.validationStampFilterEdition = false;
+                        ot.pageCall($http.put(validationStampFilter.links._shareAtProject, {})).then(vsf => {
+                            loadFilters();
+                            $scope.selectBranchValidationStampFilter(vsf);
+                        });
                     }
                 };
 
