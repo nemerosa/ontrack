@@ -1,9 +1,10 @@
 angular.module('ot.directive.validationStampFilter', [
     'ot.service.core',
+    'ot.service.form',
     'ot.service.graphql',
     'ot.service.user'
 ])
-    .directive('otValidationStampFilter', function ($location, $rootScope, ot, otGraphqlService, otUserService) {
+    .directive('otValidationStampFilter', function ($location, $rootScope, ot, otFormService, otGraphqlService, otUserService) {
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.validationStampFilter.tpl.html',
@@ -21,6 +22,9 @@ angular.module('ot.directive.validationStampFilter', [
                         branches(id: $branchId) {
                             project {
                                 name
+                            }
+                            links {
+                                _validationStampFilterCreate
                             }
                             validationStampFilters(all: true) {
                                 id
@@ -97,6 +101,20 @@ angular.module('ot.directive.validationStampFilter', [
                     $location.search(search);
                     // Setting the VS filter
                     reload();
+                };
+
+                // Creating a new filter
+                $scope.newBranchValidationStampFilter = () => {
+                    if ($scope.branch.links._validationStampFilterCreate) {
+                        // TODO $scope.validationStampFilterEdition = false;
+                        otFormService.create($scope.branch.links._validationStampFilterCreate, "Validation stamp filter")
+                            .then(filter => {
+                                loadFilters();
+                                $scope.selectBranchValidationStampFilter(filter);
+                                // Enter in edition mode immediately
+                                // TODO $scope.validationStampFilterEdition = true;
+                            });
+                    }
                 };
 
                 // Clears the selection
