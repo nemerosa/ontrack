@@ -44,6 +44,7 @@ angular.module('ot.directive.validationStampFilter', [
                         branchId: $scope.branchId
                     }).then(data => {
                         $scope.validationStampFilters = data.branches[0].validationStampFilters;
+                        loadCurrentFilter();
                     }).finally(() => {
                         $scope.loadingFilters = false;
                     });
@@ -58,10 +59,25 @@ angular.module('ot.directive.validationStampFilter', [
                 $scope.$watch('branchId', (value) => {
                     if (value) {
                         loadFilters();
-                        // Current selected filter
-                        // TODO loadCurrentFilter();
                     }
                 });
+
+                // Loading the initial validation stamp filter
+                const loadCurrentFilter = () => {
+                    // Gets the validation stamp filter in the URL
+                    const search = $location.search();
+                    const vsFilterName = search.vsFilter || localStorage.getItem(`validationStampFilter_${$scope.branchId}`);
+                    if (vsFilterName) {
+                        // Gets the filter with same name
+                        const existingFilter = $scope.validationStampFilters.find(vsf => {
+                            //noinspection EqualityComparisonWithCoercionJS
+                            return vsf.name === vsFilterName;
+                        });
+                        if (existingFilter) {
+                            $scope.selectBranchValidationStampFilter(existingFilter);
+                        }
+                    }
+                };
 
                 // Selection of a filter
                 $scope.selectBranchValidationStampFilter = validationStampFilter => {
