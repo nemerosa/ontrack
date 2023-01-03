@@ -406,6 +406,25 @@ angular.module('ot.view.branch', [
             });
         };
 
+        /**
+         * Displaying a list of validation runs grouped by status
+         */
+        $scope.displayValidationRunsGroup = (build, group) => {
+            $modal.open({
+                templateUrl: 'app/dialog/dialog.validationStampRunGroup.tpl.html',
+                controller: 'otDialogValidationStampRunGroup',
+                resolve: {
+                    config: () => ({
+                        build: build,
+                        group: group,
+                        callbackOnRunOpen: (validationStamp) => {
+                            $scope.displayValidationRuns(build, validationStamp);
+                        }
+                    })
+                }
+            });
+        };
+
         // =================================================
         // Management of selected builds
         // =================================================
