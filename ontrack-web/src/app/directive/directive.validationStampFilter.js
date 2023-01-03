@@ -32,6 +32,7 @@ angular.module('ot.directive.validationStampFilter', [
                                 vsNames
                                 scope
                                 links {
+                                    _update
                                     _delete
                                     _shareAtProject
                                     _shareAtGlobal
@@ -136,6 +137,16 @@ angular.module('ot.directive.validationStampFilter', [
                     if (validationStampFilter.links._shareAtGlobal) {
                         // TODO $scope.validationStampFilterEdition = false;
                         ot.pageCall($http.put(validationStampFilter.links._shareAtGlobal, {})).then(vsf => {
+                            loadFilters();
+                            $scope.selectBranchValidationStampFilter(vsf);
+                        });
+                    }
+                };
+
+                $scope.editBranchValidationStampFilter = validationStampFilter => {
+                    if (validationStampFilter.links._update) {
+                        $scope.validationStampFilterEdition = false;
+                        otFormService.update(validationStampFilter.links._update, "Validation stamp filter").then(vsf => {
                             loadFilters();
                             $scope.selectBranchValidationStampFilter(vsf);
                         });
