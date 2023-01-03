@@ -34,6 +34,10 @@ angular.module('ot.view.branch', [
             query LoadBranch(
                 $branchId: Int!,
             ) {
+                validationRunStatusIDList {
+                    id
+                    name
+                }
                 branches(id: $branchId) {
                     id
                     name
@@ -178,6 +182,7 @@ angular.module('ot.view.branch', [
             otGraphqlService.pageGraphQLCall(gqlBranch, {branchId})
                 .then(data => {
                     $scope.branch = data.branches[0];
+                    $scope.validationRunStatusIDList = data.validationRunStatusIDList;
                     $scope.validationStamps = $scope.branch.validationStamps;
                     if (!viewInitialized) {
                         view.breadcrumbs = ot.projectBreadcrumbs($scope.branch.project);
@@ -240,6 +245,45 @@ angular.module('ot.view.branch', [
         };
 
         /**
+         * Enriches the builds with their validation stamp group information
+         */
+        const computeGroupedValidations = (builds, validationRunStatusIDList) => {
+            builds.forEach(build => {
+                const statuses = {};
+                build.validations.forEach(validation => {
+                    if (validation.validationRuns.length > 0) {
+                        const statusID = validation.validationRuns[0].validationRunStatuses[0].statusID;
+                        const group = statuses[statusID.id];
+                        if (!group) {
+                            statuses[statusID.id] = {
+                                count: 1,
+                                validations: [
+                                    validation
+                                ]
+                            };
+                        } else {
+                            group.count = group.count + 1;
+                            group.validations.push(validation);
+                        }
+                    }
+                });
+                // Sorting
+                build.groupedValidations = [];
+                validationRunStatusIDList.forEach(statusID => {
+                    const group = statuses[statusID.id];
+                    if (group) {
+                        build.groupedValidations.push({
+                            statusID: statusID,
+                            description: `Validations with status ${statusID.name}`,
+                            count: group.count,
+                            validations: group.validations
+                        });
+                    }
+                });
+            });
+        };
+
+        /**
          * Loading the list of builds
          * @param reset True if the list of builds must be reset
          */
@@ -258,10 +302,16 @@ angular.module('ot.view.branch', [
                     const dataBranch = data.branches[0];
                     const dataBuilds = dataBranch.buildsPaginated;
                     $scope.buildsPageInfo = dataBuilds.pageInfo;
+                    let builds = dataBuilds.pageItems;
+                    // Groups of validation stamps per status
+                    if ($rootScope.user.preferences.branchViewVsGroups) {
+                        computeGroupedValidations(builds, $scope.validationRunStatusIDList);
+                    }
+                    // Completing or resetting the list of builds
                     if (reset) {
-                        $scope.builds = dataBuilds.pageItems;
+                        $scope.builds = builds;
                     } else {
-                        $scope.builds.push(...dataBuilds.pageItems);
+                        $scope.builds.push(...builds);
                     }
                 })
                 .finally(() => {
@@ -445,12 +495,11 @@ angular.module('ot.view.branch', [
          * @returns {boolean|boolean|*} `true` if the validation must be displayed.
          */
         $scope.validationStampFilterFn = function (validationStamp) {
-            return true;
             // TODO Filter implementation
             // if ($scope.validationStampFilter) {
             //     return $scope.validationStampFilterEdition || $scope.validationStampFilter.vsNames.indexOf(validationStamp.name) >= 0;
             // } else {
-            //     return !$rootScope.user.preferences.branchViewVsGroups;
+               return !$rootScope.user.preferences.branchViewVsGroups;
             // }
         };
 

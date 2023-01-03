@@ -95,6 +95,8 @@
 <!--                    </span>-->
                 </div>
             </th>
+            <!-- Empty cell in case of groups -->
+            <th ng-if="user.preferences.branchViewVsGroups">&nbsp&nbsp;</th>
         </tr>
         </thead>
         <tbody>
@@ -150,6 +152,24 @@
                         <ot-validation-run-status status="validation.validationRuns[0].validationRunStatuses[0]"></ot-validation-run-status>
                     </span>
                 </span>
+            </td>
+            <!-- Groups of validation stamps per status -->
+            <td ng-if="user.preferences.branchViewVsGroups && !validationStampFilterEdition" class="ot-branch-build-view-validation-groups">
+                <div class="ot-branch-build-view-validation-group" ng-repeat="group in build.groupedValidations">
+                    <span ng-if="group.count == 1">
+                        <span class="ot-action" ng-click="displayValidationRuns(build, group.validations[0].validationStamp)">
+                            <ot-validation-run-status status="group"></ot-validation-run-status>
+                        </span>
+                        <ot-entity-image entity="group.validations[0].validationStamp" link="#/validationStamp/{{group.validations[0].validationStamp.id}}">{{ group.validations[0].validationStamp.name }}</ot-entity-image>
+                        {{ group.statusID.name }}
+                    </span>
+                    <span ng-if="group.count > 1">
+                        <span class="ot-action" ng-click="displayValidationRunsGroup(build, group)">
+                            <ot-validation-run-status status="group"></ot-validation-run-status>
+                        </span>
+                        {{ group.count }} {{ group.statusID.name }}
+                    </span>
+                </div>
             </td>
         </tr>
         <tr ng-if="buildsPageInfo.nextPage">
