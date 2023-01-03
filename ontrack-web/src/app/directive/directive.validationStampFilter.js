@@ -18,6 +18,7 @@ angular.module('ot.directive.validationStampFilter', [
 
                 // Initial preferences
                 $scope.branchViewVsNames = $rootScope.user.preferences.branchViewVsNames;
+                $scope.branchViewVsGroups = $rootScope.user.preferences.branchViewVsGroups;
 
                 // Loading the filters
                 const loadFilters = () => {
@@ -38,6 +39,15 @@ angular.module('ot.directive.validationStampFilter', [
                     $scope.branchViewVsNames = !$scope.branchViewVsNames;
                     otUserService.setPreferences({
                         branchViewVsNames: $scope.branchViewVsNames
+                    });
+                    $scope.reload()($scope.validationStampFilter);
+                };
+
+                // Toggles the preferences for the grouping per status
+                $scope.toggleBranchViewVsGroups = () => {
+                    $scope.branchViewVsGroups = !$scope.branchViewVsGroups;
+                    otUserService.setPreferences({
+                        branchViewVsGroups: $scope.branchViewVsGroups
                     });
                     $scope.reload()($scope.validationStampFilter);
                 };
