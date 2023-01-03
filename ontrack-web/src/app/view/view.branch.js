@@ -398,6 +398,40 @@ angular.module('ot.view.branch', [
         // =================================================
 
         /**
+         * Reloading the view for the validation stamp filters
+         */
+        $scope.reloadForValidationStampFilter = () => (filter) => {
+            // TODO Checks the filter
+            // Reloading
+            loadBuilds(true);
+        };
+
+        /**
+         * Computes the height of the row for the validation stamps
+         */
+        $scope.validationStampFilterNameMaxHeight = () => {
+            if ($rootScope.user.preferences.branchViewVsNames && $scope.validationStamps) {
+                const nameLengths = $scope.validationStamps.map(vs => $scope.validationStampFilterNameElapsed(vs.name).length);
+                const maxLength = Math.max(...nameLengths);
+                return `${Math.floor(maxLength / 1.4142)}em`;
+            } else {
+                return "36px";
+            }
+        };
+
+        /**
+         * Gets the length of a validation stamp name
+         */
+        $scope.validationStampFilterNameElapsed = (name) => {
+            const maxLength = 20;
+            if (name.length <= maxLength) {
+                return name;
+            } else {
+                return name.substring(0, maxLength) + '…';
+            }
+        };
+
+        /**
          * Checks if a given validation stamp must be displayed or not.
          *
          * A validation stamp is displayed if:

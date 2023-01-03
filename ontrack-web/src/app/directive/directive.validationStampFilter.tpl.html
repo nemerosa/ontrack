@@ -9,4 +9,16 @@
         <span class="fa fa-filter"></span>
         <span class="caret"></span>
     </button>
+    <ul class="dropdown-menu ot-validationstampfilter-list" role="menu">
+        <!-- Validation stamps preferences -->
+        <li class="divider"></li>
+        <li>
+            <a>
+                <!-- Selected? -->
+                <span class="fa fa-check" ng-show="branchViewVsNames"></span>
+                <!-- Name -->
+                <span ng-click="toggleBranchViewVsNames()">Display validation stamp names</span>
+            </a>
+        </li>
+    </ul>
 </div>

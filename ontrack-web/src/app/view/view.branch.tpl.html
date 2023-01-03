@@ -41,7 +41,7 @@
                     <span class="fa fa-refresh"></span>
                 </button>
                 <!-- Validation stamp filter -->
-                <ot-validation-stamp-filter branch-id="branch.id" set-filter="setValidationStampFilter()"></ot-validation-stamp-filter>
+                <ot-validation-stamp-filter branch-id="branch.id" reload="reloadForValidationStampFilter()"></ot-validation-stamp-filter>
                 <!-- Loading indicator for the builds -->
                 <button ng-show="loadingBuilds" class="btn btn-default" disabled="disabled">
                     <span class="ot-loading-indicator"></span>
@@ -51,15 +51,16 @@
             <!-- Validation stamps -->
             <th ng-repeat="validationStamp in validationStamps | filter:validationStampFilterFn"
                 class="ot-branch-build-view-validation"
-                >
-<!--                TODO VS names -->
-<!--                ng-style="{-->
-<!--                    height: validationStampFilterNameMaxHeight()-->
-<!--                }"-->
-<!--                TODO VS names & VS filter -->
+                ng-style="{
+                    height: validationStampFilterNameMaxHeight()
+                }"
+                ng-class="{
+                    'ot-branch-build-view-validation-name-rotated': user.preferences.branchViewVsNames
+                }"
+            >
+<!--                TODO VS filter -->
 <!--                ng-class="{-->
 <!--                    'ot-validation-stamp-filter-edition': validationStampFilter && validationStampFilter._update && validationStampFilterEdition,-->
-<!--                    'ot-branch-build-view-validation-name-rotated': user.preferences.branchViewVsNames-->
 <!--                }"-->
                 <div>
                     <!-- TODO VS filter edition ON -->
