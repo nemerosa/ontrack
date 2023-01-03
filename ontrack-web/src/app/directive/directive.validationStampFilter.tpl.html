@@ -61,6 +61,14 @@
         <li ng-if="!loadingFilters && validationStampFilters.length == 0" role="presentation"
             class="dropdown-header">No validation stamp filter is available
         </li>
+        <!-- Reset filters -->
+        <li class="divider" ng-if="validationStampFilter"></li>
+        <li ng-if="validationStampFilter">
+            <a ng-click="clearBranchValidationStampFilter()">
+                <span class="fa fa-eraser"></span>
+                Clear validation stamp filter
+            </a>
+        </li>
         <!-- Validation stamps preferences -->
         <li class="divider"></li>
         <li>

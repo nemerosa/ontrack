@@ -41,7 +41,10 @@
                     <span class="fa fa-refresh"></span>
                 </button>
                 <!-- Validation stamp filter -->
-                <ot-validation-stamp-filter branch-id="branch.id" reload="reloadForValidationStampFilter()"></ot-validation-stamp-filter>
+                <ot-validation-stamp-filter
+                        branch-id="branch.id"
+                        reload="reloadForValidationStampFilter()"
+                ></ot-validation-stamp-filter>
                 <!-- Loading indicator for the builds -->
                 <button ng-show="loadingBuilds" class="btn btn-default" disabled="disabled">
                     <span class="ot-loading-indicator"></span>

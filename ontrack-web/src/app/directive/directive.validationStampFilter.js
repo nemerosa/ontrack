@@ -3,7 +3,7 @@ angular.module('ot.directive.validationStampFilter', [
     'ot.service.graphql',
     'ot.service.user'
 ])
-    .directive('otValidationStampFilter', function ($rootScope, ot, otGraphqlService, otUserService) {
+    .directive('otValidationStampFilter', function ($location, $rootScope, ot, otGraphqlService, otUserService) {
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.validationStampFilter.tpl.html',
@@ -49,6 +49,11 @@ angular.module('ot.directive.validationStampFilter', [
                     });
                 };
 
+                // Calling back the branch page
+                const reload = () => {
+                    $scope.reload()($scope.validationStampFilter);
+                };
+
                 // Loading the filters when branch ID is ready
                 $scope.$watch('branchId', (value) => {
                     if (value) {
@@ -58,13 +63,36 @@ angular.module('ot.directive.validationStampFilter', [
                     }
                 });
 
+                // Selection of a filter
+                $scope.selectBranchValidationStampFilter = validationStampFilter => {
+                    $scope.validationStampFilter = validationStampFilter;
+                    // Permalink
+                    const search = $location.search();
+                    if (validationStampFilter) {
+                        search.vsFilter = validationStampFilter.name;
+                        localStorage.setItem(`validationStampFilter_${$scope.branchId}`, validationStampFilter.name);
+                    } else {
+                        delete search.vsFilter;
+                        localStorage.removeItem(`validationStampFilter_${$scope.branchId}`);
+                    }
+                    $location.search(search);
+                    // Setting the VS filter
+                    reload();
+                };
+
+                // Clears the selection
+                $scope.clearBranchValidationStampFilter = () => {
+                    // TODO $scope.validationStampFilterEdition = false;
+                    $scope.selectBranchValidationStampFilter(undefined);
+                };
+
                 // Toggles the preferences for the VS names
                 $scope.toggleBranchViewVsNames = () => {
                     $scope.branchViewVsNames = !$scope.branchViewVsNames;
                     otUserService.setPreferences({
                         branchViewVsNames: $scope.branchViewVsNames
                     });
-                    $scope.reload()($scope.validationStampFilter);
+                    reload();
                 };
 
                 // Toggles the preferences for the grouping per status
@@ -73,7 +101,7 @@ angular.module('ot.directive.validationStampFilter', [
                     otUserService.setPreferences({
                         branchViewVsGroups: $scope.branchViewVsGroups
                     });
-                    $scope.reload()($scope.validationStampFilter);
+                    reload();
                 };
 
             }

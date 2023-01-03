@@ -467,12 +467,20 @@ angular.module('ot.view.branch', [
         // =================================================
 
         /**
+         * Current selected filter
+         */
+        $scope.validationStampFilter = undefined;
+
+        /**
          * Reloading the view for the validation stamp filters
          */
         $scope.reloadForValidationStampFilter = () => (filter) => {
-            // TODO Checks the filter
-            // Reloading
-            loadBuilds(true);
+            // Checks the filter
+            if (!angular.equals($scope.validationStampFilter, filter)) {
+                $scope.validationStampFilter = filter;
+                // Reloading
+                loadBuilds(true);
+            }
         };
 
         /**
