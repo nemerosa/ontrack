@@ -132,6 +132,16 @@ angular.module('ot.directive.validationStampFilter', [
                     }
                 };
 
+                $scope.shareValidationStampFilterAtGlobal = validationStampFilter => {
+                    if (validationStampFilter.links._shareAtGlobal) {
+                        // TODO $scope.validationStampFilterEdition = false;
+                        ot.pageCall($http.put(validationStampFilter.links._shareAtGlobal, {})).then(vsf => {
+                            loadFilters();
+                            $scope.selectBranchValidationStampFilter(vsf);
+                        });
+                    }
+                };
+
                 // Deleting an existing filter
                 $scope.deleteBranchValidationStampFilter = validationStampFilter => {
                     if (validationStampFilter.links._delete) {
@@ -140,7 +150,7 @@ angular.module('ot.directive.validationStampFilter', [
                             title: "Validation stamp filter deletion",
                             message: `Do you really want to delete the ${validationStampFilter.name} validation stamp filter?`
                         }).then(() => {
-                            ot.pageCall($http.delete(validationStampFilter.links._delete)).then(function () {
+                            ot.pageCall($http.delete(validationStampFilter.links._delete)).then(() => {
                                 loadFilters();
                                 $scope.selectBranchValidationStampFilter(undefined);
                             });
