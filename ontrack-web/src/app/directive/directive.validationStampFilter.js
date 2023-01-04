@@ -157,14 +157,16 @@ angular.module('ot.directive.validationStampFilter', [
                 $scope.directEditValidationStampFilter = validationStampFilter => {
                     if (validationStampFilter.links._update) {
                         // TODO Makes sure to select the filter without reloading the builds
-                        $scope.validationStampFilterEdition.enabled = true;
                         $scope.validationStampFilterEdition.vsNames = $scope.validationStampFilter.vsNames;
+                        $scope.validationStampFilterEdition.enabled = true;
+                        $scope.validationStampFilterEdition.changing = false;
                     }
                 };
 
                 $scope.stopDirectEditValidationStampFilter = validationStampFilter => {
                     // TODO Makes sure to select the filter without reloading the builds
                     $scope.validationStampFilterEdition.enabled = false;
+                    $scope.validationStampFilterEdition.changing = false;
                 };
 
                 // Deleting an existing filter
@@ -212,6 +214,7 @@ angular.module('ot.directive.validationStampFilter', [
                     console.log("Changed validationStampFilterEdition.vsNames...");
                     if ($scope.validationStampFilterEdition.enabled &&
                         $scope.validationStampFilter &&
+                        $scope.validationStampFilterEdition.changing &&
                         $scope.validationStampFilter.links._update
                     ) {
                         console.log("Pushing validationStampFilterEdition.vsNames...");
@@ -219,6 +222,7 @@ angular.module('ot.directive.validationStampFilter', [
                             name: $scope.validationStampFilter.name,
                             vsNames: $scope.validationStampFilterEdition.vsNames
                         })).finally(() => {
+                            $scope.validationStampFilterEdition.changing = false;
                             $scope.validationStampFilter.vsNames = $scope.validationStampFilterEdition.vsNames;
                         });
                     }

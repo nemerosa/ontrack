@@ -472,6 +472,7 @@ angular.module('ot.view.branch', [
         $scope.validationStampFilter = undefined;
         $scope.validationStampFilterEdition = {
             enabled: false,
+            changing: false,
             vsNames: []
         };
 
@@ -561,6 +562,7 @@ angular.module('ot.view.branch', [
         $scope.toggleValidationStampFromFilter = (name) => {
             if ($scope.validationStampFilterEdition.enabled && $scope.validationStampFilter && $scope.validationStampFilter.links._update) {
                 const index = $scope.validationStampFilterEdition.vsNames.indexOf(name);
+                $scope.validationStampFilterEdition.changing = true;
                 if (index >= 0) {
                     $scope.validationStampFilterEdition.vsNames.splice(index, 1);
                 } else {
