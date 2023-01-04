@@ -20,7 +20,7 @@
         <thead>
         <tr ng-if="validationStampFilterEdition.enabled">
             <th colspan="3">&nbsp;</th>
-            <th colspan="0">
+            <th colspan="{{validationStampFilterCount(0)}}">
                 <!-- TODO Filter: edition - select all-->
                 <button class="btn btn-default ot-validation-stamp-filter-edition"
                         ng-click="selectAllValidationStampFilter(validationStampFilter)"

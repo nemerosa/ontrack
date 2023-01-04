@@ -513,6 +513,18 @@ angular.module('ot.view.branch', [
             }
         };
 
+        $scope.validationStampFilterCount = plus => {
+            let placeForGroups = 0;
+            if ($rootScope.user.preferences.branchViewVsGroups) {
+                placeForGroups = 1;
+            }
+            if ($scope.validationStamps) {
+                return placeForGroups + plus + $scope.validationStamps.filter($scope.validationStampFilterFn).length;
+            } else {
+                return placeForGroups + plus;
+            }
+        };
+
         /**
          * Checks if a given validation stamp must be displayed or not.
          *
