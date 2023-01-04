@@ -207,6 +207,23 @@ angular.module('ot.directive.validationStampFilter', [
                     reload();
                 };
 
+                // Updating the filter upon changes
+                $scope.$watch('validationStampFilterEdition.vsNames', () => {
+                    console.log("Changed validationStampFilterEdition.vsNames...");
+                    if ($scope.validationStampFilterEdition.enabled &&
+                        $scope.validationStampFilter &&
+                        $scope.validationStampFilter.links._update
+                    ) {
+                        console.log("Pushing validationStampFilterEdition.vsNames...");
+                        ot.pageCall($http.put($scope.validationStampFilter.links._update, {
+                            name: $scope.validationStampFilter.name,
+                            vsNames: $scope.validationStampFilterEdition.vsNames
+                        })).finally(() => {
+                            $scope.validationStampFilter.vsNames = $scope.validationStampFilterEdition.vsNames;
+                        });
+                    }
+                }, true);
+
             }
         };
     })
