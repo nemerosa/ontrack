@@ -10,7 +10,8 @@ angular.module('ot.directive.validationStampFilter', [
             templateUrl: 'app/directive/directive.validationStampFilter.tpl.html',
             scope: {
                 branchId: '=',
-                reload: '&'
+                reload: '&',
+                validationStampFilterEdition: '='
             },
             controller: ($scope) => {
 
@@ -145,7 +146,7 @@ angular.module('ot.directive.validationStampFilter', [
 
                 $scope.editBranchValidationStampFilter = validationStampFilter => {
                     if (validationStampFilter.links._update) {
-                        $scope.validationStampFilterEdition = false;
+                        // TODO $scope.validationStampFilterEdition = false;
                         otFormService.update(validationStampFilter.links._update, "Validation stamp filter").then(vsf => {
                             loadFilters();
                             $scope.selectBranchValidationStampFilter(vsf);
@@ -153,10 +154,23 @@ angular.module('ot.directive.validationStampFilter', [
                     }
                 };
 
+                $scope.directEditValidationStampFilter = validationStampFilter => {
+                    if (validationStampFilter.links._update) {
+                        // TODO Makes sure to select the filter without reloading the builds
+                        $scope.validationStampFilterEdition.enabled = true;
+                        $scope.validationStampFilterEdition.vsNames = $scope.validationStampFilter.vsNames;
+                    }
+                };
+
+                $scope.stopDirectEditValidationStampFilter = validationStampFilter => {
+                    // TODO Makes sure to select the filter without reloading the builds
+                    $scope.validationStampFilterEdition.enabled = false;
+                };
+
                 // Deleting an existing filter
                 $scope.deleteBranchValidationStampFilter = validationStampFilter => {
                     if (validationStampFilter.links._delete) {
-                        $scope.validationStampFilterEdition = false;
+                        // TODO $scope.validationStampFilterEdition = false;
                         otAlertService.confirm({
                             title: "Validation stamp filter deletion",
                             message: `Do you really want to delete the ${validationStampFilter.name} validation stamp filter?`

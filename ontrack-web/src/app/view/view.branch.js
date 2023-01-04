@@ -470,6 +470,10 @@ angular.module('ot.view.branch', [
          * Current selected filter
          */
         $scope.validationStampFilter = undefined;
+        $scope.validationStampFilterEdition = {
+            enabled: false,
+            vsNames: []
+        };
 
         /**
          * Reloading the view for the validation stamp filters
@@ -532,6 +536,22 @@ angular.module('ot.view.branch', [
 
         $scope.validationStampRunViewFilter = function (validation) {
             return $scope.validationStampFilterFn(validation.validationStamp);
+        };
+
+        $scope.toggleValidationStampFromFilter = (name) => {
+            // TODO
+        };
+
+        $scope.removeValidationStampFromFilter = (validationStampFilter, name) => {
+            // TODO
+        };
+
+        $scope.addValidationStampFromFilter = (validationStampFilter, name) => {
+            // TODO
+        };
+
+        $scope.stopDirectEditValidationStampFilter = () => {
+            $scope.validationStampFilterEdition.enabled = false;
         };
     })
 ;

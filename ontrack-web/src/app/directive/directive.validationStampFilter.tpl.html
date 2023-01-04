@@ -15,6 +15,10 @@
         </span>
     </button>
     <ul class="dropdown-menu ot-validationstampfilter-list" role="menu">
+        <!-- TODO Edition debug -->
+        <li>
+            validationStampFilterEdition = {{ validationStampFilterEdition }}
+        </li>
         <!-- List of filters -->
         <li ng-repeat="vsf in validationStampFilters">
             <a>
@@ -36,16 +40,16 @@
                       title="Share this filter at global level"
                       ng-if="vsf.links._shareAtGlobal"
                       ng-click="shareValidationStampFilterAtGlobal(vsf)"></span>
-                <!-- TODO Edition mode: ON -->
-<!--                <span class="ot-command fa fa-eye"-->
-<!--                      title="Edit this filter using the current view"-->
-<!--                      ng-if="vsf._update && !validationStampFilterEdition"-->
-<!--                      ng-click="directEditValidationStampFilter(vsf)"></span>-->
-                <!-- TODO Edition mode: OFF -->
-<!--                <span class="ot-command fa fa-eye-slash"-->
-<!--                      title="Stop editing this filter using the current view"-->
-<!--                      ng-if="vsf._update && validationStampFilterEdition && validationStampFilter.id == vsf.id"-->
-<!--                      ng-click="stopDirectEditValidationStampFilter(vsf)"></span>-->
+                <!-- Edition mode: ON -->
+                <span class="ot-command fa fa-eye"
+                      title="Edit this filter using the current view"
+                      ng-if="vsf.links._update && !validationStampFilterEdition.enabled"
+                      ng-click="directEditValidationStampFilter(vsf)"></span>
+                <!-- Edition mode: OFF -->
+                <span class="ot-command fa fa-eye-slash"
+                      title="Stop editing this filter using the current view"
+                      ng-if="vsf.links._update && validationStampFilterEdition.enabled && validationStampFilter.id == vsf.id"
+                      ng-click="stopDirectEditValidationStampFilter(vsf)"></span>
                 <!-- Editing -->
                 <span class="ot-command-update ot-command"
                       title="Edit this filter"
