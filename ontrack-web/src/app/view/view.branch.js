@@ -550,6 +550,14 @@ angular.module('ot.view.branch', [
             return $scope.validationStampFilterFn(validation.validationStamp);
         };
 
+        $scope.selectAllValidationStampFilter = () => {
+            // TODO
+        };
+
+        $scope.selectNoneValidationStampFilter = () => {
+            // TODO
+        };
+
         $scope.toggleValidationStampFromFilter = (name) => {
             // TODO
         };

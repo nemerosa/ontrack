@@ -21,17 +21,17 @@
         <tr ng-if="validationStampFilterEdition.enabled">
             <th colspan="3">&nbsp;</th>
             <th colspan="{{validationStampFilterCount(0)}}">
-                <!-- TODO Filter: edition - select all-->
+                <!-- Filter: edition - select all-->
                 <button class="btn btn-default ot-validation-stamp-filter-edition"
-                        ng-click="selectAllValidationStampFilter(validationStampFilter)"
+                        ng-click="selectAllValidationStampFilter()"
                         title="Add all validation stamps to the {{validationStampFilter.name}} filter"
                         ng-show="validationStampFilter">
                     <span class="fa fa-check-square-o"></span>
                     Select all for <b>{{validationStampFilter.name}}</b>
                 </button>
-                <!-- TODO Filter: edition - select none -->
+                <!-- Filter: edition - select none -->
                 <button class="btn btn-default ot-validation-stamp-filter-edition"
-                        ng-click="selectNoneValidationStampFilter(validationStampFilter)"
+                        ng-click="selectNoneValidationStampFilter()"
                         title="Remove all validation stamps from the {{validationStampFilter.name}} filter"
                         ng-show="validationStampFilter">
                     <span class="fa fa-square-o"></span>
