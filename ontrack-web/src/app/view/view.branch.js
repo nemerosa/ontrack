@@ -540,7 +540,7 @@ angular.module('ot.view.branch', [
          */
         $scope.validationStampFilterFn = function (validationStamp) {
             if ($scope.validationStampFilter) {
-                return $scope.validationStampFilterEdition || $scope.validationStampFilter.vsNames.indexOf(validationStamp.name) >= 0;
+                return $scope.validationStampFilterEdition.enabled || $scope.validationStampFilter.vsNames.indexOf(validationStamp.name) >= 0;
             } else {
                return !$rootScope.user.preferences.branchViewVsGroups;
             }
@@ -554,11 +554,11 @@ angular.module('ot.view.branch', [
             // TODO
         };
 
-        $scope.removeValidationStampFromFilter = (validationStampFilter, name) => {
+        $scope.removeValidationStampFromFilter = (name) => {
             // TODO
         };
 
-        $scope.addValidationStampFromFilter = (validationStampFilter, name) => {
+        $scope.addValidationStampFromFilter = (name) => {
             // TODO
         };
 
