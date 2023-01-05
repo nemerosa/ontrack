@@ -741,6 +741,11 @@ class StructureServiceImpl(
         return structureRepository.getLastPromotionRunsForBuild(build)
     }
 
+    override fun getLastPromotionRunsForBuild(build: Build, promotionLevels: List<PromotionLevel>): List<PromotionRun> {
+        securityService.checkProjectFunction(build.branch.project.id(), ProjectView::class.java)
+        return structureRepository.getLastPromotionRunsForBuild(build, promotionLevels)
+    }
+
     override fun getLastPromotionRunForBuildAndPromotionLevel(build: Build, promotionLevel: PromotionLevel): Optional<PromotionRun> {
         securityService.checkProjectFunction(build, ProjectView::class.java)
         return structureRepository.getLastPromotionRun(build, promotionLevel)

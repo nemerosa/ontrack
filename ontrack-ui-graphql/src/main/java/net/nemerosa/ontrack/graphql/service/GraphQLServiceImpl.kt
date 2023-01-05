@@ -4,13 +4,19 @@ import graphql.ExecutionInput
 import graphql.ExecutionResult
 import graphql.GraphQL
 import graphql.execution.ExecutionStrategy
+import graphql.execution.instrumentation.ChainedInstrumentation
+import graphql.execution.instrumentation.Instrumentation
 import graphql.execution.instrumentation.dataloader.DataLoaderDispatcherInstrumentation
 import graphql.execution.instrumentation.dataloader.DataLoaderDispatcherInstrumentationOptions
+import graphql.execution.instrumentation.tracing.TracingInstrumentation
+import net.nemerosa.ontrack.graphql.OntrackGraphQLConfigProperties
 import net.nemerosa.ontrack.graphql.schema.GQLDataLoader
 import net.nemerosa.ontrack.graphql.schema.GraphqlSchemaService
 import net.nemerosa.ontrack.tx.TransactionService
 import org.dataloader.DataLoader
 import org.dataloader.DataLoaderRegistry
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,8 +31,11 @@ class GraphQLServiceImpl(
         @Qualifier("queryExecutionStrategy")
         private val mutationExecutionStrategy: ExecutionStrategy,
         private val gqlDataLoaders: List<GQLDataLoader<*, *>>,
-        private val transactionService: TransactionService
+        private val transactionService: TransactionService,
+        private val ontrackGraphQLConfigProperties: OntrackGraphQLConfigProperties,
 ) : GraphQLService {
+
+    private val logger: Logger = LoggerFactory.getLogger(GraphQLServiceImpl::class.java)
 
     private val dispatcherInstrumentation: DataLoaderDispatcherInstrumentation by lazy {
         DataLoaderDispatcherInstrumentation(
@@ -36,11 +45,24 @@ class GraphQLServiceImpl(
         )
     }
 
+    private val instrumentation: Instrumentation by lazy {
+        val instrumentations = mutableListOf<Instrumentation>()
+        instrumentations += dispatcherInstrumentation
+        if (ontrackGraphQLConfigProperties.instrumentation.tracing) {
+            logger.warn("GraphQL tracing instrumentation is enabled.")
+            instrumentations += TracingInstrumentation(
+                    TracingInstrumentation.Options.newOptions()
+                            .includeTrivialDataFetchers(false)
+            )
+        }
+        ChainedInstrumentation(instrumentations)
+    }
+
     private val graphQL: GraphQL by lazy {
         GraphQL.newGraphQL(graphqlSchemaService.schema)
                 .queryExecutionStrategy(queryExecutionStrategy)
                 .mutationExecutionStrategy(mutationExecutionStrategy)
-                .instrumentation(dispatcherInstrumentation)
+                .instrumentation(instrumentation)
                 .build()
     }
 

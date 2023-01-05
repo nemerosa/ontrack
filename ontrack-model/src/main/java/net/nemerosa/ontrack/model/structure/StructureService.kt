@@ -245,6 +245,12 @@ interface StructureService {
 
     fun getLastPromotionRunsForBuild(buildId: ID): List<PromotionRun>
 
+    /**
+     * Optimized version of getting the last promotion runs for a build, by passing preloaded (or cached)
+     * list of the promotion levels for the branch and the build itself.
+     */
+    fun getLastPromotionRunsForBuild(build: Build, promotionLevels: List<PromotionLevel>): List<PromotionRun>
+
     // TODO Replace by PromotionRun?
     fun getLastPromotionRunForBuildAndPromotionLevel(build: Build, promotionLevel: PromotionLevel): Optional<PromotionRun>
 

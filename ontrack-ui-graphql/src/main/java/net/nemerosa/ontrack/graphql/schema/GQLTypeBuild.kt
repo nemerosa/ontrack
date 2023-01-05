@@ -366,7 +366,10 @@ class GQLTypeBuild(
                 } else {
                     // Gets all the promotion runs
                     if (lastPerLevel) {
-                        return@DataFetcher structureService.getLastPromotionRunsForBuild(build.id)
+                        // TODO Use a dataloader to cache the promotion levels of the branch
+                        val promotionLevels = structureService.getPromotionLevelListForBranch(build.branch.id)
+                        // Use the build & cached promotion levels to get the promotion runs
+                        return@DataFetcher structureService.getLastPromotionRunsForBuild(build, promotionLevels)
                     } else {
                         return@DataFetcher structureService.getPromotionRunsForBuild(build.id)
                     }
