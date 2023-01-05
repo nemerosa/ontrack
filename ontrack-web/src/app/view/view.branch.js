@@ -556,7 +556,10 @@ angular.module('ot.view.branch', [
         };
 
         $scope.selectNoneValidationStampFilter = () => {
-            // TODO
+            if ($scope.validationStampFilterEdition.enabled && $scope.validationStampFilter && $scope.validationStampFilter.links._update) {
+                $scope.validationStampFilterEdition.vsNames.splice(0, $scope.validationStampFilterEdition.vsNames.length);
+                $scope.validationStampFilterEdition.changing = true;
+            }
         };
 
         $scope.toggleValidationStampFromFilter = (name) => {
