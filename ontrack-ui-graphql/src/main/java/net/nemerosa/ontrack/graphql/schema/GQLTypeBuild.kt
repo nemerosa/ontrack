@@ -338,7 +338,7 @@ class GQLTypeBuild(
             }
 
     private fun buildPromotionRunsFetcher() =
-            DataFetcher<List<PromotionRun>> { environment ->
+            DataFetcher<Any> { environment ->
                 val build: Build = environment.getSource()
                 // Last per promotion filter?
                 val lastPerLevel: Boolean = environment.getArgument(ARG_LAST_PER_LEVEL) ?: false
@@ -357,21 +357,25 @@ class GQLTypeBuild(
                 if (promotionLevel != null) {
                     // Gets promotion runs for this promotion level
                     if (lastPerLevel) {
-                        return@DataFetcher structureService.getLastPromotionRunForBuildAndPromotionLevel(build, promotionLevel)
+                        structureService.getLastPromotionRunForBuildAndPromotionLevel(build, promotionLevel)
                                 .map { listOf(it) }
                                 .orElse(listOf())
                     } else {
-                        return@DataFetcher structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel)
+                        structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel)
                     }
                 } else {
                     // Gets all the promotion runs
                     if (lastPerLevel) {
-                        // TODO Use a dataloader to cache the promotion levels of the branch
-                        val promotionLevels = structureService.getPromotionLevelListForBranch(build.branch.id)
+                        // Use a dataloader to cache the promotion levels of the branch
+                        val promotionLevelsDataLoader = environment.getDataLoader<ID, List<PromotionLevel>>(GQLDataLoaderBranchPromotionLevels.KEY)
+                        val promotionLevels = promotionLevelsDataLoader.load(build.branch.id)
                         // Use the build & cached promotion levels to get the promotion runs
-                        return@DataFetcher structureService.getLastPromotionRunsForBuild(build, promotionLevels)
+                        promotionLevels.thenApplyAsync { pls ->
+                            // FIXME The initial security context must be used here
+                            structureService.getLastPromotionRunsForBuild(build, pls)
+                        }
                     } else {
-                        return@DataFetcher structureService.getPromotionRunsForBuild(build.id)
+                        structureService.getPromotionRunsForBuild(build.id)
                     }
                 }
             }
