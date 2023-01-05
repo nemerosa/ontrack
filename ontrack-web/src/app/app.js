@@ -51,7 +51,6 @@ const ontrack = angular.module('ontrack', [
         'ot.view.settings',
         'ot.view.project',
         'ot.view.branch',
-        'ot.view.branch.old',
         'ot.view.branchLinks',
         'ot.view.build',
         'ot.view.promotionLevel',
