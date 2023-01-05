@@ -59,6 +59,7 @@ angular.module('ot.view.branch', [
                         _disable
                         _enable
                         _properties
+                        _extra
                     }
                     buildDiffActions {
                         id
