@@ -4,6 +4,8 @@ import graphql.ExecutionInput
 import graphql.ExecutionResult
 import graphql.GraphQL
 import graphql.execution.ExecutionStrategy
+import graphql.execution.instrumentation.dataloader.DataLoaderDispatcherInstrumentation
+import graphql.execution.instrumentation.dataloader.DataLoaderDispatcherInstrumentationOptions
 import net.nemerosa.ontrack.graphql.schema.GQLDataLoader
 import net.nemerosa.ontrack.graphql.schema.GraphqlSchemaService
 import net.nemerosa.ontrack.tx.TransactionService
@@ -22,14 +24,23 @@ class GraphQLServiceImpl(
         private val queryExecutionStrategy: ExecutionStrategy,
         @Qualifier("queryExecutionStrategy")
         private val mutationExecutionStrategy: ExecutionStrategy,
-        private val gqlDataLoaders: List<GQLDataLoader<*,*>>,
+        private val gqlDataLoaders: List<GQLDataLoader<*, *>>,
         private val transactionService: TransactionService
 ) : GraphQLService {
+
+    private val dispatcherInstrumentation: DataLoaderDispatcherInstrumentation by lazy {
+        DataLoaderDispatcherInstrumentation(
+                DataLoaderDispatcherInstrumentationOptions
+                        .newOptions()
+                        .includeStatistics(true)
+        )
+    }
 
     private val graphQL: GraphQL by lazy {
         GraphQL.newGraphQL(graphqlSchemaService.schema)
                 .queryExecutionStrategy(queryExecutionStrategy)
                 .mutationExecutionStrategy(mutationExecutionStrategy)
+                .instrumentation(dispatcherInstrumentation)
                 .build()
     }
 
