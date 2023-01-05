@@ -43,6 +43,7 @@ angular.module('ot.view.branch', [
                     name
                     description
                     annotatedDescription
+                    disabled
                     project {
                         id
                         name
@@ -55,6 +56,8 @@ angular.module('ot.view.branch', [
                         _actions
                         _update
                         _delete
+                        _disable
+                        _enable
                     }
                     buildDiffActions {
                         id
@@ -202,6 +205,24 @@ angular.module('ot.view.branch', [
                                 }
                             },
                             {
+                                condition: () => $scope.branch.links._disable,
+                                id: 'disableBranch',
+                                name: "Disable branch",
+                                cls: 'ot-command-branch-disable',
+                                action: () => {
+                                    ot.pageCall($http.put($scope.branch.links._disable)).then(loadBranch);
+                                }
+                            },
+                            {
+                                condition: () => $scope.branch.links._enable,
+                                id: 'enableBranch',
+                                name: "Enable branch",
+                                cls: 'ot-command-branch-enable',
+                                action: () => {
+                                    ot.pageCall($http.put($scope.branch.links._enable)).then(loadBranch);
+                                }
+                            },
+                            {
                                 condition: function () {
                                     return $scope.branch.links._update;
                                 },
@@ -251,6 +272,9 @@ angular.module('ot.view.branch', [
                     $scope.loadingBranch = false;
                 });
         };
+
+        // Reload callback available in the scope
+        $scope.reloadBranch = loadBranch;
 
         // Pagination status
         const pagination = {
