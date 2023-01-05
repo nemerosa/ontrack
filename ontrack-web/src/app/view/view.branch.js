@@ -54,6 +54,7 @@ angular.module('ot.view.branch', [
                         _createBuild
                         _actions
                         _update
+                        _delete
                     }
                     buildDiffActions {
                         id
@@ -212,6 +213,19 @@ angular.module('ot.view.branch', [
                                         $scope.branch.links._update,
                                         "Update branch"
                                     ).then(loadBranch);
+                                }
+                            },
+                            {
+                                condition: function () {
+                                    return $scope.branch.links._delete;
+                                },
+                                id: 'deleteBranch',
+                                name: "Delete branch",
+                                cls: 'ot-command-branch-delete',
+                                action: () => {
+                                    otStructureService.deleteBranch($scope.branch).then(() => {
+                                        $state.go('project', {projectId: $scope.branch.project.id});
+                                    });
                                 }
                             },
                             ot.viewActionsCommand($scope.branch.links._actions, []),

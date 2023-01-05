@@ -38,8 +38,9 @@ angular.module('ot.service.structure', [
                 title: "Deleting a branch",
                 message: "Do you really want to delete the branch " + branch.name +
                 " and all its associated data?"
-            }).then(function () {
-                return ot.call($http.delete(branch._delete));
+            }).then(() => {
+                const uri = branch.links._delete ? branch.links._delete : branch._delete; // REST/GraphQL compat
+                return ot.call($http.delete(uri));
             });
         };
 
