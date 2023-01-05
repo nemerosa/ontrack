@@ -13,13 +13,14 @@ angular.module('ot.directive.properties', [
 
                 // Loading the properties
                 function loadProperties() {
-                    ot.call($http.get(scope.entity._properties)).then(function (properties) {
+                    const uri = scope.entity.links._properties ? scope.entity.links._properties : scope.entity._properties;
+                    ot.call($http.get(uri)).then(properties => {
                         scope.properties = properties;
                         // List of properties with values
-                        var valueProperties = [];
+                        const valueProperties = [];
                         // List of properties that could be added
-                        var additions = [];
-                        angular.forEach(properties.resources, function (property) {
+                        const additions = [];
+                        angular.forEach(properties.resources, property => {
                             if (property.editable && property.empty) {
                                 additions.push(property);
                             }
@@ -32,12 +33,10 @@ angular.module('ot.directive.properties', [
                     });
 
                     // Getting the path to a property's template
-                    scope.getTemplatePath = function (property) {
-                        return 'extension/' + property.typeDescriptor.feature.id + '/property/' + property.typeDescriptor.typeName + '.tpl.html';
-                    };
+                    scope.getTemplatePath = property => 'extension/' + property.typeDescriptor.feature.id + '/property/' + property.typeDescriptor.typeName + '.tpl.html';
 
                     // Adding a property
-                    scope.addProperty = function (property) {
+                    scope.addProperty = property => {
                         otPropertiesService.addProperty(property).then(loadProperties);
                     };
 
@@ -46,20 +45,20 @@ angular.module('ot.directive.properties', [
                      *
                      * Note that editing a property is equivalent to create it.
                      */
-                    scope.editProperty = function (property) {
+                    scope.editProperty = property => {
                         scope.addProperty(property);
                     };
 
                     /**
                      * Deleting a property.
                      */
-                    scope.deleteProperty = function (property) {
+                    scope.deleteProperty = property => {
                         otPropertiesService.deleteProperty(property).then(loadProperties);
                     };
                 }
 
                 scope.$watch('entity', function () {
-                    if (scope.entity && scope.entity._properties) {
+                    if (scope.entity && (scope.entity.links._properties || scope.entity._properties)) {
                         loadProperties();
                     }
                 });
