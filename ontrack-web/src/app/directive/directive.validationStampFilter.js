@@ -65,8 +65,8 @@ angular.module('ot.directive.validationStampFilter', [
                 };
 
                 // Calling back the branch page
-                const reload = () => {
-                    $scope.reload()($scope.validationStampFilter);
+                const reload = (noReload) => {
+                    $scope.reload()($scope.validationStampFilter, noReload);
                 };
 
                 // Loading the filters when branch ID is ready
@@ -94,7 +94,7 @@ angular.module('ot.directive.validationStampFilter', [
                 };
 
                 // Selection of a filter
-                $scope.selectBranchValidationStampFilter = validationStampFilter => {
+                $scope.selectBranchValidationStampFilter = (validationStampFilter, noReload) => {
                     $scope.validationStampFilter = validationStampFilter;
                     // Permalink
                     const search = $location.search();
@@ -107,46 +107,45 @@ angular.module('ot.directive.validationStampFilter', [
                     }
                     $location.search(search);
                     // Setting the VS filter
-                    reload();
+                    reload(noReload);
                 };
 
                 // Creating a new filter
                 $scope.newBranchValidationStampFilter = () => {
                     if ($scope.branch.links._validationStampFilterCreate) {
-                        // TODO $scope.validationStampFilterEdition = false;
+                        $scope.validationStampFilterEdition.enabled = false;
                         otFormService.create($scope.branch.links._validationStampFilterCreate, "Validation stamp filter")
                             .then(filter => {
                                 loadFilters();
-                                $scope.selectBranchValidationStampFilter(filter);
                                 // Enter in edition mode immediately
-                                // TODO $scope.validationStampFilterEdition = true;
+                                $scope.directEditValidationStampFilter(filter);
                             });
                     }
                 };
 
                 $scope.shareValidationStampFilterAtProject = validationStampFilter => {
                     if (validationStampFilter.links._shareAtProject) {
-                        // TODO $scope.validationStampFilterEdition = false;
+                        $scope.validationStampFilterEdition.enabled = false;
                         ot.pageCall($http.put(validationStampFilter.links._shareAtProject, {})).then(vsf => {
                             loadFilters();
-                            $scope.selectBranchValidationStampFilter(vsf);
+                            $scope.selectBranchValidationStampFilter(vsf, true);
                         });
                     }
                 };
 
                 $scope.shareValidationStampFilterAtGlobal = validationStampFilter => {
                     if (validationStampFilter.links._shareAtGlobal) {
-                        // TODO $scope.validationStampFilterEdition = false;
+                        $scope.validationStampFilterEdition.enabled = false;
                         ot.pageCall($http.put(validationStampFilter.links._shareAtGlobal, {})).then(vsf => {
                             loadFilters();
-                            $scope.selectBranchValidationStampFilter(vsf);
+                            $scope.selectBranchValidationStampFilter(vsf, true);
                         });
                     }
                 };
 
                 $scope.editBranchValidationStampFilter = validationStampFilter => {
                     if (validationStampFilter.links._update) {
-                        // TODO $scope.validationStampFilterEdition = false;
+                        $scope.validationStampFilterEdition.enabled = false;
                         otFormService.update(validationStampFilter.links._update, "Validation stamp filter").then(vsf => {
                             loadFilters();
                             $scope.selectBranchValidationStampFilter(vsf);
@@ -156,7 +155,8 @@ angular.module('ot.directive.validationStampFilter', [
 
                 $scope.directEditValidationStampFilter = validationStampFilter => {
                     if (validationStampFilter.links._update) {
-                        // TODO Makes sure to select the filter without reloading the builds
+                        // Makes sure to select the filter without reloading the builds
+                        $scope.selectBranchValidationStampFilter(validationStampFilter, true);
                         $scope.validationStampFilterEdition.vsNames = $scope.validationStampFilter.vsNames;
                         $scope.validationStampFilterEdition.enabled = true;
                         $scope.validationStampFilterEdition.changing = false;
@@ -164,7 +164,8 @@ angular.module('ot.directive.validationStampFilter', [
                 };
 
                 $scope.stopDirectEditValidationStampFilter = validationStampFilter => {
-                    // TODO Makes sure to select the filter without reloading the builds
+                    // Makes sure to select the filter without reloading the builds
+                    $scope.selectBranchValidationStampFilter(validationStampFilter, true);
                     $scope.validationStampFilterEdition.enabled = false;
                     $scope.validationStampFilterEdition.changing = false;
                 };
@@ -172,7 +173,7 @@ angular.module('ot.directive.validationStampFilter', [
                 // Deleting an existing filter
                 $scope.deleteBranchValidationStampFilter = validationStampFilter => {
                     if (validationStampFilter.links._delete) {
-                        // TODO $scope.validationStampFilterEdition = false;
+                        $scope.validationStampFilterEdition.enabled = false;
                         otAlertService.confirm({
                             title: "Validation stamp filter deletion",
                             message: `Do you really want to delete the ${validationStampFilter.name} validation stamp filter?`
@@ -187,7 +188,7 @@ angular.module('ot.directive.validationStampFilter', [
 
                 // Clears the selection
                 $scope.clearBranchValidationStampFilter = () => {
-                    // TODO $scope.validationStampFilterEdition = false;
+                    $scope.validationStampFilterEdition.enabled = false;
                     $scope.selectBranchValidationStampFilter(undefined);
                 };
 
@@ -197,7 +198,7 @@ angular.module('ot.directive.validationStampFilter', [
                     otUserService.setPreferences({
                         branchViewVsNames: $scope.branchViewVsNames
                     });
-                    reload();
+                    reload(true);
                 };
 
                 // Toggles the preferences for the grouping per status
@@ -206,7 +207,7 @@ angular.module('ot.directive.validationStampFilter', [
                     otUserService.setPreferences({
                         branchViewVsGroups: $scope.branchViewVsGroups
                     });
-                    reload();
+                    reload(false);
                 };
 
                 // Updating the filter upon changes

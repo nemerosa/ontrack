@@ -479,10 +479,12 @@ angular.module('ot.view.branch', [
         /**
          * Reloading the view for the validation stamp filters
          */
-        $scope.reloadForValidationStampFilter = () => (filter) => {
+        $scope.reloadForValidationStampFilter = () => (filter, noReload) => {
             if (angular.equals($scope.validationStampFilter, filter)) {
                 // Filter did not change
-                loadBuilds(true);
+                if (!noReload) {
+                    loadBuilds(true);
+                }
             } else {
                 // Just changing the filter is enough
                 $scope.validationStampFilter = filter;
