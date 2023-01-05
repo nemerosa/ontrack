@@ -205,12 +205,6 @@ angular.module('ot.view.branch', [
                                 }
                             },
                             {
-                                id: 'branchPromotionLevels',
-                                name: "Promotion levels",
-                                cls: 'ot-command-promote',
-                                link: `/branch/${$scope.branch.id}/promotionLevels`
-                            },
-                            {
                                 condition: () => $scope.branch.links._disable,
                                 id: 'disableBranch',
                                 name: "Disable branch",

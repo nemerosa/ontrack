@@ -28,6 +28,7 @@ const ontrack = angular.module('ontrack', [
         'ot.directive.fieldMultiFormEntryValue',
         'ot.directive.buildFilter',
         'ot.directive.validationStampFilter',
+        'ot.directive.promotionLevels',
         // Dialogs
         'ot.dialog.applicationInfo',
         // Services
@@ -53,7 +54,6 @@ const ontrack = angular.module('ontrack', [
         'ot.view.branchLinks',
         'ot.view.build',
         'ot.view.promotionLevel',
-        'ot.view.promotionLevels',
         'ot.view.validationStamp',
         'ot.view.validationRun',
         'ot.view.buildSearch',
