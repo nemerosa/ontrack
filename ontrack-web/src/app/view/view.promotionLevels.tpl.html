@@ -9,4 +9,29 @@
         </div>
     </div>
 
+    <div class="row" ng-if="!loadingPromotionLevels && promotionLevels.length == 0">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                No promotion level has been created yet.
+            </div>
+        </div>
+    </div>
+
+    <div ng-if="promotionLevels.length > 0" class="ot-entity-sortable-list"
+         ui-sortable="promotionLevelSortOptions" ng-model="promotionLevels">
+        <div ng-repeat="promotionLevel in promotionLevels" class="ot-entity-sortable-list-item ot-decoration-list">
+            <span class="ot-entity-sortable-list-handle"
+                  ng-if="branch.links._reorderPromotionLevels"
+                  title="Move this to reorder the promotion levels">&nbsp;</span>
+            <span class="ot-entity-sortable-list-image">
+                <ot-entity-image entity="promotionLevel"
+                                 link="#/promotionLevel/{{promotionLevel.id}}"></ot-entity-image>
+            </span>
+            <a href="#/promotionLevel/{{promotionLevel.id}}" class="ot-entity-sortable-list-link">
+                {{promotionLevel.name}}
+            </a>
+            <ot-entity-embedded-decorations decorations="promotionLevel.decorations"></ot-entity-embedded-decorations>
+        </div>
+    </div>
+
 </ot-view>

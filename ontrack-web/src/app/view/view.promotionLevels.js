@@ -9,8 +9,9 @@ angular.module('ot.view.promotionLevels', [
             controller: 'PromotionLevelsCtrl'
         });
     })
-    .controller('PromotionLevelsCtrl', function ($scope, $stateParams, ot, otGraphqlService) {
+    .controller('PromotionLevelsCtrl', function ($http, $scope, $stateParams, ot, otGraphqlService) {
         const view = ot.view();
+        view.title = "Promotion levels";
         let viewInitialized = false;
         // Branch's id
         const branchId = Number($stateParams.branchId);
@@ -26,6 +27,9 @@ angular.module('ot.view.promotionLevels', [
                     project {
                         id
                         name
+                    }
+                    links {
+                        _reorderPromotionLevels
                     }
                     promotionLevels {
                         id
@@ -56,6 +60,7 @@ angular.module('ot.view.promotionLevels', [
                 .then(data => {
                     $scope.branch = data.branches[0];
                     $scope.promotionLevels = $scope.branch.promotionLevels;
+
                     if (!viewInitialized) {
                         view.breadcrumbs = ot.branchBreadcrumbs($scope.branch);
                         view.commands = [
@@ -63,6 +68,17 @@ angular.module('ot.view.promotionLevels', [
                         ];
                         viewInitialized = true;
                     }
+
+                    $scope.promotionLevelSortOptions = {
+                        disabled: !$scope.branch.links._reorderPromotionLevels,
+                        stop: () => {
+                            const ids = $scope.promotionLevels.map(pl => pl.id);
+                            ot.call($http.put(
+                                $scope.branch.links._reorderPromotionLevels,
+                                {ids: ids}
+                            ));
+                        }
+                    };
                 })
                 .finally(() => {
                     $scope.loadingPromotionLevels = false;
