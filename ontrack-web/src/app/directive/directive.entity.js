@@ -70,7 +70,6 @@ angular.module('ot.directive.entity', [
                 };
 
                 function loadEvents(uri) {
-                    $log.debug("[events] From URI = " + uri);
                     scope.loadingEvents = true;
                     ot.call($http.get(uri)).then(function (events) {
                         scope.eventsResource = events;
