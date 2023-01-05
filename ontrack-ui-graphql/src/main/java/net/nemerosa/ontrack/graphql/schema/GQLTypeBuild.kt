@@ -11,8 +11,10 @@ import net.nemerosa.ontrack.graphql.schema.actions.actions
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.pagination.PageRequest
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 
 @Component
@@ -26,6 +28,7 @@ class GQLTypeBuild(
     private val gqlEnumValidationRunSortingMode: GQLEnumValidationRunSortingMode,
     private val runInfoService: RunInfoService,
     private val paginatedListFactory: GQLPaginatedListFactory,
+    private val securityService: SecurityService,
     creation: GQLTypeCreation,
     projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
     freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
@@ -370,9 +373,16 @@ class GQLTypeBuild(
                         val promotionLevelsDataLoader = environment.getDataLoader<ID, List<PromotionLevel>>(GQLDataLoaderBranchPromotionLevels.KEY)
                         val promotionLevels = promotionLevelsDataLoader.load(build.branch.id)
                         // Use the build & cached promotion levels to get the promotion runs
-                        promotionLevels.thenApplyAsync { pls ->
-                            // FIXME The initial security context must be used here
-                            structureService.getLastPromotionRunsForBuild(build, pls)
+                        // TODO Creates a utility function for this pattern
+                        val context = SecurityContextHolder.getContext()
+                        promotionLevels.thenApply { pls ->
+                            val old = SecurityContextHolder.getContext()
+                            try {
+                                SecurityContextHolder.setContext(context)
+                                structureService.getLastPromotionRunsForBuild(build, pls)
+                            } finally {
+                                SecurityContextHolder.setContext(old)
+                            }
                         }
                     } else {
                         structureService.getPromotionRunsForBuild(build.id)

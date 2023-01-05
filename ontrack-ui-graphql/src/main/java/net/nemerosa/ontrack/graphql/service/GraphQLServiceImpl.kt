@@ -13,11 +13,14 @@ import net.nemerosa.ontrack.graphql.OntrackGraphQLConfigProperties
 import net.nemerosa.ontrack.graphql.schema.GQLDataLoader
 import net.nemerosa.ontrack.graphql.schema.GraphqlSchemaService
 import net.nemerosa.ontrack.tx.TransactionService
+import org.dataloader.BatchLoaderContextProvider
 import org.dataloader.DataLoader
+import org.dataloader.DataLoaderOptions
 import org.dataloader.DataLoaderRegistry
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -67,9 +70,17 @@ class GraphQLServiceImpl(
     }
 
     private val dataLoaderRegistry: DataLoaderRegistry by lazy {
+
+        val securityContextProvider = BatchLoaderContextProvider {
+            SecurityContextHolder.getContext()
+        }
+
+        val loaderOptions: DataLoaderOptions = DataLoaderOptions.newOptions()
+                .setBatchLoaderContextProvider(securityContextProvider)
+
         DataLoaderRegistry().apply {
             gqlDataLoaders.forEach { gqlDataLoader ->
-                val dataLoader = DataLoader(gqlDataLoader.batchLoader)
+                val dataLoader = DataLoader.newDataLoader(gqlDataLoader.batchLoader, loaderOptions)
                 register(gqlDataLoader.key, dataLoader)
             }
         }

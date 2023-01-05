@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import org.dataloader.BatchLoader
+import org.dataloader.BatchLoaderWithContext
 
 /**
  * Registration of a data loader.
@@ -18,6 +19,6 @@ interface GQLDataLoader<K, V> {
     /**
      * Associated data loader
      */
-    val batchLoader: BatchLoader<K, V>
+    val batchLoader: BatchLoaderWithContext<K, V>
 
 }
