@@ -29,6 +29,7 @@ const ontrack = angular.module('ontrack', [
         'ot.directive.buildFilter',
         'ot.directive.validationStampFilter',
         'ot.directive.promotionLevels',
+        'ot.directive.validationStamps',
         // Dialogs
         'ot.dialog.applicationInfo',
         // Services
