@@ -249,6 +249,12 @@ angular.module('ot.view.branch', [
                                     });
                                 }
                             },
+                            {
+                                id: 'branchLinks',
+                                name: "Branch links",
+                                cls: 'ot-command-branch-links fa-rotate-90',
+                                link: `/branch/${$scope.branch.id}/links`
+                            },
                             ot.viewActionsCommand($scope.branch.links._actions, []),
                             {
                                 id: 'switch-branch',
