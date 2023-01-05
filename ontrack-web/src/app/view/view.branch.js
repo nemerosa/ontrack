@@ -552,7 +552,12 @@ angular.module('ot.view.branch', [
         };
 
         $scope.selectAllValidationStampFilter = () => {
-            // TODO
+            if ($scope.validationStampFilterEdition.enabled && $scope.validationStampFilter && $scope.validationStampFilter.links._update) {
+                $scope.validationStampFilterEdition.vsNames.splice(0, $scope.validationStampFilterEdition.vsNames.length);
+                const allNames = $scope.validationStamps.map(vs => vs.name);
+                $scope.validationStampFilterEdition.vsNames.push(...allNames);
+                $scope.validationStampFilterEdition.changing = true;
+            }
         };
 
         $scope.selectNoneValidationStampFilter = () => {
