@@ -13,7 +13,7 @@ angular.module('ot.directive.properties', [
 
                 // Loading the properties
                 function loadProperties() {
-                    const uri = scope.entity.links._properties ? scope.entity.links._properties : scope.entity._properties;
+                    const uri = scope.entity.links && scope.entity.links._properties ? scope.entity.links._properties : scope.entity._properties;
                     ot.call($http.get(uri)).then(properties => {
                         scope.properties = properties;
                         // List of properties with values
@@ -58,7 +58,7 @@ angular.module('ot.directive.properties', [
                 }
 
                 scope.$watch('entity', function () {
-                    if (scope.entity && (scope.entity.links._properties || scope.entity._properties)) {
+                    if (scope.entity && ((scope.entity.links && scope.entity.links._properties) || scope.entity._properties)) {
                         loadProperties();
                     }
                 });
