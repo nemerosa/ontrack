@@ -579,14 +579,6 @@ angular.module('ot.view.branch', [
             }
         };
 
-        $scope.removeValidationStampFromFilter = (name) => {
-            // TODO
-        };
-
-        $scope.addValidationStampFromFilter = (name) => {
-            // TODO
-        };
-
         $scope.stopDirectEditValidationStampFilter = () => {
             $scope.validationStampFilterEdition.enabled = false;
         };
