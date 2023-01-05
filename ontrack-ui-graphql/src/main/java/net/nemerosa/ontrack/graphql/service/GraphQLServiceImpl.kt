@@ -12,6 +12,7 @@ import graphql.execution.instrumentation.tracing.TracingInstrumentation
 import net.nemerosa.ontrack.graphql.OntrackGraphQLConfigProperties
 import net.nemerosa.ontrack.graphql.schema.GQLDataLoader
 import net.nemerosa.ontrack.graphql.schema.GraphqlSchemaService
+import net.nemerosa.ontrack.model.support.StartupService
 import net.nemerosa.ontrack.tx.TransactionService
 import org.dataloader.BatchLoaderContextProvider
 import org.dataloader.DataLoader
@@ -36,7 +37,7 @@ class GraphQLServiceImpl(
         private val gqlDataLoaders: List<GQLDataLoader<*, *>>,
         private val transactionService: TransactionService,
         private val ontrackGraphQLConfigProperties: OntrackGraphQLConfigProperties,
-) : GraphQLService {
+) : GraphQLService, StartupService {
 
     private val logger: Logger = LoggerFactory.getLogger(GraphQLServiceImpl::class.java)
 
@@ -84,6 +85,16 @@ class GraphQLServiceImpl(
                 register(gqlDataLoader.key, dataLoader)
             }
         }
+    }
+
+    override fun getName(): String = "GraphQL service"
+
+    override fun startupOrder(): Int = StartupService.JOB_REGISTRATION
+
+    override fun start() {
+        // Forcing the creation of the lazy variables
+        logger.info("GraphQL service initialized: $graphQL")
+        logger.info("GraphQL data loader registry initialized: ${dataLoaderRegistry.dataLoaders.size} data loaders.")
     }
 
     override fun execute(
