@@ -366,6 +366,17 @@ interface StructureService {
     fun getValidationRunsForBuildAndValidationStamp(buildId: ID, validationStampId: ID, offset: Int, count: Int): List<ValidationRun>
 
     /**
+     * Gets the list of validation runs for a build and a validation stamp.
+     *
+     * @param build           Build
+     * @param validationStamp Validation stamp
+     * @param offset            Offset in the list
+     * @param count             Maximum number of elemnts to return
+     * @return List of validation runs
+     */
+    fun getValidationRunsForBuildAndValidationStamp(build: Build, validationStamp: ValidationStamp, offset: Int, count: Int): List<ValidationRun>
+
+    /**
      * Gets the list of validation runs for a build and a validation stamp, and a list of accepted statuses
      *
      * @param buildId           ID of the build

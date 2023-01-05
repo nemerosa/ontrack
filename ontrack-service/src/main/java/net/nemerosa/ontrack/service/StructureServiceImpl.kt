@@ -1220,7 +1220,11 @@ class StructureServiceImpl(
     override fun getValidationRunsForBuildAndValidationStamp(buildId: ID, validationStampId: ID, offset: Int, count: Int): List<ValidationRun> {
         val build = getBuild(buildId)
         val validationStamp = getValidationStamp(validationStampId)
-        securityService.checkProjectFunction(build.branch.project.id(), ProjectView::class.java)
+        return getValidationRunsForBuildAndValidationStamp(build, validationStamp, offset, count)
+    }
+
+    override fun getValidationRunsForBuildAndValidationStamp(build: Build, validationStamp: ValidationStamp, offset: Int, count: Int): List<ValidationRun> {
+        securityService.checkProjectFunction(build, ProjectView::class.java)
         return structureRepository.getValidationRunsForBuildAndValidationStamp(
                 build,
                 validationStamp,

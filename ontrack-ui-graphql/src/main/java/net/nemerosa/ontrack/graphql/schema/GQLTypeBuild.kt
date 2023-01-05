@@ -247,7 +247,7 @@ class GQLTypeBuild(
         return filter
     }
 
-    private fun buildValidationsFetcher(): DataFetcher<List<GQLTypeValidation.GQLTypeValidationData>> =
+    private fun buildValidationsFetcher(): DataFetcher<Any> =
         DataFetcher { environment ->
             val build: Build = environment.getSource()
             // Filter on validation stamp
@@ -271,9 +271,15 @@ class GQLTypeBuild(
                     emptyList()
                 }
             } else {
-                // Gets the validation runs for the build
-                structureService.getValidationStampListForBranch(build.branch.id)
-                        .map { validationStamp -> buildValidation(validationStamp, build, offset, size) }
+                // Use a dataloader to cache the validation stamps of the branch
+                val validationStampsDataLoader = environment.getDataLoader<ID, List<ValidationStamp>>(GQLDataLoaderBranchValidationStamps.KEY)
+                val validationStamps = validationStampsDataLoader.load(build.branch.id)
+                // Use the build & cached validation stamps to get the promotion runs
+                validationStamps.thenSecureApply { vsl ->
+                    vsl.map { validationStamp ->
+                        buildValidation(validationStamp, build, offset, size)
+                    }
+                }
             }
         }
 
@@ -286,8 +292,8 @@ class GQLTypeBuild(
         return GQLTypeValidation.GQLTypeValidationData(
                 validationStamp,
                 structureService.getValidationRunsForBuildAndValidationStamp(
-                        build.id,
-                        validationStamp.id,
+                        build,
+                        validationStamp,
                         offset,
                         size
                 )
