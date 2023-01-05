@@ -1,6 +1,7 @@
 angular.module('ot.view.promotionLevels', [
     'ot.service.core',
-    'ot.service.graphql'
+    'ot.service.graphql',
+    'ot.service.structure'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('promotionLevels', {
@@ -9,7 +10,7 @@ angular.module('ot.view.promotionLevels', [
             controller: 'PromotionLevelsCtrl'
         });
     })
-    .controller('PromotionLevelsCtrl', function ($http, $scope, $stateParams, ot, otGraphqlService) {
+    .controller('PromotionLevelsCtrl', function ($http, $scope, $stateParams, ot, otGraphqlService, otStructureService) {
         const view = ot.view();
         view.title = "Promotion levels";
         let viewInitialized = false;
@@ -29,11 +30,13 @@ angular.module('ot.view.promotionLevels', [
                         name
                     }
                     links {
+                        _createPromotionLevel
                         _reorderPromotionLevels
                     }
                     promotionLevels {
                         id
                         name
+                        description
                         image
                         _image
                         decorations {
@@ -64,6 +67,13 @@ angular.module('ot.view.promotionLevels', [
                     if (!viewInitialized) {
                         view.breadcrumbs = ot.branchBreadcrumbs($scope.branch);
                         view.commands = [
+                            {
+                                condition: () => $scope.branch.links._createPromotionLevel,
+                                id: 'createPromotionLevel',
+                                name: "New promotion level",
+                                cls: 'ot-command-new',
+                                action: createPromotionLevel
+                            },
                             ot.viewCloseCommand('/branch/' + $scope.branch.id),
                         ];
                         viewInitialized = true;
@@ -87,5 +97,9 @@ angular.module('ot.view.promotionLevels', [
 
         // Loading the promotion levels first
         loadPromotionLevels();
+
+        const createPromotionLevel = () => {
+            otStructureService.create($scope.branch.links._createPromotionLevel, "New promotion level").then(loadPromotionLevels);
+        };
     })
 ;
