@@ -1,9 +1,8 @@
 package net.nemerosa.ontrack.graphql
 
 import com.fasterxml.jackson.databind.JsonNode
-import graphql.GraphQL
-import net.nemerosa.ontrack.graphql.schema.GraphqlSchemaService
 import net.nemerosa.ontrack.graphql.schema.UserError
+import net.nemerosa.ontrack.graphql.service.GraphQLService
 import net.nemerosa.ontrack.graphql.support.exception
 import net.nemerosa.ontrack.it.links.AbstractBranchLinksTestSupport
 import net.nemerosa.ontrack.json.JsonUtils
@@ -16,9 +15,9 @@ import kotlin.test.fail
 abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
 
     @Autowired
-    private lateinit var schemaService: GraphqlSchemaService
+    private lateinit var graphQLService: GraphQLService
 
-    fun run(query: String, variables: Map<String, *> = emptyMap<String, Any>()): JsonNode {
+    fun run(query: String, variables: Map<String, Any> = emptyMap<String, Any>()): JsonNode {
         // Task to run
         val code = { internalRun(query, variables) }
         // Making sure we're at least authenticated
@@ -29,19 +28,17 @@ abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
         }
     }
 
-    fun run(query: String, variables: Map<String, *> = emptyMap<String, Any>(), code: (data: JsonNode) -> Unit) {
+    fun run(query: String, variables: Map<String, Any> = emptyMap<String, Any>(), code: (data: JsonNode) -> Unit) {
         run(query, variables).let { data ->
             code(data)
         }
     }
 
-    private fun internalRun(query: String, variables: Map<String, *> = emptyMap<String, Any>()): JsonNode {
-        val result = GraphQL
-            .newGraphQL(schemaService.schema)
-            .build()
-            .execute {
-                it.query(query).variables(variables)
-            }
+    private fun internalRun(query: String, variables: Map<String, Any> = emptyMap<String, Any>()): JsonNode {
+        val result = graphQLService.execute(
+                query,
+                variables,
+        )
         val error = result.exception
         if (error != null) {
             throw error
