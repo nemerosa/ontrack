@@ -435,6 +435,26 @@ angular.module('ot.view.branch', [
         };
 
         /**
+         * Displaying the promotion runs
+         */
+        $scope.displayPromotionRuns = (build, promotionRun) => {
+            $modal.open({
+                templateUrl: 'app/dialog/dialog.promotionRuns.tpl.html',
+                controller: 'otDialogPromotionRuns',
+                resolve: {
+                    config: () => ({
+                        build: build,
+                        promotionLevel: promotionRun.promotionLevel
+                    })
+                }
+            }).result.then(() => {
+                loadBuilds(true);
+            }, () => {
+                loadBuilds(true);
+            });
+        };
+
+        /**
          * Displaying the validation runs
          */
         $scope.displayValidationRuns = (build, validationStamp) => {
