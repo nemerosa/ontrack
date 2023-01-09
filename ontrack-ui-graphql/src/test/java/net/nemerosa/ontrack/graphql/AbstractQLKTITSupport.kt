@@ -17,7 +17,7 @@ abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
     @Autowired
     private lateinit var graphQLService: GraphQLService
 
-    fun run(query: String, variables: Map<String, Any> = emptyMap<String, Any>()): JsonNode {
+    fun run(query: String, variables: Map<String, Any?> = emptyMap()): JsonNode {
         // Task to run
         val code = { internalRun(query, variables) }
         // Making sure we're at least authenticated
@@ -28,13 +28,13 @@ abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
         }
     }
 
-    fun run(query: String, variables: Map<String, Any> = emptyMap<String, Any>(), code: (data: JsonNode) -> Unit) {
+    fun run(query: String, variables: Map<String, Any?> = emptyMap(), code: (data: JsonNode) -> Unit) {
         run(query, variables).let { data ->
             code(data)
         }
     }
 
-    private fun internalRun(query: String, variables: Map<String, Any> = emptyMap<String, Any>()): JsonNode {
+    private fun internalRun(query: String, variables: Map<String, Any?> = emptyMap()): JsonNode {
         val result = graphQLService.execute(
                 query,
                 variables,

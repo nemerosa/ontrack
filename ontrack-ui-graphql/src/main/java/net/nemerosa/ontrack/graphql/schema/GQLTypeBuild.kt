@@ -11,7 +11,6 @@ import net.nemerosa.ontrack.graphql.schema.actions.actions
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.pagination.PageRequest
-import net.nemerosa.ontrack.model.security.thenSecureApply
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import org.springframework.stereotype.Component
@@ -247,7 +246,7 @@ class GQLTypeBuild(
         return filter
     }
 
-    private fun buildValidationsFetcher(): DataFetcher<Any> =
+    private fun buildValidationsFetcher() =
         DataFetcher { environment ->
             val build: Build = environment.getSource()
             // Filter on validation stamp
@@ -271,14 +270,11 @@ class GQLTypeBuild(
                     emptyList()
                 }
             } else {
-                // Use a dataloader to cache the validation stamps of the branch
-                val validationStampsDataLoader = environment.getDataLoader<ID, List<ValidationStamp>>(GQLDataLoaderBranchValidationStamps.KEY)
-                val validationStamps = validationStampsDataLoader.load(build.branch.id)
-                // Use the build & cached validation stamps to get the promotion runs
-                validationStamps.thenSecureApply { vsl ->
-                    vsl.map { validationStamp ->
-                        buildValidation(validationStamp, build, offset, size)
-                    }
+                // Gets the validation stamps of the branch
+                val validationStamps = structureService.getValidationStampListForBranch(build.branch.id)
+                // Use the build & cached validation stamps to get the validations
+                validationStamps.map { validationStamp ->
+                    buildValidation(validationStamp, build, offset, size)
                 }
             }
         }
@@ -345,7 +341,7 @@ class GQLTypeBuild(
             }
 
     private fun buildPromotionRunsFetcher() =
-            DataFetcher<Any> { environment ->
+            DataFetcher<List<PromotionRun>> { environment ->
                 val build: Build = environment.getSource()
                 // Last per promotion filter?
                 val lastPerLevel: Boolean = environment.getArgument(ARG_LAST_PER_LEVEL) ?: false
@@ -373,13 +369,10 @@ class GQLTypeBuild(
                 } else {
                     // Gets all the promotion runs
                     if (lastPerLevel) {
-                        // Use a dataloader to cache the promotion levels of the branch
-                        val promotionLevelsDataLoader = environment.getDataLoader<ID, List<PromotionLevel>>(GQLDataLoaderBranchPromotionLevels.KEY)
-                        val promotionLevels = promotionLevelsDataLoader.load(build.branch.id)
+                        // Getting the promotion levels of the branch
+                        val promotionLevels = structureService.getPromotionLevelListForBranch(build.branch.id)
                         // Use the build & cached promotion levels to get the promotion runs
-                        promotionLevels.thenSecureApply { pls ->
-                            structureService.getLastPromotionRunsForBuild(build, pls)
-                        }
+                        structureService.getLastPromotionRunsForBuild(build, promotionLevels)
                     } else {
                         structureService.getPromotionRunsForBuild(build.id)
                     }

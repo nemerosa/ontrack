@@ -15,6 +15,11 @@ class OntrackGraphQLConfigProperties {
     class GraphQLIntrumentationProperties {
 
         /**
+         * Enabling data loader stats
+         */
+        var dataloader: Boolean = false
+
+        /**
          * Enabling tracing
          */
         var tracing: Boolean = false
