@@ -1,53 +1,44 @@
 package net.nemerosa.ontrack.boot.resources
 
 import net.nemerosa.ontrack.boot.ui.ValidationStampFilterController
-import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.model.security.GlobalSettings
+import net.nemerosa.ontrack.model.security.ValidationStampFilterCreate
+import net.nemerosa.ontrack.model.security.ValidationStampFilterMgt
+import net.nemerosa.ontrack.model.security.ValidationStampFilterShare
 import net.nemerosa.ontrack.model.structure.ValidationStampFilter
 import net.nemerosa.ontrack.model.structure.ValidationStampFilterScope
-import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator
-import net.nemerosa.ontrack.ui.resource.Link
-import net.nemerosa.ontrack.ui.resource.ResourceContext
+import net.nemerosa.ontrack.ui.resource.*
 import org.springframework.stereotype.Component
-
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @Component
-class ValidationStampFilterResourceDecorator : AbstractResourceDecorator<ValidationStampFilter>(ValidationStampFilter::class.java) {
+class ValidationStampFilterResourceDecorator : AbstractLinkResourceDecorator<ValidationStampFilter>(ValidationStampFilter::class.java) {
 
-    override fun links(resource: ValidationStampFilter, resourceContext: ResourceContext): List<Link> {
-        // Scope of the validation stamp filter
-        val canUpdate: Boolean = when {
-            resource.project != null -> resourceContext.isProjectFunctionGranted(resource.project, ValidationStampFilterMgt::class.java)
-            resource.branch != null -> resourceContext.isProjectFunctionGranted(resource.branch, ValidationStampFilterCreate::class.java)
-            else -> resourceContext.isGlobalFunctionGranted(GlobalSettings::class.java)
-        }
-        // Links
-        return resourceContext.links()
-                // Update if authorized
-                .link(
-                        Link.UPDATE,
-                        on(ValidationStampFilterController::class.java).getValidationStampFilterUpdateForm(resource.id),
-                        canUpdate
-                )
-                // Delete if authorized
-                .link(
-                        Link.DELETE,
-                        on(ValidationStampFilterController::class.java).deleteValidationStampFilter(resource.id),
-                        canUpdate
-                )
-                // Share at project level
-                .link(
-                        "_shareAtProject",
-                        on(ValidationStampFilterController::class.java).shareValidationStampFilterAtProject(resource.id),
-                        resource.scope == ValidationStampFilterScope.BRANCH && resourceContext.isProjectFunctionGranted(resource.branch, ValidationStampFilterShare::class.java)
-                )
-                // Share at global level
-                .link(
-                        "_shareAtGlobal",
-                        on(ValidationStampFilterController::class.java).shareValidationStampFilterAtGlobal(resource.id),
-                        (resource.scope == ValidationStampFilterScope.PROJECT || resource.scope == ValidationStampFilterScope.BRANCH) && resourceContext.isGlobalFunctionGranted(GlobalSettings::class.java)
-                )
-                // OK
-                .build()
+    private fun canUpdate(resource: ValidationStampFilter, resourceContext: ResourceContext) = when {
+        resource.project != null -> resourceContext.isProjectFunctionGranted(resource.project, ValidationStampFilterMgt::class.java)
+        resource.branch != null -> resourceContext.isProjectFunctionGranted(resource.branch, ValidationStampFilterCreate::class.java)
+        else -> resourceContext.isGlobalFunctionGranted(GlobalSettings::class.java)
     }
+
+    override fun getLinkDefinitions(): Iterable<LinkDefinition<ValidationStampFilter>> = listOf(
+            Link.UPDATE linkTo { resource: ValidationStampFilter ->
+                on(ValidationStampFilterController::class.java).getValidationStampFilterUpdateForm(resource.id)
+            } linkIf ::canUpdate,
+            Link.DELETE linkTo { resource: ValidationStampFilter ->
+                on(ValidationStampFilterController::class.java).deleteValidationStampFilter(resource.id)
+            } linkIf ::canUpdate,
+            "_shareAtProject" linkTo { resource: ValidationStampFilter ->
+                on(ValidationStampFilterController::class.java).shareValidationStampFilterAtProject(resource.id)
+            } linkIf { resource: ValidationStampFilter, resourceContext: ResourceContext ->
+                resource.scope == ValidationStampFilterScope.BRANCH &&
+                        resourceContext.isProjectFunctionGranted(resource.branch, ValidationStampFilterShare::class.java)
+            },
+            "_shareAtGlobal" linkTo { resource: ValidationStampFilter ->
+                on(ValidationStampFilterController::class.java).shareValidationStampFilterAtGlobal(resource.id)
+            } linkIf { resource: ValidationStampFilter, resourceContext: ResourceContext ->
+                (resource.scope == ValidationStampFilterScope.PROJECT || resource.scope == ValidationStampFilterScope.BRANCH)
+                        && resourceContext.isGlobalFunctionGranted(GlobalSettings::class.java)
+            },
+    )
+
 }

@@ -177,22 +177,6 @@ img.ot-logo {
   max-height: @otIconSizeMini;
 }
 
-div.ot-view {
-  margin-top: 1em;
-  .ot-view-title {
-    font-size: 150%;
-    font-weight: bold;
-    margin: 0px 0px 0.5em;
-    .ot-description {
-      font-size: 66%;
-      font-weight: normal;
-    }
-  }
-  .ot-view-commands {
-    .pull-right;
-  }
-}
-
 .ot-footer {
   margin-top: 20px;
   .hidden-print;
@@ -262,14 +246,6 @@ div.ot-view {
 .ot-notification-warning {
   .ot-notification;
   .alert-warning;
-}
-
-.ot-view-breadcrumbs {
-  font-size: 50%;
-  .ot-view-breadcrumbs-separator {
-    .ot-icon-x(@fa-var-play);
-    opacity: 0.3;
-  }
 }
 
 /**
@@ -471,18 +447,6 @@ a.ot-command {
   margin-right: 0.5em;
   button {
     border: 0;
-  }
-}
-
-.ot-view-commands {
-  text-align: right;
-}
-
-span.ot-view-command {
-  margin-left: 0.5em;
-  .ot-view-command-name {
-    text-wrap: none;
-    white-space: nowrap;
   }
 }
 
@@ -821,6 +785,11 @@ a.ot-application-info-error {
   &.ot-branch-build-view-auto-refresh-disabled {
     .btn-default;
   }
+}
+
+.ot-branch-build-view-more {
+  .btn;
+  .btn-link;
 }
 
 table.ot-branch-build-view {

@@ -2,14 +2,15 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
-import org.junit.Assert.assertEquals
-import org.junit.Before
+import org.junit.jupiter.api.BeforeEach
 import java.time.LocalDateTime
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
-abstract class AbstractBuildFilterIT : AbstractDSLTestJUnit4Support() {
+abstract class AbstractBuildFilterTestSupport : AbstractDSLTestSupport() {
 
     protected lateinit var branch: Branch
     protected lateinit var copper: PromotionLevel
@@ -18,11 +19,11 @@ abstract class AbstractBuildFilterIT : AbstractDSLTestJUnit4Support() {
     protected lateinit var publication: ValidationStamp
     protected lateinit var production: ValidationStamp
 
-    @Before
+    @BeforeEach
     fun prepare() {
         project {
             branch {
-                this@AbstractBuildFilterIT.branch = this
+                this@AbstractBuildFilterTestSupport.branch = this
                 copper = promotionLevel("COPPER")
                 bronze = promotionLevel("BRONZE")
                 gold = promotionLevel("GOLD")
@@ -138,6 +139,10 @@ abstract class AbstractBuildFilterIT : AbstractDSLTestJUnit4Support() {
         val actualNames = builds
                 .map { it.name }
         assertEquals(expectedNames, actualNames)
+    }
+
+    protected fun checkListIsEmpty(builds: List<Build>) {
+        assertTrue(builds.isEmpty(), "Build list is empty")
     }
 
     protected fun checkList(builds: List<Build>, vararg expectedNames: String) {

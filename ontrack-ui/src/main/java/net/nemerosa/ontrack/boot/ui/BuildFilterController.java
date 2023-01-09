@@ -46,7 +46,7 @@ public class BuildFilterController extends AbstractResourceController {
     }
 
     /**
-     * Returns the list of forms to create new forms.
+     * Returns the list of forms to create new filters.
      *
      * @param branchId ID of the branch to get the filter forms for.
      */

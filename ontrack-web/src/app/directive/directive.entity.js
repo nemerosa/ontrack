@@ -25,10 +25,18 @@ angular.module('ot.directive.entity', [
                 callback: '&'
             },
             controller: function ($scope) {
-                $scope.enableEntity = function (entity) {
-                    ot.pageCall($http.put(entity._enable, entity)).then(function () {
-                        entity.disabled = false;
-                    }).then($scope.callback);
+                $scope.enableEntity = entity => {
+                    let uri;
+                    if (entity.links) {
+                        uri = entity.links._enable;
+                    } else {
+                        uri = entity._enable;
+                    }
+                    if (uri) {
+                        ot.pageCall($http.put(uri, entity)).then(() => {
+                            entity.disabled = false;
+                        }).then($scope.callback);
+                    }
                 };
             }
         };
@@ -62,7 +70,6 @@ angular.module('ot.directive.entity', [
                 };
 
                 function loadEvents(uri) {
-                    $log.debug("[events] From URI = " + uri);
                     scope.loadingEvents = true;
                     ot.call($http.get(uri)).then(function (events) {
                         scope.eventsResource = events;

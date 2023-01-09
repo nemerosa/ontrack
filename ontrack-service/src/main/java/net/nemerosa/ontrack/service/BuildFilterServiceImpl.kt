@@ -195,7 +195,7 @@ class BuildFilterServiceImpl(
     ): String? {
         // Parsing
         val data: T? = try {
-            buildFilterProvider.parse(parameters).orElse(null)
+            buildFilterProvider.parse(parameters)
         } catch (ex: Exception) {
             return "Cannot parse build filter data: ${ex.message}"
         }
@@ -205,8 +205,8 @@ class BuildFilterServiceImpl(
 
     protected fun <T> getBuildFilterProviderData(provider: BuildFilterProvider<T>, parameters: JsonNode): BuildFilterProviderData<T> {
         val data = provider.parse(parameters)
-        return if (data.isPresent) {
-            BuildFilterProviderData.of(provider, data.get())
+        return if (data != null) {
+            provider.withData(data)
         } else {
             throw BuildFilterProviderDataParsingException(provider.javaClass.name)
         }
@@ -224,13 +224,12 @@ class BuildFilterServiceImpl(
         val provider = getBuildFilterProviderByType<T>(t.type)
         return provider
                 ?.parse(t.data)
-                ?.map { data ->
+                ?.let { data ->
                     provider.getFilterForm(
                             ID.of(t.branchId),
                             data
                     )
                 }
-                ?.orElse(null)
     }
 
     override fun saveFilter(branchId: ID, shared: Boolean, name: String, type: String, parameters: JsonNode): Ack {
@@ -275,7 +274,7 @@ class BuildFilterServiceImpl(
             Ack.NOK
         }
         // Checks the data
-        else if (!provider.parse(parameters).isPresent) {
+        else if (provider.parse(parameters) == null) {
             Ack.NOK
         } else {
             // Saving
@@ -326,7 +325,6 @@ class BuildFilterServiceImpl(
 
     private fun <T> loadBuildFilterResource(provider: BuildFilterProvider<T>, branch: Branch, shared: Boolean, name: String, data: JsonNode): BuildFilterResource<T>? {
         return provider.parse(data)
-            .getOrNull()
             ?.run {
                 BuildFilterResource(
                     branch,

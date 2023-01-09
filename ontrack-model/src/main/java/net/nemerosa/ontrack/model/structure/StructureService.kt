@@ -245,6 +245,12 @@ interface StructureService {
 
     fun getLastPromotionRunsForBuild(buildId: ID): List<PromotionRun>
 
+    /**
+     * Optimized version of getting the last promotion runs for a build, by passing preloaded (or cached)
+     * list of the promotion levels for the branch and the build itself.
+     */
+    fun getLastPromotionRunsForBuild(build: Build, promotionLevels: List<PromotionLevel>): List<PromotionRun>
+
     // TODO Replace by PromotionRun?
     fun getLastPromotionRunForBuildAndPromotionLevel(build: Build, promotionLevel: PromotionLevel): Optional<PromotionRun>
 
@@ -358,6 +364,17 @@ interface StructureService {
      * @return List of validation runs
      */
     fun getValidationRunsForBuildAndValidationStamp(buildId: ID, validationStampId: ID, offset: Int, count: Int): List<ValidationRun>
+
+    /**
+     * Gets the list of validation runs for a build and a validation stamp.
+     *
+     * @param build           Build
+     * @param validationStamp Validation stamp
+     * @param offset            Offset in the list
+     * @param count             Maximum number of elemnts to return
+     * @return List of validation runs
+     */
+    fun getValidationRunsForBuildAndValidationStamp(build: Build, validationStamp: ValidationStamp, offset: Int, count: Int): List<ValidationRun>
 
     /**
      * Gets the list of validation runs for a build and a validation stamp, and a list of accepted statuses

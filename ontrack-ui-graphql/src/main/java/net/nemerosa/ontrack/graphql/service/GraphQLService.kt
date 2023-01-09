@@ -16,8 +16,8 @@ interface GraphQLService {
      */
     @Throws(GraphQLServiceException::class)
     fun execute(
-        query: String,
-        variables: Map<String, Any> = mapOf(),
-        operationName: String? = null,
+            query: String,
+            variables: Map<String, Any?> = emptyMap(),
+            operationName: String? = null,
     ): ExecutionResult
 }

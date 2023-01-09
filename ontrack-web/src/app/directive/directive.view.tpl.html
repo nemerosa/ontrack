@@ -19,10 +19,10 @@
             <div class="ot-view-commands">
                 <span ng-repeat="command in view.commands" id="{{command.id}}"
                       ng-if="!command.condition || command.condition()" class="ot-view-command">
-                    <span ng-if="command.action" ng-click="command.action()" class="ot-command ot-view-command-name" title="{{command.title}}">
+                    <button type="button" ng-if="command.action" ng-click="command.action()" class="ot-command ot-view-command-name" title="{{command.title}}">
                         <span class="{{command.cls}}"></span>
                         {{command.name}}
-                    </span>
+                    </button>
                     <a ng-if="command.link" href="#{{command.link}}" class="ot-command ot-view-command-name" title="{{command.title}}">
                         <span class="{{command.cls}}"></span>
                         {{command.name}}
@@ -31,7 +31,7 @@
                         <span class="{{command.cls}}"></span>
                         {{command.name}}
                     </a>
-                    <div class="btn-group ot-command-group" ng-if="command.group" ng-show="command.actions">
+                    <div class="btn-group ot-command-group ot-view-command-group" ng-if="command.group" ng-show="command.actions">
                         <button type="button" class="btn btn-default dropdown-toggle ot-command" data-toggle="dropdown">
                             <span class="{{command.cls}}"></span>
                             {{command.name}}

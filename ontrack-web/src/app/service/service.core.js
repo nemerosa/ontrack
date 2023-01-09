@@ -39,7 +39,7 @@ angular.module('ot.service.core', [
          * The list of actions is returned by a call to the URI in parameter.
          */
         self.viewActionsCommand = function (uri, actions) {
-            var def = {
+            const def = {
                 id: 'actions',
                 name: "Tools",
                 cls: 'ot-command-actions',

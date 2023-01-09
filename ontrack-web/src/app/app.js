@@ -26,6 +26,10 @@ const ontrack = angular.module('ontrack', [
         'ot.directive.chart',
         'ot.directive.decorated-chart',
         'ot.directive.fieldMultiFormEntryValue',
+        'ot.directive.buildFilter',
+        'ot.directive.validationStampFilter',
+        'ot.directive.promotionLevels',
+        'ot.directive.validationStamps',
         // Dialogs
         'ot.dialog.applicationInfo',
         // Services

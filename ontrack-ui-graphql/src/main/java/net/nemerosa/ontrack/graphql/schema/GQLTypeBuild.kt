@@ -246,7 +246,7 @@ class GQLTypeBuild(
         return filter
     }
 
-    private fun buildValidationsFetcher(): DataFetcher<List<GQLTypeValidation.GQLTypeValidationData>> =
+    private fun buildValidationsFetcher() =
         DataFetcher { environment ->
             val build: Build = environment.getSource()
             // Filter on validation stamp
@@ -270,9 +270,12 @@ class GQLTypeBuild(
                     emptyList()
                 }
             } else {
-                // Gets the validation runs for the build
-                structureService.getValidationStampListForBranch(build.branch.id)
-                        .map { validationStamp -> buildValidation(validationStamp, build, offset, size) }
+                // Gets the validation stamps of the branch
+                val validationStamps = structureService.getValidationStampListForBranch(build.branch.id)
+                // Use the build & cached validation stamps to get the validations
+                validationStamps.map { validationStamp ->
+                    buildValidation(validationStamp, build, offset, size)
+                }
             }
         }
 
@@ -285,8 +288,8 @@ class GQLTypeBuild(
         return GQLTypeValidation.GQLTypeValidationData(
                 validationStamp,
                 structureService.getValidationRunsForBuildAndValidationStamp(
-                        build.id,
-                        validationStamp.id,
+                        build,
+                        validationStamp,
                         offset,
                         size
                 )
@@ -357,18 +360,21 @@ class GQLTypeBuild(
                 if (promotionLevel != null) {
                     // Gets promotion runs for this promotion level
                     if (lastPerLevel) {
-                        return@DataFetcher structureService.getLastPromotionRunForBuildAndPromotionLevel(build, promotionLevel)
+                        structureService.getLastPromotionRunForBuildAndPromotionLevel(build, promotionLevel)
                                 .map { listOf(it) }
                                 .orElse(listOf())
                     } else {
-                        return@DataFetcher structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel)
+                        structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel)
                     }
                 } else {
                     // Gets all the promotion runs
                     if (lastPerLevel) {
-                        return@DataFetcher structureService.getLastPromotionRunsForBuild(build.id)
+                        // Getting the promotion levels of the branch
+                        val promotionLevels = structureService.getPromotionLevelListForBranch(build.branch.id)
+                        // Use the build & cached promotion levels to get the promotion runs
+                        structureService.getLastPromotionRunsForBuild(build, promotionLevels)
                     } else {
-                        return@DataFetcher structureService.getPromotionRunsForBuild(build.id)
+                        structureService.getPromotionRunsForBuild(build.id)
                     }
                 }
             }

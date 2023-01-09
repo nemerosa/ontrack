@@ -1,10 +1,17 @@
 package net.nemerosa.ontrack.model.structure
 
+import net.nemerosa.ontrack.model.annotations.APIDescription
+
 class ValidationStampFilter(
+        @APIDescription("ID of the filter")
         override val id: ID = ID.NONE,
+        @APIDescription("Name of the filter")
         val name: String,
+        @APIDescription("List of validation stamps")
         val vsNames: List<String>,
+        @APIDescription("Project level")
         val project: Project? = null,
+        @APIDescription("Branch level")
         val branch: Branch? = null
 ) : Entity {
 
@@ -58,6 +65,7 @@ class ValidationStampFilter(
         )
     }
 
+    @APIDescription("Scope of the filter")
     val scope: ValidationStampFilterScope
         get() = when {
             branch != null -> ValidationStampFilterScope.BRANCH

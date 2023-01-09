@@ -1,12 +1,57 @@
 package net.nemerosa.ontrack.boot.graphql
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.getRequiredJsonField
+import net.nemerosa.ontrack.json.getRequiredTextField
+import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.security.ProjectEdit
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 
-class GraphQLLinksIT : AbstractQLKTITJUnit4Support() {
+class GraphQLLinksIT : AbstractQLKTITSupport() {
+
+    @Test
+    fun `Build filters links`() {
+        asAdmin {
+            project {
+                branch {
+                    promotionLevel("IRON")
+                    buildFilterService.saveFilter(
+                            id,
+                            true,
+                            "My filter",
+                            "net.nemerosa.ontrack.service.StandardBuildFilterProvider",
+                            mapOf(
+                                    "withPromotionLevel" to "IRON"
+                            ).asJson()
+                    )
+                    run("""
+                        {
+                            branches(id: $id) {
+                                buildFilterResources {
+                                    name
+                                    links {
+                                        _update
+                                    }
+                                }
+                            }
+                        }
+                    """) { data ->
+                        val branch = data.path("branches").path(0)
+                        assertNotNull(branch.getRequiredJsonField("buildFilterResources").find {
+                            it.getRequiredTextField("name") == "My filter"
+                        }) { filter ->
+                            val links = filter.getRequiredJsonField("links")
+                            assertNotNull(links.getTextField("_update"), "Update link is present")
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @Test
     fun `Validation stamp image link`() {

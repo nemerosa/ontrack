@@ -1,12 +1,10 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData
-import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import org.junit.Assert
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
 
-class NamedBuildFilterIT : AbstractBuildFilterIT() {
+class NamedBuildFilterIT : AbstractBuildFilterJUnit4IT() {
 
     protected fun filter(data: NamedBuildFilterData?): BuildFilterProviderData<NamedBuildFilterData> {
         return buildFilterService.getBuildFilterProviderData(

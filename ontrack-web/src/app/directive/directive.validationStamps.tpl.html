@@ -1,0 +1,41 @@
+<div class="row" ng-show="loadingValidationStamps">
+    <div class="col-md-12">
+        <div class="alert alert-info">
+            <span class="ot-loading-indicator"></span>
+            Loading the validation stamps...
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-if="!loadingValidationStamps && promotionLevels.length == 0">
+    <div class="col-md-12">
+        <div class="alert alert-warning">
+            No validation stamp has been created yet.
+        </div>
+    </div>
+</div>
+
+<div ng-if="validationStamps" class="ot-entity-sortable-list"
+     ui-sortable="validationStampSortOptions" ng-model="validationStamps">
+    <div ng-repeat="validationStamp in validationStamps" class="ot-entity-sortable-list-item">
+                    <span class="ot-entity-sortable-list-handle"
+                          ng-if="branch.links._reorderValidationStamps"
+                          title="Move this to reorder the validation stamps">&nbsp;</span>
+        <span class="ot-entity-sortable-list-image">
+            <ot-entity-image entity="validationStamp"
+                             link="#/validationStamp/{{validationStamp.id}}"></ot-entity-image>
+        </span>
+        <a href="#/validationStamp/{{validationStamp.id}}" class="ot-entity-sortable-list-link">
+            {{validationStamp.name}}
+        </a>
+        <span ng-if="validationStamp.dataType">
+            <ot-validation-data-type-decoration
+                    value="validationStamp.dataType"></ot-validation-data-type-decoration>
+        </span>
+    </div>
+</div>
+<button ng-if="branch.links._createValidationStamp" type="button" class="btn btn-default"
+        ng-click="createValidationStamp()">
+    <span class="ot-command-new"></span>
+    New validation stamp
+</button>

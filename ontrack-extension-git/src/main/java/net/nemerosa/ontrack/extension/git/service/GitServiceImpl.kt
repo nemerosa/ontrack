@@ -22,6 +22,7 @@ import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService
 import net.nemerosa.ontrack.extension.scm.service.SCMUtilsService
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
+import net.nemerosa.ontrack.git.exceptions.GitRepositoryNoRemoteException
 import net.nemerosa.ontrack.git.exceptions.GitRepositorySyncException
 import net.nemerosa.ontrack.git.model.*
 import net.nemerosa.ontrack.job.*
@@ -42,6 +43,7 @@ import java.lang.String.format
 import java.util.*
 import java.util.concurrent.Future
 import java.util.function.BiConsumer
+import java.util.function.Consumer
 import java.util.stream.Stream
 
 @Service
@@ -62,6 +64,7 @@ class GitServiceImpl(
     private val entityDataService: EntityDataService,
     private val gitConfigProperties: GitConfigProperties,
     private val gitPullRequestCache: DefaultGitPullRequestCache,
+    private val gitNoRemoteCounter: GitNoRemoteCounter,
     transactionManager: PlatformTransactionManager
 ) : AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue>(structureService, propertyService), GitService, JobOrchestratorSupplier {
 
@@ -100,7 +103,7 @@ class GitServiceImpl(
         // Indexation of repositories, based on projects actually linked
         forEachConfiguredProject(BiConsumer { project, configuration ->
             if (!project.isDisabled) {
-                jobs.add(getGitIndexationJobRegistration(configuration))
+                jobs.add(getGitIndexationJobRegistration(configuration, project))
             }
         })
         // Synchronisation of branch builds with tags when applicable
@@ -810,14 +813,14 @@ class GitServiceImpl(
         return GIT_INDEXATION_JOB.getKey(config.gitRepository.id)
     }
 
-    private fun createIndexationJob(config: GitConfiguration): Job {
+    private fun createIndexationJob(config: GitConfiguration, project: Project): Job {
         return object : Job {
             override fun getKey(): JobKey {
                 return getGitIndexationJobKey(config)
             }
 
             override fun getTask(): JobRun {
-                return JobRun { runListener -> index(config, runListener) }
+                return JobRun { runListener -> index(config, project, runListener) }
             }
 
             override fun getDescription(): String {
@@ -906,17 +909,45 @@ class GitServiceImpl(
         }
     }
 
-    private fun index(config: GitConfiguration, listener: JobRunListener) {
-        listener.message("Git sync for %s", config.name)
+    private fun index(config: GitConfiguration, project: Project, listener: JobRunListener) {
+        syncProjectRepository(config, project, listener::message)
+    }
+
+    override fun syncProjectRepository(config: GitConfiguration, project: Project, listener: (message: String) -> Unit) {
+        listener("Git sync for ${config.name}")
         // Gets the client for this configuration
         val client = gitRepositoryClientFactory.getClient(config.gitRepository)
         // Launches the synchronisation
-        client.sync(listener.logger())
+        try {
+            client.sync {
+                listener(it)
+            }
+            // Reset the counter for the project
+            gitNoRemoteCounter.resetNoRemoteCount(project.name)
+        } catch (ex: GitRepositoryNoRemoteException) {
+            // Remote was mentioned as not existing
+            if (gitConfigProperties.remote.maxNoRemote > 0) {
+                // Gets the counter for the project
+                val count = gitNoRemoteCounter.getNoRemoteCount(project.name)
+                // If < threshold, just increment the counter
+                if (count < gitConfigProperties.remote.maxNoRemote) {
+                    gitNoRemoteCounter.incNoRemoteCount(project.name)
+                } else {
+                    // If >= threshold, disable the project and logs the incident
+                    securityService.asAdmin {
+                        structureService.disableProject(project)
+                    }
+                    logger.info("Indexation of Git repository for project ${project.name} failed because of no remote ${gitConfigProperties.remote.maxNoRemote} times in a row. Disabling the project.")
+                }
+            } else {
+                throw ex
+            }
+        }
     }
 
-    private fun getGitIndexationJobRegistration(configuration: GitConfiguration): JobRegistration {
+    private fun getGitIndexationJobRegistration(configuration: GitConfiguration, project: Project): JobRegistration {
         return JobRegistration
-                .of(createIndexationJob(configuration))
+                .of(createIndexationJob(configuration, project))
                 .everyMinutes(configuration.indexationInterval.toLong())
     }
 

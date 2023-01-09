@@ -214,6 +214,12 @@ public interface StructureRepository {
 
     List<PromotionRun> getLastPromotionRunsForBuild(Build build);
 
+    /**
+     * Optimized version of [getLastPromotionRunsForBuild] with cached list of
+     * promotion levels
+     */
+    List<PromotionRun> getLastPromotionRunsForBuild(Build build, List<PromotionLevel> promotionLevels);
+
     PromotionRun getLastPromotionRunForPromotionLevel(PromotionLevel promotionLevel);
 
     Optional<PromotionRun> getLastPromotionRun(Build build, PromotionLevel promotionLevel);

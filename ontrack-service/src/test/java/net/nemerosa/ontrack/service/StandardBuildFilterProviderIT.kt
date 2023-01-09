@@ -1,15 +1,118 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.StandardBuildFilterData
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class StandardBuildFilterProviderIT : AbstractDSLTestJUnit4Support() {
+class StandardBuildFilterProviderIT : AbstractDSLTestSupport() {
 
+    @Test
+    fun `Pagination without filter`() {
+        project {
+            branch {
+                // Creating 20 builds
+                repeat(20) {
+                    build("$it")
+                }
+                // Pagination through the results, 8 by 8
+                // Note: the filter count is NOT used
+                val filter = buildFilterService.standardFilterProviderData(10).build()
+                // First page
+                filter.filterBranchBuildsWithPagination(this, 0, 8).let { page ->
+                    assertEquals(20, page.pageInfo.totalSize)
+                    assertEquals(0, page.pageInfo.currentOffset)
+                    assertEquals(8, page.pageInfo.currentSize)
+                    assertNull(page.pageInfo.previousPage, "No previous page")
+                    assertNotNull(page.pageInfo.nextPage) {
+                        assertEquals(8, it.offset)
+                        assertEquals(8, it.size)
+                    }
+                }
+                // Second page
+                filter.filterBranchBuildsWithPagination(this, 8, 8).let { page ->
+                    assertEquals(20, page.pageInfo.totalSize)
+                    assertEquals(8, page.pageInfo.currentOffset)
+                    assertEquals(8, page.pageInfo.currentSize)
+                    assertNotNull(page.pageInfo.previousPage) {
+                        assertEquals(0, it.offset)
+                        assertEquals(8, it.size)
+                    }
+                    assertNotNull(page.pageInfo.nextPage) {
+                        assertEquals(16, it.offset)
+                        assertEquals(4, it.size)
+                    }
+                }
+                // Third (and last) page
+                filter.filterBranchBuildsWithPagination(this, 16, 8).let { page ->
+                    assertEquals(20, page.pageInfo.totalSize)
+                    assertEquals(16, page.pageInfo.currentOffset)
+                    assertEquals(4, page.pageInfo.currentSize)
+                    assertNotNull(page.pageInfo.previousPage) {
+                        assertEquals(8, it.offset)
+                        assertEquals(8, it.size)
+                    }
+                    assertNull(page.pageInfo.nextPage, "No next page")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Pagination with filter`() {
+        project {
+            branch {
+                val pl = promotionLevel()
+                // Creating 20 builds (and promote one every 3 builds: 0, 3, 6, 9, 12, 15, 18)
+                repeat(20) {
+                    val build = build("$it")
+                    if (it % 3 == 0) {
+                        build.promote(pl)
+                    }
+                }
+                // Pagination through the results, 4 by 4, with the promotion
+                // Note: the filter count is NOT used
+                val filter = buildFilterService
+                        .standardFilterProviderData(10)
+                        .withWithPromotionLevel(pl.name)
+                        .build()
+                // First page
+                filter.filterBranchBuildsWithPagination(this, 0, 4).let { page ->
+                    assertEquals(7, page.pageInfo.totalSize)
+                    assertEquals(0, page.pageInfo.currentOffset)
+                    assertEquals(4, page.pageInfo.currentSize)
+                    assertEquals(
+                            listOf(18, 15, 12, 9).map { it.toString() },
+                            page.pageItems.map { it.name }
+                    )
+                    assertNull(page.pageInfo.previousPage, "No previous page")
+                    assertNotNull(page.pageInfo.nextPage) {
+                        assertEquals(4, it.offset)
+                        assertEquals(3, it.size)
+                    }
+                }
+                // Second page
+                filter.filterBranchBuildsWithPagination(this, 4, 4).let { page ->
+                    assertEquals(7, page.pageInfo.totalSize)
+                    assertEquals(4, page.pageInfo.currentOffset)
+                    assertEquals(3, page.pageInfo.currentSize)
+                    assertEquals(
+                            listOf(6, 3, 0).map { it.toString() },
+                            page.pageItems.map { it.name }
+                    )
+                    assertNotNull(page.pageInfo.previousPage) {
+                        assertEquals(0, it.offset)
+                        assertEquals(4, it.size)
+                    }
+                    assertNull(page.pageInfo.nextPage, "No next page")
+                }
+            }
+        }
+    }
 
     @Test
     fun `Limit the count of builds`() {

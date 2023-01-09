@@ -1,17 +1,20 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.security.BranchEdit
 import net.nemerosa.ontrack.model.security.BranchFilterMgt
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.structure.BranchCopyRequest
 import net.nemerosa.ontrack.model.structure.CopyService
-import org.junit.Assert.*
-import org.junit.Test
+import net.nemerosa.ontrack.model.structure.StandardBuildFilterData
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
-class BuildFilterServiceIT : AbstractDSLTestJUnit4Support() {
+class BuildFilterServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var copyService: CopyService
@@ -32,7 +35,7 @@ class BuildFilterServiceIT : AbstractDSLTestJUnit4Support() {
                     JsonUtils.`object`().end()
             )
         }
-        assertFalse("A predefined filter cannot be saved", filterCreated.isSuccess)
+        assertFalse(filterCreated.isSuccess, "A predefined filter cannot be saved")
     }
 
     /**
@@ -52,11 +55,11 @@ class BuildFilterServiceIT : AbstractDSLTestJUnit4Support() {
                     branch.id,
                     false,
                     "MyFilter",
-                    NamedBuildFilterProvider::class.java.name,
-                    objectMapper.valueToTree(NamedBuildFilterData.of("1"))
+                    StandardBuildFilterProvider::class.java.name,
+                    objectMapper.valueToTree(StandardBuildFilterData(count = 1))
             )
         }
-        assertTrue("Account filter saved", ack.isSuccess)
+        assertTrue(ack.isSuccess, "Account filter saved")
 
         // Makes sure we find this filter back when logged
         var filters = asConfigurableAccount(account).withView(branch).call { buildFilterService.getBuildFilters(branch.id) }
@@ -67,8 +70,8 @@ class BuildFilterServiceIT : AbstractDSLTestJUnit4Support() {
 
         // ... but it is not available for anybody else
         assertTrue(
-                "Account filter not available for everybody else",
-                asConfigurableAccount(otherAccount).withView(branch).call { buildFilterService.getBuildFilters(branch.id).isEmpty() }
+                asConfigurableAccount(otherAccount).withView(branch).call { buildFilterService.getBuildFilters(branch.id).isEmpty() },
+                "Account filter not available for everybody else"
         )
 
         // Now, shares a filter with the same name
@@ -80,11 +83,11 @@ class BuildFilterServiceIT : AbstractDSLTestJUnit4Support() {
                             branch.id,
                             true, // Sharing
                             "MyFilter",
-                            NamedBuildFilterProvider::class.java.name,
-                            objectMapper.valueToTree(NamedBuildFilterData.of("1"))
+                            StandardBuildFilterProvider::class.java.name,
+                            objectMapper.valueToTree(StandardBuildFilterData(count = 1))
                     )
                 }
-        assertTrue("Account filter shared", ack.isSuccess)
+        assertTrue(ack.isSuccess, "Account filter shared")
 
         // Makes sure we find this filter back when logged
         filters = asFixedAccount(account).call { buildFilterService.getBuildFilters(branch.id) }
@@ -95,7 +98,7 @@ class BuildFilterServiceIT : AbstractDSLTestJUnit4Support() {
 
         // ... and that it is available also for not logged users
         filters = asUser().withView(branch).call { buildFilterService.getBuildFilters(branch.id) }
-        assertEquals("Account filter available for everybody else", 1, filters.size.toLong())
+        assertEquals(1, filters.size.toLong(), "Account filter available for everybody else")
         filter = filters.iterator().next()
         assertEquals("MyFilter", filter.name)
         assertTrue(filter.isShared)
@@ -114,11 +117,11 @@ class BuildFilterServiceIT : AbstractDSLTestJUnit4Support() {
                     branch.id,
                     false,
                     "MyFilter",
-                    NamedBuildFilterProvider::class.java.name,
-                    objectMapper.valueToTree(NamedBuildFilterData.of("1"))
+                    StandardBuildFilterProvider::class.java.name,
+                    objectMapper.valueToTree(StandardBuildFilterData(count = 1))
             )
         }
-        assertTrue("Account filter saved", ack.isSuccess)
+        assertTrue(ack.isSuccess, "Account filter saved")
 
         // The filter is present
         var filters = asConfigurableAccount(account).withView(branch).call { buildFilterService.getBuildFilters(branch.id) }
@@ -149,11 +152,11 @@ class BuildFilterServiceIT : AbstractDSLTestJUnit4Support() {
                     branch.id,
                     true, // Shared
                     "MyFilter",
-                    NamedBuildFilterProvider::class.java.name,
-                    objectMapper.valueToTree(NamedBuildFilterData.of("1"))
+                    StandardBuildFilterProvider::class.java.name,
+                    objectMapper.valueToTree(StandardBuildFilterData(count = 1))
             )
         }
-        assertTrue("Account filter saved", ack.isSuccess)
+        assertTrue(ack.isSuccess, "Account filter saved")
 
         // The filter is present for this account
         var filters = creator.call { buildFilterService.getBuildFilters(branch.id) }
@@ -164,7 +167,7 @@ class BuildFilterServiceIT : AbstractDSLTestJUnit4Support() {
 
         // ... and that it is available also for other users
         filters = asUser().withView(branch).call { buildFilterService.getBuildFilters(branch.id) }
-        assertEquals("Account filter available for everybody else", 1, filters.size.toLong())
+        assertEquals(1, filters.size.toLong(), "Account filter available for everybody else")
         filter = filters.iterator().next()
         assertEquals("MyFilter", filter.name)
         assertTrue(filter.isShared)
@@ -178,7 +181,7 @@ class BuildFilterServiceIT : AbstractDSLTestJUnit4Support() {
 
         // ... not for other users
         filters = asUser().withView(branch).call { buildFilterService.getBuildFilters(branch.id) }
-        assertEquals("Account filter not available for everybody else", 0, filters.size.toLong())
+        assertEquals(0, filters.size.toLong(), "Account filter not available for everybody else")
     }
 
     @Test

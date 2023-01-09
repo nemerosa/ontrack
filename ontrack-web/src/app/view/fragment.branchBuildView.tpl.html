@@ -298,6 +298,15 @@
             </div>
         </td>
     </tr>
+    <tr ng-if="buildsPageInfo.nextPage">
+        <td>&nbsp;</td>
+        <td colspan="2">
+            <button type="button" class="ot-branch-build-view-more" title="Displays more builds.">
+                More...
+            </button>
+        </td>
+        <td colspan="{{validationStampFilterCount(0)}}">&nbsp;</td>
+    </tr>
     </tbody>
     <tfoot>
     <tr>

@@ -29,13 +29,13 @@ class ImageGQLProjectEntityFieldContributor(
             ProjectEntityType.PROMOTION_LEVEL -> listOf(
                 baseImageFieldBuilder { env ->
                     val pl: PromotionLevel = env.getSource()
-                    uriBuilder.build(on(PromotionLevelController::class.java).getPromotionLevelImage_(null, pl.id))
+                    uriBuilder.url("/rest/structure/promotionLevels/${pl.id}/image")
                 }
             )
             ProjectEntityType.VALIDATION_STAMP -> listOf(
                 baseImageFieldBuilder { env ->
                     val vs: ValidationStamp = env.getSource()
-                    uriBuilder.build(on(ValidationStampController::class.java).getValidationStampImage_(null, vs.id))
+                    uriBuilder.url("/rest/structure/validationStamps/${vs.id}/image")
                 }
             )
             else -> emptyList()

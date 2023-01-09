@@ -8,6 +8,7 @@ import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIName
+import net.nemerosa.ontrack.model.structure.ID
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
@@ -28,11 +29,30 @@ fun TypeBuilder.stringField(name: String, description: String): GraphQLObjectTyp
         it.name(name).description(description).type(GraphQLString)
     }
 
+fun TypeBuilder.idField(property: KProperty<ID>, description: String? = null): GraphQLObjectType.Builder =
+    field {
+        it.name(net.nemerosa.ontrack.model.annotations.getPropertyName(property))
+                .description(net.nemerosa.ontrack.model.annotations.getPropertyDescription(property, description))
+                .type(GraphQLInt)
+                .dataFetcher { env ->
+                    val source = env.getSource<Any>()
+                    val id = property.call(source)
+                    id.get()
+                }
+    }
+
 fun TypeBuilder.dateField(name: String, description: String): GraphQLObjectType.Builder = field {
     it.name(name)
         .description(description)
         .type(GQLScalarLocalDateTime.INSTANCE)
 }
+
+fun TypeBuilder.jsonField(property: KProperty<Any?>, description: String? = null): GraphQLObjectType.Builder =
+        field {
+            it.name(net.nemerosa.ontrack.model.annotations.getPropertyName(property))
+                    .description(net.nemerosa.ontrack.model.annotations.getPropertyDescription(property, description))
+                    .type(GQLScalarJSON.INSTANCE)
+        }
 
 fun TypeBuilder.booleanField(property: KProperty<Boolean>, description: String? = null): GraphQLObjectType.Builder =
     field {
@@ -106,6 +126,18 @@ fun TypeBuilder.stringField(property: KProperty<String?>, description: String? =
         it.name(property.name)
             .description(getPropertyDescription(property, description))
             .type(nullableOutputType(GraphQLString, property.returnType.isMarkedNullable))
+    }
+
+fun TypeBuilder.classField(property: KProperty<Class<*>?>, description: String? = null): GraphQLObjectType.Builder =
+    field {
+        it.name(net.nemerosa.ontrack.model.annotations.getPropertyName(property))
+            .description(net.nemerosa.ontrack.model.annotations.getPropertyDescription(property, description))
+            .type(nullableOutputType(GraphQLString, property.returnType.isMarkedNullable))
+                .dataFetcher { env ->
+                    val source = env.getSource<Any>()
+                    val cls = property.call(source)
+                    cls?.name
+                }
     }
 
 fun TypeBuilder.gqlTypeField(

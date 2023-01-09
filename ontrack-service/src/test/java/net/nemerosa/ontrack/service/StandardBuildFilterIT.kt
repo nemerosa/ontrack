@@ -6,14 +6,13 @@ import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.PromotionRun.Companion.of
 import net.nemerosa.ontrack.model.structure.Signature.Companion.of
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
-import net.nemerosa.ontrack.test.TestUtils
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
-class StandardBuildFilterIT : AbstractBuildFilterIT() {
+class StandardBuildFilterIT : AbstractBuildFilterTestSupport() {
 
     /**
      * Default filter
@@ -22,9 +21,9 @@ class StandardBuildFilterIT : AbstractBuildFilterIT() {
     fun default_filter() {
         (1..20).forEach { build(it) }
         val builds = buildFilterService.defaultFilterProviderData().filterBranchBuilds(branch)
-        Assert.assertEquals(10, builds.size.toLong())
-        Assert.assertEquals("20", builds[0].name)
-        Assert.assertEquals("11", builds[9].name)
+        assertEquals(10, builds.size.toLong())
+        assertEquals("20", builds[0].name)
+        assertEquals("11", builds[9].name)
     }
 
     /**
@@ -91,7 +90,7 @@ class StandardBuildFilterIT : AbstractBuildFilterIT() {
         // Filtering
         val builds = filter.filterBranchBuilds(branch)
         // No build being returned
-        Assert.assertTrue("No build returned on promotion level not found", builds.isEmpty())
+        assertTrue(builds.isEmpty(), "No build returned on promotion level not found")
     }
 
     /**
@@ -182,7 +181,7 @@ class StandardBuildFilterIT : AbstractBuildFilterIT() {
         // Filtering
         val builds = filter.filterBranchBuilds(branch)
         // Checks the list
-        Assert.assertTrue("Expecting no result", builds.isEmpty())
+        assertTrue(builds.isEmpty(), "Expecting no result")
     }
 
     /**
@@ -235,7 +234,7 @@ class StandardBuildFilterIT : AbstractBuildFilterIT() {
         // Filtering
         val builds = filter.filterBranchBuilds(branch)
         // Checks the list
-        Assert.assertTrue("Expecting no result", builds.isEmpty())
+        assertTrue(builds.isEmpty(), "Expecting no result")
     }
 
     /**
@@ -325,8 +324,8 @@ class StandardBuildFilterIT : AbstractBuildFilterIT() {
                 .build()
         // Filtering
         val builds = filter.filterBranchBuilds(branch)
-        // Checks the list
-        checkList(builds, 2, 1)
+        // Checks the list is empty
+        checkListIsEmpty(builds)
     }
 
     /**
@@ -420,7 +419,7 @@ class StandardBuildFilterIT : AbstractBuildFilterIT() {
         // Filtering
         val builds = filter.filterBranchBuilds(branch)
         // No build
-        Assert.assertTrue("Expecting no result", builds.isEmpty())
+        assertTrue(builds.isEmpty(), "Expecting no result")
     }
 
     @Test

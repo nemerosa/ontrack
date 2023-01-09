@@ -5,6 +5,7 @@ import graphql.schema.*;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -79,7 +80,7 @@ public class GQLInputBuildStandardFilter implements GQLInputType<BuildFilterProv
     }
 
     @Override
-    public BuildFilterProviderData<?> convert(Object filter) {
+    public @NotNull BuildFilterProviderData<?> convert(Object filter) {
         if (filter == null) {
             return buildFilterService.standardFilterProviderData(10).build();
         } else {

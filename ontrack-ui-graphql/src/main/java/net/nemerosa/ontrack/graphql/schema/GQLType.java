@@ -3,14 +3,16 @@ package net.nemerosa.ontrack.graphql.schema;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 
+import javax.validation.constraints.NotNull;
+
 public interface GQLType {
 
-    String getTypeName();
+    @NotNull String getTypeName();
 
     default GraphQLTypeReference getTypeRef() {
         return new GraphQLTypeReference(getTypeName());
     }
 
-    GraphQLObjectType createType(GQLTypeCache cache);
+    @NotNull GraphQLObjectType createType(@NotNull GQLTypeCache cache);
 
 }

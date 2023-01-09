@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository
 
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
@@ -8,7 +9,6 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.StringUtils.isNotBlank
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.stereotype.Repository
-import java.lang.String.format
 import java.util.*
 import javax.sql.DataSource
 import kotlin.math.max
@@ -194,13 +194,83 @@ class CoreBuildFilterJdbcRepository(
         data: StandardBuildFilterData,
         propertyTypeAccessor: (String) -> PropertyType<*>,
     ): List<Build> {
+        val count = min(data.count, ontrackConfigProperties.buildFilterCountMax)
+        val params = MapSqlParameterSource()
+
+        val base = buildStandardFilterQuery(branch, data, params, propertyTypeAccessor)
+        appendOrderOffsetAndCount(base, 0, count, params)
+
+        val sql = "SELECT DISTINCT(B.ID) $base"
+
+        return loadBuilds(sql, params)
+    }
+
+    override fun standardFilterPagination(
+        branch: Branch,
+        data: StandardBuildFilterData,
+        offset: Int,
+        size: Int,
+        propertyTypeAccessor: (String) -> PropertyType<*>,
+    ): PaginatedList<Build> {
+        val count = minOf(size, ontrackConfigProperties.buildFilterCountMax)
+        val params = MapSqlParameterSource()
+
+        val base = buildStandardFilterQuery(branch, data, params, propertyTypeAccessor)
+
+        // Count
+        val total = namedParameterJdbcTemplate!!.queryForObject(
+            "SELECT COUNT(B.ID) $base",
+            params,
+            Int::class.java
+        ) ?: 0
+
+        // List
+        appendOrderOffsetAndCount(base, offset, count, params)
+        val builds = loadBuilds("SELECT DISTINCT(B.ID) $base", params)
+
+        // OK
+        return PaginatedList.Companion.create(
+            builds,
+            offset,
+            size,
+            total,
+        )
+    }
+
+    /**
+     * The fat join query defines the following columns:
+     *
+     * ```
+     * B (BUILDS)
+     * PR (PROMOTION_RUNS)
+     * PL (PROMOTION_LEVELS)
+     * S (last validation run status)
+     * VALIDATIONSTAMPID
+     * VALIDATIONRUNSTATUSID
+     * PP (PROPERTIES)
+     * BDFROM (builds linked from)
+     * BRFROM (branches linked from)
+     * PJFROM (projects linked from)
+     * PLFROM (promotions linked from)
+     * BDTO (builds linked to)
+     * BRTO (branches linked to)
+     * PJTO (projects linked to)
+     * PLTO (promotions linked to)
+     * ```
+     */
+    private fun buildStandardFilterQuery(
+        branch: Branch,
+        data: StandardBuildFilterData,
+        params: MapSqlParameterSource,
+        propertyTypeAccessor: (String) -> PropertyType<*>,
+    ): StringBuilder {
         // Query root
-        val tables = StringBuilder("SELECT DISTINCT(B.ID) FROM BUILDS B ")
+        val tables = StringBuilder("FROM BUILDS B ")
         // Criterias
         val criteria = StringBuilder(" WHERE B.BRANCHID = :branch")
 
         // Parameters
-        val params = MapSqlParameterSource("branch", branch.id())
+        params.addValue("branch", branch.id())
         var sinceBuildId: Int? = null
 
         // sincePromotionLevel
@@ -243,9 +313,12 @@ class CoreBuildFilterJdbcRepository(
 
         // sinceValidationStamp
         val sinceValidationStamp = data.sinceValidationStamp
-        if (isNotBlank(sinceValidationStamp)) {
+        if (!sinceValidationStamp.isNullOrBlank()) {
             // Gets the validation stamp ID
-            val validationStampId = getValidationStampId(branch, sinceValidationStamp)!!
+            val validationStampId = getValidationStampId(branch, sinceValidationStamp)
+                ?: throw CoreBuildFilterInvalidException(
+                    "Could not find validation stamp $sinceValidationStamp."
+                )
             // Gets the last build having this validation stamp and the validation status
             val id = findLastBuildWithValidationStamp(validationStampId, data.sinceValidationStampStatus)
             if (id != null) {
@@ -259,7 +332,7 @@ class CoreBuildFilterJdbcRepository(
 
         // withValidationStamp
         val withValidationStamp = data.withValidationStamp
-        if (isNotBlank(withValidationStamp)) {
+        if (!withValidationStamp.isNullOrBlank()) {
             tables.append(
                 "  LEFT JOIN (" +
                         " SELECT R.BUILDID,  R.VALIDATIONSTAMPID, VRS.VALIDATIONRUNSTATUSID " +
@@ -269,7 +342,10 @@ class CoreBuildFilterJdbcRepository(
                         " ) S ON S.BUILDID = B.ID"
             )
             // Gets the validation stamp ID
-            val validationStampId = getValidationStampId(branch, withValidationStamp)!!
+            val validationStampId = getValidationStampId(branch, withValidationStamp)
+                ?: throw CoreBuildFilterInvalidException(
+                    "Could not find validation stamp $withValidationStamp."
+                )
             criteria.append(" AND (S.VALIDATIONSTAMPID = :validationStampId")
             params.addValue("validationStampId", validationStampId)
             // withValidationStampStatus
@@ -283,7 +359,7 @@ class CoreBuildFilterJdbcRepository(
 
         // withProperty
         val withProperty = data.withProperty
-        if (isNotBlank(withProperty)) {
+        if (!withProperty.isNullOrBlank()) {
             tables.append(" LEFT JOIN PROPERTIES PP ON PP.BUILD = B.ID")
             criteria.append(" AND PP.TYPE = :withProperty")
             params.addValue("withProperty", withProperty)
@@ -304,14 +380,16 @@ class CoreBuildFilterJdbcRepository(
                     )
                 } else {
                     // No match
-                    return emptyList()
+                    throw CoreBuildFilterInvalidException(
+                        "Property value [$withPropertyValue] for property [$withProperty] cannot be converted to search arguments."
+                    )
                 }
             }
         }
 
         // sinceProperty
         val sinceProperty = data.sinceProperty
-        if (isNotBlank(sinceProperty)) {
+        if (!sinceProperty.isNullOrBlank()) {
             val sincePropertyValue = data.sincePropertyValue
             val id = findLastBuildWithPropertyValue(branch, sinceProperty, sincePropertyValue, propertyTypeAccessor)
             if (id != null) {
@@ -396,14 +474,18 @@ class CoreBuildFilterJdbcRepository(
         }
 
         // Final SQL
-        val sql = format(
-            "%s %s ORDER BY B.ID DESC LIMIT :count",
-            tables,
-            criteria)
-        params.addValue("count", min(data.count, ontrackConfigProperties.buildFilterCountMax))
+        return tables.append(criteria)
+    }
 
-        // Running the query
-        return loadBuilds(sql, params)
+    private fun appendOrderOffsetAndCount(
+        sql: StringBuilder,
+        offset: Int,
+        count: Int,
+        params: MapSqlParameterSource,
+    ) {
+        sql.append(" ORDER BY B.ID DESC OFFSET :offset LIMIT :count")
+        params.addValue("offset", offset)
+        params.addValue("count", count)
     }
 
     private fun loadBuilds(sql: String, params: MapSqlParameterSource): List<Build> {
@@ -605,8 +687,8 @@ class CoreBuildFilterJdbcRepository(
     private fun getValidationStampId(branch: Branch, validationStampName: String): Int? {
         return structureRepository
             .getValidationStampByName(branch, validationStampName)
-            .map { it.id() }
-            .orElse(-1)
+            .orElse(null)
+            ?.id()
     }
 
     private fun findLastBuildWithValidationStamp(validationStampId: Int, status: String?): Int? {

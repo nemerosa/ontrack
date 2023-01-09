@@ -729,6 +729,11 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Promotion levels for the branch
         List<PromotionLevel> promotionLevels = getPromotionLevelListForBranch(branch.getId());
         // Gets the last promotion run for each promotion level
+        return getLastPromotionRunsForBuild(build, promotionLevels);
+    }
+
+    @Override
+    public List<PromotionRun> getLastPromotionRunsForBuild(Build build, List<PromotionLevel> promotionLevels) {
         return promotionLevels.stream()
                 .map(promotionLevel -> getLastPromotionRun(build, promotionLevel))
                 .filter(Optional::isPresent)

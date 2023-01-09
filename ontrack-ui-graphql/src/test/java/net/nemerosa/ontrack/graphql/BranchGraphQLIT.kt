@@ -6,14 +6,14 @@ import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.BranchFavouriteService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class BranchGraphQLIT : AbstractQLKTITJUnit4Support() {
+class BranchGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var branchFavouriteService: BranchFavouriteService

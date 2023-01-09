@@ -3,7 +3,32 @@ angular.module('ot.service.buildfilter', [
     'ot.service.form'
 ])
     .service('otBuildFilterService', function (ot, $q, $http, otFormService, otNotificationService) {
-        var self = {};
+        const self = {};
+
+        /**
+         * Merges the list of available filters from two sources:
+         * - the server filters for the current user
+         * - the local filters
+         *
+         * The remote filters have priority over the local ones.
+         *
+         * Additionally, fetches the available filter forms for the branch.
+         */
+        self.mergeRemoteAndLocalFilters = (branchId, remoteFilters) => {
+            // Loads the local filters for this branch
+            const store = self.getStoreForBranch(branchId);
+            // Adding the remote filters
+            angular.forEach(remoteFilters, buildFilter => {
+                store[buildFilter.name] = buildFilter;
+            });
+            // Flatten the values for the store
+            const flatBuildFilterResources = [];
+            angular.forEach(store, function (value) {
+                flatBuildFilterResources.push(value);
+            });
+            // OK
+            return flatBuildFilterResources;
+        };
 
         /**
          * Loads the list of available filters from two sources:
@@ -13,18 +38,20 @@ angular.module('ot.service.buildfilter', [
          * The remote filters have priority over the local ones.
          *
          * Additionally, fetches the available filter forms for the branch.
+         *
+         * @deprecated Not loading using REST any longer
          */
         self.loadFilters = function (branch) {
-            var d = $q.defer();
+            const d = $q.defer();
             // Loads the local filters for this branch
-            var store = self.getStoreForBranch(branch.id);
+            const store = self.getStoreForBranch(branch.id);
             // Loads the remote filters & the filter forms for this branch
             ot.call($http.get(branch._buildFilterResources)).then(function (buildFilterResources) {
                 angular.forEach(buildFilterResources.resources, function (buildFilterResource) {
                     store[buildFilterResource.name] = buildFilterResource;
                 });
                 // Flatten the values for the store
-                var flatBuildFilterResources = [];
+                const flatBuildFilterResources = [];
                 angular.forEach(store, function (value) {
                     flatBuildFilterResources.push(value);
                 });
@@ -42,9 +69,9 @@ angular.module('ot.service.buildfilter', [
          * @return Promise with the created filter
          */
         self.createBuildFilter = function (config) {
-            if (config.buildFilterForm.predefined) {
-                var d = $q.defer();
-                var buildFilterResource = {
+            if (config.buildFilterForm.isPredefined) {
+                const d = $q.defer();
+                const buildFilterResource = {
                     name: config.buildFilterForm.typeName,
                     type: config.buildFilterForm.type,
                     data: {}
@@ -57,9 +84,9 @@ angular.module('ot.service.buildfilter', [
                     title: "New filter",
                     form: config.buildFilterForm.form,
                     submit: function (data) {
-                        var name = data.name;
+                        const name = data.name;
                         delete data.name;
-                        var buildFilterResource = {
+                        const buildFilterResource = {
                             name: name,
                             type: config.buildFilterForm.type,
                             data: data
@@ -70,8 +97,8 @@ angular.module('ot.service.buildfilter', [
                         }
                         // Stores locally as current
                         self.storeCurrent(config.branchId, buildFilterResource);
-                        // OK
-                        return true;
+                        // Filter as a result
+                        return buildFilterResource;
                     }
                 });
             }
@@ -85,18 +112,18 @@ angular.module('ot.service.buildfilter', [
          * @return Promise with the created/editer filter
          */
         self.editBuildFilter = function (config) {
-            var buildFilterResource = config.buildFilterResource;
+            const buildFilterResource = config.buildFilterResource;
             // Looking for the edition form
-            var resourceBuildFilterForm;
-            var type = buildFilterResource.type;
-            angular.forEach(config.buildFilterForms.resources, function (buildFilterForm) {
-                if (buildFilterForm.type == type) {
+            let resourceBuildFilterForm;
+            const type = buildFilterResource.type;
+            angular.forEach(config.buildFilterForms, buildFilterForm => {
+                if (buildFilterForm.type === type) {
                     resourceBuildFilterForm = buildFilterForm;
                 }
             });
             // Checks for the form
             if (resourceBuildFilterForm) {
-                // Copy of the fiter's form
+                // Copy of the filter's form
                 resourceBuildFilterForm = angular.copy(resourceBuildFilterForm);
                 // Name
                 buildFilterResource.data.name = buildFilterResource.name;
@@ -106,29 +133,29 @@ angular.module('ot.service.buildfilter', [
                 return self.createBuildFilter({
                     branchId: config.branch.id,
                     buildFilterForm: resourceBuildFilterForm
-                }).then(function () {
-                    // Loads the current filter
-                    var currentFilter = self.getCurrentFilter(config.branch.id);
+                }).then(filter => {
                     // Storing if saved under the same name
-                    if (buildFilterResource._update && buildFilterResource.name == currentFilter.name) {
-                        self.saveFilter(config.branch, currentFilter);
+                    if (buildFilterResource._update && buildFilterResource.name === filter.name) {
+                        self.saveFilter(config.branch, filter);
                     }
                     // Sharing if saved under the same name
-                    if (buildFilterResource.shared && config.branch._buildFilterShare && buildFilterResource.name == currentFilter.name) {
-                        self.shareFilter(config.branch, currentFilter);
+                    if (buildFilterResource.shared && config.branch._buildFilterShare && buildFilterResource.name === filter.name) {
+                        self.shareFilter(config.branch, filter);
                     }
+                    // Returning the filter
+                    return filter;
                 });
             } else {
                 otNotificationService.error("The type of this filter appears not to be supported: " + type + ". " +
                     "Consider to delete it.");
-                var d = $q.defer();
+                const d = $q.defer();
                 d.reject();
                 return d.promise;
             }
         };
 
         self.getCurrentFilter = function (branchId) {
-            var json = localStorage.getItem('build_filter_' + branchId + '_current');
+            const json = localStorage.getItem('build_filter_' + branchId + '_current');
             if (json) {
                 return JSON.parse(json);
             } else {
@@ -182,7 +209,7 @@ angular.module('ot.service.buildfilter', [
             // What about the current filter?
             // If selected, stores only its content, not its name
             var currentBuildFilterResource = self.getCurrentFilter(branch.id);
-            if (currentBuildFilterResource && currentBuildFilterResource.name && currentBuildFilterResource.name == buildFilterResource.name) {
+            if (currentBuildFilterResource && currentBuildFilterResource.name && currentBuildFilterResource.name === buildFilterResource.name) {
                 currentBuildFilterResource.name = '';
                 self.storeCurrent(branch.id, currentBuildFilterResource);
             }
@@ -198,19 +225,19 @@ angular.module('ot.service.buildfilter', [
 
         self.saveFilter = function (branch, buildFilterResource) {
             return ot.call(
-                $http.post(branch._buildFilterSave, {
+                $http.post(branch.links._buildFilterSave, {
                     name: buildFilterResource.name,
-                    shared: buildFilterResource.shared,
+                    shared: buildFilterResource.isShared,
                     type: buildFilterResource.type,
                     data: buildFilterResource.data
                 })
             );
         };
 
-        self.shareFilter = function (branch, buildFilterResource) {
+        self.shareFilter = (branch, buildFilterResource) => {
             buildFilterResource.shared = true;
             return ot.call(
-                $http.post(branch._buildFilterShare, {
+                $http.post(branch.links._buildFilterShare, {
                     name: buildFilterResource.name,
                     shared: true,
                     type: buildFilterResource.type,
