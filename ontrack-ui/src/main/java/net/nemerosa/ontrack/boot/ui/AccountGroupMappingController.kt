@@ -19,6 +19,13 @@ class AccountGroupMappingController(
 ) : AbstractResourceController() {
 
     /**
+     * Gets the list of mappings for a provider and a blank source (for LDAP for example)
+     */
+    @GetMapping("{provider}")
+    fun getMappingsWithoutSource(@PathVariable provider: String): ResponseEntity<List<AccountGroupMapping>> =
+        getMappings(provider, "")
+
+    /**
      * Gets the list of mappings for a provider and a source
      */
     @GetMapping("{provider}/{source}")
@@ -26,6 +33,13 @@ class AccountGroupMappingController(
         val authenticationSource = authenticationSourceRepository.getRequiredAuthenticationSource(provider, source)
         return ResponseEntity.ok(accountGroupMappingService.getMappings(authenticationSource))
     }
+
+    /**
+     * Creates a mapping without a source (for LDAP for example)
+     */
+    @PostMapping("{provider}")
+    fun createMappingWithoutSource(@PathVariable provider: String, @RequestBody input: AccountGroupMappingInput): ResponseEntity<AccountGroupMapping> =
+        createMapping(provider, "", input)
 
     /**
      * Creates a mapping
@@ -37,6 +51,13 @@ class AccountGroupMappingController(
     }
 
     /**
+     * Deletes a mapping without a source (for LDAP)
+     */
+    @DeleteMapping("{provider}/{id}")
+    fun deleteMappingWithoutSource(@PathVariable provider: String, @PathVariable id: ID): ResponseEntity<Ack> =
+        deleteMapping(provider, "", id)
+
+    /**
      * Deletes a mapping
      */
     @DeleteMapping("{provider}/{source}/{id}")
@@ -44,6 +65,13 @@ class AccountGroupMappingController(
         val authenticationSource = authenticationSourceRepository.getRequiredAuthenticationSource(provider, source)
         return ResponseEntity.ok(accountGroupMappingService.deleteMapping(authenticationSource, id))
     }
+
+    /**
+     * Gets a list of provided groups for a type without a source and token.
+     */
+    @GetMapping("{provider}/search/{token:.*}")
+    fun getSuggestedMappingsWithoutSource(@PathVariable provider: String, @PathVariable token: String): ResponseEntity<List<String>> =
+        getSuggestedMappings(provider, "", token)
 
     /**
      * Gets a list of provided groups for a type and token.
