@@ -123,7 +123,10 @@ angular.module('ot.view.admin-group-mappings', [
         $scope.createMapping = () => {
             let data = $scope.mappingForm;
             if (data.mapping && data.source && data.group) {
-                ot.pageCall($http.post(`rest/group-mappings/${data.source.provider}/${data.source.key}`, {
+                const uri = data.source.key ?
+                    `rest/group-mappings/${data.source.provider}/${data.source.key}` :
+                    `rest/group-mappings/${data.source.provider}`;
+                ot.pageCall($http.post(uri, {
                     name: data.mapping,
                     group: data.group
                 })).then((groupMapping) => {
@@ -137,14 +140,20 @@ angular.module('ot.view.admin-group-mappings', [
         $scope.getSuggestedMappings = (token) => {
             if ($scope.mappingForm.source) {
                 let source = $scope.mappingForm.source;
-                return ot.call($http.get(`/rest/group-mappings/${source.provider}/${source.key}/search/${token}`)).then(names => names);
+                const uri = source.key ?
+                    `/rest/group-mappings/${source.provider}/${source.key}/search/${token}` :
+                    `/rest/group-mappings/${source.provider}/search/${token}`;
+                return ot.call($http.get(uri)).then(names => names);
             } else {
                 return [];
             }
         };
 
         $scope.deleteMapping = (mapping) => {
-            ot.pageCall($http.delete(`rest/group-mappings/${mapping.authenticationSource.provider}/${mapping.authenticationSource.key}/${mapping.id}`)).then(loadMappings);
+            const uri = mapping.authenticationSource.key ?
+                `rest/group-mappings/${mapping.authenticationSource.provider}/${mapping.authenticationSource.key}/${mapping.id}` :
+                `rest/group-mappings/${mapping.authenticationSource.provider}/${mapping.id}`;
+            ot.pageCall($http.delete(uri)).then(loadMappings);
         };
     })
 ;

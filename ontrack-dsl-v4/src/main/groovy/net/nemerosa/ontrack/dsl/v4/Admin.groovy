@@ -134,6 +134,23 @@ class Admin {
     }
 
     /**
+     * Creates or updates a mapping between a LDAP group and an actual Ontrack group.
+     *
+     * Note that this method is just a shortcut to {@link #setGroupMapping}.
+     *
+     * @param name Provided group name
+     * @param groupName Group to map to
+     * @return Mapping
+     */
+    @DSLMethod("Creates or updates a mapping between a LDAP group and an actual Ontrack group.")
+    GroupMapping ldapMapping(
+            String name,
+            String groupName
+    ) {
+        setGroupMapping("ldap", "", name, groupName)
+    }
+
+    /**
      * Creates or updates a mapping between a provided group and an actual Ontrack group
      *
      * @param provider ID of the provider
