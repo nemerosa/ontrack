@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/extension/casc")
-class CascConcd troller(
+class CascController(
     private val cascLoadingService: CascLoadingService,
     private val cascConfigurationProperties: CascConfigurationProperties,
     private val cascUploadService: CascUploadService,
