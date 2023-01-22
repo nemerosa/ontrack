@@ -31,13 +31,18 @@ class CascConfigurationProperties {
     var secrets = CascSecretConfigurationProperties()
 
     /**
+     * Upload end point
+     */
+    var upload = CascUploadConfigurationProperties()
+
+    /**
      * Reloading configuration
      */
     class CascReloadingConfigurationProperties {
         /**
          * Enables the creation of a job to reload the CasC.
          */
-        var enabled = false;
+        var enabled = false
 
         /**
          * Cron schedule for the reloading. Leave blank or empty to disable the automated reloading.
@@ -59,6 +64,16 @@ class CascConfigurationProperties {
          * Directory used to store the secret files (used only when type == "file"
          */
         var directory = ""
+    }
+
+    /**
+     * Upload end point
+     */
+    class CascUploadConfigurationProperties {
+        /**
+         * Is the upload endpoint enabled?
+         */
+        var enabled = false
     }
 
 }

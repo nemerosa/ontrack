@@ -27,7 +27,7 @@ interface StorageService {
      * @param key   Identifier of data
      * @return Data or empty if not found
      */
-    @Deprecated("Use retrieveJsonOrNull. Will be removed in V5.")
+    @Deprecated("Use findJson. Will be removed in V5.")
     fun retrieveJson(store: String, key: String): Optional<JsonNode>
 
     /**

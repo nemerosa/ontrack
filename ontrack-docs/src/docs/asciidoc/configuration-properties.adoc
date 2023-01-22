@@ -96,23 +96,6 @@ ontrack.config.key-store = file
 ontrack.config.cache.specs.properties = maximumSize=1000,expireAfterWrite=1d,recordStats
 
 #################################
-# CasC properties
-#################################
-
-# Is the configuration as code enabled?
-ontrack.config.casc.enabled = true
-
-# List of locations for the CasC definitions
-# ontrack.config.casc.locations.0 = ...
-# ontrack.config.casc.locations.1 = ...
-
-# Enables the creation of a job to reload the CasC.
-ontrack.config.casc.reloading.enabled = false
-
-# Cron schedule for the reloading. Leave blank or empty to disable the automated reloading.
-ontrack.config.casc.reloading.cron = ""
-
-#################################
 # Search configuration properties
 #################################
 
@@ -150,6 +133,28 @@ ontrack.config.search.index.tracing = false
 ----
 # True (default) to make the sending of messages part of the current transaction.
 ontrack.config.rabbitmq.transactional = true
+----
+
+[[configuration-properties-casc]]
+==== Casc configuration properties
+
+[source,properties]
+----
+# Is the configuration as code enabled?
+ontrack.config.casc.enabled = true
+
+# List of locations for the CasC definitions
+# ontrack.config.casc.locations.0 = ...
+# ontrack.config.casc.locations.1 = ...
+
+# Enables the creation of a job to reload the CasC.
+ontrack.config.casc.reloading.enabled = false
+
+# Cron schedule for the reloading. Leave blank or empty to disable the automated reloading.
+ontrack.config.casc.reloading.cron = ""
+
+# Is the upload of Casc enabeld?
+ontrack.config.casc.upload.enabled = false
 ----
 
 [[configuration-properties-notifications]]
