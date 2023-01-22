@@ -7,4 +7,9 @@ interface CascUploadService {
      */
     fun upload(yaml: String)
 
+    /**
+     * Downlaods the uploaded content
+     */
+    fun download(): String?
+
 }

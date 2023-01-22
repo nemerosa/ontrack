@@ -10,9 +10,4 @@ interface CascLoadingService {
      */
     fun load()
 
-    /**
-     * Parses the CasC locations and runs the configuration.
-     */
-    fun load(locations: List<String>)
-
 }

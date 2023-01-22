@@ -18,6 +18,11 @@ class CascUploadServiceImpl(
         storageService.store(STORE, KEY, yaml)
     }
 
+    override fun download(): String? {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
+        return storageService.findJson(STORE, KEY)?.asText()
+    }
+
     companion object {
         private val STORE = CascUploadServiceImpl::class.java.name
         private const val KEY = "default"

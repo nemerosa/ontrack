@@ -4,67 +4,33 @@ import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
 class CascLoadingServiceImpl(
-    private val cascConfigurationProperties: CascConfigurationProperties,
-    private val resourceLoader: ResourceLoader,
     private val cascService: CascService,
+    private val cascLoaders: List<CascLoader>,
     private val securityService: SecurityService,
 ): CascLoadingService {
 
     private val logger: Logger = LoggerFactory.getLogger(CascLoadingServiceImpl::class.java)
 
     override fun load() {
-        load(cascConfigurationProperties.locations)
-    }
-
-    override fun load(locations: List<String>) {
         securityService.checkGlobalFunction(GlobalSettings::class.java)
-        if (locations.isEmpty()) {
+        val fragments = cascLoaders.flatMap { loader ->
+            logger.info("Casc loader: ${loader::class.java.name}")
+            loader.loadCascFragments()
+        }
+        if (fragments.isEmpty()) {
             logger.info("No CasC resource is defined.")
-            return
-        }
-        val parsedResources = locations.flatMap { location ->
-            logger.info("CasC resource: $location")
-            parseResource(location)
-        }
-        if (parsedResources.isNotEmpty()) {
-            logger.info("CasC resources loaded, running the configuration")
+        } else {
+            logger.info("CasC resources loaded, running the configuration...")
             securityService.asAdmin {
-                cascService.runYaml(parsedResources)
+                cascService.runYaml(fragments)
             }
             logger.info("CasC ran successfully")
-        } else {
-            logger.info("No CasC resource was found.")
         }
-    }
-
-    private fun parseResource(location: String): List<String> {
-        val resource = resourceLoader.getResource(location)
-        if (resource.isFile) {
-            val file = resource.file
-            if (file.exists() && file.isDirectory) {
-                logger.info("CasC resource directory: $file")
-                return file.listFiles()?.filter {
-                    it.isFile && it.canRead() && it.extension in setOf("yml", "yaml")
-                }?.map {
-                    logger.info("CasC resource file: $it")
-                    it.readText()
-                } ?: emptyList()
-            }
-        }
-        if (!resource.exists()) {
-            error("Cannot find CasC resource at $location")
-        }
-        return listOf(
-            resource.inputStream.use {
-                it.bufferedReader().readText()
-            }
-        )
     }
 }
