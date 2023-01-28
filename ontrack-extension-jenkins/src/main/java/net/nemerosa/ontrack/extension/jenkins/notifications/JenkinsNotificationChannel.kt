@@ -32,16 +32,18 @@ class JenkinsNotificationChannel(
             JenkinsNotificationChannelConfigCallMode.ASYNC -> launchAsync(jenkinsClient, config, parameters)
             JenkinsNotificationChannelConfigCallMode.SYNC -> launchSync(jenkinsClient, config, parameters)
         }
-        // In case of error
-        if (error != null) {
-            return NotificationResult.error(error)
-        }
         // If validation is required
-        if (!config.validation.isNullOrBlank() && !config.validationTarget.isNullOrBlank()) {
+        return if (!config.validation.isNullOrBlank() && !config.validationTarget.isNullOrBlank()) {
             TODO("Validation of the build target")
         }
+        // In case of error
+        else if (error != null) {
+            NotificationResult.error(error)
+        }
         // OK
-        return NotificationResult.ok()
+        else {
+            NotificationResult.ok()
+        }
     }
 
     private fun launchSync(
