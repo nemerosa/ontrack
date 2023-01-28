@@ -43,16 +43,14 @@ class DefaultJenkinsClient(
         get() =
             client.getForObject("/api/json", JenkinsInfo::class.java) ?: error("Cannot get Jenkins info")
 
-    override fun runJob(
-        job: String,
-        parameters: Map<String, String>,
-        retries: Int,
-        retriesDelaySeconds: Int,
-    ): JenkinsBuild {
-        val retriesDelay = Duration.ofSeconds(retriesDelaySeconds.toLong())
+    override fun fireAndForgetJob(job: String, parameters: Map<String, String>): URI? {
         val path = getJobPath(job)
-        logger.debug("run,job=$job,path=$path,parameters=$parameters")
+        return launchJob(path, parameters)
+    }
+
+    private fun launchJob(path: String, parameters: Map<String, String>): URI? {
         return runBlocking {
+            logger.debug("run,path=$path,parameters=$parameters")
 
             // Query
             val map = LinkedMultiValueMap<String, Any>()
@@ -69,12 +67,27 @@ class DefaultJenkinsClient(
 
             // Launches the job with parameters and get the queue item
 
-            val queueItemURI: URI? = withContext(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
                 client.postForLocation(
                     "$path/buildWithParameters",
                     requestEntity
                 )
             }
+        }
+    }
+
+    override fun runJob(
+        job: String,
+        parameters: Map<String, String>,
+        retries: Int,
+        retriesDelaySeconds: Int,
+    ): JenkinsBuild {
+        val retriesDelay = Duration.ofSeconds(retriesDelaySeconds.toLong())
+        return runBlocking {
+
+            val path = getJobPath(job)
+
+            val queueItemURI: URI? = launchJob(path, parameters)
 
             if (queueItemURI == null) {
                 error("Cannot fire job $path")

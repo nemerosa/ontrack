@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":ontrack-extension-scm"))
     implementation(project(":ontrack-extension-auto-versioning"))
     implementation(project(":ontrack-extension-casc"))
+    implementation(project(":ontrack-extension-notifications"))
 
     implementation("org.apache.commons:commons-lang3")
 
