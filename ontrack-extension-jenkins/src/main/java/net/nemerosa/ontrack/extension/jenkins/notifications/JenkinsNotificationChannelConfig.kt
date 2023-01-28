@@ -22,10 +22,4 @@ data class JenkinsNotificationChannelConfig(
     @APIDescription("Timeout in seconds")
     @APILabel("Timeout")
     val timeout: Int,
-    @APIDescription("Validation to apply upon a successful call")
-    @APILabel("Validation")
-    val validation: String?,
-    @APIDescription("Target build for the validation (format: project|branch|build")
-    @APILabel("Validation target")
-    val validationTarget: String?,
 )
