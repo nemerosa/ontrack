@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.events
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.NameValue
 import org.apache.commons.lang3.StringUtils
+import java.util.*
 import java.util.regex.Pattern
 
 /**
@@ -97,6 +98,50 @@ class Event(
         ref,
         values
     )
+
+    /**
+     * Gets a map which can be used for a template.
+     *
+     * @param caseVariants If true, will provide case variants for the same parameter. For example,
+     * for a project name like "Ontrack", we'd get: PROJECT=ONTRACK, Project=Ontrack (unchanged), project=ontrack.
+     * By default, would return on PROJECT=Ontrack
+     */
+    fun getTemplateParameters(caseVariants: Boolean = false):Map<String,String> {
+        val result = mutableMapOf<String,String>()
+        // Entities
+        entities.forEach { (_, entity) ->
+            entity.nameValues.forEach { (name, value) ->
+                putTemplateParameter(result, name, value, caseVariants)
+            }
+        }
+        // Extra entities
+        extraEntities.forEach { (_, entity)->
+            entity.nameValues.forEach { (name, value) ->
+                putTemplateParameter(result, "extra_$name", value, caseVariants)
+            }
+        }
+        // Values
+        values.forEach { (_, item) ->
+            putTemplateParameter(result, item.name, item.value, caseVariants)
+        }
+        // OK
+        return result.toMap()
+    }
+
+    private fun putTemplateParameter(
+        map: MutableMap<String,String>,
+        name: String,
+        value: String,
+        caseVariants: Boolean,
+    ) {
+        if (caseVariants) {
+            map[name.uppercase()] = value.uppercase()
+            map[name.replaceFirstChar { it.titlecase() }] = value
+            map[name.lowercase()] = value.lowercase()
+        } else {
+            map[name] = value
+        }
+    }
 
     class EventBuilder(private val eventType: EventType) {
 

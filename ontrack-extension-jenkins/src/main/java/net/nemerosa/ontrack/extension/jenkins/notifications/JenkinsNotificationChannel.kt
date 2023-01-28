@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.jenkins.notifications
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.SimpleExpand
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClient
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClientFactory
@@ -19,18 +20,21 @@ class JenkinsNotificationChannel(
     JenkinsNotificationChannelConfig::class
 ) {
     override fun publish(config: JenkinsNotificationChannelConfig, event: Event): NotificationResult {
+        // Computing the expansion parameters
+        val templateParameters = event.getTemplateParameters(caseVariants = true)
         // Gets the Jenkins configuration
         val jenkinsConfig = jenkinsConfigurationService.findConfiguration(config.config)
             ?: return NotificationResult.invalidConfiguration("Jenkins configuration cannot be found: ${config.config}")
         // Gets the Jenkins client
         val jenkinsClient = jenkinsClientFactory.getClient(jenkinsConfig)
         // Running the job
+        val job = SimpleExpand.expand(config.job, templateParameters)
         val parameters = config.parameters.map {
-            it.name to it.value
+            it.name to SimpleExpand.expand(it.value, templateParameters)
         }.toMap()
         val error = when (config.callMode) {
-            JenkinsNotificationChannelConfigCallMode.ASYNC -> launchAsync(jenkinsClient, config, parameters)
-            JenkinsNotificationChannelConfigCallMode.SYNC -> launchSync(jenkinsClient, config, parameters)
+            JenkinsNotificationChannelConfigCallMode.ASYNC -> launchAsync(jenkinsClient, job, parameters)
+            JenkinsNotificationChannelConfigCallMode.SYNC -> launchSync(jenkinsClient, job, config.timeout, parameters)
         }
         // If validation is required
         return if (!config.validation.isNullOrBlank() && !config.validationTarget.isNullOrBlank()) {
@@ -48,13 +52,14 @@ class JenkinsNotificationChannel(
 
     private fun launchSync(
         jenkinsClient: JenkinsClient,
-        config: JenkinsNotificationChannelConfig,
+        job: String,
+        timeout: Int,
         parameters: Map<String, String>
     ): String? {
         val interval = 30 // seconds
-        val retries = config.timeout / interval
+        val retries = timeout / interval
         val build = jenkinsClient.runJob(
-            job = config.job,
+            job = job,
             parameters = parameters,
             retries = retries,
             retriesDelaySeconds = interval,
@@ -68,17 +73,17 @@ class JenkinsNotificationChannel(
 
     private fun launchAsync(
         jenkinsClient: JenkinsClient,
-        config: JenkinsNotificationChannelConfig,
+        job: String,
         parameters: Map<String, String>
     ): String? {
         val queueURI = jenkinsClient.fireAndForgetJob(
-            job = config.job,
+            job = job,
             parameters = parameters,
         )
         return if (queueURI != null) {
             null // No error
         } else {
-            "Could not find job at ${config.job}"
+            "Could not find job at $job"
         }
     }
 
