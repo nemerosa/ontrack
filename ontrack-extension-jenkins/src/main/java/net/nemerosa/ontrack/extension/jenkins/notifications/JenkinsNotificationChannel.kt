@@ -38,11 +38,11 @@ class JenkinsNotificationChannel(
         }
         // In case of error
         return if (error != null) {
-            NotificationResult.error(error)
+            NotificationResult.error(error, id = jenkinsClient.getJob(job).url)
         }
         // OK
         else {
-            NotificationResult.ok()
+            NotificationResult.ok(id = jenkinsClient.getJob(job).url)
         }
     }
 

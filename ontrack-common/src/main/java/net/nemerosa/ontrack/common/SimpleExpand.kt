@@ -9,7 +9,7 @@ object SimpleExpand {
      * Regular expression to identify the replacements
      */
     @Suppress("RegExpRedundantEscape")
-    private val regex = "\\{([a-z0-9_]+)\\}".toRegex()
+    private val regex = "\\{([A-Za-z0-9_]+)\\}".toRegex()
 
     /**
      * Performs an expansion.
