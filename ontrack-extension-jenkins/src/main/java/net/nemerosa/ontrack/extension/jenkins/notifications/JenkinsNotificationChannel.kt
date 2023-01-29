@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
-import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.*
 import org.springframework.stereotype.Component
 
 @Component
@@ -91,9 +91,28 @@ class JenkinsNotificationChannel(
     override val type: String = "jenkins"
     override val enabled: Boolean = true
 
-    override fun getForm(c: JenkinsNotificationChannelConfig?): Form {
-        TODO("Not yet implemented")
-    }
+    override fun getForm(c: JenkinsNotificationChannelConfig?): Form = Form.create()
+        // Selection of configuration
+        .selectionOfString(
+            property = JenkinsNotificationChannelConfig::config,
+            items = jenkinsConfigurationService.configurations.map { it.name },
+            value = c?.config
+        )
+        // Job
+        .textField(JenkinsNotificationChannelConfig::job, c?.job)
+        // Parameters
+        .multiform(
+            property = JenkinsNotificationChannelConfig::parameters,
+            items = c?.parameters,
+        ) {
+            Form.create()
+                .textField(JenkinsNotificationChannelConfigParam::name, null)
+                .textField(JenkinsNotificationChannelConfigParam::value, null)
+        }
+        // Call mode
+        .enumField(JenkinsNotificationChannelConfig::callMode, c?.callMode)
+        // Timeout
+        .intField(JenkinsNotificationChannelConfig::timeout, c?.timeout, min = 1)
 
     override fun toText(config: JenkinsNotificationChannelConfig): String {
         val jenkinsConfig = jenkinsConfigurationService.findConfiguration(config.config)

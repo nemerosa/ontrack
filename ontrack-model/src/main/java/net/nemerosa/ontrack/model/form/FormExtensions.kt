@@ -39,13 +39,24 @@ fun <T> Form.yesNoField(property: KProperty1<T, Boolean?>, value: Boolean?): For
             .value(value)
     )
 
-fun <T> Form.intField(property: KProperty1<T, kotlin.Int?>, value: kotlin.Int?): Form =
+fun <T> Form.intField(
+    property: KProperty1<T, kotlin.Int?>,
+    value: kotlin.Int?,
+    min: kotlin.Int? = null,
+    max: kotlin.Int? = null,
+    step: kotlin.Int? = null,
+): Form =
     with(
         Int.of(property.name)
             .label(getPropertyLabel(property))
             .help(getPropertyDescription(property))
             .optional(property.returnType.isMarkedNullable)
             .value(value)
+            .apply {
+                if (min != null) min(min)
+                if (max != null) max(max)
+                if (step != null) step(step)
+            }
     )
 
 fun <T> Form.longField(property: KProperty1<T, Long>, value: Long?): Form =
