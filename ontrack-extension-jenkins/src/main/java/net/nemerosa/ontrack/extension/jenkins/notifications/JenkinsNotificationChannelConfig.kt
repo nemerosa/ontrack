@@ -16,10 +16,14 @@ data class JenkinsNotificationChannelConfig(
     @APIDescription("Parameters to send to to the job")
     @APILabel("Parameters")
     val parameters: List<JenkinsNotificationChannelConfigParam>,
-    @APIDescription("How to call the Jenkins job.")
+    @APIDescription("""How to call the Jenkins job. ASYNC (the default) means that the job is called in "fire and forget" mode. When set to SYNC, Ontrack will wait for the completion of the job to success, with a given timeout (not recommended).""")
     @APILabel("Call mode")
-    val callMode: JenkinsNotificationChannelConfigCallMode,
+    val callMode: JenkinsNotificationChannelConfigCallMode = JenkinsNotificationChannelConfigCallMode.ASYNC,
     @APIDescription("Timeout in seconds")
     @APILabel("Timeout")
-    val timeout: Int,
-)
+    val timeout: Int = DEFAULT_TIMEOUT,
+) {
+    companion object {
+        const val DEFAULT_TIMEOUT = 30
+    }
+}

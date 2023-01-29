@@ -111,9 +111,16 @@ class JenkinsNotificationChannel(
                 .textField(JenkinsNotificationChannelConfigParam::value, null)
         }
         // Call mode
-        .enumField(JenkinsNotificationChannelConfig::callMode, c?.callMode)
+        .enumField(
+            JenkinsNotificationChannelConfig::callMode,
+            c?.callMode ?: JenkinsNotificationChannelConfigCallMode.ASYNC
+        )
         // Timeout
-        .intField(JenkinsNotificationChannelConfig::timeout, c?.timeout, min = 1)
+        .intField(
+            JenkinsNotificationChannelConfig::timeout,
+            c?.timeout ?: JenkinsNotificationChannelConfig.DEFAULT_TIMEOUT,
+            min = 1,
+        )
 
     override fun toText(config: JenkinsNotificationChannelConfig): String {
         val jenkinsConfig = jenkinsConfigurationService.findConfiguration(config.config)
