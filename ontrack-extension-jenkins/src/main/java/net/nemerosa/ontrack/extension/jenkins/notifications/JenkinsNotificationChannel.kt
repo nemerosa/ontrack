@@ -37,12 +37,13 @@ class JenkinsNotificationChannel(
             JenkinsNotificationChannelConfigCallMode.SYNC -> launchSync(jenkinsClient, job, config.timeout, parameters)
         }
         // In case of error
+        val jobUrl = jenkinsClient.getJob(job).url
         return if (error != null) {
-            NotificationResult.error(error, id = jenkinsClient.getJob(job).url)
+            NotificationResult.error(error, id = jobUrl)
         }
         // OK
         else {
-            NotificationResult.ok(id = jenkinsClient.getJob(job).url)
+            NotificationResult.ok(id = jobUrl)
         }
     }
 
