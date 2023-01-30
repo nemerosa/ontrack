@@ -35,10 +35,22 @@ class SimpleExpandTest {
     @Test
     fun `Two values and a non compliant pattern`() {
         assertEquals(
-            "Template with several values 1 and 2 and a non {Compliant} one",
-            SimpleExpand.expand("Template with several values {one} and {two} and a non {Compliant} one", mapOf(
+            "Template with several values 1 and 2 and a non {Compl-iant} one",
+            SimpleExpand.expand("Template with several values {one} and {two} and a non {Compl-iant} one", mapOf(
                 "one" to "1",
                 "two" to "2"
+            ))
+        )
+    }
+
+    @Test
+    fun `Two values and a compliant pattern`() {
+        assertEquals(
+            "Template with several values 1 and 2 and a perfectly compliant one",
+            SimpleExpand.expand("Template with several values {one} and {two} and a {Compliant} one", mapOf(
+                "one" to "1",
+                "two" to "2",
+                "Compliant" to "perfectly compliant",
             ))
         )
     }
