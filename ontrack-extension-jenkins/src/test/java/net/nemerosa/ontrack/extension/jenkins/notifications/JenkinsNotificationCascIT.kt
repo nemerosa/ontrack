@@ -129,7 +129,7 @@ class JenkinsNotificationCascIT: AbstractCascTestSupport() {
                             assertEquals("path/to/pipeline", nc.job)
                             assertEquals(
                                 listOf(
-                                    JenkinsNotificationChannelConfigParam("PROMOTION", "{Promotion_level}")
+                                    JenkinsNotificationChannelConfigParam("PROMOTION", "{Promotion}")
                                 ),
                                 nc.parameters
                             )
