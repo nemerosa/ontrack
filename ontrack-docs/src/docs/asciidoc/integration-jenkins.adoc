@@ -38,7 +38,7 @@ Case variants are available:
 * `{project}` will use the lowercase version
 * `{Project}` will use the raw value
 
-Other placeholders, like `Branch`, `Promotion_level`, etc., depending on the type of event.
+Other placeholders, like `Branch`, `Promotion`, etc., depending on the type of event.
 
 Finally, like all other subscriptions, the Jenkins notifications can be defined <<casc,as code>>. For example, to define a trigger for a promotion level:
 
@@ -59,7 +59,7 @@ ontrack:
                 job: path/to/pipeline
                 parameters:
                   - name: PROMOTION
-                    value: "{Promotion_level}"
+                    value: "{Promotion}"
                 callMode: ASYNC
               events:
                 - new_promotion_run

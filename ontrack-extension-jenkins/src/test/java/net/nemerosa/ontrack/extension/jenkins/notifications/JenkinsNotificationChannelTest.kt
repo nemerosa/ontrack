@@ -70,6 +70,24 @@ class JenkinsNotificationChannelTest {
     }
 
     @Test
+    fun `Async job with parameters successfully queued`() {
+        val config = newJenkinsNotificationConfig(
+            parameters = mapOf(
+                "PROMOTION" to "{Promotion}",
+            )
+        )
+        val event = newPromotionRunEvent()
+
+        every { jenkinsClient.fireAndForgetJob(JOB, mapOf(
+            "PROMOTION" to PROMOTION, // Parameter correctly expanded
+        )) } returns URI("uri:queue")
+
+        val result = jenkinsNotificationChannel.publish(config, event)
+
+        assertEquals(NotificationResultType.OK, result.type)
+    }
+
+    @Test
     fun `Async job not successfully queued`() {
         val config = newJenkinsNotificationConfig()
         val event = newPromotionRunEvent()
@@ -125,17 +143,20 @@ class JenkinsNotificationChannelTest {
 
     private fun newJenkinsNotificationConfig(
         callMode: JenkinsNotificationChannelConfigCallMode = JenkinsNotificationChannelConfigCallMode.ASYNC,
+        parameters: Map<String,String> = emptyMap(),
     ) = JenkinsNotificationChannelConfig(
         config = jenkinsConfigName,
         job = JOB,
-        parameters = emptyList(),
+        parameters = parameters.map { (name, value) ->
+            JenkinsNotificationChannelConfigParam(name, value)
+        },
         callMode = callMode,
     )
 
     private fun newPromotionRunEvent(): Event {
         val project = Project.of(NameDescription.nd("project", "")).withId(ID.of(1))
         val branch = Branch.of(project, NameDescription.nd("main", "")).withId(ID.of(10))
-        val promotionLevel = PromotionLevel.of(branch, NameDescription.nd("GOLD", "")).withId(ID.of(100))
+        val promotionLevel = PromotionLevel.of(branch, NameDescription.nd(PROMOTION, "")).withId(ID.of(100))
         val build = Build.of(branch, NameDescription.nd("1", ""), Signature.of("test")).withId(ID.of(1000))
         val promotionRun = PromotionRun.of(build, promotionLevel, Signature.of("test"), null).withId(ID.of(10000))
         return EventFactoryImpl().newPromotionRun(promotionRun)
@@ -144,6 +165,7 @@ class JenkinsNotificationChannelTest {
     companion object {
         const val URL = "https://jenkins"
         const val JOB = "folder/job"
+        const val PROMOTION = "GOLD"
     }
 
 }
