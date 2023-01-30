@@ -31,6 +31,7 @@ Ontrack can send notifications to:
 * <<webhooks,webhooks>>
 * <<slack,Slack>>
 * <<email,Email>>
+* <<integration-jenkins-notifications,Jenkins builds>>
 
 [[notifications-subscriptions]]
 ==== Subscriptions

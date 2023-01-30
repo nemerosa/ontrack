@@ -6,5 +6,61 @@ Jenkins can inject data into Ontrack - see <<feeding-jenkins>> for this purpose.
 * defining a Jenkins configuration
 * setting a link to a Jenkins folder at project or branch level
 * setting a link to a Jenkins build at build level
+* triggering Jenkins builds on <<notifications>>
 
-// TODO Complete the doc
+[[integration-jenkins-notifications]]
+==== Triggering Jenkins builds on notifications
+
+Upon a <<notifications,notification>>, one may want to trigger a Jenkins build. For example, given a <<model,build>> being promoted to a certain level ("BRONZE" for example), one may want to trigger a Jenkins build to complete additional validations. This is a pretty good way to perform long running deployment pipelines (security scans, performance tests, etc.) while avoiding coupling pipelines together.
+
+To do this, a <<notifications,subscription>> can be created at the promotion level, to listen to "new promotion runs" events and to trigger a Jenkins pipeline.
+
+Using the UI, the subscription looks like:
+
+image::images/integration-jenkins-notification.png[600,"Jenkins notification"]
+
+* _Configuration_ - the Jenkins configuration to use (it defines the URL to connect to, the credentials to use)
+* _Job_ - the relative path to the job to launch.
+* _Parameters_ - a list of name/value pairs to pass to the Jenkins job as parameters
+* _Call mode_ - defines if the job must be called asynchronously (the default) or synchronously. In the former case, Ontrack fires the job and then returns immediately. In the later case, Ontrack will wait for the job to complete and check its result before considering the notification successful. Note that this can have impacts on performances.
+* _Timeout_ - in case the synchronous call mode is used, defines the amount of seconds to wait for the completion of the Jenkins build
+
+Several remarks:
+
+* for the job, a reduced path, without the `/job/` separator can be used. Keeping the `/job/` separator is fine as well. So the `job/sandbox/job/test-notification` and `sandbox/test-notification` are in this regard equivalent.
+* the _job_ and _parameters_ values can contain expansion placeholders
+
+For example, a parameter value may contain `{Project}`  as a value, indicating that the project name linked to the event the notification is about will be used as a value.
+
+Case variants are available:
+
+* `{PROJECT}` will use the uppercase version
+* `{project}` will use the lowercase version
+* `{Project}` will use the raw value
+
+Other placeholders, like `Branch`, `Promotion_level`, etc., depending on the type of event.
+
+Finally, like all other subscriptions, the Jenkins notifications can be defined <<casc,as code>>. For example, to define a trigger for a promotion level:
+
+[source,yaml]
+----
+ontrack:
+  extensions:
+    notifications:
+      entity-subscriptions:
+        - entity:
+            project: my-project
+            branch: my-branch
+            promotion: GOLD
+          subscriptions:
+            - channel: jenkins
+              channel-config:
+                config: my-jenkins-config-name
+                job: path/to/pipeline
+                parameters:
+                  - name: PROMOTION
+                    value: "{Promotion_level}"
+                callMode: ASYNC
+              events:
+                - new_promotion_run
+----
