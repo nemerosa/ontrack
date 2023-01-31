@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component
  */
 @Component
 class ProjectPermissionsAdminContext(
-    private val securityService: SecurityService,
     private val structureService: StructureService,
     private val accountService: AccountService,
     private val rolesService: RolesService,
