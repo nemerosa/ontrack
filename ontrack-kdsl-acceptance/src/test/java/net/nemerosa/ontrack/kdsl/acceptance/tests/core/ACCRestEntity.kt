@@ -35,12 +35,27 @@ class ACCRestEntity : AbstractACCDSLTestSupport() {
     }
 
     @Test
-    fun `Getting a validation stamp by name`() {
+    fun `Getting a validation stamp by name with a space`() {
         project {
             branch {
                 val vs = validationStamp(name = "Some validation stamp")
                 val json =
-                    ontrack.connector.get("/rest/structure/entity/validationStamp/${project.name}/$name/${vs.name}").body.asJson()
+                    ontrack.connector.get("/rest/structure/entity/validationStamp/${project.name}/$name/Some validation stamp").body.asJson()
+                assertEquals(
+                    vs.id.toInt(),
+                    json.getRequiredIntField("id")
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Getting a validation stamp by name with encoded spaces`() {
+        project {
+            branch {
+                val vs = validationStamp(name = "Some validation stamp")
+                val json =
+                    ontrack.connector.get("/rest/structure/entity/validationStamp/${project.name}/$name/Some+validation+stamp").body.asJson()
                 assertEquals(
                     vs.id.toInt(),
                     json.getRequiredIntField("id")

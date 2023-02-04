@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.boot.ui
 import net.nemerosa.ontrack.model.exceptions.*
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.web.bind.annotation.*
+import java.net.URLDecoder
 
 /**
  * Gives access to the structure. See [net.nemerosa.ontrack.model.structure.ProjectEntityType] for
@@ -42,13 +43,16 @@ class StructureController (
     /**
      * Validation stamp access
      */
-    @GetMapping("entity/validationStamp/{project:[A-Za-z0-9\\._-]+}/{branch:[A-Za-z0-9\\._-]+}/{validationStamp:[A-Za-z0-9\\._ -]+}")
+    @GetMapping("entity/validationStamp/{project:[A-Za-z0-9\\._-]+}/{branch:[A-Za-z0-9\\._-]+}/{validationStamp:[A-Za-z0-9\\._ +-]+}")
     fun validationStamp(
         @PathVariable project: String,
         @PathVariable branch: String,
         @PathVariable validationStamp: String,
-    ): ValidationStamp = structureService.findValidationStampByName(project, branch, validationStamp)
-        .orElseThrow { ValidationStampNotFoundException(project, branch, validationStamp) }
+    ): ValidationStamp {
+        val decodedValidationStamp: String = URLDecoder.decode(validationStamp, Charsets.UTF_8)
+        return structureService.findValidationStampByName(project, branch, decodedValidationStamp)
+            .orElseThrow { ValidationStampNotFoundException(project, branch, decodedValidationStamp) }
+    }
 
     @GetMapping("entity/build/{project:[A-Za-z0-9\\._-]+}/{branch:[A-Za-z0-9\\._-]+}/{build:[A-Za-z0-9\\._-]+}")
     fun build(
