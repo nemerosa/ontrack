@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.structure
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonView
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import javax.validation.constraints.Max
 import javax.validation.constraints.Size
 
@@ -12,7 +13,9 @@ import javax.validation.constraints.Size
 data class ValidationStamp(
         override val id: ID,
         @Size(max = NAME_MAX_LENGTH)
+        @APIDescription("Name of the validation stamp")
         val name: String,
+        @APIDescription("Description of the validation stamp")
         override val description: String?,
         @JsonView(value = [ValidationStamp::class])
         val branch: Branch,
@@ -29,6 +32,11 @@ data class ValidationStamp(
          * Maximum length for the name of a validation stamp.
          */
         const val NAME_MAX_LENGTH = 120
+
+        /**
+         * Format for the name of a validation stamp
+         */
+        const val NAME_REGEX = "[A-Za-z0-9_\\.\\- ]+"
 
         @JvmStatic
         fun of(branch: Branch, nameDescription: NameDescription): ValidationStamp {
