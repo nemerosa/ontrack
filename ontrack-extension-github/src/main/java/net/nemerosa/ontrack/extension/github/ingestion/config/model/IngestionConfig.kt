@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.github.ingestion.config.model
 
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging.IngestionTaggingConfig
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIName
+import net.nemerosa.ontrack.model.structure.ValidationStamp.Companion.normalizeValidationStampName
 
 /**
  * Configuration for the ingestion.
@@ -40,7 +40,7 @@ data class IngestionConfig(
         if (step == null) {
             val jobConfig = findJobValidationConfig(job)
             val baseName = jobConfig?.validation ?: job
-            normalizeName(baseName)
+            normalizeValidationStampName(baseName)
         } else {
             val stepConfig = findStepValidationConfig(step)
             // Step contribution
@@ -57,7 +57,7 @@ data class IngestionConfig(
                 stepValidation
             }
             // Normalization
-            normalizeName(jobContribution)
+            normalizeValidationStampName(jobContribution)
         }
 
     /**

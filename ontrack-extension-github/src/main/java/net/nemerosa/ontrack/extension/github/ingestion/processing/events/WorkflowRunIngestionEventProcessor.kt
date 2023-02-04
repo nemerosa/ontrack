@@ -20,6 +20,7 @@ import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
+import net.nemerosa.ontrack.model.structure.ValidationStamp.Companion.normalizeValidationStampName
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.LocalDateTime
@@ -155,7 +156,7 @@ class WorkflowRunIngestionEventProcessor(
     ) {
         // Gets the validation name from the run name
         val validationStampName =
-            normalizeName("${config.workflows.validations.prefix}${workflowRun.name}${config.workflows.validations.suffix}")
+            normalizeValidationStampName("${config.workflows.validations.prefix}${workflowRun.name}${config.workflows.validations.suffix}")
         // Gets or creates the validation stamp
         val vs = ingestionModelAccessService.setupValidationStamp(
             build.branch, validationStampName, "${workflowRun.name} workflow"

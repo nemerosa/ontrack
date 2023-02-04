@@ -34,9 +34,20 @@ data class ValidationStamp(
         const val NAME_MAX_LENGTH = 120
 
         /**
+         * All allowed characters
+         */
+        private const val NAME_ALLOWED_CHARACTERS = "A-Za-z0-9_\\.\\- "
+
+        /**
          * Format for the name of a validation stamp
          */
-        const val NAME_REGEX = "[A-Za-z0-9_\\.\\- ]+"
+        const val NAME_REGEX = "[$NAME_ALLOWED_CHARACTERS]+"
+
+        /**
+         * Given any value, converts it to a valid validation stamp name.
+         */
+        fun normalizeValidationStampName(value: String): String =
+            value.replace("[^$NAME_ALLOWED_CHARACTERS]".toRegex(), "-").take(NAME_MAX_LENGTH)
 
         @JvmStatic
         fun of(branch: Branch, nameDescription: NameDescription): ValidationStamp {
