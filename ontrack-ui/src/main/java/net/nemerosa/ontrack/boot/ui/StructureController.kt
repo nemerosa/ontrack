@@ -16,14 +16,14 @@ class StructureController (
     /**
      * Project access
      */
-    @GetMapping("entity/project/{project:.*}")
+    @GetMapping("entity/project/{project:[A-Za-z0-9\\._-]+}")
     fun project(@PathVariable project: String): Project =
         structureService.findProjectByName(project).orElseThrow { ProjectNotFoundException(project) }
 
     /**
      * Branch access
      */
-    @GetMapping("entity/branch/{project}/{branch:.*}")
+    @GetMapping("entity/branch/{project:[A-Za-z0-9\\._-]+}/{branch:[A-Za-z0-9\\._-]+}")
     fun branch(@PathVariable project: String, @PathVariable branch: String): Branch =
         structureService.findBranchByName(project, branch)
             .orElseThrow { BranchNotFoundException(project, branch) }
@@ -31,7 +31,7 @@ class StructureController (
     /**
      * Promotion level access
      */
-    @GetMapping("entity/promotionLevel/{project}/{branch}/{promotionLevel:.*}")
+    @GetMapping("entity/promotionLevel/{project:[A-Za-z0-9\\._-]+}/{branch:[A-Za-z0-9\\._-]+}/{promotionLevel:[A-Za-z0-9\\._-]+}")
     fun promotionLevel(
         @PathVariable project: String,
         @PathVariable branch: String,
@@ -42,7 +42,7 @@ class StructureController (
     /**
      * Validation stamp access
      */
-    @GetMapping("entity/validationStamp/{project}/{branch}/{validationStamp:.*}")
+    @GetMapping("entity/validationStamp/{project:[A-Za-z0-9\\._-]+}/{branch:[A-Za-z0-9\\._-]+}/{validationStamp:[A-Za-z0-9\\._ -]+}")
     fun validationStamp(
         @PathVariable project: String,
         @PathVariable branch: String,
@@ -50,7 +50,7 @@ class StructureController (
     ): ValidationStamp = structureService.findValidationStampByName(project, branch, validationStamp)
         .orElseThrow { ValidationStampNotFoundException(project, branch, validationStamp) }
 
-    @GetMapping("entity/build/{project}/{branch}/{build:.*}")
+    @GetMapping("entity/build/{project:[A-Za-z0-9\\._-]+}/{branch:[A-Za-z0-9\\._-]+}/{build:[A-Za-z0-9\\._-]+}")
     fun build(
         @PathVariable project: String,
         @PathVariable branch: String,
