@@ -1,16 +1,16 @@
 package net.nemerosa.ontrack.git.model.plot
 
-import java.util.*
+import kotlin.math.max
 
 class GPlot {
 
-    private val items = ArrayList<GItem>()
+    val items = mutableListOf<GItem>()
 
     val width: Int
         get() {
             var width = 0
             for (item in items) {
-                width = Math.max(width, item.maxX)
+                width = max(width, item.maxX)
             }
             return width
         }
@@ -19,7 +19,7 @@ class GPlot {
         get() {
             var height = 0
             for (item in items) {
-                height = Math.max(height, item.maxY)
+                height = max(height, item.maxY)
             }
             return height
         }
