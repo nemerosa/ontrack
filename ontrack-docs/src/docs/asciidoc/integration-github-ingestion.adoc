@@ -101,7 +101,7 @@ This file is taken into account automatically, on push or when the ingestion con
 [source,yaml]
 ----
 # Version of the configuration (required)
-version: v1
+version: v2
 # Optional: Configuration for the ingestion of the workflows
 # workflows:
   # Optional: Filter on the workflow names
@@ -226,6 +226,9 @@ version: v1
     # type: ...
     # Required: JSON configuration of the tagging strategy
     # config: {}
+# Optional: configuration of the validation stamp names normalization
+# Choices: DEFAULT, LEGACY
+# vs-name-normalization: DEFAULT
 ----
 
 For example, if we want to associate the validation stamp `unit-tests` to the step `Runs unit tests` in the `build` job, we can use:
@@ -368,6 +371,19 @@ setup:
 
 Whenever the `ingestion.yml` is pushed on the `main` branch, the <<branches-stale,stale property>> will be set on the project.
 
+[[integration-github-ingestion-customization-changelog]]
+===== Change log
+
+[[integration-github-ingestion-customization-changelog-v1]]
+====== v1
+
+* added a `vs-name-normalization` optional field with `LEGACY` as the default value - see <<integration-github-ingestion-validations>> for more information
+
+[[integration-github-ingestion-customization-changelog-v2]]
+====== v2
+
+* added a `vs-name-normalization` optional field with `DEFAULT` as the default value - see <<integration-github-ingestion-validations>> for more information
+
 [[integration-github-ingestion-settings]]
 ==== General settings
 
@@ -384,7 +400,7 @@ In the _Settings > GitHub workflow ingestion_ section, you can configure the fol
 [[integration-github-ingestion-validations]]
 ==== Validation stamp names
 
-By default, a step `My step` running in the `My job` job will be associated with the following name: `my-job-my-step`. This can be configured in many ways.
+By default, a step `My step` running in the `My job` job will be associated with the following name: `My job-My step`. This can be configured in many ways.
 
 The validation stamp name can be specified in the <<integration-github-ingestion-customization,step configuration>> using the `validation` field. For example, we can force the `My step` to be named `my-job-unit-tests` by using the following configuration:
 
@@ -407,6 +423,11 @@ When facing the naming of a step, how to decide if the job prefix must be used o
 
 * if defined at step level, use this value
 * if defined at job level, use this value
+
+There is a `vs-name-normalization` which can be set at the root of the configuration with one of the following values:
+
+* `DEFAULT` - a "My job" job and a step "My step" are rendered as `My job-My step`
+* `LEGACY` - lowercase & escaping the whitespaces: `my-job-my-step`.
 
 [[integration-github-ingestion-pr]]
 ==== Support for pull requests

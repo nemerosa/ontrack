@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.config.model
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging.IngestionTaggingConfig
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIName
@@ -27,6 +28,7 @@ data class IngestionConfig(
     val setup: IngestionConfigSetup = IngestionConfigSetup(),
     @APIDescription("Configuration for the tag ingestion")
     val tagging: IngestionTaggingConfig = IngestionTaggingConfig(),
+    @JsonProperty("vs-name-normalization")
     @APIDescription("Defines the way a computed name must be normalized before it can be used as a validation stamp name.")
     val vsNameNormalization: IngestionConfigVSNameNormalization = IngestionConfigVSNameNormalization.DEFAULT,
 ) {

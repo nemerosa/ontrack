@@ -54,6 +54,28 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
     }
 
     @Test
+    fun `Creation of a simple validation run with the legacy VS name normalization`() {
+        ConfigLoaderServiceITMockConfig.customIngestionConfig(
+            configLoaderService,
+            IngestionConfig(
+                steps = IngestionConfigSteps(
+                    filter = FilterConfig.all
+                ),
+                vsNameNormalization = IngestionConfigVSNameNormalization.LEGACY,
+            )
+        )
+        project {
+            branch {
+                build {
+                    runTest(
+                        expectedVsName = "build-publishing-to-the-repository"
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Creation of a simple validation run with a very large ID`() {
         project {
             branch {

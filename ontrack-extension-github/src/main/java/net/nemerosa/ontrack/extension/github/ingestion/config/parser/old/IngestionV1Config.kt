@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.config.parser.old
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.*
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig.Companion.V1_VERSION
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging.IngestionTaggingConfig
@@ -18,6 +19,7 @@ data class IngestionV1Config(
     /**
      * Added with a default legacy value
      */
+    @JsonProperty("vs-name-normalization")
     val vsNameNormalization: IngestionConfigVSNameNormalization = IngestionConfigVSNameNormalization.LEGACY,
 ) {
     fun convert() = IngestionConfig(
