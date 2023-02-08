@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.github.ingestion.config.model
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging.IngestionTaggingConfig
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIName
-import net.nemerosa.ontrack.model.structure.ValidationStamp.Companion.normalizeValidationStampName
 
 /**
  * Configuration for the ingestion.
@@ -17,7 +16,7 @@ import net.nemerosa.ontrack.model.structure.ValidationStamp.Companion.normalizeV
 @APIName("GitHubIngestionConfig")
 data class IngestionConfig(
     @APIDescription("Version of the configuration")
-    val version: String = V1_VERSION,
+    val version: String = V2_VERSION,
     @APIDescription("Configuration for the ingestion of the workflows")
     val workflows: IngestionConfigWorkflows = IngestionConfigWorkflows(),
     @APIDescription("Configuration for the ingestion of the jobs")
@@ -28,9 +27,12 @@ data class IngestionConfig(
     val setup: IngestionConfigSetup = IngestionConfigSetup(),
     @APIDescription("Configuration for the tag ingestion")
     val tagging: IngestionTaggingConfig = IngestionTaggingConfig(),
+    @APIDescription("Defines the way a computed name must be normalized before it can be used as a validation stamp name.")
+    val vsNameNormalization: IngestionConfigVSNameNormalization = IngestionConfigVSNameNormalization.DEFAULT,
 ) {
     companion object {
         const val V1_VERSION = "v1"
+        const val V2_VERSION = "v2"
     }
 
     /**
@@ -59,6 +61,12 @@ data class IngestionConfig(
             // Normalization
             normalizeValidationStampName(jobContribution)
         }
+
+    /**
+     * Normalizes a name before it can be used as a validation stamp name.
+     */
+    fun normalizeValidationStampName(name: String): String =
+        vsNameNormalization.normalization(name)
 
     /**
      * Gets the validation stamp description for a given job and step

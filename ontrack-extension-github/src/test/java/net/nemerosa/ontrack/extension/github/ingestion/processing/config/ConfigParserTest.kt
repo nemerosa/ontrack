@@ -100,7 +100,7 @@ class ConfigParserTest {
         assertEquals(
             """
                 ---
-                version: "v1"
+                version: "v2"
                 workflows:
                   filter:
                     includes: ".*"
@@ -153,6 +153,7 @@ class ConfigParserTest {
                 tagging:
                   strategies: []
                   commit-property: true
+                vsNameNormalization: "DEFAULT"
             """.trimIndent().trim(),
             yaml.trim()
         )
