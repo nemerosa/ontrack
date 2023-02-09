@@ -120,11 +120,6 @@ pipeline {
                         --no-daemon \\
                         --console plain
                 '''
-                echo "Pushing image to registry..."
-                sh '''
-                    docker tag nemerosa/ontrack:${VERSION} docker.nemerosa.net/nemerosa/ontrack:${VERSION}
-                    docker tag nemerosa/ontrack-acceptance:${VERSION} docker.nemerosa.net/nemerosa/ontrack-acceptance:${VERSION}
-                '''
             }
             post {
                 always {

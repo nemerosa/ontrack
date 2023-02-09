@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupp
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigJobs
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigSteps
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigVSNameNormalization
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
 import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderService
@@ -47,6 +48,28 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
             branch {
                 build {
                     runTest()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creation of a simple validation run with the legacy VS name normalization`() {
+        ConfigLoaderServiceITMockConfig.customIngestionConfig(
+            configLoaderService,
+            IngestionConfig(
+                steps = IngestionConfigSteps(
+                    filter = FilterConfig.all
+                ),
+                vsNameNormalization = IngestionConfigVSNameNormalization.LEGACY,
+            )
+        )
+        project {
+            branch {
+                build {
+                    runTest(
+                        expectedVsName = "build-publishing-to-the-repository"
+                    )
                 }
             }
         }
@@ -235,7 +258,7 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
                         structureService.findValidationStampByName(
                             project.name,
                             branch.name,
-                            "build-publishing-to-the-repository"
+                            "build-Publishing to the repository"
                         ).getOrNull(),
                         "Validation stamp has been created"
                     ) { vs ->
@@ -273,7 +296,7 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
         status: WorkflowJobStepStatus = WorkflowJobStepStatus.completed,
         conclusion: WorkflowJobStepConclusion? = WorkflowJobStepConclusion.success,
         expectedStep: Boolean = true,
-        expectedVsName: String = normalizeName("$job-$step"),
+        expectedVsName: String = IngestionConfigVSNameNormalization.DEFAULT("$job-$step"),
         expectedStatus: String = "PASSED",
         expectedJob: Boolean = false,
         expectedJobVsName: String = normalizeName(job),

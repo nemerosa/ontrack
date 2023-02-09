@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Form.Companion.nameAndDescription
 import net.nemerosa.ontrack.model.form.ServiceConfigurator
+import net.nemerosa.ontrack.model.form.textField
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.structure.*
@@ -75,7 +76,9 @@ class ValidationStampController(
     @GetMapping("branches/{branchId}/validationStamps/create")
     fun newValidationStampForm(@PathVariable branchId: ID): Form {
         structureService.getBranch(branchId)
-        return nameAndDescription()
+        return Form.create()
+            .textField(ValidationStamp::name, null)
+            .textField(ValidationStamp::description, null)
             .with(
                 ServiceConfigurator.of("dataType")
                     .label("Data type")

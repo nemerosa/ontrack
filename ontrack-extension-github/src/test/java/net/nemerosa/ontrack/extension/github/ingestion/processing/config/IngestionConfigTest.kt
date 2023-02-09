@@ -45,7 +45,7 @@ class IngestionConfigTest {
     @Test
     fun `Step validation stamp name without customization`() {
         assertEquals(
-            "job-name-step-name",
+            "Job name-Step name",
             IngestionConfig().getValidationStampName("Job name", "Step name")
         )
     }
@@ -53,7 +53,7 @@ class IngestionConfigTest {
     @Test
     fun `Step validation stamp name with customization of validation`() {
         assertEquals(
-            "job-name-step-validation",
+            "Job name-step-validation",
             IngestionConfig(
                 steps = IngestionConfigSteps(
                     mappings = listOf(
@@ -104,7 +104,7 @@ class IngestionConfigTest {
     @Test
     fun `Step validation stamp name with customization of job prefix at job level`() {
         assertEquals(
-            "step-name",
+            "Step name",
             IngestionConfig(
                 jobs = IngestionConfigJobs(validationPrefix = false),
                 steps = IngestionConfigSteps(
@@ -119,7 +119,7 @@ class IngestionConfigTest {
     @Test
     fun `Step validation stamp name with customization of job prefix at job level and overridden at step level`() {
         assertEquals(
-            "job-name-step-name",
+            "Job name-Step name",
             IngestionConfig(
                 jobs = IngestionConfigJobs(validationPrefix = false),
                 steps = IngestionConfigSteps(
@@ -134,7 +134,7 @@ class IngestionConfigTest {
     @Test
     fun `Step validation stamp name with no job prefix`() {
         assertEquals(
-            "step-name",
+            "Step name",
             IngestionConfig(
                 jobs = IngestionConfigJobs(validationPrefix = false),
             ).getValidationStampName("Job name", "Step name")

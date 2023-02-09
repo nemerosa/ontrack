@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.dsl.v4.doc.DSL
 import net.nemerosa.ontrack.dsl.v4.doc.DSLMethod
 import net.nemerosa.ontrack.dsl.v4.http.OTHttpClient
 import net.nemerosa.ontrack.dsl.v4.http.OTNotFoundException
+import org.apache.commons.codec.Charsets
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.StringEntity
 
@@ -157,9 +158,10 @@ class Ontrack {
 
     @DSLMethod(value = "Looks for a validation stamp by name. Fails if not found.")
     ValidationStamp validationStamp(String project, String branch, String validationStamp) {
+        String encodedValidationStamp = URLEncoder.encode(validationStamp, Charsets.UTF_8)
         new ValidationStamp(
                 this,
-                get("rest/structure/entity/validationStamp/${project}/${branch}/${validationStamp}")
+                get("rest/structure/entity/validationStamp/${project}/${branch}/${encodedValidationStamp}")
         )
     }
 

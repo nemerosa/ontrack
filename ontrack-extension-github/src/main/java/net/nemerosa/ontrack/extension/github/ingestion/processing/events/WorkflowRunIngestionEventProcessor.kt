@@ -155,7 +155,7 @@ class WorkflowRunIngestionEventProcessor(
     ) {
         // Gets the validation name from the run name
         val validationStampName =
-            normalizeName("${config.workflows.validations.prefix}${workflowRun.name}${config.workflows.validations.suffix}")
+            config.normalizeValidationStampName("${config.workflows.validations.prefix}${workflowRun.name}${config.workflows.validations.suffix}")
         // Gets or creates the validation stamp
         val vs = ingestionModelAccessService.setupValidationStamp(
             build.branch, validationStampName, "${workflowRun.name} workflow"

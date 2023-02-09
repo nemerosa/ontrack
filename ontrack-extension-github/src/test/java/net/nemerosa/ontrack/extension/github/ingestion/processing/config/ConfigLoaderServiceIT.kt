@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.github.TestOnGitHub
 import net.nemerosa.ontrack.extension.github.githubTestEnv
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
+import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigVSNameNormalization
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigWorkflows
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
 import org.junit.jupiter.api.Test
@@ -28,9 +29,11 @@ class ConfigLoaderServiceIT : AbstractIngestionTestSupport() {
                 assertNotNull(config, "Ingestion configuration was loaded") {
                     assertEquals(
                         IngestionConfig(
+                            version = "v1",
                             workflows = IngestionConfigWorkflows(
                                 filter = FilterConfig(includes = "build")
-                            )
+                            ),
+                            vsNameNormalization = IngestionConfigVSNameNormalization.LEGACY,
                         ),
                         it
                     )
@@ -50,9 +53,11 @@ class ConfigLoaderServiceIT : AbstractIngestionTestSupport() {
                 assertNotNull(config, "Ingestion configuration was loaded") {
                     assertEquals(
                         IngestionConfig(
+                            version = "v1",
                             workflows = IngestionConfigWorkflows(
                                 filter = FilterConfig(includes = "build")
-                            )
+                            ),
+                            vsNameNormalization = IngestionConfigVSNameNormalization.LEGACY,
                         ),
                         it
                     )

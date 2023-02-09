@@ -21,7 +21,7 @@ import net.nemerosa.ontrack.model.annotations.APIName
  */
 @APIName("GitHubIngestionConfig")
 @APIDescription("Configuration for the ingestion of GitHub Actions workflows.")
-@Deprecated("Use the V1 model")
+@Deprecated("Use the V2 model")
 data class IngestionConfigOld(
     @APIDescription("General settings")
     val general: OldIngestionConfigGeneral = OldIngestionConfigGeneral(),

@@ -10,6 +10,81 @@ import kotlin.test.assertFailsWith
 class ConfigParserTest {
 
     @Test
+    fun `V2 configuration`() {
+        test(
+            """
+                version: v2
+                jobs:
+                    validationPrefix: false
+                    mappings:
+                        - name: Job name
+                          validation: my-job
+                          description: My description
+                steps:
+                    mappings:
+                        - name: Step name
+                          validation: my-validation
+                          validationPrefix: false
+                          description: My description
+            """
+        ) {
+            assertEquals("v2", it.version)
+
+            assertEquals(false, it.jobs.validationPrefix)
+            assertEquals(1, it.jobs.mappings.size)
+            assertEquals("Job name", it.jobs.mappings.first().name)
+            assertEquals("my-job", it.jobs.mappings.first().validation)
+            assertEquals("My description", it.jobs.mappings.first().description)
+
+            assertEquals(1, it.steps.mappings.size)
+            assertEquals("Step name", it.steps.mappings.first().name)
+            assertEquals("my-validation", it.steps.mappings.first().validation)
+            assertEquals(false, it.steps.mappings.first().validationPrefix)
+            assertEquals("My description", it.steps.mappings.first().description)
+
+            assertEquals(IngestionConfigVSNameNormalization.DEFAULT, it.vsNameNormalization)
+        }
+    }
+
+    @Test
+    fun `V2 configuration with legacy VS name normalization`() {
+        test(
+            """
+                version: v2
+                jobs:
+                    validationPrefix: false
+                    mappings:
+                        - name: Job name
+                          validation: my-job
+                          description: My description
+                steps:
+                    mappings:
+                        - name: Step name
+                          validation: my-validation
+                          validationPrefix: false
+                          description: My description
+                vs-name-normalization: LEGACY
+            """
+        ) {
+            assertEquals("v2", it.version)
+
+            assertEquals(false, it.jobs.validationPrefix)
+            assertEquals(1, it.jobs.mappings.size)
+            assertEquals("Job name", it.jobs.mappings.first().name)
+            assertEquals("my-job", it.jobs.mappings.first().validation)
+            assertEquals("My description", it.jobs.mappings.first().description)
+
+            assertEquals(1, it.steps.mappings.size)
+            assertEquals("Step name", it.steps.mappings.first().name)
+            assertEquals("my-validation", it.steps.mappings.first().validation)
+            assertEquals(false, it.steps.mappings.first().validationPrefix)
+            assertEquals("My description", it.steps.mappings.first().description)
+
+            assertEquals(IngestionConfigVSNameNormalization.LEGACY, it.vsNameNormalization)
+        }
+    }
+
+    @Test
     fun `V1 configuration`() {
         test(
             """
@@ -41,6 +116,46 @@ class ConfigParserTest {
             assertEquals("my-validation", it.steps.mappings.first().validation)
             assertEquals(false, it.steps.mappings.first().validationPrefix)
             assertEquals("My description", it.steps.mappings.first().description)
+
+            assertEquals(IngestionConfigVSNameNormalization.LEGACY, it.vsNameNormalization)
+        }
+    }
+
+    @Test
+    fun `V1 configuration with default VS name normalization`() {
+        test(
+            """
+                version: v1
+                jobs:
+                    validationPrefix: false
+                    mappings:
+                        - name: Job name
+                          validation: my-job
+                          description: My description
+                steps:
+                    mappings:
+                        - name: Step name
+                          validation: my-validation
+                          validationPrefix: false
+                          description: My description
+                vs-name-normalization: DEFAULT
+            """
+        ) {
+            assertEquals("v1", it.version)
+
+            assertEquals(false, it.jobs.validationPrefix)
+            assertEquals(1, it.jobs.mappings.size)
+            assertEquals("Job name", it.jobs.mappings.first().name)
+            assertEquals("my-job", it.jobs.mappings.first().validation)
+            assertEquals("My description", it.jobs.mappings.first().description)
+
+            assertEquals(1, it.steps.mappings.size)
+            assertEquals("Step name", it.steps.mappings.first().name)
+            assertEquals("my-validation", it.steps.mappings.first().validation)
+            assertEquals(false, it.steps.mappings.first().validationPrefix)
+            assertEquals("My description", it.steps.mappings.first().description)
+
+            assertEquals(IngestionConfigVSNameNormalization.DEFAULT, it.vsNameNormalization)
         }
     }
 
@@ -100,7 +215,7 @@ class ConfigParserTest {
         assertEquals(
             """
                 ---
-                version: "v1"
+                version: "v2"
                 workflows:
                   filter:
                     includes: ".*"
@@ -153,6 +268,7 @@ class ConfigParserTest {
                 tagging:
                   strategies: []
                   commit-property: true
+                vsNameNormalization: "DEFAULT"
             """.trimIndent().trim(),
             yaml.trim()
         )

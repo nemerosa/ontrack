@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.config.model
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging.IngestionTaggingConfig
-import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIName
 
@@ -17,7 +17,7 @@ import net.nemerosa.ontrack.model.annotations.APIName
 @APIName("GitHubIngestionConfig")
 data class IngestionConfig(
     @APIDescription("Version of the configuration")
-    val version: String = V1_VERSION,
+    val version: String = V2_VERSION,
     @APIDescription("Configuration for the ingestion of the workflows")
     val workflows: IngestionConfigWorkflows = IngestionConfigWorkflows(),
     @APIDescription("Configuration for the ingestion of the jobs")
@@ -28,9 +28,13 @@ data class IngestionConfig(
     val setup: IngestionConfigSetup = IngestionConfigSetup(),
     @APIDescription("Configuration for the tag ingestion")
     val tagging: IngestionTaggingConfig = IngestionTaggingConfig(),
+    @JsonProperty("vs-name-normalization")
+    @APIDescription("Defines the way a computed name must be normalized before it can be used as a validation stamp name.")
+    val vsNameNormalization: IngestionConfigVSNameNormalization = IngestionConfigVSNameNormalization.DEFAULT,
 ) {
     companion object {
         const val V1_VERSION = "v1"
+        const val V2_VERSION = "v2"
     }
 
     /**
@@ -40,7 +44,7 @@ data class IngestionConfig(
         if (step == null) {
             val jobConfig = findJobValidationConfig(job)
             val baseName = jobConfig?.validation ?: job
-            normalizeName(baseName)
+            normalizeValidationStampName(baseName)
         } else {
             val stepConfig = findStepValidationConfig(step)
             // Step contribution
@@ -57,8 +61,14 @@ data class IngestionConfig(
                 stepValidation
             }
             // Normalization
-            normalizeName(jobContribution)
+            normalizeValidationStampName(jobContribution)
         }
+
+    /**
+     * Normalizes a name before it can be used as a validation stamp name.
+     */
+    fun normalizeValidationStampName(name: String): String =
+        vsNameNormalization.normalization(name)
 
     /**
      * Gets the validation stamp description for a given job and step

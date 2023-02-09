@@ -11,3 +11,4 @@ fun getProjectName(owner: String, repository: String, orgProjectPrefix: Boolean)
     }
 
 fun normalizeName(name: String) = NameDescription.escapeName(name.lowercase()).take(ValidationStamp.NAME_MAX_LENGTH)
+

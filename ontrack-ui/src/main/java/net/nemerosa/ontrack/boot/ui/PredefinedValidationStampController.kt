@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Form.Companion.nameAndDescription
 import net.nemerosa.ontrack.model.form.ServiceConfigurator
+import net.nemerosa.ontrack.model.form.textField
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
@@ -44,7 +45,9 @@ class PredefinedValidationStampController(
     @Suppress("DuplicatedCode")
     @GetMapping("predefinedValidationStamps/create")
     fun predefinedValidationStampCreationForm(): Form =
-        nameAndDescription()
+        Form.create()
+            .textField(ValidationStamp::name, null)
+            .textField(ValidationStamp::description, null)
             .with(
                 ServiceConfigurator.of("dataType")
                     .label("Data type")

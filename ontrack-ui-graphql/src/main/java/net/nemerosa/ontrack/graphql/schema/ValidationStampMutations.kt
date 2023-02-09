@@ -130,7 +130,7 @@ data class CreateValidationStampByIdInput(
     @APIDescription("Branch ID")
     val branchId: Int,
     @get:NotNull(message = "The name is required.")
-    @get:Pattern(regexp = NameDescription.NAME, message = "The name ${NameDescription.NAME_MESSAGE_SUFFIX}")
+    @get:Pattern(regexp = ValidationStamp.NAME_REGEX, message = "The name ${NameDescription.NAME_MESSAGE_SUFFIX}")
     @APIDescription("Validation stamp name")
     val name: String,
     @APIDescription("Validation stamp description")
