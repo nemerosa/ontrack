@@ -136,14 +136,14 @@ pipeline {
                 }
             }
             environment {
-                ONTRACK_ACCEPTANCE_GITHUB_ORGANIZATION = credentials("ONTRACK_ACCEPTANCE_GITHUB_ORGANIZATION")
-                ONTRACK_ACCEPTANCE_GITHUB_TOKEN = credentials("ONTRACK_ACCEPTANCE_GITHUB_TOKEN")
-                ONTRACK_ACCEPTANCE_GITHUB_AUTOMERGETOKEN = credentials("ONTRACK_ACCEPTANCE_GITHUB_AUTOMERGETOKEN")
-                ONTRACK_ACCEPTANCE_GITHUB_AUTOVERSIONING_POSTPROCESSING_PROCESSOR_ORG = credentials("ONTRACK_ACCEPTANCE_GITHUB_AUTOVERSIONING_POSTPROCESSING_PROCESSOR_ORG")
-                ONTRACK_ACCEPTANCE_GITHUB_AUTOVERSIONING_POSTPROCESSING_PROCESSOR_REPOSITORY = credentials("ONTRACK_ACCEPTANCE_GITHUB_AUTOVERSIONING_POSTPROCESSING_PROCESSOR_REPOSITORY")
-                ONTRACK_ACCEPTANCE_GITHUB_AUTOVERSIONING_POSTPROCESSING_SAMPLE_ORG = credentials("ONTRACK_ACCEPTANCE_GITHUB_AUTOVERSIONING_POSTPROCESSING_SAMPLE_ORG")
-                ONTRACK_ACCEPTANCE_GITHUB_AUTOVERSIONING_POSTPROCESSING_SAMPLE_REPOSITORY = credentials("ONTRACK_ACCEPTANCE_GITHUB_AUTOVERSIONING_POSTPROCESSING_SAMPLE_REPOSITORY")
-                ONTRACK_ACCEPTANCE_GITHUB_AUTOVERSIONING_POSTPROCESSING_SAMPLE_VERSION = credentials("ONTRACK_ACCEPTANCE_GITHUB_AUTOVERSIONING_POSTPROCESSING_SAMPLE_VERSION")
+                ONTRACK_ACCEPTANCE_GITHUB_ORGANIZATION = credentials("ontrack-acceptance-github-organization")
+                ONTRACK_ACCEPTANCE_GITHUB_TOKEN = credentials("ontrack-acceptance-github-token")
+                ONTRACK_ACCEPTANCE_GITHUB_AUTOMERGETOKEN = credentials("ontrack-acceptance-github-automerge-token")
+                ONTRACK_ACCEPTANCE_GITHUB_AUTOVERSIONING_POSTPROCESSING_PROCESSOR_ORG = credentials("ontrack-acceptance-github-autoversioning-postprocessing-processor-org")
+                ONTRACK_ACCEPTANCE_GITHUB_AUTOVERSIONING_POSTPROCESSING_PROCESSOR_REPOSITORY = credentials("ontrack-acceptance-github-autoversioning-postprocessing-processor-repository")
+                ONTRACK_ACCEPTANCE_GITHUB_AUTOVERSIONING_POSTPROCESSING_SAMPLE_ORG = credentials("ontrack-acceptance-github-autoversioning-postprocessing-sample-org")
+                ONTRACK_ACCEPTANCE_GITHUB_AUTOVERSIONING_POSTPROCESSING_SAMPLE_REPOSITORY = credentials("ontrack-acceptance-github-autoversioning-postprocessing-sample-repository")
+                ONTRACK_ACCEPTANCE_GITHUB_AUTOVERSIONING_POSTPROCESSING_SAMPLE_VERSION = credentials("ontrack-acceptance-github-autoversioning-postprocessing-sample-version")
             }
             steps {
                 timeout(time: 30, unit: 'MINUTES') {
