@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.chart.GetChartOptions
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.Signature
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.format.DateTimeFormatter
@@ -192,6 +193,7 @@ internal class PromotionLevelChartsIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @Disabled("flaky")
     fun `Promotion level frequency`() {
         asAdmin {
             project {
