@@ -102,7 +102,6 @@ pipeline {
                         test \\
                         build \\
                         integrationTest \\
-                        publishToMavenLocal \\
                         osPackages \\
                         dockerBuild \\
                         javadocPackage \\
