@@ -410,8 +410,8 @@ pipeline {
 
         stage('Release') {
             environment {
-                GITHUB_TOKEN = credentials("JENKINS_GITHUB_TOKEN")
-                GITTER_TOKEN = credentials("GITTER_TOKEN")
+                GITHUB_TOKEN = credentials("github-token")
+                GITTER_TOKEN = credentials("gitter-token")
             }
             when {
                 beforeAgent true
@@ -448,7 +448,7 @@ pipeline {
 
         stage('Documentation') {
             environment {
-                AMS3_DELIVERY = credentials("AMS3_DELIVERY")
+                AMS3_DELIVERY = credentials("digitalocean-spaces")
             }
             when {
                 beforeAgent true
@@ -549,7 +549,7 @@ pipeline {
                 branch 'master'
             }
             environment {
-                AMS3_DELIVERY = credentials("AMS3_DELIVERY")
+                AMS3_DELIVERY = credentials("digitalocean-spaces")
             }
             steps {
                 sh '''
@@ -620,7 +620,7 @@ pipeline {
         stage('Site generation') {
             environment {
                 // GitHub OAuth token
-                GRGIT_USER = credentials("JENKINS_GITHUB_TOKEN")
+                GRGIT_USER = credentials("github-token")
                 GITHUB_URI = 'https://github.com/nemerosa/ontrack.git'
             }
             when {
