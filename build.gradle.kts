@@ -666,7 +666,7 @@ val gitterAnnouncement by tasks.registering(GitterAnnouncement::class) {
 
 val announcements by tasks.registering {
     mustRunAfter(githubRelease)
-    dependsOn(gitterAnnouncement)
+    // TODO dependsOn(gitterAnnouncement)
 }
 
 val release by tasks.registering {
