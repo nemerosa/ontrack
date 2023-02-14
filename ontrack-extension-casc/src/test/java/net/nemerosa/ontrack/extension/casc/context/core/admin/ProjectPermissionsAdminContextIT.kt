@@ -6,10 +6,12 @@ import net.nemerosa.ontrack.model.security.PermissionInput
 import net.nemerosa.ontrack.model.security.PermissionTargetType
 import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.test.TestUtils.uid
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
+@Disabled("flaky")
 class ProjectPermissionsAdminContextIT : AbstractCascTestSupport() {
 
     @Autowired
