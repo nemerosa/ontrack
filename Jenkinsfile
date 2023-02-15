@@ -436,6 +436,10 @@ pipeline {
 
             }
             post {
+                success {
+                    def text = readFile file: "build/slack.txt"
+                    slackSend channel: "#releases", color: "good", message: text
+                }
                 always {
                     ontrackCliValidate(
                             stamp: 'GITHUB.RELEASE',

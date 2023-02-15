@@ -5,7 +5,6 @@ import com.netflix.gradle.plugins.deb.Deb
 import com.netflix.gradle.plugins.packaging.SystemPackagingTask
 import com.netflix.gradle.plugins.rpm.Rpm
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
-import net.nemerosa.ontrack.gradle.GitterAnnouncement
 import net.nemerosa.ontrack.gradle.OntrackChangeLog
 import net.nemerosa.ontrack.gradle.OntrackLastReleases
 import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
@@ -647,26 +646,22 @@ val githubRelease by tasks.named("githubRelease") {
  * Release & announcement
  */
 
-val gitterToken: String by project
-val gitterRoom: String by project
-
-val gitterAnnouncement by tasks.registering(GitterAnnouncement::class) {
+val slackMessagePreparation by tasks.registering {
     dependsOn(githubReleaseChangeLog)
     mustRunAfter(githubRelease)
-    token = gitterToken
-    roomId = gitterRoom
-    text = {
-        """
-        |## Ontrack $version is out
-        |
-        |${githubReleaseChangeLog.get().changeLog}
-        """.trimMargin()
+    doLast {
+        val text = """
+            |## Ontrack $version is out
+            |
+            |${githubReleaseChangeLog.get().changeLog}
+            """.trimMargin()
+        project.file("build/slack.txt").writeText(text)
     }
 }
 
 val announcements by tasks.registering {
     mustRunAfter(githubRelease)
-    // TODO dependsOn(gitterAnnouncement)
+    dependsOn(slackMessagePreparation)
 }
 
 val release by tasks.registering {
