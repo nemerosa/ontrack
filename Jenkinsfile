@@ -411,7 +411,6 @@ pipeline {
         stage('Release') {
             environment {
                 GITHUB_TOKEN = credentials("github-token")
-                GITTER_TOKEN = credentials("gitter-token")
             }
             when {
                 beforeAgent true
@@ -430,15 +429,16 @@ pipeline {
                         -PgitHubToken=${GITHUB_TOKEN} \\
                         -PgitHubCommit=${GIT_COMMIT} \\
                         -PgitHubChangeLogReleaseBranch=${ONTRACK_BRANCH_NAME} \\
-                        -PgitterToken=${GITTER_TOKEN} \\
                         release
                 '''
 
             }
             post {
                 success {
-                    def text = readFile file: "build/slack.txt"
-                    slackSend channel: "#releases", color: "good", message: text
+                    script {
+                        def text = readFile file: "build/slack.txt"
+                        slackSend channel: "#releases", color: "good", message: text, iconEmoji: "ontrack"
+                    }
                 }
                 always {
                     ontrackCliValidate(
