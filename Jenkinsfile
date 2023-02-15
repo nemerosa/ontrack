@@ -437,7 +437,7 @@ pipeline {
                 success {
                     script {
                         def text = readFile file: "build/slack.txt"
-                        slackSend channel: "#releases", color: "good", message: text, iconEmoji: "ontrack"
+                        slackSend channel: "#releases", color: "good", message: text
                     }
                 }
                 always {

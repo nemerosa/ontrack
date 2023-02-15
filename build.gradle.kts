@@ -651,7 +651,7 @@ val slackMessagePreparation by tasks.registering {
     mustRunAfter(githubRelease)
     doLast {
         val text = """
-            |## Ontrack $version is out
+            |:ontrack: *Ontrack `$version` is out*
             |
             |${githubReleaseChangeLog.get().changeLog}
             """.trimMargin()
