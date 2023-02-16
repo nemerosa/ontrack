@@ -219,9 +219,38 @@ Two types are currently supported:
 
 * `properties` (default) - Java properties file, typically used for a `gradle.properties` file
 * `npm` - NPM package file, typically used for `package.json`
+* `maven` - <<auto-versioning-config-type-maven,Maven POM file>>
 * `yaml` - YAML file, see <<auto-versioning-config-type-yaml>>
 
 See the <<auto-versioning-config-examples,examples section>> for their usage.
+
+[[auto-versioning-config-type-maven]]
+====== Maven POM file
+
+For the `maven` type, the file to transform is a Maven `pom.xml` file. The `property` is _required_ to be one of the `<properties>` elements of the file.
+
+For example, given the following POM:
+
+[source,xml]
+----
+<project>
+    <properties>
+        <dep.version>1.10</dep.version>
+        <ontrack.version>4.4.10</ontrack.version>
+    </properties>
+</project>
+----
+
+we can refer to the `ontrack.version` using the following auto versioning configuration:
+
+[source,yaml]
+----
+configurations:
+  # ...
+  targetPath: pom.xml
+  propertyType: maven
+  property: ontrack.version
+----
 
 [[auto-versioning-config-type-yaml]]
 ====== YAML files

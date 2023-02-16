@@ -4,6 +4,10 @@ import net.nemerosa.ontrack.extension.issues.model.Issue
 
 import java.time.LocalDateTime
 
+/**
+ * @deprecated Switch to Kotlin
+ */
+@Deprecated
 class MockIssue implements Issue {
 
     private final int key
