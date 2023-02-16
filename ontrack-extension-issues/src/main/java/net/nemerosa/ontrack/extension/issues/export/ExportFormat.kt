@@ -15,6 +15,8 @@ data class ExportFormat(
         @JvmField
         val MARKDOWN = ExportFormat("markdown", "Markdown", "text/plain")
         @JvmField
+        val SLACK = ExportFormat("slack", "Slack", "text/plain")
+        @JvmField
         val HTML = ExportFormat("html", "HTML", "text/html")
     }
 
