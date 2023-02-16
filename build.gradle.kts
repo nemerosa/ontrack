@@ -613,6 +613,7 @@ val gitHubChangeLogReleaseBranchFilter: String by project
 val githubReleaseChangeLog by tasks.registering(OntrackChangeLog::class) {
     ontrackReleaseBranch = gitHubChangeLogReleaseBranch
     ontrackReleaseFilter = gitHubChangeLogReleaseBranchFilter
+    format = "text"
 }
 
 githubRelease {
@@ -646,14 +647,20 @@ val githubRelease by tasks.named("githubRelease") {
  * Release & announcement
  */
 
+val slackReleaseChangeLog by tasks.registering(OntrackChangeLog::class) {
+    ontrackReleaseBranch = gitHubChangeLogReleaseBranch
+    ontrackReleaseFilter = gitHubChangeLogReleaseBranchFilter
+    format = "slack"
+}
+
 val slackMessagePreparation by tasks.registering {
-    dependsOn(githubReleaseChangeLog)
+    dependsOn(slackReleaseChangeLog)
     mustRunAfter(githubRelease)
     doLast {
         val text = """
             |:ontrack: *Ontrack `$version` is out*
             |
-            |${githubReleaseChangeLog.get().changeLog}
+            |${slackReleaseChangeLog.get().changeLog}
             """.trimMargin()
         project.file("build/slack.txt").writeText(text)
     }

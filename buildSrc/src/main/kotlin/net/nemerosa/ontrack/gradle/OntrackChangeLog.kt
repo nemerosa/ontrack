@@ -19,6 +19,9 @@ open class OntrackChangeLog : AbstractOntrackTask() {
     @Input
     var ontrackReleaseFilter: String = ""
 
+    @Input
+    var format: String = "text"
+
     @Internal
     var changeLog: String = ""
 
@@ -44,7 +47,7 @@ open class OntrackChangeLog : AbstractOntrackTask() {
             // Exports the issues
             this.changeLog = changeLog.exportIssues(
                 mapOf(
-                    "format" to "text",
+                    "format" to format,
                     "groups" to mapOf(
                         "Features" to listOf("type: feature"),
                         "Enhancements" to listOf("type: enhancement"),
