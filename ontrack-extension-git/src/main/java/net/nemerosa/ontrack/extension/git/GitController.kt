@@ -259,7 +259,10 @@ class GitController(
      * Change log commits
      */
     @GetMapping("changelog/{uuid}/commits")
-    fun changeLogCommits(@PathVariable uuid: String): GitChangeLogCommits {
+    fun changeLogCommits(
+        @PathVariable uuid: String,
+        @RequestParam(name = "showBuilds", required = false, defaultValue = "false") showBuilds: Boolean,
+    ): GitChangeLogCommits {
         // Gets the change log
         val changeLog = getChangeLog(uuid)
         // Cached?
@@ -268,7 +271,12 @@ class GitController(
             return commits
         }
         // Loads the commits
-        val loadedCommits = changeLog.loadCommits(gitService::getChangeLogCommits)
+        val options = GitChangeLogCommitOptions(
+            showBuilds = showBuilds,
+        )
+        val loadedCommits = changeLog.loadCommits {
+            gitService.getChangeLogCommits(it, options)
+        }
         // Stores in cache
         logCache.put(uuid, changeLog)
         // OK

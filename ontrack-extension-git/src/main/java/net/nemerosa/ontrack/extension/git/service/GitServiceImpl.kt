@@ -221,7 +221,10 @@ class GitServiceImpl(
                 ?: throw GitProjectNotConfiguredException(project.id)
     }
 
-    override fun getChangeLogCommits(changeLog: GitChangeLog): GitChangeLogCommits {
+    override fun getChangeLogCommits(
+        changeLog: GitChangeLog,
+        gitChangeLogCommitOptions: GitChangeLogCommitOptions,
+    ): GitChangeLogCommits {
         // Gets the client
         val client = getGitRepositoryClient(changeLog.project)
         // Gets the build boundaries
@@ -241,7 +244,11 @@ class GitServiceImpl(
         }
         // Consolidation to UI
         val commits = log.commits
-        val uiCommits = toUICommits(getRequiredProjectConfiguration(changeLog.project), commits)
+        val uiCommits = toUICommits(
+            getRequiredProjectConfiguration(changeLog.project),
+            commits,
+            gitChangeLogCommitOptions,
+        )
         return GitChangeLogCommits(
                 GitUILog(
                         log.plot,
@@ -624,16 +631,25 @@ class GitServiceImpl(
         ).first()
     }
 
-    private fun toUICommits(gitConfiguration: GitConfiguration, commits: List<GitCommit>): List<GitUICommit> {
+    private fun toUICommits(
+        gitConfiguration: GitConfiguration,
+        commits: List<GitCommit>,
+        gitChangeLogCommitOptions: GitChangeLogCommitOptions = GitChangeLogCommitOptions(),
+    ): List<GitUICommit> {
         // Link?
         val commitLink = gitConfiguration.commitLink
         // Issue-based annotations
         val messageAnnotators = getMessageAnnotators(gitConfiguration)
         // OK
-        return commits.map { commit -> toUICommit(commitLink, messageAnnotators, commit) }
+        return commits.map { commit -> toUICommit(commitLink, messageAnnotators, commit, gitChangeLogCommitOptions) }
     }
 
-    private fun toUICommit(commitLink: String, messageAnnotators: List<MessageAnnotator>, commit: GitCommit): GitUICommit {
+    private fun toUICommit(
+        commitLink: String,
+        messageAnnotators: List<MessageAnnotator>,
+        commit: GitCommit,
+        gitChangeLogCommitOptions: GitChangeLogCommitOptions = GitChangeLogCommitOptions(),
+    ): GitUICommit {
         return GitUICommit(
                 commit,
                 MessageAnnotationUtils.annotate(commit.shortMessage, messageAnnotators),

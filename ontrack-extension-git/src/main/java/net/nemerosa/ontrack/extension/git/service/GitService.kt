@@ -100,7 +100,10 @@ interface GitService : SCMService {
     /**
      * Change log commits
      */
-    fun getChangeLogCommits(changeLog: GitChangeLog): GitChangeLogCommits
+    fun getChangeLogCommits(
+        changeLog: GitChangeLog,
+        gitChangeLogCommitOptions: GitChangeLogCommitOptions = GitChangeLogCommitOptions(),
+    ): GitChangeLogCommits
 
     /**
      * Change log issues IDs
