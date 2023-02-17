@@ -356,7 +356,10 @@ angular.module('ontrack.extension.git', [
                 if (!$scope.commits) {
                     $scope.commitsLoading = true;
                     $scope.commitsCommand = "Loading the commits...";
-                    ot.pageCall($http.get($scope.changeLog._commits)).then(function (commits) {
+                    const params = {
+                        showBuilds: true
+                    };
+                    ot.pageCall($http.get($scope.changeLog._commits, {params: params})).then(function (commits) {
                         $scope.commits = commits;
                         $scope.commitsLoading = false;
                         $scope.commitsCommand = "Commits";
