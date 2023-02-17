@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.git.branching.BranchingModelService
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.git.repository.GitRepositoryHelper
 import net.nemerosa.ontrack.extension.git.support.NoGitCommitPropertyException
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
@@ -65,6 +66,7 @@ class GitServiceImpl(
     private val gitConfigProperties: GitConfigProperties,
     private val gitPullRequestCache: DefaultGitPullRequestCache,
     private val gitNoRemoteCounter: GitNoRemoteCounter,
+    private val gitCommitPropertyType: GitCommitPropertyType,
     transactionManager: PlatformTransactionManager
 ) : AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue>(structureService, propertyService), GitService, JobOrchestratorSupplier {
 
@@ -659,13 +661,18 @@ class GitServiceImpl(
         )
     }
 
-    private fun loadCommitBuild(commit: GitCommit, gitChangeLogCommitOptions: GitChangeLogCommitOptions): Build? {
+    private fun loadCommitBuild(commit: GitCommit, gitChangeLogCommitOptions: GitChangeLogCommitOptions): Build? =
         if (gitChangeLogCommitOptions.showBuilds) {
-            TODO("Gets the build from the commit")
+            propertyService.findByEntityTypeAndSearchArguments(
+                entityType = ProjectEntityType.BUILD,
+                propertyType = GitCommitPropertyType::class,
+                searchArguments = gitCommitPropertyType.getSearchArguments(commit.id),
+            ).firstOrNull()?.let { id ->
+                structureService.getBuild(id)
+            }
         } else {
-            return null
+            null
         }
-    }
 
     private fun getMessageAnnotators(gitConfiguration: GitConfiguration): List<MessageAnnotator> {
         val configuredIssueService = gitConfiguration.configuredIssueService
