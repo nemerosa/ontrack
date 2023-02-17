@@ -651,11 +651,20 @@ class GitServiceImpl(
         gitChangeLogCommitOptions: GitChangeLogCommitOptions = GitChangeLogCommitOptions(),
     ): GitUICommit {
         return GitUICommit(
-                commit,
-                MessageAnnotationUtils.annotate(commit.shortMessage, messageAnnotators),
-                MessageAnnotationUtils.annotate(commit.fullMessage, messageAnnotators),
-                StringUtils.replace(commitLink, "{commit}", commit.id)
+            commit = commit,
+            annotatedMessage = MessageAnnotationUtils.annotate(commit.shortMessage, messageAnnotators),
+            fullAnnotatedMessage = MessageAnnotationUtils.annotate(commit.fullMessage, messageAnnotators),
+            link = StringUtils.replace(commitLink, "{commit}", commit.id),
+            build = loadCommitBuild(commit, gitChangeLogCommitOptions),
         )
+    }
+
+    private fun loadCommitBuild(commit: GitCommit, gitChangeLogCommitOptions: GitChangeLogCommitOptions): Build? {
+        if (gitChangeLogCommitOptions.showBuilds) {
+            TODO("Gets the build from the commit")
+        } else {
+            return null
+        }
     }
 
     private fun getMessageAnnotators(gitConfiguration: GitConfiguration): List<MessageAnnotator> {

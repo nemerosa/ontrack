@@ -3,13 +3,18 @@ package net.nemerosa.ontrack.extension.git.model
 import lombok.Data
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogCommit
 import net.nemerosa.ontrack.git.model.GitCommit
+import net.nemerosa.ontrack.model.structure.Build
 
+/**
+ * @param build Build attached to the commit (if any or requested)
+ */
 @Data
 class GitUICommit(
-        val commit: GitCommit,
-        val annotatedMessage: String,
-        val fullAnnotatedMessage: String,
-        override val link: String
+    val commit: GitCommit,
+    val annotatedMessage: String,
+    val fullAnnotatedMessage: String,
+    override val link: String,
+    val build: Build? = null,
 ) : SCMChangeLogCommit {
 
     override val message = commit.fullMessage
