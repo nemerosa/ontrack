@@ -651,23 +651,45 @@ class GitServiceImpl(
         commit: GitCommit,
         gitChangeLogCommitOptions: GitChangeLogCommitOptions = GitChangeLogCommitOptions(),
     ): GitUICommit {
+        val cache = OptionsCache()
         return GitUICommit(
             commit = commit,
             annotatedMessage = MessageAnnotationUtils.annotate(commit.shortMessage, messageAnnotators),
             fullAnnotatedMessage = MessageAnnotationUtils.annotate(commit.fullMessage, messageAnnotators),
             link = StringUtils.replace(commitLink, "{commit}", commit.id),
-            build = loadCommitBuild(commit, gitChangeLogCommitOptions),
+            build = loadCommitBuild(cache, commit, gitChangeLogCommitOptions),
+            promotions = loadCommitPromotions(cache, commit, gitChangeLogCommitOptions),
         )
     }
 
-    private fun loadCommitBuild(commit: GitCommit, gitChangeLogCommitOptions: GitChangeLogCommitOptions): Build? =
-        if (gitChangeLogCommitOptions.showBuilds) {
-            propertyService.findByEntityTypeAndSearchArguments(
+    private class OptionsCache {
+        var build: Build? = null
+    }
+
+    private fun loadCommitBuild(
+        cache: OptionsCache,
+        commit: GitCommit,
+        gitChangeLogCommitOptions: GitChangeLogCommitOptions,
+        force: Boolean = false,
+    ): Build? =
+        if (gitChangeLogCommitOptions.showBuilds || force) {
+            cache.build = propertyService.findByEntityTypeAndSearchArguments(
                 entityType = ProjectEntityType.BUILD,
                 propertyType = GitCommitPropertyType::class,
                 searchArguments = GitCommitPropertyType.getGitCommitSearchArguments(commit.id),
             ).firstOrNull()?.let { id ->
                 structureService.getBuild(id)
+            }
+            cache.build
+        } else {
+            null
+        }
+
+    private fun loadCommitPromotions(cache: OptionsCache, commit: GitCommit, options: GitChangeLogCommitOptions): List<PromotionRun>? =
+        if (options.showPromotions) {
+            val build = cache.build ?: loadCommitBuild(cache, commit, options, force = true)
+            build?.let {
+                structureService.getPromotionRunsForBuild(it.id)
             }
         } else {
             null
