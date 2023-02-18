@@ -141,7 +141,12 @@
                                     {{gitUICommit.commit.commitTime | date:'mediumDate'}}
                                     {{gitUICommit.commit.commitTime | date:'shortTime'}}
                                 </span>
-                                <!-- TODO #1068 Build decoration -->
+                                <!-- Build decoration -->
+                                <span
+                                        ng-if="gitUICommit.build"
+                                        class="ot-change-log-commit-build">
+                                    <a href="{{gitUICommit.build._page}}">{{gitUICommit.build.name}}</a>
+                                </span>
                                 <!-- TODO #1068 Promotions decoration -->
                                 <!-- TODO #1068 Dependency links decoration -->
                             </div>
