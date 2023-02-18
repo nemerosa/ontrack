@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.git.resource
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.git.GitController
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog
+import net.nemerosa.ontrack.extension.git.model.GitChangeLogCommitOptions
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.scm.SCMController
 import net.nemerosa.ontrack.ui.resource.AbstractLinkResourceDecorator
@@ -20,7 +21,7 @@ class GitChangeLogResourceDecorator(
     override fun getLinkDefinitions(): Iterable<LinkDefinition<GitChangeLog>> = listOf(
         // Commits
         "_commits" linkTo { changeLog ->
-            on(GitController::class.java).changeLogCommits(changeLog.uuid, null)
+            on(GitController::class.java).changeLogCommits(changeLog.uuid, GitChangeLogCommitOptions())
         },
         // Issues
         "_issues" linkTo { changeLog: GitChangeLog, _ ->

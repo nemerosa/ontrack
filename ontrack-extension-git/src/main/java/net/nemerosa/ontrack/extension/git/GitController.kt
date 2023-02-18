@@ -206,12 +206,10 @@ class GitController(
                 ?: throw GitProjectNotConfiguredException(project.id)
         // Gets the issue service
         val configuredIssueService = gitConfiguration.configuredIssueService
-        if (configuredIssueService == null) {
-            return ResponseEntity(
+            ?: return ResponseEntity(
                     "The branch is not configured for issues",
                     HttpStatus.NO_CONTENT
             )
-        }
         // Gets the issue change log
         val changeLogIssues = gitService.getChangeLogIssues(changeLog)
         // List of issues
@@ -261,7 +259,7 @@ class GitController(
     @GetMapping("changelog/{uuid}/commits")
     fun changeLogCommits(
         @PathVariable uuid: String,
-        @RequestParam(name = "showBuilds", required = false, defaultValue = "") showBuilds: Boolean? = null,
+        options: GitChangeLogCommitOptions?,
     ): GitChangeLogCommits {
         // Gets the change log
         val changeLog = getChangeLog(uuid)
@@ -271,11 +269,8 @@ class GitController(
             return commits
         }
         // Loads the commits
-        val options = GitChangeLogCommitOptions(
-            showBuilds = showBuilds ?: false,
-        )
         val loadedCommits = changeLog.loadCommits {
-            gitService.getChangeLogCommits(it, options)
+            gitService.getChangeLogCommits(it, options ?: GitChangeLogCommitOptions())
         }
         // Stores in cache
         logCache.put(uuid, changeLog)
