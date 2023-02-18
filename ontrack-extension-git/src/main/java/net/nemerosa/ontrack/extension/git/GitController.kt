@@ -261,7 +261,7 @@ class GitController(
     @GetMapping("changelog/{uuid}/commits")
     fun changeLogCommits(
         @PathVariable uuid: String,
-        @RequestParam(name = "showBuilds", required = false, defaultValue = "false") showBuilds: Boolean,
+        @RequestParam(name = "showBuilds", required = false, defaultValue = "") showBuilds: Boolean? = null,
     ): GitChangeLogCommits {
         // Gets the change log
         val changeLog = getChangeLog(uuid)
@@ -272,7 +272,7 @@ class GitController(
         }
         // Loads the commits
         val options = GitChangeLogCommitOptions(
-            showBuilds = showBuilds,
+            showBuilds = showBuilds ?: false,
         )
         val loadedCommits = changeLog.loadCommits {
             gitService.getChangeLogCommits(it, options)
