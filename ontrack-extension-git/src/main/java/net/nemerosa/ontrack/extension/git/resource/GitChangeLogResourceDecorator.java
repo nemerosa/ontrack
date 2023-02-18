@@ -37,7 +37,7 @@ public class GitChangeLogResourceDecorator extends AbstractResourceDecorator<Git
         }
         // Links
         return resourceContext.links()
-                .link("_commits", on(GitController.class).changeLogCommits(changeLog.getUuid()))
+                .link("_commits", on(GitController.class).changeLogCommits(changeLog.getUuid(), false))
                 .link(
                         "_issues",
                         on(GitController.class).changeLogIssues(changeLog.getUuid()),

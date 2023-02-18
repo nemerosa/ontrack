@@ -66,7 +66,6 @@ class GitServiceImpl(
     private val gitConfigProperties: GitConfigProperties,
     private val gitPullRequestCache: DefaultGitPullRequestCache,
     private val gitNoRemoteCounter: GitNoRemoteCounter,
-    private val gitCommitPropertyType: GitCommitPropertyType,
     transactionManager: PlatformTransactionManager
 ) : AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue>(structureService, propertyService), GitService, JobOrchestratorSupplier {
 
@@ -666,7 +665,7 @@ class GitServiceImpl(
             propertyService.findByEntityTypeAndSearchArguments(
                 entityType = ProjectEntityType.BUILD,
                 propertyType = GitCommitPropertyType::class,
-                searchArguments = gitCommitPropertyType.getSearchArguments(commit.id),
+                searchArguments = GitCommitPropertyType.getGitCommitSearchArguments(commit.id),
             ).firstOrNull()?.let { id ->
                 structureService.getBuild(id)
             }
