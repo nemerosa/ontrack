@@ -30,7 +30,7 @@ class GitChangeLogCommitsTest {
     }
 
     @Test
-    fun `Rendering of build decorations without branches`() {
+    fun `Rendering of build decorations with branch`() {
         val buildName = uid("b-")
         val build = BuildFixtures.testBuild(name = buildName)
         val commits = GitChangeLogCommits(
@@ -48,8 +48,39 @@ class GitChangeLogCommitsTest {
             assertJsonNotNull(path("build")) {
                 // Checks the name is alright
                 assertEquals(buildName, getRequiredTextField("name"))
-                // Checks no branch field is set
-                assertJsonNull(path("branch"), "Branch field is not set")
+                // Checks branch field is set
+                assertJsonNotNull(path("branch"), "Branch field is set")
+            }
+        }
+    }
+
+    @Test
+    fun `Rendering of dependencies contain branches and projects`() {
+        val buildName = uid("b-")
+        val dependency = BuildFixtures.testBuild(name = buildName)
+        val commits = GitChangeLogCommits(
+            log = GitUILog(
+                plot = GPlot(),
+                commits = listOf(
+                    GitCommitFixtures.testGitUICommit(dependencies = listOf(dependency)),
+                )
+            )
+        )
+        val json = mapper.write(commits).parseAsJson()
+        // First commit
+        assertJsonNotNull(json.path("log").path("commits").path(0)) {
+            // Dependencies node
+            assertJsonNotNull(path("dependencies"), "Dependencies") {
+                // First dependency
+                assertJsonNotNull(path(0), "First dependency") {
+                    // Dep name
+                    assertEquals(buildName, getRequiredTextField("name"))
+                    // Branch
+                    assertJsonNotNull(path("branch"), "Dep branch") {
+                        // Project
+                        assertJsonNotNull(path("project"), "Dep project")
+                    }
+                }
             }
         }
     }

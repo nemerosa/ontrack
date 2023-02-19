@@ -163,8 +163,9 @@
                                     <span ng-repeat="dependency in gitUICommit.dependencies" class="ot-change-log-commit-dependency">
                                         <span class="fa fa-link"></span>
                                         <span class="ot-change-log-commit-dependency-build-name">
-                                            {{ dependency.branch.project.name }}
                                             {{ dependency.name }}
+                                            @
+                                            {{ dependency.branch.project.name }}
                                         </span>
                                     </span>
                                 </span>

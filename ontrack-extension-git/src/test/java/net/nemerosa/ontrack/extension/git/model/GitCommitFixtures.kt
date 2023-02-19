@@ -12,6 +12,7 @@ object GitCommitFixtures {
         commit: GitCommit = testGitCommit(),
         build: Build? = null,
         promotions: List<PromotionRun>? = null,
+        dependencies: List<Build>? = null,
     ) = GitUICommit(
         commit = commit,
         annotatedMessage = commit.fullMessage,
@@ -19,6 +20,7 @@ object GitCommitFixtures {
         link = "uri:commit/${commit.id}",
         build = build,
         promotions = promotions,
+        dependencies = dependencies,
     )
 
     fun testGitCommit() = GitCommit(
