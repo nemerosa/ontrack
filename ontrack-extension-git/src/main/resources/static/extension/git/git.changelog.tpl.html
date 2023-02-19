@@ -157,7 +157,17 @@
                                         <ot-entity-image entity="promotion.promotionLevel"></ot-entity-image>
                                     </span>
                                 </span>
-                                <!-- TODO #1068 Dependency links decoration -->
+                                <!-- Dependency links decoration -->
+                                <span class="ot-change-log-commit-dependencies"
+                                      ng-if="gitUICommit.dependencies && gitUICommit.dependencies.length > 0">
+                                    <span ng-repeat="dependency in gitUICommit.dependencies" class="ot-change-log-commit-dependency">
+                                        <span class="fa fa-link"></span>
+                                        <span class="ot-change-log-commit-dependency-build-name">
+                                            {{ dependency.branch.project.name }}
+                                            {{ dependency.name }}
+                                        </span>
+                                    </span>
+                                </span>
                             </div>
                         </div>
                     </div>

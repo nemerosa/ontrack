@@ -6,4 +6,5 @@ package net.nemerosa.ontrack.extension.git.model
 data class GitChangeLogCommitOptions(
     var showBuilds: Boolean = false,
     var showPromotions: Boolean = false,
+    var showDependencies: Boolean = false,
 )

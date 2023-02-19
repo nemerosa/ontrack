@@ -659,6 +659,7 @@ class GitServiceImpl(
             link = StringUtils.replace(commitLink, "{commit}", commit.id),
             build = loadCommitBuild(cache, commit, gitChangeLogCommitOptions),
             promotions = loadCommitPromotions(cache, commit, gitChangeLogCommitOptions),
+            dependencies = loadCommitDependencies(cache, commit, gitChangeLogCommitOptions),
         )
     }
 
@@ -690,6 +691,16 @@ class GitServiceImpl(
             val build = cache.build ?: loadCommitBuild(cache, commit, options, force = true)
             build?.let {
                 structureService.getPromotionRunsForBuild(it.id)
+            }
+        } else {
+            null
+        }
+
+    private fun loadCommitDependencies(cache: OptionsCache, commit: GitCommit, options: GitChangeLogCommitOptions): List<Build>? =
+        if (options.showDependencies) {
+            val build = cache.build ?: loadCommitBuild(cache, commit, options, force = true)
+            build?.let {
+                structureService.getBuildsUsedBy(it).pageItems
             }
         } else {
             null

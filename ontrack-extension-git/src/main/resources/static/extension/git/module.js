@@ -359,6 +359,7 @@ angular.module('ontrack.extension.git', [
                     const params = {
                         showBuilds: true,
                         showPromotions: true,
+                        showDependencies: true,
                     };
                     ot.pageCall($http.get($scope.changeLog._commits, {params: params})).then(function (commits) {
                         $scope.commits = commits;

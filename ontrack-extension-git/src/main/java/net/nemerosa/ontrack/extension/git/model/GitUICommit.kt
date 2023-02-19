@@ -19,6 +19,8 @@ data class GitUICommit(
     val build: Build? = null,
     @ListRef
     val promotions: List<PromotionRun>? = null,
+    @ListRef
+    val dependencies: List<Build>? = null,
 ) : SCMChangeLogCommit {
 
     override val message = commit.fullMessage
