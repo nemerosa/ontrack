@@ -244,8 +244,7 @@ class GitController(
      */
     @GetMapping("changelog/{uuid}/commits")
     fun changeLogCommits(
-        @PathVariable uuid: String,
-        options: GitChangeLogCommitOptions?,
+        @PathVariable uuid: String
     ): GitChangeLogCommits {
         // Gets the change log
         val changeLog = getChangeLog(uuid)
@@ -256,7 +255,7 @@ class GitController(
         }
         // Loads the commits
         val loadedCommits = changeLog.loadCommits {
-            gitService.getChangeLogCommits(it, options ?: GitChangeLogCommitOptions())
+            gitService.getChangeLogCommits(it)
         }
         // Stores in cache
         gitChangeLogCache.put(changeLog)

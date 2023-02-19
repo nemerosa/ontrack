@@ -102,7 +102,6 @@ interface GitService : SCMService {
      */
     fun getChangeLogCommits(
         changeLog: GitChangeLog,
-        gitChangeLogCommitOptions: GitChangeLogCommitOptions = GitChangeLogCommitOptions(),
     ): GitChangeLogCommits
 
     /**

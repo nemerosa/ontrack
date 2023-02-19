@@ -11,7 +11,7 @@ data class Build(
         val name: String,
         override val description: String?,
         override val signature: Signature,
-        @JsonView(value = [Build::class, BuildView::class, PromotionRun::class, ValidationRun::class, BuildDiff::class, Decoration::class])
+        @JsonView(value = [Build::class, BuildView::class, PromotionRun::class, ValidationRun::class, BuildDiff::class])
         val branch: Branch
 ) : RunnableEntity {
 

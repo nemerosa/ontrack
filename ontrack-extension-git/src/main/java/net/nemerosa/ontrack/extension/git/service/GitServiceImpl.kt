@@ -10,7 +10,6 @@ import net.nemerosa.ontrack.extension.git.branching.BranchingModelService
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
-import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.git.repository.GitRepositoryHelper
 import net.nemerosa.ontrack.extension.git.support.NoGitCommitPropertyException
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
@@ -44,7 +43,6 @@ import java.lang.String.format
 import java.util.*
 import java.util.concurrent.Future
 import java.util.function.BiConsumer
-import java.util.function.Consumer
 import java.util.stream.Stream
 
 @Service
@@ -102,13 +100,13 @@ class GitServiceImpl(
     override fun collectJobRegistrations(): Stream<JobRegistration> {
         val jobs = ArrayList<JobRegistration>()
         // Indexation of repositories, based on projects actually linked
-        forEachConfiguredProject(BiConsumer { project, configuration ->
+        forEachConfiguredProject({ project, configuration ->
             if (!project.isDisabled) {
                 jobs.add(getGitIndexationJobRegistration(configuration, project))
             }
         })
         // Synchronisation of branch builds with tags when applicable
-        forEachConfiguredBranch(BiConsumer { branch, branchConfiguration ->
+        forEachConfiguredBranch({ branch, branchConfiguration ->
             if (!branch.isDisabled && !branch.project.isDisabled) {
                 // Build/tag sync job
                 if (branchConfiguration.buildTagInterval > 0 && branchConfiguration.buildCommitLink?.link is IndexableBuildGitCommitLink<*>) {
@@ -224,7 +222,6 @@ class GitServiceImpl(
 
     override fun getChangeLogCommits(
         changeLog: GitChangeLog,
-        gitChangeLogCommitOptions: GitChangeLogCommitOptions,
     ): GitChangeLogCommits {
         // Gets the client
         val client = getGitRepositoryClient(changeLog.project)
@@ -248,7 +245,6 @@ class GitServiceImpl(
         val uiCommits = toUICommits(
             getRequiredProjectConfiguration(changeLog.project),
             commits,
-            gitChangeLogCommitOptions,
         )
         return GitChangeLogCommits(
                 GitUILog(
@@ -635,76 +631,27 @@ class GitServiceImpl(
     private fun toUICommits(
         gitConfiguration: GitConfiguration,
         commits: List<GitCommit>,
-        gitChangeLogCommitOptions: GitChangeLogCommitOptions = GitChangeLogCommitOptions(),
     ): List<GitUICommit> {
         // Link?
         val commitLink = gitConfiguration.commitLink
         // Issue-based annotations
         val messageAnnotators = getMessageAnnotators(gitConfiguration)
         // OK
-        return commits.map { commit -> toUICommit(commitLink, messageAnnotators, commit, gitChangeLogCommitOptions) }
+        return commits.map { commit -> toUICommit(commitLink, messageAnnotators, commit) }
     }
 
     private fun toUICommit(
         commitLink: String,
         messageAnnotators: List<MessageAnnotator>,
         commit: GitCommit,
-        gitChangeLogCommitOptions: GitChangeLogCommitOptions = GitChangeLogCommitOptions(),
     ): GitUICommit {
-        val cache = OptionsCache()
         return GitUICommit(
             commit = commit,
             annotatedMessage = MessageAnnotationUtils.annotate(commit.shortMessage, messageAnnotators),
             fullAnnotatedMessage = MessageAnnotationUtils.annotate(commit.fullMessage, messageAnnotators),
             link = StringUtils.replace(commitLink, "{commit}", commit.id),
-            build = loadCommitBuild(cache, commit, gitChangeLogCommitOptions),
-            promotions = loadCommitPromotions(cache, commit, gitChangeLogCommitOptions),
-            dependencies = loadCommitDependencies(cache, commit, gitChangeLogCommitOptions),
         )
     }
-
-    private class OptionsCache {
-        var build: Build? = null
-    }
-
-    private fun loadCommitBuild(
-        cache: OptionsCache,
-        commit: GitCommit,
-        gitChangeLogCommitOptions: GitChangeLogCommitOptions,
-        force: Boolean = false,
-    ): Build? =
-        if (gitChangeLogCommitOptions.showBuilds || force) {
-            cache.build = propertyService.findByEntityTypeAndSearchArguments(
-                entityType = ProjectEntityType.BUILD,
-                propertyType = GitCommitPropertyType::class,
-                searchArguments = GitCommitPropertyType.getGitCommitSearchArguments(commit.id),
-            ).firstOrNull()?.let { id ->
-                structureService.getBuild(id)
-            }
-            cache.build
-        } else {
-            null
-        }
-
-    private fun loadCommitPromotions(cache: OptionsCache, commit: GitCommit, options: GitChangeLogCommitOptions): List<PromotionRun>? =
-        if (options.showPromotions) {
-            val build = cache.build ?: loadCommitBuild(cache, commit, options, force = true)
-            build?.let {
-                structureService.getPromotionRunsForBuild(it.id)
-            }
-        } else {
-            null
-        }
-
-    private fun loadCommitDependencies(cache: OptionsCache, commit: GitCommit, options: GitChangeLogCommitOptions): List<Build>? =
-        if (options.showDependencies) {
-            val build = cache.build ?: loadCommitBuild(cache, commit, options, force = true)
-            build?.let {
-                structureService.getBuildsUsedBy(it).pageItems
-            }
-        } else {
-            null
-        }
 
     private fun getMessageAnnotators(gitConfiguration: GitConfiguration): List<MessageAnnotator> {
         val configuredIssueService = gitConfiguration.configuredIssueService

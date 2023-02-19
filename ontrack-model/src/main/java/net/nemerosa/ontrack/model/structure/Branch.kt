@@ -21,7 +21,7 @@ data class Branch(
         @JsonProperty("project")
         @get:JsonView(value = [
             PromotionView::class, Branch::class, Build::class, PromotionLevel::class, ValidationStamp::class,
-            PromotionRun::class, ValidationRun::class, PromotionRunView::class, Decoration::class,
+            PromotionRun::class, ValidationRun::class, PromotionRunView::class,
         ])
         @get:JsonIgnore(false) // Overridding default at [ProjectEntity] level
         override val project: Project,
