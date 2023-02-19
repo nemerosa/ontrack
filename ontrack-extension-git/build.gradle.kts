@@ -22,6 +22,7 @@ dependencies {
     implementation("io.micrometer:micrometer-core")
 
     testImplementation(project(":ontrack-it-utils"))
+    testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-issues", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-scm", configuration = "tests"))

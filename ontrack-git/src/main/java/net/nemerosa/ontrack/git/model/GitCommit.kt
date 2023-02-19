@@ -6,7 +6,7 @@ class GitCommit(
         val id: String,
         val shortId: String,
         val author: GitPerson,
-        val committer: GitPerson,
+        val committer: GitPerson = author,
         val commitTime: LocalDateTime,
         val fullMessage: String,
         val shortMessage: String
