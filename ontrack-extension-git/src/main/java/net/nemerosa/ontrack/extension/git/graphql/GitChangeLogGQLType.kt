@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.graphql
 
 import graphql.Scalars.GraphQLString
 import graphql.schema.DataFetchingEnvironment
+import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog
@@ -10,6 +11,7 @@ import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.listType
+import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
@@ -31,6 +33,12 @@ class GitChangeLogGQLType(
     override fun createType(cache: GQLTypeCache): GraphQLObjectType {
         return GraphQLObjectType.newObject()
             .name(GIT_CHANGE_LOG)
+            // UUID
+            .field {
+                it.name("uuid")
+                    .description("UUID of the change log.")
+                    .type(GraphQLNonNull(GraphQLString))
+            }
             // Commits
             .field { f ->
                 f.name("commits")
