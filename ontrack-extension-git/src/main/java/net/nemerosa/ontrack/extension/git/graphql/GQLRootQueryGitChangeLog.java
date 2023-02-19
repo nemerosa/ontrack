@@ -14,13 +14,13 @@ import org.springframework.stereotype.Component;
 import static graphql.Scalars.GraphQLInt;
 
 @Component
-public class GitChangeLogGraphQLRootQuery implements GQLRootQuery {
+public class GQLRootQueryGitChangeLog implements GQLRootQuery {
 
     private final GitChangeLogGQLType gitChangeLogGQLType;
     private final GitService gitService;
 
     @Autowired
-    public GitChangeLogGraphQLRootQuery(GitChangeLogGQLType gitChangeLogGQLType, GitService gitService) {
+    public GQLRootQueryGitChangeLog(GitChangeLogGQLType gitChangeLogGQLType, GitService gitService) {
         this.gitChangeLogGQLType = gitChangeLogGQLType;
         this.gitService = gitService;
     }
