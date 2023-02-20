@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.extension.indicators.ui.graphql.durationArgument
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
+import net.nemerosa.ontrack.graphql.schema.GQLTypeProject
 import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.toNotNull
@@ -42,6 +43,15 @@ class GQLTypeGitChangeLog(
                 it.name("uuid")
                     .description("UUID of the change log.")
                     .type(GraphQLNonNull(GraphQLString))
+            }
+            // Project
+            .field {
+                it.name("project")
+                    .description("Project linked to the change log")
+                    .type(GraphQLTypeReference(GQLTypeProject.PROJECT).toNotNull())
+                    .dataFetcher { env ->
+                        env.getSource<GitChangeLog>().from.build.project
+                    }
             }
             // Build from & to
             .field {
