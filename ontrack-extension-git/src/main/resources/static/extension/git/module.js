@@ -370,6 +370,21 @@ angular.module('ontrack.extension.git', [
                     }
                     data
                   }
+                  promotionRuns {
+                    creation {
+                      time
+                    }
+                    build {
+                      id
+                      name
+                    }
+                    promotionLevel {
+                      id
+                      name
+                      image
+                      _image
+                    }
+                  }
                 }
             `;
             otGraphqlService.pageGraphQLCall(query, {
