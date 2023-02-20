@@ -444,6 +444,7 @@ angular.module('ontrack.extension.git', [
                 const query = `
                     query GetChangeLogCommits($uuid: String!) {
                       gitChangeLogByUUID(uuid: $uuid) {
+                        commitsPlot
                         commits {
                           id
                           shortId
@@ -457,6 +458,7 @@ angular.module('ontrack.extension.git', [
                 `;
                 otGraphqlService.pageGraphQLCall(query, {uuid: $scope.changeLog.uuid}).then(data => {
                     $scope.commits = data.gitChangeLogByUUID.commits;
+                    $scope.commitsPlot = data.gitChangeLogByUUID.commitsPlot;
                 }).finally(() => {
                     $scope.commitsLoading = false;
                     $scope.commitsCommand = "Commits";

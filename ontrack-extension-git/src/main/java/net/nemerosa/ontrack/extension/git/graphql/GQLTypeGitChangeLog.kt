@@ -8,11 +8,14 @@ import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog
 import net.nemerosa.ontrack.extension.git.service.GitService
+import net.nemerosa.ontrack.extension.indicators.ui.graphql.durationArgument
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
+import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.toNotNull
+import net.nemerosa.ontrack.json.asJson
 import org.springframework.stereotype.Component
 
 /**
@@ -55,6 +58,18 @@ class GQLTypeGitChangeLog(
                         env.getSource<GitChangeLog>().to.build
                     }
             }
+            // Commits plot
+            .field {
+                it.name("commitsPlot")
+                    .description("List of commits as a plot")
+                    .type(GQLScalarJSON.INSTANCE)
+                    .dataFetcher { env ->
+                        val gitChangeLog: GitChangeLog = env.getSource()
+                        gitChangeLog.loadCommits {
+                            gitService.getChangeLogCommits(gitChangeLog)
+                        }.log.plot.asJson()
+                    }
+            }
             // Commits
             .field { f ->
                 f.name("commits")
@@ -62,7 +77,9 @@ class GQLTypeGitChangeLog(
                     .type(listType(gitUICommitGQLType.typeRef))
                     .dataFetcher { env ->
                         val gitChangeLog: GitChangeLog = env.getSource()
-                        gitService.getChangeLogCommits(gitChangeLog).commits
+                        gitChangeLog.loadCommits {
+                            gitService.getChangeLogCommits(gitChangeLog)
+                        }.commits
                     }
             }
             // Issues
