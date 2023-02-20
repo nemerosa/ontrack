@@ -385,6 +385,32 @@ angular.module('ontrack.extension.git', [
                       _image
                     }
                   }
+                  validations {
+                    validationStamp {
+                      id
+                      name
+                      image
+                      _image
+                      links {
+                        _page
+                      }
+                    }
+                    validationRuns(count: 1) {
+                      validationRunStatuses(lastOnly: true) {
+                        statusID {
+                          id
+                        }
+                        description
+                        creation {
+                            time
+                            user
+                        }
+                      }
+                      links {
+                        _page
+                      }
+                    }
+                  }
                 }
             `;
             otGraphqlService.pageGraphQLCall(query, {

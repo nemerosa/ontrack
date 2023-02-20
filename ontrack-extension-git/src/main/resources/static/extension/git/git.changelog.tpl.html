@@ -52,18 +52,27 @@
                                     <ot-build-promotion-runs promotion-runs="build.promotionRuns"></ot-build-promotion-runs>
                                 </div>
                             </div>
-<!--                            <div class="row">-->
-<!--                                <div class="col-md-12">-->
-<!--                                    <h3><small>Validation runs</small></h3>-->
-<!--                                    <span ng-repeat="validationStampRunView in scmBuildView.buildView.validationStampRunViews"-->
-<!--                                          class="ot-view-validation-stamp-run-view"-->
-<!--                                          ng-class="{-->
-<!--                                            'ot-view-validation-stamp-run-view-norun': !validationStampRunView.validationRun.length-->
-<!--                                          }">-->
-<!--                                        <ot-validation-stamp-run-view validation-stamp-run-view="validationStampRunView"></ot-validation-stamp-run-view>-->
-<!--                                    </span>-->
-<!--                                </div>-->
-<!--                            </div>-->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3><small>Validation runs</small></h3>
+                                    <span ng-repeat="validation in build.validations"
+                                          class="ot-view-validation-stamp-run-view"
+                                          ng-class="{
+                                            'ot-view-validation-stamp-run-view-norun': !validation.validationRuns.length
+                                          }">
+                                        <ot-entity-image entity="validation.validationStamp"
+                                                         link="{{ validation.validationStamp.links._page }}">
+                                            {{validation.validationStamp.name}}
+                                        </ot-entity-image>
+                                        <span ng-repeat="validationRun in validation.validationRuns"
+                                              class="ot-validation-run-status-horizontal">
+                                            <a href="{{ validationRun.links._page }}">
+                                                <ot-validation-run-status status="validationRun.validationRunStatuses[0]"></ot-validation-run-status>
+                                            </a>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
                         <!--                        <div class="row">-->
                         <!--                            <div class="col-md-12">-->
                         <!--                                <h3>-->
