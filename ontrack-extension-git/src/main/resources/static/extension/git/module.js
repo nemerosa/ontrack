@@ -366,6 +366,10 @@ angular.module('ontrack.extension.git', [
                     links {
                         _page
                     }
+                    project {
+                      id
+                      name
+                    }
                   }
                   decorations {
                     decorationType
@@ -422,6 +426,10 @@ angular.module('ontrack.extension.git', [
                 to: to
             }).then(data => {
                 $scope.changeLog = data.gitChangeLog;
+                view.breadcrumbs = ot.projectBreadcrumbs($scope.changeLog.buildFrom.branch.project);
+                view.commands = [
+                    ot.viewCloseCommand('/project/' + $scope.changeLog.buildFrom.branch.project.id)
+                ];
             });
         };
 
@@ -430,13 +438,6 @@ angular.module('ontrack.extension.git', [
 
         //
         // ot.pageCall($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
-        //     $scope.changeLog = changeLog;
-        //
-        //     view.breadcrumbs = ot.projectBreadcrumbs(changeLog.project);
-        //
-        //
-        //
-        //
         //
         //     // Loading the commits if needed
         //     $scope.changeLogCommits = function () {
