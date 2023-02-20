@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component
 class GQLTypeGitChangeLog(
     private val gitUICommitGQLType: GitUICommitGQLType,
     private val gitChangeLogIssuesGQLType: GitChangeLogIssuesGQLType,
+    private val gqlTypeGitChangeLogFiles: GQLTypeGitChangeLogFiles,
     private val issueChangeLogExportRequestGQLInputType: IssueChangeLogExportRequestGQLInputType,
     private val gitService: GitService,
 ) : GQLType {
@@ -101,6 +102,16 @@ class GQLTypeGitChangeLog(
                     .dataFetcher { env ->
                         val gitChangeLog: GitChangeLog = env.getSource()
                         gitService.getChangeLogIssues(gitChangeLog)
+                    }
+            }
+            // File changes
+            .field {
+                it.name("files")
+                    .description("List of files changes")
+                    .type(gqlTypeGitChangeLogFiles.typeRef.toNotNull())
+                    .dataFetcher { env ->
+                        val gitChangeLog: GitChangeLog = env.getSource()
+                        gitService.getChangeLogFiles(gitChangeLog)
                     }
             }
             // Export of change log
