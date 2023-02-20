@@ -363,6 +363,13 @@ angular.module('ontrack.extension.git', [
                         _page
                     }
                   }
+                  decorations {
+                    decorationType
+                    feature {
+                      id
+                    }
+                    data
+                  }
                 }
             `;
             otGraphqlService.pageGraphQLCall(query, {
