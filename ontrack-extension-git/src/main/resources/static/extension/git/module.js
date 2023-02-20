@@ -355,6 +355,7 @@ angular.module('ontrack.extension.git', [
                   name
                   creation {
                     time
+                    user
                   }
                   links {
                     _page

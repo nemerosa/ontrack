@@ -86,11 +86,7 @@
                                         </li>
                                         <li>
                                             <span class="fa fa-li fa-user"></span>
-                                            {{changeLog.scmBuildFrom.buildView.build.signature.user.name}}
-                                        </li>
-                                        <li ng-if="changeLog.scmBuildFrom.buildView.build.description">
-                                            <span class="fa fa-li fa-file-text-o"></span>
-                                            {{changeLog.scmBuildFrom.buildView.build.description}}
+                                            {{ build.creation.user }}
                                         </li>
                                     </ul>
                                 </div>
