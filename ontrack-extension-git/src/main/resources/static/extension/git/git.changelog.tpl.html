@@ -73,28 +73,28 @@
                                     </span>
                                 </div>
                             </div>
-                        <!--                        <div class="row">-->
-                        <!--                            <div class="col-md-12">-->
-                        <!--                                <h3>-->
-                        <!--                                    <small>Build info</small>-->
-                        <!--                                </h3>-->
-                        <!--                                <ul class="fa-ul">-->
-                        <!--                                    <li>-->
-                        <!--                                        <span class="fa fa-li fa-clock-o"></span>-->
-                        <!--                                        {{changeLog.scmBuildFrom.buildView.build.signature.time | date:'mediumDate' }}-->
-                        <!--                                        {{changeLog.scmBuildFrom.buildView.build.signature.time | date:'shortTime' }}-->
-                        <!--                                    </li>-->
-                        <!--                                    <li>-->
-                        <!--                                        <span class="fa fa-li fa-user"></span>-->
-                        <!--                                        {{changeLog.scmBuildFrom.buildView.build.signature.user.name}}-->
-                        <!--                                    </li>-->
-                        <!--                                    <li ng-if="changeLog.scmBuildFrom.buildView.build.description">-->
-                        <!--                                        <span class="fa fa-li fa-file-text-o"></span>-->
-                        <!--                                        {{changeLog.scmBuildFrom.buildView.build.description}}-->
-                        <!--                                    </li>-->
-                        <!--                                </ul>-->
-                        <!--                            </div>-->
-                        <!--                        </div>-->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3>
+                                        <small>Build info</small>
+                                    </h3>
+                                    <ul class="fa-ul">
+                                        <li>
+                                            <span class="fa fa-li fa-clock-o"></span>
+                                            {{ build.creation.time | date:'mediumDate' }}
+                                            {{ build.creation.time | date:'shortTime' }}
+                                        </li>
+                                        <li>
+                                            <span class="fa fa-li fa-user"></span>
+                                            {{changeLog.scmBuildFrom.buildView.build.signature.user.name}}
+                                        </li>
+                                        <li ng-if="changeLog.scmBuildFrom.buildView.build.description">
+                                            <span class="fa fa-li fa-file-text-o"></span>
+                                            {{changeLog.scmBuildFrom.buildView.build.description}}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

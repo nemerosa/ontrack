@@ -353,6 +353,9 @@ angular.module('ontrack.extension.git', [
                 fragment BuildInfo on Build {
                   id
                   name
+                  creation {
+                    time
+                  }
                   links {
                     _page
                   }
