@@ -341,7 +341,28 @@ angular.module('ontrack.extension.git', [
                 query GitChangeLog( $from: Int!, $to: Int!, ) {
                     gitChangeLog(from: $from, to: $to) {
                         uuid
+                        buildFrom {
+                            ...BuildInfo
+                        }
+                        buildTo {
+                            ...BuildInfo
+                        }
                     }
+                }
+
+                fragment BuildInfo on Build {
+                  id
+                  name
+                  links {
+                    _page
+                  }
+                  branch {
+                    id
+                    name
+                    links {
+                        _page
+                    }
+                  }
                 }
             `;
             otGraphqlService.pageGraphQLCall(query, {

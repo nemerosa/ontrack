@@ -4,12 +4,15 @@ import graphql.Scalars.GraphQLString
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
+import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.graphql.schema.GQLType
+import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.listType
+import net.nemerosa.ontrack.graphql.support.toNotNull
 import org.springframework.stereotype.Component
 
 /**
@@ -34,6 +37,23 @@ class GQLTypeGitChangeLog(
                 it.name("uuid")
                     .description("UUID of the change log.")
                     .type(GraphQLNonNull(GraphQLString))
+            }
+            // Build from & to
+            .field {
+                it.name("buildFrom")
+                    .description("From build")
+                    .type(GraphQLTypeReference(GQLTypeBuild.BUILD).toNotNull())
+                    .dataFetcher { env ->
+                        env.getSource<GitChangeLog>().from.build
+                    }
+            }
+            .field {
+                it.name("buildTo")
+                    .description("To build")
+                    .type(GraphQLTypeReference(GQLTypeBuild.BUILD).toNotNull())
+                    .dataFetcher { env ->
+                        env.getSource<GitChangeLog>().to.build
+                    }
             }
             // Commits
             .field { f ->

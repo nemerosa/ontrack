@@ -36,59 +36,58 @@
             <!-- Build info -->
 
             <div class="row">
-                <div class="col-md-6">
-                    <a name="buildFrom"></a>
-                    <ot-scm-changelog-build scm-build-view="changeLog.scmBuildFrom">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h3>
-                                    <small>Build info</small>
-                                </h3>
-                                <ul class="fa-ul">
-                                    <li>
-                                        <span class="fa fa-li fa-clock-o"></span>
-                                        {{changeLog.scmBuildFrom.buildView.build.signature.time | date:'mediumDate' }}
-                                        {{changeLog.scmBuildFrom.buildView.build.signature.time | date:'shortTime' }}
-                                    </li>
-                                    <li>
-                                        <span class="fa fa-li fa-user"></span>
-                                        {{changeLog.scmBuildFrom.buildView.build.signature.user.name}}
-                                    </li>
-                                    <li ng-if="changeLog.scmBuildFrom.buildView.build.description">
-                                        <span class="fa fa-li fa-file-text-o"></span>
-                                        {{changeLog.scmBuildFrom.buildView.build.description}}
-                                    </li>
-                                </ul>
-                            </div>
+                <div class="col-md-6" ng-repeat="build in [changeLog.buildFrom, changeLog.buildTo]">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Build
+                            <a href="{{ build.branch.links._page }}">{{build.branch.name}}</a>
+                            /
+                            <a href="{{ build.links._page }}">{{build.name}}</a>
+<!--                            <ot-entity-decorations entity="scmBuildView.buildView.build"></ot-entity-decorations>-->
                         </div>
-                    </ot-scm-changelog-build>
-                </div>
-                <div class="col-md-6">
-                    <a id="buildTo"></a>
-                    <ot-scm-changelog-build scm-build-view="changeLog.scmBuildTo">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h3>
-                                    <small>Build info</small>
-                                </h3>
-                                <ul class="fa-ul">
-                                    <li>
-                                        <span class="fa fa-li fa-clock-o"></span>
-                                        {{changeLog.scmBuildTo.buildView.build.signature.time | date:'mediumDate' }}
-                                        {{changeLog.scmBuildTo.buildView.build.signature.time | date:'shortTime' }}
-                                    </li>
-                                    <li>
-                                        <span class="fa fa-li fa-user"></span>
-                                        {{changeLog.scmBuildTo.buildView.build.signature.user.name}}
-                                    </li>
-                                    <li>
-                                        <span class="fa fa-li fa-file-text-o"></span>
-                                        {{changeLog.scmBuildTo.buildView.build.description}}
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </ot-scm-changelog-build>
+<!--                        <div class="panel-body">-->
+<!--                            <div class="row">-->
+<!--                                <div class="col-md-12">-->
+<!--                                    <h3><small>Promotions</small></h3>-->
+<!--                                    <ot-build-promotion-runs promotion-runs="scmBuildView.buildView.promotionRuns"></ot-build-promotion-runs>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="row">-->
+<!--                                <div class="col-md-12">-->
+<!--                                    <h3><small>Validation runs</small></h3>-->
+<!--                                    <span ng-repeat="validationStampRunView in scmBuildView.buildView.validationStampRunViews"-->
+<!--                                          class="ot-view-validation-stamp-run-view"-->
+<!--                                          ng-class="{-->
+<!--                                            'ot-view-validation-stamp-run-view-norun': !validationStampRunView.validationRun.length-->
+<!--                                          }">-->
+<!--                                        <ot-validation-stamp-run-view validation-stamp-run-view="validationStampRunView"></ot-validation-stamp-run-view>-->
+<!--                                    </span>-->
+<!--                                </div>-->
+<!--                            </div>-->
+                        <!--                        <div class="row">-->
+                        <!--                            <div class="col-md-12">-->
+                        <!--                                <h3>-->
+                        <!--                                    <small>Build info</small>-->
+                        <!--                                </h3>-->
+                        <!--                                <ul class="fa-ul">-->
+                        <!--                                    <li>-->
+                        <!--                                        <span class="fa fa-li fa-clock-o"></span>-->
+                        <!--                                        {{changeLog.scmBuildFrom.buildView.build.signature.time | date:'mediumDate' }}-->
+                        <!--                                        {{changeLog.scmBuildFrom.buildView.build.signature.time | date:'shortTime' }}-->
+                        <!--                                    </li>-->
+                        <!--                                    <li>-->
+                        <!--                                        <span class="fa fa-li fa-user"></span>-->
+                        <!--                                        {{changeLog.scmBuildFrom.buildView.build.signature.user.name}}-->
+                        <!--                                    </li>-->
+                        <!--                                    <li ng-if="changeLog.scmBuildFrom.buildView.build.description">-->
+                        <!--                                        <span class="fa fa-li fa-file-text-o"></span>-->
+                        <!--                                        {{changeLog.scmBuildFrom.buildView.build.description}}-->
+                        <!--                                    </li>-->
+                        <!--                                </ul>-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
+<!--                        </div>-->
+                    </div>
                 </div>
             </div>
 
