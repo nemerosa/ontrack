@@ -469,31 +469,38 @@ angular.module('ontrack.extension.git', [
             }
         };
 
+        // Loading the issues
+        $scope.changeLogIssues = () => {
+            if (!$scope.issues) {
+                $scope.issuesLoading = true;
+                $scope.issuesCommand = "Loading the issues...";
+                const query = `
+                    query GetChangeLogIssues($uuid: String!) {
+                      gitChangeLogByUUID(uuid: $uuid) {
+                        issues {
+                          issueServiceConfiguration {
+                            serviceId
+                          }
+                          list {
+                            issue: issueObject
+                          }
+                        }
+                      }
+                    }
+                `;
+                otGraphqlService.pageGraphQLCall(query, {uuid: $scope.changeLog.uuid}).then(data => {
+                    $scope.issues = data.gitChangeLogByUUID.issues;
+                    $location.hash('issues');
+                    $anchorScroll();
+                }).finally(() => {
+                    $scope.issuesLoading = false;
+                    $scope.issuesCommand = "Issues";
+                });
+            }
+        };
+
         //
         // ot.pageCall($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
-        //
-        //     // Loading the commits if needed
-        //     $scope.changeLogCommits = function () {
-        //         if (!$scope.commits) {
-        //             $scope.commitsLoading = true;
-        //             $scope.commitsCommand = "Loading the commits...";
-        //             const params = {
-        //                 showBuilds: true,
-        //                 showPromotions: true,
-        //                 showDependencies: true,
-        //             };
-        //             ot.pageCall($http.get($scope.changeLog._commits, {params: params})).then(function (commits) {
-        //                 $scope.commits = commits;
-        //                 $scope.commitsLoading = false;
-        //                 $scope.commitsCommand = "Commits";
-        //                 $location.hash('commits');
-        //                 $anchorScroll();
-        //             });
-        //         } else {
-        //             $location.hash('commits');
-        //             $anchorScroll();
-        //         }
-        //     };
         //
         //     // Loading the issues if needed
         //     $scope.changeLogIssues = function () {

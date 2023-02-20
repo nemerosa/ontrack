@@ -180,10 +180,9 @@
             </div>
 
             <!-- Issue sections -->
-            <div class="row" ng-if="changeLog._issues">
+            <div class="row" ng-if="changeLog.hasIssues">
                 <div class="col-md-12">
-                    <a name="issues"></a>
-
+                    <a id="issues"></a>
                     <div class="panel panel-default">
                         <div class="panel-heading clearfix">
                             Issues
@@ -214,8 +213,7 @@
                                 <ot-loading>Issues are loading...</ot-loading>
                             </div>
                             <div ng-if="issues && issues.issueServiceConfiguration.serviceId">
-                                <ot-include value="issues" template="extension/{{issues.issueServiceConfiguration.serviceId}}/changelog.issues.tpl.html">
-                                </ot-include>
+                                <ot-include value="issues" template="extension/{{issues.issueServiceConfiguration.serviceId}}/changelog.issues.tpl.html"></ot-include>
                             </div>
                         </div>
                     </div>
