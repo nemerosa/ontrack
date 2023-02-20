@@ -99,12 +99,12 @@
             <!-- Commits sections -->
             <div class="row">
                 <div class="col-md-12">
-                    <a name="commits"></a>
-
+                    <a id="commits"></a>
                     <div class="panel panel-default">
                         <div class="panel-heading clearfix">
                             Commits
                             <div class="pull-right">
+                                <!-- TODO Issues available? -->
                                 <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()"
                                    ng-disabled="issuesLoading">
                                     <ot-loading ng-if="issuesLoading"></ot-loading>
@@ -134,45 +134,45 @@
                                 <canvas git-plot="commits.log.plot"></canvas>
                             </div>
                             <div class="ot-graph-line"
-                                 ng-repeat="gitUICommit in commits.log.commits">
-                                <span class="ot-graph-code" ng-if="!gitUICommit.link">{{gitUICommit.commit.shortId}}</span>
-                                <span class="ot-graph-code" ng-if="gitUICommit.link"><a href="{{gitUICommit.link}}" target="_blank">{{gitUICommit.commit.shortId}}</a></span>
+                                 ng-repeat="gitUICommit in commits">
+                                <span class="ot-graph-code" ng-if="!gitUICommit.link">{{gitUICommit.shortId}}</span>
+                                <span class="ot-graph-code" ng-if="gitUICommit.link"><a href="{{gitUICommit.link}}" target="_blank">{{gitUICommit.shortId}}</a></span>
                                 <span class="ot-graph-message" ng-bind-html="gitUICommit.annotatedMessage"></span>
                                 <span class="ot-graph-label">
-                                    {{gitUICommit.commit.author.name}}
+                                    {{gitUICommit.author}}
                                 </span>
                                 <span class="ot-graph-label">
-                                    {{gitUICommit.commit.commitTime | date:'mediumDate'}}
-                                    {{gitUICommit.commit.commitTime | date:'shortTime'}}
+                                    {{gitUICommit.timestamp | date:'mediumDate'}}
+                                    {{gitUICommit.timestamp | date:'shortTime'}}
                                 </span>
-                                <!-- Build decoration -->
-                                <span
-                                        ng-if="gitUICommit.build"
-                                        class="ot-change-log-commit-build">
-                                    <a href="{{gitUICommit.build._page}}">{{gitUICommit.build.name}}</a>
-                                </span>
-                                <!-- Promotions decoration -->
-                                <span
-                                        class="ot-change-log-commit-promotions"
-                                        ng-if="gitUICommit.promotions && gitUICommit.promotions.length > 0">
-                                    <span
-                                            ng-repeat="promotion in gitUICommit.promotions"
-                                            class="ot-change-log-commit-promotion">
-                                        <ot-entity-image entity="promotion.promotionLevel"></ot-entity-image>
-                                    </span>
-                                </span>
-                                <!-- Dependency links decoration -->
-                                <span class="ot-change-log-commit-dependencies"
-                                      ng-if="gitUICommit.dependencies && gitUICommit.dependencies.length > 0">
-                                    <span ng-repeat="dependency in gitUICommit.dependencies" class="ot-change-log-commit-dependency">
-                                        <span class="fa fa-link"></span>
-                                        <span class="ot-change-log-commit-dependency-build-name">
-                                            {{ dependency.name }}
-                                            @
-                                            {{ dependency.branch.project.name }}
-                                        </span>
-                                    </span>
-                                </span>
+                                <!-- TODO Build decoration -->
+<!--                                <span-->
+<!--                                        ng-if="gitUICommit.build"-->
+<!--                                        class="ot-change-log-commit-build">-->
+<!--                                    <a href="{{gitUICommit.build._page}}">{{gitUICommit.build.name}}</a>-->
+<!--                                </span>-->
+                                <!-- TODO Promotions decoration -->
+<!--                                <span-->
+<!--                                        class="ot-change-log-commit-promotions"-->
+<!--                                        ng-if="gitUICommit.promotions && gitUICommit.promotions.length > 0">-->
+<!--                                    <span-->
+<!--                                            ng-repeat="promotion in gitUICommit.promotions"-->
+<!--                                            class="ot-change-log-commit-promotion">-->
+<!--                                        <ot-entity-image entity="promotion.promotionLevel"></ot-entity-image>-->
+<!--                                    </span>-->
+<!--                                </span>-->
+                                <!-- TODO Dependency links decoration -->
+<!--                                <span class="ot-change-log-commit-dependencies"-->
+<!--                                      ng-if="gitUICommit.dependencies && gitUICommit.dependencies.length > 0">-->
+<!--                                    <span ng-repeat="dependency in gitUICommit.dependencies" class="ot-change-log-commit-dependency">-->
+<!--                                        <span class="fa fa-link"></span>-->
+<!--                                        <span class="ot-change-log-commit-dependency-build-name">-->
+<!--                                            {{ dependency.name }}-->
+<!--                                            @-->
+<!--                                            {{ dependency.branch.project.name }}-->
+<!--                                        </span>-->
+<!--                                    </span>-->
+<!--                                </span>-->
                             </div>
                         </div>
                     </div>

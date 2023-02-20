@@ -436,6 +436,36 @@ angular.module('ontrack.extension.git', [
         // Loading the change load at startup
         loadChangeLogFrame();
 
+        // Loading the commits
+        $scope.changeLogCommits = () => {
+            if (!$scope.commits) {
+                $scope.commitsLoading = true;
+                $scope.commitsCommand = "Loading the commits...";
+                const query = `
+                    query GetChangeLogCommits($uuid: String!) {
+                      gitChangeLogByUUID(uuid: $uuid) {
+                        commits {
+                          id
+                          shortId
+                          annotatedMessage
+                          link
+                          author
+                          timestamp
+                        }
+                      }
+                    }
+                `;
+                otGraphqlService.pageGraphQLCall(query, {uuid: $scope.changeLog.uuid}).then(data => {
+                    $scope.commits = data.gitChangeLogByUUID.commits;
+                }).finally(() => {
+                    $scope.commitsLoading = false;
+                    $scope.commitsCommand = "Commits";
+                    $location.hash('commits');
+                    $anchorScroll();
+                });
+            }
+        };
+
         //
         // ot.pageCall($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
         //
