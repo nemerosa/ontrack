@@ -2,13 +2,13 @@ package net.nemerosa.ontrack.extension.scm;
 
 import net.nemerosa.ontrack.extension.scm.model.SCMFileChangeFilter;
 import net.nemerosa.ontrack.extension.scm.model.SCMFileChangeFilters;
+import net.nemerosa.ontrack.extension.scm.service.SCMFileChangeFilterService;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Memo;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.EntityDataService;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureService;
@@ -20,23 +20,21 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.stream.Collectors;
-
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
 @RequestMapping("extension/scm")
 public class SCMController extends AbstractResourceController {
 
-    private final EntityDataService entityDataService;
     private final StructureService structureService;
     private final SecurityService securityService;
+    private final SCMFileChangeFilterService scmFileChangeFilterService;
 
     @Autowired
-    public SCMController(EntityDataService entityDataService, StructureService structureService, SecurityService securityService) {
-        this.entityDataService = entityDataService;
+    public SCMController(StructureService structureService, SecurityService securityService, SCMFileChangeFilterService scmFileChangeFilterService) {
         this.structureService = structureService;
         this.securityService = securityService;
+        this.scmFileChangeFilterService = scmFileChangeFilterService;
     }
 
     /**
@@ -83,17 +81,8 @@ public class SCMController extends AbstractResourceController {
         return securityService.asAdmin(() -> {
             // Loads the project
             Project project = structureService.getProject(projectId);
-            // Gets the store
-            SCMFileChangeFilters config = entityDataService.retrieve(
-                    project,
-                    SCMFileChangeFilters.class.getName(),
-                    SCMFileChangeFilters.class
-            );
-            if (config == null) config = SCMFileChangeFilters.create();
-            // Updates the store
-            config = config.save(filter);
-            // Saves the store back
-            entityDataService.store(project, SCMFileChangeFilters.class.getName(), config);
+            // Saves the new filter into the store
+            scmFileChangeFilterService.save(project, filter);
             // OK
             return getChangeLogFileFilter(projectId, filter.getName());
         });
@@ -114,7 +103,7 @@ public class SCMController extends AbstractResourceController {
                 .with(Memo.of("patterns")
                         .label("Filter(s)")
                         .help("List of ANT-like patterns (one per line).")
-                        .value(filter.getData().getPatterns().stream().collect(Collectors.joining("\n"))))
+                        .value(String.join("\n", filter.getData().getPatterns())))
                 ;
     }
 
@@ -164,16 +153,8 @@ public class SCMController extends AbstractResourceController {
 
     private SCMFileChangeFilters loadStore(ID projectId) {
         return securityService.asAdmin(() -> {
-            // Loads the project
             Project project = structureService.getProject(projectId);
-            // Loads the store
-            SCMFileChangeFilters config = entityDataService.retrieve(
-                    project,
-                    SCMFileChangeFilters.class.getName(),
-                    SCMFileChangeFilters.class
-            );
-            if (config == null) config = SCMFileChangeFilters.create();
-            return config;
+            return scmFileChangeFilterService.loadSCMFileChangeFilters(project);
         });
     }
 
@@ -184,12 +165,10 @@ public class SCMController extends AbstractResourceController {
     public Ack deleteChangeLogFileFilter(@PathVariable ID projectId, @PathVariable String name) {
         securityService.checkProjectFunction(projectId.get(), ProjectConfig.class);
         securityService.asAdmin(() ->
-                        entityDataService.withData(
-                                structureService.getProject(projectId),
-                                SCMFileChangeFilters.class.getName(),
-                                SCMFileChangeFilters.class,
-                                (SCMFileChangeFilters filters) -> filters.remove(name)
-                        )
+                scmFileChangeFilterService.delete(
+                        structureService.getProject(projectId),
+                        name
+                )
         );
         return Ack.OK;
     }

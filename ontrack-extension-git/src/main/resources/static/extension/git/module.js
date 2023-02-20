@@ -541,8 +541,6 @@ angular.module('ontrack.extension.git', [
         //
         // ot.pageCall($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
         //
-        //     // File filter configuration
-        //     $scope.changeLogFileFilterConfig = otScmChangelogFilechangefilterService.initFilterConfig();
         //
         //     // Configuring the change log export
         //     $scope.changeLogExport = function () {
