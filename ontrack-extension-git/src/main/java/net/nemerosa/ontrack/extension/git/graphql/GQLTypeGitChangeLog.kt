@@ -6,14 +6,10 @@ import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog
-import net.nemerosa.ontrack.extension.git.model.GitProjectNotConfiguredException
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.listType
-import net.nemerosa.ontrack.graphql.support.stringField
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 
 /**
@@ -21,7 +17,7 @@ import org.springframework.stereotype.Component
  * @see net.nemerosa.ontrack.extension.git.model.GitChangeLog
  */
 @Component
-class GitChangeLogGQLType(
+class GQLTypeGitChangeLog(
     private val gitUICommitGQLType: GitUICommitGQLType,
     private val gitChangeLogIssuesGQLType: GitChangeLogIssuesGQLType,
     private val issueChangeLogExportRequestGQLInputType: IssueChangeLogExportRequestGQLInputType,

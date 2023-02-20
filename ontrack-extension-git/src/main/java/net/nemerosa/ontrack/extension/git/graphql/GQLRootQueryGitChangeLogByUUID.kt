@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLRootQueryGitChangeLogByUUID(
-    private val gitChangeLogGQLType: GitChangeLogGQLType,
+    private val gitChangeLogGQLType: GQLTypeGitChangeLog,
     private val gitChangeLogCache: GitChangeLogCache,
 ) : GQLRootQuery {
 

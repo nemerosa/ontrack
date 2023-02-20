@@ -22,12 +22,12 @@ import static net.nemerosa.ontrack.graphql.support.GraphqlUtils.fetcher;
 @Component
 public class GitChangeLogBranchGraphQLFieldContributor implements GQLProjectEntityFieldContributor {
 
-    private final GitChangeLogGQLType gitChangeLogGQLType;
+    private final GQLTypeGitChangeLog gitChangeLogGQLType;
     private final StructureService structureService;
     private final GitService gitService;
 
     @Autowired
-    public GitChangeLogBranchGraphQLFieldContributor(GitChangeLogGQLType gitChangeLogGQLType, StructureService structureService, GitService gitService) {
+    public GitChangeLogBranchGraphQLFieldContributor(GQLTypeGitChangeLog gitChangeLogGQLType, StructureService structureService, GitService gitService) {
         this.gitChangeLogGQLType = gitChangeLogGQLType;
         this.structureService = structureService;
         this.gitService = gitService;

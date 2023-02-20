@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLRootQueryGitChangeLog(
-    private val gitChangeLogGQLType: GitChangeLogGQLType,
+    private val gitChangeLogGQLType: GQLTypeGitChangeLog,
     private val gitService: GitService,
     private val gitChangeLogCache: GitChangeLogCache,
 ) : GQLRootQuery {
