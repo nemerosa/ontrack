@@ -17,7 +17,7 @@
                         <span class="ot-header-command-unloaded" ng-hide="commits || commitsLoading"></span>
                         {{commitsCommand}}
                     </button>
-                    <button ng-if="changeLog._issues" class="btn btn-default" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
+                    <button ng-if="changeLog.hasIssues" class="btn btn-default" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
                         <ot-loading ng-if="issuesLoading"></ot-loading>
                         <span class="ot-header-command-unloaded" ng-hide="issues || issuesLoading"></span>
                         {{issuesCommand}}

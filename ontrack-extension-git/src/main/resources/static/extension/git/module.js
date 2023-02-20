@@ -347,6 +347,7 @@ angular.module('ontrack.extension.git', [
                         buildTo {
                             ...BuildInfo
                         }
+                        hasIssues
                     }
                 }
 

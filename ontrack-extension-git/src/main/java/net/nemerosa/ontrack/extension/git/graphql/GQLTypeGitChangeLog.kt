@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.graphql
 
+import graphql.Scalars.GraphQLBoolean
 import graphql.Scalars.GraphQLString
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLNonNull
@@ -80,6 +81,16 @@ class GQLTypeGitChangeLog(
                         gitChangeLog.loadCommits {
                             gitService.getChangeLogCommits(gitChangeLog)
                         }.commits
+                    }
+            }
+            // Checking if a change log has issues
+            .field {
+                it.name("hasIssues")
+                    .description("Checking if a change log can have issues")
+                    .type(GraphQLBoolean.toNotNull())
+                    .dataFetcher { env ->
+                        val gitChangeLog: GitChangeLog = env.getSource()
+                        gitService.getProjectConfiguration(gitChangeLog.project) != null
                     }
             }
             // Issues
