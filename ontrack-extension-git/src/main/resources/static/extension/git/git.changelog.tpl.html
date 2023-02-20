@@ -223,8 +223,7 @@
             <!-- Files sections -->
             <div class="row">
                 <div class="col-md-12">
-                    <a name="files"></a>
-
+                    <a id="files"></a>
                     <div class="panel panel-default">
                         <div class="panel-heading clearfix">
                             File changes
@@ -234,7 +233,7 @@
                                     <span class="ot-header-command-unloaded" ng-hide="commits || commitsLoading"></span>
                                     {{commitsCommand}}
                                 </a>
-                                <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
+                                <a class="btn btn-default btn-xs" ng-if="changeLog.hasIssues" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
                                     <ot-loading ng-if="issuesLoading"></ot-loading>
                                     <span class="ot-header-command-unloaded" ng-hide="issues || issuesLoading"></span>
                                     {{issuesCommand}}

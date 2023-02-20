@@ -466,6 +466,9 @@ angular.module('ontrack.extension.git', [
                     $location.hash('commits');
                     $anchorScroll();
                 });
+            } else {
+                $location.hash('commits');
+                $anchorScroll();
             }
         };
 
@@ -496,47 +499,47 @@ angular.module('ontrack.extension.git', [
                     $scope.issuesLoading = false;
                     $scope.issuesCommand = "Issues";
                 });
+            } else {
+                $location.hash('issues');
+                $anchorScroll();
+            }
+        };
+
+        // Loading the file changes if needed
+        $scope.changeLogFiles = () => {
+            if (!$scope.files) {
+                $scope.filesLoading = true;
+                $scope.filesCommand = "Loading the file changes...";
+                const query = `
+                    query GetChangeLogFiles($uuid: String!) {
+                      gitChangeLogByUUID(uuid: $uuid) {
+                        files {
+                          list {
+                            changeType
+                            oldPath
+                            newPath
+                            url
+                          }
+                        }
+                      }
+                    }
+                `;
+                otGraphqlService.pageGraphQLCall(query, {uuid: $scope.changeLog.uuid}).then(data => {
+                    $scope.files = data.gitChangeLogByUUID.files;
+                    $location.hash('files');
+                    $anchorScroll();
+                }).finally(() => {
+                    $scope.filesLoading = false;
+                    $scope.filesCommand = "File changes";
+                });
+            } else {
+                $location.hash('files');
+                $anchorScroll();
             }
         };
 
         //
         // ot.pageCall($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
-        //
-        //     // Loading the issues if needed
-        //     $scope.changeLogIssues = function () {
-        //         if (!$scope.issues) {
-        //             $scope.issuesLoading = true;
-        //             $scope.issuesCommand = "Loading the issues...";
-        //             ot.pageCall($http.get($scope.changeLog._issues)).then(function (issues) {
-        //                 $scope.issues = issues;
-        //                 $scope.issuesLoading = false;
-        //                 $scope.issuesCommand = "Issues";
-        //                 $location.hash('issues');
-        //                 $anchorScroll();
-        //             });
-        //         } else {
-        //             $location.hash('issues');
-        //             $anchorScroll();
-        //         }
-        //     };
-        //
-        //     // Loading the file changes if needed
-        //     $scope.changeLogFiles = function () {
-        //         if (!$scope.files) {
-        //             $scope.filesLoading = true;
-        //             $scope.filesCommand = "Loading the file changes...";
-        //             ot.pageCall($http.get($scope.changeLog._files)).then(function (files) {
-        //                 $scope.files = files;
-        //                 $scope.filesLoading = false;
-        //                 $scope.filesCommand = "File changes";
-        //                 $location.hash('files');
-        //                 $anchorScroll();
-        //             });
-        //         } else {
-        //             $location.hash('files');
-        //             $anchorScroll();
-        //         }
-        //     };
         //
         //     // File filter configuration
         //     $scope.changeLogFileFilterConfig = otScmChangelogFilechangefilterService.initFilterConfig();
