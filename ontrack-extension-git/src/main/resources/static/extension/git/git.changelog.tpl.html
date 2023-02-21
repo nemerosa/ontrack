@@ -251,7 +251,7 @@
                             <ot-loading>File changes are loading...</ot-loading>
                         </div>
                         <div class="panel-body ot-panel-padded" ng-show="files">
-                            <ot-extension-git-changelog-file-filters project-id="changeLog.project.id">
+                            <ot-extension-git-changelog-file-filters project-id="changeLog.project.id" context="fileChangeContext">
                                 <!-- TODO Diff condition -->
                                 <button class="btn btn-default btn-sm" type="button"
                                         ng-disabled="diffComputing"
@@ -263,9 +263,8 @@
                             </ot-extension-git-changelog-file-filters>
                         </div>
                         <div class="panel-body ot-panel-padded" ng-show="files">
-                            <!-- TODO Points to the filter -->
                             <div class="ot-line-no-overflow ot-line-hover ot-line-border"
-                                 ng-repeat="changeLogFile in files.list">
+                                 ng-repeat="changeLogFile in files.list | filter:fileChangeContext.filterFunction">
                                 <span class="ot-label-change ot-label-change-{{changeLogFile.changeType | lowercase}}">
                                     <span class="ot-label-change-icon" title="{{changeLogFile.changeType | lowercase}}"></span>
                                 </span>

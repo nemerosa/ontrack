@@ -244,11 +244,14 @@ angular.module('ontrack.extension.scm', [
 
         self.filterFunction = function (patterns) {
             return function (path) {
+                console.log("scm/filterFunction/path = ", path);
                 if (patterns) {
+                    console.log("scm/filterFunction/patterns = ", patterns);
                     return patterns.some(function (pattern) {
                         return patternMatch(pattern, path);
                     });
                 } else {
+                    console.log("scm/filterFunction/patterns = <empty>");
                     return true;
                 }
             };

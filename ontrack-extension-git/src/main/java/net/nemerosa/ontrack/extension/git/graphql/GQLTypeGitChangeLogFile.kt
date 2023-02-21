@@ -20,6 +20,7 @@ class GQLTypeGitChangeLogFile : GQLType {
             .enumField(GitChangeLogFile::changeType)
             .stringField(GitChangeLogFile::oldPath)
             .stringField(GitChangeLogFile::newPath)
+            .stringField(GitChangeLogFile::path)
             .stringField(GitChangeLogFile::url)
             .build()
 }

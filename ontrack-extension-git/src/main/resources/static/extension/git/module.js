@@ -319,13 +319,14 @@ angular.module('ontrack.extension.git', [
             controller: 'GitChangeLogCtrl'
         });
     })
-    .directive('otExtensionGitChangelogFileFilters', function (otGraphqlService) {
+    .directive('otExtensionGitChangelogFileFilters', function (otGraphqlService, otScmChangelogFilechangefilterService) {
         return {
             restrict: 'E',
             templateUrl: 'extension/git/directive.changelogFileFilters.tpl.html',
             transclude: true,
             scope: {
-                projectId: '='
+                projectId: '=',
+                context: '='
             },
             controller: function ($scope) {
                 $scope.quickPattern = '';
@@ -343,8 +344,8 @@ angular.module('ontrack.extension.git', [
                                 }
                             }
                         `;
-                        otGraphqlService.pageGraphQLCall(query, {projectId: scope.projectId}).then(data => {
-                            scope.filters = data.projects[0].scmFileChangeFilters;
+                        otGraphqlService.pageGraphQLCall(query, {projectId: $scope.projectId}).then(data => {
+                            $scope.filters = data.projects[0].scmFileChangeFilters;
                         });
                     }
                 });
@@ -358,7 +359,12 @@ angular.module('ontrack.extension.git', [
                 };
 
                 $scope.submitQuickPattern = () => {
-                    // TODO
+                    const pattern = $scope.quickPattern;
+                    if (pattern) {
+                        $scope.submitPattern([pattern]);
+                    } else {
+                        $scope.submitPattern([]);
+                    }
                 };
 
                 $scope.saveQuickFilter = () => {
@@ -383,6 +389,10 @@ angular.module('ontrack.extension.git', [
 
                 $scope.shareFileFilter = (filter) => {
                     // TODO
+                };
+
+                $scope.submitPattern = (patterns) => {
+                    $scope.context.filterFunction = otScmChangelogFilechangefilterService.filterFunction(patterns);
                 };
             }
         };
@@ -589,6 +599,7 @@ angular.module('ontrack.extension.git', [
                             changeType
                             oldPath
                             newPath
+                            path
                             url
                           }
                         }
@@ -608,6 +619,8 @@ angular.module('ontrack.extension.git', [
                 $anchorScroll();
             }
         };
+
+        $scope.fileChangeContext = {};
 
         $scope.diffFileFilter = (quickPattern, selectedFilter) => {
             // TODO
