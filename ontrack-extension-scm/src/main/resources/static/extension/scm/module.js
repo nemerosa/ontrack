@@ -324,9 +324,14 @@ angular.module('ontrack.extension.scm', [
             });
         };
 
+        // Deprecated, used only for legacy HTTP calls
         self.editFilter = function (changeLog, filter) {
+            return self.editFilterByProjectId(changeLog.project.id, filter);
+        };
+
+        self.editFilterByProjectId = function (projectId, filter) {
             // Form configuration
-            var form = {
+            const form = {
                 fields: [{
                     name: 'name',
                     type: 'text',
@@ -349,16 +354,14 @@ angular.module('ontrack.extension.scm', [
             return otFormService.display({
                 form: form,
                 title: "Edit file change filter",
-                submit: function (data) {
+                submit: data => {
                     // Parsing the patterns
-                    var patterns = data.patterns.split('\n').map(function (it) {
-                        return it.trim();
-                    });
+                    const patterns = data.patterns.split('\n').map(it => it.trim());
                     // Saves the filter
-                    var store = loadStore(changeLog.project);
+                    const store = loadStoreByProjectId(projectId);
                     store[filter.name] = patterns;
-                    saveStore(changeLog.project, store);
-                    var raw = {
+                    saveStoreByProjectId(projectId, store);
+                    const raw = {
                         name: filter.name,
                         patterns: patterns
                     };
