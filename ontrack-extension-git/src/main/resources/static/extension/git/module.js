@@ -319,6 +319,16 @@ angular.module('ontrack.extension.git', [
             controller: 'GitChangeLogCtrl'
         });
     })
+    .directive('otExtensionGitChangelogFileFilters', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/git/directive.changelogFileFilters.tpl.html',
+            transclude: true,
+            scope: {
+                projectId: '='
+            },
+        };
+    })
     .controller('GitChangeLogCtrl', function ($q, $log, $interpolate, $anchorScroll, $location, $stateParams, $scope, $http,
                                               ot, otGraphqlService, otStructureService, otScmChangeLogService, otScmChangelogFilechangefilterService) {
 
