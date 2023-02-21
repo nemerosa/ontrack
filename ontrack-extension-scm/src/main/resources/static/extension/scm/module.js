@@ -126,10 +126,15 @@ angular.module('ontrack.extension.scm', [
     })
     .service('otScmChangelogFilechangefilterService', function ($q, $http, $modal, $interpolate,
                                                                 ot, otFormService) {
-        var self = {};
+        const self = {};
 
+        // Deprecated, used only for legacy HTTP calls
         function loadStore(project) {
-            var json = localStorage.getItem("fileChangeFilters_" + project.id);
+            return loadStoreByProjectId(project.id);
+        }
+
+        function loadStoreByProjectId(projectId) {
+            const json = localStorage.getItem("fileChangeFilters_" + projectId);
             if (json) {
                 return JSON.parse(json);
             } else {
@@ -137,8 +142,13 @@ angular.module('ontrack.extension.scm', [
             }
         }
 
+        // Deprecated, used only for legacy HTTP calls
         function saveStore(project, store) {
-            localStorage.setItem("fileChangeFilters_" + project.id, JSON.stringify(store));
+            saveStoreByProjectId(project.id, store);
+        }
+
+        function saveStoreByProjectId(projectId, store) {
+            localStorage.setItem("fileChangeFilters_" + projectId, JSON.stringify(store));
         }
 
         function patternMatch(pattern, path) {
@@ -263,9 +273,14 @@ angular.module('ontrack.extension.scm', [
             };
         };
 
+        // Deprecated, used only for legacy HTTP calls
         self.addFilter = function (changeLog, patterns) {
+            return self.addFilterByProjectId(changeLog.project.id, patterns);
+        };
+
+        self.addFilterByProjectId = function (projectId, patterns) {
             // Form configuration
-            var form = {
+            const form = {
                 fields: [{
                     name: 'name',
                     type: 'text',
@@ -288,18 +303,18 @@ angular.module('ontrack.extension.scm', [
                 title: "Create file change filter",
                 submit: function (data) {
                     // Loads the store
-                    var store = loadStore(changeLog.project);
+                    const store = loadStoreByProjectId(projectId);
                     // Controlling the name
                     if (store[data.name]) {
                         return "Filter with name " + data.name + " already exists.";
                     }
                     // Parsing the patterns
-                    var patterns = data.patterns.split('\n').map(function (it) {
+                    const patterns = data.patterns.split('\n').map(function (it) {
                         return it.trim();
                     });
                     // Saves the filter
                     store[data.name] = patterns;
-                    saveStore(changeLog.project, store);
+                    saveStoreByProjectId(projectId, store);
                     // Returns the filter
                     return {
                         name: data.name,
