@@ -12,4 +12,9 @@
             <option value=""></option>
         </select>
     </div>
+    <button class="btn btn-default btn-sm" type="button" ng-disabled="!selectedFilter" ng-click="editFileFilter()"><span class="fa fa-pencil" title="Edits the selected pattern"></span></button>
+    <button class="btn btn-default btn-sm" type="button" ng-disabled="!selectedFilter" ng-click="deleteFileFilter()"><span class="fa fa-minus" title="Deletes the selected pattern"></span></button>
+    <button class="btn btn-default btn-sm" type="button" ng-click="addFileFilter()"><span class="fa fa-plus" title="Adds a pattern (name, multiple patterns...)"></span></button>
+    <button class="btn btn-default btn-sm" type="button" ng-click="shareFileFilter(selectedFilter)" ng-show="filterCanShare(selectedFilter)"><span class="fa fa-users" title="Shares this filter for the whole project"></span></button>
+    <span ng-transclude></span>
 </form>

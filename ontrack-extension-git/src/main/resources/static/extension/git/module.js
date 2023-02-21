@@ -364,6 +364,26 @@ angular.module('ontrack.extension.git', [
                 $scope.saveQuickFilter = () => {
                     // TODO
                 };
+
+                $scope.editFileFilter = () => {
+                    // TODO
+                };
+
+                $scope.deleteFileFilter = () => {
+                    // TODO
+                };
+
+                $scope.addFileFilter = () => {
+                    // TODO
+                };
+
+                $scope.filterCanShare = (filter) => {
+                    // TODO filter && !filter._update && otScmChangelogFilechangefilterService.remoteFilters._create;
+                };
+
+                $scope.shareFileFilter = (filter) => {
+                    // TODO
+                };
             }
         };
     })
@@ -587,6 +607,10 @@ angular.module('ontrack.extension.git', [
                 $location.hash('files');
                 $anchorScroll();
             }
+        };
+
+        $scope.diffFileFilter = (quickPattern, selectedFilter) => {
+            // TODO
         };
 
         //

@@ -252,11 +252,10 @@
                         </div>
                         <div class="panel-body ot-panel-padded" ng-show="files">
                             <ot-extension-git-changelog-file-filters project-id="changeLog.project.id">
-                                <!-- TODO Diff -->
+                                <!-- TODO Diff condition -->
                                 <button class="btn btn-default btn-sm" type="button"
-                                        ng-if="changeLog._diff"
                                         ng-disabled="diffComputing"
-                                        ng-click="diffFileFilter(changeLog, quickPattern, selectedFilter)">
+                                        ng-click="diffFileFilter(quickPattern, selectedFilter)">
                                     <span class="fa fa-download" title="Exports the changes as diff" ng-hide="diffComputing"></span>
                                     <span class="fa fa-spinner fa-spin" ng-show="diffComputing"></span>
                                     Diff
