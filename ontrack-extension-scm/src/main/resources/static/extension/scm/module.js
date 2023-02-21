@@ -242,16 +242,22 @@ angular.module('ontrack.extension.scm', [
             });
         };
 
+        self.itemFilterFunction = (patterns, itemFn) => function (item) {
+            const path = itemFn(item);
+            if (patterns) {
+                return patterns.some(pattern => patternMatch(pattern, path));
+            } else {
+                return true;
+            }
+        };
+
         self.filterFunction = function (patterns) {
             return function (path) {
-                console.log("scm/filterFunction/path = ", path);
                 if (patterns) {
-                    console.log("scm/filterFunction/patterns = ", patterns);
                     return patterns.some(function (pattern) {
                         return patternMatch(pattern, path);
                     });
                 } else {
-                    console.log("scm/filterFunction/patterns = <empty>");
                     return true;
                 }
             };

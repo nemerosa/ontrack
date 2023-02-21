@@ -358,12 +358,17 @@ angular.module('ontrack.extension.git', [
                     }
                 };
 
+                $scope.unselectPattern = () => {
+                    $scope.quickPattern = '';
+                    $scope.submitQuickPattern();
+                };
+
                 $scope.submitQuickPattern = () => {
                     const pattern = $scope.quickPattern;
                     if (pattern) {
                         $scope.submitPattern([pattern]);
                     } else {
-                        $scope.submitPattern([]);
+                        $scope.submitPattern(null);
                     }
                 };
 
@@ -392,7 +397,7 @@ angular.module('ontrack.extension.git', [
                 };
 
                 $scope.submitPattern = (patterns) => {
-                    $scope.context.filterFunction = otScmChangelogFilechangefilterService.filterFunction(patterns);
+                    $scope.context.filterFunction = otScmChangelogFilechangefilterService.itemFilterFunction(patterns, (item) => item.path);
                 };
             }
         };
