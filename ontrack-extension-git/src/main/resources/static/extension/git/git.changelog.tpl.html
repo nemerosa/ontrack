@@ -251,7 +251,17 @@
                             <ot-loading>File changes are loading...</ot-loading>
                         </div>
                         <div class="panel-body ot-panel-padded" ng-show="files">
-                            <ot-extension-scm-changelog-filechangefilter change-log="changeLog" filter-callback="changeLogFileFilterConfig.callback"></ot-extension-scm-changelog-filechangefilter>
+                            <ot-extension-git-changelog-file-filters project-id="changeLog.project.id">
+                                <!-- TODO Diff -->
+                                <button class="btn btn-default btn-sm" type="button"
+                                        ng-if="changeLog._diff"
+                                        ng-disabled="diffComputing"
+                                        ng-click="diffFileFilter(changeLog, quickPattern, selectedFilter)">
+                                    <span class="fa fa-download" title="Exports the changes as diff" ng-hide="diffComputing"></span>
+                                    <span class="fa fa-spinner fa-spin" ng-show="diffComputing"></span>
+                                    Diff
+                                </button>
+                            </ot-extension-git-changelog-file-filters>
                         </div>
                         <div class="panel-body ot-panel-padded" ng-show="files">
                             <div class="ot-line-no-overflow ot-line-hover ot-line-border"

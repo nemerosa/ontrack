@@ -341,6 +341,9 @@ angular.module('ontrack.extension.git', [
                 query GitChangeLog( $from: Int!, $to: Int!, ) {
                     gitChangeLog(from: $from, to: $to) {
                         uuid
+                        project {
+                            id
+                        }
                         buildFrom {
                             ...BuildInfo
                         }
