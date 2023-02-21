@@ -319,7 +319,7 @@ angular.module('ontrack.extension.git', [
             controller: 'GitChangeLogCtrl'
         });
     })
-    .directive('otExtensionGitChangelogFileFilters', function () {
+    .directive('otExtensionGitChangelogFileFilters', function (otGraphqlService) {
         return {
             restrict: 'E',
             templateUrl: 'extension/git/directive.changelogFileFilters.tpl.html',
@@ -327,6 +327,44 @@ angular.module('ontrack.extension.git', [
             scope: {
                 projectId: '='
             },
+            controller: function ($scope) {
+                $scope.quickPattern = '';
+                $scope.selectedFilter = null;
+
+                $scope.$watch('projectId', (value) => {
+                    if (value) {
+                        const query = `
+                            query LoadSCMChangeLogFilters($projectId: Int!) {
+                                projects(id: $projectId) {
+                                    scmFileChangeFilters {
+                                        name
+                                        patterns
+                                    }
+                                }
+                            }
+                        `;
+                        otGraphqlService.pageGraphQLCall(query, {projectId: scope.projectId}).then(data => {
+                            scope.filters = data.projects[0].scmFileChangeFilters;
+                        });
+                    }
+                });
+
+                $scope.filterDisplayName = filter => {
+                    if (filter.shared) {
+                        return `${filter.name} (*)`;
+                    } else {
+                        return filter.name;
+                    }
+                };
+
+                $scope.submitQuickPattern = () => {
+                    // TODO
+                };
+
+                $scope.saveQuickFilter = () => {
+                    // TODO
+                };
+            }
         };
     })
     .controller('GitChangeLogCtrl', function ($q, $log, $interpolate, $anchorScroll, $location, $stateParams, $scope, $http,

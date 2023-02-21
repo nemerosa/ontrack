@@ -35,7 +35,7 @@
 
             <!-- Build info -->
 
-            <div class="row">
+            <div class="row" ng-if="changeLog">
                 <div class="col-md-6" ng-repeat="build in [changeLog.buildFrom, changeLog.buildTo]">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -264,8 +264,9 @@
                             </ot-extension-git-changelog-file-filters>
                         </div>
                         <div class="panel-body ot-panel-padded" ng-show="files">
+                            <!-- TODO Points to the filter -->
                             <div class="ot-line-no-overflow ot-line-hover ot-line-border"
-                                 ng-repeat="changeLogFile in files.list | filter:changeLogFileFilterConfig.filter">
+                                 ng-repeat="changeLogFile in files.list">
                                 <span class="ot-label-change ot-label-change-{{changeLogFile.changeType | lowercase}}">
                                     <span class="ot-label-change-icon" title="{{changeLogFile.changeType | lowercase}}"></span>
                                 </span>
