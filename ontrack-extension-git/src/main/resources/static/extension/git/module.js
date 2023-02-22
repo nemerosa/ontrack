@@ -651,15 +651,15 @@ angular.module('ontrack.extension.git', [
 
         $scope.fileChangeContext = {};
 
-        $scope.diffFileFilter = () => {
+        $scope.diffFileFilter = (patterns) => {
             $scope.diffComputing = true;
-            const selectedPatterns = $scope.fileChangeContext.getSelectedPatterns();
+            const selectedPatterns = patterns ? patterns : $scope.fileChangeContext.getSelectedPatterns();
             const params = {
                 from: $scope.changeLog.buildFrom.id,
                 to: $scope.changeLog.buildTo.id,
                 patterns: selectedPatterns.join(',')
             };
-            ot.pageCall($http.get("/extension/git/changelog/diff", {params})).then(diff => {
+            return ot.pageCall($http.get("/extension/git/changelog/diff", {params})).then(diff => {
                 let link = "/extension/git/changelog/diff";
                 link += $interpolate('?from={{from}}&to={{to}}&patterns={{patterns}}')(params);
                 $modal.open({
@@ -679,6 +679,17 @@ angular.module('ontrack.extension.git', [
             });
         };
 
+        // Shows the diff for a file
+        $scope.showFileDiff = changeLogFile => {
+            if (!$scope.diffComputing) {
+                changeLogFile.diffComputing = true;
+                $scope.diffFileFilter([changeLogFile.path])
+                    .finally(() => {
+                        changeLogFile.diffComputing = false;
+                    });
+            }
+        };
+
         //
         // ot.pageCall($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
         //
@@ -690,20 +701,6 @@ angular.module('ontrack.extension.git', [
         //             exportFormatsLink: changeLog._exportFormats,
         //             exportIssuesLink: changeLog._exportIssues
         //         });
-        //     };
-        //
-        //     // Shows the diff for a file
-        //     $scope.showFileDiff = function (changelog, changeLogFile) {
-        //         if (!$scope.diffLoading) {
-        //             $scope.diffLoading = true;
-        //             changeLogFile.diffLoading = true;
-        //             otScmChangelogFilechangefilterService
-        //                 .diffFileFilter(changeLog, changeLogFile.oldPath ? changeLogFile.oldPath : changeLogFile.newPath)
-        //                 .finally(function () {
-        //                     changeLogFile.diffLoading = false;
-        //                     $scope.diffLoading = false;
-        //                 });
-        //         }
         //     };
         //
         // });

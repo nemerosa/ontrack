@@ -273,8 +273,8 @@
                                     <span class="fa fa-arrow-right"></span>
                                     {{changeLogFile.newPath}}
                                 </span>
-                                <span ng-hide="changeLogFile.diffLoading || diffLoading" class="fa fa-download ot-command" title="Shows diff" ng-click="showFileDiff(changeLog, changeLogFile)"></span>
-                                <span ng-show="changeLogFile.diffLoading" class="fa fa-spin fa-spinner ot-command" title="Diff is loading..."></span>
+                                <span ng-hide="changeLogFile.diffComputing || diffComputing" class="fa fa-download ot-command" title="Shows diff" ng-click="showFileDiff(changeLogFile)"></span>
+                                <span ng-show="changeLogFile.diffComputing" class="fa fa-spin fa-spinner ot-command" title="Diff is loading..."></span>
                             </div>
                         </div>
                     </div>
