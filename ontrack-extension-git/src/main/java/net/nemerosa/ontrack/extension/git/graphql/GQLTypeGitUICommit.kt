@@ -14,7 +14,7 @@ import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 
 @Component
-class GitUICommitGQLType(
+class GQLTypeGitUICommit(
     private val propertyService: PropertyService,
     private val structureService: StructureService,
 ) : GQLType {

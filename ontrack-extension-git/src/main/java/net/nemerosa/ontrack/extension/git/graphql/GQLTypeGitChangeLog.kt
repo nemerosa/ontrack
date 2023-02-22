@@ -9,7 +9,6 @@ import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog
 import net.nemerosa.ontrack.extension.git.service.GitService
-import net.nemerosa.ontrack.extension.indicators.ui.graphql.durationArgument
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
@@ -26,7 +25,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 class GQLTypeGitChangeLog(
-    private val gitUICommitGQLType: GitUICommitGQLType,
+    private val gitUICommitGQLType: GQLTypeGitUICommit,
     private val gitChangeLogIssuesGQLType: GitChangeLogIssuesGQLType,
     private val gqlTypeGitChangeLogFiles: GQLTypeGitChangeLogFiles,
     private val issueChangeLogExportRequestGQLInputType: IssueChangeLogExportRequestGQLInputType,
