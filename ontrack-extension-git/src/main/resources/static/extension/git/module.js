@@ -332,6 +332,16 @@ angular.module('ontrack.extension.git', [
                 $scope.quickPattern = '';
                 $scope.selectedFilter = null;
 
+                $scope.context.getSelectedPatterns = () => {
+                    if ($scope.quickPattern) {
+                        return [$scope.quickPattern];
+                    } else if ($scope.selectedFilter) {
+                        return $scope.selectedFilter.patterns;
+                    } else {
+                        return [];
+                    }
+                };
+
                 $scope.$watch('projectId', (value) => {
                     if (value) {
                         otScmChangelogFilechangefilterService.loadFiltersWithGraphQL($scope.projectId).then(({canManage, filters}) => {
@@ -416,8 +426,8 @@ angular.module('ontrack.extension.git', [
             }
         };
     })
-    .controller('GitChangeLogCtrl', function ($q, $log, $interpolate, $anchorScroll, $location, $stateParams, $scope, $http,
-                                              ot, otGraphqlService, otStructureService, otScmChangeLogService, otScmChangelogFilechangefilterService) {
+    .controller('GitChangeLogCtrl', function ($q, $log, $modal, $interpolate, $anchorScroll, $location, $stateParams, $scope, $http,
+                                              ot, otGraphqlService) {
 
         // The view
         const view = ot.view();
@@ -641,8 +651,32 @@ angular.module('ontrack.extension.git', [
 
         $scope.fileChangeContext = {};
 
-        $scope.diffFileFilter = (quickPattern, selectedFilter) => {
-            // TODO
+        $scope.diffFileFilter = () => {
+            $scope.diffComputing = true;
+            const selectedPatterns = $scope.fileChangeContext.getSelectedPatterns();
+            const params = {
+                from: $scope.changeLog.buildFrom.id,
+                to: $scope.changeLog.buildTo.id,
+                patterns: selectedPatterns.join(',')
+            };
+            ot.pageCall($http.get("/extension/git/changelog/diff", {params})).then(diff => {
+                let link = "/extension/git/changelog/diff";
+                link += $interpolate('?from={{from}}&to={{to}}&patterns={{patterns}}')(params);
+                $modal.open({
+                    templateUrl: 'extension/scm/dialog.scmDiff.tpl.html',
+                    controller: 'otExtensionScmDialogDiff',
+                    resolve: {
+                        config: function () {
+                            return {
+                                diff: diff,
+                                link: link
+                            };
+                        }
+                    }
+                });
+            }).finally(() => {
+                $scope.diffComputing = false;
+            });
         };
 
         //
