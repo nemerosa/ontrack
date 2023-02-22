@@ -145,12 +145,12 @@
                                     {{gitUICommit.timestamp | date:'mediumDate'}}
                                     {{gitUICommit.timestamp | date:'shortTime'}}
                                 </span>
-                                <!-- TODO Build decoration -->
-<!--                                <span-->
-<!--                                        ng-if="gitUICommit.build"-->
-<!--                                        class="ot-change-log-commit-build">-->
-<!--                                    <a href="{{gitUICommit.build._page}}">{{gitUICommit.build.name}}</a>-->
-<!--                                </span>-->
+                                <!-- Build decoration -->
+                                <span
+                                        ng-if="gitUICommit.build"
+                                        class="ot-change-log-commit-build">
+                                    <a href="{{gitUICommit.build.links._page}}">{{gitUICommit.build.name}}</a>
+                                </span>
                                 <!-- TODO Promotions decoration -->
 <!--                                <span-->
 <!--                                        class="ot-change-log-commit-promotions"-->

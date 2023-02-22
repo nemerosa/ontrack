@@ -563,6 +563,13 @@ angular.module('ontrack.extension.git', [
                           link
                           author
                           timestamp
+                          build {
+                            id
+                            name
+                            links {
+                              _page
+                            }
+                          }
                         }
                       }
                     }
