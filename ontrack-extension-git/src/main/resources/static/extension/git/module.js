@@ -733,7 +733,39 @@ angular.module('ontrack.extension.git', [
 
         // Navigating to the next project
         $scope.goToNextProject = () => {
-            // TODO
+            if ($scope.nextProject.name) {
+                const query = `
+                    query DepChangeLog(
+                        $uuid: String!,
+                        $depName: String!,
+                    ) {
+                      gitChangeLogByUUID(uuid: $uuid) {
+                        depChangeLog(project: $depName) {
+                          buildFrom {
+                            id
+                          }
+                          buildTo {
+                            id
+                          }
+                        }
+                      }
+                    }
+
+                `;
+                otGraphqlService.pageGraphQLCall(query, {
+                    uuid: $scope.changeLog.uuid,
+                    depName: $scope.nextProject.name
+                }).then(data => {
+                    // Extracts the boundaries
+                    const depFrom = data.gitChangeLogByUUID.depChangeLog.buildFrom.id;
+                    const depTo = data.gitChangeLogByUUID.depChangeLog.buildTo.id;
+                    // Navigation
+                    $location.path("/extension/git/changelog").search({
+                        from: depFrom,
+                        to: depTo
+                    });
+                });
+            }
         };
 
         // Selecting the next project

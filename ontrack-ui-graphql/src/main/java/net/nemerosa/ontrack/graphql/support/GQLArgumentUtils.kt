@@ -13,11 +13,12 @@ import java.util.*
  */
 fun stringArgument(
     name: String,
-    description: String
+    description: String,
+    nullable: Boolean = true,
 ): GraphQLArgument = GraphQLArgument.newArgument()
     .name(name)
     .description(description)
-    .type(GraphQLString)
+    .type(nullableInputType(GraphQLString, nullable))
     .build()
 
 /**

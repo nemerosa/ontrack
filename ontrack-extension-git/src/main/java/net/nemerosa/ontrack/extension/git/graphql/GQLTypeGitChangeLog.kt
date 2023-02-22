@@ -6,18 +6,19 @@ import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
+import net.nemerosa.ontrack.extension.git.GitChangeLogCache
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.GQLTypeProject
-import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
-import net.nemerosa.ontrack.graphql.support.booleanField
-import net.nemerosa.ontrack.graphql.support.listType
-import net.nemerosa.ontrack.graphql.support.toNotNull
+import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 
 /**
@@ -31,6 +32,8 @@ class GQLTypeGitChangeLog(
     private val gqlTypeGitChangeLogFiles: GQLTypeGitChangeLogFiles,
     private val issueChangeLogExportRequestGQLInputType: IssueChangeLogExportRequestGQLInputType,
     private val gitService: GitService,
+    private val recursiveChangeLogService: RecursiveChangeLogService,
+    private val gitChangeLogCache: GitChangeLogCache,
 ) : GQLType {
 
     override fun getTypeName(): String = GIT_CHANGE_LOG
@@ -166,6 +169,40 @@ class GQLTypeGitChangeLog(
                         exportedChangeLogIssues.content
                     }
             }
+            // Dependency change log
+            .field {
+                it.name("depChangeLog")
+                    .description("Gets the change of some dependency")
+                    .type(GraphQLTypeReference(typeName)) // Recursive
+                    .argument(stringArgument(DEP_CHANGE_LOG_PROJECT, "Name of the project to follow", nullable = false))
+                    .dataFetcher { env ->
+                        val projectName: String = env.getArgument(DEP_CHANGE_LOG_PROJECT)
+                        val baseChangeLog: GitChangeLog = env.getSource()
+                        val baseCommits = baseChangeLog.loadCommits {
+                            gitService.getChangeLogCommits(baseChangeLog)
+                        }.log.commits
+                        val dependencies = baseCommits.mapNotNull { baseCommit ->
+                            recursiveChangeLogService.getDepBuildByCommit(baseCommit.id, projectName)
+                        }
+                        // If no build, returning a null change log
+                        if (dependencies.isEmpty()) {
+                            null
+                        }
+                        // Getting the first & last build
+                        else {
+                            val depFirst = dependencies.first()
+                            val depLast = dependencies.last()
+                            gitService.changeLog(
+                                BuildDiffRequest(
+                                    depFirst.id,
+                                    depLast.id
+                                )
+                            ).apply {
+                                gitChangeLogCache.put(this)
+                            }
+                        }
+                    }
+            }
             // OK
             .build()
     }
@@ -177,5 +214,6 @@ class GQLTypeGitChangeLog(
 
     companion object {
         const val GIT_CHANGE_LOG = "GitChangeLog"
+        const val DEP_CHANGE_LOG_PROJECT = "project"
     }
 }
