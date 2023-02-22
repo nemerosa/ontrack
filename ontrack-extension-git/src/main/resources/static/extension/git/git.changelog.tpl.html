@@ -151,16 +151,16 @@
                                         class="ot-change-log-commit-build">
                                     <a href="{{gitUICommit.build.links._page}}">{{gitUICommit.build.name}}</a>
                                 </span>
-                                <!-- TODO Promotions decoration -->
-<!--                                <span-->
-<!--                                        class="ot-change-log-commit-promotions"-->
-<!--                                        ng-if="gitUICommit.promotions && gitUICommit.promotions.length > 0">-->
-<!--                                    <span-->
-<!--                                            ng-repeat="promotion in gitUICommit.promotions"-->
-<!--                                            class="ot-change-log-commit-promotion">-->
-<!--                                        <ot-entity-image entity="promotion.promotionLevel"></ot-entity-image>-->
-<!--                                    </span>-->
-<!--                                </span>-->
+                                <!-- Promotions decoration -->
+                                <span
+                                        class="ot-change-log-commit-promotions"
+                                        ng-if="gitUICommit.build && gitUICommit.build.promotionRuns && gitUICommit.build.promotionRuns.length > 0">
+                                    <span
+                                            ng-repeat="promotion in gitUICommit.build.promotionRuns"
+                                            class="ot-change-log-commit-promotion">
+                                        <ot-entity-image entity="promotion.promotionLevel"></ot-entity-image>
+                                    </span>
+                                </span>
                                 <!-- TODO Dependency links decoration -->
 <!--                                <span class="ot-change-log-commit-dependencies"-->
 <!--                                      ng-if="gitUICommit.dependencies && gitUICommit.dependencies.length > 0">-->

@@ -569,6 +569,14 @@ angular.module('ontrack.extension.git', [
                             links {
                               _page
                             }
+                            promotionRuns(lastPerLevel: true) {
+                              promotionLevel {
+                                id
+                                name
+                                image
+                                _image
+                              }
+                            }
                           }
                         }
                       }
