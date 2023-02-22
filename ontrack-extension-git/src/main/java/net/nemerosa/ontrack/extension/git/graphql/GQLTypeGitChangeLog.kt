@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.GQLTypeProject
 import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
+import net.nemerosa.ontrack.graphql.support.booleanField
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.toNotNull
 import net.nemerosa.ontrack.json.asJson
@@ -52,6 +53,8 @@ class GQLTypeGitChangeLog(
                         env.getSource<GitChangeLog>().from.build.project
                     }
             }
+            // Sync error
+            .booleanField(GitChangeLog::syncError, "If an error has occured during the synchronization")
             // Build from & to
             .field {
                 it.name("buildFrom")
