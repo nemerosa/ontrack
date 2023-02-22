@@ -1,4 +1,5 @@
 angular.module('ontrack.extension.scm', [
+    'ot.service.graphql',
     'ot.service.form'
 ])
     .directive('otScmChangelogBuild', function () {
@@ -125,7 +126,7 @@ angular.module('ontrack.extension.scm', [
         };
     })
     .service('otScmChangelogFilechangefilterService', function ($q, $http, $modal, $interpolate,
-                                                                ot, otFormService) {
+                                                                ot, otGraphqlService, otFormService) {
         const self = {};
 
         // Deprecated, used only for legacy HTTP calls
@@ -177,6 +178,49 @@ angular.module('ontrack.extension.scm', [
             return changeLogFileFilterConfig;
         };
 
+        self.loadFiltersWithGraphQL = (projectId) => {
+            const d = $q.defer();
+            // Loading the shared filters
+            const query = `
+                query LoadSCMChangeLogFilters($projectId: Int!) {
+                    projects(id: $projectId) {
+                        scmFileChangeFilters {
+                            name
+                            patterns
+                        }
+                    }
+                }
+            `;
+            otGraphqlService.pageGraphQLCall(query, {projectId}).then(data => {
+                // Remote filters
+                const remoteFilters = data.projects[0].scmFileChangeFilters;
+                // Loads the local filters
+                const localStore = loadStoreByProjectId(projectId);
+                // Expansion into objects
+                const index = {};
+                angular.forEach(localStore, (patterns, name) => {
+                    index[name] = {
+                        name: name,
+                        patterns: patterns
+                    };
+                });
+                // Remote filters
+                angular.forEach(remoteFilters, filter => {
+                    index[filter.name] = filter;
+                    filter.shared = true;
+                });
+                // Flattening
+                const filters = [];
+                angular.forEach(index, filter => {
+                    filters.push(filter);
+                });
+                // OK
+                d.resolve(filters);
+            });
+            return d.promise;
+        };
+
+        // Deprecated, use the GraphQL method
         self.loadFilters = function (changeLog) {
             var d = $q.defer();
             // Loading shared filters
