@@ -350,6 +350,7 @@ angular.module('ontrack.extension.git', [
 
                 $scope.unselectPattern = () => {
                     $scope.quickPattern = '';
+                    $scope.selectedFilter = undefined;
                     $scope.submitQuickPattern();
                 };
 
@@ -373,6 +374,14 @@ angular.module('ontrack.extension.git', [
                             });
                     }
                 };
+
+                $scope.$watch('selectedFilter', () => {
+                    if ($scope.selectedFilter) {
+                        $scope.submitPattern($scope.selectedFilter.patterns);
+                    } else {
+                        $scope.submitPattern(undefined);
+                    }
+                });
 
                 $scope.editFileFilter = () => {
                     if ($scope.selectedFilter) {
