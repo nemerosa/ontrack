@@ -438,8 +438,8 @@ angular.module('ontrack.extension.scm', [
                         patterns: patterns
                     };
                     // Remote change
-                    if (filter._update) {
-                        ot.call($http.put(filter._update, raw));
+                    if (filter.shared) {
+                        self.shareFileFilterByProjectId(projectId, filter);
                     }
                     // Returns the filter
                     return raw;
@@ -458,8 +458,27 @@ angular.module('ontrack.extension.scm', [
             delete store[filter.name];
             saveStoreByProjectId(projectId, store);
             // Remote changes
-            if (filter._delete) {
-                ot.call($http.delete(filter._delete));
+            if (filter.shared) {
+                // Deletes the remote filter
+                const query = `
+                    mutation UnshareFileFilter(
+                        $projectId: Int!,
+                        $filterName: String!,
+                    ) {
+                        unshareSCMFileChangeFilter(input: {
+                            projectId: $projectId,
+                            name: $filterName,
+                        }) {
+                            errors {
+                                message
+                            }
+                        } 
+                    }
+                `;
+                otGraphqlService.pageGraphQLCall(query, {
+                    projectId,
+                    filterName: filter.name
+                });
             }
         };
 

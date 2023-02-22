@@ -31,6 +31,14 @@ class SCMFileChangeFilterMutations(
                 )
             )
         },
+        unitMutation<UnshareSCMFileChangeFilterInput>(
+            name = "unshareSCMFileChangeFilter",
+            description = "Unshares a filter at project level",
+        ) { input ->
+            val project = structureService.getProject(ID.of(input.projectId))
+            securityService.checkProjectFunction(project, ProjectConfig::class.java)
+            scmFileChangeFilterService.delete(project, input.name)
+        },
     )
 
 }
