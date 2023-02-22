@@ -375,11 +375,16 @@ angular.module('ontrack.extension.scm', [
             });
         };
 
+        // Deprecated, used only for legacy HTTP calls
         self.deleteFilter = function (changeLog, filter) {
+            return self.deleteFilterByProjectId(changeLog.project.id, filter);
+        };
+
+        self.deleteFilterByProjectId = (projectId, filter) => {
             // Local changes
-            var store = loadStore(changeLog.project);
+            const store = loadStoreByProjectId(projectId);
             delete store[filter.name];
-            saveStore(changeLog.project, store);
+            saveStoreByProjectId(projectId, store);
             // Remote changes
             if (filter._delete) {
                 ot.call($http.delete(filter._delete));

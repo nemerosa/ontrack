@@ -395,7 +395,11 @@ angular.module('ontrack.extension.git', [
                 };
 
                 $scope.deleteFileFilter = () => {
-                    // TODO
+                    if ($scope.selectedFilter) {
+                        otScmChangelogFilechangefilterService.deleteFilterByProjectId($scope.projectId, $scope.selectedFilter);
+                        $scope.filters.splice($scope.filters.indexOf($scope.selectedFilter), 1);
+                        $scope.selectedFilter = undefined;
+                    }
                 };
 
                 $scope.addFileFilter = () => {
