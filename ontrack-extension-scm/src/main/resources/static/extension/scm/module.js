@@ -259,13 +259,36 @@ angular.module('ontrack.extension.scm', [
             return d.promise;
         };
 
+        // Deprecated, use shareFileFilterByProjectId
         self.shareFileFilter = function (changeLog, filter) {
-            ot.pageCall($http.post(self.remoteFilters._create, {
-                name: filter.name,
+            self.shareFileFilterByProjectId(changeLog.project.id, filter);
+        };
+
+        self.shareFileFilterByProjectId = function (projectId, filter) {
+            const query = `
+                mutation ShareFileFilter(
+                    $projectId: Int!,
+                    $filterName: String!,
+                    $patterns: [String!]!,
+                ) {
+                    shareSCMFileChangeFilter(input: {
+                        projectId: $projectId,
+                        name: $filterName,
+                        patterns: $patterns,
+                    }) {
+                        errors {
+                            message
+                        }
+                    } 
+                }
+            `;
+            return otGraphqlService.pageGraphQLCall(query, {
+                projectId,
+                filterName: filter.name,
                 patterns: filter.patterns
-            })).then(function (sharedFilter) {
-                angular.copy(sharedFilter, filter);
+            }).then(data => {
                 filter.shared = true;
+                return data;
             });
         };
 

@@ -411,7 +411,7 @@ angular.module('ontrack.extension.git', [
                 };
 
                 $scope.shareFileFilter = (filter) => {
-                    // TODO
+                    otScmChangelogFilechangefilterService.shareFileFilterByProjectId($scope.projectId, filter);
                 };
 
                 $scope.submitPattern = (patterns) => {
