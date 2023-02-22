@@ -185,15 +185,20 @@ angular.module('ontrack.extension.scm', [
                 query LoadSCMChangeLogFilters($projectId: Int!) {
                     projects(id: $projectId) {
                         scmFileChangeFilters {
-                            name
-                            patterns
+                            canManage
+                            filters {
+                                name
+                                patterns
+                            }
                         }
                     }
                 }
             `;
             otGraphqlService.pageGraphQLCall(query, {projectId}).then(data => {
+                // User rights
+                const canManage = data.projects[0].scmFileChangeFilters.canManage;
                 // Remote filters
-                const remoteFilters = data.projects[0].scmFileChangeFilters;
+                const remoteFilters = data.projects[0].scmFileChangeFilters.filters;
                 // Loads the local filters
                 const localStore = loadStoreByProjectId(projectId);
                 // Expansion into objects
@@ -215,7 +220,7 @@ angular.module('ontrack.extension.scm', [
                     filters.push(filter);
                 });
                 // OK
-                d.resolve(filters);
+                d.resolve({canManage, filters});
             });
             return d.promise;
         };

@@ -334,8 +334,9 @@ angular.module('ontrack.extension.git', [
 
                 $scope.$watch('projectId', (value) => {
                     if (value) {
-                        otScmChangelogFilechangefilterService.loadFiltersWithGraphQL($scope.projectId).then(filters => {
+                        otScmChangelogFilechangefilterService.loadFiltersWithGraphQL($scope.projectId).then(({canManage, filters}) => {
                             $scope.filters = filters;
+                            $scope.canManage = canManage;
                         });
                     }
                 });
