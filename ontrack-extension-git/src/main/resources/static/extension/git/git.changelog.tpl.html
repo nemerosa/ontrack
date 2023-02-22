@@ -104,13 +104,17 @@
                         <div class="panel-heading clearfix">
                             Commits
                             <div class="pull-right">
-                                <a class="btn btn-default btn-xs" ng-if="changeLog.hasIssues" ng-click="changeLogIssues()"
+                                <input type="text" class="form-control col-md-4 input-sm" ng-show="commits"/>
+                                <a class="btn btn-default btn-sm" title="Navigate to the change log of dependencies" ng-show="commits">
+                                    <span class="fa fa-arrow-right"></span>
+                                </a>
+                                <a class="btn btn-default btn-sm" ng-if="changeLog.hasIssues" ng-click="changeLogIssues()"
                                    ng-disabled="issuesLoading">
                                     <ot-loading ng-if="issuesLoading"></ot-loading>
                                     <span class="ot-header-command-unloaded" ng-hide="issues || issuesLoading"></span>
                                     {{issuesCommand}}
                                 </a>
-                                <a class="btn btn-default btn-xs" ng-click="changeLogFiles()"
+                                <a class="btn btn-default btn-sm" ng-click="changeLogFiles()"
                                    ng-disabled="filesLoading">
                                     <ot-loading ng-if="filesLoading"></ot-loading>
                                     <span class="ot-header-command-unloaded" ng-hide="files || filesLoading"></span>
