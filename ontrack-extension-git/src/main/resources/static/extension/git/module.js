@@ -577,6 +577,17 @@ angular.module('ontrack.extension.git', [
                                 _image
                               }
                             }
+                            using {
+                              pageItems {
+                                id
+                                branch {
+                                  project {
+                                    name
+                                  }
+                                }
+                                name
+                              }
+                            }
                           }
                         }
                       }
