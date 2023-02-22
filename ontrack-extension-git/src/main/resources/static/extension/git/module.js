@@ -427,7 +427,7 @@ angular.module('ontrack.extension.git', [
         };
     })
     .controller('GitChangeLogCtrl', function ($q, $log, $modal, $interpolate, $anchorScroll, $location, $stateParams, $scope, $http,
-                                              ot, otGraphqlService) {
+                                              ot, otGraphqlService, otScmChangeLogService) {
 
         // The view
         const view = ot.view();
@@ -615,6 +615,15 @@ angular.module('ontrack.extension.git', [
             }
         };
 
+        // Configuring the change log export
+        $scope.changeLogExport = () => {
+            otScmChangeLogService.displayChangeLogExportGraphQL({
+                projectId: $scope.changeLog.project.id,
+                buildFromId: $scope.changeLog.buildFrom.id,
+                buildToId: $scope.changeLog.buildTo.id,
+            });
+        };
+
         // Loading the file changes if needed
         $scope.changeLogFiles = () => {
             if (!$scope.files) {
@@ -689,21 +698,6 @@ angular.module('ontrack.extension.git', [
                     });
             }
         };
-
-        //
-        // ot.pageCall($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
-        //
-        //
-        //     // Configuring the change log export
-        //     $scope.changeLogExport = function () {
-        //         otScmChangeLogService.displayChangeLogExport({
-        //             changeLog: $scope.changeLog,
-        //             exportFormatsLink: changeLog._exportFormats,
-        //             exportIssuesLink: changeLog._exportIssues
-        //         });
-        //     };
-        //
-        // });
 
     })
     .directive('gitPlot', function (otPlot) {

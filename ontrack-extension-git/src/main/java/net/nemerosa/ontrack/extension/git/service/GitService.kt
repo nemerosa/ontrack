@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.git.service
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
+import net.nemerosa.ontrack.extension.issues.export.ExportFormat
 import net.nemerosa.ontrack.extension.scm.service.SCMService
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.model.GitCommit
@@ -271,4 +272,9 @@ interface GitService : SCMService {
      * Checks if the repository is ready to be used.
      */
     fun isRepositorySynched(gitConfiguration: GitConfiguration): Boolean
+
+    /**
+     * Gets the list of available issue export formats for this project
+     */
+    fun getIssueExportFormats(project: Project): List<ExportFormat>
 }

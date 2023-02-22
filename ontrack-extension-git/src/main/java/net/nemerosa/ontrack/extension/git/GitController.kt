@@ -158,25 +158,11 @@ class GitController(
      */
     @GetMapping("changelog/export/{projectId}/formats")
     fun changeLogExportFormats(@PathVariable projectId: ID): Resources<ExportFormat> {
-        // Gets the project
         val project = structureService.getProject(projectId)
-        // Gets the configuration for the project
-        val projectConfiguration = gitService.getProjectConfiguration(project)
-        if (projectConfiguration != null) {
-            val configuredIssueService = projectConfiguration.configuredIssueService
-            if (configuredIssueService != null) {
-                return Resources.of(
-                        configuredIssueService.issueServiceExtension.exportFormats(
-                                configuredIssueService.issueServiceConfiguration
-                        ),
-                        uri(on(GitController::class.java).changeLogExportFormats(projectId))
-                )
-            }
-        }
-        // Not found
+        val formats = gitService.getIssueExportFormats(project)
         return Resources.of(
-                emptyList(),
-                uri(on(GitController::class.java).changeLogExportFormats(projectId))
+            formats,
+            uri(on(GitController::class.java).changeLogExportFormats(projectId))
         )
     }
 

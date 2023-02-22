@@ -6,12 +6,14 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequestDifferenceProjectException
 import net.nemerosa.ontrack.extension.git.GitConfigProperties
+import net.nemerosa.ontrack.extension.git.GitController
 import net.nemerosa.ontrack.extension.git.branching.BranchingModelService
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.repository.GitRepositoryHelper
 import net.nemerosa.ontrack.extension.git.support.NoGitCommitPropertyException
+import net.nemerosa.ontrack.extension.issues.export.ExportFormat
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceNotConfiguredException
@@ -33,12 +35,14 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.*
 import net.nemerosa.ontrack.tx.TransactionService
+import net.nemerosa.ontrack.ui.resource.Resources
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 import java.lang.String.format
 import java.util.*
 import java.util.concurrent.Future
@@ -65,7 +69,8 @@ class GitServiceImpl(
     private val gitPullRequestCache: DefaultGitPullRequestCache,
     private val gitNoRemoteCounter: GitNoRemoteCounter,
     transactionManager: PlatformTransactionManager
-) : AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue>(structureService, propertyService), GitService, JobOrchestratorSupplier {
+) : AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue>(structureService, propertyService),
+    GitService, JobOrchestratorSupplier {
 
     private val logger = LoggerFactory.getLogger(GitService::class.java)
 
@@ -73,12 +78,12 @@ class GitServiceImpl(
 
     override fun forEachConfiguredProject(consumer: BiConsumer<Project, GitConfiguration>) {
         structureService.projectList
-                .forEach { project ->
-                    val configuration = getProjectConfiguration(project)
-                    if (configuration != null) {
-                        consumer.accept(project, configuration)
-                    }
+            .forEach { project ->
+                val configuration = getProjectConfiguration(project)
+                if (configuration != null) {
+                    consumer.accept(project, configuration)
                 }
+            }
     }
 
     override fun forEachConfiguredBranch(consumer: BiConsumer<Branch, GitBranchConfiguration>) {
@@ -87,14 +92,17 @@ class GitServiceImpl(
         }
     }
 
-    override fun forEachConfiguredBranchInProject(project: Project, consumer: (Branch, GitBranchConfiguration) -> Unit) {
+    override fun forEachConfiguredBranchInProject(
+        project: Project,
+        consumer: (Branch, GitBranchConfiguration) -> Unit
+    ) {
         structureService.getBranchesForProject(project.id)
-                .forEach { branch ->
-                    val configuration = getBranchConfiguration(branch)
-                    if (configuration != null) {
-                        consumer(branch, configuration)
-                    }
+            .forEach { branch ->
+                val configuration = getBranchConfiguration(branch)
+                if (configuration != null) {
+                    consumer(branch, configuration)
                 }
+            }
     }
 
     override fun collectJobRegistrations(): Stream<JobRegistration> {
@@ -172,27 +180,27 @@ class GitServiceImpl(
                     syncError = false
                 } catch (ex: GitRepositorySyncException) {
                     applicationLogService.log(
-                            ApplicationLogEntry.error(
-                                    ex,
-                                    NameDescription.nd(
-                                            "git-sync",
-                                            "Git synchronisation issue"
-                                    ),
-                                    oProjectConfiguration.remote
-                            ).withDetail("project", project.name)
-                                    .withDetail("git-name", oProjectConfiguration.name)
-                                    .withDetail("git-remote", oProjectConfiguration.remote)
+                        ApplicationLogEntry.error(
+                            ex,
+                            NameDescription.nd(
+                                "git-sync",
+                                "Git synchronisation issue"
+                            ),
+                            oProjectConfiguration.remote
+                        ).withDetail("project", project.name)
+                            .withDetail("git-name", oProjectConfiguration.name)
+                            .withDetail("git-remote", oProjectConfiguration.remote)
                     )
                     syncError = true
                 }
 
                 // Change log computation
                 return GitChangeLog(
-                        UUID.randomUUID().toString(),
-                        project,
-                        getSCMBuildView(buildFrom.id),
-                        getSCMBuildView(buildTo.id),
-                        syncError
+                    UUID.randomUUID().toString(),
+                    project,
+                    getSCMBuildView(buildFrom.id),
+                    getSCMBuildView(buildTo.id),
+                    syncError
                 )
             } else {
                 throw GitProjectNotConfiguredException(project.id)
@@ -216,8 +224,8 @@ class GitServiceImpl(
 
     protected fun getGitRepositoryClient(project: Project): GitRepositoryClient {
         return getProjectConfiguration(project)?.gitRepository
-                ?.let { gitRepositoryClientFactory.getClient(it) }
-                ?: throw GitProjectNotConfiguredException(project.id)
+            ?.let { gitRepositoryClientFactory.getClient(it) }
+            ?: throw GitProjectNotConfiguredException(project.id)
     }
 
     override fun getChangeLogCommits(
@@ -247,18 +255,18 @@ class GitServiceImpl(
             commits,
         )
         return GitChangeLogCommits(
-                GitUILog(
-                        log.plot,
-                        uiCommits
-                )
+            GitUILog(
+                log.plot,
+                uiCommits
+            )
         )
     }
 
     protected fun getCommitFromBuild(build: Build): String {
         return getBranchConfiguration(build.branch)
-                ?.buildCommitLink
-                ?.getCommitFromBuild(build)
-                ?: throw GitBranchNotConfiguredException(build.branch.id)
+            ?.buildCommitLink
+            ?.getCommitFromBuild(build)
+            ?: throw GitBranchNotConfiguredException(build.branch.id)
     }
 
     override fun getChangeLogIssuesIds(changeLog: GitChangeLog): List<String> {
@@ -272,7 +280,7 @@ class GitServiceImpl(
             val configuration = getRequiredProjectConfiguration(changeLog.project)
             // Issue service
             val configuredIssueService = configuration.configuredIssueService
-                    ?: throw IssueServiceNotConfiguredException()
+                ?: throw IssueServiceNotConfiguredException()
             // Set of issues
             val issueKeys = TreeSet<String>()
             // For all commits in this commit log
@@ -296,7 +304,7 @@ class GitServiceImpl(
             val configuration = getRequiredProjectConfiguration(changeLog.project)
             // Issue service
             val configuredIssueService = configuration.configuredIssueService
-                    ?: throw IssueServiceNotConfiguredException()
+                ?: throw IssueServiceNotConfiguredException()
             // Index of issues, sorted by keys
             val issues = TreeMap<String, GitChangeLogIssue>()
             // For all commits in this commit log
@@ -342,11 +350,11 @@ class GitServiceImpl(
         val fileChangeLinkFormat = configuration.fileAtCommitLink
         // OK
         return GitChangeLogFiles(
-                diff.entries.map { entry ->
-                    toChangeLogFile(entry).withUrl(
-                            getDiffUrl(diff, entry, fileChangeLinkFormat)
-                    )
-                }
+            diff.entries.map { entry ->
+                toChangeLogFile(entry).withUrl(
+                    getDiffUrl(diff, entry, fileChangeLinkFormat)
+                )
+            }
         )
     }
 
@@ -378,6 +386,18 @@ class GitServiceImpl(
         return gitClient.isReady
     }
 
+    override fun getIssueExportFormats(project: Project): List<ExportFormat> {
+        val projectConfiguration = getProjectConfiguration(project)
+        return projectConfiguration?.let {
+            val configuredIssueService = it.configuredIssueService
+            configuredIssueService?.let { cis ->
+                cis.issueServiceExtension.exportFormats(
+                    cis.issueServiceConfiguration
+                )
+            }
+        } ?: emptyList()
+    }
+
     override fun getCommitProjectInfo(projectId: ID, commit: String): OntrackGitCommitInfo {
         return getOntrackGitCommitInfo(structureService.getProject(projectId), commit)
     }
@@ -400,9 +420,9 @@ class GitServiceImpl(
         val commitTo = getCommitFromBuild(buildTo)
         // Gets the diff
         return gitClient.unifiedDiff(
-                commitFrom,
-                commitTo,
-                pathFilter
+            commitFrom,
+            commitTo,
+            pathFilter
         )
     }
 
@@ -411,7 +431,7 @@ class GitServiceImpl(
         return transactionService.doInTransaction {
             val branchConfiguration = getRequiredBranchConfiguration(branch)
             val client = gitRepositoryClientFactory.getClient(
-                    branchConfiguration.configuration.gitRepository
+                branchConfiguration.configuration.gitRepository
             )
             client.download(branchConfiguration.branch, path).asOptional()
         }
@@ -451,8 +471,8 @@ class GitServiceImpl(
     override fun getProjectGitSyncInfo(project: Project): GitSynchronisationInfo {
         securityService.checkProjectFunction(project, ProjectConfig::class.java)
         return getProjectConfiguration(project)
-                ?.let { getGitSynchronisationInfo(it) }
-                ?: throw GitProjectNotConfiguredException(project.id)
+            ?.let { getGitSynchronisationInfo(it) }
+            ?: throw GitProjectNotConfiguredException(project.id)
     }
 
     private fun getGitSynchronisationInfo(gitConfiguration: GitConfiguration): GitSynchronisationInfo {
@@ -468,12 +488,12 @@ class GitServiceImpl(
         }
         // OK
         return GitSynchronisationInfo(
-                gitConfiguration.type,
-                gitConfiguration.name,
-                gitConfiguration.remote,
-                gitConfiguration.indexationInterval,
-                status,
-                branches
+            gitConfiguration.type,
+            gitConfiguration.name,
+            gitConfiguration.remote,
+            gitConfiguration.indexationInterval,
+            status,
+            branches
         )
     }
 
@@ -493,7 +513,8 @@ class GitServiceImpl(
             return null
         } else {
             // Gets a client for this project
-            val repositoryClient: GitRepositoryClient = gitRepositoryClientFactory.getClient(projectConfiguration.gitRepository)
+            val repositoryClient: GitRepositoryClient =
+                gitRepositoryClientFactory.getClient(projectConfiguration.gitRepository)
             // Regular expression for the issue
             val regex = configuredIssueService.getMessageRegex(issue)
             // Now, get the last commit for this issue
@@ -505,17 +526,17 @@ class GitServiceImpl(
                 val commitInfo = getOntrackGitCommitInfo(project, commit)
                 // We now return the commit info together with the issue
                 OntrackGitIssueInfo(
-                        configuredIssueService.issueServiceConfigurationRepresentation,
-                        issue,
-                        commitInfo
+                    configuredIssueService.issueServiceConfigurationRepresentation,
+                    issue,
+                    commitInfo
                 )
             }
             // If not found, no commit info
             else {
                 OntrackGitIssueInfo(
-                        configuredIssueService.issueServiceConfigurationRepresentation,
-                        issue,
-                        null
+                    configuredIssueService.issueServiceConfigurationRepresentation,
+                    issue,
+                    null
                 )
             }
         }
@@ -534,9 +555,9 @@ class GitServiceImpl(
         // Gets the annotated commit
         val messageAnnotators = getMessageAnnotators(projectConfiguration)
         val uiCommit = toUICommit(
-                projectConfiguration.commitLink,
-                messageAnnotators,
-                commitObject
+            projectConfiguration.commitLink,
+            messageAnnotators,
+            commitObject
         )
 
         // Looks for all Git branches for this commit
@@ -544,11 +565,11 @@ class GitServiceImpl(
         // Sorts the branches according to the branching model
         val indexedBranches = logTime("branch-index") {
             branchingModelService.getBranchingModel(project)
-                    .groupBranches(gitBranches)
-                    .mapValues { (_, gitBranches) ->
-                        gitBranches.mapNotNull { findBranchWithGitBranch(project, it) }
-                    }
-                    .filterValues { !it.isEmpty() }
+                .groupBranches(gitBranches)
+                .mapValues { (_, gitBranches) ->
+                    gitBranches.mapNotNull { findBranchWithGitBranch(project, it) }
+                }
+                .filterValues { !it.isEmpty() }
         }
 
         // Logging of the index
@@ -569,16 +590,16 @@ class GitServiceImpl(
                 val promotions: List<PromotionRun> = logTime("earliest-promotion", listOf("branch" to branch.name)) {
                     firstBuildOnThisBranch?.let { build ->
                         structureService.getPromotionLevelListForBranch(branch.id)
-                                .mapNotNull { promotionLevel ->
-                                    structureService.getEarliestPromotionRunAfterBuild(promotionLevel, build).orElse(null)
-                                }
+                            .mapNotNull { promotionLevel ->
+                                structureService.getEarliestPromotionRunAfterBuild(promotionLevel, build).orElse(null)
+                            }
                     } ?: emptyList()
                 }
                 // Complete branch info
                 BranchInfo(
-                        branch,
-                        firstBuildOnThisBranch,
-                        promotions
+                    branch,
+                    firstBuildOnThisBranch,
+                    promotions
                 )
             }
         }.mapValues { (_, infos) ->
@@ -588,23 +609,28 @@ class GitServiceImpl(
         }
         // Result
         return OntrackGitCommitInfo(
-                uiCommit,
-                branchInfos
+            uiCommit,
+            branchInfos
         )
     }
 
-    internal fun getEarliestBuildAfterCommit(commit: GitCommit, branch: Branch, branchConfiguration: GitBranchConfiguration, client: GitRepositoryClient): Build? {
+    internal fun getEarliestBuildAfterCommit(
+        commit: GitCommit,
+        branch: Branch,
+        branchConfiguration: GitBranchConfiguration,
+        client: GitRepositoryClient
+    ): Build? {
         return gitRepositoryHelper.getEarliestBuildAfterCommit(
-                branch,
-                IndexableGitCommit(commit)
+            branch,
+            IndexableGitCommit(commit)
         )?.let { structureService.getBuild(ID.of(it)) }
     }
 
     private fun getDiffUrl(diff: GitDiff, entry: GitDiffEntry, fileChangeLinkFormat: String): String {
         return if (StringUtils.isNotBlank(fileChangeLinkFormat)) {
             fileChangeLinkFormat
-                    .replace("{commit}", entry.getReferenceId(diff.from, diff.to))
-                    .replace("{path}", entry.referencePath)
+                .replace("{commit}", entry.getReferenceId(diff.from, diff.to))
+                .replace("{path}", entry.referencePath)
         } else {
             ""
         }
@@ -616,15 +642,20 @@ class GitServiceImpl(
             GitChangeType.COPY -> GitChangeLogFile.of(SCMChangeLogFileChangeType.COPIED, entry.oldPath, entry.newPath)
             GitChangeType.DELETE -> GitChangeLogFile.of(SCMChangeLogFileChangeType.DELETED, entry.oldPath)
             GitChangeType.MODIFY -> GitChangeLogFile.of(SCMChangeLogFileChangeType.MODIFIED, entry.oldPath)
-            GitChangeType.RENAME -> GitChangeLogFile.of(SCMChangeLogFileChangeType.RENAMED, entry.oldPath, entry.newPath)
+            GitChangeType.RENAME -> GitChangeLogFile.of(
+                SCMChangeLogFileChangeType.RENAMED,
+                entry.oldPath,
+                entry.newPath
+            )
+
             else -> GitChangeLogFile.of(SCMChangeLogFileChangeType.UNDEFINED, entry.oldPath, entry.newPath)
         }
     }
 
     override fun toUICommit(gitConfiguration: GitConfiguration, commit: GitCommit): GitUICommit {
         return toUICommits(
-                gitConfiguration,
-                listOf(commit)
+            gitConfiguration,
+            listOf(commit)
         ).first()
     }
 
@@ -670,76 +701,79 @@ class GitServiceImpl(
     }
 
     override fun getGitConfiguratorAndConfiguration(project: Project): Pair<GitConfigurator, GitConfiguration>? =
-            gitConfigurators.mapNotNull {
-                val configuration = it.getConfiguration(project)
-                if (configuration != null) {
-                    it to configuration
-                } else {
-                    null
-                }
-            }.firstOrNull()
+        gitConfigurators.mapNotNull {
+            val configuration = it.getConfiguration(project)
+            if (configuration != null) {
+                it to configuration
+            } else {
+                null
+            }
+        }.firstOrNull()
 
     override fun isProjectConfiguredForGit(project: Project): Boolean =
-            gitConfigurators.any { configurator ->
-                configurator.isProjectConfigured(project)
-            }
+        gitConfigurators.any { configurator ->
+            configurator.isProjectConfigured(project)
+        }
 
     override fun getProjectConfiguration(project: Project): GitConfiguration? {
         return gitConfigurators.asSequence()
-                .mapNotNull { c -> c.getConfiguration(project) }
-                .firstOrNull()
+            .mapNotNull { c -> c.getConfiguration(project) }
+            .firstOrNull()
     }
 
     protected fun getRequiredBranchConfiguration(branch: Branch): GitBranchConfiguration {
         return getBranchConfiguration(branch)
-                ?: throw GitBranchNotConfiguredException(branch.id)
+            ?: throw GitBranchNotConfiguredException(branch.id)
     }
 
     override fun getBranchAsPullRequest(branch: Branch): GitPullRequest? =
-            propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java).value?.let { property ->
-                getBranchAsPullRequest(branch, property)
-            }
+        propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java).value?.let { property ->
+            getBranchAsPullRequest(branch, property)
+        }
 
     override fun isBranchAPullRequest(branch: Branch): Boolean =
-            gitConfigProperties.pullRequests.enabled &&
-                    propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java).value
-                            ?.let { property ->
-                                getGitConfiguratorAndConfiguration(branch.project)
-                                        ?.let { (configurator, _) ->
-                                            configurator.toPullRequestID(property.branch) != null
-                                        }
+        gitConfigProperties.pullRequests.enabled &&
+                propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java).value
+                    ?.let { property ->
+                        getGitConfiguratorAndConfiguration(branch.project)
+                            ?.let { (configurator, _) ->
+                                configurator.toPullRequestID(property.branch) != null
                             }
-                    ?: false
+                    }
+                ?: false
 
-    override fun getBranchAsPullRequest(branch: Branch, gitBranchConfigurationProperty: GitBranchConfigurationProperty?): GitPullRequest? =
-            if (gitConfigProperties.pullRequests.enabled) {
-                // Actual code to get the PR
-                fun internalPR() = gitBranchConfigurationProperty?.let {
-                    getGitConfiguratorAndConfiguration(branch.project)
-                            ?.let { (configurator, configuration) ->
-                                configurator.toPullRequestID(gitBranchConfigurationProperty.branch)?.let { prId ->
-                                    try {
-                                        configurator.getPullRequest(configuration, prId)
-                                            ?: GitPullRequest.invalidPR(prId, configurator.toPullRequestKey(prId))
-                                    } catch (any: Exception) {
-                                        ApplicationLogEntry.error(
-                                            any,
-                                            NameDescription.nd("git-pr-error", "Git PR error"),
-                                            "Error while getting PR info for ${branch.entityDisplayName}"
-                                        )
-                                            .withDetail("branch", branch.entityDisplayName)
-                                        // Not returning a PR
-                                        null
-                                    }
-                                }
+    override fun getBranchAsPullRequest(
+        branch: Branch,
+        gitBranchConfigurationProperty: GitBranchConfigurationProperty?
+    ): GitPullRequest? =
+        if (gitConfigProperties.pullRequests.enabled) {
+            // Actual code to get the PR
+            fun internalPR() = gitBranchConfigurationProperty?.let {
+                getGitConfiguratorAndConfiguration(branch.project)
+                    ?.let { (configurator, configuration) ->
+                        configurator.toPullRequestID(gitBranchConfigurationProperty.branch)?.let { prId ->
+                            try {
+                                configurator.getPullRequest(configuration, prId)
+                                    ?: GitPullRequest.invalidPR(prId, configurator.toPullRequestKey(prId))
+                            } catch (any: Exception) {
+                                ApplicationLogEntry.error(
+                                    any,
+                                    NameDescription.nd("git-pr-error", "Git PR error"),
+                                    "Error while getting PR info for ${branch.entityDisplayName}"
+                                )
+                                    .withDetail("branch", branch.entityDisplayName)
+                                // Not returning a PR
+                                null
                             }
-                }
-                // Calling the cache
-                gitPullRequestCache.getBranchPullRequest(branch, ::internalPR)
-            } else {
-                // Pull requests are not supported
-                null
+                        }
+                    }
             }
+            // Calling the cache
+            gitPullRequestCache.getBranchPullRequest(branch, ::internalPR)
+        } else {
+            // Pull requests are not supported
+            null
+        }
 
     override fun getBranchConfiguration(branch: Branch): GitBranchConfiguration? {
         // Get the configuration for the project
@@ -761,11 +795,11 @@ class GitServiceImpl(
                 buildTagInterval = branchConfigurationProperty.buildTagInterval
                 // OK
                 return GitBranchConfiguration(
-                        configuration,
-                        gitBranch,
-                        buildCommitLink,
-                        override,
-                        buildTagInterval
+                    configuration,
+                    gitBranch,
+                    buildCommitLink,
+                    override,
+                    buildTagInterval
                 )
             } else {
                 return null
@@ -777,7 +811,7 @@ class GitServiceImpl(
 
     override fun findBranchWithGitBranch(project: Project, branchName: String): Branch? {
         return gitRepositoryHelper.findBranchWithProjectAndGitBranch(project, branchName)
-                ?.let { structureService.getBranch(ID.of(it)) }
+            ?.let { structureService.getBranch(ID.of(it)) }
     }
 
     private fun <T> toConfiguredBuildGitCommitLink(serviceConfiguration: ServiceConfiguration): ConfiguredBuildGitCommitLink<T> {
@@ -785,8 +819,8 @@ class GitServiceImpl(
         val link = buildGitCommitLinkService.getLink(serviceConfiguration.id) as BuildGitCommitLink<T>
         val linkData = link.parseData(serviceConfiguration.data)
         return ConfiguredBuildGitCommitLink(
-                link,
-                linkData
+            link,
+            linkData
         )
     }
 
@@ -804,9 +838,9 @@ class GitServiceImpl(
 
             override fun getDescription(): String {
                 return format(
-                        "Branch %s @ %s",
-                        branch.name,
-                        branch.project.name
+                    "Branch %s @ %s",
+                    branch.name,
+                    branch.project.name
                 )
             }
 
@@ -836,10 +870,10 @@ class GitServiceImpl(
 
             override fun getDescription(): String {
                 return format(
-                        "%s (%s @ %s)",
-                        config.remote,
-                        config.name,
-                        config.type
+                    "%s (%s @ %s)",
+                    config.remote,
+                    config.name,
+                    config.type
                 )
             }
 
@@ -904,16 +938,16 @@ class GitServiceImpl(
                 if (createBuild) {
                     listener.message("Creating build %s from tag %s", buildName, tagName)
                     structureService.newBuild(
-                            Build.of(
-                                    branch,
-                                    NameDescription(
-                                            buildName,
-                                            "Imported from Git tag $tagName"
-                                    ),
-                                    securityService.currentSignature.withTime(
-                                            tag.time
-                                    )
+                        Build.of(
+                            branch,
+                            NameDescription(
+                                buildName,
+                                "Imported from Git tag $tagName"
+                            ),
+                            securityService.currentSignature.withTime(
+                                tag.time
                             )
+                        )
                     )
                 }
             }
@@ -924,7 +958,11 @@ class GitServiceImpl(
         syncProjectRepository(config, project, listener::message)
     }
 
-    override fun syncProjectRepository(config: GitConfiguration, project: Project, listener: (message: String) -> Unit) {
+    override fun syncProjectRepository(
+        config: GitConfiguration,
+        project: Project,
+        listener: (message: String) -> Unit
+    ) {
         listener("Git sync for ${config.name}")
         // Gets the client for this configuration
         val client = gitRepositoryClientFactory.getClient(config.gitRepository)
@@ -958,15 +996,15 @@ class GitServiceImpl(
 
     private fun getGitIndexationJobRegistration(configuration: GitConfiguration, project: Project): JobRegistration {
         return JobRegistration
-                .of(createIndexationJob(configuration, project))
-                .everyMinutes(configuration.indexationInterval.toLong())
+            .of(createIndexationJob(configuration, project))
+            .everyMinutes(configuration.indexationInterval.toLong())
     }
 
     override fun scheduleGitBuildSync(branch: Branch, property: GitBranchConfigurationProperty) {
         if (property.buildTagInterval > 0) {
             jobScheduler.schedule(
-                    createBuildSyncJob(branch),
-                    Schedule.everyMinutes(property.buildTagInterval.toLong())
+                createBuildSyncJob(branch),
+                Schedule.everyMinutes(property.buildTagInterval.toLong())
             )
         } else {
             unscheduleGitBuildSync(branch, property)
@@ -990,17 +1028,17 @@ class GitServiceImpl(
             }
 
     override fun getCommitForBuild(build: Build): IndexableGitCommit? =
-            entityDataService.retrieve(
-                    build,
-                    "git-commit",
-                    IndexableGitCommit::class.java
-            )
+        entityDataService.retrieve(
+            build,
+            "git-commit",
+            IndexableGitCommit::class.java
+        )
 
     override fun setCommitForBuild(build: Build, commit: IndexableGitCommit) {
         entityDataService.store(
-                build,
-                "git-commit",
-                commit
+            build,
+            "git-commit",
+            commit
         )
     }
 
@@ -1012,22 +1050,22 @@ class GitServiceImpl(
             val branchConfiguration = getBranchConfiguration(branch)
             if (branchConfiguration != null) {
                 collectIndexableGitCommitForBranch(
-                        branch,
-                        client,
-                        branchConfiguration,
-                        overrides,
-                        JobRunListener.logger(logger)
+                    branch,
+                    client,
+                    branchConfiguration,
+                    overrides,
+                    JobRunListener.logger(logger)
                 )
             }
         }
     }
 
     override fun collectIndexableGitCommitForBranch(
-            branch: Branch,
-            client: GitRepositoryClient,
-            config: GitBranchConfiguration,
-            overrides: Boolean,
-            listener: JobRunListener
+        branch: Branch,
+        client: GitRepositoryClient,
+        config: GitBranchConfiguration,
+        overrides: Boolean,
+        listener: JobRunListener
     ) {
         val buildCommitLink = config.buildCommitLink
         if (buildCommitLink != null) {
@@ -1046,11 +1084,11 @@ class GitServiceImpl(
             val buildCommitLink = branchConfiguration?.buildCommitLink
             if (buildCommitLink != null) {
                 collectIndexableGitCommitForBuild(
-                        build,
-                        client,
-                        buildCommitLink,
-                        true,
-                        JobRunListener.logger(logger)
+                    build,
+                    client,
+                    buildCommitLink,
+                    true,
+                    JobRunListener.logger(logger)
                 )
             }
         }
@@ -1063,18 +1101,18 @@ class GitServiceImpl(
         }
 
     private fun collectIndexableGitCommitForBuild(
-            build: Build,
-            client: GitRepositoryClient,
-            buildCommitLink: ConfiguredBuildGitCommitLink<*>,
-            overrides: Boolean,
-            listener: JobRunListener
+        build: Build,
+        client: GitRepositoryClient,
+        buildCommitLink: ConfiguredBuildGitCommitLink<*>,
+        overrides: Boolean,
+        listener: JobRunListener
     ): Boolean? = transactionTemplate.execute {
         val commit =
-                try {
-                    buildCommitLink.getCommitFromBuild(build)
-                } catch (ex: NoGitCommitPropertyException) {
-                    null
-                }
+            try {
+                buildCommitLink.getCommitFromBuild(build)
+            } catch (ex: NoGitCommitPropertyException) {
+                null
+            }
         if (commit != null) {
             listener.message("Indexing $commit for build ${build.entityDisplayName}")
             // Gets the Git information for the commit
@@ -1104,6 +1142,7 @@ class GitServiceImpl(
 
     companion object {
         private val GIT_INDEXATION_JOB = GIT_JOB_CATEGORY.getType("git-indexation").withName("Git indexation")
-        private val GIT_BUILD_SYNC_JOB = GIT_JOB_CATEGORY.getType("git-build-sync").withName("Git build synchronisation")
+        private val GIT_BUILD_SYNC_JOB =
+            GIT_JOB_CATEGORY.getType("git-build-sync").withName("Git build synchronisation")
     }
 }

@@ -484,7 +484,7 @@ angular.module('ontrack.extension.scm', [
 
         return self;
     })
-    .service('otScmChangeLogService', function ($http, $modal, $interpolate, ot) {
+    .service('otScmChangeLogService', function ($http, $modal, $interpolate, ot, otGraphqlService) {
         var self = {};
 
         function storeExportRequest(projectId, exportRequest) {
@@ -494,8 +494,8 @@ angular.module('ontrack.extension.scm', [
             );
         }
 
-        function loadExportRequest(projectId) {
-            var json = localStorage.getItem('issueExportConfig_' + projectId);
+        const loadLocalExportRequest = projectId => {
+            const json = localStorage.getItem('issueExportConfig_' + projectId);
             if (json) {
                 return JSON.parse(json);
             } else {
@@ -503,21 +503,27 @@ angular.module('ontrack.extension.scm', [
                     grouping: []
                 };
             }
-        }
+        };
 
-        self.displayChangeLogExport = function (config) {
-
-            var projectId = config.changeLog.project.id;
-
+        self.displayChangeLogExportGraphQL = ({projectId, buildFromId, buildToId}) => {
             $modal.open({
                 templateUrl: 'extension/scm/scmChangeLogExport.tpl.html',
                 controller: function ($scope, $modalInstance) {
-                    $scope.config = config;
                     // Export request
-                    $scope.exportRequest = loadExportRequest(projectId);
+                    $scope.exportRequest = loadLocalExportRequest(projectId);
                     // Loading the export formats
-                    ot.call($http.get(config.exportFormatsLink)).then(function (exportFormatsResources) {
-                        $scope.exportFormats = exportFormatsResources.resources;
+                    otGraphqlService.pageGraphQLCall(`
+                        query LoadProjectExportFormats($projectId: Int!) {
+                            projects(id: $projectId) {
+                                gitIssueExportFormats {
+                                    id
+                                    name
+                                    type
+                                }
+                            }
+                        }
+                    `, {projectId: projectId}).then(data => {
+                        $scope.exportFormats = data.projects[0].gitIssueExportFormats;
                     });
 
                     // Closing the dialog
@@ -535,7 +541,7 @@ angular.module('ontrack.extension.scm', [
                     };
                     // Removing a group
                     $scope.removeGroup = function (groups, group) {
-                        var idx = groups.indexOf(group);
+                        const idx = groups.indexOf(group);
                         if (idx >= 0) {
                             groups.splice(idx, 1);
                         }
@@ -545,13 +551,13 @@ angular.module('ontrack.extension.scm', [
                     $scope.doExport = function () {
 
                         // Request
-                        var request = {
-                            from: config.changeLog.scmBuildFrom.buildView.build.id,
-                            to: config.changeLog.scmBuildTo.buildView.build.id
+                        const request = {
+                            from: buildFromId,
+                            to: buildToId
                         };
 
                         // Permalink
-                        var url = config.exportIssuesLink;
+                        let url = "/extension/git/changelog/export";
                         url += $interpolate('?from={{from}}&to={{to}}')(request);
 
                         // Format
@@ -562,12 +568,12 @@ angular.module('ontrack.extension.scm', [
 
                         // Grouping
                         if ($scope.exportRequest.grouping.length > 0) {
-                            var grouping = '';
-                            for (var i = 0; i < $scope.exportRequest.grouping.length; i++) {
+                            let grouping = '';
+                            for (let i = 0; i < $scope.exportRequest.grouping.length; i++) {
                                 if (i > 0) {
                                     grouping += '|';
                                 }
-                                var groupSpec = $scope.exportRequest.grouping[i];
+                                const groupSpec = $scope.exportRequest.grouping[i];
                                 grouping += groupSpec.name + '=' + groupSpec.types;
                             }
                             grouping = encodeURIComponent(grouping);
