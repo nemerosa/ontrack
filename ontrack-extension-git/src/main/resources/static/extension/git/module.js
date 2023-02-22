@@ -726,6 +726,21 @@ angular.module('ontrack.extension.git', [
             }
         };
 
+        // Next project for the recursive change log
+        $scope.nextProject = {
+            name: ''
+        };
+
+        // Navigating to the next project
+        $scope.goToNextProject = () => {
+            // TODO
+        };
+
+        // Selecting the next project
+        $scope.setNextProject = (name) => {
+            $scope.nextProject.name = name;
+        };
+
     })
     .directive('gitPlot', function (otPlot) {
         return {

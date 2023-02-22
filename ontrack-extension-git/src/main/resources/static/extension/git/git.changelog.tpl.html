@@ -104,8 +104,11 @@
                         <div class="panel-heading clearfix">
                             Commits
                             <div class="pull-right">
-                                <input type="text" class="form-control col-md-4 input-sm" ng-show="commits"/>
-                                <a class="btn btn-default btn-sm" title="Navigate to the change log of dependencies" ng-show="commits">
+                                <input type="text" ng-model="nextProject.name" class="form-control col-md-4 input-sm" ng-show="commits"/>
+                                <a class="btn btn-default btn-sm"
+                                   ng-disabled="!nextProject.name"
+                                   ng-click="goToNextProject()"
+                                   title="Navigate to the change log of dependencies" ng-show="commits">
                                     <span class="fa fa-arrow-right"></span>
                                 </a>
                                 <a class="btn btn-default btn-sm" ng-if="changeLog.hasIssues" ng-click="changeLogIssues()"
@@ -167,7 +170,9 @@
                                 <!-- Dependency links decoration -->
                                 <span class="ot-change-log-commit-dependencies"
                                       ng-if="gitUICommit.build && gitUICommit.build.using.pageItems && gitUICommit.build.using.pageItems.length > 0">
-                                    <span ng-repeat="dependency in gitUICommit.build.using.pageItems" class="ot-change-log-commit-dependency">
+                                    <span ng-repeat="dependency in gitUICommit.build.using.pageItems"
+                                          ng-click="setNextProject(dependency.branch.project.name)"
+                                          class="ot-action ot-change-log-commit-dependency">
                                         <span class="fa fa-link"></span>
                                         <span class="ot-change-log-commit-dependency-build-name">
                                             {{ dependency.name }}
