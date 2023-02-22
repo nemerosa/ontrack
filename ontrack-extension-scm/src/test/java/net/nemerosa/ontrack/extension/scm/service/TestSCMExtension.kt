@@ -12,6 +12,10 @@ class TestSCMExtension(
     extensionFeature: SCMExtensionFeature,
 ) : AbstractExtension(extensionFeature), SCMExtension {
 
+    companion object {
+        val instance = TestSCMExtension(SCMExtensionFeature())
+    }
+
     private val projects = mutableMapOf<String, TestSCMExtensionProject>()
 
     fun registerProjectForTestSCM(project: Project, init: TestSCMExtensionInitContext.() -> Unit) {
@@ -25,7 +29,7 @@ class TestSCMExtension(
             TestSCM(project, it)
         }
 
-    private inner class TestSCM(
+    inner class TestSCM(
         project: Project,
         private val config: TestSCMExtensionProject,
     ) : SCM {

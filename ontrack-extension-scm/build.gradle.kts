@@ -1,7 +1,6 @@
 import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
 
 plugins {
-    groovy
     `java-library`
 }
 
@@ -18,8 +17,8 @@ dependencies {
     implementation("io.micrometer:micrometer-core")
     implementation("com.opencsv:opencsv")
 
-    testImplementation("org.codehaus.groovy:groovy")
     testImplementation(project(":ontrack-it-utils"))
+    testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testRuntimeOnly(project(":ontrack-service"))
