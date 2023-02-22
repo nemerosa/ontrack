@@ -104,8 +104,7 @@
                         <div class="panel-heading clearfix">
                             Commits
                             <div class="pull-right">
-                                <!-- TODO Issues available? -->
-                                <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()"
+                                <a class="btn btn-default btn-xs" ng-if="changeLog.hasIssues" ng-click="changeLogIssues()"
                                    ng-disabled="issuesLoading">
                                     <ot-loading ng-if="issuesLoading"></ot-loading>
                                     <span class="ot-header-command-unloaded" ng-hide="issues || issuesLoading"></span>
