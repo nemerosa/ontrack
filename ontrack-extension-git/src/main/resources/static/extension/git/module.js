@@ -402,10 +402,6 @@ angular.module('ontrack.extension.git', [
                     }
                 };
 
-                $scope.addFileFilter = () => {
-                    // TODO
-                };
-
                 $scope.filterCanShare = (filter) => {
                     return filter && !filter.shared && $scope.canManage;
                 };
