@@ -542,6 +542,16 @@ angular.module('ontrack.extension.git', [
                 view.commands = [
                     ot.viewCloseCommand('/project/' + $scope.changeLog.buildFrom.branch.project.id)
                 ];
+
+                // Preloading according to the hash
+                const initialHash = $location.hash();
+                if (initialHash === "commits") {
+                    $scope.changeLogCommits();
+                } else if (initialHash === "issues") {
+                    $scope.changeLogIssues();
+                } else if (initialHash === "files") {
+                    $scope.changeLogFiles();
+                }
             });
         };
 
@@ -763,7 +773,7 @@ angular.module('ontrack.extension.git', [
                     $location.path("/extension/git/changelog").search({
                         from: depFrom,
                         to: depTo
-                    });
+                    }).hash("commits");
                 });
             }
         };
