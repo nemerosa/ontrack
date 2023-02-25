@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.graphql
 
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
@@ -15,6 +16,38 @@ class RecursiveChangeLogServiceImpl(
     private val structureService: StructureService,
 ) : RecursiveChangeLogService {
 
+    override fun getDependencyChangeLog(
+        buildFrom: Build,
+        buildTo: Build,
+        depName: String,
+    ): Pair<Build, Build>? {
+        // Makes sure the order of the builds is correct
+        // "From" must be the most recent build
+        val from: Build
+        val to: Build
+        if (buildFrom.signature.time < buildTo.signature.time) {
+            from = buildTo
+            to = buildFrom
+        } else {
+            from = buildFrom
+            to = buildTo
+        }
+        // Gets the build just before "to"
+        val previous = structureService.getPreviousBuild(to.id).getOrNull()
+        // If no previous build, we cannot compute a change log
+            ?: return null
+        // Gets the dependency builds
+        val depCheck = { build: Build -> build.project.name == depName }
+        val depFrom = structureService.getBuildsUsedBy(from, filter = depCheck).pageItems.firstOrNull()
+        val depTo = structureService.getBuildsUsedBy(previous, filter = depCheck).pageItems.firstOrNull()
+        // Only returning the consistent non-null boundaries
+        return if (depFrom != null && depTo != null) {
+            depFrom to depTo
+        } else {
+            null
+        }
+    }
+
     override fun getBuildByCommit(commitHash: String): Build? =
         propertyService.findByEntityTypeAndSearchArguments(
             entityType = ProjectEntityType.BUILD,
@@ -23,11 +56,4 @@ class RecursiveChangeLogServiceImpl(
         ).firstOrNull()?.let { id ->
             structureService.getBuild(id)
         }
-
-    override fun getDepBuildByCommit(commitHash: String, projectName: String): Build? =
-        getBuildByCommit(commitHash)?.let { build ->
-            structureService.getBuildsUsedBy(build) {
-                it.project.name == projectName
-            }
-        }?.pageItems?.firstOrNull()
 }

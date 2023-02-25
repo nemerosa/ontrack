@@ -17,6 +17,7 @@ import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.GQLTypeProject
 import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
@@ -178,20 +179,14 @@ class GQLTypeGitChangeLog(
                     .dataFetcher { env ->
                         val projectName: String = env.getArgument(DEP_CHANGE_LOG_PROJECT)
                         val baseChangeLog: GitChangeLog = env.getSource()
-                        val baseCommits = baseChangeLog.loadCommits {
-                            gitService.getChangeLogCommits(baseChangeLog)
-                        }.log.commits
-                        val dependencies = baseCommits.mapNotNull { baseCommit ->
-                            recursiveChangeLogService.getDepBuildByCommit(baseCommit.id, projectName)
-                        }
-                        // If no build, returning a null change log
-                        if (dependencies.isEmpty()) {
-                            null
-                        }
-                        // Getting the first & last build
-                        else {
-                            val depFirst = dependencies.first()
-                            val depLast = dependencies.last()
+                        val buildFrom: Build = baseChangeLog.scmBuildFrom.buildView.build
+                        val buildTo: Build = baseChangeLog.scmBuildTo.buildView.build
+                        // Dependency change log
+                        val depBoundaries = recursiveChangeLogService.getDependencyChangeLog(
+                            buildFrom, buildTo, projectName
+                        )
+                        if (depBoundaries != null) {
+                            val (depFirst, depLast) = depBoundaries
                             gitService.changeLog(
                                 BuildDiffRequest(
                                     depFirst.id,
@@ -200,6 +195,9 @@ class GQLTypeGitChangeLog(
                             ).apply {
                                 gitChangeLogCache.put(this)
                             }
+                        } else {
+                            // No change log
+                            null
                         }
                     }
             }
