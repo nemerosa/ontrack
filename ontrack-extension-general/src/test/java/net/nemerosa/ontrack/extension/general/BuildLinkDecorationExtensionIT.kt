@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class BuildLinkDecorationExtensionIT : AbstractGeneralExtensionTestSupport() {
+class BuildLinkDecorationExtensionIT : AbstractGeneralExtensionTestJUnit4Support() {
 
     @Autowired
     private lateinit var extension: BuildLinkDecorationExtension

@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import org.junit.Test
 import kotlin.test.assertFailsWith
 
-class PreviousPromotionConditionPropertyCheckIT : AbstractGeneralExtensionTestSupport() {
+class PreviousPromotionConditionPropertyCheckIT : AbstractGeneralExtensionTestJUnit4Support() {
 
     @Test
     fun `No promotion check`() {

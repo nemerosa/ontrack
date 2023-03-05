@@ -6,10 +6,7 @@ import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.security.PromotionRunCreate
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import net.nemerosa.ontrack.model.structure.PropertySearchArguments
-import net.nemerosa.ontrack.model.structure.SearchIndexService
+import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import java.util.*
 import java.util.function.Function
@@ -18,7 +15,8 @@ import java.util.function.Function
 class ReleasePropertyType(
         extensionFeature: GeneralExtensionFeature,
         private val searchIndexService: SearchIndexService,
-        private val releaseSearchExtension: ReleaseSearchExtension
+        private val releaseSearchExtension: ReleaseSearchExtension,
+        private val releasePropertyListeners: List<ReleasePropertyListener>,
 ) : AbstractPropertyType<ReleaseProperty>(extensionFeature) {
 
     override fun getName(): String = "Release"
@@ -37,6 +35,9 @@ class ReleasePropertyType(
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean = true
 
     override fun onPropertyChanged(entity: ProjectEntity, value: ReleaseProperty) {
+        releasePropertyListeners.forEach { listener ->
+            listener.onBuildReleaseLabel(entity as Build, value)
+        }
         searchIndexService.createSearchIndex(releaseSearchExtension, ReleaseSearchItem(entity, value))
     }
 

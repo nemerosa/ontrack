@@ -1,12 +1,13 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
 import net.nemerosa.ontrack.model.labels.MainBuildLinksService
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
 import org.springframework.beans.factory.annotation.Autowired
 
-abstract class AbstractGeneralExtensionTestSupport : AbstractDSLTestSupport() {
+@Deprecated("JUnit 4 is deprecated", replaceWith = ReplaceWith("AbstractGeneralExtensionTestSupport"))
+abstract class AbstractGeneralExtensionTestJUnit4Support : AbstractDSLTestJUnit4Support() {
 
 
     @Autowired

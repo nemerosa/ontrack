@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.model.structure.PromotionLevel
 import org.junit.Test
 import kotlin.test.assertFailsWith
 
-class PromotionRunDependenciesCheckExtensionIT : AbstractGeneralExtensionTestSupport() {
+class PromotionRunDependenciesCheckExtensionIT : AbstractGeneralExtensionTestJUnit4Support() {
 
     @Test
     fun `No promotion dependency check`() {
