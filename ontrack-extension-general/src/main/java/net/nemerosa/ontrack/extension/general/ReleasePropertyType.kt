@@ -13,10 +13,10 @@ import java.util.function.Function
 
 @Component
 class ReleasePropertyType(
-        extensionFeature: GeneralExtensionFeature,
-        private val searchIndexService: SearchIndexService,
-        private val releaseSearchExtension: ReleaseSearchExtension,
-        private val releasePropertyListeners: List<ReleasePropertyListener>,
+    extensionFeature: GeneralExtensionFeature,
+    private val searchIndexService: SearchIndexService,
+    private val releaseSearchExtension: ReleaseSearchExtension,
+    private val releasePropertyListeners: List<ReleasePropertyListener> = emptyList(),
 ) : AbstractPropertyType<ReleaseProperty>(extensionFeature) {
 
     override fun getName(): String = "Release"
