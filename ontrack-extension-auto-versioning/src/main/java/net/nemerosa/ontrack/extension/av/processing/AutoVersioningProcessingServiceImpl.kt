@@ -97,7 +97,7 @@ class AutoVersioningProcessingServiceImpl(
                         // Audit
                         autoVersioningAuditService.onProcessingUpdatingFile(order, upgradeBranch, targetPath)
                         // Uploads of the file content
-                        scm.uploadLines(upgradeBranch, commitId, targetPath, updatedLines)
+                        scm.uploadLines(upgradeBranch, commitId, targetPath, updatedLines, message = order.getCommitMessage())
                         // Post processing
                         if (!order.postProcessing.isNullOrBlank()) {
                             // Gets the post processor
@@ -145,17 +145,21 @@ class AutoVersioningProcessingServiceImpl(
                     logger.debug("Processing auto versioning order creating PR: {}", order)
                     // Audit
                     autoVersioningAuditService.onPRCreating(order, upgradeBranch)
+                    // Common message to all operations
+                    val message = order.getCommitMessage()
                     // PR creation
                     val pr = scm.createPR(
                         from = upgradeBranch,
                         to = scmBranch,
-                        title = "Upgrade of ${order.sourceProject} to version ${order.targetVersion}",
+                        title = message,
                         // Change log as description?
-                        description = "Upgrade of ${order.sourceProject} to version ${order.targetVersion}",
+                        description = message,
                         // Auto approval
                         autoApproval = order.autoApproval,
                         // Remote auto merge?
-                        remoteAutoMerge = (order.autoApprovalMode == AutoApprovalMode.SCM)
+                        remoteAutoMerge = (order.autoApprovalMode == AutoApprovalMode.SCM),
+                        // Commit message to use on merge
+                        message = message,
                     )
                     // If auto approval mode = CLIENT and PR is not merged, we had a timeout
                     logger.debug("Processing auto versioning order end of PR process: {}", order)

@@ -590,7 +590,7 @@ class DefaultOntrackGitHubClient(
         }?.`object`?.sha
     }
 
-    override fun setFileContent(repository: String, branch: String, sha: String, path: String, content: ByteArray) {
+    override fun setFileContent(repository: String, branch: String, sha: String, path: String, content: ByteArray, message: String) {
         // Getting a client
         val client = createGitHubRestTemplate()
         // Gets the repository for this project
@@ -600,7 +600,7 @@ class DefaultOntrackGitHubClient(
             put(
                 "/repos/$owner/$name/contents/$path",
                 mapOf(
-                    "message" to "Creating $path",
+                    "message" to message,
                     "content" to Base64.encodeBase64String(content),
                     "sha" to sha,
                     "branch" to branch
@@ -652,7 +652,7 @@ class DefaultOntrackGitHubClient(
         }
     }
 
-    override fun enableAutoMerge(repository: String, pr: Int) {
+    override fun enableAutoMerge(repository: String, pr: Int, message: String) {
         // Getting a client
         val client = createGitHubRestTemplate()
         // Gets the repository for this project
@@ -681,7 +681,7 @@ class DefaultOntrackGitHubClient(
             """,
             mapOf(
                 "prNodeId" to nodeId,
-                "commitHeadline" to "Automated merged from Ontrack for auto versioning on promotion"
+                "commitHeadline" to message,
             )
         ) { data ->
             val prNumber = data.path("enablePullRequestAutoMerge").path("pullRequest").path("number")
@@ -719,7 +719,7 @@ class DefaultOntrackGitHubClient(
             put(
                 "/repos/$owner/$name/pulls/$pr/merge",
                 mapOf(
-                    "commit_title" to "Automated merged from Ontrack for auto versioning on promotion"
+                    "commit_title" to message,
                 )
             )
         }

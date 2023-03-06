@@ -75,12 +75,12 @@ class GitHubSCMExtension(
         override fun download(scmBranch: String, path: String, retryOnNotFound: Boolean): ByteArray? =
             client.getFileContent(property.repository, scmBranch, path, retryOnNotFound)
 
-        override fun upload(scmBranch: String, commit: String, path: String, content: ByteArray) {
+        override fun upload(scmBranch: String, commit: String, path: String, content: ByteArray, message: String) {
             // First, we need the SHA of the file
             val sha = client.getFile(property.repository, scmBranch, path, retryOnNotFound = true)
                 ?.sha
                 ?: error("Cannot find file at $path for branch $scmBranch")
-            client.setFileContent(property.repository, scmBranch, sha, path, content)
+            client.setFileContent(property.repository, scmBranch, sha, path, content, message)
         }
 
         /**
@@ -93,6 +93,7 @@ class GitHubSCMExtension(
             description: String,
             autoApproval: Boolean,
             remoteAutoMerge: Boolean,
+            message: String,
         ): SCMPullRequest {
             // Creates the pull request
             val pr = client.createPR(
@@ -116,9 +117,9 @@ class GitHubSCMExtension(
                 )
                 // Auto merge
                 if (remoteAutoMerge) {
-                    client.enableAutoMerge(property.repository, pr.number)
+                    client.enableAutoMerge(property.repository, pr.number, message)
                 } else {
-                    merged = waitAndMerge(prId)
+                    merged = waitAndMerge(prId, message)
                 }
             }
             // PR
@@ -130,7 +131,7 @@ class GitHubSCMExtension(
             )
         }
 
-        private fun waitAndMerge(prId: Int): Boolean {
+        private fun waitAndMerge(prId: Int, message: String): Boolean {
             // Waits for the PR checks to be OK
             // See https://docs.github.com/en/free-pro-team@latest/rest/guides/getting-started-with-the-git-database-api#checking-mergeability-of-pull-requests
             // for a reference
@@ -151,7 +152,7 @@ class GitHubSCMExtension(
             client.mergePR(
                 property.repository,
                 prId,
-                "Automated merged from Ontrack for auto versioning on promotion"
+                message
             )
             // Merged
             return true

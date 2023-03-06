@@ -21,4 +21,10 @@ data class AutoVersioningOrder(
     val postProcessingConfig: JsonNode?,
     val validationStamp: String?,
     val autoApprovalMode: AutoApprovalMode,
-) : AutoVersioningTargetConfig
+) : AutoVersioningTargetConfig {
+    /**
+     * Gets a meaningful commit message for this order
+     */
+    fun getCommitMessage() =
+        "[auto-versioning] Upgrade of $sourceProject to version $targetVersion"
+}

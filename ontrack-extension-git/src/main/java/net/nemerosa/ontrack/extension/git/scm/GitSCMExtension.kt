@@ -65,7 +65,7 @@ class GitSCMExtension(
             unsupported("download")
         }
 
-        override fun upload(scmBranch: String, commit: String, path: String, content: ByteArray) {
+        override fun upload(scmBranch: String, commit: String, path: String, content: ByteArray, message: String) {
             unsupported("upload")
         }
 
@@ -76,6 +76,7 @@ class GitSCMExtension(
             description: String,
             autoApproval: Boolean,
             remoteAutoMerge: Boolean,
+            message: String,
         ): SCMPullRequest {
             unsupported("createPR")
         }

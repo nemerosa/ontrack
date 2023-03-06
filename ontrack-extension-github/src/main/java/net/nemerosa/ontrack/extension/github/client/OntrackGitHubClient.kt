@@ -159,8 +159,9 @@ interface OntrackGitHubClient {
      * @param sha Sha of the initial file
      * @param path Path to get the file at
      * @param content Content of the file as binary
+     * @param message Commit message
      */
-    fun setFileContent(repository: String, branch: String, sha: String, path: String, content: ByteArray)
+    fun setFileContent(repository: String, branch: String, sha: String, path: String, content: ByteArray, message: String)
 
     /**
      * Creates a pull request
@@ -189,8 +190,9 @@ interface OntrackGitHubClient {
      *
      * @param repository Repository name, like `nemerosa/ontrack`
      * @param pr PR number
+     * @param message Message to use for the actual merge commit
      */
-    fun enableAutoMerge(repository: String, pr: Int)
+    fun enableAutoMerge(repository: String, pr: Int, message: String)
 
     /**
      * Checks if a pull request is mergeable
