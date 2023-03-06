@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 class DefaultCascEntityService(
     private val securityService: SecurityService,
     private val projectContext: CascEntityProjectContext,
+    private val branchContext: CascEntityBranchContext,
 ) : CascEntityService {
 
     override fun apply(entity: ProjectEntity, node: JsonNode) {
@@ -20,6 +21,7 @@ class DefaultCascEntityService(
         // Gets the root context for this entity type
         val rootContext = when (entity.projectEntityType) {
             ProjectEntityType.PROJECT -> projectContext
+            ProjectEntityType.BRANCH -> branchContext
             else -> error("Casc for ${entity.projectEntityType} is not supported.")
         }
         // Applies the configuration

@@ -152,7 +152,19 @@ object GraphQLBeanConverter {
             .fields(asInputFields(type, dictionary))
             .build()
 
-    fun asObjectType(type: KClass<*>, cache: GQLTypeCache): GraphQLObjectType =
+    fun asObjectType(
+        type: KClass<*>,
+        cache: GQLTypeCache,
+        code: GraphQLObjectType.Builder.() -> Unit = {},
+    ): GraphQLObjectType =
+        asObjectTypeBuilder(type, cache)
+            .apply { code() }
+            .build()
+
+    fun asObjectType(
+        type: KClass<*>,
+        cache: GQLTypeCache,
+    ): GraphQLObjectType =
         asObjectTypeBuilder(type, cache).build()
 
     fun asObjectTypeBuilder(type: KClass<*>, cache: GQLTypeCache): GraphQLObjectType.Builder =

@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component
  */
 @Component
 class OntrackGitCommitInfoGQLType(
-        private val gitUICommitGQLType: GitUICommitGQLType,
-        private val branchInfosGQLType: BranchInfosGQLType
+    private val gitUICommitGQLType: GQLTypeGitUICommit,
+    private val branchInfosGQLType: BranchInfosGQLType
 ) : GQLType {
     override fun getTypeName(): String =
             OntrackGitCommitInfo::class.java.simpleName

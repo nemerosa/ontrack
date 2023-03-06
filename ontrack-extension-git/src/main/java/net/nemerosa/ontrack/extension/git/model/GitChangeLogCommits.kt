@@ -5,10 +5,11 @@ import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogCommits
 
 // TODO #532 Workaround
 open class GitChangeLogCommits(
-        val log: GitUILog
+    val log: GitUILog
 ) : SCMChangeLogCommits {
 
     override fun getCommits(): List<SCMChangeLogCommit> {
         return log.commits
     }
+
 }

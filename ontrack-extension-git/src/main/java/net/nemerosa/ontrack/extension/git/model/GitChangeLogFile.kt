@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.model
 
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFile
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.apache.commons.lang3.StringUtils
 
 class GitChangeLogFile(
@@ -11,6 +12,7 @@ class GitChangeLogFile(
         val url: String
 ) : SCMChangeLogFile {
 
+    @APIDescription("Old path if set, new path otherwiser")
     override val path: String
         get() = if (StringUtils.isNotBlank(oldPath)) oldPath else newPath
 

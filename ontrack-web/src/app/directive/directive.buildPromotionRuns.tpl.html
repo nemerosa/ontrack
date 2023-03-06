@@ -5,9 +5,13 @@
                 {{promotionRun.promotionLevel.name}}
             </ot-entity-image>
         </span>
-        <span class="ot-promotion-run-signature">
+        <span class="ot-promotion-run-signature" ng-if="promotionRun.signature">
             {{promotionRun.signature.time | date:'mediumDate'}}
             {{promotionRun.signature.time | date:'shortTime'}}
+        </span>
+        <span class="ot-promotion-run-signature" ng-if="promotionRun.creation">
+            {{promotionRun.creation.time | date:'mediumDate'}}
+            {{promotionRun.creation.time | date:'shortTime'}}
         </span>
     </span>
     <span ng-if="!$last" class="ot-promotion-run-separator"></span>

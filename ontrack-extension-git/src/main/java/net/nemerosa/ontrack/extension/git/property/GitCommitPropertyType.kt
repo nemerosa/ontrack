@@ -21,8 +21,8 @@ import java.util.function.Function
 
 @Component
 class GitCommitPropertyType(
-        extensionFeature: GitExtensionFeature,
-        private val gitService: GitService
+    extensionFeature: GitExtensionFeature,
+    private val gitService: GitService
 ) : AbstractPropertyType<GitCommitProperty>(extensionFeature) {
 
     override fun getName(): String {
@@ -47,11 +47,11 @@ class GitCommitPropertyType(
 
     override fun getEditionForm(entity: ProjectEntity, value: GitCommitProperty?): Form {
         return Form.create()
-                .with(
-                        Text.of("commit")
-                                .label("Git commit")
-                                .value(value?.commit ?: "HEAD")
-                )
+            .with(
+                Text.of("commit")
+                    .label("Git commit")
+                    .value(value?.commit ?: "HEAD")
+            )
     }
 
     override fun fromClient(node: JsonNode): GitCommitProperty {
@@ -60,11 +60,14 @@ class GitCommitPropertyType(
 
     override fun fromStorage(node: JsonNode): GitCommitProperty {
         return GitCommitProperty(
-                JsonUtils.get(node, "commit")
+            JsonUtils.get(node, "commit")
         )
     }
 
-    override fun replaceValue(value: GitCommitProperty, replacementFunction: Function<String, String>): GitCommitProperty {
+    override fun replaceValue(
+        value: GitCommitProperty,
+        replacementFunction: Function<String, String>
+    ): GitCommitProperty {
         // A commit is immutable...
         return value
     }
@@ -81,15 +84,19 @@ class GitCommitPropertyType(
     /**
      * Search criteria
      */
-    override fun getSearchArguments(token: String): PropertySearchArguments? {
-        return if (token.isNotBlank()) {
-            PropertySearchArguments(
-                jsonContext = null,
-                jsonCriteria = "pp.json->>'commit' = :token",
-                criteriaParams = mapOf("token" to token)
-            )
-        } else {
-            null
-        }
+    override fun getSearchArguments(token: String): PropertySearchArguments? =
+        getGitCommitSearchArguments(token)
+
+    companion object {
+        fun getGitCommitSearchArguments(token: String): PropertySearchArguments? =
+            if (token.isNotBlank()) {
+                PropertySearchArguments(
+                    jsonContext = null,
+                    jsonCriteria = "pp.json->>'commit' = :token",
+                    criteriaParams = mapOf("token" to token)
+                )
+            } else {
+                null
+            }
     }
 }

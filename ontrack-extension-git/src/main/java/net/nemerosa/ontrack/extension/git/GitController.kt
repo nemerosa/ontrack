@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git
 
-import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.api.model.FileDiffChangeLogRequest
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
@@ -9,7 +8,6 @@ import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat
-import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogUUIDException
 import net.nemerosa.ontrack.extension.scm.model.SCMDocumentNotFoundException
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController
 import net.nemerosa.ontrack.model.Ack
@@ -26,17 +24,11 @@ import net.nemerosa.ontrack.model.support.ConnectionResult
 import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.Resource
 import net.nemerosa.ontrack.ui.resource.Resources
-import org.springframework.cache.Cache
-import org.springframework.cache.CacheManager
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
-
-const val CACHE_GIT_CHANGE_LOG = "gitChangeLog"
-
-class GitChangeLogCacheNotAvailableException: BaseException("Cache for Git change log is not available")
 
 @RestController
 @RequestMapping("extension/git")
@@ -47,12 +39,8 @@ class GitController(
         private val configurationService: GitConfigurationService,
         private val issueServiceRegistry: IssueServiceRegistry,
         private val securityService: SecurityService,
-        cacheManager: CacheManager
+        private val gitChangeLogCache: GitChangeLogCache,
 ) : AbstractExtensionController<GitExtensionFeature>(feature) {
-
-    private val logCache: Cache by lazy {
-        cacheManager.getCache(CACHE_GIT_CHANGE_LOG) ?: throw GitChangeLogCacheNotAvailableException()
-    }
 
     /**
      * Gets the configurations
@@ -160,7 +148,7 @@ class GitController(
     fun changeLog(request: BuildDiffRequest): BuildDiff {
         val changeLog = gitService.changeLog(request)
         // Stores in cache
-        logCache.put(changeLog.uuid, changeLog)
+        gitChangeLogCache.put(changeLog)
         // OK
         return changeLog
     }
@@ -170,25 +158,11 @@ class GitController(
      */
     @GetMapping("changelog/export/{projectId}/formats")
     fun changeLogExportFormats(@PathVariable projectId: ID): Resources<ExportFormat> {
-        // Gets the project
         val project = structureService.getProject(projectId)
-        // Gets the configuration for the project
-        val projectConfiguration = gitService.getProjectConfiguration(project)
-        if (projectConfiguration != null) {
-            val configuredIssueService = projectConfiguration.configuredIssueService
-            if (configuredIssueService != null) {
-                return Resources.of(
-                        configuredIssueService.issueServiceExtension.exportFormats(
-                                configuredIssueService.issueServiceConfiguration
-                        ),
-                        uri(on(GitController::class.java).changeLogExportFormats(projectId))
-                )
-            }
-        }
-        // Not found
+        val formats = gitService.getIssueExportFormats(project)
         return Resources.of(
-                emptyList(),
-                uri(on(GitController::class.java).changeLogExportFormats(projectId))
+            formats,
+            uri(on(GitController::class.java).changeLogExportFormats(projectId))
         )
     }
 
@@ -206,12 +180,10 @@ class GitController(
                 ?: throw GitProjectNotConfiguredException(project.id)
         // Gets the issue service
         val configuredIssueService = gitConfiguration.configuredIssueService
-        if (configuredIssueService == null) {
-            return ResponseEntity(
+            ?: return ResponseEntity(
                     "The branch is not configured for issues",
                     HttpStatus.NO_CONTENT
             )
-        }
         // Gets the issue change log
         val changeLogIssues = gitService.getChangeLogIssues(changeLog)
         // List of issues
@@ -230,9 +202,7 @@ class GitController(
         return ResponseEntity(exportedChangeLogIssues.content, responseHeaders, HttpStatus.OK)
     }
 
-    private fun getChangeLog(uuid: String): GitChangeLog {
-        return logCache.get(uuid)?.get() as? GitChangeLog? ?: throw SCMChangeLogUUIDException(uuid)
-    }
+    private fun getChangeLog(uuid: String): GitChangeLog = gitChangeLogCache.getRequired(uuid)
 
     /**
      * File diff change log
@@ -259,7 +229,9 @@ class GitController(
      * Change log commits
      */
     @GetMapping("changelog/{uuid}/commits")
-    fun changeLogCommits(@PathVariable uuid: String): GitChangeLogCommits {
+    fun changeLogCommits(
+        @PathVariable uuid: String
+    ): GitChangeLogCommits {
         // Gets the change log
         val changeLog = getChangeLog(uuid)
         // Cached?
@@ -268,9 +240,11 @@ class GitController(
             return commits
         }
         // Loads the commits
-        val loadedCommits = changeLog.loadCommits(gitService::getChangeLogCommits)
+        val loadedCommits = changeLog.loadCommits {
+            gitService.getChangeLogCommits(it)
+        }
         // Stores in cache
-        logCache.put(uuid, changeLog)
+        gitChangeLogCache.put(changeLog)
         // OK
         return loadedCommits
     }
@@ -290,7 +264,7 @@ class GitController(
         // Loads the issues
         issues = gitService.getChangeLogIssues(changeLog)
         // Stores in cache
-        logCache.put(uuid, changeLog.withIssues(issues))
+        gitChangeLogCache.put(changeLog.withIssues(issues))
         // OK
         return issues
     }
@@ -321,7 +295,7 @@ class GitController(
         // Loads the files
         files = gitService.getChangeLogFiles(changeLog)
         // Stores in cache
-        logCache.put(uuid, changeLog.withFiles(files))
+        gitChangeLogCache.put(changeLog.withFiles(files))
         // OK
         return files
     }

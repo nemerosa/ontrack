@@ -1,0 +1,42 @@
+@import 'main';
+
+.ot-change-log-commit-decoration {
+  a {
+    text-decoration: none;
+    color: black;
+  }
+  img {
+    .ot-icon-mini;
+  }
+}
+
+.ot-change-log-commit-decoration-bordered {
+  border: solid gray 1px !important;
+  border-radius: 0.5em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+.ot-change-log-commit-build {
+  margin-left: 0.5em;
+  .ot-change-log-commit-decoration;
+  .ot-change-log-commit-decoration-bordered;
+}
+
+.ot-change-log-commit-promotions {
+  margin-left: 0.5em;
+  .ot-change-log-commit-promotion {
+    .ot-change-log-commit-decoration;
+  }
+}
+
+.ot-change-log-commit-dependencies {
+  margin-left: 0.5em;
+  .ot-change-log-commit-dependency {
+    .ot-change-log-commit-decoration;
+    .ot-change-log-commit-decoration-bordered;
+    .ot-change-log-commit-dependency-build-name {
+      white-space: nowrap;
+    }
+  }
+}

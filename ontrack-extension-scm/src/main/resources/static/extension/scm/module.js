@@ -1,4 +1,5 @@
 angular.module('ontrack.extension.scm', [
+    'ot.service.graphql',
     'ot.service.form'
 ])
     .directive('otScmChangelogBuild', function () {
@@ -125,11 +126,16 @@ angular.module('ontrack.extension.scm', [
         };
     })
     .service('otScmChangelogFilechangefilterService', function ($q, $http, $modal, $interpolate,
-                                                                ot, otFormService) {
-        var self = {};
+                                                                ot, otGraphqlService, otFormService) {
+        const self = {};
 
+        // Deprecated, used only for legacy HTTP calls
         function loadStore(project) {
-            var json = localStorage.getItem("fileChangeFilters_" + project.id);
+            return loadStoreByProjectId(project.id);
+        }
+
+        function loadStoreByProjectId(projectId) {
+            const json = localStorage.getItem("fileChangeFilters_" + projectId);
             if (json) {
                 return JSON.parse(json);
             } else {
@@ -137,8 +143,13 @@ angular.module('ontrack.extension.scm', [
             }
         }
 
+        // Deprecated, used only for legacy HTTP calls
         function saveStore(project, store) {
-            localStorage.setItem("fileChangeFilters_" + project.id, JSON.stringify(store));
+            saveStoreByProjectId(project.id, store);
+        }
+
+        function saveStoreByProjectId(projectId, store) {
+            localStorage.setItem("fileChangeFilters_" + projectId, JSON.stringify(store));
         }
 
         function patternMatch(pattern, path) {
@@ -167,6 +178,54 @@ angular.module('ontrack.extension.scm', [
             return changeLogFileFilterConfig;
         };
 
+        self.loadFiltersWithGraphQL = (projectId) => {
+            const d = $q.defer();
+            // Loading the shared filters
+            const query = `
+                query LoadSCMChangeLogFilters($projectId: Int!) {
+                    projects(id: $projectId) {
+                        scmFileChangeFilters {
+                            canManage
+                            filters {
+                                name
+                                patterns
+                            }
+                        }
+                    }
+                }
+            `;
+            otGraphqlService.pageGraphQLCall(query, {projectId}).then(data => {
+                // User rights
+                const canManage = data.projects[0].scmFileChangeFilters.canManage;
+                // Remote filters
+                const remoteFilters = data.projects[0].scmFileChangeFilters.filters;
+                // Loads the local filters
+                const localStore = loadStoreByProjectId(projectId);
+                // Expansion into objects
+                const index = {};
+                angular.forEach(localStore, (patterns, name) => {
+                    index[name] = {
+                        name: name,
+                        patterns: patterns
+                    };
+                });
+                // Remote filters
+                angular.forEach(remoteFilters, filter => {
+                    index[filter.name] = filter;
+                    filter.shared = true;
+                });
+                // Flattening
+                const filters = [];
+                angular.forEach(index, filter => {
+                    filters.push(filter);
+                });
+                // OK
+                d.resolve({canManage, filters});
+            });
+            return d.promise;
+        };
+
+        // Deprecated, use the GraphQL method
         self.loadFilters = function (changeLog) {
             var d = $q.defer();
             // Loading shared filters
@@ -200,13 +259,36 @@ angular.module('ontrack.extension.scm', [
             return d.promise;
         };
 
+        // Deprecated, use shareFileFilterByProjectId
         self.shareFileFilter = function (changeLog, filter) {
-            ot.pageCall($http.post(self.remoteFilters._create, {
-                name: filter.name,
+            self.shareFileFilterByProjectId(changeLog.project.id, filter);
+        };
+
+        self.shareFileFilterByProjectId = function (projectId, filter) {
+            const query = `
+                mutation ShareFileFilter(
+                    $projectId: Int!,
+                    $filterName: String!,
+                    $patterns: [String!]!,
+                ) {
+                    shareSCMFileChangeFilter(input: {
+                        projectId: $projectId,
+                        name: $filterName,
+                        patterns: $patterns,
+                    }) {
+                        errors {
+                            message
+                        }
+                    } 
+                }
+            `;
+            return otGraphqlService.pageGraphQLCall(query, {
+                projectId,
+                filterName: filter.name,
                 patterns: filter.patterns
-            })).then(function (sharedFilter) {
-                angular.copy(sharedFilter, filter);
+            }).then(data => {
                 filter.shared = true;
+                return data;
             });
         };
 
@@ -242,6 +324,15 @@ angular.module('ontrack.extension.scm', [
             });
         };
 
+        self.itemFilterFunction = (patterns, itemFn) => function (item) {
+            const path = itemFn(item);
+            if (patterns) {
+                return patterns.some(pattern => patternMatch(pattern, path));
+            } else {
+                return true;
+            }
+        };
+
         self.filterFunction = function (patterns) {
             return function (path) {
                 if (patterns) {
@@ -254,9 +345,14 @@ angular.module('ontrack.extension.scm', [
             };
         };
 
+        // Deprecated, used only for legacy HTTP calls
         self.addFilter = function (changeLog, patterns) {
+            return self.addFilterByProjectId(changeLog.project.id, patterns);
+        };
+
+        self.addFilterByProjectId = function (projectId, patterns) {
             // Form configuration
-            var form = {
+            const form = {
                 fields: [{
                     name: 'name',
                     type: 'text',
@@ -279,18 +375,18 @@ angular.module('ontrack.extension.scm', [
                 title: "Create file change filter",
                 submit: function (data) {
                     // Loads the store
-                    var store = loadStore(changeLog.project);
+                    const store = loadStoreByProjectId(projectId);
                     // Controlling the name
                     if (store[data.name]) {
                         return "Filter with name " + data.name + " already exists.";
                     }
                     // Parsing the patterns
-                    var patterns = data.patterns.split('\n').map(function (it) {
+                    const patterns = data.patterns.split('\n').map(function (it) {
                         return it.trim();
                     });
                     // Saves the filter
                     store[data.name] = patterns;
-                    saveStore(changeLog.project, store);
+                    saveStoreByProjectId(projectId, store);
                     // Returns the filter
                     return {
                         name: data.name,
@@ -300,9 +396,14 @@ angular.module('ontrack.extension.scm', [
             });
         };
 
+        // Deprecated, used only for legacy HTTP calls
         self.editFilter = function (changeLog, filter) {
+            return self.editFilterByProjectId(changeLog.project.id, filter);
+        };
+
+        self.editFilterByProjectId = function (projectId, filter) {
             // Form configuration
-            var form = {
+            const form = {
                 fields: [{
                     name: 'name',
                     type: 'text',
@@ -325,22 +426,20 @@ angular.module('ontrack.extension.scm', [
             return otFormService.display({
                 form: form,
                 title: "Edit file change filter",
-                submit: function (data) {
+                submit: data => {
                     // Parsing the patterns
-                    var patterns = data.patterns.split('\n').map(function (it) {
-                        return it.trim();
-                    });
+                    const patterns = data.patterns.split('\n').map(it => it.trim());
                     // Saves the filter
-                    var store = loadStore(changeLog.project);
+                    const store = loadStoreByProjectId(projectId);
                     store[filter.name] = patterns;
-                    saveStore(changeLog.project, store);
-                    var raw = {
+                    saveStoreByProjectId(projectId, store);
+                    const raw = {
                         name: filter.name,
                         patterns: patterns
                     };
                     // Remote change
-                    if (filter._update) {
-                        ot.call($http.put(filter._update, raw));
+                    if (filter.shared) {
+                        self.shareFileFilterByProjectId(projectId, filter);
                     }
                     // Returns the filter
                     return raw;
@@ -348,20 +447,44 @@ angular.module('ontrack.extension.scm', [
             });
         };
 
+        // Deprecated, used only for legacy HTTP calls
         self.deleteFilter = function (changeLog, filter) {
+            return self.deleteFilterByProjectId(changeLog.project.id, filter);
+        };
+
+        self.deleteFilterByProjectId = (projectId, filter) => {
             // Local changes
-            var store = loadStore(changeLog.project);
+            const store = loadStoreByProjectId(projectId);
             delete store[filter.name];
-            saveStore(changeLog.project, store);
+            saveStoreByProjectId(projectId, store);
             // Remote changes
-            if (filter._delete) {
-                ot.call($http.delete(filter._delete));
+            if (filter.shared) {
+                // Deletes the remote filter
+                const query = `
+                    mutation UnshareFileFilter(
+                        $projectId: Int!,
+                        $filterName: String!,
+                    ) {
+                        unshareSCMFileChangeFilter(input: {
+                            projectId: $projectId,
+                            name: $filterName,
+                        }) {
+                            errors {
+                                message
+                            }
+                        } 
+                    }
+                `;
+                otGraphqlService.pageGraphQLCall(query, {
+                    projectId,
+                    filterName: filter.name
+                });
             }
         };
 
         return self;
     })
-    .service('otScmChangeLogService', function ($http, $modal, $interpolate, ot) {
+    .service('otScmChangeLogService', function ($http, $modal, $interpolate, ot, otGraphqlService) {
         var self = {};
 
         function storeExportRequest(projectId, exportRequest) {
@@ -371,8 +494,8 @@ angular.module('ontrack.extension.scm', [
             );
         }
 
-        function loadExportRequest(projectId) {
-            var json = localStorage.getItem('issueExportConfig_' + projectId);
+        const loadLocalExportRequest = projectId => {
+            const json = localStorage.getItem('issueExportConfig_' + projectId);
             if (json) {
                 return JSON.parse(json);
             } else {
@@ -380,21 +503,27 @@ angular.module('ontrack.extension.scm', [
                     grouping: []
                 };
             }
-        }
+        };
 
-        self.displayChangeLogExport = function (config) {
-
-            var projectId = config.changeLog.project.id;
-
+        self.displayChangeLogExportGraphQL = ({projectId, buildFromId, buildToId}) => {
             $modal.open({
                 templateUrl: 'extension/scm/scmChangeLogExport.tpl.html',
                 controller: function ($scope, $modalInstance) {
-                    $scope.config = config;
                     // Export request
-                    $scope.exportRequest = loadExportRequest(projectId);
+                    $scope.exportRequest = loadLocalExportRequest(projectId);
                     // Loading the export formats
-                    ot.call($http.get(config.exportFormatsLink)).then(function (exportFormatsResources) {
-                        $scope.exportFormats = exportFormatsResources.resources;
+                    otGraphqlService.pageGraphQLCall(`
+                        query LoadProjectExportFormats($projectId: Int!) {
+                            projects(id: $projectId) {
+                                gitIssueExportFormats {
+                                    id
+                                    name
+                                    type
+                                }
+                            }
+                        }
+                    `, {projectId: projectId}).then(data => {
+                        $scope.exportFormats = data.projects[0].gitIssueExportFormats;
                     });
 
                     // Closing the dialog
@@ -412,7 +541,7 @@ angular.module('ontrack.extension.scm', [
                     };
                     // Removing a group
                     $scope.removeGroup = function (groups, group) {
-                        var idx = groups.indexOf(group);
+                        const idx = groups.indexOf(group);
                         if (idx >= 0) {
                             groups.splice(idx, 1);
                         }
@@ -422,13 +551,13 @@ angular.module('ontrack.extension.scm', [
                     $scope.doExport = function () {
 
                         // Request
-                        var request = {
-                            from: config.changeLog.scmBuildFrom.buildView.build.id,
-                            to: config.changeLog.scmBuildTo.buildView.build.id
+                        const request = {
+                            from: buildFromId,
+                            to: buildToId
                         };
 
                         // Permalink
-                        var url = config.exportIssuesLink;
+                        let url = "/extension/git/changelog/export";
                         url += $interpolate('?from={{from}}&to={{to}}')(request);
 
                         // Format
@@ -439,12 +568,12 @@ angular.module('ontrack.extension.scm', [
 
                         // Grouping
                         if ($scope.exportRequest.grouping.length > 0) {
-                            var grouping = '';
-                            for (var i = 0; i < $scope.exportRequest.grouping.length; i++) {
+                            let grouping = '';
+                            for (let i = 0; i < $scope.exportRequest.grouping.length; i++) {
                                 if (i > 0) {
                                     grouping += '|';
                                 }
-                                var groupSpec = $scope.exportRequest.grouping[i];
+                                const groupSpec = $scope.exportRequest.grouping[i];
                                 grouping += groupSpec.name + '=' + groupSpec.types;
                             }
                             grouping = encodeURIComponent(grouping);

@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.general
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class MainBuildLinksServiceForProjectIT : AbstractGeneralExtensionTestSupport() {
+class MainBuildLinksServiceForProjectIT : AbstractGeneralExtensionTestJUnit4Support() {
 
     @Test
     fun `Only project settings`() {

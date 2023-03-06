@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
+import net.nemerosa.ontrack.extension.general.ReleaseValidationPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
@@ -139,6 +140,49 @@ internal class IngestionPushPayloadListenerIT : AbstractIngestionTestSupport() {
                     "Build link display property has been set on the project"
                 ) { property ->
                     assertEquals(true, property.useLabel)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Configuration of the release validation property on a branch by the ingestion configuration file`() {
+        asAdmin {
+            onlyOneGitHubConfig()
+            val repository = uid("repo_")
+            ConfigLoaderServiceITMockConfig.customIngestionConfig(
+                configLoaderService, IngestionConfig(
+                    setup = IngestionConfigSetup(
+                        branch = IngestionConfigCascSetup(
+                            casc = mapOf(
+                                "properties" to mapOf(
+                                    "releaseValidationProperty" to mapOf(
+                                        "validation" to "labelled"
+                                    )
+                                )
+                            ).asJson()
+                        )
+                    )
+                )
+            )
+            ingestionPushPayloadListener.process(
+                payload = IngestionHookFixtures.samplePushPayload(
+                    repoName = repository,
+                    ref = "refs/heads/main",
+                    added = listOf(".github/ontrack/ingestion.yml"),
+                ),
+                configuration = null
+            )
+            assertNotNull(
+                structureService.findBranchByName(repository, "main").getOrNull(),
+                "Branch has been created"
+            ) { branch ->
+                // Gets its release validation display property
+                assertNotNull(
+                    getProperty(branch, ReleaseValidationPropertyType::class.java),
+                    "Release validation property has been set on the branch"
+                ) { property ->
+                    assertEquals("labelled", property.validation)
                 }
             }
         }

@@ -29,6 +29,13 @@ fun TypeBuilder.stringField(name: String, description: String): GraphQLObjectTyp
         it.name(name).description(description).type(GraphQLString)
     }
 
+fun TypeBuilder.stringListField(property: KProperty<List<String>>, description: String? = null): GraphQLObjectType.Builder =
+    field {
+        it.name(getPropertyName(property))
+            .description(description ?: getPropertyDescription(property))
+            .type(listType(GraphQLString))
+    }
+
 fun TypeBuilder.idField(property: KProperty<ID>, description: String? = null): GraphQLObjectType.Builder =
     field {
         it.name(net.nemerosa.ontrack.model.annotations.getPropertyName(property))

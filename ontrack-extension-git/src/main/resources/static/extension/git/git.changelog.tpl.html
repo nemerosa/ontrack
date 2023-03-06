@@ -17,7 +17,7 @@
                         <span class="ot-header-command-unloaded" ng-hide="commits || commitsLoading"></span>
                         {{commitsCommand}}
                     </button>
-                    <button ng-if="changeLog._issues" class="btn btn-default" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
+                    <button ng-if="changeLog.hasIssues" class="btn btn-default" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
                         <ot-loading ng-if="issuesLoading"></ot-loading>
                         <span class="ot-header-command-unloaded" ng-hide="issues || issuesLoading"></span>
                         {{issuesCommand}}
@@ -35,79 +35,89 @@
 
             <!-- Build info -->
 
-            <div class="row">
-                <div class="col-md-6">
-                    <a name="buildFrom"></a>
-                    <ot-scm-changelog-build scm-build-view="changeLog.scmBuildFrom">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h3>
-                                    <small>Build info</small>
-                                </h3>
-                                <ul class="fa-ul">
-                                    <li>
-                                        <span class="fa fa-li fa-clock-o"></span>
-                                        {{changeLog.scmBuildFrom.buildView.build.signature.time | date:'mediumDate' }}
-                                        {{changeLog.scmBuildFrom.buildView.build.signature.time | date:'shortTime' }}
-                                    </li>
-                                    <li>
-                                        <span class="fa fa-li fa-user"></span>
-                                        {{changeLog.scmBuildFrom.buildView.build.signature.user.name}}
-                                    </li>
-                                    <li ng-if="changeLog.scmBuildFrom.buildView.build.description">
-                                        <span class="fa fa-li fa-file-text-o"></span>
-                                        {{changeLog.scmBuildFrom.buildView.build.description}}
-                                    </li>
-                                </ul>
+            <div class="row" ng-if="changeLog">
+                <div class="col-md-6" ng-repeat="build in [changeLog.buildFrom, changeLog.buildTo]">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Build
+                            <a href="{{ build.branch.links._page }}">{{build.branch.name}}</a>
+                            /
+                            <a href="{{ build.links._page }}">{{build.name}}</a>
+                            <ot-entity-embedded-decorations decorations="build.decorations"></ot-entity-embedded-decorations>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3><small>Promotions</small></h3>
+                                    <ot-build-promotion-runs promotion-runs="build.promotionRuns"></ot-build-promotion-runs>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3><small>Validation runs</small></h3>
+                                    <span ng-repeat="validation in build.validations"
+                                          class="ot-view-validation-stamp-run-view"
+                                          ng-class="{
+                                            'ot-view-validation-stamp-run-view-norun': !validation.validationRuns.length
+                                          }">
+                                        <ot-entity-image entity="validation.validationStamp"
+                                                         link="{{ validation.validationStamp.links._page }}">
+                                            {{validation.validationStamp.name}}
+                                        </ot-entity-image>
+                                        <span ng-repeat="validationRun in validation.validationRuns"
+                                              class="ot-validation-run-status-horizontal">
+                                            <a href="{{ validationRun.links._page }}">
+                                                <ot-validation-run-status status="validationRun.validationRunStatuses[0]"></ot-validation-run-status>
+                                            </a>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3>
+                                        <small>Build info</small>
+                                    </h3>
+                                    <ul class="fa-ul">
+                                        <li>
+                                            <span class="fa fa-li fa-clock-o"></span>
+                                            {{ build.creation.time | date:'mediumDate' }}
+                                            {{ build.creation.time | date:'shortTime' }}
+                                        </li>
+                                        <li>
+                                            <span class="fa fa-li fa-user"></span>
+                                            {{ build.creation.user }}
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </ot-scm-changelog-build>
-                </div>
-                <div class="col-md-6">
-                    <a id="buildTo"></a>
-                    <ot-scm-changelog-build scm-build-view="changeLog.scmBuildTo">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h3>
-                                    <small>Build info</small>
-                                </h3>
-                                <ul class="fa-ul">
-                                    <li>
-                                        <span class="fa fa-li fa-clock-o"></span>
-                                        {{changeLog.scmBuildTo.buildView.build.signature.time | date:'mediumDate' }}
-                                        {{changeLog.scmBuildTo.buildView.build.signature.time | date:'shortTime' }}
-                                    </li>
-                                    <li>
-                                        <span class="fa fa-li fa-user"></span>
-                                        {{changeLog.scmBuildTo.buildView.build.signature.user.name}}
-                                    </li>
-                                    <li>
-                                        <span class="fa fa-li fa-file-text-o"></span>
-                                        {{changeLog.scmBuildTo.buildView.build.description}}
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </ot-scm-changelog-build>
+                    </div>
                 </div>
             </div>
 
             <!-- Commits sections -->
             <div class="row">
                 <div class="col-md-12">
-                    <a name="commits"></a>
-
+                    <a id="commits"></a>
                     <div class="panel panel-default">
                         <div class="panel-heading clearfix">
                             Commits
                             <div class="pull-right">
-                                <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()"
+                                <input type="text" ng-model="nextProject.name" class="form-control col-md-4 input-sm" ng-show="commits"/>
+                                <a class="btn btn-default btn-sm"
+                                   ng-disabled="!nextProject.name"
+                                   ng-click="goToNextProject()"
+                                   title="Navigate to the change log of dependencies" ng-show="commits">
+                                    <span class="fa fa-arrow-right"></span>
+                                </a>
+                                <a class="btn btn-default btn-sm" ng-if="changeLog.hasIssues" ng-click="changeLogIssues()"
                                    ng-disabled="issuesLoading">
                                     <ot-loading ng-if="issuesLoading"></ot-loading>
                                     <span class="ot-header-command-unloaded" ng-hide="issues || issuesLoading"></span>
                                     {{issuesCommand}}
                                 </a>
-                                <a class="btn btn-default btn-xs" ng-click="changeLogFiles()"
+                                <a class="btn btn-default btn-sm" ng-click="changeLogFiles()"
                                    ng-disabled="filesLoading">
                                     <ot-loading ng-if="filesLoading"></ot-loading>
                                     <span class="ot-header-command-unloaded" ng-hide="files || filesLoading"></span>
@@ -127,19 +137,49 @@
                         </div>
                         <div class="panel-body ot-panel-padded" ng-if="commits">
                             <div class="pull-left">
-                                <canvas git-plot="commits.log.plot"></canvas>
+                                <canvas git-plot="commitsPlot"></canvas>
                             </div>
                             <div class="ot-graph-line"
-                                 ng-repeat="gitUICommit in commits.log.commits">
-                                <span class="ot-graph-code" ng-if="!gitUICommit.link">{{gitUICommit.commit.shortId}}</span>
-                                <span class="ot-graph-code" ng-if="gitUICommit.link"><a href="{{gitUICommit.link}}" target="_blank">{{gitUICommit.commit.shortId}}</a></span>
+                                 ng-repeat="gitUICommit in commits">
+                                <span class="ot-graph-code" ng-if="!gitUICommit.link">{{gitUICommit.shortId}}</span>
+                                <span class="ot-graph-code" ng-if="gitUICommit.link"><a href="{{gitUICommit.link}}" target="_blank">{{gitUICommit.shortId}}</a></span>
                                 <span class="ot-graph-message" ng-bind-html="gitUICommit.annotatedMessage"></span>
                                 <span class="ot-graph-label">
-                                    {{gitUICommit.commit.author.name}}
+                                    {{gitUICommit.author}}
                                 </span>
                                 <span class="ot-graph-label">
-                                    {{gitUICommit.commit.commitTime | date:'mediumDate'}}
-                                    {{gitUICommit.commit.commitTime | date:'shortTime'}}
+                                    {{gitUICommit.timestamp | date:'mediumDate'}}
+                                    {{gitUICommit.timestamp | date:'shortTime'}}
+                                </span>
+                                <!-- Build decoration -->
+                                <span
+                                        ng-if="gitUICommit.build"
+                                        class="ot-change-log-commit-build">
+                                    <a href="{{gitUICommit.build.links._page}}">{{gitUICommit.build.name}}</a>
+                                </span>
+                                <!-- Promotions decoration -->
+                                <span
+                                        class="ot-change-log-commit-promotions"
+                                        ng-if="gitUICommit.build && gitUICommit.build.promotionRuns && gitUICommit.build.promotionRuns.length > 0">
+                                    <span
+                                            ng-repeat="promotion in gitUICommit.build.promotionRuns"
+                                            class="ot-change-log-commit-promotion">
+                                        <ot-entity-image entity="promotion.promotionLevel"></ot-entity-image>
+                                    </span>
+                                </span>
+                                <!-- Dependency links decoration -->
+                                <span class="ot-change-log-commit-dependencies"
+                                      ng-if="gitUICommit.build && gitUICommit.build.using.pageItems && gitUICommit.build.using.pageItems.length > 0">
+                                    <span ng-repeat="dependency in gitUICommit.build.using.pageItems"
+                                          ng-click="setNextProject(dependency.branch.project.name)"
+                                          class="ot-action ot-change-log-commit-dependency">
+                                        <span class="fa fa-link"></span>
+                                        <span class="ot-change-log-commit-dependency-build-name">
+                                            {{ dependency.name }}
+                                            @
+                                            {{ dependency.branch.project.name }}
+                                        </span>
+                                    </span>
                                 </span>
                             </div>
                         </div>
@@ -148,10 +188,9 @@
             </div>
 
             <!-- Issue sections -->
-            <div class="row" ng-if="changeLog._issues">
+            <div class="row" ng-if="changeLog.hasIssues">
                 <div class="col-md-12">
-                    <a name="issues"></a>
-
+                    <a id="issues"></a>
                     <div class="panel panel-default">
                         <div class="panel-heading clearfix">
                             Issues
@@ -182,8 +221,7 @@
                                 <ot-loading>Issues are loading...</ot-loading>
                             </div>
                             <div ng-if="issues && issues.issueServiceConfiguration.serviceId">
-                                <ot-include value="issues" template="extension/{{issues.issueServiceConfiguration.serviceId}}/changelog.issues.tpl.html">
-                                </ot-include>
+                                <ot-include value="issues" template="extension/{{issues.issueServiceConfiguration.serviceId}}/changelog.issues.tpl.html"></ot-include>
                             </div>
                         </div>
                     </div>
@@ -193,8 +231,7 @@
             <!-- Files sections -->
             <div class="row">
                 <div class="col-md-12">
-                    <a name="files"></a>
-
+                    <a id="files"></a>
                     <div class="panel panel-default">
                         <div class="panel-heading clearfix">
                             File changes
@@ -204,7 +241,7 @@
                                     <span class="ot-header-command-unloaded" ng-hide="commits || commitsLoading"></span>
                                     {{commitsCommand}}
                                 </a>
-                                <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
+                                <a class="btn btn-default btn-xs" ng-if="changeLog.hasIssues" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
                                     <ot-loading ng-if="issuesLoading"></ot-loading>
                                     <span class="ot-header-command-unloaded" ng-hide="issues || issuesLoading"></span>
                                     {{issuesCommand}}
@@ -222,11 +259,19 @@
                             <ot-loading>File changes are loading...</ot-loading>
                         </div>
                         <div class="panel-body ot-panel-padded" ng-show="files">
-                            <ot-extension-scm-changelog-filechangefilter change-log="changeLog" filter-callback="changeLogFileFilterConfig.callback"></ot-extension-scm-changelog-filechangefilter>
+                            <ot-extension-git-changelog-file-filters project-id="changeLog.project.id" context="fileChangeContext">
+                                <button class="btn btn-default btn-sm" type="button"
+                                        ng-disabled="diffComputing"
+                                        ng-click="diffFileFilter()">
+                                    <span class="fa fa-download" title="Exports the changes as diff" ng-hide="diffComputing"></span>
+                                    <span class="fa fa-spinner fa-spin" ng-show="diffComputing"></span>
+                                    Diff
+                                </button>
+                            </ot-extension-git-changelog-file-filters>
                         </div>
                         <div class="panel-body ot-panel-padded" ng-show="files">
                             <div class="ot-line-no-overflow ot-line-hover ot-line-border"
-                                 ng-repeat="changeLogFile in files.list | filter:changeLogFileFilterConfig.filter">
+                                 ng-repeat="changeLogFile in files.list | filter:fileChangeContext.filterFunction">
                                 <span class="ot-label-change ot-label-change-{{changeLogFile.changeType | lowercase}}">
                                     <span class="ot-label-change-icon" title="{{changeLogFile.changeType | lowercase}}"></span>
                                 </span>
@@ -236,8 +281,8 @@
                                     <span class="fa fa-arrow-right"></span>
                                     {{changeLogFile.newPath}}
                                 </span>
-                                <span ng-hide="changeLogFile.diffLoading || diffLoading" class="fa fa-download ot-command" title="Shows diff" ng-click="showFileDiff(changeLog, changeLogFile)"></span>
-                                <span ng-show="changeLogFile.diffLoading" class="fa fa-spin fa-spinner ot-command" title="Diff is loading..."></span>
+                                <span ng-hide="changeLogFile.diffComputing || diffComputing" class="fa fa-download ot-command" title="Shows diff" ng-click="showFileDiff(changeLogFile)"></span>
+                                <span ng-show="changeLogFile.diffComputing" class="fa fa-spin fa-spinner ot-command" title="Diff is loading..."></span>
                             </div>
                         </div>
                     </div>

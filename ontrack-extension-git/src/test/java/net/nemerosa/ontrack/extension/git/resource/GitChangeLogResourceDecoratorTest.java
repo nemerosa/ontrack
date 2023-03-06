@@ -159,7 +159,6 @@ public class GitChangeLogResourceDecoratorTest {
                         .with("_diff", "urn:test:net.nemerosa.ontrack.extension.git.GitController#diff:")
                         .with("_exportFormats", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogExportFormats:1")
                         .with("_exportIssues", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLog:IssueChangeLogExportRequest%28format%3D%27text%27%2C+grouping%3D%27%27%2C+exclude%3D%27%27%2C+altGroup%3D%27Other%27%29")
-                        .with("_page", "urn:test:#:extension/git/changelog?from=1&to=2")
                         .end(),
                 changeLog
         );
@@ -278,7 +277,6 @@ public class GitChangeLogResourceDecoratorTest {
                         .with("_diff", "urn:test:net.nemerosa.ontrack.extension.git.GitController#diff:")
                         .with("_exportFormats", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogExportFormats:1")
                         .with("_exportIssues", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLog:IssueChangeLogExportRequest%28format%3D%27text%27%2C+grouping%3D%27%27%2C+exclude%3D%27%27%2C+altGroup%3D%27Other%27%29")
-                        .with("_page", "urn:test:#:extension/git/changelog?from=1&to=2")
                         .end(),
                 changeLog
         );

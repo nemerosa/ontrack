@@ -319,119 +319,469 @@ angular.module('ontrack.extension.git', [
             controller: 'GitChangeLogCtrl'
         });
     })
-    .controller('GitChangeLogCtrl', function ($q, $log, $interpolate, $anchorScroll, $location, $stateParams, $scope, $http,
-                                              ot, otStructureService, otScmChangeLogService, otScmChangelogFilechangefilterService) {
+    .directive('otExtensionGitChangelogFileFilters', function (otGraphqlService, otScmChangelogFilechangefilterService) {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/git/directive.changelogFileFilters.tpl.html',
+            transclude: true,
+            scope: {
+                projectId: '=',
+                context: '='
+            },
+            controller: function ($scope) {
+                $scope.quickPattern = '';
+                $scope.selectedFilter = null;
 
-        // The build request
-        $scope.buildDiffRequest = {
-            from: $stateParams.from,
-            to: $stateParams.to
+                $scope.context.getSelectedPatterns = () => {
+                    if ($scope.quickPattern) {
+                        return [$scope.quickPattern];
+                    } else if ($scope.selectedFilter) {
+                        return $scope.selectedFilter.patterns;
+                    } else {
+                        return [];
+                    }
+                };
+
+                $scope.$watch('projectId', (value) => {
+                    if (value) {
+                        otScmChangelogFilechangefilterService.loadFiltersWithGraphQL($scope.projectId).then(({canManage, filters}) => {
+                            $scope.filters = filters;
+                            $scope.canManage = canManage;
+                        });
+                    }
+                });
+
+                $scope.filterDisplayName = filter => {
+                    if (filter.shared) {
+                        return `${filter.name} (*)`;
+                    } else {
+                        return filter.name;
+                    }
+                };
+
+                $scope.unselectPattern = () => {
+                    $scope.quickPattern = '';
+                    $scope.selectedFilter = undefined;
+                    $scope.submitQuickPattern();
+                };
+
+                $scope.submitQuickPattern = () => {
+                    const pattern = $scope.quickPattern;
+                    if (pattern) {
+                        $scope.submitPattern([pattern]);
+                    } else {
+                        $scope.submitPattern(null);
+                    }
+                };
+
+                $scope.saveQuickFilter = () => {
+                    const pattern = $scope.quickPattern;
+                    if (pattern) {
+                        otScmChangelogFilechangefilterService.addFilterByProjectId($scope.projectId, [pattern])
+                            .then(filter => {
+                                // Adds the filter into the list and selects it
+                                $scope.filters.push(filter);
+                                $scope.selectedFilter = filter;
+                            });
+                    }
+                };
+
+                $scope.$watch('selectedFilter', () => {
+                    if ($scope.selectedFilter) {
+                        $scope.submitPattern($scope.selectedFilter.patterns);
+                    } else {
+                        $scope.submitPattern(undefined);
+                    }
+                });
+
+                $scope.editFileFilter = () => {
+                    if ($scope.selectedFilter) {
+                        otScmChangelogFilechangefilterService.editFilterByProjectId($scope.projectId, $scope.selectedFilter)
+                            .then(filter => {
+                                $scope.selectedFilter.patterns = filter.patterns;
+                                $scope.submitPattern(filter.patterns);
+                            });
+                    }
+                };
+
+                $scope.deleteFileFilter = () => {
+                    if ($scope.selectedFilter) {
+                        otScmChangelogFilechangefilterService.deleteFilterByProjectId($scope.projectId, $scope.selectedFilter);
+                        $scope.filters.splice($scope.filters.indexOf($scope.selectedFilter), 1);
+                        $scope.selectedFilter = undefined;
+                    }
+                };
+
+                $scope.filterCanShare = (filter) => {
+                    return filter && !filter.shared && $scope.canManage;
+                };
+
+                $scope.shareFileFilter = (filter) => {
+                    otScmChangelogFilechangefilterService.shareFileFilterByProjectId($scope.projectId, filter);
+                };
+
+                $scope.submitPattern = (patterns) => {
+                    $scope.context.filterFunction = otScmChangelogFilechangefilterService.itemFilterFunction(patterns, (item) => item.path);
+                };
+            }
         };
+    })
+    .controller('GitChangeLogCtrl', function ($q, $log, $modal, $interpolate, $anchorScroll, $location, $stateParams, $scope, $http,
+                                              ot, otGraphqlService, otScmChangeLogService) {
 
         // The view
-        var view = ot.view();
+        const view = ot.view();
         view.title = "Git change log";
 
-        /**
-         * The REST end point to contact is contained by the current path, with the leading
-         * slash being removed.
-         */
-        var path = $location.path().substring(1);
+        // Boundaries
+        const from = $stateParams.from;
+        const to = $stateParams.to;
 
-        /**
-         * Loads the change log
-         */
+        // Initial button names
+        $scope.commitsCommand = "Commits";
+        $scope.issuesCommand = "Issues";
+        $scope.filesCommand = "File changes";
 
-        ot.pageCall($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
-            $scope.changeLog = changeLog;
+        // Loading the change log skeleton
+        const loadChangeLogFrame = () => {
+            const query = `
+                query GitChangeLog( $from: Int!, $to: Int!, ) {
+                    gitChangeLog(from: $from, to: $to) {
+                        uuid
+                        syncError
+                        project {
+                            id
+                        }
+                        buildFrom {
+                            ...BuildInfo
+                        }
+                        buildTo {
+                            ...BuildInfo
+                        }
+                        hasIssues
+                    }
+                }
 
-            view.breadcrumbs = ot.projectBreadcrumbs(changeLog.project);
+                fragment BuildInfo on Build {
+                  id
+                  name
+                  creation {
+                    time
+                    user
+                  }
+                  links {
+                    _page
+                  }
+                  branch {
+                    id
+                    name
+                    links {
+                        _page
+                    }
+                    project {
+                      id
+                      name
+                    }
+                  }
+                  decorations {
+                    decorationType
+                    feature {
+                      id
+                    }
+                    data
+                  }
+                  promotionRuns {
+                    creation {
+                      time
+                    }
+                    build {
+                      id
+                      name
+                    }
+                    promotionLevel {
+                      id
+                      name
+                      image
+                      _image
+                    }
+                  }
+                  validations {
+                    validationStamp {
+                      id
+                      name
+                      image
+                      _image
+                      links {
+                        _page
+                      }
+                    }
+                    validationRuns(count: 1) {
+                      validationRunStatuses(lastOnly: true) {
+                        statusID {
+                          id
+                        }
+                        description
+                        creation {
+                            time
+                            user
+                        }
+                      }
+                      links {
+                        _page
+                      }
+                    }
+                  }
+                }
+            `;
+            otGraphqlService.pageGraphQLCall(query, {
+                from: from,
+                to: to
+            }).then(data => {
+                $scope.changeLog = data.gitChangeLog;
+                view.breadcrumbs = ot.projectBreadcrumbs($scope.changeLog.buildFrom.branch.project);
+                view.commands = [
+                    ot.viewCloseCommand('/project/' + $scope.changeLog.buildFrom.branch.project.id)
+                ];
 
-            $scope.commitsCommand = "Commits";
-            $scope.issuesCommand = "Issues";
-            $scope.filesCommand = "File changes";
+                // Preloading according to the hash
+                const initialHash = $location.hash();
+                if (initialHash === "commits") {
+                    $scope.changeLogCommits();
+                } else if (initialHash === "issues") {
+                    $scope.changeLogIssues();
+                } else if (initialHash === "files") {
+                    $scope.changeLogFiles();
+                }
+            });
+        };
 
-            // Loading the commits if needed
-            $scope.changeLogCommits = function () {
-                if (!$scope.commits) {
-                    $scope.commitsLoading = true;
-                    $scope.commitsCommand = "Loading the commits...";
-                    ot.pageCall($http.get($scope.changeLog._commits)).then(function (commits) {
-                        $scope.commits = commits;
-                        $scope.commitsLoading = false;
-                        $scope.commitsCommand = "Commits";
-                        $location.hash('commits');
-                        $anchorScroll();
-                    });
-                } else {
+        // Loading the change load at startup
+        loadChangeLogFrame();
+
+        // Loading the commits
+        $scope.changeLogCommits = () => {
+            if (!$scope.commits) {
+                $scope.commitsLoading = true;
+                $scope.commitsCommand = "Loading the commits...";
+                const query = `
+                    query GetChangeLogCommits($uuid: String!) {
+                      gitChangeLogByUUID(uuid: $uuid) {
+                        commitsPlot
+                        commits {
+                          id
+                          shortId
+                          annotatedMessage
+                          link
+                          author
+                          timestamp
+                          build {
+                            id
+                            name
+                            links {
+                              _page
+                            }
+                            promotionRuns(lastPerLevel: true) {
+                              promotionLevel {
+                                id
+                                name
+                                image
+                                _image
+                              }
+                            }
+                            using {
+                              pageItems {
+                                id
+                                branch {
+                                  project {
+                                    name
+                                  }
+                                }
+                                name
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                `;
+                otGraphqlService.pageGraphQLCall(query, {uuid: $scope.changeLog.uuid}).then(data => {
+                    $scope.commits = data.gitChangeLogByUUID.commits;
+                    $scope.commitsPlot = data.gitChangeLogByUUID.commitsPlot;
+                }).finally(() => {
+                    $scope.commitsLoading = false;
+                    $scope.commitsCommand = "Commits";
                     $location.hash('commits');
                     $anchorScroll();
-                }
-            };
+                });
+            } else {
+                $location.hash('commits');
+                $anchorScroll();
+            }
+        };
 
-            // Loading the issues if needed
-            $scope.changeLogIssues = function () {
-                if (!$scope.issues) {
-                    $scope.issuesLoading = true;
-                    $scope.issuesCommand = "Loading the issues...";
-                    ot.pageCall($http.get($scope.changeLog._issues)).then(function (issues) {
-                        $scope.issues = issues;
-                        $scope.issuesLoading = false;
-                        $scope.issuesCommand = "Issues";
-                        $location.hash('issues');
-                        $anchorScroll();
-                    });
-                } else {
+        // Loading the issues
+        $scope.changeLogIssues = () => {
+            if (!$scope.issues) {
+                $scope.issuesLoading = true;
+                $scope.issuesCommand = "Loading the issues...";
+                const query = `
+                    query GetChangeLogIssues($uuid: String!) {
+                      gitChangeLogByUUID(uuid: $uuid) {
+                        issues {
+                          issueServiceConfiguration {
+                            serviceId
+                          }
+                          list {
+                            issue: issueObject
+                          }
+                        }
+                      }
+                    }
+                `;
+                otGraphqlService.pageGraphQLCall(query, {uuid: $scope.changeLog.uuid}).then(data => {
+                    $scope.issues = data.gitChangeLogByUUID.issues;
                     $location.hash('issues');
                     $anchorScroll();
-                }
-            };
+                }).finally(() => {
+                    $scope.issuesLoading = false;
+                    $scope.issuesCommand = "Issues";
+                });
+            } else {
+                $location.hash('issues');
+                $anchorScroll();
+            }
+        };
 
-            // Loading the file changes if needed
-            $scope.changeLogFiles = function () {
-                if (!$scope.files) {
-                    $scope.filesLoading = true;
-                    $scope.filesCommand = "Loading the file changes...";
-                    ot.pageCall($http.get($scope.changeLog._files)).then(function (files) {
-                        $scope.files = files;
-                        $scope.filesLoading = false;
-                        $scope.filesCommand = "File changes";
-                        $location.hash('files');
-                        $anchorScroll();
-                    });
-                } else {
+        // Configuring the change log export
+        $scope.changeLogExport = () => {
+            otScmChangeLogService.displayChangeLogExportGraphQL({
+                projectId: $scope.changeLog.project.id,
+                buildFromId: $scope.changeLog.buildFrom.id,
+                buildToId: $scope.changeLog.buildTo.id,
+            });
+        };
+
+        // Loading the file changes if needed
+        $scope.changeLogFiles = () => {
+            if (!$scope.files) {
+                $scope.filesLoading = true;
+                $scope.filesCommand = "Loading the file changes...";
+                const query = `
+                    query GetChangeLogFiles($uuid: String!) {
+                      gitChangeLogByUUID(uuid: $uuid) {
+                        files {
+                          list {
+                            changeType
+                            oldPath
+                            newPath
+                            path
+                            url
+                          }
+                        }
+                      }
+                    }
+                `;
+                otGraphqlService.pageGraphQLCall(query, {uuid: $scope.changeLog.uuid}).then(data => {
+                    $scope.files = data.gitChangeLogByUUID.files;
                     $location.hash('files');
                     $anchorScroll();
-                }
-            };
-
-            // File filter configuration
-            $scope.changeLogFileFilterConfig = otScmChangelogFilechangefilterService.initFilterConfig();
-
-            // Configuring the change log export
-            $scope.changeLogExport = function () {
-                otScmChangeLogService.displayChangeLogExport({
-                    changeLog: $scope.changeLog,
-                    exportFormatsLink: changeLog._exportFormats,
-                    exportIssuesLink: changeLog._exportIssues
+                }).finally(() => {
+                    $scope.filesLoading = false;
+                    $scope.filesCommand = "File changes";
                 });
-            };
+            } else {
+                $location.hash('files');
+                $anchorScroll();
+            }
+        };
 
-            // Shows the diff for a file
-            $scope.showFileDiff = function (changelog, changeLogFile) {
-                if (!$scope.diffLoading) {
-                    $scope.diffLoading = true;
-                    changeLogFile.diffLoading = true;
-                    otScmChangelogFilechangefilterService
-                        .diffFileFilter(changeLog, changeLogFile.oldPath ? changeLogFile.oldPath : changeLogFile.newPath)
-                        .finally(function () {
-                            changeLogFile.diffLoading = false;
-                            $scope.diffLoading = false;
-                        });
-                }
-            };
+        $scope.fileChangeContext = {};
 
-        });
+        $scope.diffFileFilter = (patterns) => {
+            $scope.diffComputing = true;
+            const selectedPatterns = patterns ? patterns : $scope.fileChangeContext.getSelectedPatterns();
+            const params = {
+                from: $scope.changeLog.buildFrom.id,
+                to: $scope.changeLog.buildTo.id,
+                patterns: selectedPatterns.join(',')
+            };
+            return ot.pageCall($http.get("/extension/git/changelog/diff", {params})).then(diff => {
+                let link = "/extension/git/changelog/diff";
+                link += $interpolate('?from={{from}}&to={{to}}&patterns={{patterns}}')(params);
+                $modal.open({
+                    templateUrl: 'extension/scm/dialog.scmDiff.tpl.html',
+                    controller: 'otExtensionScmDialogDiff',
+                    resolve: {
+                        config: function () {
+                            return {
+                                diff: diff,
+                                link: link
+                            };
+                        }
+                    }
+                });
+            }).finally(() => {
+                $scope.diffComputing = false;
+            });
+        };
+
+        // Shows the diff for a file
+        $scope.showFileDiff = changeLogFile => {
+            if (!$scope.diffComputing) {
+                changeLogFile.diffComputing = true;
+                $scope.diffFileFilter([changeLogFile.path])
+                    .finally(() => {
+                        changeLogFile.diffComputing = false;
+                    });
+            }
+        };
+
+        // Next project for the recursive change log
+        $scope.nextProject = {
+            name: ''
+        };
+
+        // Navigating to the next project
+        $scope.goToNextProject = () => {
+            if ($scope.nextProject.name) {
+                const query = `
+                    query DepChangeLog(
+                        $uuid: String!,
+                        $depName: String!,
+                    ) {
+                      gitChangeLogByUUID(uuid: $uuid) {
+                        depChangeLog(project: $depName) {
+                          buildFrom {
+                            id
+                          }
+                          buildTo {
+                            id
+                          }
+                        }
+                      }
+                    }
+
+                `;
+                otGraphqlService.pageGraphQLCall(query, {
+                    uuid: $scope.changeLog.uuid,
+                    depName: $scope.nextProject.name
+                }).then(data => {
+                    // Extracts the boundaries
+                    const depFrom = data.gitChangeLogByUUID.depChangeLog.buildFrom.id;
+                    const depTo = data.gitChangeLogByUUID.depChangeLog.buildTo.id;
+                    // Navigation
+                    $location.path("/extension/git/changelog").search({
+                        from: depFrom,
+                        to: depTo
+                    }).hash("commits");
+                });
+            }
+        };
+
+        // Selecting the next project
+        $scope.setNextProject = (name) => {
+            $scope.nextProject.name = name;
+        };
 
     })
     .directive('gitPlot', function (otPlot) {

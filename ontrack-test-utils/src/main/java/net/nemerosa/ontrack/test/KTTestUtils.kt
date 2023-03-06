@@ -36,7 +36,7 @@ fun assertJsonNotNull(
     message: String = "Node is expected not to be null",
     code: JsonNode.() -> Unit = {}
 ) {
-    if (node == null || node.isNull) {
+    if (node == null || node.isNull || node.isMissingNode) {
         fail(message)
     } else {
         node.code()
