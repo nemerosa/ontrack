@@ -53,9 +53,10 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
             ),
             runName = "ci",
             runNumber = 26,
+            runId = 12345L,
         )
         assertEquals(
-            "ci#26@PR-13",
+            "12345",
             processor.getPayloadSource(payload)
         )
     }
@@ -63,11 +64,12 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
     @Test
     fun `Payload source for a branch`() {
         val payload = payload(
+            runId = 1234L,
             runName = "ci",
             runNumber = 26,
         )
         assertEquals(
-            "ci#26@main",
+            "1234",
             processor.getPayloadSource(payload)
         )
     }
