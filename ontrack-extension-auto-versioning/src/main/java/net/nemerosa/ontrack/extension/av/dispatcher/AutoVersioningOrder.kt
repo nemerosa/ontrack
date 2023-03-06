@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.av.dispatcher
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningTargetConfig
@@ -25,6 +26,7 @@ data class AutoVersioningOrder(
     /**
      * Gets a meaningful commit message for this order
      */
+    @JsonIgnore
     fun getCommitMessage() =
         "[auto-versioning] Upgrade of $sourceProject to version $targetVersion"
 }
