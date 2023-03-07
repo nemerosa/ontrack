@@ -1,22 +1,30 @@
 package net.nemerosa.ontrack.extension.av.graphql
 
 import graphql.schema.GraphQLObjectType
+import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditEntry
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditQueryFilter
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditQueryService
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.graphql.schema.GQLType
+import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.field
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeBuildAutoVersioning(
     private val gqlTypeAutoVersioningAuditEntry: GQLTypeAutoVersioningAuditEntry,
     private val autoVersioningAuditQueryService: AutoVersioningAuditQueryService,
+    private val structureService: StructureService,
+    private val buildFilterService: BuildFilterService,
+    private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
 ) : GQLType {
 
     override fun getTypeName(): String = "BuildAutoVersioning"
@@ -36,8 +44,32 @@ class GQLTypeBuildAutoVersioning(
                         getLastAuditEntry(context)
                     }
             }
+            // Last eligible build for this AV config
+            .field {
+                it.name("lastEligibleBuild")
+                    .description("Last eligible build for this AV config")
+                    .type(GraphQLTypeReference(GQLTypeBuild.BUILD))
+                    .dataFetcher { env ->
+                        val context: Context = env.getSource()
+                        getLastEligibleBuild(context)
+                    }
+            }
             // OK
             .build()
+
+    private fun getLastEligibleBuild(context: Context): Build? {
+        val av = context.config
+        val dependencyBuild = context.dependencyBuild
+        // Gets the latest branch
+        val latestBranch = autoVersioningConfigurationService.getLatestBranch(dependencyBuild.project, av)
+            ?: return null
+        // Gets the latest promoted build on this branch
+        return buildFilterService.standardFilterProviderData(1)
+            .withWithPromotionLevel(av.sourcePromotion)
+            .build()
+            .filterBranchBuilds(latestBranch)
+            .firstOrNull()
+    }
 
     private fun getLastAuditEntry(context: Context): AutoVersioningAuditEntry? =
         autoVersioningAuditQueryService.findByFilter(
