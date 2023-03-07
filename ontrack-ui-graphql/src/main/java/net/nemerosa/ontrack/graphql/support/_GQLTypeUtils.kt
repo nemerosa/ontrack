@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.structure.ID
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.jvm.javaType
 
 typealias TypeBuilder = GraphQLObjectType.Builder
 
@@ -29,7 +30,10 @@ fun TypeBuilder.stringField(name: String, description: String): GraphQLObjectTyp
         it.name(name).description(description).type(GraphQLString)
     }
 
-fun TypeBuilder.stringListField(property: KProperty<List<String>>, description: String? = null): GraphQLObjectType.Builder =
+fun TypeBuilder.stringListField(
+    property: KProperty<List<String>>,
+    description: String? = null
+): GraphQLObjectType.Builder =
     field {
         it.name(getPropertyName(property))
             .description(description ?: getPropertyDescription(property))
@@ -39,13 +43,13 @@ fun TypeBuilder.stringListField(property: KProperty<List<String>>, description: 
 fun TypeBuilder.idField(property: KProperty<ID>, description: String? = null): GraphQLObjectType.Builder =
     field {
         it.name(net.nemerosa.ontrack.model.annotations.getPropertyName(property))
-                .description(net.nemerosa.ontrack.model.annotations.getPropertyDescription(property, description))
-                .type(GraphQLInt)
-                .dataFetcher { env ->
-                    val source = env.getSource<Any>()
-                    val id = property.call(source)
-                    id.get()
-                }
+            .description(net.nemerosa.ontrack.model.annotations.getPropertyDescription(property, description))
+            .type(GraphQLInt)
+            .dataFetcher { env ->
+                val source = env.getSource<Any>()
+                val id = property.call(source)
+                id.get()
+            }
     }
 
 fun TypeBuilder.dateField(name: String, description: String): GraphQLObjectType.Builder = field {
@@ -55,11 +59,11 @@ fun TypeBuilder.dateField(name: String, description: String): GraphQLObjectType.
 }
 
 fun TypeBuilder.jsonField(property: KProperty<Any?>, description: String? = null): GraphQLObjectType.Builder =
-        field {
-            it.name(net.nemerosa.ontrack.model.annotations.getPropertyName(property))
-                    .description(net.nemerosa.ontrack.model.annotations.getPropertyDescription(property, description))
-                    .type(GQLScalarJSON.INSTANCE)
-        }
+    field {
+        it.name(net.nemerosa.ontrack.model.annotations.getPropertyName(property))
+            .description(net.nemerosa.ontrack.model.annotations.getPropertyDescription(property, description))
+            .type(GQLScalarJSON.INSTANCE)
+    }
 
 fun TypeBuilder.booleanField(property: KProperty<Boolean>, description: String? = null): GraphQLObjectType.Builder =
     field {
@@ -90,6 +94,18 @@ fun <T> TypeBuilder.field(
     description: String? = null,
 ): GraphQLObjectType.Builder =
     field(property, GraphQLTypeReference(typeName), description)
+
+fun <T> TypeBuilder.field(
+    property: KProperty<T?>,
+    description: String? = null,
+): GraphQLObjectType.Builder {
+    val typeName = (property.returnType.javaType as Class<*>).simpleName
+    return field {
+        it.name(getPropertyName(property))
+            .description(getPropertyDescription(property, description))
+            .type(nullableOutputType(GraphQLTypeReference(typeName), property.returnType.isMarkedNullable))
+    }
+}
 
 fun <T> TypeBuilder.field(
     property: KProperty<T?>,
@@ -124,8 +140,12 @@ inline fun <reified E : Enum<E>> TypeBuilder.enumField(
     field {
         it.name(property.name)
             .description(getPropertyDescription(property, description))
-            .type(nullableOutputType(GraphQLTypeReference(E::class.java.simpleName),
-                property.returnType.isMarkedNullable))
+            .type(
+                nullableOutputType(
+                    GraphQLTypeReference(E::class.java.simpleName),
+                    property.returnType.isMarkedNullable
+                )
+            )
     }
 
 fun TypeBuilder.stringField(property: KProperty<String?>, description: String? = null): GraphQLObjectType.Builder =
@@ -140,11 +160,11 @@ fun TypeBuilder.classField(property: KProperty<Class<*>?>, description: String? 
         it.name(net.nemerosa.ontrack.model.annotations.getPropertyName(property))
             .description(net.nemerosa.ontrack.model.annotations.getPropertyDescription(property, description))
             .type(nullableOutputType(GraphQLString, property.returnType.isMarkedNullable))
-                .dataFetcher { env ->
-                    val source = env.getSource<Any>()
-                    val cls = property.call(source)
-                    cls?.name
-                }
+            .dataFetcher { env ->
+                val source = env.getSource<Any>()
+                val cls = property.call(source)
+                cls?.name
+            }
     }
 
 fun TypeBuilder.gqlTypeField(
