@@ -11,11 +11,13 @@ import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscript
 import net.nemerosa.ontrack.extension.notifications.subscriptions.subscribe
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.security.Roles
+import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.toProjectEntityID
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -503,6 +505,107 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                         otherSubscriptions
                     )
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Get AV config between two branches with parent not being configured`() {
+        asAdmin {
+            val parent = project<Branch> {
+                branch()
+            }
+            val dependency = project<Branch> {
+                branch()
+            }
+            assertNull(
+                autoVersioningConfigurationService.getAutoVersioningBetween(parent, dependency),
+                "No AV config between branches because parent not configured"
+            )
+        }
+    }
+
+    @Test
+    fun `Get AV config between two branches with no matching project`() {
+        asAdmin {
+            val parent = project<Branch> {
+                branch {
+                    autoVersioningConfigurationService.setupAutoVersioning(
+                        this,
+                        AutoVersioningConfig(
+                            configurations = listOf(
+                                AutoVersioningTestFixtures.sourceConfig()
+                            )
+                        )
+                    )
+                }
+            }
+            val dependency = project<Branch> {
+                branch()
+            }
+            assertNull(
+                autoVersioningConfigurationService.getAutoVersioningBetween(parent, dependency),
+                "No AV config between branches because no matching project"
+            )
+        }
+    }
+
+    @Test
+    fun `Get AV config between two branches with not latest branch`() {
+        asAdmin {
+            val dependency = project<Branch> {
+                branch("release/1.2") // The latest branch
+                branch("release/1.1") // The branch we want to compare
+            }
+            val parent = project<Branch> {
+                branch {
+                    autoVersioningConfigurationService.setupAutoVersioning(
+                        this,
+                        AutoVersioningConfig(
+                            configurations = listOf(
+                                AutoVersioningTestFixtures.sourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = "release/.*"
+                                )
+                            )
+                        )
+                    )
+                }
+            }
+            assertNull(
+                autoVersioningConfigurationService.getAutoVersioningBetween(parent, dependency),
+                "No AV config between branches because not latest branch"
+            )
+        }
+    }
+
+    @Test
+    fun `Get AV config between two branches with matching branch`() {
+        asAdmin {
+            val dependency = project<Branch> {
+                branch("release/1.1")
+            }
+            val parent = project<Branch> {
+                branch {
+                    autoVersioningConfigurationService.setupAutoVersioning(
+                        this,
+                        AutoVersioningConfig(
+                            configurations = listOf(
+                                AutoVersioningTestFixtures.sourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = "release/1.1"
+                                )
+                            )
+                        )
+                    )
+                }
+            }
+            assertNotNull(
+                autoVersioningConfigurationService.getAutoVersioningBetween(parent, dependency),
+                "AV config on matching branch"
+            ) {
+                assertEquals(dependency.project.name, it.sourceProject)
+                assertEquals("release/1.1", it.sourceBranch)
             }
         }
     }

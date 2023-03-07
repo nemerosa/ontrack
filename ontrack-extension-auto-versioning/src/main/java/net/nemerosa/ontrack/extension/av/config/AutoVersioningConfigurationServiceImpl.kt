@@ -99,6 +99,24 @@ class AutoVersioningConfigurationServiceImpl(
     override fun getAutoVersioning(branch: Branch): AutoVersioningConfig? =
         entityDataService.retrieve(branch, STORE, AutoVersioningConfig::class.java)?.postDeserialize()
 
+    override fun getAutoVersioningBetween(parent: Branch, dependency: Branch): AutoVersioningSourceConfig? {
+        // Gets the AV config of the parent branch
+        // or returns null if not set at all
+        val parentAVConfig = getAutoVersioning(parent) ?: return null
+        // Gets the configurations matching the dependency project
+        val dependencyConfigs = parentAVConfig.configurations.filter {
+            it.sourceProject == dependency.project.name
+        }
+        // Among these project matching configurations, retains the one
+        // where the dependency branch matches the last eligible branch
+        val branchMatchingConfigs = dependencyConfigs.filter {
+            val latestBranch = getLatestBranch(dependency.project, it)
+            latestBranch?.id == dependency.id
+        }
+        // Takes the first one
+        return branchMatchingConfigs.firstOrNull()
+    }
+
     override fun getBranchesConfiguredFor(project: String, promotion: String): List<Branch> =
         entityDataService.findEntities(
             type = ProjectEntityType.BRANCH,
