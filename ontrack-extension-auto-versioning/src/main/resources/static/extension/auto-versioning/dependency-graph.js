@@ -14,5 +14,6 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         $scope.buildId = $stateParams.buildId;
 
         const view = ot.view();
-        view.title = "TODO Change after it's been loaded"
+        view.title = "TODO Change after it's been loaded";
     })
+;
