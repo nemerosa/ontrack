@@ -59,6 +59,22 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             ${gqlBuildMinInfo}
         `;
 
+        const gqlBuildDependencies = `
+            fragment BuildDependencies on Build {
+              using {
+                pageItems {
+                  ...BuildInfo
+                  lastBuild: branch {
+                    builds(count: 1) {
+                      ...BuildMinInfo
+                    }
+                  }
+                }
+              }
+            }
+            ${gqlBuildInfo}
+        `;
+
         // Loading the first node & initializing the view
 
         let viewInitialized = false;
@@ -68,9 +84,10 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 query RootNode($rootBuildId: Int!) {
                     build(id: $rootBuildId) {
                         ...BuildInfo
+                        ...BuildDependencies
                     }
                 }
-                ${gqlBuildInfo}
+                ${gqlBuildDependencies}
             `, {rootBuildId: $scope.rootBuildId}
             ).then(data => {
                 $scope.rootBuild = data.build;
