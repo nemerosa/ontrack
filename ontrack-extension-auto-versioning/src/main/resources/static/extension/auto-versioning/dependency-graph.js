@@ -168,22 +168,53 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             return node;
         };
 
-        // Initializes the chart location
+        // Looks for the node having buildId as a value
 
-        const initChartEventHandling = (chart) => {
-            chart.on('click', (params) => {
-                const node = params.data;
-                const buildId = params.value;
-                if (node && buildId && !node.children) {
+        const lookForNode = (node, buildId) => {
+            if (node.value === buildId) {
+                return node;
+            } else if (node.children && node.children.length > 0) {
+                let result = null;
+                node.children.forEach(child => {
+                    const childResult = lookForNode(child, buildId);
+                    if (childResult) {
+                        result = childResult;
+                    }
+                });
+                return result;
+            } else {
+                return null;
+            }
+        };
+
+        // Loading the children for a node
+
+        const loadNodeDependencies = (buildId) => {
+            // Looks for the node having the buildId as a value
+            const node = lookForNode(options.series[0].data[0], buildId);
+            if (node) {
+                // Check if the children have been already loaded or not
+                if (!node.childrenLoaded) {
                     // Loading the dependencies
                     loadBuildDependencies(buildId).then(builds => {
                         if (builds) {
                             node.children = builds.map(child => transformData(child));
-                            // TODO Refreshes the chart
-                        } else {
-                            node.children = [];
+                            // Refreshes the chart
+                            getOrCreateChart().setOption(options);
                         }
+                        node.childrenLoaded = true;
                     });
+                }
+            }
+        };
+
+        // Initializes the chart location
+
+        const initChartEventHandling = (chart) => {
+            chart.on('click', (params) => {
+                const buildId = params.value;
+                if (buildId) {
+                    loadNodeDependencies(buildId);
                 }
             });
         };
