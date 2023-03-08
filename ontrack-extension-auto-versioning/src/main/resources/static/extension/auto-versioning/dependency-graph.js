@@ -104,7 +104,13 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
         // Given a build, creates a node & its descendants, for use inside the graph
 
-        const transformData = async (build) => {
+        const createDependencyNodes = (node, build) => {
+            if (build.using?.pageItems) {
+                node.children = build.using.pageItems.map(childBuild => transformData(childBuild));
+            }
+        };
+
+        const transformData = (build) => {
             // Initial node
             const node = {
                 name: build.name,
@@ -136,6 +142,10 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
             // Label formatter
             node.label.formatter = formatterLines.join('\n');
+
+            // Fill the dependencies
+            createDependencyNodes(node, build);
+
             // OK
             return node;
         };
@@ -156,7 +166,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             return chart;
         };
 
-        const getOrCreateChart = async () => {
+        const getOrCreateChart = () => {
             if (context.chart) {
                 return context.chart;
             }
@@ -235,10 +245,12 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             $scope.loadingData = true;
             try {
                 const rootBuild = await loadRootNode();
-                const rootNode = await transformData(rootBuild);
+                const rootNode = transformData(rootBuild);
+                // TODO Remove logging
+                console.log({rootNode});
                 // Graph setup
-                const chart = await getOrCreateChart();
-                await createOptionWithData(rootNode);
+                const chart = getOrCreateChart();
+                createOptionWithData(rootNode);
                 if (clear) {
                     chart.clear();
                 }
