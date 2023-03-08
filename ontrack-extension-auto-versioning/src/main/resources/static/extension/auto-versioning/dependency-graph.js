@@ -69,9 +69,9 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
               using {
                 pageItems {
                   ...BuildInfo
-                  lastBuild: branch {
-                    builds(count: 1) {
-                      ...BuildMinInfo
+                  autoVersioning(buildId: $buildId) {
+                    lastEligibleBuild {
+                      ...BuildInfo
                     }
                   }
                 }
@@ -86,14 +86,14 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
         const loadRootNode = () => {
             return otGraphqlService.pageGraphQLCall(`
-                query RootNode($rootBuildId: Int!) {
-                    build(id: $rootBuildId) {
+                query RootNode($buildId: Int!) {
+                    build(id: $buildId) {
                         ...BuildInfo
                         ...BuildDependencies
                     }
                 }
                 ${gqlBuildDependencies}
-            `, {rootBuildId: $scope.rootBuildId}
+            `, {buildId: $scope.rootBuildId}
             ).then(data => {
                 $scope.rootBuild = data.build;
                 if (!viewInitialized) {
@@ -186,6 +186,11 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             formatterLines.push(build.branch.name);
             // Build line
             formatterLines.push(buildLine(node, build));
+
+            // Last eligible build
+            if (build.autoVersioning?.lastEligibleBuild) {
+                formatterLines.push(buildLine(node, build.autoVersioning.lastEligibleBuild, "Last eligible build: "));
+            }
 
             // Last build
             const lastBuilds = build.branch.lastBuild;
