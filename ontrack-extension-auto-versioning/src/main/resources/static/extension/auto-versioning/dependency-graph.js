@@ -31,7 +31,9 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     promotionLevel {
                         name
                         image
-                        _image
+                        links {
+                            _image
+                        }
                     }
                 }
             }
@@ -153,10 +155,25 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             if (build.releaseProperty?.value?.name) {
                 displayName = build.releaseProperty.value.name;
             }
-            // TODO Promotions
+            // Promotions
+            let promotionsFormat = '';
+            if (build.promotionRuns && build.promotionRuns.length > 0) {
+                const run = build.promotionRuns[build.promotionRuns.length - 1];
+                const promotion = run.promotionLevel.name;
+                const image = run.promotionLevel.links._image;
+                if (image) {
+                    node.label.rich[promotion] = {
+                        backgroundColor: {
+                            image: image
+                        },
+                        height: 16,
+                        weight: 16
+                    };
+                    promotionsFormat += `{${promotion}|}`;
+                }
+            }
             // Build line
-            // TODO formatterLines.push(`${promotionsFormat}{decorationText|${displayName}}`);
-            formatterLines.push(displayName);
+            formatterLines.push(`${promotionsFormat}{decorationText|${displayName}}`);
 
             // Label formatter
             node.label.formatter = formatterLines.join('\n');
