@@ -73,6 +73,18 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     lastEligibleBuild {
                       ...BuildInfo
                     }
+                    status {
+                      order {
+                        targetVersion
+                      }
+                      running
+                      mostRecentState {
+                        state
+                        creation {
+                          time
+                        }
+                      }
+                    }
                   }
                 }
               }
