@@ -59,9 +59,12 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             ${gqlBuildMinInfo}
         `;
 
-        // Loading the first node
+        // Loading the first node & initializing the view
+
+        let viewInitialized = false;
+
         const loadRootNode = () => {
-            otGraphqlService.pageGraphQLCall(`
+            return otGraphqlService.pageGraphQLCall(`
                 query RootNode($rootBuildId: Int!) {
                     build(id: $rootBuildId) {
                         ...BuildInfo
@@ -71,13 +74,141 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             `, {rootBuildId: $scope.rootBuildId}
             ).then(data => {
                 $scope.rootBuild = data.build;
-                view.breadcrumbs = ot.buildBreadcrumbs($scope.rootBuild);
-                view.commands = [
-                    ot.viewCloseCommand(`/build/${$scope.rootBuild.id}`)
-                ];
+                if (!viewInitialized) {
+                    view.breadcrumbs = ot.buildBreadcrumbs($scope.rootBuild);
+                    view.commands = [
+                        ot.viewCloseCommand(`/build/${$scope.rootBuild.id}`)
+                    ];
+                    viewInitialized = true;
+                }
+                return data.build;
             });
         };
 
-        loadRootNode();
+        // Given a build, creates a node & its descendants, for use inside the graph
+
+        const transformData = async (build) => {
+            // Initial node
+            const node = {
+                name: build.name,
+                value: build.id
+            };
+            // OK
+            return node;
+        };
+
+        // Initializes the chart location
+
+        const initChartEventHandling = (chart) => {
+            // chart.on('dblclick', (params) => {
+            // });
+        };
+
+        const createChart = () => {
+            const graph = document.getElementById('graph');
+            const chart = echarts.init(graph);
+            // Event handling
+            initChartEventHandling(chart);
+            // OK
+            return chart;
+        };
+
+        const getOrCreateChart = async () => {
+            if (context.chart) {
+                return context.chart;
+            }
+            context.chart = createChart();
+            return context.chart;
+        };
+
+        // Chart options
+        const options = {
+            tooltip: {
+                trigger: 'item',
+                triggerOn: 'click',
+                enterable: true,
+                alwaysShowContent: true,
+                show: false // Managed at data node level
+            },
+            series: [
+                {
+                    type: 'tree',
+                    data: [],
+                    top: '1%',
+                    left: '20%',
+                    bottom: '1%',
+                    right: '20%',
+                    symbol: 'none',
+                    symbolSize: 1,
+                    label: {
+                        backgroundColor: 'white',
+                        borderColor: '#CCCCCC',
+                        borderWidth: 1,
+                        padding: 5,
+                        borderRadius: 5,
+                        align: 'left',
+                        position: 'inside',
+                        verticalAlign: 'middle',
+                        fontSize: 12,
+                        rich: {
+                            decorationText: {
+                                padding: [0, 0, 0, 8]
+                            }
+                        }
+                    },
+                    leaves: {
+                        label: {
+                            position: 'top',
+                            verticalAlign: 'middle',
+                            align: 'center'
+                        }
+                    },
+                    emphasis: {
+                        focus: 'ancestor'
+                    },
+                    expandAndCollapse: false,
+                    animationDuration: 550,
+                    animationDurationUpdate: 750
+                }
+            ]
+        };
+
+        // Creates the chart option with some data
+        const createOptionWithData = (data) => {
+            options.series[0].data = [data];
+        };
+
+        // Overall context
+        const context = {
+            // Chart will be
+            chart: undefined,
+        }
+
+        // Loading the graph
+        const loadGraph = async (clear) => {
+            if (context.chart && clear) {
+                context.chart.showLoading();
+            }
+            $scope.loadingData = true;
+            try {
+                const rootBuild = await loadRootNode();
+                const data = await transformData(rootBuild);
+                // Graph setup
+                const chart = await getOrCreateChart();
+                await createOptionWithData(data);
+                if (clear) {
+                    chart.clear();
+                }
+                chart.setOption(options);
+            } finally {
+                $scope.loadingData = false;
+                if (context.chart && clear) {
+                    context.chart.hideLoading();
+                }
+            }
+        };
+
+        // Calling the loading of the graph on page startup
+        loadGraph();
     })
 ;
