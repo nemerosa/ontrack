@@ -102,6 +102,21 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             });
         };
 
+        // Loading a build node dependencies
+
+        const loadBuildDependencies = (buildId) => {
+            return otGraphqlService.pageGraphQLCall(`
+                query BuildDependencies($buildId: Int!) {
+                    build(id: $buildId) {
+                        ...BuildDependencies
+                    }
+                }
+                ${gqlBuildDependencies}
+            `, {buildId}).then(data => {
+                return data.build.using.pageItems;
+            });
+        };
+
         // Given a build, creates a node & its descendants, for use inside the graph
 
         const createDependencyNodes = (node, build) => {
@@ -111,11 +126,13 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         };
 
         const transformData = (build) => {
+
             // Initial node
             const node = {
                 name: build.name,
                 value: build.id
             };
+
             // Styling
             node.label = {
                 rich: {
@@ -124,6 +141,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     }
                 }
             };
+
             // Format lines
             const formatterLines = [];
 
@@ -153,8 +171,21 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         // Initializes the chart location
 
         const initChartEventHandling = (chart) => {
-            // chart.on('dblclick', (params) => {
-            // });
+            chart.on('click', (params) => {
+                const node = params.data;
+                const buildId = params.value;
+                if (node && buildId && !node.children) {
+                    // Loading the dependencies
+                    loadBuildDependencies(buildId).then(builds => {
+                        if (builds) {
+                            node.children = builds.map(child => transformData(child));
+                            // TODO Refreshes the chart
+                        } else {
+                            node.children = [];
+                        }
+                    });
+                }
+            });
         };
 
         const createChart = () => {
@@ -246,8 +277,6 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             try {
                 const rootBuild = await loadRootNode();
                 const rootNode = transformData(rootBuild);
-                // TODO Remove logging
-                console.log({rootNode});
                 // Graph setup
                 const chart = getOrCreateChart();
                 createOptionWithData(rootNode);
