@@ -154,7 +154,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 }
             }
             // OK
-            let line = `${promotionsFormat}{decorationText|${displayName}}`;
+            let line = `${promotionsFormat}${displayName}`;
             if (prefix) {
                 line = prefix + line;
             }
