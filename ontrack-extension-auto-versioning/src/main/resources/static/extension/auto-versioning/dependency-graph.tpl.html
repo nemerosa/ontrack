@@ -1,1 +1,19 @@
-Graph
+<ot-view>
+
+    <div class="row">
+        <div class="col-md-12 ot-view-title">
+            <span id="build-page-title">
+                Dependency graph for
+                <a href="{{ rootBuild.branch.project.links._page }}">{{ rootBuild.branch.project.name }}</a>
+                /
+                <a href="{{ rootBuild.branch.links._page }}">{{ rootBuild.branch.name }}</a>
+                /
+                <a href="{{ rootBuild.links._page }}">{{ rootBuild.name }}</a>
+                <span class="ot-decoration-border ot-decoration-success" ng-if="rootBuild.releaseProperty.value">
+                    {{ rootBuild.releaseProperty.value.name }}
+                </span>
+            </span>
+        </div>
+    </div>
+
+</ot-view>
