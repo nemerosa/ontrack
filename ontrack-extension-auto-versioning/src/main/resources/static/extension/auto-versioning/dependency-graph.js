@@ -54,6 +54,9 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     links {
                         _page
                     }
+                    lastBuild: builds(count: 1) {
+                        ...BuildMinInfo
+                    }
                 }
                 ...BuildMinInfo
             }
@@ -127,6 +130,37 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             }
         };
 
+        const buildLine = (node, build, prefix) => {
+            // Display name is the build name unless there is a release property attached to the build
+            let displayName = build.name;
+            if (build.releaseProperty?.value?.name) {
+                displayName = build.releaseProperty.value.name;
+            }
+            // Promotions
+            let promotionsFormat = '';
+            if (build.promotionRuns && build.promotionRuns.length > 0) {
+                const run = build.promotionRuns[build.promotionRuns.length - 1];
+                const promotion = run.promotionLevel.name;
+                const image = run.promotionLevel.links._image;
+                if (image) {
+                    node.label.rich[promotion] = {
+                        backgroundColor: {
+                            image: image
+                        },
+                        height: 16,
+                        weight: 16
+                    };
+                    promotionsFormat += `{${promotion}|}`;
+                }
+            }
+            // OK
+            let line = `${promotionsFormat}{decorationText|${displayName}}`;
+            if (prefix) {
+                line = prefix + line;
+            }
+            return line;
+        };
+
         const transformData = (build) => {
 
             // Initial node
@@ -150,30 +184,17 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             // Project & branch name as a line
             formatterLines.push(`{projectName|${build.branch.project.name}}`);
             formatterLines.push(build.branch.name);
-            // Display name is the build name unless there is a release property attached to the build
-            let displayName = build.name;
-            if (build.releaseProperty?.value?.name) {
-                displayName = build.releaseProperty.value.name;
-            }
-            // Promotions
-            let promotionsFormat = '';
-            if (build.promotionRuns && build.promotionRuns.length > 0) {
-                const run = build.promotionRuns[build.promotionRuns.length - 1];
-                const promotion = run.promotionLevel.name;
-                const image = run.promotionLevel.links._image;
-                if (image) {
-                    node.label.rich[promotion] = {
-                        backgroundColor: {
-                            image: image
-                        },
-                        height: 16,
-                        weight: 16
-                    };
-                    promotionsFormat += `{${promotion}|}`;
+            // Build line
+            formatterLines.push(buildLine(node, build));
+
+            // Last build
+            const lastBuilds = build.branch.lastBuild;
+            if (lastBuilds && lastBuilds.length > 0) {
+                const lastBuild = lastBuilds[0];
+                if (lastBuild.id > build.id) {
+                    formatterLines.push(buildLine(node, lastBuild, "Last build: "));
                 }
             }
-            // Build line
-            formatterLines.push(`${promotionsFormat}{decorationText|${displayName}}`);
 
             // Label formatter
             node.label.formatter = formatterLines.join('\n');
