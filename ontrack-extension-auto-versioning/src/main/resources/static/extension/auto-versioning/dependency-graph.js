@@ -173,6 +173,10 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             return line;
         };
 
+        const avStatus = (node, status) => {
+            return `${status.mostRecentState.state} - ${status.running} - ${status.order.targetVersion}`;
+        };
+
         const transformData = (build) => {
 
             // Initial node
@@ -211,6 +215,11 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 if (lastBuild.id > build.id) {
                     formatterLines.push(buildLine(node, lastBuild, "Last build: "));
                 }
+            }
+
+            // Last AV status
+            if (build.autoVersioning?.status) {
+                formatterLines.push(avStatus(node, build.autoVersioning.status))
             }
 
             // Label formatter
