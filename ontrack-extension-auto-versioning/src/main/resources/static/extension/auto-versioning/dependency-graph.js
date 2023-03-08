@@ -93,6 +93,32 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 name: build.name,
                 value: build.id
             };
+            // Styling
+            node.label = {
+                rich: {
+                    projectName: {
+                        fontWeight: 'bold'
+                    }
+                }
+            };
+            // Format lines
+            const formatterLines = [];
+
+            // Project & branch name as a line
+            formatterLines.push(`{projectName|${build.branch.project.name}}`);
+            formatterLines.push(build.branch.name);
+            // Display name is the build name unless there is a release property attached to the build
+            let displayName = build.name;
+            if (build.releaseProperty?.value?.name) {
+                displayName = build.releaseProperty.value.name;
+            }
+            // TODO Promotions
+            // Build line
+            // TODO formatterLines.push(`${promotionsFormat}{decorationText|${displayName}}`);
+            formatterLines.push(displayName);
+
+            // Label formatter
+            node.label.formatter = formatterLines.join('\n');
             // OK
             return node;
         };
