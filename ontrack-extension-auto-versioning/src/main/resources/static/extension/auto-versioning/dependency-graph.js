@@ -192,10 +192,10 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             $scope.loadingData = true;
             try {
                 const rootBuild = await loadRootNode();
-                const data = await transformData(rootBuild);
+                const rootNode = await transformData(rootBuild);
                 // Graph setup
                 const chart = await getOrCreateChart();
-                await createOptionWithData(data);
+                await createOptionWithData(rootNode);
                 if (clear) {
                     chart.clear();
                 }
