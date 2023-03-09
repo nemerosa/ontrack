@@ -80,6 +80,8 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                       running
                       mostRecentState {
                         state
+                        running
+                        processing
                         creation {
                           time
                         }
@@ -173,8 +175,33 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             return line;
         };
 
+        const getAVStateImageUrl = (state) => {
+            let icon;
+            if (state.running) {
+                if (state.processing) {
+                    icon = 'processing';
+                } else {
+                    icon = 'running';
+                }
+            } else {
+                icon = 'stopped';
+            }
+            return `/extension/auto-versioning/state/${icon}.png`;
+        };
+
         const avStatus = (node, status) => {
-            return `${status.mostRecentState.state} - ${status.running} - ${status.order.targetVersion}`;
+            const className = status.mostRecentState.state;
+            if (!node.label.rich[className]) {
+                const imageUrl = getAVStateImageUrl(status.mostRecentState);
+                node.label.rich[className] = {
+                    backgroundColor: {
+                        image: imageUrl
+                    },
+                    height: 12,
+                    weight: 12
+                };
+            }
+            return `AV Status: {${className}|} ${status.mostRecentState.state} - ${status.order.targetVersion}`;
         };
 
         const transformData = (build) => {

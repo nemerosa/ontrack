@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.av.graphql
 
+import graphql.Scalars.GraphQLBoolean
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditEntryState
 import net.nemerosa.ontrack.graphql.schema.GQLType
@@ -35,6 +36,24 @@ class GQLTypeAutoVersioningAuditEntryState(
                 it.name("state")
                     .description("State of the processing")
                     .type(gqlEnumAutoVersioningAuditState.getTypeRef().toNotNull())
+            }
+            .field {
+                it.name("running")
+                    .description("Is the state indicating a running request?")
+                    .type(GraphQLBoolean.toNotNull())
+                    .dataFetcher { env ->
+                        val item: AutoVersioningAuditEntryState = env.getSource()
+                        item.state.isRunning
+                    }
+            }
+            .field {
+                it.name("processing")
+                    .description("Is the state indicating a request being processed?")
+                    .type(GraphQLBoolean.toNotNull())
+                    .dataFetcher { env ->
+                        val item: AutoVersioningAuditEntryState = env.getSource()
+                        item.state.isProcessing
+                    }
             }
             .field {
                 it.name("data")
