@@ -19,7 +19,7 @@ class BuildDependenciesGraphActionExtension(
             Optional.of(
                 Action.of(
                     "auto-versioning-dependency-graph",
-                    "Auto versioning dependency graph",
+                    "Dependency graph",
                     "dependency-graph/build/${entity.id}"
                 )
             )
