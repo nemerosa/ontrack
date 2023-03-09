@@ -139,7 +139,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         // Given a build, creates a node & its descendants, for use inside the graph
 
         const createDependencyNodes = (node, build) => {
-            if (build.using?.pageItems) {
+            if (build.using && build.using.pageItems) {
                 node.children = build.using.pageItems.map(childBuild => transformData(childBuild));
             }
         };
@@ -147,7 +147,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         const buildLine = (node, build, prefix) => {
             // Display name is the build name unless there is a release property attached to the build
             let displayName = build.name;
-            if (build.releaseProperty?.value?.name) {
+            if (build.releaseProperty && build.releaseProperty.value && build.releaseProperty.value.name) {
                 displayName = build.releaseProperty.value.name;
             }
             // Promotions
@@ -231,7 +231,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             formatterLines.push(buildLine(node, build));
 
             // Last eligible build
-            if (build.autoVersioning?.lastEligibleBuild) {
+            if (build.autoVersioning && build.autoVersioning.lastEligibleBuild) {
                 formatterLines.push(buildLine(node, build.autoVersioning.lastEligibleBuild, "Last eligible build: "));
             }
 
@@ -245,8 +245,8 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             }
 
             // Last AV status
-            if (build.autoVersioning?.status) {
-                formatterLines.push(avStatus(node, build.autoVersioning.status))
+            if (build.autoVersioning && build.autoVersioning.status) {
+                formatterLines.push(avStatus(node, build.autoVersioning.status));
             }
 
             // Label formatter
@@ -388,16 +388,15 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         const context = {
             // Chart will be
             chart: undefined,
-        }
+        };
 
         // Loading the graph
-        const loadGraph = async (clear) => {
+        const loadGraph = (clear) => {
             if (context.chart && clear) {
                 context.chart.showLoading();
             }
             $scope.loadingData = true;
-            try {
-                const rootBuild = await loadRootNode();
+            loadRootNode().then(rootBuild => {
                 const rootNode = transformData(rootBuild);
                 // Graph setup
                 const chart = getOrCreateChart();
@@ -406,12 +405,12 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     chart.clear();
                 }
                 chart.setOption(options);
-            } finally {
+            }).finally(() => {
                 $scope.loadingData = false;
                 if (context.chart && clear) {
                     context.chart.hideLoading();
                 }
-            }
+            });
         };
 
         // Calling the loading of the graph on page startup
