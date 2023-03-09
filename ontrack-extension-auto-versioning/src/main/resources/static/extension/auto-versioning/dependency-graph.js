@@ -144,7 +144,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             }
         };
 
-        const buildLine = (node, build, prefix) => {
+        const buildLine = (node, build, config) => {
             // Display name is the build name unless there is a release property attached to the build
             let displayName = build.name;
             if (build.releaseProperty && build.releaseProperty.value && build.releaseProperty.value.name) {
@@ -168,9 +168,15 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 }
             }
             // OK
-            let line = `${promotionsFormat}${displayName}`;
-            if (prefix) {
-                line = prefix + line;
+            let line = '';
+            if (config && config.prefix) {
+                line += config.prefix;
+            }
+            line += promotionsFormat;
+            if (config && config.main) {
+                line += `{mainBuildName|${displayName}}`;
+            } else {
+                line += displayName;
             }
             return line;
         };
@@ -217,6 +223,9 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 rich: {
                     projectName: {
                         fontWeight: 'bold'
+                    },
+                    mainBuildName: {
+                        fontWeight: 'bold'
                     }
                 }
             };
@@ -228,11 +237,11 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             formatterLines.push(`{projectName|${build.branch.project.name}}`);
             formatterLines.push(build.branch.name);
             // Build line
-            formatterLines.push(buildLine(node, build));
+            formatterLines.push(buildLine(node, build, {main: true}));
 
             // Last eligible build
             if (build.autoVersioning && build.autoVersioning.lastEligibleBuild) {
-                formatterLines.push(buildLine(node, build.autoVersioning.lastEligibleBuild, "Last eligible build: "));
+                formatterLines.push(buildLine(node, build.autoVersioning.lastEligibleBuild, {prefix: "Last eligible build: "}));
             }
 
             // Last build
@@ -240,7 +249,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             if (lastBuilds && lastBuilds.length > 0) {
                 const lastBuild = lastBuilds[0];
                 if (lastBuild.id > build.id) {
-                    formatterLines.push(buildLine(node, lastBuild, "Last build: "));
+                    formatterLines.push(buildLine(node, lastBuild, {prefix: "Last build: "}));
                 }
             }
 
