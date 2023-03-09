@@ -233,6 +233,11 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             // Format lines
             const formatterLines = [];
 
+            // Function to include a separator
+            const separator = () => {
+                formatterLines.push('{hr|}');
+            };
+
             // Project & branch name as a line
             formatterLines.push(`{projectName|${build.branch.project.name}}`);
             formatterLines.push(build.branch.name);
@@ -241,6 +246,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
             // Last eligible build
             if (build.autoVersioning && build.autoVersioning.lastEligibleBuild) {
+                separator();
                 formatterLines.push(buildLine(node, build.autoVersioning.lastEligibleBuild, {prefix: "Last eligible build: "}));
             }
 
@@ -249,12 +255,14 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             if (lastBuilds && lastBuilds.length > 0) {
                 const lastBuild = lastBuilds[0];
                 if (lastBuild.id > build.id) {
+                    separator();
                     formatterLines.push(buildLine(node, lastBuild, {prefix: "Last build: "}));
                 }
             }
 
             // Last AV status
             if (build.autoVersioning && build.autoVersioning.status) {
+                separator();
                 formatterLines.push(avStatus(node, build.autoVersioning.status));
             }
 
@@ -360,7 +368,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     },
                     label: {
                         backgroundColor: 'white',
-                        borderColor: '#CCCCCC',
+                        borderColor: '#777',
                         borderWidth: 1,
                         padding: 5,
                         borderRadius: 5,
@@ -368,9 +376,13 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         position: 'inside',
                         verticalAlign: 'middle',
                         fontSize: 12,
+                        lineHeight: 12,
                         rich: {
-                            decorationText: {
-                                padding: [0, 0, 0, 8]
+                            hr : {
+                                borderColor: '#777',
+                                width: '100%',
+                                borderWidth: 0.5,
+                                height: 0
                             }
                         }
                     },
