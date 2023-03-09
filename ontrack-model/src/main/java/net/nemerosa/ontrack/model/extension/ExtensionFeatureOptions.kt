@@ -60,4 +60,11 @@ class ExtensionFeatureOptions(
         dependencies = dependencies,
     )
 
+    fun toProduction() = ExtensionFeatureOptions(
+        isGui = isGui,
+        // In production, all JS module are grouped into the `module` one.
+        extraJsModules = emptyList(),
+        dependencies = dependencies,
+    )
+
 }
