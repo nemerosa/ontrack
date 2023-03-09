@@ -164,7 +164,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         height: 12,
                         weight: 12
                     };
-                    promotionsFormat += `{${promotion}|}`;
+                    promotionsFormat += `{${promotion}|} `;
                 }
             }
             // OK
