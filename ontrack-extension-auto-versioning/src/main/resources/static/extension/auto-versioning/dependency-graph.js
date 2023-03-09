@@ -161,8 +161,8 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         backgroundColor: {
                             image: image
                         },
-                        height: 16,
-                        weight: 16
+                        height: 12,
+                        weight: 12
                     };
                     promotionsFormat += `{${promotion}|}`;
                 }
@@ -346,6 +346,9 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     right: '20%',
                     symbol: 'none',
                     symbolSize: 1,
+                    labelLayout: {
+                        align: 'left'
+                    },
                     label: {
                         backgroundColor: 'white',
                         borderColor: '#CCCCCC',
