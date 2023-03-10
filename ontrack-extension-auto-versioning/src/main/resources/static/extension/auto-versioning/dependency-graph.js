@@ -106,6 +106,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
          * @param config.rootBuild Given the data returns by the GraphQL query, returns the root build
          * @param config.rootVariables Variables to pass to the root query
          * @param config.autoVersioningArguments Arguments to pass to Build.autoVersioning (for the root query only)
+         * @param config.onBuildSelected Method to call whenever a build is selected
          */
         self.loadRootNode = (config) => {
             const query = `
@@ -194,7 +195,10 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     }
                     ${gqlBuildDependencies('buildId: $buildId')}
                 `, {buildId}).then(data => {
-                    return data.build.using.pageItems;
+                    return {
+                        build: data.buidl,
+                        dependencies: data.build.using.pageItems
+                    };
                 });
             };
 
@@ -366,15 +370,23 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     // Check if the children have been already loaded or not
                     if (!node.childrenLoaded) {
                         // Loading the dependencies
-                        loadBuildDependencies(buildId).then(builds => {
+                        return loadBuildDependencies(buildId).then(data => {
+                            const build = data.build;
+                            const builds = data.dependencies;
                             if (builds) {
                                 node.children = builds.map(child => transformData(child));
                                 // Refreshes the chart
                                 getOrCreateChart().setOption(options);
                             }
                             node.childrenLoaded = true;
+                            // OK
+                            return build;
                         });
+                    } else {
+                        return null;
                     }
+                } else {
+                    return null;
                 }
             };
 
@@ -384,7 +396,12 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 chart.on('click', (params) => {
                     const buildId = params.value;
                     if (buildId) {
-                        loadNodeDependencies(buildId);
+                        const buildLoading = loadNodeDependencies(buildId);
+                        if (buildLoading && config.onBuildSelected) {
+                            buildLoading.then(build => {
+                                config.onBuildSelected(build);
+                            });
+                        }
                     }
                 });
             };
