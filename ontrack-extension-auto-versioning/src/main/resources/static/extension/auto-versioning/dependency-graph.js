@@ -486,6 +486,18 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
     })
 
+    .directive('otAutoVersioningDependencyGraphSelectedBuild', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/auto-versioning/directive.dependency-graph-selected-build.tpl.html',
+            scope: {
+                selectedBuild: '='
+            },
+            controller: function ($scope, otGraphqlService) {
+            }
+        };
+    })
+
     .controller('AutoVersioningDependencyGraphCtrl', function ($stateParams, $scope,
                                                                ot, otGraphqlService,
                                                                otExtensionAutoVersioningDependencyGraph) {
@@ -513,7 +525,6 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             rootBuild: (data) => data.build,
             autoVersioningArguments: 'buildId: $buildId',
             onBuildSelected: (build) => {
-                console.log({selectedBuild: build.name});
                 $scope.selectedBuild = build;
             }
         }).then(rootBuild => {
