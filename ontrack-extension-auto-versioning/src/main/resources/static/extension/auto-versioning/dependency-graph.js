@@ -117,6 +117,23 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         const self = {};
 
         /**
+         * URL to the AV state icon
+         */
+        self.getAVStateImageUrl = (state) => {
+            let icon;
+            if (state.running) {
+                if (state.processing) {
+                    icon = 'processing';
+                } else {
+                    icon = 'running';
+                }
+            } else {
+                icon = 'stopped';
+            }
+            return `/extension/auto-versioning/state/${icon}.png`;
+        };
+
+        /**
          * Initializes the graph & the initial data
          * @param config.rootQuery Function which takes a GraphQL fragment and returns a GraphQL path to put under the query
          * @param config.rootBuild Given the data returns by the GraphQL query, returns the root build
@@ -260,24 +277,10 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 return line;
             };
 
-            const getAVStateImageUrl = (state) => {
-                let icon;
-                if (state.running) {
-                    if (state.processing) {
-                        icon = 'processing';
-                    } else {
-                        icon = 'running';
-                    }
-                } else {
-                    icon = 'stopped';
-                }
-                return `/extension/auto-versioning/state/${icon}.png`;
-            };
-
             const avStatus = (node, status) => {
                 const className = status.mostRecentState.state;
                 if (!node.label.rich[className]) {
-                    const imageUrl = getAVStateImageUrl(status.mostRecentState);
+                    const imageUrl = self.getAVStateImageUrl(status.mostRecentState);
                     node.label.rich[className] = {
                         backgroundColor: {
                             image: imageUrl
@@ -501,6 +504,9 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             templateUrl: 'extension/auto-versioning/directive.dependency-graph-selected-build.tpl.html',
             scope: {
                 selectedBuild: '='
+            },
+            controller: function ($scope, otExtensionAutoVersioningDependencyGraph) {
+                $scope.avStatusIconUrl = (state) => otExtensionAutoVersioningDependencyGraph.getAVStateImageUrl(state);
             }
         };
     })
