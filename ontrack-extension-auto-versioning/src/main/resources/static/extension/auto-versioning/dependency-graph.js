@@ -399,7 +399,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     if (buildId) {
                         const build = loadNodeDependencies(buildId);
                         if (build && config.onBuildSelected) {
-                            config.onBuildSelected(build);
+                            config.onBuildSelected(angular.copy(build));
                         }
                     }
                 });
