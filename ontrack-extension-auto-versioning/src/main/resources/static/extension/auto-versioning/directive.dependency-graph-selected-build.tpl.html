@@ -1,7 +1,9 @@
 <!-- Build basic information -->
 <p>
-    <a href="{{ selectedBuild.branch.project.links._page }}">{{ selectedBuild.branch.project.name }}</a>
+    <a href="{{ selectedBuild.branch.project.links._page }}"><b>{{ selectedBuild.branch.project.name }}</b></a>
+    /
+    <a href="{{ selectedBuild.branch.links._page }}">{{ selectedBuild.branch.name }}</a>
 </p>
 <p>
-    <a href="{{ selectedBuild.branch.links._page }}">{{ selectedBuild.branch.name }}</a>
+    <ot-auto-versioning-dependency-graph-build-links build="selectedBuild"></ot-auto-versioning-dependency-graph-build-links>
 </p>

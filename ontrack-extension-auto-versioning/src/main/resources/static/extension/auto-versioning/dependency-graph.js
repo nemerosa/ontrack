@@ -492,6 +492,16 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             templateUrl: 'extension/auto-versioning/directive.dependency-graph-selected-build.tpl.html',
             scope: {
                 selectedBuild: '='
+            }
+        };
+    })
+
+    .directive('otAutoVersioningDependencyGraphBuildLinks', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/auto-versioning/directive.dependency-graph-build-links.tpl.html',
+            scope: {
+                build: '='
             },
             controller: function ($scope, otGraphqlService) {
             }

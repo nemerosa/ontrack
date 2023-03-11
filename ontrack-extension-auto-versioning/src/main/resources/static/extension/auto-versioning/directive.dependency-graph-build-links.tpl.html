@@ -1,0 +1,6 @@
+<span ng-if="build.releaseProperty.value.name">
+    <a href="{{ build.links._page }}"><b>{{ build.releaseProperty.value.name }}</b></a>
+</span>
+<span ng-if="!build.releaseProperty.value.name">
+    <a href="{{ build.links._page }}"><b>{{ build.name }}</b></a>
+</span>
