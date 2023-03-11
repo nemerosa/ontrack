@@ -35,6 +35,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     promotionLevel {
                         name
                         image
+                        _image
                         links {
                             _image
                         }
