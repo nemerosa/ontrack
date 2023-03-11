@@ -4,4 +4,11 @@
     /
     <a href="{{ selectedBuild.branch.links._page }}">{{ selectedBuild.branch.name }}</a>
 </p>
-<ot-auto-versioning-dependency-graph-build-links build="selectedBuild"></ot-auto-versioning-dependency-graph-build-links>
+<p>
+    <ot-auto-versioning-dependency-graph-build-links build="selectedBuild"></ot-auto-versioning-dependency-graph-build-links>
+</p>
+<p ng-if="selectedBuild.autoVersioning.lastEligibleBuild">
+    <ot-auto-versioning-dependency-graph-build-links
+            name="Last eligible build"
+            build="selectedBuild.autoVersioning.lastEligibleBuild"></ot-auto-versioning-dependency-graph-build-links>
+</p>

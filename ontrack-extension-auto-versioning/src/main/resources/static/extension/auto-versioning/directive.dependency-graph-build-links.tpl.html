@@ -1,16 +1,15 @@
-<p>
-    <!-- Build name & link to the build -->
-    <span ng-if="build.releaseProperty.value.name">
-        <a href="{{ build.links._page }}"><b>{{ build.releaseProperty.value.name }}</b></a>
-    </span>
-        <span ng-if="!build.releaseProperty.value.name">
-        <a href="{{ build.links._page }}"><b>{{ build.name }}</b></a>
-    </span>
-    <!-- Promotions -->
-    <span ng-if="build.promotionRuns.length > 0">
-        <ot-entity-image
-                ng-repeat="run in build.promotionRuns"
-                class-name="ot-icon-minimal"
-                entity="run.promotionLevel"></ot-entity-image>
-    </span>
-</p>
+<!-- Build name & link to the build -->
+<span ng-if="name">{{ name }}: </span>
+<span ng-if="build.releaseProperty.value.name">
+    <a href="{{ build.links._page }}"><b>{{ build.releaseProperty.value.name }}</b></a>
+</span>
+    <span ng-if="!build.releaseProperty.value.name">
+    <a href="{{ build.links._page }}"><b>{{ build.name }}</b></a>
+</span>
+<!-- Promotions -->
+<span ng-if="build.promotionRuns.length > 0">
+    <ot-entity-image
+            ng-repeat="run in build.promotionRuns"
+            class-name="ot-icon-minimal"
+            entity="run.promotionLevel"></ot-entity-image>
+</span>

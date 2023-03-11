@@ -502,6 +502,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             restrict: 'E',
             templateUrl: 'extension/auto-versioning/directive.dependency-graph-build-links.tpl.html',
             scope: {
+                name: '@',
                 build: '='
             },
             controller: function ($scope, otGraphqlService) {
