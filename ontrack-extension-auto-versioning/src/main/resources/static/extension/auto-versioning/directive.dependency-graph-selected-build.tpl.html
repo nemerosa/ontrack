@@ -7,8 +7,16 @@
 <p>
     <ot-auto-versioning-dependency-graph-build-links build="selectedBuild"></ot-auto-versioning-dependency-graph-build-links>
 </p>
-<p ng-if="selectedBuild.autoVersioning.lastEligibleBuild">
+<p ng-if="selectedBuild.autoVersioning.lastEligibleBuild && selectedBuild.autoVersioning.lastEligibleBuild.id != selectedBuild.id">
     <ot-auto-versioning-dependency-graph-build-links
             name="Last eligible build"
             build="selectedBuild.autoVersioning.lastEligibleBuild"></ot-auto-versioning-dependency-graph-build-links>
+</p>
+<p ng-if="selectedBuild.branch.lastBuild &&
+          selectedBuild.branch.lastBuild.length > 0 &&
+          selectedBuild.branch.lastBuild[0].id != selectedBuild.id
+">
+    <ot-auto-versioning-dependency-graph-build-links
+            name="Last build"
+            build="selectedBuild.branch.lastBuild[0]"></ot-auto-versioning-dependency-graph-build-links>
 </p>
