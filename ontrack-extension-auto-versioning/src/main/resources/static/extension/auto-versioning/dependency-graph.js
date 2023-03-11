@@ -56,11 +56,14 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                             _page
                         }
                     }
+                    buildDiffActions {
+                      id
+                      name
+                      type
+                      uri
+                    }
                     links {
                         _page
-                    }
-                    lastBuild: builds(count: 1) {
-                        ...BuildMinInfo
                     }
                 }
                 ...BuildMinInfo
@@ -72,6 +75,11 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         const gqlBuildNodeInfo = (autoVersioningArguments) => `
             fragment BuildNodeInfo on Build {
               ...BuildInfo
+              lastBuildInfo: branch {
+                lastBuild: builds(count: 1) {
+                  ...BuildInfo
+                }
+              }
               autoVersioning(${autoVersioningArguments}) {
                 lastEligibleBuild {
                   ...BuildInfo
@@ -323,7 +331,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 }
 
                 // Last build
-                const lastBuilds = build.branch.lastBuild;
+                const lastBuilds = build.lastBuildInfo.lastBuild;
                 if (lastBuilds && lastBuilds.length > 0) {
                     const lastBuild = lastBuilds[0];
                     if (lastBuild.id > build.id) {
@@ -503,9 +511,19 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             templateUrl: 'extension/auto-versioning/directive.dependency-graph-build-links.tpl.html',
             scope: {
                 name: '@',
+                refBuild: '=',
                 build: '='
             },
-            controller: function ($scope, otGraphqlService) {
+            controller: function ($scope, $state) {
+                $scope.buildDiff = action => {
+                    if ($scope.refBuild) {
+                        $state.go(action.id, {
+                            branch: $scope.build.branch.id,
+                            from: $scope.refBuild.id,
+                            to: $scope.build.id
+                        });
+                    }
+                };
             }
         };
     })

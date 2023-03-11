@@ -19,3 +19,11 @@
             title="Link to the dependency graph of this build"
             href="/#/extension/auto-versioning/dependency-graph/build/{{ build.id }}"><i class="fa fa-code-fork"></i></a>
 </span>
+<!-- Change log -->
+<span ng-if="refBuild">
+    <span ng-repeat="action in build.branch.buildDiffActions"
+        class="ot-action"
+        title="{{action.name}} since {{ refBuild.releaseProperty.value.name ? refBuild.releaseProperty.value.name : refBuild.name }}"
+        id="{{action.id}}"
+        ng-click="buildDiff(action)"><i class="fa fa-file-text-o "></i></span>
+</span>
