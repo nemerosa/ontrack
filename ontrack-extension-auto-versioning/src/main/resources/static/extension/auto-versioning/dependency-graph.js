@@ -388,8 +388,6 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     loadBuildDependencies(node.value).then(builds => {
                         if (builds) {
                             node.children = builds.map(child => transformData(child));
-                            // Refreshes the chart
-                            getOrCreateChart().setOption(options);
                         }
                         node.childrenLoaded = true;
                     });
@@ -409,6 +407,8 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 const node = lookForNode(options.series[0].data[0], buildId);
                 if (node) {
                     loadDependenciesForNode(node);
+                    // Refreshes the chart
+                    getOrCreateChart().setOption(options);
                     // Returning the build attached to the node
                     return node.build;
                 } else {
@@ -473,6 +473,8 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             graph.expandAllDependencies = () => {
                 const root = options.series[0].data[0];
                 loadDependenciesForNode(root, true);
+                // Refreshes the chart
+                getOrCreateChart().setOption(options);
             };
 
             return graph;
