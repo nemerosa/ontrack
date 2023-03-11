@@ -134,14 +134,15 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         };
 
         /**
-         * Initializes the graph & the initial data
+         * Initializes a graph
          * @param config.rootQuery Function which takes a GraphQL fragment and returns a GraphQL path to put under the query
          * @param config.rootBuild Given the data returns by the GraphQL query, returns the root build
          * @param config.rootVariables Variables to pass to the root query
          * @param config.autoVersioningArguments Arguments to pass to Build.autoVersioning (for the root query only)
          * @param config.onBuildSelected Method to call whenever a build is selected
          */
-        self.loadRootNode = (config) => {
+        self.createGraph = (config) => {
+
             const query = `
                 ${
                     config.rootQuery(`
@@ -380,22 +381,34 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
             // Loading the children for a node
 
+            const loadDependenciesForNode = (node, recursive) => {
+                // Check if the children have been already loaded or not
+                if (!node.childrenLoaded) {
+                    // Loading the dependencies
+                    loadBuildDependencies(node.value).then(builds => {
+                        if (builds) {
+                            node.children = builds.map(child => transformData(child));
+                            // Refreshes the chart
+                            getOrCreateChart().setOption(options);
+                        }
+                        node.childrenLoaded = true;
+                    });
+                }
+                // Recursive loading
+                if (recursive) {
+                    if (node.children) {
+                        node.children.forEach(child => {
+                            loadDependenciesForNode(child, recursive);
+                        });
+                    }
+                }
+            };
+
             const loadNodeDependencies = (buildId) => {
                 // Looks for the node having the buildId as a value
                 const node = lookForNode(options.series[0].data[0], buildId);
                 if (node) {
-                    // Check if the children have been already loaded or not
-                    if (!node.childrenLoaded) {
-                        // Loading the dependencies
-                        loadBuildDependencies(buildId).then(builds => {
-                            if (builds) {
-                                node.children = builds.map(child => transformData(child));
-                                // Refreshes the chart
-                                getOrCreateChart().setOption(options);
-                            }
-                            node.childrenLoaded = true;
-                        });
-                    }
+                    loadDependenciesForNode(node);
                     // Returning the build attached to the node
                     return node.build;
                 } else {
@@ -439,18 +452,30 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 options.series[0].data = [data];
             };
 
-            return otGraphqlService.pageGraphQLCall(
-                query,
-                config.rootVariables
-            ).then(data => {
-                const rootBuild = config.rootBuild(data);
-                const rootNode = transformData(rootBuild);
-                // Graph setup
-                const chart = getOrCreateChart();
-                createOptionWithData(rootNode);
-                chart.setOption(options);
-                return rootBuild;
-            });
+
+            const graph = {};
+
+            graph.loadRootNode = () => {
+                return otGraphqlService.pageGraphQLCall(
+                    query,
+                    config.rootVariables
+                ).then(data => {
+                    const rootBuild = config.rootBuild(data);
+                    const rootNode = transformData(rootBuild);
+                    // Graph setup
+                    const chart = getOrCreateChart();
+                    createOptionWithData(rootNode);
+                    chart.setOption(options);
+                    return rootBuild;
+                });
+            };
+
+            graph.expandAllDependencies = () => {
+                const root = options.series[0].data[0];
+                loadDependenciesForNode(root, true);
+            };
+
+            return graph;
         };
 
         return self;
@@ -471,7 +496,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
         let viewInitialized = false;
 
-        otExtensionAutoVersioningDependencyGraph.loadRootNode({
+        const graph = otExtensionAutoVersioningDependencyGraph.createGraph({
             rootQuery: (fragment) => {
                 return `
                     query RootBuild($branchId: Int!) {
@@ -491,7 +516,9 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     $scope.selectedBuild = build;
                 });
             }
-        }).then(rootBuild => {
+        });
+
+        graph.loadRootNode().then(rootBuild => {
             $scope.rootBuild = rootBuild;
             if (!viewInitialized) {
                 view.breadcrumbs = ot.branchBreadcrumbs($scope.rootBuild.branch);
@@ -501,6 +528,17 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 viewInitialized = true;
             }
         });
+
+        // Expanding all dependencies
+        $scope.expandAllDependencies = () => {
+            $scope.expanding = true;
+            try {
+                graph.expandAllDependencies();
+            } finally {
+                $scope.expanding = false;
+                $scope.expanded = true;
+            }
+        };
 
     })
 
@@ -555,7 +593,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
         let viewInitialized = false;
 
-        otExtensionAutoVersioningDependencyGraph.loadRootNode({
+        const graph = otExtensionAutoVersioningDependencyGraph.createGraph({
             rootQuery: (fragment) => {
                 return `
                     query RootBuild($buildId: Int!) {
@@ -573,7 +611,9 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     $scope.selectedBuild = build;
                 });
             }
-        }).then(rootBuild => {
+        });
+
+        graph.loadRootNode().then(rootBuild => {
             $scope.rootBuild = rootBuild;
             if (!viewInitialized) {
                 view.breadcrumbs = ot.buildBreadcrumbs($scope.rootBuild);
@@ -583,5 +623,16 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 viewInitialized = true;
             }
         });
+
+        // Expanding all dependencies
+        $scope.expandAllDependencies = () => {
+            $scope.expanding = true;
+            try {
+                graph.expandAllDependencies();
+            } finally {
+                $scope.expanding = false;
+                $scope.expanded = true;
+            }
+        };
     })
 ;
