@@ -505,9 +505,11 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
         const view = ot.view();
 
-        // Loading the first node & initializing the view
+        // Build selection
 
         $scope.selectedBuild = undefined;
+
+        // Loading the first node & initializing the view
 
         let viewInitialized = false;
 
@@ -525,7 +527,9 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             rootBuild: (data) => data.build,
             autoVersioningArguments: 'buildId: $buildId',
             onBuildSelected: (build) => {
-                $scope.selectedBuild = build;
+                $scope.$apply(function () {
+                    $scope.selectedBuild = build;
+                });
             }
         }).then(rootBuild => {
             $scope.rootBuild = rootBuild;
