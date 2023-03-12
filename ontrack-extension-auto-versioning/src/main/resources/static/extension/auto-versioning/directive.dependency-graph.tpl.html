@@ -36,6 +36,20 @@
                 </button>
             </div>
         </div>
+        <!-- Refresh -->
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-default form-control"
+                        style="margin-bottom: 1em;"
+                        ng-disabled="refreshing"
+                        ng-click="refreshGraph()"
+                        title="Refreshes the data in the graph">
+                    <span class="ot-loading-indicator" ng-show="refreshing"></span>
+                    <i class="fa fa-refresh" ng-hide="refreshing"></i>
+                    Refresh
+                </button>
+            </div>
+        </div>
         <!-- Selected build area -->
         <ot-auto-versioning-dependency-graph-selected-build
                 selected-build="selectedBuild"></ot-auto-versioning-dependency-graph-selected-build>

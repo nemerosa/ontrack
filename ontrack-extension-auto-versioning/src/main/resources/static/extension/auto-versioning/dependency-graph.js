@@ -648,6 +648,19 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     }
                 });
 
+                // Refreshing the graph
+                $scope.refreshGraph = () => {
+                    $scope.refreshing = true;
+                    graph.loadRootNode().then(rootBuild => {
+                        if ($scope.rootBuildSetter) {
+                            $scope.rootBuildSetter(rootBuild);
+                            $scope.selectedBuild = rootBuild;
+                        }
+                    }).finally(() => {
+                        $scope.refreshing = false;
+                    });
+                };
+
                 // Expanding all dependencies
                 $scope.expandAllDependencies = () => {
                     $scope.expanding = true;
