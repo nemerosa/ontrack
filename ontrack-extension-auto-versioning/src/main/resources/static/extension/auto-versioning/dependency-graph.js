@@ -72,7 +72,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             ${gqlBuildMinInfo}
         `;
 
-        const gqlBuildNodeInfo = (autoVersioningArguments) => `
+        const gqlBuildNodeInfo = (autoVersioningArguments, direction) => `
             fragment BuildNodeInfo on Build {
               ...BuildInfo
               lastBuildInfo: branch {
@@ -80,7 +80,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                   ...BuildInfo
                 }
               }
-              autoVersioning(${autoVersioningArguments}) {
+              autoVersioning(${autoVersioningArguments}, direction: ${direction}) {
                 lastEligibleBuild {
                   ...BuildInfo
                 }
@@ -103,16 +103,22 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             ${gqlBuildInfo}
         `;
 
-        const gqlBuildDependencies = (autoVersioningArguments) => `
-            fragment BuildDependencies on Build {
-              using {
-                pageItems {
-                  ...BuildNodeInfo
-                }
-              }
+        const gqlBuildDependencies = (autoVersioningArguments, direction) => {
+            let dependencyDirection = 'using';
+            if (direction !== 'DOWN') {
+                dependencyDirection = 'usedBy';
             }
-            ${gqlBuildNodeInfo(autoVersioningArguments)}
-        `;
+            return `
+                fragment BuildDependencies on Build {
+                  ${dependencyDirection} {
+                    pageItems {
+                      ...BuildNodeInfo
+                    }
+                  }
+                }
+                ${gqlBuildNodeInfo(autoVersioningArguments, direction)}
+            `;
+        };
 
         const self = {};
 
@@ -140,6 +146,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
          * @param config.rootVariables Variables to pass to the root query
          * @param config.autoVersioningArguments Arguments to pass to Build.autoVersioning (for the root query only)
          * @param config.onBuildSelected Method to call whenever a build is selected
+         * @param config.direction DOWN or UP
          */
         self.createGraph = (config) => {
 
@@ -150,7 +157,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         ...BuildDependencies
                     `)
                 }
-                ${gqlBuildDependencies(config.autoVersioningArguments)}
+                ${gqlBuildDependencies(config.autoVersioningArguments, config.direction)}
             `;
 
             // Overall context
@@ -227,7 +234,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                             ...BuildDependencies
                         }
                     }
-                    ${gqlBuildDependencies('buildId: $buildId')}
+                    ${gqlBuildDependencies('buildId: $buildId', config.direction)}
                 `, {buildId}).then(data => {
                     return data.build.using.pageItems;
                 });
@@ -544,10 +551,12 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             scope: {
                 rootBuildId: '=',
                 rootBranchId: '=',
-                rootBuildSetter: '='
+                rootBuildSetter: '=',
+                direction: '@'
             },
             controller: function ($scope) {
                 const config = {};
+                config.direction = $scope.direction ? $scope.direction : 'DOWN';
                 if ($scope.rootBuildId) {
                     config.rootQuery = (fragment) => {
                         return `
