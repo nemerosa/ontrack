@@ -15,14 +15,12 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeBuildAutoVersioning(
     private val gqlTypeAutoVersioningAuditEntry: GQLTypeAutoVersioningAuditEntry,
     private val autoVersioningAuditQueryService: AutoVersioningAuditQueryService,
-    private val structureService: StructureService,
     private val buildFilterService: BuildFilterService,
     private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
 ) : GQLType {
@@ -59,9 +57,9 @@ class GQLTypeBuildAutoVersioning(
 
     private fun getLastEligibleBuild(context: Context): Build? {
         val av = context.config
-        val dependencyBuild = context.dependencyBuild
+        val dependencyBranch = context.dependencyBranch
         // Gets the latest branch
-        val latestBranch = autoVersioningConfigurationService.getLatestBranch(dependencyBuild.project, av)
+        val latestBranch = autoVersioningConfigurationService.getLatestBranch(dependencyBranch.project, av)
             ?: return null
         // Gets the latest promoted build on this branch
         return buildFilterService.standardFilterProviderData(1)
@@ -76,14 +74,14 @@ class GQLTypeBuildAutoVersioning(
             AutoVersioningAuditQueryFilter(
                 project = context.parentBranch.project.name,
                 branch = context.parentBranch.name,
-                source = context.dependencyBuild.project.name,
+                source = context.dependencyBranch.project.name,
                 count = 1
             )
         ).firstOrNull()
 
     data class Context(
         val parentBranch: Branch,
-        val dependencyBuild: Build,
+        val dependencyBranch: Branch,
         @APIDescription("AV source config")
         val config: AutoVersioningSourceConfig,
     )

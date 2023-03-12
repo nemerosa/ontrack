@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.graphql.support
 import graphql.Scalars.*
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLArgument
+import graphql.schema.GraphQLTypeReference
 import java.util.*
 
 /**
@@ -35,6 +36,22 @@ fun intArgument(
     .name(name)
     .description(description)
     .type(nullableInputType(GraphQLInt, nullable))
+    .build()
+
+/**
+ * Creates a `Enum` GraphQL argument.
+ *
+ * @param name Name of the argument
+ * @param description Description of the argument
+ */
+inline fun <reified E: Enum<E>> enumArgument(
+    name: String,
+    description: String,
+    nullable: Boolean = true,
+): GraphQLArgument = GraphQLArgument.newArgument()
+    .name(name)
+    .description(description)
+    .type(nullableInputType(GraphQLTypeReference(E::class.java.simpleName), nullable))
     .build()
 
 /**

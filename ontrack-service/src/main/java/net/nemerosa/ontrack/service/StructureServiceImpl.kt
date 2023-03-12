@@ -140,7 +140,7 @@ class StructureServiceImpl(
 
     override fun getBranch(branchId: ID): Branch {
         val branch = structureRepository.getBranch(branchId)
-        securityService.checkProjectFunction(branch.project.id(), ProjectView::class.java)
+        securityService.checkProjectFunction(branch, ProjectView::class.java)
         return branch
     }
 

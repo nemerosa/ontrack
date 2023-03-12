@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.av.graphql
 import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.graphql.schema.GQLProjectEntityFieldContributor
+import net.nemerosa.ontrack.graphql.support.enumArgument
 import net.nemerosa.ontrack.graphql.support.intArgument
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
@@ -37,24 +38,55 @@ class AutoVersioningGQLBuildFieldContributor(
                         "ID of the parent branch. Is overridden by the $ARG_BUILD_ID argument, but at least one of each is required."
                     )
                 )
+                .argument(
+                    enumArgument<AutoVersioningDirection>(
+                        ARG_DIRECTION,
+                        "Downstream or upstream dependencies (down by default)."
+                    )
+                )
                 .dataFetcher { env ->
-                    val dependency: Build = env.getSource()
-                    val parentBuildId: Int? = env.getArgument(ARG_BUILD_ID)
-                    val parentBranchId: Int? = env.getArgument(ARG_BRANCH_ID)
-                    val parentBranch = if (parentBuildId != null) {
-                        structureService.getBuild(ID.of(parentBuildId)).branch
-                    } else if (parentBranchId != null) {
-                        structureService.getBranch(ID.of(parentBranchId))
+
+                    // Local branch
+                    val localBuild: Build = env.getSource()
+                    val localBranch = localBuild.branch
+
+                    // Reference branch
+                    val refBuildId: Int? = env.getArgument(ARG_BUILD_ID)
+                    val refBranchId: Int? = env.getArgument(ARG_BRANCH_ID)
+                    val refBranch = if (refBuildId != null) {
+                        structureService.getBuild(ID.of(refBuildId)).branch
+                    } else if (refBranchId != null) {
+                        structureService.getBranch(ID.of(refBranchId))
                     } else {
                         error("Either $ARG_BUILD_ID or $ARG_BRANCH_ID is required.")
                     }
+
+                    // Getting the dependencies right
+                    val direction = env.getArgument<String?>(ARG_DIRECTION)
+                        ?.takeIf { it.isNotBlank() }
+                        ?.let { AutoVersioningDirection.valueOf(it) }
+                        ?: AutoVersioningDirection.DOWN
+                    val dependency: Branch
+                    val parent: Branch
+                    when (direction) {
+                        AutoVersioningDirection.DOWN -> {
+                            dependency = localBranch
+                            parent = refBranch
+                        }
+
+                        AutoVersioningDirection.UP -> {
+                            dependency = refBranch
+                            parent = localBranch
+                        }
+                    }
+
                     // Gets the AV config between the parent branch and its dependency
                     val config =
-                        autoVersioningConfigurationService.getAutoVersioningBetween(parentBranch, dependency.branch)
+                        autoVersioningConfigurationService.getAutoVersioningBetween(parent, dependency)
                     // Returns the contextual object for this field
                     config?.run {
                         GQLTypeBuildAutoVersioning.Context(
-                            parentBranch, dependency, this
+                            parent, dependency, this
                         )
                     }
                 }
@@ -67,6 +99,7 @@ class AutoVersioningGQLBuildFieldContributor(
     companion object {
         const val ARG_BUILD_ID = "buildId"
         const val ARG_BRANCH_ID = "branchId"
+        const val ARG_DIRECTION = "direction"
     }
 
 }
