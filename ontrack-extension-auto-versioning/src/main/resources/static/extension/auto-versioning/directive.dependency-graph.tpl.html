@@ -22,16 +22,20 @@
                 </button>
             </div>
         </div>
-        <!-- Control buttons -->
-        <button class="btn btn-default" style="margin-bottom: 1em; width: 100%;"
-                ng-hide="expanded"
-                ng-disabled="expanding"
-                ng-click="expandAllDependencies()"
-                title="Expands all dependencies">
-            <span class="ot-loading-indicator" ng-show="expanding"></span>
-            <i class="fa fa-expand" ng-hide="expanding"></i>
-            Expand all
-        </button>
+        <!-- Expand all -->
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-default form-control"
+                        style="margin-bottom: 1em;"
+                        ng-disabled="expanding"
+                        ng-click="expandAllDependencies()"
+                        title="Expands all dependencies">
+                    <span class="ot-loading-indicator" ng-show="expanding"></span>
+                    <i class="fa fa-expand" ng-hide="expanding"></i>
+                    Expand all
+                </button>
+            </div>
+        </div>
         <!-- Selected build area -->
         <ot-auto-versioning-dependency-graph-selected-build
                 selected-build="selectedBuild"></ot-auto-versioning-dependency-graph-selected-build>
