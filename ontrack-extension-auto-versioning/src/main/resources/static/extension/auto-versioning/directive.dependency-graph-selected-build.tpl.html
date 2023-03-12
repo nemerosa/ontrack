@@ -29,6 +29,26 @@
             <ot-auto-versioning-dependency-graph-build-links build="selectedBuild"></ot-auto-versioning-dependency-graph-build-links>
         </p>
     </div>
+    <!-- Previous build -->
+    <div class="panel-heading" ng-if="selectedBuild.previousBuild && selectedBuild.previousBuild.id != selectedBuild.id">
+        <i class="fa fa-arrow-left"></i>
+        Previous build
+    </div>
+    <div class="panel-body" ng-if="selectedBuild.previousBuild && selectedBuild.previousBuild.id != selectedBuild.id">
+        <ot-auto-versioning-dependency-graph-build-links
+                ref-build="selectedBuild"
+                build="selectedBuild.previousBuild"></ot-auto-versioning-dependency-graph-build-links>
+    </div>
+    <!-- Next build -->
+    <div class="panel-heading" ng-if="selectedBuild.nextBuild && selectedBuild.nextBuild.id != selectedBuild.id">
+        <i class="fa fa-arrow-right"></i>
+        Next build
+    </div>
+    <div class="panel-body" ng-if="selectedBuild.nextBuild && selectedBuild.nextBuild.id != selectedBuild.id">
+        <ot-auto-versioning-dependency-graph-build-links
+                ref-build="selectedBuild"
+                build="selectedBuild.nextBuild"></ot-auto-versioning-dependency-graph-build-links>
+    </div>
     <!-- Last AV eligible build -->
     <div class="panel-heading" ng-if="selectedBuild.autoVersioning.lastEligibleBuild && selectedBuild.autoVersioning.lastEligibleBuild.id != selectedBuild.id">
         Last eligible build

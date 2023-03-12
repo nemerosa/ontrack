@@ -96,6 +96,12 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                   ...BuildInfo
                 }
               }
+              previousBuild {
+                  ...BuildInfo
+              }
+              nextBuild {
+                  ...BuildInfo
+              }
               autoVersioning(${autoVersioningArguments}, direction: ${direction}) {
                 lastEligibleBuild {
                   ...BuildInfo
@@ -362,6 +368,18 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 formatterLines.push(build.branch.name);
                 // Build line
                 formatterLines.push(buildLine(node, build, {main: true}));
+
+                // Previous build
+                if (build.previousBuild) {
+                    separator();
+                    formatterLines.push(buildLine(node, build.previousBuild, {prefix: "Previous build: "}));
+                }
+
+                // Next build
+                if (build.nextBuild) {
+                    separator();
+                    formatterLines.push(buildLine(node, build.nextBuild, {prefix: "Next build: "}));
+                }
 
                 // Last eligible build
                 if (build.autoVersioning && build.autoVersioning.lastEligibleBuild) {
