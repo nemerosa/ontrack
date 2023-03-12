@@ -387,19 +387,14 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 // Check if the children have been already loaded or not
                 if (!node.childrenLoaded) {
                     // Loading the dependencies
-                    loadBuildDependencies(node.value).then(builds => {
+                    return loadBuildDependencies(node.value).then(builds => {
                         if (builds) {
                             node.children = builds.map(child => transformData(child));
                         }
                         node.childrenLoaded = true;
                         // Recursive loading
                         if (recursive && node.children) {
-                            const loaders = [];
-                            node.children.forEach(child => {
-                                const loader = loadDependenciesForNode(child, recursive);
-                                loaders.push(loader);
-                            });
-                            $q.all(loaders).then(() => {
+                            $q.all(node.children.map(child => loadDependenciesForNode(child, recursive))).then(() => {
                                 d.resolve({});
                             });
                         }
@@ -407,12 +402,20 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         else {
                             d.resolve({});
                         }
+                        // OK
+                        return d.promise;
                     });
                 } else {
-                    d.resolve({});
+                    if (recursive && node.children) {
+                        $q.all(node.children.map(child => loadDependenciesForNode(child, recursive))).then(() => {
+                            d.resolve({});
+                        });
+                        return d.promise;
+                    } else {
+                        d.resolve({});
+                        return d.promise;
+                    }
                 }
-                // OK
-                return d.promise;
             };
 
             const loadNodeDependencies = (buildId) => {
