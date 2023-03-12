@@ -221,6 +221,26 @@ class GQLTypeBuild(
                             .type(runInfo.typeRef)
                             .runInfoFetcher<Build> { entity -> runInfoService.getRunInfo(entity) }
                 }
+                // Previous build
+                .field {
+                    it.name("previousBuild")
+                        .description("Previous build")
+                        .type(GraphQLTypeReference(BUILD))
+                        .dataFetcher { env ->
+                            val build: Build = env.getSource()
+                            structureService.getPreviousBuild(build.id)
+                        }
+                }
+                // Next build
+                .field {
+                    it.name("nextBuild")
+                        .description("Next build")
+                        .type(GraphQLTypeReference(BUILD))
+                        .dataFetcher { env ->
+                            val build: Build = env.getSource()
+                            structureService.getNextBuild(build.id)
+                        }
+                }
                 // OK
                 .build()
     }

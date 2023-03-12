@@ -277,11 +277,11 @@ class StructureServiceImpl(
         return structureRepository.deleteBuild(buildId)
     }
 
-    override fun getPreviousBuild(buildId: ID): Optional<Build> {
+    override fun getPreviousBuild(buildId: ID): Build? {
         return structureRepository.getPreviousBuild(getBuild(buildId))
     }
 
-    override fun getNextBuild(buildId: ID): Optional<Build> {
+    override fun getNextBuild(buildId: ID): Build? {
         return structureRepository.getNextBuild(getBuild(buildId))
     }
 

@@ -1,23 +1,18 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.BuildEdit
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.BuildSearchForm
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.test.TestUtils
-import net.nemerosa.ontrack.test.assertNotPresent
-import net.nemerosa.ontrack.test.assertPresent
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.access.AccessDeniedException
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
-class StructureServiceIT : AbstractDSLTestJUnit4Support() {
+class StructureServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Project signature at creation`() {
@@ -83,13 +78,15 @@ class StructureServiceIT : AbstractDSLTestJUnit4Support() {
 
     }
 
-    @Test(expected = AccessDeniedException::class)
+    @Test
     fun `Changing a build signature is not granted by default`() {
         val build = doCreateBuild()
         // Attempts to change the build signature without being granted
         val time = TestUtils.dateTime()
-        asUser().with(build, BuildEdit::class.java).call {
-            structureService.saveBuild(build.withSignature(Signature.of(time, "Test2")))
+        asUser().withProjectFunction(build, BuildEdit::class.java).call {
+            assertFailsWith<AccessDeniedException> {
+                structureService.saveBuild(build.withSignature(Signature.of(time, "Test2")))
+            }
         }
     }
 
@@ -98,7 +95,7 @@ class StructureServiceIT : AbstractDSLTestJUnit4Support() {
         var build = doCreateBuild()
         // Changing the build signature
         val time = TestUtils.dateTime().plusDays(1)
-        build = asUser().with(build, ProjectEdit::class.java).call {
+        build = asUser().withProjectFunction(build, ProjectEdit::class.java).call {
             structureService.saveBuild(build.withSignature(Signature.of(time, "Test2")))
         }
         assertEquals("Test2", build.signature.user.name)
@@ -114,13 +111,17 @@ class StructureServiceIT : AbstractDSLTestJUnit4Support() {
         ))
     }
 
-    @Test(expected = DataIntegrityViolationException::class)
+    @Test
     fun `#269 Branch name of more than 120 characters is not allowed`() {
         val project = doCreateProject()
-        doCreateBranch(project, nd(
-                "b".repeat(121),
-                "Test with 121 characters"
-        ))
+        assertFailsWith<DataIntegrityViolationException> {
+            doCreateBranch(
+                project, nd(
+                    "b".repeat(121),
+                    "Test with 121 characters"
+                )
+            )
+        }
     }
 
     @Test
@@ -140,8 +141,9 @@ class StructureServiceIT : AbstractDSLTestJUnit4Support() {
         val build2 = doCreateBuild(branch, nd("2", ""))
         // Gets the previous build of 2
         val o = asUserWithView(branch).call { structureService.getPreviousBuild(build2.id) }
-        assertPresent(o)
-        assertEquals(build1.id, o.get().id)
+        assertNotNull(o, "Previous build present") {
+            assertEquals(build1.id, it.id)
+        }
     }
 
     @Test
@@ -150,7 +152,7 @@ class StructureServiceIT : AbstractDSLTestJUnit4Support() {
         val build = doCreateBuild(branch, nd("1", ""))
         // Gets the previous build of 1
         val o = asUserWithView(branch).call { structureService.getPreviousBuild(build.id) }
-        assertNotPresent(o)
+        assertNull(o, "No previous build")
     }
 
     @Test
@@ -160,8 +162,9 @@ class StructureServiceIT : AbstractDSLTestJUnit4Support() {
         val build2 = doCreateBuild(branch, nd("2", ""))
         // Gets the next build of 1
         val o = asUserWithView(branch).call { structureService.getNextBuild(build1.id) }
-        assertPresent(o)
-        assertEquals(build2.id, o.get().id)
+        assertNotNull(o, "Next build present") {
+            assertEquals(build2.id, it.id)
+        }
     }
 
     @Test
@@ -170,7 +173,7 @@ class StructureServiceIT : AbstractDSLTestJUnit4Support() {
         val build = doCreateBuild(branch, nd("1", ""))
         // Gets the next build of 1
         val o = asUserWithView(branch).call { structureService.getNextBuild(build.id) }
-        assertNotPresent(o)
+        assertNull(o, "No next build")
     }
 
     @Test
