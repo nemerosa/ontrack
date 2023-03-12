@@ -501,67 +501,6 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         return self;
     })
 
-    .controller('AutoVersioningDependencyGraphBranchCtrl', function ($stateParams, $scope,
-                                                               ot, otGraphqlService,
-                                                               otExtensionAutoVersioningDependencyGraph) {
-        $scope.branchId = $stateParams.branchId;
-
-        const view = ot.view();
-
-        // Build selection
-
-        $scope.selectedBuild = undefined;
-
-        // Loading the first node & initializing the view
-
-        let viewInitialized = false;
-
-        const graph = otExtensionAutoVersioningDependencyGraph.createGraph({
-            rootQuery: (fragment) => {
-                return `
-                    query RootBuild($branchId: Int!) {
-                        branches(id: $branchId) {
-                            builds(count: 1) {
-                                ${fragment}
-                            }
-                        }
-                    }
-                `;
-            },
-            rootVariables: {branchId: $scope.branchId},
-            rootBuild: (data) => data.branches[0].builds[0],
-            autoVersioningArguments: 'branchId: $branchId',
-            onBuildSelected: (build) => {
-                $scope.$apply(function () {
-                    $scope.selectedBuild = build;
-                });
-            }
-        });
-
-        graph.loadRootNode().then(rootBuild => {
-            $scope.rootBuild = rootBuild;
-            if (!viewInitialized) {
-                view.breadcrumbs = ot.branchBreadcrumbs($scope.rootBuild.branch);
-                view.commands = [
-                    ot.viewCloseCommand(`/branch/${$scope.rootBuild.branch.id}`)
-                ];
-                viewInitialized = true;
-            }
-        });
-
-        // Expanding all dependencies
-        $scope.expandAllDependencies = () => {
-            $scope.expanding = true;
-            try {
-                graph.expandAllDependencies();
-            } finally {
-                $scope.expanding = false;
-                $scope.expanded = true;
-            }
-        };
-
-    })
-
     .directive('otAutoVersioningDependencyGraphSelectedBuild', function () {
         return {
             restrict: 'E',
@@ -598,42 +537,84 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         };
     })
 
+    .directive('otAutoVersioningDependencyGraph', function (otExtensionAutoVersioningDependencyGraph) {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/auto-versioning/directive.dependency-graph.tpl.html',
+            scope: {
+                rootBuildId: '=',
+                rootBranchId: '=',
+                rootBuildSetter: '='
+            },
+            controller: function ($scope) {
+                const config = {};
+                if ($scope.rootBuildId) {
+                    config.rootQuery = (fragment) => {
+                        return `
+                            query RootBuild($buildId: Int!) {
+                                build(id: $buildId) {
+                                    ${fragment}
+                                }
+                            }
+                        `;
+                    };
+                    config.rootVariables = {buildId: $scope.rootBuildId};
+                    config.rootBuild = (data) => data.build;
+                    config.autoVersioningArguments = 'buildId: $buildId';
+                } else if ($scope.rootBranchId) {
+                    config.rootQuery = (fragment) => {
+                        return `
+                            query RootBuild($branchId: Int!) {
+                                branches(id: $branchId) {
+                                    builds(count: 1) {
+                                        ${fragment}
+                                    }
+                                }
+                            }
+                        `;
+                    };
+                    config.rootVariables = {branchId: $scope.rootBranchId};
+                    config.rootBuild = (data) => data.branches[0].builds[0];
+                    config.autoVersioningArguments = 'branchId: $branchId';
+                } else {
+                    throw new Error("Either root-build-id or root-branch-id must be set.");
+                }
+                config.onBuildSelected = (build) => {
+                    $scope.$apply(function () {
+                        $scope.selectedBuild = build;
+                    });
+                };
+
+                const graph = otExtensionAutoVersioningDependencyGraph.createGraph(config);
+
+                graph.loadRootNode().then(rootBuild => {
+                    if ($scope.rootBuildSetter) {
+                        $scope.rootBuildSetter(rootBuild);
+                    }
+                });
+
+                // Expanding all dependencies
+                $scope.expandAllDependencies = () => {
+                    $scope.expanding = true;
+                    try {
+                        graph.expandAllDependencies();
+                    } finally {
+                        $scope.expanding = false;
+                        $scope.expanded = true;
+                    }
+                };
+            }
+        };
+    })
+
     .controller('AutoVersioningDependencyGraphCtrl', function ($stateParams, $scope,
                                                                ot, otGraphqlService,
                                                                otExtensionAutoVersioningDependencyGraph) {
         $scope.rootBuildId = $stateParams.buildId;
 
         const view = ot.view();
-
-        // Build selection
-
-        $scope.selectedBuild = undefined;
-
-        // Loading the first node & initializing the view
-
         let viewInitialized = false;
-
-        const graph = otExtensionAutoVersioningDependencyGraph.createGraph({
-            rootQuery: (fragment) => {
-                return `
-                    query RootBuild($buildId: Int!) {
-                        build(id: $buildId) {
-                            ${fragment}
-                        }
-                    }
-                `;
-            },
-            rootVariables: {buildId: $scope.rootBuildId},
-            rootBuild: (data) => data.build,
-            autoVersioningArguments: 'buildId: $buildId',
-            onBuildSelected: (build) => {
-                $scope.$apply(function () {
-                    $scope.selectedBuild = build;
-                });
-            }
-        });
-
-        graph.loadRootNode().then(rootBuild => {
+        $scope.rootBuildSetter = (rootBuild) => {
             $scope.rootBuild = rootBuild;
             if (!viewInitialized) {
                 view.breadcrumbs = ot.buildBreadcrumbs($scope.rootBuild);
@@ -642,17 +623,26 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 ];
                 viewInitialized = true;
             }
-        });
+        };
+    })
 
-        // Expanding all dependencies
-        $scope.expandAllDependencies = () => {
-            $scope.expanding = true;
-            try {
-                graph.expandAllDependencies();
-            } finally {
-                $scope.expanding = false;
-                $scope.expanded = true;
+    .controller('AutoVersioningDependencyGraphBranchCtrl', function ($stateParams, $scope,
+                                                                     ot, otGraphqlService,
+                                                                     otExtensionAutoVersioningDependencyGraph) {
+        $scope.branchId = $stateParams.branchId;
+
+        const view = ot.view();
+        let viewInitialized = false;
+        $scope.rootBuildSetter = (rootBuild) => {
+            $scope.rootBuild = rootBuild;
+            if (!viewInitialized) {
+                view.breadcrumbs = ot.branchBreadcrumbs($scope.rootBuild.branch);
+                view.commands = [
+                    ot.viewCloseCommand(`/branch/${$scope.rootBuild.branch.id}`)
+                ];
+                viewInitialized = true;
             }
         };
+
     })
 ;
