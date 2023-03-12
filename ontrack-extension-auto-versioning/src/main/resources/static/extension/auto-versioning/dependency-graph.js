@@ -3,7 +3,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
     'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
-        $stateProvider.state('auto-versioning-dependency-graph-', {
+        $stateProvider.state('auto-versioning-dependency-graph', {
             url: '/extension/auto-versioning/dependency-graph/build/{buildId}/downstream',
             templateUrl: 'extension/auto-versioning/dependency-graph.tpl.html',
             controller: 'AutoVersioningDependencyGraphCtrl'
@@ -15,6 +15,13 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             url: '/extension/auto-versioning/dependency-graph/branch/{branchId}/downstream',
             templateUrl: 'extension/auto-versioning/dependency-graph-branch.tpl.html',
             controller: 'AutoVersioningDependencyGraphBranchCtrl'
+        });
+    })
+    .config(function ($stateProvider) {
+        $stateProvider.state('auto-versioning-dependency-graph-upstreal', {
+            url: '/extension/auto-versioning/dependency-graph/build/{buildId}/upstream',
+            templateUrl: 'extension/auto-versioning/dependency-graph-upstream.tpl.html',
+            controller: 'AutoVersioningDependencyGraphUpstreamCtrl'
         });
     })
 
@@ -236,16 +243,27 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     }
                     ${gqlBuildDependencies('buildId: $buildId', config.direction)}
                 `, {buildId}).then(data => {
-                    return data.build.using.pageItems;
+                    if (config.direction === 'DOWN') {
+                        return data.build.using.pageItems;
+                    } else {
+                        return data.build.usedBy.pageItems;
+                    }
                 });
             };
 
             // Given a build, creates a node & its descendants, for use inside the graph
 
             const createDependencyNodes = (node, build) => {
-                if (build.using && build.using.pageItems) {
-                    node.childrenLoaded = true;
-                    node.children = build.using.pageItems.map(childBuild => transformData(childBuild));
+                if (config.direction === 'DOWN') {
+                    if (build.using && build.using.pageItems) {
+                        node.childrenLoaded = true;
+                        node.children = build.using.pageItems.map(childBuild => transformData(childBuild));
+                    }
+                } else {
+                    if (build.usedBy && build.usedBy.pageItems) {
+                        node.childrenLoaded = true;
+                        node.children = build.usedBy.pageItems.map(childBuild => transformData(childBuild));
+                    }
                 }
             };
 
@@ -616,9 +634,24 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         };
     })
 
-    .controller('AutoVersioningDependencyGraphCtrl', function ($stateParams, $scope,
-                                                               ot, otGraphqlService,
-                                                               otExtensionAutoVersioningDependencyGraph) {
+    .controller('AutoVersioningDependencyGraphCtrl', function ($stateParams, $scope, ot) {
+        $scope.rootBuildId = $stateParams.buildId;
+
+        const view = ot.view();
+        let viewInitialized = false;
+        $scope.rootBuildSetter = (rootBuild) => {
+            $scope.rootBuild = rootBuild;
+            if (!viewInitialized) {
+                view.breadcrumbs = ot.buildBreadcrumbs($scope.rootBuild);
+                view.commands = [
+                    ot.viewCloseCommand(`/build/${$scope.rootBuild.id}`)
+                ];
+                viewInitialized = true;
+            }
+        };
+    })
+
+    .controller('AutoVersioningDependencyGraphUpstreamCtrl', function ($stateParams, $scope, ot) {
         $scope.rootBuildId = $stateParams.buildId;
 
         const view = ot.view();
