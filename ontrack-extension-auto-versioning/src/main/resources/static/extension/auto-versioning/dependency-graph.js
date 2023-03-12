@@ -571,7 +571,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         };
     })
 
-    .directive('otAutoVersioningDependencyGraph', function (otExtensionAutoVersioningDependencyGraph) {
+    .directive('otAutoVersioningDependencyGraph', function ($state, otExtensionAutoVersioningDependencyGraph) {
         return {
             restrict: 'E',
             templateUrl: 'extension/auto-versioning/directive.dependency-graph.tpl.html',
@@ -637,6 +637,32 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     } finally {
                         $scope.expanding = false;
                         $scope.expanded = true;
+                    }
+                };
+
+                // Navigate to the downstream graph
+                $scope.goToDownstreamGraph = () => {
+                    if ($scope.rootBuildId) {
+                        $state.go('auto-versioning-dependency-graph', {
+                            buildId: $scope.rootBuildId
+                        });
+                    } else if ($scope.rootBranchId) {
+                        $state.go('auto-versioning-dependency-graph-branch', {
+                            branchId: $scope.rootBranchId
+                        });
+                    }
+                };
+
+                // Navigate to the upstream graph
+                $scope.goToUpstreamGraph = () => {
+                    if ($scope.rootBuildId) {
+                        $state.go('auto-versioning-dependency-graph-upstream', {
+                            buildId: $scope.rootBuildId
+                        });
+                    } else if ($scope.rootBranchId) {
+                        $state.go('auto-versioning-dependency-graph-branch-upstream', {
+                            branchId: $scope.rootBranchId
+                        });
                     }
                 };
             }
