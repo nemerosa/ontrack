@@ -11,6 +11,19 @@
             <a href="{{ selectedBuild.branch.project.links._page }}"><b>{{ selectedBuild.branch.project.name }}</b></a>
             /
             <a href="{{ selectedBuild.branch.links._page }}">{{ selectedBuild.branch.name }}</a>
+
+            <!-- Link to the dependency graph of this build -->
+            <span>
+                <a
+                        title="Link to the dependency graph of this branch"
+                        href="/#/extension/auto-versioning/dependency-graph/branch/{{ selectedBuild.branch.id }}/downstream"><i class="fa fa-code-fork"></i></a>
+            </span>
+            <!-- Link to the upstream dependency graph of this branch -->
+            <span>
+                <a
+                        title="Link to the upstream dependency graph of this branch"
+                        href="/#/extension/auto-versioning/dependency-graph/branch/{{ selectedBuild.branch.id }}/upstream"><i class="fa fa-code-fork fa-rotate-180"></i></a>
+            </span>
         </p>
         <p>
             <ot-auto-versioning-dependency-graph-build-links build="selectedBuild"></ot-auto-versioning-dependency-graph-build-links>
