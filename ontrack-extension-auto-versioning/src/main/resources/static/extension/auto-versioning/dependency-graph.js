@@ -237,6 +237,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
             const createDependencyNodes = (node, build) => {
                 if (build.using && build.using.pageItems) {
+                    node.childrenLoaded = true;
                     node.children = build.using.pageItems.map(childBuild => transformData(childBuild));
                 }
             };
