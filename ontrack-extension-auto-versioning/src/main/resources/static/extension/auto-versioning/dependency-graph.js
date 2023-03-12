@@ -1,6 +1,7 @@
 angular.module('ontrack.extension.auto-versioning.dependency-graph', [
     'ot.service.core',
-    'ot.service.graphql'
+    'ot.service.graphql',
+    'ot.service.task'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('auto-versioning-dependency-graph', {
@@ -589,7 +590,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         };
     })
 
-    .directive('otAutoVersioningDependencyGraph', function ($state, otExtensionAutoVersioningDependencyGraph) {
+    .directive('otAutoVersioningDependencyGraph', function ($state, otExtensionAutoVersioningDependencyGraph, otTaskService) {
         return {
             restrict: 'E',
             templateUrl: 'extension/auto-versioning/directive.dependency-graph.tpl.html',
@@ -649,7 +650,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 });
 
                 // Refreshing the graph
-                $scope.refreshGraph = () => {
+                const refreshGraph = () => {
                     $scope.refreshing = true;
                     graph.loadRootNode().then(rootBuild => {
                         if ($scope.rootBuildSetter) {
@@ -660,6 +661,23 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         $scope.refreshing = false;
                     });
                 };
+                $scope.refreshGraph = refreshGraph;
+
+                // Toggling the auto refresh
+                $scope.toggleAutoRefresh = () => {
+                    $scope.graphAutoRefresh = !$scope.graphAutoRefresh;
+                };
+
+                // Auto refresh watching
+                $scope.$watch('graphAutoRefresh', () => {
+                    const taskName = 'Graph auto refresh';
+                    if ($scope.graphAutoRefresh) {
+                        // 1 minute interval
+                        otTaskService.register(taskName, refreshGraph, 60 * 1000);
+                    } else {
+                        otTaskService.stop(taskName);
+                    }
+                });
 
                 // Expanding all dependencies
                 $scope.expandAllDependencies = () => {
