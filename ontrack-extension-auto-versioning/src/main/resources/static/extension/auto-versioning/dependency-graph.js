@@ -3,8 +3,8 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
     'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
-        $stateProvider.state('auto-versioning-dependency-graph', {
-            url: '/extension/auto-versioning/dependency-graph/build/{buildId}',
+        $stateProvider.state('auto-versioning-dependency-graph-', {
+            url: '/extension/auto-versioning/dependency-graph/build/{buildId}/downstream',
             templateUrl: 'extension/auto-versioning/dependency-graph.tpl.html',
             controller: 'AutoVersioningDependencyGraphCtrl'
         });
@@ -12,7 +12,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
     .config(function ($stateProvider) {
         $stateProvider.state('auto-versioning-dependency-graph-branch', {
-            url: '/extension/auto-versioning/dependency-graph/branch/{branchId}',
+            url: '/extension/auto-versioning/dependency-graph/branch/{branchId}/downstream',
             templateUrl: 'extension/auto-versioning/dependency-graph-branch.tpl.html',
             controller: 'AutoVersioningDependencyGraphBranchCtrl'
         });

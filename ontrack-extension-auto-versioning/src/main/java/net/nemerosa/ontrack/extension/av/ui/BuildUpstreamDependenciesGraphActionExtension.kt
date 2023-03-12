@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class BuildDependenciesGraphActionExtension(
+class BuildUpstreamDependenciesGraphActionExtension(
     extensionFeature: AutoVersioningExtensionFeature,
 ) : AbstractExtension(extensionFeature), ProjectEntityActionExtension {
 
@@ -18,9 +18,9 @@ class BuildDependenciesGraphActionExtension(
         return if (entity is Build) {
             Optional.of(
                 Action.of(
-                    "auto-versioning-dependency-graph",
-                    "Dependency graph",
-                    "dependency-graph/build/${entity.id}/downstream"
+                    "auto-versioning-dependency-graph-upstream",
+                    "Upstream dependency graph",
+                    "dependency-graph/build/${entity.id}/upstream"
                 )
             )
         } else {

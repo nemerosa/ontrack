@@ -20,7 +20,7 @@ class BranchDependenciesGraphActionExtension(
                 Action.of(
                     "auto-versioning-dependency-graph",
                     "Dependency graph",
-                    "dependency-graph/branch/${entity.id}"
+                    "dependency-graph/branch/${entity.id}/downstream"
                 )
             )
         } else {
