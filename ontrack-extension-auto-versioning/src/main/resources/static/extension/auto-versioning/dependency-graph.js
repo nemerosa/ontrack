@@ -17,11 +17,20 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             controller: 'AutoVersioningDependencyGraphBranchCtrl'
         });
     })
+
     .config(function ($stateProvider) {
-        $stateProvider.state('auto-versioning-dependency-graph-upstreal', {
+        $stateProvider.state('auto-versioning-dependency-graph-upstream', {
             url: '/extension/auto-versioning/dependency-graph/build/{buildId}/upstream',
             templateUrl: 'extension/auto-versioning/dependency-graph-upstream.tpl.html',
             controller: 'AutoVersioningDependencyGraphUpstreamCtrl'
+        });
+    })
+
+    .config(function ($stateProvider) {
+        $stateProvider.state('auto-versioning-dependency-graph-branch-upstream', {
+            url: '/extension/auto-versioning/dependency-graph/branch/{branchId}/upstream',
+            templateUrl: 'extension/auto-versioning/dependency-graph-branch-upstream.tpl.html',
+            controller: 'AutoVersioningDependencyGraphBranchUpstreamCtrl'
         });
     })
 
@@ -668,9 +677,25 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         };
     })
 
-    .controller('AutoVersioningDependencyGraphBranchCtrl', function ($stateParams, $scope,
-                                                                     ot, otGraphqlService,
-                                                                     otExtensionAutoVersioningDependencyGraph) {
+    .controller('AutoVersioningDependencyGraphBranchCtrl', function ($stateParams, $scope, ot) {
+        $scope.branchId = $stateParams.branchId;
+
+        const view = ot.view();
+        let viewInitialized = false;
+        $scope.rootBuildSetter = (rootBuild) => {
+            $scope.rootBuild = rootBuild;
+            if (!viewInitialized) {
+                view.breadcrumbs = ot.branchBreadcrumbs($scope.rootBuild.branch);
+                view.commands = [
+                    ot.viewCloseCommand(`/branch/${$scope.rootBuild.branch.id}`)
+                ];
+                viewInitialized = true;
+            }
+        };
+
+    })
+
+    .controller('AutoVersioningDependencyGraphBranchUpstreamCtrl', function ($stateParams, $scope, ot) {
         $scope.branchId = $stateParams.branchId;
 
         const view = ot.view();
