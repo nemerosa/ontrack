@@ -644,6 +644,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 graph.loadRootNode().then(rootBuild => {
                     if ($scope.rootBuildSetter) {
                         $scope.rootBuildSetter(rootBuild);
+                        $scope.selectedBuild = rootBuild;
                     }
                 });
 
