@@ -64,7 +64,67 @@
             </div>
         </div>
         <!-- Selected build area -->
-        <ot-auto-versioning-dependency-graph-selected-build
-                selected-build="selectedBuild"></ot-auto-versioning-dependency-graph-selected-build>
+        <ot-auto-versioning-dependency-graph-selected-build selected-build="selectedBuild">
+        </ot-auto-versioning-dependency-graph-selected-build>
+        <!-- Layout options -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Layout options</h3>
+                    </div>
+                    <!-- Selection of the elements -->
+                    <div class="panel-heading">
+                        <i class="fa fa-check-square-o"></i>
+                        Elements
+                    </div>
+                    <div class="panel-body">
+                        <form>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"> Previous build
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"> Next build
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"> Last build
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"> Last eligible build
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"> AV status
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Height of the graph -->
+                    <div class="panel-heading">
+                        <i class="fa fa-arrows-v"></i>
+                        Height of the graph
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-inline">
+                            <div class="form-group">
+                                <label for="graphHeight">Height</label>
+                                <input type="number" min="200" max="2400" step="10"
+                                       value="600"
+                                       class="form-control" id="graphHeight"/>
+                            </div>
+                            <button type="submit" class="btn btn-default">Apply</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
