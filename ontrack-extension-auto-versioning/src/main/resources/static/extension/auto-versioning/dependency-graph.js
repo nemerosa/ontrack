@@ -203,7 +203,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         type: 'tree',
                         data: [],
                         top: '1%',
-                        left: '20%',
+                        left: '1%',
                         bottom: '1%',
                         right: '20%',
                         symbol: 'none',
