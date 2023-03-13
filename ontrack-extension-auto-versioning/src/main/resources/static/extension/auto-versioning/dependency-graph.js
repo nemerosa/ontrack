@@ -170,6 +170,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
          * @param config.autoVersioningArguments Arguments to pass to Build.autoVersioning (for the root query only)
          * @param config.onBuildSelected Method to call whenever a build is selected
          * @param config.direction DOWN or UP
+         * @param config.layout.elements Layout options for the elements
          */
         self.createGraph = (config) => {
 
@@ -371,35 +372,37 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 formatterLines.push(buildLine(node, build, {main: true}));
 
                 // Previous build
-                if (build.previousBuild) {
+                if (config.layout.elements.previousBuild && build.previousBuild) {
                     separator();
                     formatterLines.push(buildLine(node, build.previousBuild, {prefix: "Previous build: "}));
                 }
 
                 // Next build
-                if (build.nextBuild) {
+                if (config.layout.elements.nextBuild && build.nextBuild) {
                     separator();
                     formatterLines.push(buildLine(node, build.nextBuild, {prefix: "Next build: "}));
                 }
 
                 // Last eligible build
-                if (build.autoVersioning && build.autoVersioning.lastEligibleBuild) {
+                if (config.layout.elements.lastEligibleBuild && build.autoVersioning && build.autoVersioning.lastEligibleBuild) {
                     separator();
                     formatterLines.push(buildLine(node, build.autoVersioning.lastEligibleBuild, {prefix: "Last eligible build: "}));
                 }
 
                 // Last build
-                const lastBuilds = build.lastBuildInfo.lastBuild;
-                if (lastBuilds && lastBuilds.length > 0) {
-                    const lastBuild = lastBuilds[0];
-                    if (lastBuild.id > build.id) {
-                        separator();
-                        formatterLines.push(buildLine(node, lastBuild, {prefix: "Last build: "}));
+                if (config.layout.elements.lastBuild) {
+                    const lastBuilds = build.lastBuildInfo.lastBuild;
+                    if (lastBuilds && lastBuilds.length > 0) {
+                        const lastBuild = lastBuilds[0];
+                        if (lastBuild.id > build.id) {
+                            separator();
+                            formatterLines.push(buildLine(node, lastBuild, {prefix: "Last build: "}));
+                        }
                     }
                 }
 
                 // Last AV status
-                if (build.autoVersioning && build.autoVersioning.status) {
+                if (config.layout.elements.avStatus && build.autoVersioning && build.autoVersioning.status) {
                     separator();
                     formatterLines.push(avStatus(node, build.autoVersioning.status));
                 }
@@ -601,6 +604,26 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 direction: '@'
             },
             controller: function ($scope) {
+
+                // Layout initial options
+                const localStorageLayoutKey = 'dependencyGraphLayout';
+                $scope.layout = {
+                    elements: {
+                        previousBuild: true,
+                        nextBuild: true,
+                        lastBuild: true,
+                        lastEligibleBuild: true,
+                        avStatus: true
+                    }
+                }
+                let storedLayout = localStorage.getItem(localStorageLayoutKey);
+                if (storedLayout) {
+                    const parsedStoredLayout = JSON.parse(storedLayout);
+                    if (parsedStoredLayout) {
+                        angular.copy(parsedStoredLayout, $scope.layout);
+                    }
+                }
+
                 const config = {};
                 config.direction = $scope.direction ? $scope.direction : 'DOWN';
                 if ($scope.rootBuildId) {
@@ -639,6 +662,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         $scope.selectedBuild = build;
                     });
                 };
+                config.layout = $scope.layout;
 
                 const graph = otExtensionAutoVersioningDependencyGraph.createGraph(config);
 
@@ -715,25 +739,6 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         });
                     }
                 };
-
-                // Layout initial options
-                const localStorageLayoutKey = 'dependencyGraphLayout';
-                $scope.layout = {
-                    elements: {
-                        previousBuild: true,
-                        nextBuild: true,
-                        lastBuild: true,
-                        lastEligibleBuild: true,
-                        avStatus: true
-                    }
-                }
-                let storedLayout = localStorage.getItem(localStorageLayoutKey);
-                if (storedLayout) {
-                    const parsedStoredLayout = JSON.parse(storedLayout);
-                    if (parsedStoredLayout) {
-                        angular.copy(parsedStoredLayout, $scope.layout);
-                    }
-                }
 
                 // Toggling an element
                 $scope.toggleElement = () => {
