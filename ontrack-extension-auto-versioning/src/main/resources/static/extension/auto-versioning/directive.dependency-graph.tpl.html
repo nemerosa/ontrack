@@ -82,27 +82,32 @@
                         <form>
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox"> Previous build
+                                    <input type="checkbox" ng-model="layout.elements.previousBuild"
+                                           ng-change="toggleElement()"> Previous build
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox"> Next build
+                                    <input type="checkbox" ng-model="layout.elements.nextBuild"
+                                           ng-change="toggleElement()"> Next build
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox"> Last build
+                                    <input type="checkbox" ng-model="layout.elements.lastBuild"
+                                           ng-change="toggleElement()"> Last build
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox"> Last eligible build
+                                    <input type="checkbox" ng-model="layout.elements.lastEligibleBuild"
+                                           ng-change="toggleElement()"> Last eligible build
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox"> AV status
+                                    <input type="checkbox" ng-model="layout.elements.avStatus"
+                                           ng-change="toggleElement()"> AV status
                                 </label>
                             </div>
                         </form>

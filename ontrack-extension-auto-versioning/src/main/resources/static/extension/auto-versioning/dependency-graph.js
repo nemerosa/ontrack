@@ -715,6 +715,33 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         });
                     }
                 };
+
+                // Layout initial options
+                const localStorageLayoutKey = 'dependencyGraphLayout';
+                $scope.layout = {
+                    elements: {
+                        previousBuild: true,
+                        nextBuild: true,
+                        lastBuild: true,
+                        lastEligibleBuild: true,
+                        avStatus: true
+                    }
+                }
+                let storedLayout = localStorage.getItem(localStorageLayoutKey);
+                if (storedLayout) {
+                    const parsedStoredLayout = JSON.parse(storedLayout);
+                    if (parsedStoredLayout) {
+                        angular.copy(parsedStoredLayout, $scope.layout);
+                    }
+                }
+
+                // Toggling an element
+                $scope.toggleElement = () => {
+                    // Value in the model has already been changed, just reacting to it now
+                    // TODO Refreshes the graph
+                    // Saves the value
+                    localStorage.setItem(localStorageLayoutKey, JSON.stringify($scope.layout));
+                };
             }
         };
     })
