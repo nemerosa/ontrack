@@ -118,11 +118,11 @@
                         Height of the graph
                     </div>
                     <div class="panel-body">
-                        <form class="form-inline">
+                        <form class="form-inline" ng-submit="applyHeight()">
                             <div class="form-group">
                                 <label for="graphHeight">Height</label>
                                 <input type="number" min="200" max="2400" step="10"
-                                       value="600"
+                                       ng-model="layout.height"
                                        class="form-control" id="graphHeight"/>
                             </div>
                             <button type="submit" class="btn btn-default">Apply</button>

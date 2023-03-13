@@ -551,6 +551,20 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 });
             };
 
+            // Resizing in height
+            graph.resizeHeight = (height) => {
+                if (context.chart) {
+                    context.chart.resize({
+                        width: null,
+                        height: height,
+                        silent: true,
+                        animation: {
+                            duration: 250
+                        }
+                    })
+                }
+            };
+
             return graph;
         };
 
@@ -614,7 +628,8 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         lastBuild: true,
                         lastEligibleBuild: true,
                         avStatus: true
-                    }
+                    },
+                    height: 600
                 }
                 let storedLayout = localStorage.getItem(localStorageLayoutKey);
                 if (storedLayout) {
@@ -747,6 +762,15 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     localStorage.setItem(localStorageLayoutKey, JSON.stringify($scope.layout));
                     // Refreshes the graph
                     refreshGraph();
+                };
+
+                // Changing the height of the chart
+                $scope.applyHeight = () => {
+                    let height = $scope.layout.height;
+                    if (!height) {
+                        height = 600;
+                    }
+                    graph.resizeHeight(height);
                 };
             }
         };
