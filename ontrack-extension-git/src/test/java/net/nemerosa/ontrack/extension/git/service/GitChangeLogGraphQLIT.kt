@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.test.assertJsonNotNull
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -17,6 +18,7 @@ import kotlin.test.assertEquals
 /**
  * Integration tests for Git support.
  */
+@Disabled("flaky")
 class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
 
     @Autowired

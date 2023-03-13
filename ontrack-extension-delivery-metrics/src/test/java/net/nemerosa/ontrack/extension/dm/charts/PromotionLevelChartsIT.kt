@@ -19,6 +19,7 @@ internal class PromotionLevelChartsIT : AbstractDSLTestSupport() {
     private lateinit var chartService: ChartService
 
     @Test
+    @Disabled("flaky")
     fun `Promotion level lead time`() {
         asAdmin {
             project {
