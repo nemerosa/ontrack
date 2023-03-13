@@ -14,10 +14,11 @@ internal class WorkflowJobIngestionEventProcessorTest {
             workflowJobProcessingService = mockk(),
         )
         val payload = IngestionHookFixtures.sampleWorkflowJobPayload(
-            jobName = "my-job"
+            jobName = "my-job",
+            runId = 123L,
         )
         assertEquals(
-            "my-job",
+            "123",
             processor.getPayloadSource(payload)
         )
     }

@@ -24,6 +24,8 @@ services:
         condition: service_started
       elasticsearch:
         condition: service_started
+      rabbit:
+        condition: service_started
     volumes:
       - "ontrack_data:/var/ontrack/data"
     ports:

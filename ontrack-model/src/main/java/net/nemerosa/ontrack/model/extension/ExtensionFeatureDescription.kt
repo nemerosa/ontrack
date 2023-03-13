@@ -6,4 +6,12 @@ data class ExtensionFeatureDescription(
         val description: String,
         val version: String,
         val options: ExtensionFeatureOptions
-)
+) {
+    fun toProduction() = ExtensionFeatureDescription(
+        id = id,
+        name = name,
+        description = description,
+        version = version,
+        options = options.toProduction(),
+    )
+}

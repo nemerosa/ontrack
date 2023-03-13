@@ -56,8 +56,9 @@ interface SCM {
      * @param commit Commit of the branch
      * @param path Path to the file
      * @param content Binary content of the file
+     * @param message Commit message
      */
-    fun upload(scmBranch: String, commit: String, path: String, content: ByteArray)
+    fun upload(scmBranch: String, commit: String, path: String, content: ByteArray, message: String)
 
     /**
      * Creates a pull request from the branch [from] to the branch [to], with a given [title] and
@@ -70,6 +71,7 @@ interface SCM {
      * @param description Description for the pull request
      * @param autoApproval Must the created pull request be auto-approved?
      * @param remoteAutoMerge If the SCM allows this, sets the PR in auto merge mode
+     * @param message Commit message to set on auto merge
      * @return PR information
      */
     fun createPR(
@@ -79,6 +81,7 @@ interface SCM {
         description: String,
         autoApproval: Boolean,
         remoteAutoMerge: Boolean,
+        message: String,
     ): SCMPullRequest
 
 }

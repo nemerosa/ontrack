@@ -10,4 +10,9 @@ data class Commit(
     val added: List<String> = emptyList(),
     val removed: List<String> = emptyList(),
     val modified: List<String> = emptyList(),
-)
+) {
+    /**
+     * Returns the consolidated list of all paths being impacted
+     */
+    fun paths(): Set<String> = added.toSet() + removed.toSet() + modified.toSet()
+}

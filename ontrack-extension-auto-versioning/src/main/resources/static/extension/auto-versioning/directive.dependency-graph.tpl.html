@@ -1,0 +1,135 @@
+<div class="row">
+    <div class="col-md-9">
+        <div id="graph" style="width:100%; height:600px;"></div>
+    </div>
+    <div class="col-md-3">
+        <!-- Up/down buttons -->
+        <div class="row">
+            <div class="col-md-12">
+                <button style="margin-bottom: 1em;"
+                        ng-if="direction != 'UP'"
+                        ng-click="goToUpstreamGraph()"
+                        class="btn btn-default form-control">
+                    <i class="fa fa-arrow-up"></i>
+                    Upstream dependency graph
+                </button>
+                <button style="margin-bottom: 1em;"
+                        ng-if="direction == 'UP'"
+                        ng-click="goToDownstreamGraph()"
+                        class="btn btn-default form-control">
+                    <i class="fa fa-arrow-down"></i>
+                    Downstream dependency graph
+                </button>
+            </div>
+        </div>
+        <!-- Expand all -->
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-default form-control"
+                        style="margin-bottom: 1em;"
+                        ng-disabled="expanding"
+                        ng-click="expandAllDependencies()"
+                        title="Expands all dependencies">
+                    <span class="ot-loading-indicator" ng-show="expanding"></span>
+                    <i class="fa fa-expand" ng-hide="expanding"></i>
+                    Expand all
+                </button>
+            </div>
+        </div>
+        <!-- Refresh -->
+        <div class="row">
+            <div class="col-md-9">
+                <button class="btn btn-default form-control"
+                        style="margin-bottom: 1em;"
+                        ng-disabled="refreshing"
+                        ng-click="refreshGraph()"
+                        title="Refreshes the data in the graph">
+                    <span class="ot-loading-indicator" ng-show="refreshing"></span>
+                    <i class="fa fa-refresh" ng-hide="refreshing"></i>
+                    Refresh
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn form-control"
+                        ng-class="{
+                            'btn-default': !graphAutoRefresh,
+                            'btn-warning': graphAutoRefresh
+                        }"
+                        style="margin-bottom: 1em;"
+                        ng-click="toggleAutoRefresh()"
+                        title="Puts the graph in auto refresh mode">
+                    <span class="fa fa-magic"></span>
+                    Auto
+                </button>
+            </div>
+        </div>
+        <!-- Selected build area -->
+        <ot-auto-versioning-dependency-graph-selected-build selected-build="selectedBuild">
+        </ot-auto-versioning-dependency-graph-selected-build>
+        <!-- Layout options -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Layout options</h3>
+                    </div>
+                    <!-- Selection of the elements -->
+                    <div class="panel-heading">
+                        <i class="fa fa-check-square-o"></i>
+                        Elements
+                    </div>
+                    <div class="panel-body">
+                        <form>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="layout.elements.previousBuild"
+                                           ng-change="toggleElement()"> Previous build
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="layout.elements.nextBuild"
+                                           ng-change="toggleElement()"> Next build
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="layout.elements.lastBuild"
+                                           ng-change="toggleElement()"> Last build
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="layout.elements.lastEligibleBuild"
+                                           ng-change="toggleElement()"> Last eligible build
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="layout.elements.avStatus"
+                                           ng-change="toggleElement()"> AV status
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Height of the graph -->
+                    <div class="panel-heading">
+                        <i class="fa fa-arrows-v"></i>
+                        Height of the graph
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-inline" ng-submit="applyHeight()">
+                            <div class="form-group">
+                                <label for="graphHeight">Height</label>
+                                <input type="number" min="200" max="2400" step="10"
+                                       ng-model="layout.height"
+                                       class="form-control" id="graphHeight"/>
+                            </div>
+                            <button type="submit" class="btn btn-default">Apply</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

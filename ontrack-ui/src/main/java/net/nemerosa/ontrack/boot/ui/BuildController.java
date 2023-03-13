@@ -236,9 +236,12 @@ public class BuildController extends AbstractResourceController {
      */
     @RequestMapping(value = "builds/{buildId}/previous", method = RequestMethod.GET)
     public ResponseEntity<Build> getPreviousBuild(@PathVariable ID buildId) {
-        return structureService.getPreviousBuild(buildId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.NO_CONTENT).body(null));
+        Build previousBuild = structureService.getPreviousBuild(buildId);
+        if (previousBuild != null) {
+            return ResponseEntity.ok(previousBuild);
+        } else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
     }
 
     /**
@@ -246,9 +249,12 @@ public class BuildController extends AbstractResourceController {
      */
     @RequestMapping(value = "builds/{buildId}/next", method = RequestMethod.GET)
     public ResponseEntity<Build> getNextBuild(@PathVariable ID buildId) {
-        return structureService.getNextBuild(buildId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.NO_CONTENT).body(null));
+        Build nextBuild = structureService.getNextBuild(buildId);
+        if (nextBuild != null) {
+            return ResponseEntity.ok(nextBuild);
+        } else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
     }
 
     /**

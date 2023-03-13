@@ -520,8 +520,9 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public Optional<Build> getPreviousBuild(Build build) {
-        return getOptional(
+    @Nullable
+    public Build getPreviousBuild(Build build) {
+        return getFirstItem(
                 "SELECT * FROM BUILDS WHERE BRANCHID = :branch AND ID < :id ORDER BY ID DESC LIMIT 1",
                 params("branch", build.getBranch().id()).addValue("id", build.id()),
                 (rs, rowNum) -> toBuild(rs, this::getBranch)
@@ -529,8 +530,9 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public Optional<Build> getNextBuild(Build build) {
-        return getOptional(
+    @Nullable
+    public Build getNextBuild(Build build) {
+        return getFirstItem(
                 "SELECT * FROM BUILDS WHERE BRANCHID = :branch AND ID > :id ORDER BY ID ASC LIMIT 1",
                 params("branch", build.getBranch().id()).addValue("id", build.id()),
                 (rs, rowNum) -> toBuild(rs, this::getBranch)

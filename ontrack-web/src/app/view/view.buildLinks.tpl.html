@@ -1,6 +1,26 @@
 <ot-view>
 
     <div class="row" ng-show="build">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                <p>
+                    This diagram is now considered deprecated and replaced by the
+                    <a href="#/extension/auto-versioning/dependency-graph/build/{{ build.id }}/downstream">dependency graph</a>
+                    and
+                    <a href="#/extension/auto-versioning/dependency-graph/build/{{ build.id }}/upstream">upstream dependency graph</a>
+                    ,
+                    accessible from the <i>Tools</i> menu.
+                </p>
+                <p>
+                    <i class="fa fa-info-circle text-info"></i>
+                    If you consider this view should be kept, please participate in this
+                    <a href="https://github.com/nemerosa/ontrack/discussions/1077">GitHub discussion</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-show="build">
         <div class="col-md-12 ot-view-title" ng-class="{'text-muted': loadingData}">
             <button type="button" class="btn btn-default"
                     ng-click="changeDirection()"

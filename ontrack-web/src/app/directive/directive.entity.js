@@ -11,7 +11,8 @@ angular.module('ot.directive.entity', [
             scope: {
                 entity: '=',
                 link: '@',
-                title: '@'
+                title: '@',
+                className: '@'
             }
         };
     })

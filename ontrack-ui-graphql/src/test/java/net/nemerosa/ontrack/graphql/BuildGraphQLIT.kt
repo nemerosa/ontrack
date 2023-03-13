@@ -7,11 +7,13 @@ import net.nemerosa.ontrack.json.*
 import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
 import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
 import net.nemerosa.ontrack.model.security.BuildCreate
+import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.RunInfoInput
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.assertJsonNotNull
 import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -25,7 +27,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
     @Test
     fun `Build creation`() {
         val branch = doCreateBranch()
-        val build = asUser().with(branch, BuildCreate::class.java).call {
+        val build = asUser().withProjectFunction(branch, BuildCreate::class.java).call {
             structureService.newBuild(
                 Build.of(
                     branch,
@@ -189,7 +191,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 id
             }
         }""") { data ->
-            assertEquals(build.id(), data.path("builds").first().getInt("id"))
+            assertEquals(build.id(), data.path("builds").first().getIntField("id"))
         }
     }
 
@@ -216,7 +218,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 id
             }
         }""") { data ->
-            assertEquals(build.id(), data.path("builds").first().getInt("id"))
+            assertEquals(build.id(), data.path("builds").first().getIntField("id"))
         }
     }
 
@@ -251,7 +253,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         }""") { data ->
             val builds = data.path("builds")
             assertEquals(1, builds.size())
-            assertEquals(build1.id(), builds.first().getInt("id"))
+            assertEquals(build1.id(), builds.first().getIntField("id"))
         }
     }
 
@@ -1426,6 +1428,50 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 }
                 val list = data["builds"]
                 assertEquals(0, list.size())
+            }
+        }
+    }
+
+    @Test
+    fun `Previous and next builds`() {
+
+        fun doTest(branch: Branch, buildName: String, previousName: String?, nextName: String?) {
+            run("""
+                {
+                    builds(project: "${branch.project.name}", branch: "${branch.name}", name: "$buildName") {
+                        name
+                        previousBuild { name }
+                        nextBuild { name }
+                    }
+                }
+            """) { data ->
+                val build = data.path("builds").path(0)
+                assertEquals(buildName, build.path("name").asText(), "Build found")
+                if (previousName != null) {
+                    assertJsonNotNull(build.path("previousBuild"), "Previous build") {
+                        assertEquals(previousName, path("name").asText(), "Previous build")
+                    }
+                } else {
+                    assertJsonNull(build.path("previousBuild"), "No previous build")
+                }
+                if (nextName != null) {
+                    assertJsonNotNull(build.path("nextBuild"), "Next build") {
+                        assertEquals(nextName, path("name").asText(), "Next build")
+                    }
+                } else {
+                    assertJsonNull(build.path("nextBuild"), "No next build")
+                }
+            }
+        }
+
+        project {
+            branch {
+                (1..3).forEach { no ->
+                    build("$no")
+                }
+                doTest(this, "1", null, "2")
+                doTest(this, "2", "1", "3")
+                doTest(this, "3", "2", null)
             }
         }
     }

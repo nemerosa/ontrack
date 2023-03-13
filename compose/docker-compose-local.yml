@@ -1,57 +1,60 @@
 version: "2.1"
 
 services:
-  # InfluxDB container
-  influxdb:
-    image: influxdb:1.8.6
-    environment:
-      PRE_CREATE_DB: "ontrack"
-    # Makes all ports accessible on the host for testing
-    ports:
-      - "8083"
-      - "8086"
 
   # Ontrack container
   ontrack:
-    image: nemerosa/ontrack:latest
+    image: "nemerosa/ontrack:latest"
+    restart: always
+    environment:
+      PROFILE: prod
+      JAVA_OPTIONS: "${JAVA_OPTIONS:--Xms1024m -Xmx1024m}"
+      # Database
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
+      # Elasticsearch
+      SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
+      # Rabbit MQ
+      SPRING_RABBITMQ_HOST: rabbit
+      SPRING_RABBITMQ_USERNAME: ontrack
+      SPRING_RABBITMQ_PASSWORD: ontrack
     depends_on:
-      postgresql:
-        condition: service_started
-      influxdb:
+      postgres:
         condition: service_started
       elasticsearch:
         condition: service_started
-    environment:
-      JAVA_OPTIONS: "${JAVA_OPTIONS}"
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgresql/ontrack"
-      # InfluxDB being enabled
-      ONTRACK_INFLUXDB_ENABLED: "true"
-      ONTRACK_INFLUXDB_URI: "http://influxdb:8086"
-      # Elastic search
-      SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
-      PROFILE: acceptance
-    volumes:
-      - "./ci/ontrack:/var/ontrack/conf"
-      # Better startup performances in CI and DO, do not use in Prod
-      - "/dev/urandom:/dev/random"
+      rabbit:
+        condition: service_started
     ports:
-      - "8080"
-      - "8800"
+      - "8080:8080"
+      - "8800:8800"
 
   # Postgresql database
-  postgresql:
+  postgres:
     image: postgres:11
+    restart: always
     environment:
-      POSTGRES_DB      : ontrack
-      POSTGRES_USER    : ontrack
+      POSTGRES_DB: ontrack
+      POSTGRES_USER: ontrack
       POSTGRES_PASSWORD: ontrack
-    ports:
-      - "5432"
 
+  # ElasticSearch
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
-    ports:
-      - "9200:9200"
-      - "9300:9300"
+    restart: always
     environment:
       - "discovery.type=single-node"
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  # Rabbit MQ
+  rabbit:
+    image: rabbitmq:3.8.25-management
+    restart: always
+    hostname: rabbit
+    environment:
+      RABBITMQ_DEFAULT_USER: ontrack
+      RABBITMQ_DEFAULT_PASS: ontrack

@@ -121,11 +121,9 @@ interface StructureService {
 
     fun deleteBuild(buildId: ID): Ack
 
-    // TODO Replace by Build?
-    fun getPreviousBuild(buildId: ID): Optional<Build>
+    fun getPreviousBuild(buildId: ID): Build?
 
-    // TODO Replace by Build?
-    fun getNextBuild(buildId: ID): Optional<Build>
+    fun getNextBuild(buildId: ID): Build?
 
     /**
      * Build links

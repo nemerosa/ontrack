@@ -1,0 +1,100 @@
+<div class="well" ng-if="!selectedBuild" style="height: 100%;">
+    <p class="text-muted">
+        Select a build on the graph to access more information.
+    </p>
+</div>
+<div class="panel panel-default" ng-if="selectedBuild">
+    <!-- Build basic information -->
+    <div class="panel-heading">Selected build</div>
+    <div class="panel-body">
+        <p>
+            <a href="{{ selectedBuild.branch.project.links._page }}"><b>{{ selectedBuild.branch.project.name }}</b></a>
+            /
+            <a href="{{ selectedBuild.branch.links._page }}">{{ selectedBuild.branch.name }}</a>
+
+            <!-- Link to the dependency graph of this build -->
+            <span>
+                <a
+                        title="Link to the dependency graph of this branch"
+                        href="/#/extension/auto-versioning/dependency-graph/branch/{{ selectedBuild.branch.id }}/downstream"><i class="fa fa-code-fork"></i></a>
+            </span>
+            <!-- Link to the upstream dependency graph of this branch -->
+            <span>
+                <a
+                        title="Link to the upstream dependency graph of this branch"
+                        href="/#/extension/auto-versioning/dependency-graph/branch/{{ selectedBuild.branch.id }}/upstream"><i class="fa fa-code-fork fa-rotate-180"></i></a>
+            </span>
+        </p>
+        <p>
+            <ot-auto-versioning-dependency-graph-build-links build="selectedBuild"></ot-auto-versioning-dependency-graph-build-links>
+        </p>
+    </div>
+    <!-- Previous build -->
+    <div class="panel-heading" ng-if="selectedBuild.previousBuild && selectedBuild.previousBuild.id != selectedBuild.id">
+        <i class="fa fa-arrow-left"></i>
+        Previous build
+    </div>
+    <div class="panel-body" ng-if="selectedBuild.previousBuild && selectedBuild.previousBuild.id != selectedBuild.id">
+        <ot-auto-versioning-dependency-graph-build-links
+                ref-build="selectedBuild"
+                build="selectedBuild.previousBuild"></ot-auto-versioning-dependency-graph-build-links>
+    </div>
+    <!-- Next build -->
+    <div class="panel-heading" ng-if="selectedBuild.nextBuild && selectedBuild.nextBuild.id != selectedBuild.id">
+        <i class="fa fa-arrow-right"></i>
+        Next build
+    </div>
+    <div class="panel-body" ng-if="selectedBuild.nextBuild && selectedBuild.nextBuild.id != selectedBuild.id">
+        <ot-auto-versioning-dependency-graph-build-links
+                ref-build="selectedBuild"
+                build="selectedBuild.nextBuild"></ot-auto-versioning-dependency-graph-build-links>
+    </div>
+    <!-- Last AV eligible build -->
+    <div class="panel-heading" ng-if="selectedBuild.autoVersioning.lastEligibleBuild && selectedBuild.autoVersioning.lastEligibleBuild.id != selectedBuild.id">
+        Last eligible build
+    </div>
+    <div class="panel-body" ng-if="selectedBuild.autoVersioning.lastEligibleBuild && selectedBuild.autoVersioning.lastEligibleBuild.id != selectedBuild.id">
+        <ot-auto-versioning-dependency-graph-build-links
+                ref-build="selectedBuild"
+                build="selectedBuild.autoVersioning.lastEligibleBuild"></ot-auto-versioning-dependency-graph-build-links>
+    </div>
+    <!-- Last build -->
+    <div class="panel-heading" ng-if="selectedBuild.lastBuildInfo.lastBuild &&
+      selectedBuild.lastBuildInfo.lastBuild.length > 0 &&
+      selectedBuild.lastBuildInfo.lastBuild[0].id != selectedBuild.id
+    ">
+        Last build
+    </div>
+    <div class="panel-body" ng-if="selectedBuild.lastBuildInfo.lastBuild &&
+      selectedBuild.lastBuildInfo.lastBuild.length > 0 &&
+      selectedBuild.lastBuildInfo.lastBuild[0].id != selectedBuild.id
+    ">
+        <ot-auto-versioning-dependency-graph-build-links
+                ref-build="selectedBuild"
+                build="selectedBuild.lastBuildInfo.lastBuild[0]"></ot-auto-versioning-dependency-graph-build-links>
+    </div>
+    <!-- AV status -->
+    <div class="panel-heading" ng-if="selectedBuild.autoVersioning.status">
+        Auto versioning last status
+    </div>
+    <div class="panel-body" ng-if="selectedBuild.autoVersioning.status">
+        <p>
+            <img class="ot-icon-minimal" ng-src="{{ avStatusIconUrl(selectedBuild.autoVersioning.status.mostRecentState) }}"/>
+            {{ selectedBuild.autoVersioning.status.mostRecentState.state }}
+        </p>
+        <p>
+            <i class="fa fa-arrow-right"></i>
+            Next version: {{ selectedBuild.autoVersioning.status.order.targetVersion }}
+        </p>
+        <p>
+            <i class="fa fa-clock-o"></i>
+            Time: {{ selectedBuild.autoVersioning.status.mostRecentState.creation.time | date:'shortDate' }}
+            {{ selectedBuild.autoVersioning.status.mostRecentState.creation.time | date:'mediumTime' }}
+        </p>
+    </div>
+    <!-- Other selections -->
+    <div class="panel-heading">
+        <i class="fa fa-info-circle text-info"></i>
+        <span class="text-muted">Select a build on the graph to access more information.</span>
+    </div>
+</div>

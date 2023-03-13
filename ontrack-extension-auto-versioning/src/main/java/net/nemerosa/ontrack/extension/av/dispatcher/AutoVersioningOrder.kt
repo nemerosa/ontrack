@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.av.dispatcher
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningTargetConfig
@@ -21,4 +22,11 @@ data class AutoVersioningOrder(
     val postProcessingConfig: JsonNode?,
     val validationStamp: String?,
     val autoApprovalMode: AutoApprovalMode,
-) : AutoVersioningTargetConfig
+) : AutoVersioningTargetConfig {
+    /**
+     * Gets a meaningful commit message for this order
+     */
+    @JsonIgnore
+    fun getCommitMessage() =
+        "[auto-versioning] Upgrade of $sourceProject to version $targetVersion"
+}

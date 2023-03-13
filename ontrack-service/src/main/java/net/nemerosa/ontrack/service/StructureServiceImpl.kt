@@ -140,7 +140,7 @@ class StructureServiceImpl(
 
     override fun getBranch(branchId: ID): Branch {
         val branch = structureRepository.getBranch(branchId)
-        securityService.checkProjectFunction(branch.project.id(), ProjectView::class.java)
+        securityService.checkProjectFunction(branch, ProjectView::class.java)
         return branch
     }
 
@@ -277,11 +277,11 @@ class StructureServiceImpl(
         return structureRepository.deleteBuild(buildId)
     }
 
-    override fun getPreviousBuild(buildId: ID): Optional<Build> {
+    override fun getPreviousBuild(buildId: ID): Build? {
         return structureRepository.getPreviousBuild(getBuild(buildId))
     }
 
-    override fun getNextBuild(buildId: ID): Optional<Build> {
+    override fun getNextBuild(buildId: ID): Build? {
         return structureRepository.getNextBuild(getBuild(buildId))
     }
 

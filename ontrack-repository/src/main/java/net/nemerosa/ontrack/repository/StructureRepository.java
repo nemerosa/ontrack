@@ -102,9 +102,11 @@ public interface StructureRepository {
      */
     int getBuildCountForProject(Project project);
 
-    Optional<Build> getPreviousBuild(Build build);
+    @Nullable
+    Build getPreviousBuild(Build build);
 
-    Optional<Build> getNextBuild(Build build);
+    @Nullable
+    Build getNextBuild(Build build);
 
     /**
      * Iterates over the builds of the branch, from the newest to the oldest, until

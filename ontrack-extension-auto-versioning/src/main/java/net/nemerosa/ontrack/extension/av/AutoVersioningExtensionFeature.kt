@@ -15,4 +15,5 @@ class AutoVersioningExtensionFeature(
     ExtensionFeatureOptions.DEFAULT
         .withDependency(scmExtensionFeature)
         .withGui(true)
+        .withExtraJSModule("dependency-graph")
 )

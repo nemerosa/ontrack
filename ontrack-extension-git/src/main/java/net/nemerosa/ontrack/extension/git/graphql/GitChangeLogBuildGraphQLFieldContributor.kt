@@ -43,7 +43,6 @@ class GitChangeLogBuildGraphQLFieldContributor(
                         // Looking for the next build
                         val buildTo: Build = if (to.isNullOrBlank()) {
                             structureService.getPreviousBuild(buildFrom.id)
-                                .getOrNull()
                                 ?: return@dataFetcher null // No change log
                         } else {
                             structureService.findBuildByName(buildFrom.branch.project.name, buildFrom.branch.name, to)

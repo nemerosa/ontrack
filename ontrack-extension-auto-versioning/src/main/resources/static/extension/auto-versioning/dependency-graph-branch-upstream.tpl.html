@@ -1,0 +1,22 @@
+<ot-view>
+
+    <div class="row" ng-if="rootBuild">
+        <div class="col-md-12">
+            <span class="ot-view-title">
+                Upstream dependency graph for
+                <a href="{{ rootBuild.branch.project.links._page }}">{{ rootBuild.branch.project.name }}</a>
+                /
+                <a href="{{ rootBuild.branch.links._page }}">{{ rootBuild.branch.name }}</a>
+            </span>
+            <p class="text-muted">
+                The graph shows the builds and branches which depend on this branch.
+            </p>
+        </div>
+    </div>
+
+    <ot-auto-versioning-dependency-graph
+            direction="UP"
+            root-build-setter="rootBuildSetter"
+            root-branch-id="branchId"></ot-auto-versioning-dependency-graph>
+
+</ot-view>

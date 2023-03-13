@@ -28,6 +28,18 @@ interface AutoVersioningConfigurationService {
     fun getAutoVersioning(branch: Branch): AutoVersioningConfig?
 
     /**
+     * Gets the auto versioning source between a parent branch & a dependency branch, if any.
+     *
+     * @param parent Branch which may have or not an AV config
+     * @param dependency Branch which may be or not a dependency of the parent's AV config
+     * @return Associated AV source or null if not available
+     */
+    fun getAutoVersioningBetween(
+        parent: Branch,
+        dependency: Branch,
+    ): AutoVersioningSourceConfig?
+
+    /**
      * Gets the list of branches which are configured for auto versioning for the given [project] and [promotion].
      */
     fun getBranchesConfiguredFor(project: String, promotion: String): List<Branch>

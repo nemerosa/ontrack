@@ -51,7 +51,7 @@ class TestSCMExtension(
             return file?.content?.invoke()?.toByteArray()
         }
 
-        override fun upload(scmBranch: String, commit: String, path: String, content: ByteArray) {}
+        override fun upload(scmBranch: String, commit: String, path: String, content: ByteArray, message: String) {}
 
         override fun createPR(
             from: String,
@@ -60,6 +60,7 @@ class TestSCMExtension(
             description: String,
             autoApproval: Boolean,
             remoteAutoMerge: Boolean,
+            message: String,
         ): SCMPullRequest {
             TODO("Not yet implemented")
         }

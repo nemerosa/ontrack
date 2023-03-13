@@ -81,13 +81,29 @@ class PushIngestionEventProcessorTest {
     }
 
     @Test
-    fun `Payload source for a branch`() {
+    fun `Payload source for a branch with multiple updates`() {
         val payload = IngestionHookFixtures.samplePushPayload(
             ref = "refs/heads/main",
             id = "1234567",
+            added = listOf("added"),
+            removed = listOf("removed"),
+            modified = listOf("modified"),
         )
         assertEquals(
             "main@1234567",
+            processor.getPayloadSource(payload)
+        )
+    }
+
+    @Test
+    fun `Payload source for a branch with one updated path`() {
+        val payload = IngestionHookFixtures.samplePushPayload(
+            ref = "refs/heads/main",
+            id = "1234567",
+            modified = listOf(".github/ontrack/auto-versioning.yml"),
+        )
+        assertEquals(
+            ".github/ontrack/auto-versioning.yml",
             processor.getPayloadSource(payload)
         )
     }

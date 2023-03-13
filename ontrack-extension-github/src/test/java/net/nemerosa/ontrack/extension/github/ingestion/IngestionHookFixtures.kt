@@ -276,10 +276,11 @@ object IngestionHookFixtures {
      */
     fun sampleWorkflowJobPayload(
         jobName: String = "the-job",
+        runId: Long = 1,
     ) = WorkflowJobPayload(
         action = WorkflowJobAction.in_progress,
         workflowJob = WorkflowJob(
-            runId = 1,
+            runId = runId,
             runAttempt = 1,
             status = WorkflowJobStepStatus.in_progress,
             conclusion = null,

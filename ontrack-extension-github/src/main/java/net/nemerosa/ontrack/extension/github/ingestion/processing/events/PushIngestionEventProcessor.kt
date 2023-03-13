@@ -43,14 +43,28 @@ class PushIngestionEventProcessor(
     }
 
     /**
-     * Tag, or branch#commit
+     * Tag, or path if only one, or branch#commit
      */
     override fun getPayloadSource(payload: PushPayload): String? =
         payload.getTag()
-            ?: if (payload.headCommit != null) {
-                "${payload.branchName}@${payload.headCommit.id}"
+            ?: if (payload.commits.size == 1) {
+                val commit = payload.commits.first()
+                val paths = commit.paths()
+                if (paths.size == 1) {
+                    paths.first()
+                } else {
+                    branchCommit(payload)
+                }
             } else {
-                payload.branchName
+                branchCommit(payload)
             }
+
+    private fun branchCommit(payload: PushPayload) =
+        if (payload.headCommit != null) {
+            "${payload.branchName}@${payload.headCommit.id}"
+        } else {
+            payload.branchName
+        }
+
 }
 
