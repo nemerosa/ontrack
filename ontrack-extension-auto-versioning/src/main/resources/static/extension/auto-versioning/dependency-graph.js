@@ -743,9 +743,10 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 // Toggling an element
                 $scope.toggleElement = () => {
                     // Value in the model has already been changed, just reacting to it now
-                    // TODO Refreshes the graph
                     // Saves the value
                     localStorage.setItem(localStorageLayoutKey, JSON.stringify($scope.layout));
+                    // Refreshes the graph
+                    refreshGraph();
                 };
             }
         };
