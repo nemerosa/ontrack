@@ -561,7 +561,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         animation: {
                             duration: 250
                         }
-                    })
+                    });
                 }
             };
 
@@ -630,7 +630,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         avStatus: true
                     },
                     height: 600
-                }
+                };
                 let storedLayout = localStorage.getItem(localStorageLayoutKey);
                 if (storedLayout) {
                     const parsedStoredLayout = JSON.parse(storedLayout);
