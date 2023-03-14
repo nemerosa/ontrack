@@ -188,6 +188,8 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             const context = {
                 // Chart will be
                 chart: undefined,
+                // Selected node
+                selectedNode: undefined
             };
 
             // Chart options
@@ -472,19 +474,30 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 }
             };
 
-            const loadNodeDependencies = (buildId) => {
+            const selectBuildId = (buildId) => {
                 // Looks for the node having the buildId as a value
                 const node = lookForNode(options.series[0].data[0], buildId);
                 if (node) {
                     loadDependenciesForNode(node).then(() => {
+                        // Selection
+                        selectNode(node);
+                        if (node.build && config.onBuildSelected) {
+                            config.onBuildSelected(angular.copy(node.build));
+                        }
                         // Refreshes the chart
                         getOrCreateChart().setOption(options);
                     });
-                    // Returning the build attached to the node
-                    return node.build;
-                } else {
-                    return null;
                 }
+            };
+
+            // Selection of a node
+
+            const selectNode = (node) => {
+                if (context.selectedNode) {
+                    context.selectedNode.label.borderWidth = 1;
+                }
+                context.selectedNode = node;
+                context.selectedNode.label.borderWidth = 4;
             };
 
             // Initializes the chart location
@@ -493,10 +506,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 chart.on('click', (params) => {
                     const buildId = params.value;
                     if (buildId) {
-                        const build = loadNodeDependencies(buildId);
-                        if (build && config.onBuildSelected) {
-                            config.onBuildSelected(angular.copy(build));
-                        }
+                        selectBuildId(buildId);
                     }
                 });
             };
@@ -533,6 +543,8 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 ).then(data => {
                     const rootBuild = config.rootBuild(data);
                     const rootNode = transformData(rootBuild);
+                    // Initial selection
+                    selectNode(rootNode);
                     // Graph setup
                     const chart = getOrCreateChart();
                     createOptionWithData(rootNode);
@@ -671,9 +683,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     throw new Error("Either root-build-id or root-branch-id must be set.");
                 }
                 config.onBuildSelected = (build) => {
-                    $scope.$apply(function () {
-                        $scope.selectedBuild = build;
-                    });
+                    $scope.selectedBuild = build;
                 };
                 config.layout = $scope.layout;
 
