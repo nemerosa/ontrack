@@ -780,6 +780,42 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     }
                     graph.resizeHeight(height);
                 };
+
+                // Registering a key listener at dom level
+                let keyListener = (event) => {
+                    if (event.code === 'ArrowRight' && event.shiftKey) {
+                        selectBuildRight();
+                    } else if (event.code === 'ArrowLeft' && event.shiftKey) {
+                        selectBuildLeft();
+                    } else if (event.code === 'ArrowUp' && event.shiftKey) {
+                        selectBuildUp();
+                    } else if (event.code === 'ArrowDown' && event.shiftKey) {
+                        selectBuildDown();
+                    } else {
+                        // console.log({event});
+                    }
+                };
+                document.addEventListener('keyup', keyListener);
+                // Unregistering the event when changing the page
+                $scope.$on('$stateChangeStart', function () {
+                    document.removeEventListener('keyup', keyListener);
+                });
+
+                const selectBuildRight = () => {
+                    console.log("selectBuildRight");
+                }
+
+                const selectBuildLeft = () => {
+                    console.log("selectBuildLeft");
+                }
+
+                const selectBuildUp = () => {
+                    console.log("selectBuildUp");
+                }
+
+                const selectBuildDown = () => {
+                    console.log("selectBuildDown");
+                }
             }
         };
     })
