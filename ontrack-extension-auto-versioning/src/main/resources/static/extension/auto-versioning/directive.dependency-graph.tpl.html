@@ -131,5 +131,99 @@
                 </div>
             </div>
         </div>
+        <!-- Key shortcuts -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            Key shortcuts
+                            <i title="Shows the key shortcuts"
+                               ng-hide="keyShortcutsVisible"
+                               ng-click="toggleKeyShortcutsVisible()"
+                               class="fa fa-eye ot-action"></i>
+                            <i title="Hides the key shortcuts"
+                               ng-show="keyShortcutsVisible"
+                               ng-click="toggleKeyShortcutsVisible()"
+                               class="fa fa-eye-slash ot-action"></i>
+                        </h3>
+                    </div>
+                    <table ng-show="keyShortcutsVisible" class="table table-bordered table-condensed table-striped">
+                        <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><code>shift + right</code></td>
+                            <td>Select the first build on the right</td>
+                        </tr>
+                        <tr>
+                            <td><code>shift + left</code></td>
+                            <td>Select the first build on the left</td>
+                        </tr>
+                        <tr>
+                            <td><code>shift + down</code></td>
+                            <td>Select the build down</td>
+                        </tr>
+                        <tr>
+                            <td><code>shift + up</code></td>
+                            <td>Select the build up</td>
+                        </tr>
+                        <tr>
+                            <td><code>M</code></td>
+                            <td>Branch downstream dependencies</td>
+                        </tr>
+                        <tr>
+                            <td><code>shift + M</code></td>
+                            <td>Branch upstream dependencies</td>
+                        </tr>
+                        <tr>
+                            <td><code>B</code></td>
+                            <td>Build downstream dependencies</td>
+                        </tr>
+                        <tr>
+                            <td><code>shift + B</code></td>
+                            <td>Build upstream dependencies</td>
+                        </tr>
+                        <tr>
+                            <td><code>P</code></td>
+                            <td>Previous build downstream dependencies</td>
+                        </tr>
+                        <tr>
+                            <td><code>shift + P</code></td>
+                            <td>Previous build upstream dependencies</td>
+                        </tr>
+                        <tr>
+                            <td><code>N</code></td>
+                            <td>Next build downstream dependencies</td>
+                        </tr>
+                        <tr>
+                            <td><code>shift + N</code></td>
+                            <td>Next build upstream dependencies</td>
+                        </tr>
+                        <tr>
+                            <td><code>L</code></td>
+                            <td>Last build downstream dependencies</td>
+                        </tr>
+                        <tr>
+                            <td><code>shift + L</code></td>
+                            <td>Last build upstream dependencies</td>
+                        </tr>
+                        <tr>
+                            <td><code>E</code></td>
+                            <td>Last eligible build downstream dependencies</td>
+                        </tr>
+                        <tr>
+                            <td><code>shift + E</code></td>
+                            <td>Last eligible build upstream dependencies</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

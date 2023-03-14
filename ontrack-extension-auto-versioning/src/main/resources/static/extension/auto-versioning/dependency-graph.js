@@ -781,6 +781,12 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     graph.resizeHeight(height);
                 };
 
+                // Key shortcutd
+                $scope.keyShortcutsVisible = false;
+                $scope.toggleKeyShortcutsVisible = () => {
+                    $scope.keyShortcutsVisible = !$scope.keyShortcutsVisible;
+                };
+
                 // Registering a key listener at dom level
                 let keyListener = (event) => {
                     if (event.code === 'ArrowRight' && event.shiftKey) {
