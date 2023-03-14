@@ -242,9 +242,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         emphasis: {
                             focus: 'ancestor'
                         },
-                        expandAndCollapse: false,
-                        animationDuration: 550,
-                        animationDurationUpdate: 750
+                        expandAndCollapse: false
                     }
                 ]
             };
