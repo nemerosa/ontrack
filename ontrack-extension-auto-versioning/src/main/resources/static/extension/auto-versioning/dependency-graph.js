@@ -789,20 +789,20 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
                 // Registering a key listener at dom level
                 let keyListener = (event) => {
-                    if (event.code === 'ArrowRight' && event.shiftKey) {
+                    if (event.key === 'ArrowRight' && event.shiftKey) {
                         selectBuildRight();
-                    } else if (event.code === 'ArrowLeft' && event.shiftKey) {
+                    } else if (event.key === 'ArrowLeft' && event.shiftKey) {
                         selectBuildLeft();
-                    } else if (event.code === 'ArrowUp' && event.shiftKey) {
+                    } else if (event.key === 'ArrowUp' && event.shiftKey) {
                         selectBuildUp();
-                    } else if (event.code === 'ArrowDown' && event.shiftKey) {
+                    } else if (event.key === 'ArrowDown' && event.shiftKey) {
                         selectBuildDown();
-                    } else if (event.code === 'M' && !event.shiftKey) {
+                    } else if (event.key === 'm') {
                         goToBranchDownstream();
-                    } else if (event.code === 'M' && event.shiftKey) {
+                    } else if (event.key === 'M') {
                         goToBranchUpstream();
                     } else {
-                        // console.log({event});
+                        console.log({event});
                     }
                 };
                 document.addEventListener('keyup', keyListener);
@@ -812,11 +812,17 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 });
 
                 const goToBranchDownstream = () => {
-                    // TODO
+                    console.log("Go to branch downstrem...");
+                    if ($scope.selectedBuild) {
+                        console.log("Go to branch downstrem NOW.");
+                        location.href = `#/extension/auto-versioning/dependency-graph/branch/${$scope.selectedBuild.branch.id}/downstream`;
+                    }
                 };
 
                 const goToBranchUpstream = () => {
-                    // TODO
+                    if ($scope.selectedBuild) {
+                        location.href = `#/extension/auto-versioning/dependency-graph/branch/${$scope.selectedBuild.branch.id}/upstream`;
+                    }
                 };
 
                 const selectBuildRight = () => {
