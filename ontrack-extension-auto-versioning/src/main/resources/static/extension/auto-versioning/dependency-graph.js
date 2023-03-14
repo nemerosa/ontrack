@@ -797,6 +797,10 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         selectBuildUp();
                     } else if (event.code === 'ArrowDown' && event.shiftKey) {
                         selectBuildDown();
+                    } else if (event.code === 'M' && !event.shiftKey) {
+                        goToBranchDownstream();
+                    } else if (event.code === 'M' && event.shiftKey) {
+                        goToBranchUpstream();
                     } else {
                         // console.log({event});
                     }
@@ -807,20 +811,28 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     document.removeEventListener('keyup', keyListener);
                 });
 
+                const goToBranchDownstream = () => {
+                    // TODO
+                };
+
+                const goToBranchUpstream = () => {
+                    // TODO
+                };
+
                 const selectBuildRight = () => {
-                    console.log("selectBuildRight");
+                    // TODO
                 }
 
                 const selectBuildLeft = () => {
-                    console.log("selectBuildLeft");
+                    // TODO
                 }
 
                 const selectBuildUp = () => {
-                    console.log("selectBuildUp");
+                    // TODO
                 }
 
                 const selectBuildDown = () => {
-                    console.log("selectBuildDown");
+                    // TODO
                 }
             }
         };
