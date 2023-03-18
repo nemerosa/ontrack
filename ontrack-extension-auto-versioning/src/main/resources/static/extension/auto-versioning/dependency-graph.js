@@ -841,7 +841,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 });
 
                 const goToBuildGraph = (build, direction) => {
-                    location.href = `#/extension/auto-versioning/dependency-graph/branch/${build.id}/${direction}`;
+                    location.href = `#/extension/auto-versioning/dependency-graph/build/${build.id}/${direction}`;
                 }
 
                 const _goToBuildDownstream = (build) => {
