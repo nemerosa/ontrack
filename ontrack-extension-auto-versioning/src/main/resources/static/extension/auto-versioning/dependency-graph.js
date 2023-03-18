@@ -286,12 +286,12 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 if (config.direction === 'DOWN') {
                     if (build.using && build.using.pageItems) {
                         node.childrenLoaded = true;
-                        node.children = build.using.pageItems.map(childBuild => transformData(childBuild));
+                        node.children = build.using.pageItems.map(childBuild => transformData(childBuild, node));
                     }
                 } else {
                     if (build.usedBy && build.usedBy.pageItems) {
                         node.childrenLoaded = true;
-                        node.children = build.usedBy.pageItems.map(childBuild => transformData(childBuild));
+                        node.children = build.usedBy.pageItems.map(childBuild => transformData(childBuild, node));
                     }
                 }
             };
@@ -348,7 +348,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 return `AV Status: {${className}|} ${status.mostRecentState.state} - ${status.order.targetVersion}`;
             };
 
-            const transformData = (build) => {
+            const transformData = (build, parentNode) => {
 
                 // Initial node
                 const node = {
@@ -454,7 +454,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     // Loading the dependencies
                     return loadBuildDependencies(node.value).then(builds => {
                         if (builds) {
-                            node.children = builds.map(child => transformData(child));
+                            node.children = builds.map(child => transformData(child, node));
                         }
                         node.childrenLoaded = true;
                         // Recursive loading
@@ -551,7 +551,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     config.rootVariables
                 ).then(data => {
                     const rootBuild = config.rootBuild(data);
-                    const rootNode = transformData(rootBuild);
+                    const rootNode = transformData(rootBuild, null);
                     // Initial selection
                     selectNode(rootNode);
                     // Graph setup
@@ -598,6 +598,14 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                             selectBuildId(child.value);
                         }
                     });
+                }
+            };
+
+            // Selects the build on the left of the selected one (the parent)
+
+            graph.selectBuildLeft = () => {
+                if (context.selectedNode && context.selectedNode.parent) {
+                    selectBuildId(context.selectedNode.parent.value);
                 }
             };
 
@@ -952,7 +960,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 }
 
                 const selectBuildLeft = () => {
-                    // TODO
+                    graph.selectBuildLeft();
                 }
 
                 const selectBuildUp = () => {
