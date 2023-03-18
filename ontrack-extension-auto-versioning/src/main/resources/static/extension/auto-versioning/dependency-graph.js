@@ -903,7 +903,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
                 const goToBuildGraph = (build, direction) => {
                     location.href = `#/extension/auto-versioning/dependency-graph/build/${build.id}/${direction}`;
-                }
+                };
 
                 const _goToBuildDownstream = (build) => {
                     goToBuildGraph(build, 'downstream');
@@ -993,19 +993,19 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
                 const selectBuildRight = () => {
                     graph.selectBuildRight();
-                }
+                };
 
                 const selectBuildLeft = () => {
                     graph.selectBuildLeft();
-                }
+                };
 
                 const selectBuildUp = () => {
                     graph.selectBuildUp();
-                }
+                };
 
                 const selectBuildDown = () => {
                     graph.selectBuildDown();
-                }
+                };
             }
         };
     })
