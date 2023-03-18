@@ -201,7 +201,9 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 // Chart will be
                 chart: undefined,
                 // Selected node
-                selectedNode: undefined
+                selectedNode: undefined,
+                // Links build ID --> parent node
+                parents: {}
             };
 
             // Chart options
@@ -356,6 +358,9 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     name: build.name,
                     value: build.id
                 };
+
+                // Links build ID --> parent node
+                context.parents[build.id] = parentNode;
 
                 // Styling
                 node.label = {
@@ -604,8 +609,11 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             // Selects the build on the left of the selected one (the parent)
 
             graph.selectBuildLeft = () => {
-                if (context.selectedNode && context.selectedNode.parent) {
-                    selectBuildId(context.selectedNode.parent.value);
+                if (context.selectedNode) {
+                    const parentNode = context.parents[context.selectedNode.value];
+                    if (parentNode) {
+                        selectBuildId(parentNode.value);
+                    }
                 }
             };
 
