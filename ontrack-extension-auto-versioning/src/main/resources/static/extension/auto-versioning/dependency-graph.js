@@ -203,7 +203,9 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 // Selected node
                 selectedNode: undefined,
                 // Links build ID --> parent node
-                parents: {}
+                parents: {},
+                // Index (build IDs --> Boolean) of nodes having been expanded
+                expansionIndex: {}
             };
 
             // Chart options
@@ -434,6 +436,10 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             // Loading the children for a node
 
             const loadDependenciesForNode = (node, recursive) => {
+                // Checking if expansion must be done for this done
+                const expansionState = context.expansionIndex[node.value] === true;
+                const mustExpand = recursive || expansionState;
+                // Promise to return
                 const d = $q.defer();
                 // Check if the children have been already loaded or not
                 if (!node.childrenLoaded) {
@@ -443,8 +449,10 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                             node.children = builds.map(child => transformData(child, node));
                         }
                         node.childrenLoaded = true;
+                        // Adding to the index for restoration on refresh
+                        context.expansionIndex[node.value] = true;
                         // Recursive loading
-                        if (recursive && node.children) {
+                        if (mustExpand && node.children) {
                             $q.all(node.children.map(child => loadDependenciesForNode(child, recursive))).then(() => {
                                 d.resolve(node);
                             });
@@ -457,7 +465,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         return d.promise;
                     });
                 } else {
-                    if (recursive && node.children) {
+                    if (mustExpand && node.children) {
                         $q.all(node.children.map(child => loadDependenciesForNode(child, recursive))).then(() => {
                             d.resolve(node);
                         });
