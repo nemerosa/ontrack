@@ -584,6 +584,23 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 }
             };
 
+            // Selects the build on the right of the selected one (top most)
+
+            graph.selectBuildRight = () => {
+                if (context.selectedNode) {
+                    // Making sure its children are loaded
+                    loadDependenciesForNode(context.selectedNode).then(() => {
+                        // Gets its children
+                        const children = context.selectedNode.children;
+                        if (children && children.length > 0) {
+                            // Selects the first child
+                            const child = children[0];
+                            selectBuildId(child.value);
+                        }
+                    });
+                }
+            };
+
             return graph;
         };
 
@@ -931,7 +948,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 };
 
                 const selectBuildRight = () => {
-                    // TODO
+                    graph.selectBuildRight();
                 }
 
                 const selectBuildLeft = () => {
