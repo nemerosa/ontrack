@@ -282,22 +282,6 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 });
             };
 
-            // Given a build, creates a node & its descendants, for use inside the graph
-
-            const createDependencyNodes = (node, build) => {
-                if (config.direction === 'DOWN') {
-                    if (build.using && build.using.pageItems) {
-                        node.childrenLoaded = true;
-                        node.children = build.using.pageItems.map(childBuild => transformData(childBuild, node));
-                    }
-                } else {
-                    if (build.usedBy && build.usedBy.pageItems) {
-                        node.childrenLoaded = true;
-                        node.children = build.usedBy.pageItems.map(childBuild => transformData(childBuild, node));
-                    }
-                }
-            };
-
             const buildLine = (node, build, config) => {
                 // Display name is the build name unless there is a release property attached to the build
                 let displayName = build.name;
@@ -424,9 +408,6 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 // Label formatter
                 node.label.formatter = formatterLines.join('\n');
 
-                // Fill the dependencies
-                createDependencyNodes(node, build);
-
                 // OK
                 return node;
             };
@@ -465,12 +446,12 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         // Recursive loading
                         if (recursive && node.children) {
                             $q.all(node.children.map(child => loadDependenciesForNode(child, recursive))).then(() => {
-                                d.resolve({});
+                                d.resolve(node);
                             });
                         }
                         // We're done here
                         else {
-                            d.resolve({});
+                            d.resolve(node);
                         }
                         // OK
                         return d.promise;
@@ -478,11 +459,11 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 } else {
                     if (recursive && node.children) {
                         $q.all(node.children.map(child => loadDependenciesForNode(child, recursive))).then(() => {
-                            d.resolve({});
+                            d.resolve(node);
                         });
                         return d.promise;
                     } else {
-                        d.resolve({});
+                        d.resolve(node);
                         return d.promise;
                     }
                 }
@@ -557,13 +538,16 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 ).then(data => {
                     const rootBuild = config.rootBuild(data);
                     const rootNode = transformData(rootBuild, null);
+                    // Loading of dependencies
+                    return loadDependenciesForNode(rootNode, false);
+                }).then((rootNode) => {
                     // Initial selection
                     selectNode(rootNode);
                     // Graph setup
                     const chart = getOrCreateChart();
                     createOptionWithData(rootNode);
                     chart.setOption(options);
-                    return rootBuild;
+                    return rootNode.build;
                 });
             };
 
