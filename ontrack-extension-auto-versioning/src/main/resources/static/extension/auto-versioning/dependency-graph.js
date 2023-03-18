@@ -163,6 +163,18 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         };
 
         /**
+         * Given a build, returns its last build if available.
+         */
+        self.getLastBuild = (build) => {
+            const lastBuilds = build.lastBuildInfo.lastBuild;
+            if (lastBuilds && lastBuilds.length > 0) {
+                return lastBuilds[0];
+            } else {
+                return null;
+            }
+        };
+
+        /**
          * Initializes a graph
          * @param config.rootQuery Function which takes a GraphQL fragment and returns a GraphQL path to put under the query
          * @param config.rootBuild Given the data returns by the GraphQL query, returns the root build
@@ -391,13 +403,10 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
                 // Last build
                 if (config.layout.elements.lastBuild) {
-                    const lastBuilds = build.lastBuildInfo.lastBuild;
-                    if (lastBuilds && lastBuilds.length > 0) {
-                        const lastBuild = lastBuilds[0];
-                        if (lastBuild.id > build.id) {
-                            separator();
-                            formatterLines.push(buildLine(node, lastBuild, {prefix: "Last build: "}));
-                        }
+                    const lastBuild = self.getLastBuild(build);
+                    if (lastBuild && lastBuild.id > build.id) {
+                        separator();
+                        formatterLines.push(buildLine(node, lastBuild, {prefix: "Last build: "}));
                     }
                 }
 
@@ -806,21 +815,21 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     } else if (event.key === 'B') {
                         goToBuildUpstream();
                     } else if (event.key === 'p') {
-                        // TODO goToPreviousBuildDownstream();
+                        goToPreviousBuildDownstream();
                     } else if (event.key === 'P') {
-                        // TODO goToPreviousBuildDownstream();
+                        goToPreviousBuildUpstream();
                     } else if (event.key === 'n') {
-                        // TODO goToNextBuildDownstream();
+                        goToNextBuildDownstream();
                     } else if (event.key === 'N') {
-                        // TODO goToNextBuildDownstream();
+                        goToNextBuildUpstream();
                     } else if (event.key === 'l') {
-                        // TODO goToLastBuildDownstream();
+                        goToLastBuildDownstream();
                     } else if (event.key === 'L') {
-                        // TODO goToLastBuildDownstream();
+                        goToLastBuildUpstream();
                     } else if (event.key === 'e') {
-                        // TODO goToLastEligibleBuildDownstream();
+                        goToLastEligibleBuildDownstream();
                     } else if (event.key === 'E') {
-                        // TODO goToLastEligibleBuildDownstream();
+                        goToLastEligibleBuildUpstream();
                     } else {
                         // console.log({event});
                     }
@@ -830,6 +839,18 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 $scope.$on('$stateChangeStart', function () {
                     document.removeEventListener('keyup', keyListener);
                 });
+
+                const goToBuildGraph = (build, direction) => {
+                    location.href = `#/extension/auto-versioning/dependency-graph/branch/${build.id}/${direction}`;
+                }
+
+                const _goToBuildDownstream = (build) => {
+                    goToBuildGraph(build, 'downstream');
+                };
+
+                const _goToBuildUpstream = (build) => {
+                    goToBuildGraph(build, 'upstream');
+                };
 
                 const goToBranchDownstream = () => {
                     if ($scope.selectedBuild) {
@@ -845,13 +866,67 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
                 const goToBuildDownstream = () => {
                     if ($scope.selectedBuild) {
-                        location.href = `#/extension/auto-versioning/dependency-graph/build/${$scope.selectedBuild.id}/downstream`;
+                        _goToBuildDownstream($scope.selectedBuild);
                     }
                 };
 
                 const goToBuildUpstream = () => {
                     if ($scope.selectedBuild) {
-                        location.href = `#/extension/auto-versioning/dependency-graph/build/${$scope.selectedBuild.id}/upstream`;
+                        _goToBuildUpstream($scope.selectedBuild);
+                    }
+                };
+
+                const goToPreviousBuildDownstream = () => {
+                    if ($scope.selectedBuild && $scope.selectedBuild.previousBuild) {
+                        _goToBuildDownstream($scope.selectedBuild.previousBuild);
+                    }
+                };
+
+                const goToPreviousBuildUpstream = () => {
+                    if ($scope.selectedBuild && $scope.selectedBuild.previousBuild) {
+                        _goToBuildUpstream($scope.selectedBuild.previousBuild);
+                    }
+                };
+
+                const goToNextBuildDownstream = () => {
+                    if ($scope.selectedBuild && $scope.selectedBuild.nextBuild) {
+                        _goToBuildDownstream($scope.selectedBuild.nextBuild);
+                    }
+                };
+
+                const goToNextBuildUpstream = () => {
+                    if ($scope.selectedBuild && $scope.selectedBuild.nextBuild) {
+                        _goToBuildUpstream($scope.selectedBuild.nextBuild);
+                    }
+                };
+
+                const goToLastBuildDownstream = () => {
+                    if ($scope.selectedBuild) {
+                        const lastBuild = otExtensionAutoVersioningDependencyGraph.getLastBuild($scope.selectedBuild);
+                        if (lastBuild) {
+                            _goToBuildDownstream(lastBuild);
+                        }
+                    }
+                };
+
+                const goToLastBuildUpstream = () => {
+                    if ($scope.selectedBuild) {
+                        const lastBuild = otExtensionAutoVersioningDependencyGraph.getLastBuild($scope.selectedBuild);
+                        if (lastBuild) {
+                            _goToBuildUpstream(lastBuild);
+                        }
+                    }
+                };
+
+                const goToLastEligibleBuildDownstream = () => {
+                    if ($scope.selectedBuild && $scope.selectedBuild.autoVersioning && $scope.selectedBuild.autoVersioning.lastEligibleBuild) {
+                        _goToBuildDownstream($scope.selectedBuild.autoVersioning.lastEligibleBuild);
+                    }
+                };
+
+                const goToLastEligibleBuildUpstream = () => {
+                    if ($scope.selectedBuild && $scope.selectedBuild.autoVersioning && $scope.selectedBuild.autoVersioning.lastEligibleBuild) {
+                        _goToBuildUpstream($scope.selectedBuild.autoVersioning.lastEligibleBuild);
                     }
                 };
 
