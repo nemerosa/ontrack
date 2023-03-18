@@ -801,8 +801,28 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         goToBranchDownstream();
                     } else if (event.key === 'M') {
                         goToBranchUpstream();
+                    } else if (event.key === 'b') {
+                        goToBuildDownstream();
+                    } else if (event.key === 'B') {
+                        goToBuildUpstream();
+                    } else if (event.key === 'p') {
+                        // TODO goToPreviousBuildDownstream();
+                    } else if (event.key === 'P') {
+                        // TODO goToPreviousBuildDownstream();
+                    } else if (event.key === 'n') {
+                        // TODO goToNextBuildDownstream();
+                    } else if (event.key === 'N') {
+                        // TODO goToNextBuildDownstream();
+                    } else if (event.key === 'l') {
+                        // TODO goToLastBuildDownstream();
+                    } else if (event.key === 'L') {
+                        // TODO goToLastBuildDownstream();
+                    } else if (event.key === 'e') {
+                        // TODO goToLastEligibleBuildDownstream();
+                    } else if (event.key === 'E') {
+                        // TODO goToLastEligibleBuildDownstream();
                     } else {
-                        console.log({event});
+                        // console.log({event});
                     }
                 };
                 document.addEventListener('keyup', keyListener);
@@ -812,9 +832,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 });
 
                 const goToBranchDownstream = () => {
-                    console.log("Go to branch downstrem...");
                     if ($scope.selectedBuild) {
-                        console.log("Go to branch downstrem NOW.");
                         location.href = `#/extension/auto-versioning/dependency-graph/branch/${$scope.selectedBuild.branch.id}/downstream`;
                     }
                 };
@@ -822,6 +840,18 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 const goToBranchUpstream = () => {
                     if ($scope.selectedBuild) {
                         location.href = `#/extension/auto-versioning/dependency-graph/branch/${$scope.selectedBuild.branch.id}/upstream`;
+                    }
+                };
+
+                const goToBuildDownstream = () => {
+                    if ($scope.selectedBuild) {
+                        location.href = `#/extension/auto-versioning/dependency-graph/build/${$scope.selectedBuild.id}/downstream`;
+                    }
+                };
+
+                const goToBuildUpstream = () => {
+                    if ($scope.selectedBuild) {
+                        location.href = `#/extension/auto-versioning/dependency-graph/build/${$scope.selectedBuild.id}/upstream`;
                     }
                 };
 
