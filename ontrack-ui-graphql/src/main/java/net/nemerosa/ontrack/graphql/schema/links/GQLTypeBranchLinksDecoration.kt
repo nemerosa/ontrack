@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.links.BranchLinksDecoration
 import org.springframework.stereotype.Component
 
 @Component
+@Deprecated(GraphFieldContributorConstants.DEPRECATION)
 class GQLTypeBranchLinksDecoration(
     private val gqlTypeExtensionFeatureDescription: GQLTypeExtensionFeatureDescription
 ) : GQLType {

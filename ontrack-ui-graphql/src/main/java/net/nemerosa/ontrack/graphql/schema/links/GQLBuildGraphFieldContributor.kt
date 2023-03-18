@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
 
 @Component
+@Deprecated(GraphFieldContributorConstants.DEPRECATION)
 class GQLBuildGraphFieldContributor(
     gqlEnumBranchLinksDirection: GQLEnumBranchLinksDirection,
     gqlTypeBranchLinksNode: GQLTypeBranchLinksNode,
