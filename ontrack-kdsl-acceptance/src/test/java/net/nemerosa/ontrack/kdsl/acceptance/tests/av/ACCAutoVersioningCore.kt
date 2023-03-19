@@ -1008,4 +1008,64 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
         }
     }
 
+    @Test
+    fun `Auto versioning from a project using version as a label is not triggered when build has no label`() {
+        withTestGitHubRepository {
+            withAutoVersioning {
+                repositoryFile("gradle.properties") {
+                    """
+                        depVersion = 1.0.0
+                    """.trimIndent()
+                }
+                val dependency = project {
+                    buildLinkDisplayUseLabel = true
+                    branch(name = "main") {
+                        promotion(name = "IRON")
+                        this
+                    }
+                }
+                project {
+                    branch {
+                        configuredForGitHubRepository(ontrack)
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "depVersion",
+                                )
+                            )
+                        )
+
+                        dependency.apply {
+                            build(name = "1.1.0-1") {
+                                // Build has no label
+                                // label = "1.1.0"
+                                promote("IRON")
+                            }
+                        }
+
+                        waitForAutoVersioningCompletion()
+
+                        assertThatGitHubRepository {
+
+                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-1.1.0-fad58de7366495db4650cfefac2fcd61")
+
+                            fileContains("gradle.properties") {
+                                """
+                                    depVersion = 1.0.0
+                                """.trimIndent()
+                            }
+
+                            hasNoPR(to = "main")
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
 }
