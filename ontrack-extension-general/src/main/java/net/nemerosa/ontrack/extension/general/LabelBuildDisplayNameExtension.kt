@@ -8,12 +8,20 @@ import org.springframework.stereotype.Component
 
 @Component
 class LabelBuildDisplayNameExtension(
-        extensionFeature: GeneralExtensionFeature,
-        private val propertyService: PropertyService
+    extensionFeature: GeneralExtensionFeature,
+    private val propertyService: PropertyService
 ) : AbstractExtension(extensionFeature), BuildDisplayNameExtension {
+
     override fun getBuildDisplayName(build: Build): String? {
-        val displayProperty: BuildLinkDisplayProperty? = propertyService.getProperty(build.project, BuildLinkDisplayPropertyType::class.java).value
+        val displayProperty: BuildLinkDisplayProperty? =
+            propertyService.getProperty(build.project, BuildLinkDisplayPropertyType::class.java).value
         val labelProperty: ReleaseProperty? = propertyService.getProperty(build, ReleasePropertyType::class.java).value
-        return displayProperty.getLabel(build, labelProperty)
+        return displayProperty.getLabel(labelProperty)
+    }
+
+    override fun mustProvideBuildName(build: Build): Boolean {
+        val displayProperty: BuildLinkDisplayProperty? =
+            propertyService.getProperty(build.project, BuildLinkDisplayPropertyType::class.java).value
+        return displayProperty?.useLabel ?: false
     }
 }

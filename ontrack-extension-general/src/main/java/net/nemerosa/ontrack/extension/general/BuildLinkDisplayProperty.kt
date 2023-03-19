@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.model.structure.Build
-
 /**
  * Configuration of the display options for build links
  * targeting a project.
@@ -14,14 +12,13 @@ import net.nemerosa.ontrack.model.structure.Build
  * the build name.
  */
 class BuildLinkDisplayProperty(
-        val useLabel: Boolean
+    val useLabel: Boolean
 )
 
 fun BuildLinkDisplayProperty?.getLabel(
-        build: Build,
-        labelProperty: ReleaseProperty?
-): String = if (this == null || labelProperty == null || !useLabel) {
-    build.name
+    labelProperty: ReleaseProperty?
+): String? = if (this == null || labelProperty == null || !useLabel) {
+    null
 } else {
     labelProperty.name
 }

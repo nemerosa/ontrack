@@ -10,6 +10,8 @@ import net.nemerosa.ontrack.model.structure.PromotionLevel
 interface AutoVersioningPromotionListenerService {
     /**
      * Given a [build] promoted to a given [promotion], returns a list of configured branches eligible for auto versioning.
+     *
+     * @return Null if no auto versioning can be performed
      */
-    fun getConfiguredBranches(build: Build, promotion: PromotionLevel): AutoVersioningConfiguredBranches
+    fun getConfiguredBranches(build: Build, promotion: PromotionLevel): AutoVersioningConfiguredBranches?
 }
