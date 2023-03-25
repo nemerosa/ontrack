@@ -44,6 +44,7 @@ class TFCHookDispatcherImpl(
     private fun TFCNotificationProcessorResponse.toHookNotificationResponse() = TFCHookNotificationResponse(
         type = when (type) {
             TFCNotificationProcessorResponseType.IGNORED -> TFCHookResponseType.IGNORED
+            TFCNotificationProcessorResponseType.OK -> TFCHookResponseType.OK
         },
         message = null,
     )

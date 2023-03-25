@@ -41,11 +41,27 @@ class RunCompletedProcessor(
         processingPayload: RunPayload,
     ): TFCNotificationProcessorResponse =
         when (processingPayload.runStatus) {
-            "applied" -> applied(processingPayload)
+            "applied" -> applied(params, processingPayload)
             else -> TFCNotificationProcessorResponse.runStatusIgnored(processingPayload.runStatus)
         }
 
-    private fun applied(processingPayload: RunPayload): TFCNotificationProcessorResponse {
-        TODO("Not yet implemented")
+    private fun applied(
+        params: TFCParameters,
+        processingPayload: RunPayload,
+    ): TFCNotificationProcessorResponse {
+        val result = tfcService.validate(
+            params,
+            processingPayload.workspaceId,
+            processingPayload.runUrl,
+        )
+        return if (result.build != null) {
+            if (result.validationRun != null) {
+                TFCNotificationProcessorResponse.validated(result.build, result.validationRun)
+            } else {
+                TFCNotificationProcessorResponse.buildNotValidated(result.build, result.parameters)
+            }
+        } else {
+            TFCNotificationProcessorResponse.buildNotFound(result.parameters)
+        }
     }
 }
