@@ -10,9 +10,11 @@ import net.nemerosa.ontrack.extension.tfc.processing.TFCNotificationProcessor
 import net.nemerosa.ontrack.extension.tfc.processing.TFCNotificationProcessorRegistry
 import net.nemerosa.ontrack.extension.tfc.processing.TFCNotificationProcessorResponse
 import net.nemerosa.ontrack.extension.tfc.processing.TFCNotificationProcessorResponseType
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
-@Component
+@Service
+@Transactional
 class TFCHookDispatcherImpl(
     private val tfcNotificationProcessorRegistry: TFCNotificationProcessorRegistry
 ) : TFCHookDispatcher {
