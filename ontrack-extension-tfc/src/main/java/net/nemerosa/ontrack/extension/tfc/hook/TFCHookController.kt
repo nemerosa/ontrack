@@ -29,6 +29,8 @@ class TFCHookController(
         params: TFCHookParameters,
         @RequestHeader("X-TFE-Notification-Signature") signature: String,
     ): TFCHookResponse {
+        // TODO
+        logger.info("Signature = $signature")
         // Checking if the hook is enabled
         val settings = cachedSettingsService.getCachedSettings(TFCSettings::class.java)
         if (!settings.enabled) {

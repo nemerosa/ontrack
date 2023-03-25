@@ -7,4 +7,7 @@ data class TFCSettings(
     @APIDescription("Is the support for TFC notifications enabled?")
     @APILabel("Enabled")
     val enabled: Boolean = false,
+    @APIDescription("Secret token to be passed by TFC")
+    @APILabel("Token")
+    val token: String = "",
 )
