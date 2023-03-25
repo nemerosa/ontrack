@@ -4,9 +4,7 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.PropertyService
-import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Service
 
 @Service
@@ -20,11 +18,32 @@ class TFCServiceImpl(
     override fun validate(params: TFCParameters, workspaceId: String, runUrl: String): TFCValidationResult {
         // Getting the actual parameters
         val actualParams = expandParams(params, workspaceId, runUrl)
-        securityService.asAdmin {
+        return securityService.asAdmin {
             // Looking for the build
-            val build = findBuild(actualParams)
-            TODO("Getting or creating the validation stamp")
-            TODO("Validation")
+            val build = findBuild(actualParams) ?: return@asAdmin TFCValidationResult(
+                params, null, null
+            )
+            // Forcing the creation of the validation stamp if not existing
+            val stamp = structureService.findValidationStampByName(
+                params.project, params.branch, params.validation
+            ).getOrNull()
+            if (stamp == null) {
+                structureService.newValidationStamp(
+                    ValidationStamp.of(
+                        build.branch,
+                        NameDescription.nd(params.validation, "")
+                    )
+                )
+            }
+            // Validation
+            val run = structureService.newValidationRun(
+                build, ValidationRunRequest(
+                    validationStampName = params.validation,
+                    validationRunStatusId = ValidationRunStatusID.STATUS_PASSED,
+                )
+            )
+            // OK
+            TFCValidationResult(params, build, run)
         }
     }
 
