@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.tfc.processing.TFCNotificationProcessor
 import net.nemerosa.ontrack.extension.tfc.processing.TFCNotificationProcessorResponse
 import net.nemerosa.ontrack.extension.tfc.service.TFCParameters
 import net.nemerosa.ontrack.extension.tfc.service.TFCService
+import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
 import kotlin.reflect.KProperty0
 
@@ -51,6 +52,7 @@ class RunCompletedProcessor(
     ): TFCNotificationProcessorResponse {
         val result = tfcService.validate(
             params,
+            ValidationRunStatusID.STATUS_PASSED,
             processingPayload.workspaceId,
             processingPayload.runUrl,
         )

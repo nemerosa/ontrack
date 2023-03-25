@@ -15,7 +15,12 @@ class TFCServiceImpl(
     private val buildFilterService: BuildFilterService,
 ) : TFCService {
 
-    override fun validate(params: TFCParameters, workspaceId: String, runUrl: String): TFCValidationResult {
+    override fun validate(
+        params: TFCParameters,
+        status: ValidationRunStatusID,
+        workspaceId: String,
+        runUrl: String
+    ): TFCValidationResult {
         // Getting the actual parameters
         val actualParams = expandParams(params, workspaceId, runUrl)
         return securityService.asAdmin {
@@ -39,7 +44,7 @@ class TFCServiceImpl(
             val run = structureService.newValidationRun(
                 build, ValidationRunRequest(
                     validationStampName = params.validation,
-                    validationRunStatusId = ValidationRunStatusID.STATUS_PASSED,
+                    validationRunStatusId = status,
                 )
             )
             // OK
