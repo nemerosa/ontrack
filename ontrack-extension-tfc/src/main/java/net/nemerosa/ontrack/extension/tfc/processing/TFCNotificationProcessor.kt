@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.tfc.processing
 
 import net.nemerosa.ontrack.extension.tfc.hook.model.TFCHookPayload
 import net.nemerosa.ontrack.extension.tfc.hook.model.TFCHookPayloadNotification
+import net.nemerosa.ontrack.extension.tfc.service.TFCParameters
 
 interface TFCNotificationProcessor<P> {
 
@@ -18,6 +19,6 @@ interface TFCNotificationProcessor<P> {
     /**
      * Processing
      */
-    fun process(processingPayload: P): TFCNotificationProcessorResponse
+    fun process(params: TFCParameters, processingPayload: P): TFCNotificationProcessorResponse
 
 }

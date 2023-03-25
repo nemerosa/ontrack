@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.tfc.hook.dispatching
 
 import net.nemerosa.ontrack.extension.tfc.hook.TFCHookNotificationResponse
+import net.nemerosa.ontrack.extension.tfc.hook.TFCHookParameters
 import net.nemerosa.ontrack.extension.tfc.hook.TFCHookResponse
 import net.nemerosa.ontrack.extension.tfc.hook.TFCHookResponseType
 import net.nemerosa.ontrack.extension.tfc.hook.model.TFCHookPayload
@@ -16,16 +17,17 @@ class TFCHookDispatcherImpl(
     private val tfcNotificationProcessorRegistry: TFCNotificationProcessorRegistry
 ) : TFCHookDispatcher {
 
-    override fun dispatch(payload: TFCHookPayload): TFCHookResponse {
+    override fun dispatch(parameters: TFCHookParameters, payload: TFCHookPayload): TFCHookResponse {
         // Processing of each notification
         val responses = payload.notifications.map { notification ->
-            dispatchNotification(payload, notification)
+            dispatchNotification(parameters, payload, notification)
         }
         // Consolidates all responses
         return TFCHookResponse.all(responses)
     }
 
     private fun dispatchNotification(
+        parameters: TFCHookParameters,
         payload: TFCHookPayload,
         notification: TFCHookPayloadNotification
     ): TFCHookNotificationResponse {
@@ -34,7 +36,7 @@ class TFCHookDispatcherImpl(
         val processor = tfcNotificationProcessorRegistry.findProcessorByTrigger<Any>(trigger)
             ?: return TFCHookNotificationResponse.processorNotFound(trigger)
         // Launching the processing
-        val response = processing(processor, payload, notification)
+        val response = processing(processor, parameters, payload, notification)
         // Conversion of the response
         return response.toHookNotificationResponse()
     }
@@ -48,13 +50,16 @@ class TFCHookDispatcherImpl(
 
     private fun <P> processing(
         processor: TFCNotificationProcessor<P>,
+        parameters: TFCHookParameters,
         payload: TFCHookPayload,
         notification: TFCHookPayloadNotification
     ): TFCNotificationProcessorResponse {
         // Conversion to the final payload
         val processingPayload = processor.convertFromHook(payload, notification)
+        // Conversion of parameters
+        val serviceParams = parameters.toServiceParameters()
         // Processing
-        return processor.process(processingPayload)
+        return processor.process(serviceParams, processingPayload)
     }
 
 }

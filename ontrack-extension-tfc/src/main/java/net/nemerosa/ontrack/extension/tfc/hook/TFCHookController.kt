@@ -57,6 +57,6 @@ class TFCHookController(
         val payload = json.parseOrNull<TFCHookPayload>()
             ?: throw TFCHookPayloadParsingException()
         // Dispatching
-        return tfcHookDispatcher.dispatch(payload)
+        return tfcHookDispatcher.dispatch(params, payload)
     }
 }
