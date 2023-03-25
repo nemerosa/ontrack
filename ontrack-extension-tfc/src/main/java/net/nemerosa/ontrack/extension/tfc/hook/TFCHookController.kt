@@ -1,9 +1,13 @@
 package net.nemerosa.ontrack.extension.tfc.hook
 
 import io.micrometer.core.instrument.MeterRegistry
+import net.nemerosa.ontrack.extension.tfc.hook.dispatching.TFCHookDispatcher
+import net.nemerosa.ontrack.extension.tfc.hook.model.TFCHookPayload
 import net.nemerosa.ontrack.extension.tfc.metrics.TFCMetrics
 import net.nemerosa.ontrack.extension.tfc.settings.TFCSettings
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.slf4j.Logger
@@ -19,6 +23,7 @@ class TFCHookController(
     private val cachedSettingsService: CachedSettingsService,
     private val tfcHookSignatureService: TFCHookSignatureService,
     private val meterRegistry: MeterRegistry,
+    private val tfcHookDispatcher: TFCHookDispatcher,
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(TFCHookController::class.java)
@@ -48,8 +53,10 @@ class TFCHookController(
             TFCHookSignatureCheck.MISSING_TOKEN -> throw TFCSettingsMissingTokenException()
             TFCHookSignatureCheck.OK -> body.parseAsJson()
         }
-
-        // TODO Response
-        return TFCHookResponse("test ok")
+        // Parsing
+        val payload = json.parseOrNull<TFCHookPayload>()
+            ?: throw TFCHookPayloadParsingException()
+        // Dispatching
+        return tfcHookDispatcher.dispatch(payload)
     }
 }
