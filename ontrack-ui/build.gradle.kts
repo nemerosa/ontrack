@@ -77,6 +77,7 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-delivery-metrics"))
     runtimeOnly(project(":ontrack-extension-auto-versioning"))
     runtimeOnly(project(":ontrack-extension-license"))
+    runtimeOnly(project(":ontrack-extension-tfc"))
 }
 
 /**
