@@ -29,11 +29,10 @@ class QueueDispatcherImpl(
                 logger.warn("Processing queuing in synchronous mode.")
             }
             queueProcessor.process(payload)
-            "0"
+            "(sync)"
         } else {
             val queuePayload = QueuePayload.create(queueProcessor, payload)
-            val routingKey = QueueRouting.getRoutingKey(
-                queueConfigProperties,
+            val routingKey = queueConfigProperties.getRoutingKey(
                 queueProcessor,
                 payload
             )

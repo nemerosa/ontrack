@@ -12,6 +12,8 @@ class TFCQueueProcessor(
 
     override val id: String = "tfc"
 
+    override fun getRoutingIdentifier(payload: RunPayload): String = payload.workspaceName
+
     override fun process(payload: RunPayload) {
         TODO("Not yet implemented")
     }
