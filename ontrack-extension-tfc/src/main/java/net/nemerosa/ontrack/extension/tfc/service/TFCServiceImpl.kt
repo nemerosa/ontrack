@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.tfc.service
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
+import net.nemerosa.ontrack.extension.tfc.client.TFCClientFactory
+import net.nemerosa.ontrack.extension.tfc.config.TFCConfigurationService
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
@@ -13,6 +15,8 @@ class TFCServiceImpl(
     private val securityService: SecurityService,
     private val propertyService: PropertyService,
     private val buildFilterService: BuildFilterService,
+    private val tfcConfigurationService: TFCConfigurationService,
+    private val tfcClientFactory: TFCClientFactory,
 ) : TFCService {
 
     override fun validate(
@@ -83,7 +87,17 @@ class TFCServiceImpl(
         }
 
     private fun getWorkspaceVariables(workspaceId: String, runUrl: String): Map<String, String> {
-        TODO("Not yet implemented")
+        // Gets a configuration using the URL
+        val config = tfcConfigurationService.findConfigurationByURL(runUrl)
+            ?: throw TFCNoConfigurationException(runUrl)
+        // Creating a client
+        val client = tfcClientFactory.createClient(config)
+        // Getting the list of variables for the workspace
+        val variables = client.getWorkspaceVariables(workspaceId)
+        // Indexing
+        return variables.associate { v ->
+            v.key to (v.value ?: "")
+        }
     }
 
 }
