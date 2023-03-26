@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.tfc.config
 
 import net.nemerosa.ontrack.extension.support.AbstractConfigurationService
+import net.nemerosa.ontrack.extension.tfc.client.TFCClientFactory
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventPostService
 import net.nemerosa.ontrack.model.security.EncryptionService
@@ -18,6 +19,7 @@ class TFCConfigurationServiceImpl(
     eventPostService: EventPostService,
     eventFactory: EventFactory,
     ontrackConfigProperties: OntrackConfigProperties,
+    private val tfcClientFactory: TFCClientFactory,
 ) : AbstractConfigurationService<TFCConfiguration>(
     TFCConfiguration::class.java,
     configurationRepository,
@@ -29,7 +31,13 @@ class TFCConfigurationServiceImpl(
 ), TFCConfigurationService {
 
     override fun validate(configuration: TFCConfiguration): ConnectionResult {
-        TODO()
+        val client = tfcClientFactory.createClient(configuration)
+        return try {
+            client.organizations
+            ConnectionResult.ok()
+        } catch (any: Exception) {
+            ConnectionResult.error(any.message)
+        }
     }
 
 }
