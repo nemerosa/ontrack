@@ -9,6 +9,6 @@ interface TFCService {
         status: ValidationRunStatusID,
         workspaceId: String,
         runUrl: String
-    ): TFCValidationResult
+    )
 
 }

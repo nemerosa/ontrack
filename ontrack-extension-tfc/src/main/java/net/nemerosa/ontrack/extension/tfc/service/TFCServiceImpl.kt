@@ -24,14 +24,12 @@ class TFCServiceImpl(
         status: ValidationRunStatusID,
         workspaceId: String,
         runUrl: String
-    ): TFCValidationResult {
+    ) {
         // Getting the actual parameters
         val actualParams = expandParams(params, workspaceId, runUrl)
         return securityService.asAdmin {
             // Looking for the build
-            val build = findBuild(actualParams) ?: return@asAdmin TFCValidationResult(
-                params, null, null
-            )
+            val build = findBuild(actualParams) ?: return@asAdmin
             // Forcing the creation of the validation stamp if not existing
             val stamp = structureService.findValidationStampByName(
                 params.project, params.branch, params.validation
@@ -45,14 +43,12 @@ class TFCServiceImpl(
                 )
             }
             // Validation
-            val run = structureService.newValidationRun(
+            structureService.newValidationRun(
                 build, ValidationRunRequest(
                     validationStampName = params.validation,
                     validationRunStatusId = status,
                 )
             )
-            // OK
-            TFCValidationResult(params, build, run)
         }
     }
 
