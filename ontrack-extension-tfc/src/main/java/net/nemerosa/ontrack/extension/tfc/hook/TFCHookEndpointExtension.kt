@@ -55,7 +55,10 @@ class TFCHookEndpointExtension(
             processNotification(parameters, payload, notification)
         }
         // OK
-        return hookProcessing(mapOf("processes" to processes))
+        return hookConsolidate(
+            types = processes.map { it.type },
+            info = mapOf("processes" to processes)
+        )
     }
 
     private fun processNotification(
@@ -88,7 +91,11 @@ class TFCHookEndpointExtension(
         val id = queueDispatcher.dispatch(queueProcessor, payload)
         // OK
         return HookNotificationProcessing(
-            type = HookResponseType.PROCESSING,
+            type = if (id != null) {
+                HookResponseType.PROCESSING
+            } else {
+                HookResponseType.PROCESSED
+            },
             message = "Processing in the background",
             id = id,
         )

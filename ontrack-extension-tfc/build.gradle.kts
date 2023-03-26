@@ -18,6 +18,8 @@ dependencies {
 
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(":ontrack-extension-general"))
+    testImplementation(project(path = ":ontrack-extension-queue", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-hook", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
     testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))

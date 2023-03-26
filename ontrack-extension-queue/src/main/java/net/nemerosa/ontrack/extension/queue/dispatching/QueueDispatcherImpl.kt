@@ -23,13 +23,13 @@ class QueueDispatcherImpl(
 
     private val logger: Logger = LoggerFactory.getLogger(QueueDispatcherImpl::class.java)
 
-    override fun <T : Any> dispatch(queueProcessor: QueueProcessor<T>, payload: T): String =
+    override fun <T : Any> dispatch(queueProcessor: QueueProcessor<T>, payload: T): String? =
         if (sync(queueProcessor)) {
             if (queueConfigProperties.general.warnIfAsync) {
                 logger.warn("Processing queuing in synchronous mode.")
             }
             queueProcessor.process(payload)
-            "(sync)"
+            null
         } else {
             val queuePayload = QueuePayload.create(queueProcessor, payload)
             val routingKey = queueConfigProperties.getRoutingKey(

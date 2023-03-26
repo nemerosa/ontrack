@@ -13,6 +13,6 @@ interface QueueDispatcher {
     fun <T : Any> dispatch(
         queueProcessor: QueueProcessor<T>,
         payload: T
-    ): String
+    ): String?
 
 }
