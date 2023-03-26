@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.tfc.hook.model
+package net.nemerosa.ontrack.extension.tfc.hook
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty

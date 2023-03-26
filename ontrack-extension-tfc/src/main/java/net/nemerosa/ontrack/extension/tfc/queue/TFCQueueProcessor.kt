@@ -1,16 +1,16 @@
 package net.nemerosa.ontrack.extension.tfc.queue
 
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
-import net.nemerosa.ontrack.extension.tfc.service.TFCPayload
+import net.nemerosa.ontrack.extension.tfc.service.RunPayload
 import net.nemerosa.ontrack.extension.tfc.service.TFCService
 import org.springframework.stereotype.Component
 
 @Component
 class TFCQueueProcessor(
     private val tfcService: TFCService,
-): QueueProcessor<TFCPayload> {
+) : QueueProcessor<RunPayload> {
 
-    override fun process(payload: TFCPayload) {
+    override fun process(payload: RunPayload) {
         TODO("Not yet implemented")
     }
 

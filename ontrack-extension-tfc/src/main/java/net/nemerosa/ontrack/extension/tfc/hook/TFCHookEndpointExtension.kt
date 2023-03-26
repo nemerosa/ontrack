@@ -5,8 +5,6 @@ import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.tfc.TFCConfigProperties
 import net.nemerosa.ontrack.extension.tfc.TFCExtensionFeature
-import net.nemerosa.ontrack.extension.tfc.hook.model.TFCHookPayload
-import net.nemerosa.ontrack.extension.tfc.hook.model.TFCHookPayloadNotification
 import net.nemerosa.ontrack.extension.tfc.queue.TFCQueueProcessor
 import net.nemerosa.ontrack.extension.tfc.service.RunPayload
 import net.nemerosa.ontrack.extension.tfc.service.RunPayloadMissingFieldException
