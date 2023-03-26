@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.tfc.service.RunPayload
 import net.nemerosa.ontrack.extension.tfc.service.TFCService
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
+import kotlin.reflect.KClass
 
 @Component
 class TFCQueueProcessor(
@@ -14,6 +15,8 @@ class TFCQueueProcessor(
     override val id: String = "tfc"
 
     override fun getRoutingIdentifier(payload: RunPayload): String = payload.workspaceName
+
+    override val payloadType: KClass<RunPayload> = RunPayload::class
 
     override fun process(payload: RunPayload) {
         val status = if (payload.runStatus == "applied") {
