@@ -1,11 +1,14 @@
 package net.nemerosa.ontrack.extension.tfc.hook
 
 import net.nemerosa.ontrack.extension.hook.*
+import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.tfc.TFCConfigProperties
 import net.nemerosa.ontrack.extension.tfc.TFCExtensionFeature
 import net.nemerosa.ontrack.extension.tfc.hook.model.TFCHookPayload
+import net.nemerosa.ontrack.extension.tfc.queue.TFCQueueProcessor
 import net.nemerosa.ontrack.extension.tfc.service.TFCParameters
+import net.nemerosa.ontrack.extension.tfc.service.TFCPayload
 import net.nemerosa.ontrack.extension.tfc.settings.TFCSettings
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.slf4j.Logger
@@ -16,6 +19,8 @@ import org.springframework.stereotype.Component
 class TFCHookEndpointExtension(
     private val cachedSettingsService: CachedSettingsService,
     private val tfcConfigProperties: TFCConfigProperties,
+    private val queueDispatcher: QueueDispatcher,
+    private val queueProcessor: TFCQueueProcessor,
     extensionFeature: TFCExtensionFeature,
 ) : AbstractExtension(extensionFeature), HookEndpointExtension {
 
@@ -45,6 +50,8 @@ class TFCHookEndpointExtension(
         // Parsing the body
         val payload = request.parseBodyAsJson<TFCHookPayload>()
         // Launching the processing on a queue dispatcher
-        TODO("Launching the processing on a queue dispatcher")
+        val id = queueDispatcher.dispatch(queueProcessor, TFCPayload(parameters, payload))
+        // OK
+        return hookProcessing(id)
     }
 }
