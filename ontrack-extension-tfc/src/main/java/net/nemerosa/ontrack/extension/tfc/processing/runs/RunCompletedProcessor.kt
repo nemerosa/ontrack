@@ -4,6 +4,8 @@ import net.nemerosa.ontrack.extension.tfc.hook.model.TFCHookPayload
 import net.nemerosa.ontrack.extension.tfc.hook.model.TFCHookPayloadNotification
 import net.nemerosa.ontrack.extension.tfc.processing.TFCNotificationProcessor
 import net.nemerosa.ontrack.extension.tfc.processing.TFCNotificationProcessorResponse
+import net.nemerosa.ontrack.extension.tfc.service.RunPayload
+import net.nemerosa.ontrack.extension.tfc.service.RunPayloadMissingFieldException
 import net.nemerosa.ontrack.extension.tfc.service.TFCParameters
 import net.nemerosa.ontrack.extension.tfc.service.TFCService
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID

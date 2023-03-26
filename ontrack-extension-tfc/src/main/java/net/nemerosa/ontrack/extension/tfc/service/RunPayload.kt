@@ -1,6 +1,7 @@
-package net.nemerosa.ontrack.extension.tfc.processing.runs
+package net.nemerosa.ontrack.extension.tfc.service
 
 data class RunPayload(
+    val parameters: TFCParameters,
     val runUrl: String,
     val runId: String,
     val workspaceId: String,

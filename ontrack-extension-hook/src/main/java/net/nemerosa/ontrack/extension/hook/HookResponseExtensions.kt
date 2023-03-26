@@ -5,7 +5,7 @@ fun hookDisabled(hook: String) = HookResponse(
     info = "Hook `$hook` is disabled."
 )
 
-fun hookProcessing(id: String) = HookResponse(
+fun hookProcessing(info: Any? = null) = HookResponse(
     type = HookResponseType.PROCESSING,
-    info = mapOf("id" to id)
+    info = info,
 )
