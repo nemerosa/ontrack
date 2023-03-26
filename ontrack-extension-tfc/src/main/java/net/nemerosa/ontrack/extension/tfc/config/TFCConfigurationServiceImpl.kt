@@ -30,6 +30,9 @@ class TFCConfigurationServiceImpl(
     ontrackConfigProperties
 ), TFCConfigurationService {
 
+    override fun findConfigurationByURL(url: String): TFCConfiguration? =
+        configurations.find { url.startsWith(it.url) }
+
     override fun validate(configuration: TFCConfiguration): ConnectionResult {
         val client = tfcClientFactory.createClient(configuration)
         return try {
