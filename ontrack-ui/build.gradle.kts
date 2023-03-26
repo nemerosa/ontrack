@@ -78,6 +78,8 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-auto-versioning"))
     runtimeOnly(project(":ontrack-extension-license"))
     runtimeOnly(project(":ontrack-extension-tfc"))
+    runtimeOnly(project(":ontrack-extension-hook"))
+    runtimeOnly(project(":ontrack-extension-queue"))
 }
 
 /**

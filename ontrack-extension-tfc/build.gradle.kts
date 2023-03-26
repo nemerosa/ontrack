@@ -9,6 +9,8 @@ apply<OntrackExtensionPlugin>()
 dependencies {
     api(project(":ontrack-extension-support"))
 
+    implementation(project(":ontrack-extension-hook"))
+    implementation(project(":ontrack-extension-queue"))
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-extension-general"))
     implementation("io.micrometer:micrometer-core")
