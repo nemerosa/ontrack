@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.queue
 
+import kotlin.reflect.KClass
+
 interface QueueProcessor<T : Any> {
 
     /**
@@ -30,5 +32,10 @@ interface QueueProcessor<T : Any> {
      * Processes the payload.
      */
     fun process(payload: T)
+
+    /**
+     * Type of the payload
+     */
+    val payloadType: KClass<T>
 
 }
