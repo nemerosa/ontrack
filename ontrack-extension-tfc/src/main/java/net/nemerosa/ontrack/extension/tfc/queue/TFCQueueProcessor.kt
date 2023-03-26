@@ -30,7 +30,6 @@ class TFCQueueProcessor(
             workspaceId = payload.workspaceId,
             runUrl = payload.runUrl,
         )
-        TODO("Not yet implemented")
     }
 
 }
