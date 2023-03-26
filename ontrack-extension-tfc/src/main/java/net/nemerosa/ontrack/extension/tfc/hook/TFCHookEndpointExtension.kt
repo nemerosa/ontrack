@@ -1,12 +1,11 @@
 package net.nemerosa.ontrack.extension.tfc.hook
 
-import net.nemerosa.ontrack.extension.hook.HookEndpointExtension
-import net.nemerosa.ontrack.extension.hook.HookRequest
-import net.nemerosa.ontrack.extension.hook.HookResponse
-import net.nemerosa.ontrack.extension.hook.HookSignature
+import net.nemerosa.ontrack.extension.hook.*
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.tfc.TFCConfigProperties
 import net.nemerosa.ontrack.extension.tfc.TFCExtensionFeature
+import net.nemerosa.ontrack.extension.tfc.hook.model.TFCHookPayload
+import net.nemerosa.ontrack.extension.tfc.service.TFCParameters
 import net.nemerosa.ontrack.extension.tfc.settings.TFCSettings
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.slf4j.Logger
@@ -41,6 +40,11 @@ class TFCHookEndpointExtension(
     }
 
     override fun process(request: HookRequest): HookResponse {
-        TODO("Not yet implemented")
+        // Getting the parameters from the URL
+        val parameters = request.parseParameters<TFCParameters>()
+        // Parsing the body
+        val payload = request.parseBodyAsJson<TFCHookPayload>()
+        // Launching the processing on a queue dispatcher
+        TODO("Launching the processing on a queue dispatcher")
     }
 }
