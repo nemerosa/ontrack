@@ -9,6 +9,7 @@ apply<OntrackExtensionPlugin>()
 dependencies {
     api(project(":ontrack-extension-support"))
 
+    implementation(project(":ontrack-rabbitmq"))
     implementation("io.micrometer:micrometer-core")
     implementation("org.slf4j:slf4j-api")
 }

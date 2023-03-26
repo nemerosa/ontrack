@@ -10,6 +10,8 @@ class TFCQueueProcessor(
     private val tfcService: TFCService,
 ) : QueueProcessor<RunPayload> {
 
+    override val id: String = "tfc"
+
     override fun process(payload: RunPayload) {
         TODO("Not yet implemented")
     }
