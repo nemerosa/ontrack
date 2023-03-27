@@ -7,8 +7,10 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.queue.QueueACCTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.resourceAsText
 import net.nemerosa.ontrack.kdsl.connector.parse
 import net.nemerosa.ontrack.kdsl.spec.Build
+import net.nemerosa.ontrack.kdsl.spec.extension.queue.QueueRecordState
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class ACCTFCValidation : AbstractACCDSLTestSupport() {
 
@@ -32,9 +34,12 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
                     val queueID = response.queueID
                     // Waiting for the processing to be don
                     val queueSupport = QueueACCTestSupport(ontrack)
-                    queueSupport.waitForQueueRecordToBeDone(queueID)
+                    queueSupport.waitForQueueRecordToBe(queueID, QueueRecordState.COMPLETED)
                     // Checks the build has been validated to "passed"
-                    TODO("Checks the build has been validated to \"passed\"")
+                    val run = getValidationRuns(vs.name, 1).firstOrNull()
+                    assertNotNull(run, "Validation was done") {
+                        assertEquals("PASSED", it.lastStatus.id)
+                    }
                 }
             }
         }

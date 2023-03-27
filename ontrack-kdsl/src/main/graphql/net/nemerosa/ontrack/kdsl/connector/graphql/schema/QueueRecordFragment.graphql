@@ -3,7 +3,7 @@ fragment QueueRecordData on QueueRecord {
     queuePayload {
         id
         processor
-        id
+        body
     }
     startTime
     endTime
