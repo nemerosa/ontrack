@@ -1,0 +1,5 @@
+query QueueGetRecord($id: String!) {
+    queueRecord(id: $id) {
+        ...QueueRecordData
+    }
+}

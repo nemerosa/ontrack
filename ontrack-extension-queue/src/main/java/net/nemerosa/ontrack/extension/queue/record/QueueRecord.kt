@@ -3,17 +3,28 @@ package net.nemerosa.ontrack.extension.queue.record
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.queue.QueuePayload
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import java.time.LocalDateTime
 
+@APIDescription("Recording a queuing event.")
 data class QueueRecord(
+    @APIDescription("State of the queuing")
     val state: QueueRecordState,
+    @APIDescription("Payload for the queue message")
     val queuePayload: QueuePayload,
+    @APIDescription("Time of creation")
     val startTime: LocalDateTime,
+    @APIDescription("End of processing")
     val endTime: LocalDateTime?,
+    @APIDescription("Queue routing key being used")
     val routingKey: String?,
+    @APIDescription("Queue where the message was stored")
     val queueName: String?,
+    @APIDescription("Actual payload sent to the processing")
     val actualPayload: JsonNode?,
+    @APIDescription("Error on processing")
     val exception: String?,
+    @APIDescription("History of the states")
     val history: List<QueueRecordHistory>,
 ) {
 

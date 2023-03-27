@@ -1,0 +1,18 @@
+fragment QueueRecordData on QueueRecord {
+    state
+    queuePayload {
+        id
+        processor
+        id
+    }
+    startTime
+    endTime
+    routingKey
+    queueName
+    actualPayload
+    exception
+    history {
+        state
+        time
+    }
+}

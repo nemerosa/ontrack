@@ -4,12 +4,17 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseInto
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import java.util.*
 import kotlin.reflect.KClass
 
+@APIDescription("Payload for a message sent on a queue for processing")
 class QueuePayload private constructor(
+    @APIDescription("Unique ID of the message")
     val id: String,
+    @APIDescription("ID of the target processor")
     val processor: String,
+    @APIDescription("Message body for the processor")
     val body: JsonNode,
 ) {
     fun <T : Any> parse(payloadType: KClass<out T>): T =
