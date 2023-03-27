@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":ontrack-extension-general"))
     implementation("io.micrometer:micrometer-core")
     implementation("org.slf4j:slf4j-api")
+    implementation("jakarta.annotation:jakarta.annotation-api")
 
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(":ontrack-extension-general"))
