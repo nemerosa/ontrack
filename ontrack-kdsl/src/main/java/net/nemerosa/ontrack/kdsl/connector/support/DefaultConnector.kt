@@ -43,6 +43,10 @@ class DefaultConnector(
         restTemplate(headers).put(path, body)
     }
 
+    override fun delete(path: String, headers: Map<String, String>) {
+        restTemplate(headers).delete(path)
+    }
+
     private fun restTemplate(
         headers: Map<String, String>,
     ): RestTemplate {

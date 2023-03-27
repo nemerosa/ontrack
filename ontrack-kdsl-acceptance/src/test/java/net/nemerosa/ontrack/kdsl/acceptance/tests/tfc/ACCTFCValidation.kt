@@ -5,9 +5,12 @@ import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.queue.QueueACCTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.resourceAsText
+import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.connector.parse
 import net.nemerosa.ontrack.kdsl.spec.Build
+import net.nemerosa.ontrack.kdsl.spec.configurations.configurations
 import net.nemerosa.ontrack.kdsl.spec.extension.queue.QueueRecordState
+import net.nemerosa.ontrack.kdsl.spec.extension.tfc.TFCConfiguration
 import net.nemerosa.ontrack.kdsl.spec.extension.tfc.TFCSettings
 import net.nemerosa.ontrack.kdsl.spec.extension.tfc.tfc
 import net.nemerosa.ontrack.kdsl.spec.settings.settings
@@ -30,20 +33,22 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
                             .parseAsJson()
                     // Sending the payload to the hook
                     withTfcHookEnabled {
-                        val response = sendPayloadToHook(
-                            ref = this,
-                            validation = vs.name,
-                            payload = payload,
-                        )
-                        // Gets the queue ID
-                        val queueID = response.queueID
-                        // Waiting for the processing to be don
-                        val queueSupport = QueueACCTestSupport(ontrack)
-                        queueSupport.waitForQueueRecordToBe(queueID, QueueRecordState.COMPLETED)
-                        // Checks the build has been validated to "passed"
-                        val run = getValidationRuns(vs.name, 1).firstOrNull()
-                        assertNotNull(run, "Validation was done") {
-                            assertEquals("PASSED", it.lastStatus.id)
+                        withTfcConfiguration {
+                            val response = sendPayloadToHook(
+                                ref = this,
+                                validation = vs.name,
+                                payload = payload,
+                            )
+                            // Gets the queue ID
+                            val queueID = response.queueID
+                            // Waiting for the processing to be don
+                            val queueSupport = QueueACCTestSupport(ontrack)
+                            queueSupport.waitForQueueRecordToBe(queueID, QueueRecordState.COMPLETED)
+                            // Checks the build has been validated to "passed"
+                            val run = getValidationRuns(vs.name, 1).firstOrNull()
+                            assertNotNull(run, "Validation was done") {
+                                assertEquals("PASSED", it.lastStatus.id)
+                            }
                         }
                     }
                 }
@@ -63,21 +68,23 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
                             .parseAsJson()
                     // Sending the payload to the hook
                     withTfcHookEnabled {
-                        val response = sendPayloadToHook(
-                            ref = this,
-                            build = "@ontrack_version", // Hardcoded in MockingTFCClientFactory
-                            validation = vs.name,
-                            payload = payload,
-                        )
-                        // Gets the queue ID
-                        val queueID = response.queueID
-                        // Waiting for the processing to be don
-                        val queueSupport = QueueACCTestSupport(ontrack)
-                        queueSupport.waitForQueueRecordToBe(queueID, QueueRecordState.COMPLETED)
-                        // Checks the build has been validated to "passed"
-                        val run = getValidationRuns(vs.name, 1).firstOrNull()
-                        assertNotNull(run, "Validation was done") {
-                            assertEquals("PASSED", it.lastStatus.id)
+                        withTfcConfiguration {
+                            val response = sendPayloadToHook(
+                                ref = this,
+                                build = "@ontrack_version", // Hardcoded in MockingTFCClientFactory
+                                validation = vs.name,
+                                payload = payload,
+                            )
+                            // Gets the queue ID
+                            val queueID = response.queueID
+                            // Waiting for the processing to be don
+                            val queueSupport = QueueACCTestSupport(ontrack)
+                            queueSupport.waitForQueueRecordToBe(queueID, QueueRecordState.COMPLETED)
+                            // Checks the build has been validated to "passed"
+                            val run = getValidationRuns(vs.name, 1).firstOrNull()
+                            assertNotNull(run, "Validation was done") {
+                                assertEquals("PASSED", it.lastStatus.id)
+                            }
                         }
                     }
                 }
@@ -97,23 +104,40 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
                             .parseAsJson()
                     // Sending the payload to the hook
                     withTfcHookEnabled {
-                        val response = sendPayloadToHook(
-                            ref = this,
-                            build = "@unknown_variable", // Not managed by MockingTFCClientFactory
-                            validation = vs.name,
-                            payload = payload,
-                        )
-                        // Gets the queue ID
-                        val queueID = response.queueID
-                        // Waiting for the processing to be in error
-                        val queueSupport = QueueACCTestSupport(ontrack)
-                        queueSupport.waitForQueueRecordToBe(queueID, QueueRecordState.ERRORED)
-                        // Checks the build has NOT been validated to "passed"
-                        val run = getValidationRuns(vs.name, 1).firstOrNull()
-                        assertNull(run, "Validation was NOT done")
+                        withTfcConfiguration {
+                            val response = sendPayloadToHook(
+                                ref = this,
+                                build = "@unknown_variable", // Not managed by MockingTFCClientFactory
+                                validation = vs.name,
+                                payload = payload,
+                            )
+                            // Gets the queue ID
+                            val queueID = response.queueID
+                            // Waiting for the processing to be in error
+                            val queueSupport = QueueACCTestSupport(ontrack)
+                            queueSupport.waitForQueueRecordToBe(queueID, QueueRecordState.ERRORED)
+                            // Checks the build has NOT been validated to "passed"
+                            val run = getValidationRuns(vs.name, 1).firstOrNull()
+                            assertNull(run, "Validation was NOT done")
+                        }
                     }
                 }
             }
+        }
+    }
+
+    private fun withTfcConfiguration(code: () -> Unit) {
+        val name = uid("tfc_")
+        val config = TFCConfiguration(
+            name = name,
+            url = "https://app.terraform.io",
+            token = "xxx"
+        )
+        try {
+            ontrack.configurations.tfc.create(config)
+            code()
+        } finally {
+            ontrack.configurations.tfc.delete(name)
         }
     }
 
