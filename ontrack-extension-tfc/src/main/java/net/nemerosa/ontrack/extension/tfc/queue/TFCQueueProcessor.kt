@@ -19,10 +19,14 @@ class TFCQueueProcessor(
     override val payloadType: KClass<RunPayload> = RunPayload::class
 
     override fun process(payload: RunPayload) {
-        val status = if (payload.runStatus == "applied") {
-            ValidationRunStatusID.STATUS_PASSED
-        } else {
-            ValidationRunStatusID.STATUS_DEFECTIVE
+        val status = when (payload.trigger) {
+            "run:completed" -> when (payload.runStatus) {
+                "applied" -> ValidationRunStatusID.STATUS_PASSED
+                else -> ValidationRunStatusID.STATUS_WARNING
+            }
+
+            "run:errored" -> ValidationRunStatusID.STATUS_FAILED
+            else -> ValidationRunStatusID.STATUS_WARNING
         }
         tfcService.validate(
             params = payload.parameters,

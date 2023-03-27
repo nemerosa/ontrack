@@ -57,6 +57,41 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
     }
 
     @Test
+    fun `Failed validation on failed run`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                build {
+                    // Payload
+                    val payload =
+                        resourceAsText("/tfc/run-errored.json")
+                            .parseAsJson()
+                    // Sending the payload to the hook
+                    withTfcHookEnabled {
+                        withTfcConfiguration {
+                            val response = sendPayloadToHook(
+                                ref = this,
+                                validation = vs.name,
+                                payload = payload,
+                            )
+                            // Gets the queue ID
+                            val queueID = response.queueID
+                            // Waiting for the processing to be don
+                            val queueSupport = QueueACCTestSupport(ontrack)
+                            queueSupport.waitForQueueRecordToBe(queueID, QueueRecordState.COMPLETED)
+                            // Checks the build has been validated to "passed"
+                            val run = getValidationRuns(vs.name, 1).firstOrNull()
+                            assertNotNull(run, "Validation was done") {
+                                assertEquals("FAILED", it.lastStatus.id)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Validation with build variable`() {
         project {
             branch {

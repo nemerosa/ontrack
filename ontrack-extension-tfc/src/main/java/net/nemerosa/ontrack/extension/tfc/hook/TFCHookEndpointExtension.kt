@@ -66,11 +66,12 @@ class TFCHookEndpointExtension(
         payload: TFCHookPayload,
         notification: TFCHookPayloadNotification
     ): QueueDispatchResult = when (notification.trigger) {
-        "run:completed" -> processRunCompleted(parameters, payload, notification)
+        "run:completed" -> processRun(parameters, payload, notification)
+        "run:errored" -> processRun(parameters, payload, notification)
         else -> ignoredTrigger(notification)
     }
 
-    private fun processRunCompleted(
+    private fun processRun(
         parameters: TFCParameters,
         hook: TFCHookPayload,
         notification: TFCHookPayloadNotification
