@@ -8,6 +8,7 @@ apply<OntrackExtensionPlugin>()
 
 dependencies {
     api(project(":ontrack-extension-support"))
+    api(project(":ontrack-extension-queue"))
 
     implementation("io.micrometer:micrometer-core")
     implementation("org.slf4j:slf4j-api")
