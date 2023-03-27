@@ -41,7 +41,7 @@ class TFCHookIT : AbstractDSLTestSupport() {
                             // Processed, because running in sync mode
                             assertEquals(HookResponseType.PROCESSED, response.type)
                             // Checks the build has been validated
-                            TODO()
+                            assertValidated(this, vs)
                         }
                     }
                 }
