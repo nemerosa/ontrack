@@ -29,7 +29,7 @@ class QueueConfiguration(
     ) {
         val id = processor.id
         // Topic
-        val topic = "ontrack.queue.$id.topic"
+        val topic = "ontrack.queue.$id"
         val exchange = DirectExchange(topic)
         declarables += exchange
 

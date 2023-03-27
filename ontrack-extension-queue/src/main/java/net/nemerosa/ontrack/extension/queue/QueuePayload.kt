@@ -19,7 +19,7 @@ class QueuePayload private constructor(
         fun <T : Any> create(processor: QueueProcessor<T>, body: T) =
             QueuePayload(
                 id = UUID.randomUUID().toString(),
-                processor = processor::class.java.name,
+                processor = processor.id,
                 body = body.asJson()
             )
 
