@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.tfc
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.json.parseOrNull
 import kotlin.test.fail
 
 /**
@@ -14,11 +16,20 @@ data class HookResponse(
     /**
      *
      */
-    val info: List<QueueDispatchResult>,
+    val info: JsonNode,
 ) {
     @get:JsonIgnore
     val queueID: String
         get() =
-            info.firstOrNull()?.id
-                ?: fail("No queue ID returned")
+            if (info.isTextual) {
+                val message = info.asText()
+                fail(message)
+            } else if (info.isArray) {
+                val results = info.mapNotNull {
+                    it.parseOrNull<QueueDispatchResult>()
+                }
+                results.firstOrNull()?.id ?: fail("No queue ID returned: $info")
+            } else {
+                fail("No queue ID returned: $info")
+            }
 }
