@@ -1,8 +1,13 @@
 package net.nemerosa.ontrack.extension.queue.config
 
+import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.queue.QueueConfigProperties
 import net.nemerosa.ontrack.extension.queue.QueuePayload
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
+import net.nemerosa.ontrack.extension.queue.metrics.queueMessageReceived
+import net.nemerosa.ontrack.extension.queue.metrics.queueProcessCompleted
+import net.nemerosa.ontrack.extension.queue.metrics.queueProcessErrored
+import net.nemerosa.ontrack.extension.queue.metrics.queueProcessTime
 import net.nemerosa.ontrack.extension.queue.record.QueueRecordService
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -24,6 +29,7 @@ class QueueListener(
     private val securityService: SecurityService,
     private val applicationLogService: ApplicationLogService,
     private val queueRecordService: QueueRecordService,
+    private val meterRegistry: MeterRegistry,
 ) : RabbitListenerConfigurer {
 
     override fun configureRabbitListeners(registrar: RabbitListenerEndpointRegistrar) {
@@ -82,6 +88,7 @@ class QueueListener(
                 val queue = message.messageProperties.consumerQueue
                 val body = message.body.toString(Charsets.UTF_8).parseAsJson()
                 val qp = QueuePayload.parse(body)
+                meterRegistry.queueMessageReceived(qp)
                 queueRecordService.received(qp, queue)
 
                 // Checks the processor
@@ -93,13 +100,17 @@ class QueueListener(
                 val payload = qp.parse(queueProcessor.payloadType)
                 queueRecordService.parsed(qp, payload)
 
-                // TOO Metrics
+                // Processing
                 securityService.asAdmin {
                     queueRecordService.processing(qp)
                     try {
-                        queueProcessor.process(payload)
+                        meterRegistry.queueProcessTime(qp) {
+                            queueProcessor.process(payload)
+                        }
+                        meterRegistry.queueProcessCompleted(qp)
                         queueRecordService.completed(qp)
                     } catch (any: Exception) {
+                        meterRegistry.queueProcessErrored(qp)
                         queueRecordService.errored(qp, any)
                         throw any
                     }
