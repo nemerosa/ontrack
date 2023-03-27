@@ -7,5 +7,6 @@ data class HookRequest(
 ) {
     fun getRequiredHeader(name: String): String =
         headers[name]
+            ?: headers[name.lowercase()]
             ?: throw HookHeaderRequiredException(name)
 }
