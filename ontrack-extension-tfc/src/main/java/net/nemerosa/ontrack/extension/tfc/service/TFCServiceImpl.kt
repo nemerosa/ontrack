@@ -1,10 +1,13 @@
 package net.nemerosa.ontrack.extension.tfc.service
 
+import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
 import net.nemerosa.ontrack.extension.tfc.client.TFCClientFactory
 import net.nemerosa.ontrack.extension.tfc.config.TFCConfigurationService
+import net.nemerosa.ontrack.extension.tfc.metrics.TFCMetrics
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
+import net.nemerosa.ontrack.model.metrics.time
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Service
@@ -17,6 +20,7 @@ class TFCServiceImpl(
     private val buildFilterService: BuildFilterService,
     private val tfcConfigurationService: TFCConfigurationService,
     private val tfcClientFactory: TFCClientFactory,
+    private val meterRegistry: MeterRegistry,
 ) : TFCService {
 
     override fun validate(
@@ -89,7 +93,9 @@ class TFCServiceImpl(
         // Creating a client
         val client = tfcClientFactory.createClient(config)
         // Getting the list of variables for the workspace
-        val variables = client.getWorkspaceVariables(workspaceId)
+        val variables = meterRegistry.time(TFCMetrics.tfc_variables) {
+            client.getWorkspaceVariables(workspaceId)
+        } ?: emptyList()
         // Indexing
         return variables.associate { v ->
             v.key to (v.value ?: "")
