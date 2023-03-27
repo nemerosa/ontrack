@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.hook
 import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.hook.metrics.*
+import net.nemerosa.ontrack.model.metrics.time
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*
@@ -56,7 +57,9 @@ class HookController(
 
         // Processing
         return try {
-            val result = endpoint.process(request)
+            val result = meterRegistry.time(HookMetrics.time, "hook" to hook) {
+                endpoint.process(request)
+            } ?: error("Processing did not return any result")
             meterRegistry.hookSuccess(hook)
             result
         } catch (any: Exception) {

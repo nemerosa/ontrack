@@ -8,4 +8,6 @@ object HookMetrics {
     const val success = "ontrack_extension_hook_success"
     const val error = "ontrack_extension_hook_error"
 
+    const val time = "ontrack_extension_hook_time"
+
 }
