@@ -1,9 +1,10 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.tfc
 
-import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.annotation.JsonIgnore
+import kotlin.test.fail
 
 /**
- * Data returned by a hook.
+ * Data returned by the TFC hook.
  */
 data class HookResponse(
     /**
@@ -11,7 +12,13 @@ data class HookResponse(
      */
     val type: String,
     /**
-     * Additional information (non structured, will typically be rendered as JSON)
+     *
      */
-    val info: JsonNode?,
-)
+    val info: List<QueueDispatchResult>,
+) {
+    @get:JsonIgnore
+    val queueID: String
+        get() =
+            info.firstOrNull()?.id
+                ?: fail("No queue ID returned")
+}

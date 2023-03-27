@@ -27,6 +27,8 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
                         validation = vs.name,
                         payload = payload,
                     )
+                    // Gets the queue ID
+                    val queueID = response.queueID
                     // Waiting for the processing to be done
                     TODO("Waiting for the processing to be done")
                     // Checks the build has been validated to "passed"
@@ -45,7 +47,7 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
         payload: JsonNode,
     ): HookResponse {
         val response = rawConnector().post(
-            "/hook/secured/tfc/ingestion?project=$project&branch=$branch&build=$build&validation=$validation",
+            "/hook/secured/tfc?project=$project&branch=$branch&build=$build&validation=$validation",
             headers = mapOf(
                 "X-TFE-Notification-Signature" to "signature-is-not-checked",
             ),
