@@ -9,9 +9,12 @@ apply<OntrackExtensionPlugin>()
 dependencies {
     api(project(":ontrack-extension-support"))
 
+    implementation(project(":ontrack-repository-support"))
     implementation(project(":ontrack-rabbitmq"))
     implementation("io.micrometer:micrometer-core")
     implementation("org.slf4j:slf4j-api")
+    implementation("jakarta.annotation:jakarta.annotation-api")
+    implementation("org.apache.commons:commons-lang3")
 
     testImplementation(project(":ontrack-it-utils"))
 

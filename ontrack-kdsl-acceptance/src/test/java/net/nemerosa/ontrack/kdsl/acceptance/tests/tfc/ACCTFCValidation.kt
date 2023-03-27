@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.tfc
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
+import net.nemerosa.ontrack.kdsl.acceptance.tests.queue.QueueACCTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.resourceAsText
 import net.nemerosa.ontrack.kdsl.connector.parse
 import net.nemerosa.ontrack.kdsl.spec.Build
@@ -29,8 +30,9 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
                     )
                     // Gets the queue ID
                     val queueID = response.queueID
-                    // Waiting for the processing to be done
-                    TODO("Waiting for the processing to be done")
+                    // Waiting for the processing to be don
+                    val queueSupport = QueueACCTestSupport(ontrack)
+                    queueSupport.waitForQueueRecordToBeDone(queueID)
                     // Checks the build has been validated to "passed"
                     TODO("Checks the build has been validated to \"passed\"")
                 }

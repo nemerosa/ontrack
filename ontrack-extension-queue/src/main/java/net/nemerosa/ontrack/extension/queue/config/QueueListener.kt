@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.queue.config
 import net.nemerosa.ontrack.extension.queue.QueueConfigProperties
 import net.nemerosa.ontrack.extension.queue.QueuePayload
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
+import net.nemerosa.ontrack.extension.queue.record.QueueRecordService
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -22,6 +23,7 @@ class QueueListener(
     private val queueProcessors: List<QueueProcessor<*>>,
     private val securityService: SecurityService,
     private val applicationLogService: ApplicationLogService,
+    private val queueRecordService: QueueRecordService,
 ) : RabbitListenerConfigurer {
 
     override fun configureRabbitListeners(registrar: RabbitListenerEndpointRegistrar) {
@@ -77,8 +79,10 @@ class QueueListener(
     ) : MessageListener {
         override fun onMessage(message: Message) {
             try {
+                val queue = message.messageProperties.consumerQueue
                 val body = message.body.toString(Charsets.UTF_8).parseAsJson()
                 val qp = QueuePayload.parse(body)
+                queueRecordService.received(qp, queue)
 
                 // Checks the processor
                 if (qp.processor != queueProcessor.id) {
@@ -87,13 +91,18 @@ class QueueListener(
 
                 // Parsing the payload
                 val payload = qp.parse(queueProcessor.payloadType)
+                queueRecordService.parsed(qp, payload)
 
-                val queue = message.messageProperties.consumerQueue
                 // TOO Metrics
                 securityService.asAdmin {
-                    // TODO Audit
-                    // Processing
-                    queueProcessor.process(payload)
+                    queueRecordService.processing(qp)
+                    try {
+                        queueProcessor.process(payload)
+                        queueRecordService.completed(qp)
+                    } catch (any: Exception) {
+                        queueRecordService.errored(qp, any)
+                        throw any
+                    }
                 }
             } catch (any: Throwable) {
                 applicationLogService.log(

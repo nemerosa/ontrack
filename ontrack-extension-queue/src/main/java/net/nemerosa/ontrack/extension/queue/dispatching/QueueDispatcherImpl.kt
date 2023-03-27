@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.queue.dispatching
 import net.nemerosa.ontrack.extension.queue.QueueConfigProperties
 import net.nemerosa.ontrack.extension.queue.QueuePayload
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
+import net.nemerosa.ontrack.extension.queue.record.QueueRecordService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.format
 import org.slf4j.Logger
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component
 class QueueDispatcherImpl(
     private val queueConfigProperties: QueueConfigProperties,
     private val amqpTemplate: AmqpTemplate,
+    private val queueRecordService: QueueRecordService,
 ) : QueueDispatcher {
 
     private val logger: Logger = LoggerFactory.getLogger(QueueDispatcherImpl::class.java)
@@ -32,10 +34,12 @@ class QueueDispatcherImpl(
             QueueDispatchResult(type = QueueDispatchResultType.PROCESSED, id = null)
         } else {
             val queuePayload = QueuePayload.create(queueProcessor, payload)
+            queueRecordService.start(queuePayload)
             val routingKey = queueConfigProperties.getRoutingKey(
                 queueProcessor,
                 payload
             )
+            queueRecordService.setRouting(queuePayload, routingKey)
             val message = queuePayload.asJson().format()
             val topic = "ontrack.queue.${queueProcessor.id}"
             amqpTemplate.convertAndSend(
@@ -43,6 +47,7 @@ class QueueDispatcherImpl(
                 routingKey,
                 message,
             )
+            queueRecordService.sent(queuePayload)
             QueueDispatchResult(
                 type = QueueDispatchResultType.PROCESSING,
                 id = queuePayload.id,
