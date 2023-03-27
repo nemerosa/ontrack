@@ -18,6 +18,9 @@ class QueueRecordStoreImpl(
         )
     }
 
+    override fun findByQueuePayloadID(id: String): QueueRecord? =
+        store.find(STORE, id, QueueRecord::class)
+
     override fun save(queuePayload: QueuePayload, code: (QueueRecord) -> QueueRecord) {
         val oldRecord = getRecord(queuePayload.id)
         val newRecord = code(oldRecord)
@@ -25,7 +28,7 @@ class QueueRecordStoreImpl(
     }
 
     private fun getRecord(id: String): QueueRecord =
-        store.find(STORE, id, QueueRecord::class)
+        findByQueuePayloadID(id)
             ?: throw QueueRecordNotFoundException(id)
 
     companion object {

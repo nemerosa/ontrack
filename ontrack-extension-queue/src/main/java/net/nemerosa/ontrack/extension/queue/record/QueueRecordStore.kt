@@ -6,4 +6,6 @@ interface QueueRecordStore {
     fun start(queuePayload: QueuePayload)
 
     fun save(queuePayload: QueuePayload, code: (QueueRecord) -> QueueRecord)
+
+    fun findByQueuePayloadID(id: String): QueueRecord?
 }

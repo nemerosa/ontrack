@@ -14,6 +14,7 @@ data class QueueRecord(
     val queueName: String?,
     val actualPayload: JsonNode?,
     val exception: String?,
+    val history: List<QueueRecordHistory>,
 ) {
 
     fun withState(state: QueueRecordState) = QueueRecord(
@@ -25,6 +26,12 @@ data class QueueRecord(
         queueName = queueName,
         actualPayload = actualPayload,
         exception = exception,
+        history = listOf(
+            QueueRecordHistory(
+                state = state,
+                time = Time.now()
+            )
+        ) + history,
     )
 
     fun withRoutingKey(routingKey: String) = QueueRecord(
@@ -36,6 +43,7 @@ data class QueueRecord(
         queueName = queueName,
         actualPayload = actualPayload,
         exception = exception,
+        history = history,
     )
 
     fun withQueue(queueName: String?) = QueueRecord(
@@ -47,6 +55,7 @@ data class QueueRecord(
         queueName = queueName,
         actualPayload = actualPayload,
         exception = exception,
+        history = history,
     )
 
     fun withActualPayload(actualPayload: JsonNode) = QueueRecord(
@@ -58,6 +67,7 @@ data class QueueRecord(
         queueName = queueName,
         actualPayload = actualPayload,
         exception = exception,
+        history = history,
     )
 
     fun withException(exception: String) = QueueRecord(
@@ -69,6 +79,7 @@ data class QueueRecord(
         queueName = queueName,
         actualPayload = actualPayload,
         exception = exception,
+        history = history,
     )
 
     fun withEndTime(endTime: LocalDateTime) = QueueRecord(
@@ -80,18 +91,28 @@ data class QueueRecord(
         queueName = queueName,
         actualPayload = actualPayload,
         exception = exception,
+        history = history,
     )
 
     companion object {
-        fun create(queuePayload: QueuePayload) = QueueRecord(
-            state = QueueRecordState.STARTED,
-            queuePayload = queuePayload,
-            startTime = Time.now(),
-            endTime = null,
-            routingKey = null,
-            queueName = null,
-            actualPayload = null,
-            exception = null,
-        )
+        fun create(queuePayload: QueuePayload): QueueRecord {
+            val time = Time.now()
+            return QueueRecord(
+                state = QueueRecordState.STARTED,
+                queuePayload = queuePayload,
+                startTime = time,
+                endTime = null,
+                routingKey = null,
+                queueName = null,
+                actualPayload = null,
+                exception = null,
+                history = listOf(
+                    QueueRecordHistory(
+                        state = QueueRecordState.STARTED,
+                        time = time,
+                    )
+                )
+            )
+        }
     }
 }
