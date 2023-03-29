@@ -11,12 +11,15 @@
                        id="filterId"
                        type="text"
                        ng-model="filter.id"/>
-                <label for="filterProcessor" class="col-sm-1 control-label">Processor</label>
-                <input class="form-control col-sm-4"
-                       id="filterProcessor"
-                       type="text"
-                       ng-model="filter.processor"/>
                 <!-- Processor -->
+                <label for="filterProcessor" class="col-sm-1 control-label">Processor</label>
+                <select class="form-control col-sm-2"
+                        ng-if="processors"
+                        id="filterProcessor"
+                        ng-options="processor for processor in processors"
+                        ng-model="filter.processor">
+                    <option value="">Any</option>
+                </select>
             </div>
             <!-- TODO Free text -->
             <!-- TODO Routing key -->

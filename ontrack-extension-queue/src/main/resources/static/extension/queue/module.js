@@ -22,6 +22,14 @@ angular.module('ontrack.extension.queue', [
             processor: undefined
         };
 
+        const queryInfo = `
+            query QueueRecordsInfo {
+                queueRecordFilterInfo {
+                    processors
+                }
+            }
+        `;
+
         const query = `
             query QueueRecords(
                 $id: String,
@@ -53,6 +61,12 @@ angular.module('ontrack.extension.queue', [
             }
         `;
 
+        const loadRecordsInfo = () => {
+            return otGraphqlService.pageGraphQLCall(queryInfo).then(data => {
+                 $scope.processors = data.queueRecordFilterInfo.processors;
+            });
+        };
+
         const loadRecords = () => {
             $scope.loading = true;
             const variables = {
@@ -66,7 +80,7 @@ angular.module('ontrack.extension.queue', [
             });
         };
 
-        loadRecords();
+        loadRecordsInfo().then(loadRecords);
 
         $scope.onClear = () => {
             $scope.filter.id = undefined;
