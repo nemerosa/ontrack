@@ -29,9 +29,26 @@
                     <option value="">Any</option>
                 </select>
             </div>
-            <!-- TODO Free text -->
-            <!-- TODO Routing key -->
-            <!-- TODO Queue name -->
+            <div class="form-group">
+                <!-- Free text -->
+                <label for="filterText" class="col-sm-1 control-label">Text</label>
+                <input class="form-control col-sm-4"
+                       id="filterText"
+                       type="text"
+                       ng-model="filter.text"/>
+                <!-- Routing key -->
+                <label for="filterRouting" class="col-sm-1 control-label">Routing</label>
+                <input class="form-control col-sm-2"
+                       id="filterRouting"
+                       type="text"
+                       ng-model="filter.routing"/>
+                <!-- Queue name -->
+                <label for="filterQueue" class="col-sm-1 control-label">Queue</label>
+                <input class="form-control col-sm-2"
+                       id="filterQueue"
+                       type="text"
+                       ng-model="filter.queue"/>
+            </div>
             <!-- Buttons -->
             <div class="form-group">
                 <label class="col-sm-1 control-label"></label>

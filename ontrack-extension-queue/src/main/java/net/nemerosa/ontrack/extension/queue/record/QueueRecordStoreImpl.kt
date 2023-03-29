@@ -48,6 +48,21 @@ class QueueRecordStoreImpl(
             queryVariables["state"] = filter.state.name
         }
 
+        if (!filter.routingKey.isNullOrBlank()) {
+            queries += "data::jsonb->>'routingKey' = :routingKey"
+            queryVariables["routingKey"] = filter.routingKey
+        }
+
+        if (!filter.queueName.isNullOrBlank()) {
+            queries += "data::jsonb->>'queueName' = :queueName"
+            queryVariables["queueName"] = filter.queueName
+        }
+
+        if (!filter.text.isNullOrBlank()) {
+            queries += "(data::jsonb->'queuePayload'->>'body' LIKE :text) OR (data::jsonb->>'actualPayload' LIKE :text)"
+            queryVariables["text"] = "%${filter.text}%"
+        }
+
         val query = queries.joinToString(" AND ") { "( $it )" }
 
         return store.paginatedFilter(

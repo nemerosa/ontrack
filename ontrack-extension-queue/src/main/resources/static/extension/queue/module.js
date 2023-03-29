@@ -20,7 +20,10 @@ angular.module('ontrack.extension.queue', [
         $scope.filter = {
             id: undefined,
             processor: undefined,
-            state: undefined
+            state: undefined,
+            text: undefined,
+            routing: undefined,
+            queue: undefined
         };
 
         const queryInfo = `
@@ -33,7 +36,7 @@ angular.module('ontrack.extension.queue', [
         `;
 
         let offset = 0;
-        const initialSize = 5;
+        const initialSize = 20;
         let size = initialSize;
 
         const query = `
@@ -41,6 +44,9 @@ angular.module('ontrack.extension.queue', [
                 $id: String,
                 $processor: String,
                 $state: QueueRecordState,
+                $text: String,
+                $routing: String,
+                $queue: String,
                 $offset: Int!,
                 $size: Int!,
             ) {
@@ -48,6 +54,9 @@ angular.module('ontrack.extension.queue', [
                     id: $id,
                     processor: $processor,
                     state: $state,
+                    routing: $routing,
+                    queue: $queue,
+                    text: $text,
                     offset: $offset,
                     size: $size,
                 ) {
@@ -98,6 +107,9 @@ angular.module('ontrack.extension.queue', [
                 id: $scope.filter.id ? $scope.filter.id : null,
                 processor: $scope.filter.processor ? $scope.filter.processor : null,
                 state: $scope.filter.state ? $scope.filter.state : null,
+                text: $scope.filter.text ? $scope.filter.text : null,
+                routing: $scope.filter.routing ? $scope.filter.routing : null,
+                queue: $scope.filter.queue ? $scope.filter.queue : null,
                 offset: offset,
                 size: size,
             };
@@ -119,6 +131,9 @@ angular.module('ontrack.extension.queue', [
             $scope.filter.id = undefined;
             $scope.filter.processor = undefined;
             $scope.filter.state = undefined;
+            $scope.filter.text = undefined;
+            $scope.filter.routing = undefined;
+            $scope.filter.queue = undefined;
             loadRecords(true);
         };
 

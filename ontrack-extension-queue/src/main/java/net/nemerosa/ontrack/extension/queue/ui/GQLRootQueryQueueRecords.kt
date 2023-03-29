@@ -37,6 +37,9 @@ class GQLRootQueryQueueRecords(
                 stringArgument(ARG_ID, "Queue message ID"),
                 stringArgument(ARG_PROCESSOR, "Queue processor"),
                 enumArgument<QueueRecordState>(ARG_STATE, "Queue message state"),
+                stringArgument(ARG_ROUTING, "Routing key"),
+                stringArgument(ARG_QUEUE, "Queue name"),
+                stringArgument(ARG_TEXT, "Text in the payload"),
             )
         )
 
@@ -45,6 +48,9 @@ class GQLRootQueryQueueRecords(
             id = env.getArgument(ARG_ID),
             processor = env.getArgument(ARG_PROCESSOR),
             state = env.getArgument<String?>(ARG_STATE)?.let { QueueRecordState.valueOf(it) },
+            routingKey = env.getArgument(ARG_ROUTING),
+            queueName = env.getArgument(ARG_QUEUE),
+            text = env.getArgument(ARG_TEXT),
         )
         return queueRecordQueryService.findByFilter(filter, offset, size)
     }
@@ -53,5 +59,8 @@ class GQLRootQueryQueueRecords(
         const val ARG_ID = "id"
         const val ARG_PROCESSOR = "processor"
         const val ARG_STATE = "state"
+        const val ARG_ROUTING = "routing"
+        const val ARG_QUEUE = "queue"
+        const val ARG_TEXT = "text"
     }
 }
