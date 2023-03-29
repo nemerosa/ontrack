@@ -77,10 +77,11 @@
             <th>End time</th>
         </tr>
         </thead>
-        <tbody>
-        <tr ng-repeat="message in messages">
+        <tbody ng-repeat-start="message in messages">
+        <tr>
             <td>
-                <code>{{ message.queuePayload.id }}</code>
+                <code class="ot-action" ng-click="toggleMessage(message)"
+                      title="Click to show/hide the details of this message">{{ message.queuePayload.id }}</code>
             </td>
             <td>
                 <code>{{ message.queuePayload.processor }}</code>
@@ -95,6 +96,42 @@
             <td>
                 {{ message.endTime | date:'shortDate' }}
                 {{ message.endTime | date:'mediumTime' }}
+            </td>
+        </tr>
+        </tbody>
+        <tbody ng-repeat-end ng-show="message.details">
+        <tr>
+            <td colspan="5">
+                <form class="form-horizontal col-md-12">
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label">Routing</label>
+                        <div class="col-sm-3">
+                            <p class="form-control-static"><code>{{ message.routingKey }}</code></p>
+                        </div>
+                        <label class="col-sm-1 control-label">Queue</label>
+                        <div class="col-sm-3">
+                            <p class="form-control-static"><code>{{ message.queueName }}</code></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label">Queue payload</label>
+                        <div class="col-sm-11">
+                            <textarea class="form-control" readonly rows="3">{{ message.queuePayload.body }}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-if="message.actualPayload">
+                        <label class="col-sm-1 control-label">Actual payload</label>
+                        <div class="col-sm-11">
+                            <textarea class="form-control" readonly rows="3">{{ message.actualPayload }}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-if="message.exception">
+                        <label class="col-sm-1 control-label">Error</label>
+                        <div class="col-sm-11">
+                            <textarea class="form-control" readonly rows="9">{{ message.exception }}</textarea>
+                        </div>
+                    </div>
+                </form>
             </td>
         </tr>
         </tbody>

@@ -98,5 +98,9 @@ angular.module('ontrack.extension.queue', [
         $scope.onFilter = () => {
             loadRecords();
         };
+
+        $scope.toggleMessage = (message) => {
+            message.details = !message.details;
+        };
     })
 ;
