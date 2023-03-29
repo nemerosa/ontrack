@@ -16,5 +16,41 @@ angular.module('ontrack.extension.queue', [
         view.commands = [
             ot.viewCloseCommand('/home')
         ];
+
+        const query = `
+            query QueueRecords {
+                queueRecords {
+                    pageItems {
+                        state
+                        queuePayload {
+                            id
+                            processor
+                            body
+                        }
+                        startTime
+                        endTime
+                        routingKey
+                        queueName
+                        actualPayload
+                        exception
+                        history {
+                            state
+                            time
+                        }
+                    }
+                }
+            }
+        `;
+
+        const loadRecords = () => {
+            $scope.loading = true;
+            otGraphqlService.pageGraphQLCall(query, {}).then(data => {
+                $scope.messages = data.queueRecords.pageItems;
+            }).finally(() => {
+                $scope.loading = false;
+            });
+        };
+
+        loadRecords();
     })
 ;
