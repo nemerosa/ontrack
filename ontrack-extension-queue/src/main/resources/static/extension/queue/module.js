@@ -32,17 +32,31 @@ angular.module('ontrack.extension.queue', [
             }
         `;
 
+        let offset = 0;
+        const initialSize = 5;
+        let size = initialSize;
+
         const query = `
             query QueueRecords(
                 $id: String,
                 $processor: String,
                 $state: QueueRecordState,
+                $offset: Int!,
+                $size: Int!,
             ) {
                 queueRecords(
                     id: $id,
                     processor: $processor,
                     state: $state,
+                    offset: $offset,
+                    size: $size,
                 ) {
+                    pageInfo {
+                        nextPage {
+                            offset
+                            size
+                        }
+                    }
                     pageItems {
                         state
                         queuePayload {
@@ -72,35 +86,56 @@ angular.module('ontrack.extension.queue', [
             });
         };
 
-        const loadRecords = () => {
+        const loadRecords = (reset) => {
             $scope.loading = true;
+
+            if (reset) {
+                offset = 0;
+                size = initialSize;
+            }
+
             const variables = {
                 id: $scope.filter.id ? $scope.filter.id : null,
                 processor: $scope.filter.processor ? $scope.filter.processor : null,
                 state: $scope.filter.state ? $scope.filter.state : null,
+                offset: offset,
+                size: size,
             };
             otGraphqlService.pageGraphQLCall(query, variables).then(data => {
-                $scope.messages = data.queueRecords.pageItems;
+                if (reset) {
+                    $scope.messages = data.queueRecords.pageItems;
+                } else {
+                    $scope.messages = $scope.messages.concat(data.queueRecords.pageItems);
+                }
+                $scope.pageInfo = data.queueRecords.pageInfo;
             }).finally(() => {
                 $scope.loading = false;
             });
         };
 
-        loadRecordsInfo().then(loadRecords);
+        loadRecordsInfo().then(() => loadRecords(true));
 
         $scope.onClear = () => {
             $scope.filter.id = undefined;
             $scope.filter.processor = undefined;
             $scope.filter.state = undefined;
-            loadRecords();
+            loadRecords(true);
         };
 
         $scope.onFilter = () => {
-            loadRecords();
+            loadRecords(true);
         };
 
         $scope.toggleMessage = (message) => {
             message.details = !message.details;
+        };
+
+        $scope.loadNextPage = () => {
+            if ($scope.pageInfo.nextPage) {
+                offset = $scope.pageInfo.nextPage.offset;
+                size = $scope.pageInfo.nextPage.size;
+                loadRecords(false);
+            }
         };
     })
 ;

@@ -159,6 +159,13 @@
             </td>
         </tr>
         </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="5">
+                <button class="btn btn-link" ng-if="pageInfo.nextPage" ng-click="loadNextPage()">More...</button>
+            </td>
+        </tr>
+        </tfoot>
     </table>
 
 </ot-view>
