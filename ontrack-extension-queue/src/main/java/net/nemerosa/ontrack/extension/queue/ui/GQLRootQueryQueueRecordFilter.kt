@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.queue.QueueProcessor
 import net.nemerosa.ontrack.extension.queue.record.QueueRecord
 import net.nemerosa.ontrack.extension.queue.record.QueueRecordQueryFilter
 import net.nemerosa.ontrack.extension.queue.record.QueueRecordQueryService
+import net.nemerosa.ontrack.extension.queue.record.QueueRecordState
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
@@ -31,6 +32,7 @@ class GQLRootQueryQueueRecordFilter(
             .dataFetcher {
                 QueueRecordFilterInfo(
                     processors = queueProcessors.map { it.id }.sorted(),
+                    states = QueueRecordState.values().map { it.name },
                 )
             }
             .build()

@@ -43,6 +43,11 @@ class QueueRecordStoreImpl(
             queryVariables["processor"] = filter.processor
         }
 
+        if (filter.state != null) {
+            queries += "data::jsonb->>'state' = :state"
+            queryVariables["state"] = filter.state.name
+        }
+
         val query = queries.joinToString(" AND ") { "( $it )" }
 
         return store.paginatedFilter(

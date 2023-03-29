@@ -3,7 +3,6 @@
     <!-- Form to filter the messages -->
     <div class="well">
         <form class="form-horizontal" ng-submit="onFilter()">
-            <!-- TODO State -->
             <div class="form-group">
                 <!-- ID -->
                 <label for="filterId" class="col-sm-1 control-label">ID</label>
@@ -18,6 +17,15 @@
                         id="filterProcessor"
                         ng-options="processor for processor in processors"
                         ng-model="filter.processor">
+                    <option value="">Any</option>
+                </select>
+                <!-- State -->
+                <label for="filterState" class="col-sm-1 control-label">State</label>
+                <select class="form-control col-sm-2"
+                        ng-if="states"
+                        id="filterState"
+                        ng-options="state for state in states"
+                        ng-model="filter.state">
                     <option value="">Any</option>
                 </select>
             </div>

@@ -5,8 +5,10 @@ import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.extension.queue.record.QueueRecord
 import net.nemerosa.ontrack.extension.queue.record.QueueRecordQueryFilter
 import net.nemerosa.ontrack.extension.queue.record.QueueRecordQueryService
+import net.nemerosa.ontrack.extension.queue.record.QueueRecordState
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
+import net.nemerosa.ontrack.graphql.support.enumArgument
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.graphql.support.stringArgument
 import net.nemerosa.ontrack.model.pagination.PaginatedList
@@ -34,6 +36,7 @@ class GQLRootQueryQueueRecords(
             arguments = listOf(
                 stringArgument(ARG_ID, "Queue message ID"),
                 stringArgument(ARG_PROCESSOR, "Queue processor"),
+                enumArgument<QueueRecordState>(ARG_STATE, "Queue message state"),
             )
         )
 
@@ -41,6 +44,7 @@ class GQLRootQueryQueueRecords(
         val filter = QueueRecordQueryFilter(
             id = env.getArgument(ARG_ID),
             processor = env.getArgument(ARG_PROCESSOR),
+            state = env.getArgument<String?>(ARG_STATE)?.let { QueueRecordState.valueOf(it) },
         )
         return queueRecordQueryService.findByFilter(filter, offset, size)
     }
@@ -48,5 +52,6 @@ class GQLRootQueryQueueRecords(
     companion object {
         const val ARG_ID = "id"
         const val ARG_PROCESSOR = "processor"
+        const val ARG_STATE = "state"
     }
 }

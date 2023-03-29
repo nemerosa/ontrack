@@ -19,13 +19,15 @@ angular.module('ontrack.extension.queue', [
 
         $scope.filter = {
             id: undefined,
-            processor: undefined
+            processor: undefined,
+            state: undefined
         };
 
         const queryInfo = `
             query QueueRecordsInfo {
                 queueRecordFilterInfo {
                     processors
+                    states
                 }
             }
         `;
@@ -34,10 +36,12 @@ angular.module('ontrack.extension.queue', [
             query QueueRecords(
                 $id: String,
                 $processor: String,
+                $state: QueueRecordState,
             ) {
                 queueRecords(
                     id: $id,
                     processor: $processor,
+                    state: $state,
                 ) {
                     pageItems {
                         state
@@ -64,6 +68,7 @@ angular.module('ontrack.extension.queue', [
         const loadRecordsInfo = () => {
             return otGraphqlService.pageGraphQLCall(queryInfo).then(data => {
                  $scope.processors = data.queueRecordFilterInfo.processors;
+                 $scope.states = data.queueRecordFilterInfo.states;
             });
         };
 
@@ -71,7 +76,8 @@ angular.module('ontrack.extension.queue', [
             $scope.loading = true;
             const variables = {
                 id: $scope.filter.id ? $scope.filter.id : null,
-                processor: $scope.filter.processor ? $scope.filter.processor : null
+                processor: $scope.filter.processor ? $scope.filter.processor : null,
+                state: $scope.filter.state ? $scope.filter.state : null,
             };
             otGraphqlService.pageGraphQLCall(query, variables).then(data => {
                 $scope.messages = data.queueRecords.pageItems;
@@ -85,6 +91,7 @@ angular.module('ontrack.extension.queue', [
         $scope.onClear = () => {
             $scope.filter.id = undefined;
             $scope.filter.processor = undefined;
+            $scope.filter.state = undefined;
             loadRecords();
         };
 
