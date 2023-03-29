@@ -33,9 +33,14 @@ class QueueRecordStoreImpl(
         val queries = mutableListOf<String>()
         val queryVariables = mutableMapOf<String, String>()
 
-        if (filter.id != null) {
+        if (!filter.id.isNullOrBlank()) {
             queries += "data::jsonb->'queuePayload'->>'id' = :id"
             queryVariables["id"] = filter.id
+        }
+
+        if (!filter.processor.isNullOrBlank()) {
+            queries += "data::jsonb->'queuePayload'->>'processor' = :processor"
+            queryVariables["processor"] = filter.processor
         }
 
         val query = queries.joinToString(" AND ") { "( $it )" }

@@ -4,15 +4,20 @@
     <div class="well">
         <form class="form-horizontal" ng-submit="onFilter()">
             <!-- TODO State -->
-            <!-- ID -->
             <div class="form-group">
+                <!-- ID -->
                 <label for="filterId" class="col-sm-1 control-label">ID</label>
                 <input class="form-control col-sm-4"
                        id="filterId"
                        type="text"
                        ng-model="filter.id"/>
+                <label for="filterProcessor" class="col-sm-1 control-label">Processor</label>
+                <input class="form-control col-sm-4"
+                       id="filterProcessor"
+                       type="text"
+                       ng-model="filter.processor"/>
+                <!-- Processor -->
             </div>
-            <!-- TODO Processor -->
             <!-- TODO Free text -->
             <!-- TODO Routing key -->
             <!-- TODO Queue name -->

@@ -33,17 +33,20 @@ class GQLRootQueryQueueRecords(
             },
             arguments = listOf(
                 stringArgument(ARG_ID, "Queue message ID"),
+                stringArgument(ARG_PROCESSOR, "Queue processor"),
             )
         )
 
     private fun getPaginatedList(env: DataFetchingEnvironment, offset: Int, size: Int): PaginatedList<QueueRecord> {
         val filter = QueueRecordQueryFilter(
             id = env.getArgument(ARG_ID),
+            processor = env.getArgument(ARG_PROCESSOR),
         )
         return queueRecordQueryService.findByFilter(filter, offset, size)
     }
 
     companion object {
         const val ARG_ID = "id"
+        const val ARG_PROCESSOR = "processor"
     }
 }

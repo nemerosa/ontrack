@@ -18,15 +18,18 @@ angular.module('ontrack.extension.queue', [
         ];
 
         $scope.filter = {
-            id: undefined
+            id: undefined,
+            processor: undefined
         };
 
         const query = `
             query QueueRecords(
                 $id: String,
+                $processor: String,
             ) {
                 queueRecords(
                     id: $id,
+                    processor: $processor,
                 ) {
                     pageItems {
                         state
@@ -53,7 +56,8 @@ angular.module('ontrack.extension.queue', [
         const loadRecords = () => {
             $scope.loading = true;
             const variables = {
-                id: $scope.filter.id ? $scope.filter.id : null
+                id: $scope.filter.id ? $scope.filter.id : null,
+                processor: $scope.filter.processor ? $scope.filter.processor : null
             };
             otGraphqlService.pageGraphQLCall(query, variables).then(data => {
                 $scope.messages = data.queueRecords.pageItems;
@@ -66,6 +70,7 @@ angular.module('ontrack.extension.queue', [
 
         $scope.onClear = () => {
             $scope.filter.id = undefined;
+            $scope.filter.processor = undefined;
             loadRecords();
         };
 
