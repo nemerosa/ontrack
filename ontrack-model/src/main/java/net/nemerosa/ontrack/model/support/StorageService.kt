@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseInto
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -144,6 +145,20 @@ interface StorageService {
         queryVariables: Map<String, *>? = null,
         orderQuery: String? = null,
     ): List<T>
+
+    /**
+     * Gets items in a store matching some criteria.
+     */
+    fun <T : Any> paginatedFilter(
+        store: String,
+        type: KClass<T>,
+        offset: Int = 0,
+        size: Int = 40,
+        context: String = "",
+        query: String? = null,
+        queryVariables: Map<String, *>? = null,
+        orderQuery: String? = null,
+    ): PaginatedList<T>
 
     /**
      * Looping over items in a store matching some criteria.
