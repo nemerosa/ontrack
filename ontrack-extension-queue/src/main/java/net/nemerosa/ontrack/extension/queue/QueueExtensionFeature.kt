@@ -10,4 +10,5 @@ class QueueExtensionFeature : AbstractExtensionFeature(
     "Queuing",
     "Framework for the other extensions to deal with asynchronous and monitored processing.",
     ExtensionFeatureOptions.DEFAULT
+        .withGui(true)
 )

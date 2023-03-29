@@ -1,0 +1,38 @@
+<ot-view>
+
+    <!-- Form to filter the messages -->
+    <div class="well">
+        <form class="form-horizontal" ng-submit="onFilter()">
+            <!-- TODO State -->
+            <!-- TODO ID -->
+            <!-- TODO Processor -->
+            <!-- TODO Free text -->
+            <!-- TODO Routing key -->
+            <!-- TODO Queue name -->
+        </form>
+    </div>
+
+    <!-- Loading indicator -->
+    <div class="row" ng-show="loading">
+        <div class="col-span-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the messages...
+            </div>
+        </div>
+    </div>
+
+    <!-- No queue message found -->
+    <div class="row" ng-show="messages.length == 0 && !loading">
+        <div class="col-span-12">
+            <div class="alert alert-info">
+                No queue message was found.
+            </div>
+        </div>
+    </div>
+
+    <!-- List of messages -->
+    <table class="table" ng-show="messages.length > 0 && !loading">
+    </table>
+
+</ot-view>
