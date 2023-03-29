@@ -33,6 +33,36 @@
 
     <!-- List of messages -->
     <table class="table" ng-show="messages.length > 0 && !loading">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Processor</th>
+            <th>Start time</th>
+            <th>State</th>
+            <th>End time</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="message in messages">
+            <td>
+                <code>{{ message.queuePayload.id }}</code>
+            </td>
+            <td>
+                <code>{{ message.queuePayload.processor }}</code>
+            </td>
+            <td>
+                {{ message.startTime | date:'shortDate' }}
+                {{ message.startTime | date:'mediumTime' }}
+            </td>
+            <td>
+                <code>{{ message.state }}</code>
+            </td>
+            <td>
+                {{ message.endTime | date:'shortDate' }}
+                {{ message.endTime | date:'mediumTime' }}
+            </td>
+        </tr>
+        </tbody>
     </table>
 
 </ot-view>

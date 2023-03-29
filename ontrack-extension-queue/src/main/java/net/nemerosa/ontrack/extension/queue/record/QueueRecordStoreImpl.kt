@@ -47,6 +47,7 @@ class QueueRecordStoreImpl(
             size = size,
             query = query,
             queryVariables = queryVariables,
+            orderQuery = "ORDER BY data::jsonb->>'startTime' DESC",
         )
     }
 
