@@ -4,11 +4,30 @@
     <div class="well">
         <form class="form-horizontal" ng-submit="onFilter()">
             <!-- TODO State -->
-            <!-- TODO ID -->
+            <!-- ID -->
+            <div class="form-group">
+                <label for="filterId" class="col-sm-1 control-label">ID</label>
+                <input class="form-control col-sm-4"
+                       id="filterId"
+                       type="text"
+                       ng-model="filter.id"/>
+            </div>
             <!-- TODO Processor -->
             <!-- TODO Free text -->
             <!-- TODO Routing key -->
             <!-- TODO Queue name -->
+            <!-- Buttons -->
+            <div class="form-group">
+                <label class="col-sm-1 control-label"></label>
+                <button type="submit" class="btn btn-primary" ng-disabled="loading" id="filterSearch">
+                    <i class="fa fa-search"></i>
+                    Search
+                </button>
+                <button type="button" class="btn btn-link" ng-click="onClear()" ng-disabled="loading" id="filterClear">
+                    <i class="fa fa-ban"></i>
+                    Clear
+                </button>
+            </div>
         </form>
     </div>
 

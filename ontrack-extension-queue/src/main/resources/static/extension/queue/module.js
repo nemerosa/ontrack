@@ -17,9 +17,17 @@ angular.module('ontrack.extension.queue', [
             ot.viewCloseCommand('/home')
         ];
 
+        $scope.filter = {
+            id: undefined
+        };
+
         const query = `
-            query QueueRecords {
-                queueRecords {
+            query QueueRecords(
+                $id: String,
+            ) {
+                queueRecords(
+                    id: $id,
+                ) {
                     pageItems {
                         state
                         queuePayload {
@@ -44,7 +52,10 @@ angular.module('ontrack.extension.queue', [
 
         const loadRecords = () => {
             $scope.loading = true;
-            otGraphqlService.pageGraphQLCall(query, {}).then(data => {
+            const variables = {
+                id: $scope.filter.id ? $scope.filter.id : null
+            };
+            otGraphqlService.pageGraphQLCall(query, variables).then(data => {
                 $scope.messages = data.queueRecords.pageItems;
             }).finally(() => {
                 $scope.loading = false;
@@ -52,5 +63,14 @@ angular.module('ontrack.extension.queue', [
         };
 
         loadRecords();
+
+        $scope.onClear = () => {
+            $scope.filter.id = undefined;
+            loadRecords();
+        };
+
+        $scope.onFilter = () => {
+            loadRecords();
+        };
     })
 ;
