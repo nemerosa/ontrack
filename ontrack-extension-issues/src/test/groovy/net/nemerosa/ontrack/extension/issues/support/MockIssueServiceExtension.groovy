@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component
 
 import java.util.regex.Matcher
 
+@Deprecated
 @Component
 class MockIssueServiceExtension extends AbstractIssueServiceExtension {
 

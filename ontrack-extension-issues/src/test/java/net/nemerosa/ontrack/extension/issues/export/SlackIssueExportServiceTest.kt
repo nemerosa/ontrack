@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.issues.export
 
 import io.mockk.mockk
-import net.nemerosa.ontrack.extension.issues.mock.MockIssue
+import net.nemerosa.ontrack.extension.issues.mock.TestIssue
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -21,8 +21,8 @@ class SlackIssueExportServiceTest {
             issueServiceConfiguration = mockk(),
             groupedIssues = mapOf(
                 "Features" to listOf(
-                    MockIssue(1),
-                    MockIssue(2),
+                    TestIssue(1),
+                    TestIssue(2),
                 )
             ),
             s = s

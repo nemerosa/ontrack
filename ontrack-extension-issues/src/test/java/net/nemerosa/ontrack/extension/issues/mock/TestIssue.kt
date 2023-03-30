@@ -3,9 +3,10 @@ package net.nemerosa.ontrack.extension.issues.mock
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import java.time.LocalDateTime
 
-data class MockIssue(
+data class TestIssue(
     val id: Int,
-    override val status: MockIssueStatus = MockIssueStatus.OPEN,
+    override val status: TestIssueStatus = TestIssueStatus.OPEN,
+    val type: String? = null,
 ) : Issue {
     override val key: String = id.toString()
 

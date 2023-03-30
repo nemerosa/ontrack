@@ -2,12 +2,12 @@ package net.nemerosa.ontrack.extension.stash
 
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService
-import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.test.TestUtils
 import org.springframework.beans.factory.annotation.Autowired
 
-abstract class AbstractBitbucketTestSupport : AbstractQLKTITJUnit4Support() {
+abstract class AbstractBitbucketTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var stashConfigurationService: StashConfigurationService
