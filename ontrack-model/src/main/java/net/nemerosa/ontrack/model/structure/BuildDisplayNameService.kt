@@ -7,4 +7,10 @@ interface BuildDisplayNameService {
 
     fun getBuildDisplayName(build: Build): String
 
+    /**
+     * This method does not return any default value. It'll check the display name extensions
+     * and will return the first eligible value.
+     */
+    fun getEligibleBuildDisplayName(build: Build): String?
+
 }

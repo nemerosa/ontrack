@@ -1,21 +1,21 @@
 package net.nemerosa.ontrack.extension.stash
 
 import net.nemerosa.ontrack.extension.git.model.GitFreeTextAnnotatorContributor
+import net.nemerosa.ontrack.extension.issues.mock.TestIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.model.toIdentifier
-import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
 import net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
 import net.nemerosa.ontrack.test.TestUtils
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class BitBucketFreeTextAnnotatorContributorIT : AbstractDSLTestJUnit4Support() {
+class BitBucketFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var stashConfigurationService: StashConfigurationService
@@ -41,7 +41,7 @@ class BitBucketFreeTextAnnotatorContributorIT : AbstractDSLTestJUnit4Support() {
     @Test
     fun `Git configuration with an issue service`() {
         project {
-            bitBucketConfig(issueServiceConfigurationIdentifier = MockIssueServiceConfiguration.INSTANCE.toIdentifier().format())
+            bitBucketConfig(issueServiceConfigurationIdentifier = TestIssueServiceConfiguration.INSTANCE.toIdentifier().format())
             expects("Text with #123" to """Text with <a href="http://issue/123">#123</a>""")
         }
     }

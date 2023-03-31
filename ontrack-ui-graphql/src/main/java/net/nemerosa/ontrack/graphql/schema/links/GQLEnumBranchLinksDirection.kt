@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.links.BranchLinksDirection
 import org.springframework.stereotype.Component
 
 @Component
+@Deprecated(GraphFieldContributorConstants.DEPRECATION)
 class GQLEnumBranchLinksDirection : AbstractGQLEnum<BranchLinksDirection>(
     BranchLinksDirection::class,
     BranchLinksDirection.values(),

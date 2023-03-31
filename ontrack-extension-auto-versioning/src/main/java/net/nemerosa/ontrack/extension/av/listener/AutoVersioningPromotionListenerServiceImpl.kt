@@ -25,10 +25,23 @@ class AutoVersioningPromotionListenerServiceImpl(
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningPromotionListenerServiceImpl::class.java)
 
-    override fun getConfiguredBranches(build: Build, promotion: PromotionLevel): AutoVersioningConfiguredBranches {
+    override fun getConfiguredBranches(build: Build, promotion: PromotionLevel): AutoVersioningConfiguredBranches? {
         logger.debug("Looking for configured branches: ${build.entityDisplayName} @ ${promotion.name}...")
         // Gets the build name or version
-        val version = buildDisplayNameService.getBuildDisplayName(build)
+        // We need to check if the build has any eligible version, based on its settings.
+        // For example, a build having a "build display name" property stating that the label
+        // must be used, if not having a label, won't have any eligible version.
+        val version = buildDisplayNameService.getEligibleBuildDisplayName(build)
+        // If no version can be gotten from the build, we don't return any configuration
+        if (version == null) {
+            // Logging the event
+            logger.info("Build ${build.id} (${build.entityDisplayName}) was promoted, " +
+                    "but is not eligible to auto versioning because no version was returned. " +
+                    "This can typically be due to the fact that its project requires a label " +
+                    "and the build has none.")
+            // Not returning any config
+            return null
+        }
         // Creation of the event
         val promotionEvent = PromotionEvent(build, promotion.name, version)
         // Gets all the trigger configurations about this event, based on project & promotion only

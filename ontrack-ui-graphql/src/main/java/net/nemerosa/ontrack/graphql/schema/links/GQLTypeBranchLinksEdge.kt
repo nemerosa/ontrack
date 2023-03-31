@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.model.links.BranchLinksEdge
 import org.springframework.stereotype.Component
 
 @Component
+@Deprecated(GraphFieldContributorConstants.DEPRECATION)
 class GQLTypeBranchLinksEdge(
     private val gqlEnumBranchLinksDirection: GQLEnumBranchLinksDirection,
     private val gqlTypeBranchLinksDecoration: GQLTypeBranchLinksDecoration

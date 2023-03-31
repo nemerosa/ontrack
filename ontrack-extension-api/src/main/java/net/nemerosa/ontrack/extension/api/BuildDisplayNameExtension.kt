@@ -11,4 +11,9 @@ interface BuildDisplayNameExtension : Extension {
 
     fun getBuildDisplayName(build: Build): String?
 
+    /**
+     * Checks if
+     */
+    fun mustProvideBuildName(build: Build): Boolean
+
 }

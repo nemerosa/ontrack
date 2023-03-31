@@ -163,6 +163,18 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         };
 
         /**
+         * Given a build, returns its last build if available.
+         */
+        self.getLastBuild = (build) => {
+            const lastBuilds = build.lastBuildInfo.lastBuild;
+            if (lastBuilds && lastBuilds.length > 0) {
+                return lastBuilds[0];
+            } else {
+                return null;
+            }
+        };
+
+        /**
          * Initializes a graph
          * @param config.rootQuery Function which takes a GraphQL fragment and returns a GraphQL path to put under the query
          * @param config.rootBuild Given the data returns by the GraphQL query, returns the root build
@@ -188,6 +200,12 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             const context = {
                 // Chart will be
                 chart: undefined,
+                // Selected node
+                selectedNode: undefined,
+                // Links build ID --> parent node
+                parents: {},
+                // Index (build IDs --> Boolean) of nodes having been expanded
+                expansionIndex: {}
             };
 
             // Chart options
@@ -242,9 +260,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         emphasis: {
                             focus: 'ancestor'
                         },
-                        expandAndCollapse: false,
-                        animationDuration: 550,
-                        animationDurationUpdate: 750
+                        expandAndCollapse: false
                     }
                 ]
             };
@@ -266,22 +282,6 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         return data.build.usedBy.pageItems;
                     }
                 });
-            };
-
-            // Given a build, creates a node & its descendants, for use inside the graph
-
-            const createDependencyNodes = (node, build) => {
-                if (config.direction === 'DOWN') {
-                    if (build.using && build.using.pageItems) {
-                        node.childrenLoaded = true;
-                        node.children = build.using.pageItems.map(childBuild => transformData(childBuild));
-                    }
-                } else {
-                    if (build.usedBy && build.usedBy.pageItems) {
-                        node.childrenLoaded = true;
-                        node.children = build.usedBy.pageItems.map(childBuild => transformData(childBuild));
-                    }
-                }
             };
 
             const buildLine = (node, build, config) => {
@@ -336,7 +336,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 return `AV Status: {${className}|} ${status.mostRecentState.state} - ${status.order.targetVersion}`;
             };
 
-            const transformData = (build) => {
+            const transformData = (build, parentNode) => {
 
                 // Initial node
                 const node = {
@@ -344,6 +344,9 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     name: build.name,
                     value: build.id
                 };
+
+                // Links build ID --> parent node
+                context.parents[build.id] = parentNode;
 
                 // Styling
                 node.label = {
@@ -391,13 +394,10 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
                 // Last build
                 if (config.layout.elements.lastBuild) {
-                    const lastBuilds = build.lastBuildInfo.lastBuild;
-                    if (lastBuilds && lastBuilds.length > 0) {
-                        const lastBuild = lastBuilds[0];
-                        if (lastBuild.id > build.id) {
-                            separator();
-                            formatterLines.push(buildLine(node, lastBuild, {prefix: "Last build: "}));
-                        }
+                    const lastBuild = self.getLastBuild(build);
+                    if (lastBuild && lastBuild.id > build.id) {
+                        separator();
+                        formatterLines.push(buildLine(node, lastBuild, {prefix: "Last build: "}));
                     }
                 }
 
@@ -409,9 +409,6 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
 
                 // Label formatter
                 node.label.formatter = formatterLines.join('\n');
-
-                // Fill the dependencies
-                createDependencyNodes(node, build);
 
                 // OK
                 return node;
@@ -439,54 +436,71 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
             // Loading the children for a node
 
             const loadDependenciesForNode = (node, recursive) => {
+                // Checking if expansion must be done for this done
+                const expansionState = context.expansionIndex[node.value] === true;
+                const mustExpand = recursive || expansionState;
+                // Promise to return
                 const d = $q.defer();
                 // Check if the children have been already loaded or not
                 if (!node.childrenLoaded) {
                     // Loading the dependencies
                     return loadBuildDependencies(node.value).then(builds => {
                         if (builds) {
-                            node.children = builds.map(child => transformData(child));
+                            node.children = builds.map(child => transformData(child, node));
                         }
                         node.childrenLoaded = true;
+                        // Adding to the index for restoration on refresh
+                        context.expansionIndex[node.value] = true;
                         // Recursive loading
-                        if (recursive && node.children) {
+                        if (mustExpand && node.children) {
                             $q.all(node.children.map(child => loadDependenciesForNode(child, recursive))).then(() => {
-                                d.resolve({});
+                                d.resolve(node);
                             });
                         }
                         // We're done here
                         else {
-                            d.resolve({});
+                            d.resolve(node);
                         }
                         // OK
                         return d.promise;
                     });
                 } else {
-                    if (recursive && node.children) {
+                    if (mustExpand && node.children) {
                         $q.all(node.children.map(child => loadDependenciesForNode(child, recursive))).then(() => {
-                            d.resolve({});
+                            d.resolve(node);
                         });
                         return d.promise;
                     } else {
-                        d.resolve({});
+                        d.resolve(node);
                         return d.promise;
                     }
                 }
             };
 
-            const loadNodeDependencies = (buildId) => {
+            const selectBuildId = (buildId) => {
                 // Looks for the node having the buildId as a value
                 const node = lookForNode(options.series[0].data[0], buildId);
                 if (node) {
                     loadDependenciesForNode(node).then(() => {
+                        // Selection
+                        selectNode(node);
+                        if (node.build && config.onBuildSelected) {
+                            config.onBuildSelected(angular.copy(node.build));
+                        }
                         // Refreshes the chart
                         getOrCreateChart().setOption(options);
                     });
-                    // Returning the build attached to the node
-                    return node.build;
-                } else {
-                    return null;
                 }
+            };
+
+            // Selection of a node
+
+            const selectNode = (node) => {
+                if (context.selectedNode) {
+                    context.selectedNode.label.borderWidth = 1;
+                }
+                context.selectedNode = node;
+                context.selectedNode.label.borderWidth = 4;
             };
 
             // Initializes the chart location
@@ -495,10 +509,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                 chart.on('click', (params) => {
                     const buildId = params.value;
                     if (buildId) {
-                        const build = loadNodeDependencies(buildId);
-                        if (build && config.onBuildSelected) {
-                            config.onBuildSelected(angular.copy(build));
-                        }
+                        selectBuildId(buildId);
                     }
                 });
             };
@@ -534,12 +545,17 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     config.rootVariables
                 ).then(data => {
                     const rootBuild = config.rootBuild(data);
-                    const rootNode = transformData(rootBuild);
+                    const rootNode = transformData(rootBuild, null);
+                    // Loading of dependencies
+                    return loadDependenciesForNode(rootNode, false);
+                }).then((rootNode) => {
+                    // Initial selection
+                    selectNode(rootNode);
                     // Graph setup
                     const chart = getOrCreateChart();
                     createOptionWithData(rootNode);
                     chart.setOption(options);
-                    return rootBuild;
+                    return rootNode.build;
                 });
             };
 
@@ -562,6 +578,70 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                             duration: 250
                         }
                     });
+                }
+            };
+
+            // Selects the build on the right of the selected one (top most)
+
+            graph.selectBuildRight = () => {
+                if (context.selectedNode) {
+                    // Making sure its children are loaded
+                    loadDependenciesForNode(context.selectedNode).then(() => {
+                        // Gets its children
+                        const children = context.selectedNode.children;
+                        if (children && children.length > 0) {
+                            // Selects the first child
+                            const child = children[0];
+                            selectBuildId(child.value);
+                        }
+                    });
+                }
+            };
+
+            // Selects the build on the left of the selected one (the parent)
+
+            graph.selectBuildLeft = () => {
+                if (context.selectedNode) {
+                    const parentNode = context.parents[context.selectedNode.value];
+                    if (parentNode) {
+                        selectBuildId(parentNode.value);
+                    }
+                }
+            };
+
+            // Selects the build down of the selected one
+
+            graph.selectBuildDown = () => {
+                if (context.selectedNode) {
+                    const parentNode = context.parents[context.selectedNode.value];
+                    if (parentNode) {
+                        const children = parentNode.children;
+                        if (children && children.length > 0) {
+                            const index = children.indexOf(context.selectedNode);
+                            if (index >= 0 && (index + 1) < children.length) {
+                                const nextNode = children[index + 1];
+                                selectBuildId(nextNode.value);
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Selects the build up of the selected one
+
+            graph.selectBuildUp = () => {
+                if (context.selectedNode) {
+                    const parentNode = context.parents[context.selectedNode.value];
+                    if (parentNode) {
+                        const children = parentNode.children;
+                        if (children && children.length > 0) {
+                            const index = children.indexOf(context.selectedNode);
+                            if (index > 0) {
+                                const previousNode = children[index - 1];
+                                selectBuildId(previousNode.value);
+                            }
+                        }
+                    }
                 }
             };
 
@@ -673,9 +753,7 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     throw new Error("Either root-build-id or root-branch-id must be set.");
                 }
                 config.onBuildSelected = (build) => {
-                    $scope.$apply(function () {
-                        $scope.selectedBuild = build;
-                    });
+                    $scope.selectedBuild = build;
                 };
                 config.layout = $scope.layout;
 
@@ -771,6 +849,162 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                         height = 600;
                     }
                     graph.resizeHeight(height);
+                };
+
+                // Key shortcutd
+                $scope.keyShortcutsVisible = false;
+                $scope.toggleKeyShortcutsVisible = () => {
+                    $scope.keyShortcutsVisible = !$scope.keyShortcutsVisible;
+                };
+
+                // Registering a key listener at dom level
+                let keyListener = (event) => {
+                    if (event.key === 'ArrowRight' && event.shiftKey) {
+                        selectBuildRight();
+                    } else if (event.key === 'ArrowLeft' && event.shiftKey) {
+                        selectBuildLeft();
+                    } else if (event.key === 'ArrowUp' && event.shiftKey) {
+                        selectBuildUp();
+                    } else if (event.key === 'ArrowDown' && event.shiftKey) {
+                        selectBuildDown();
+                    } else if (event.key === 'm') {
+                        goToBranchDownstream();
+                    } else if (event.key === 'M') {
+                        goToBranchUpstream();
+                    } else if (event.key === 'b') {
+                        goToBuildDownstream();
+                    } else if (event.key === 'B') {
+                        goToBuildUpstream();
+                    } else if (event.key === 'p') {
+                        goToPreviousBuildDownstream();
+                    } else if (event.key === 'P') {
+                        goToPreviousBuildUpstream();
+                    } else if (event.key === 'n') {
+                        goToNextBuildDownstream();
+                    } else if (event.key === 'N') {
+                        goToNextBuildUpstream();
+                    } else if (event.key === 'l') {
+                        goToLastBuildDownstream();
+                    } else if (event.key === 'L') {
+                        goToLastBuildUpstream();
+                    } else if (event.key === 'e') {
+                        goToLastEligibleBuildDownstream();
+                    } else if (event.key === 'E') {
+                        goToLastEligibleBuildUpstream();
+                    } else {
+                        // console.log({event});
+                    }
+                };
+                document.addEventListener('keyup', keyListener);
+                // Unregistering the event when changing the page
+                $scope.$on('$stateChangeStart', function () {
+                    document.removeEventListener('keyup', keyListener);
+                });
+
+                const goToBuildGraph = (build, direction) => {
+                    location.href = `#/extension/auto-versioning/dependency-graph/build/${build.id}/${direction}`;
+                };
+
+                const _goToBuildDownstream = (build) => {
+                    goToBuildGraph(build, 'downstream');
+                };
+
+                const _goToBuildUpstream = (build) => {
+                    goToBuildGraph(build, 'upstream');
+                };
+
+                const goToBranchDownstream = () => {
+                    if ($scope.selectedBuild) {
+                        location.href = `#/extension/auto-versioning/dependency-graph/branch/${$scope.selectedBuild.branch.id}/downstream`;
+                    }
+                };
+
+                const goToBranchUpstream = () => {
+                    if ($scope.selectedBuild) {
+                        location.href = `#/extension/auto-versioning/dependency-graph/branch/${$scope.selectedBuild.branch.id}/upstream`;
+                    }
+                };
+
+                const goToBuildDownstream = () => {
+                    if ($scope.selectedBuild) {
+                        _goToBuildDownstream($scope.selectedBuild);
+                    }
+                };
+
+                const goToBuildUpstream = () => {
+                    if ($scope.selectedBuild) {
+                        _goToBuildUpstream($scope.selectedBuild);
+                    }
+                };
+
+                const goToPreviousBuildDownstream = () => {
+                    if ($scope.selectedBuild && $scope.selectedBuild.previousBuild) {
+                        _goToBuildDownstream($scope.selectedBuild.previousBuild);
+                    }
+                };
+
+                const goToPreviousBuildUpstream = () => {
+                    if ($scope.selectedBuild && $scope.selectedBuild.previousBuild) {
+                        _goToBuildUpstream($scope.selectedBuild.previousBuild);
+                    }
+                };
+
+                const goToNextBuildDownstream = () => {
+                    if ($scope.selectedBuild && $scope.selectedBuild.nextBuild) {
+                        _goToBuildDownstream($scope.selectedBuild.nextBuild);
+                    }
+                };
+
+                const goToNextBuildUpstream = () => {
+                    if ($scope.selectedBuild && $scope.selectedBuild.nextBuild) {
+                        _goToBuildUpstream($scope.selectedBuild.nextBuild);
+                    }
+                };
+
+                const goToLastBuildDownstream = () => {
+                    if ($scope.selectedBuild) {
+                        const lastBuild = otExtensionAutoVersioningDependencyGraph.getLastBuild($scope.selectedBuild);
+                        if (lastBuild) {
+                            _goToBuildDownstream(lastBuild);
+                        }
+                    }
+                };
+
+                const goToLastBuildUpstream = () => {
+                    if ($scope.selectedBuild) {
+                        const lastBuild = otExtensionAutoVersioningDependencyGraph.getLastBuild($scope.selectedBuild);
+                        if (lastBuild) {
+                            _goToBuildUpstream(lastBuild);
+                        }
+                    }
+                };
+
+                const goToLastEligibleBuildDownstream = () => {
+                    if ($scope.selectedBuild && $scope.selectedBuild.autoVersioning && $scope.selectedBuild.autoVersioning.lastEligibleBuild) {
+                        _goToBuildDownstream($scope.selectedBuild.autoVersioning.lastEligibleBuild);
+                    }
+                };
+
+                const goToLastEligibleBuildUpstream = () => {
+                    if ($scope.selectedBuild && $scope.selectedBuild.autoVersioning && $scope.selectedBuild.autoVersioning.lastEligibleBuild) {
+                        _goToBuildUpstream($scope.selectedBuild.autoVersioning.lastEligibleBuild);
+                    }
+                };
+
+                const selectBuildRight = () => {
+                    graph.selectBuildRight();
+                };
+
+                const selectBuildLeft = () => {
+                    graph.selectBuildLeft();
+                };
+
+                const selectBuildUp = () => {
+                    graph.selectBuildUp();
+                };
+
+                const selectBuildDown = () => {
+                    graph.selectBuildDown();
                 };
             }
         };

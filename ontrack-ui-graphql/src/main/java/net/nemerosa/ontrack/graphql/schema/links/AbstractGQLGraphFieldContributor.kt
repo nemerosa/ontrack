@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
 
+@Deprecated(GraphFieldContributorConstants.DEPRECATION)
 abstract class AbstractGQLGraphFieldContributor<T : ProjectEntity>(
     private val projectEntityType: ProjectEntityType,
     private val description: String,
@@ -30,6 +31,7 @@ abstract class AbstractGQLGraphFieldContributor<T : ProjectEntity>(
                 GraphQLFieldDefinition.newFieldDefinition()
                     .name("graph")
                     .description(description)
+                    .deprecate(GraphFieldContributorConstants.DEPRECATION)
                     .argument {
                         it.name(ARG_DIRECTION)
                             .description("Direction for the dependencies")
