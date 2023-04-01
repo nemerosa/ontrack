@@ -84,7 +84,10 @@ public class UserController extends AbstractResourceController {
     private ConnectedAccount userMenu(ConnectedAccount user) {
         // Settings
         if (securityService.isGlobalFunctionGranted(GlobalSettings.class)) {
-            user.add(Action.of("settings", "Settings", "settings"));
+            user.add(
+                    Action.of("settings", "Settings", "settings")
+                            .withGroup(UserMenuExtensionGroups.system)
+            );
         }
         // Access to the user profile
         if (securityService.isLogged()) {
