@@ -206,9 +206,6 @@ const ontrack = angular.module('ontrack', [
                 });
             };
 
-            // User menu filter
-            $scope.userMenuFilter = '';
-
             /**
              * Application info mgt
              */

@@ -50,20 +50,6 @@
                             <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu" role="menu">
-                            <!-- Filter box -->
-                            <li class="user-menu-filter" onclick="event.stopPropagation();">
-                                <div class="input-group">
-                                    <span class="input-group-addon" id="user-menu-filter-addon">
-                                        <span class="fa fa-search"></span>
-                                    </span>
-                                    <input type="text"
-                                           ng-model="userMenuFilter"
-                                           placeholder="Search in the list"
-                                           aria-describedby="user-menu-filter-addon"
-                                           class="form-control"
-                                           />
-                                </div>
-                            </li>
                             <!-- All menu groups -->
                             <li ng-repeat="item in user.menu" ng-class="{
                                 'dropdown-header': item.menuType == 'group',
