@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.configuration
 
 import net.nemerosa.ontrack.extension.api.UserMenuExtension
+import net.nemerosa.ontrack.extension.api.UserMenuExtensionGroups
 import net.nemerosa.ontrack.extension.bitbucket.cloud.BitbucketCloudExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.security.GlobalFunction
@@ -17,8 +18,10 @@ class BitbucketCloudConfigurationUserMenuExtension(
     feature: BitbucketCloudExtensionFeature
 ) : AbstractExtension(feature), UserMenuExtension {
 
-    override fun getGlobalFunction(): Class<out GlobalFunction?> = GlobalSettings::class.java
+    override val globalFunction: Class<out GlobalFunction?> = GlobalSettings::class.java
 
-    override fun getAction(): Action =
+    override val action: Action =
         of("bitbucket-cloud-configurations", "Bitbucket Cloud configurations", "configurations")
+            .withGroup(UserMenuExtensionGroups.configuration)
+
 }

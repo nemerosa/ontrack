@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.scm.catalog.ui
 
 import net.nemerosa.ontrack.extension.api.UserMenuExtension
+import net.nemerosa.ontrack.extension.api.UserMenuExtensionGroups
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogAccessFunction
 import net.nemerosa.ontrack.extension.support.AbstractExtension
@@ -13,7 +14,8 @@ class SCMCatalogUserMenuExtension(
         extensionFeature: SCMExtensionFeature
 ) : AbstractExtension(extensionFeature), UserMenuExtension {
 
-    override fun getAction(): Action = Action.of("scm-catalog", "SCM Catalog", "catalog")
+    override val action: Action = Action.of("scm-catalog", "SCM Catalog", "catalog")
+        .withGroup(UserMenuExtensionGroups.information)
 
-    override fun getGlobalFunction(): Class<out GlobalFunction> = SCMCatalogAccessFunction::class.java
+    override val globalFunction: Class<out GlobalFunction> = SCMCatalogAccessFunction::class.java
 }

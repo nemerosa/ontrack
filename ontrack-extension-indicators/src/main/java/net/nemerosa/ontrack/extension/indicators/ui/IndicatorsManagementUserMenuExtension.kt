@@ -12,13 +12,14 @@ import org.springframework.stereotype.Component
  * User menu to access the management of indicators.
  */
 @Component
+@Deprecated("Will be split into different entries in a common group")
 class IndicatorsManagementUserMenuExtension(
     extension: IndicatorsExtensionFeature,
 ) : AbstractExtension(extension), UserMenuExtension {
 
-    override fun getAction(): Action =
+    override val action: Action =
         Action.of("indicators-management", "Indicators", "indicators-management")
 
-    override fun getGlobalFunction(): Class<out GlobalFunction> = IndicatorPortfolioAccess::class.java
+    override val globalFunction: Class<out GlobalFunction> = IndicatorPortfolioAccess::class.java
 
 }
