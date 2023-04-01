@@ -893,10 +893,44 @@ class StructureServiceImpl(
         isEntityDefined(validationStamp.branch.project, "Project must be defined")
         // Security
         securityService.checkProjectFunction(validationStamp.projectId(), ValidationStampEdit::class.java)
+        // Gets any predefined validation stamp
+        val predefined = predefinedValidationStampService.findPredefinedValidationStampByName(validationStamp.name).getOrNull()
+        val actualValidationStamp = if (predefined != null) {
+            // Adapting the description
+            val description = if (validationStamp.description.isNullOrBlank()) {
+                predefined.description
+            } else {
+                validationStamp.description
+            }
+            // Adapting the type
+            val dataType = validationStamp.dataType ?: predefined.dataType
+            // New stamp
+            ValidationStamp(
+                id = validationStamp.id,
+                name = validationStamp.name,
+                description = description,
+                branch = validationStamp.branch,
+                owner = validationStamp.owner,
+                isImage = validationStamp.isImage,
+                signature = validationStamp.signature,
+                dataType = dataType,
+            )
+        } else {
+            validationStamp
+        }
         // Repository
-        structureRepository.saveValidationStamp(validationStamp)
+        structureRepository.saveValidationStamp(actualValidationStamp)
+        // Adapting the image from the predefined
+        if (!validationStamp.isImage && predefined != null && predefined.isImage) {
+            securityService.asAdmin {
+                setValidationStampImage(
+                    validationStamp.id,
+                    predefinedValidationStampService.getPredefinedValidationStampImage(predefined.id)
+                )
+            }
+        }
         // Event
-        eventPostService.post(eventFactory.updateValidationStamp(validationStamp))
+        eventPostService.post(eventFactory.updateValidationStamp(actualValidationStamp))
     }
 
     override fun deleteValidationStamp(validationStampId: ID): Ack {
