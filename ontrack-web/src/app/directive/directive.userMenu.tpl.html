@@ -2,20 +2,20 @@
 
 <div class="off-canvas">
     <ul class="list-group">
-        <li class="list-group-item">Cras justo odio</li>
-        <li class="list-group-item">Dapibus ac facilisis in</li>
-        <li class="list-group-item">Morbi leo risus</li>
-        <li class="list-group-item">Porta ac consectetur ac</li>
-        <li class="list-group-item">Vestibulum at eros</li>
-        <li class="list-group-item">Cras justo odio</li>
-        <li class="list-group-item">Dapibus ac facilisis in</li>
-        <li class="list-group-item">Morbi leo risus</li>
-        <li class="list-group-item">Porta ac consectetur ac</li>
-        <li class="list-group-item">Vestibulum at eros</li>
-        <li class="list-group-item">Cras justo odio</li>
-        <li class="list-group-item">Dapibus ac facilisis in</li>
-        <li class="list-group-item">Morbi leo risus</li>
-        <li class="list-group-item">Porta ac consectetur ac</li>
-        <li class="list-group-item">Vestibulum at eros</li>
+        <!-- All actions -->
+        <li class="list-group-item" ng-repeat="action in menu.actions">
+            {{ action.name }}
+        </li>
+        <!-- All groups -->
+        <li class="list-group-item list-group-item-info" ng-repeat-start="group in menu.groups">
+            {{ group.name }}
+        </li>
+        <li class="list-group-item" ng-repeat-end ng-repeat="action in group.actions">
+            {{ action.name }}
+        </li>
+        <!-- Logout action -->
+        <li class="list-group-item list-group-item-warning">
+            <i class="fa fa-sign-out"></i>&nbsp;Sign out
+        </li>
     </ul>
 </div>

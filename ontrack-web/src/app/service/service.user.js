@@ -65,9 +65,7 @@ angular.module('ot.service.user', [
                         }
                     });
                     // Inside the groups, sort the actions alphabetically
-                    // Typing of groups & actions
                     groups.forEach(group => {
-                        group.menuType = 'group';
                         group.actions.sort((a, b) => {
                             const na = a.name;
                             const nb = b.name;
@@ -80,20 +78,11 @@ angular.module('ot.service.user', [
                             }
                         });
                     });
-                    ungrouped.forEach(action => {
-                        action.menuType = 'action';
-                    });
                     // Building the final menu
-                    const menu = [];
-                    // Putting the groups first
-                    groups.forEach(group => {
-                        menu.push(group);
-                        menu.push(...group.actions);
-                    });
-                    // Then a divider
-                    menu.push({menuType: 'divider'});
-                    // Then the ungrouped actions
-                    menu.push(...ungrouped);
+                    const menu = {
+                        groups: groups,
+                        actions: ungrouped
+                    };
                     // Puts the menu into the user object
                     userResource.menu = menu;
 
