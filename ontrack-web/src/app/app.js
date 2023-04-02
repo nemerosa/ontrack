@@ -32,6 +32,7 @@ const ontrack = angular.module('ontrack', [
         'ot.directive.validationStamps',
         'ot.directive.userMenu',
         'ot.directive.userMenuAction',
+        'ot.directive.userMenuGroup',
         // Dialogs
         'ot.dialog.applicationInfo',
         // Services
