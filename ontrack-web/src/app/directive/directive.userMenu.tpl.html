@@ -1,6 +1,12 @@
 <div class="off-canvas-overlay"></div>
 
 <div class="off-canvas">
+    <div class="off-canvas-header">
+        <button type="button" class="user-menu-close pull-right" ng-click="onAfterAction()">
+            Close
+            <i class="fa fa-times"></i>
+        </button>
+    </div>
     <div class="list-group">
         <!-- All actions -->
         <ot-user-menu-action ng-repeat="action in menu.actions" action="action" close-action="onAfterAction()"></ot-user-menu-action>
