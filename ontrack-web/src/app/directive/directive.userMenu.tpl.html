@@ -1,21 +1,21 @@
 <div class="off-canvas-overlay"></div>
 
 <div class="off-canvas">
-    <ul class="list-group">
+    <div class="list-group">
         <!-- All actions -->
-        <li class="list-group-item" ng-repeat="action in menu.actions">
+        <button type="button" class="list-group-item user-menu-item user-menu-action" ng-repeat="action in menu.actions">
             {{ action.name }}
-        </li>
+        </button>
         <!-- All groups -->
-        <li class="list-group-item list-group-item-info" ng-repeat-start="group in menu.groups">
+        <button type="button" class="list-group-item list-group-item-info user-menu-item user-menu-group" ng-repeat-start="group in menu.groups">
             {{ group.name }}
-        </li>
-        <li class="list-group-item" ng-repeat-end ng-repeat="action in group.actions">
+        </button>
+        <button type="button" class="list-group-item user-menu-item user-menu-action" ng-repeat-end ng-repeat="action in group.actions">
             {{ action.name }}
-        </li>
+        </button>
         <!-- Logout action -->
-        <li class="list-group-item list-group-item-warning">
+        <button type="button" class="list-group-item list-group-item-warning user-menu-item user-menu-action">
             <i class="fa fa-sign-out"></i>&nbsp;Sign out
-        </li>
-    </ul>
+        </button>
+    </div>
 </div>

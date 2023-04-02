@@ -14,6 +14,23 @@ body {
   transform: translateX(-100%);
   transition: .4s ease-in-out;
   z-index: 1060;
+  button.user-menu-item {
+    width: 100%;
+    text-align: left;
+    padding-top: 4px;
+    padding-bottom: 5px;
+  }
+  button.user-menu-action {
+    &:hover {
+      cursor: pointer;
+      background-color: #CCC;
+    }
+  }
+  button.user-menu-group {
+    &:hover {
+      cursor: default;
+    }
+  }
 }
 
 .off-canvas-active .off-canvas {
