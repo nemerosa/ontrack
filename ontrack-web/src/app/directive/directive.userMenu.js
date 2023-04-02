@@ -29,6 +29,9 @@ angular.module('ot.directive.userMenu', [])
                         body.removeClass('off-canvas-active');
                     }
                 });
+                $scope.onAfterAction = () => {
+                    $scope.closeMenu()();
+                };
             }
         };
     })

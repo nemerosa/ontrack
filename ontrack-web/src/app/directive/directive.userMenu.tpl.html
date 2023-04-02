@@ -3,12 +3,12 @@
 <div class="off-canvas">
     <div class="list-group">
         <!-- All actions -->
-        <ot-user-menu-action ng-repeat="action in menu.actions" action="action"></ot-user-menu-action>
+        <ot-user-menu-action ng-repeat="action in menu.actions" action="action" close-action="onAfterAction()"></ot-user-menu-action>
         <!-- All groups -->
         <button type="button" class="list-group-item list-group-item-info user-menu-item user-menu-group" ng-repeat-start="group in menu.groups">
             {{ group.name }}
         </button>
-        <ot-user-menu-action ng-repeat-end ng-repeat="action in group.actions" action="action"></ot-user-menu-action>
+        <ot-user-menu-action ng-repeat-end ng-repeat="action in group.actions" action="action" close-action="onAfterAction()"></ot-user-menu-action>
         <!-- Logout action -->
         <button type="button" class="list-group-item list-group-item-warning user-menu-item user-menu-action">
             <i class="fa fa-sign-out"></i>&nbsp;Sign out
