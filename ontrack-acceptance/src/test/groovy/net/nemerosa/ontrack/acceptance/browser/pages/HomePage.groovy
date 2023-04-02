@@ -23,11 +23,11 @@ public class HomePage extends AbstractHeaderPage {
     }
 
     @Override
-    public String getPath(Map<String, Object> parameters) {
+    String getPath(Map<String, Object> parameters) {
         return "index.html";
     }
 
-    public ProjectDialog createProject(Closure closure) {
+    ProjectDialog createProject(Closure closure) {
         def createProjectCommand = $('.ot-command-project-new')
         browser.waitUntil { createProjectCommand.displayed }
         createProjectCommand.click()

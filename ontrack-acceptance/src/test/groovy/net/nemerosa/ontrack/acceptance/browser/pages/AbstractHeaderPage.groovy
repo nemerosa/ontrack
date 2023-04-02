@@ -43,6 +43,10 @@ abstract class AbstractHeaderPage extends AbstractPage {
         browser.waitUntil(id) { item.displayed }
         // Clicks on the item
         item.click()
+        // Waiting for the overlay to fully disappear
+        browser.waitUntil("User menu overlay to be gone") {
+            !browser.findElement(By.id('user-menu-overlay')).displayed
+        }
         // Selects the page
         P page = browser.page(pageClass)
         // Waits for the page

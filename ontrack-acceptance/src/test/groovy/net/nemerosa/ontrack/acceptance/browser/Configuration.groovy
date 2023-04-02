@@ -103,7 +103,12 @@ class Configuration {
 
     void waitUntil(String message, int seconds, Closure<Boolean> closure) {
         try {
+            // Logging
+            logger.info("[$message] Starting to wait $seconds seconds...")
+            // Waiting
             new WebDriverWait(driver, Duration.ofSeconds(seconds)).until { driver -> closure() }
+            // Logging
+            logger.info("[$message] Waiting done, no problem.")
         } catch (TimeoutException ex) {
             // Takes a screenshot
             screenshot("timeout")
