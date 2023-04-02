@@ -48,12 +48,12 @@
 
                     <!-- Connected user -->
                     <li>
-                        <p id="header-user-menu" class="navbar-text">{{ user.account.fullName }}</p>
+                        <p id="header-user-name" class="navbar-text">{{ user.account.fullName }}</p>
                     </li>
 
                     <!-- User menu -->
                     <li>
-                        <p class="navbar-text ot-action" title="Displays/hides the main menu" ng-click="toggleUserMenu()"><i
+                        <p id="header-user-menu" class="navbar-text ot-action" title="Displays/hides the main menu" ng-click="toggleUserMenu()"><i
                                 class="fa fa-bars"
                                 ng-class="{
                                     'fa-rotate-90': userMenu.active

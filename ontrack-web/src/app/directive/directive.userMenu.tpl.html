@@ -14,7 +14,7 @@
         <ot-user-menu-group ng-repeat-start="group in menu.groups" group="group"></ot-user-menu-group>
         <ot-user-menu-action ng-hide="group.collapsed" ng-repeat-end ng-repeat="action in group.actions" action="action" close-action="onAfterAction()"></ot-user-menu-action>
         <!-- Logout action -->
-        <button type="button" ng-click="logout()" class="list-group-item list-group-item-warning user-menu-item user-menu-action">
+        <button id="user-logout" type="button" ng-click="logout()" class="list-group-item list-group-item-warning user-menu-item user-menu-action">
             <i class="fa fa-sign-out"></i>&nbsp;Sign out
         </button>
     </div>

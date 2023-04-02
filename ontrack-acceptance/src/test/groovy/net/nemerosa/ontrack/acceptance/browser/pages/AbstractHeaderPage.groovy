@@ -52,7 +52,7 @@ abstract class AbstractHeaderPage extends AbstractPage {
     }
 
     UserProfilePage goToUserProfile() {
-        return selectUserMenu(UserProfilePage, "user-profile-link")
+        return selectUserMenu(UserProfilePage, "user-profile")
     }
 
     APIPage goToAPI() {
