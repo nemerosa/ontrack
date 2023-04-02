@@ -201,13 +201,6 @@ const ontrack = angular.module('ontrack', [
 
             $log.debug('[app] Initialising the app controller...');
 
-            // Logout
-            $scope.logout = function () {
-                ot.call($http.post("logout", {})).then(function () {
-                    location.href = '/login?logout';
-                });
-            };
-
             /**
              * Application info mgt
              */

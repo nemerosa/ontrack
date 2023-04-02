@@ -1,5 +1,7 @@
-angular.module('ot.directive.userMenu', [])
-    .directive('otUserMenu', function ($document) {
+angular.module('ot.directive.userMenu', [
+    'ot.service.core'
+])
+    .directive('otUserMenu', function ($document, $http, ot) {
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.userMenu.tpl.html',
@@ -31,6 +33,12 @@ angular.module('ot.directive.userMenu', [])
                 });
                 $scope.onAfterAction = () => {
                     $scope.closeMenu()();
+                };
+
+                $scope.logout = function () {
+                    ot.call($http.post("logout", {})).then(() => {
+                        location.href = '/login?logout';
+                    });
                 };
             }
         };
