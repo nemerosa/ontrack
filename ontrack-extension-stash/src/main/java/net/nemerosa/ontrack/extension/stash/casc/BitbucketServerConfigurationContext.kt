@@ -60,15 +60,15 @@ class BitbucketServerConfigurationContext(
         ) {
             equality { a, b -> a.name == b.name }
             onCreation { item ->
-                logger.info("Creating GitHub configuration: ${item.name}")
+                logger.info("Creating Bitbucket Server configuration: ${item.name}")
                 stashConfigurationService.newConfiguration(item)
             }
             onModification { item, _ ->
-                logger.info("Updating GitHub configuration: ${item.name}")
+                logger.info("Updating Bitbucket Server configuration: ${item.name}")
                 stashConfigurationService.updateConfiguration(item.name, item)
             }
             onDeletion { existing ->
-                logger.info("Deleting GitHub configuration: ${existing.name}")
+                logger.info("Deleting Bitbucket Server configuration: ${existing.name}")
                 stashConfigurationService.deleteConfiguration(existing.name)
             }
         }
