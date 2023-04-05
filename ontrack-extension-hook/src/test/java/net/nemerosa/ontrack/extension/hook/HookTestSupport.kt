@@ -26,6 +26,8 @@ class HookTestSupport(
             enabled: Boolean = true,
             denied: Boolean = false,
             error: Boolean = false,
+            body: String = "Any body for now",
+            parameters: Map<String, String> = emptyMap(),
     ): HookResponse {
         val oldEnabled = testHookEndpointExtension.enabled
         val oldDenied = testHookEndpointExtension.denied
@@ -36,8 +38,8 @@ class HookTestSupport(
             testHookEndpointExtension.error = error
             hook(
                     hook = "test",
-                    body = "Any body for now",
-                    parameters = emptyMap(),
+                    body = body,
+                    parameters = parameters,
                     headers = emptyMap(),
             )
         } finally {
