@@ -14,9 +14,11 @@ dependencies {
     implementation("org.slf4j:slf4j-api")
     implementation("org.apache.commons:commons-lang3")
     implementation("jakarta.annotation:jakarta.annotation-api")
+    implementation(project(":ontrack-ui-graphql"))
 
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))

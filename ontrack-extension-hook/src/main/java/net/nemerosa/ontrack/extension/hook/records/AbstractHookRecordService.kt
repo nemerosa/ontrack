@@ -17,7 +17,7 @@ abstract class AbstractHookRecordService(
         val record = HookRecord(
                 id = UUID.randomUUID().toString(),
                 hook = hook,
-                request = request,
+                request = request.obfuscate(), // Removing all headers
                 startTime = Time.now(),
                 state = HookRecordState.RECEIVED,
                 message = null,

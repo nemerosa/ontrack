@@ -1,8 +1,11 @@
 package net.nemerosa.ontrack.extension.hook
 
+import net.nemerosa.ontrack.model.annotations.APIDescription
+
 /**
  * Types of responses returned by hooks.
  */
+@APIDescription("Types of responses returned by hooks.")
 enum class HookResponseType {
 
     /**

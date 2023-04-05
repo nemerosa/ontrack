@@ -10,4 +10,5 @@ class HookExtensionFeature : AbstractExtensionFeature(
     "Hooks",
     "Framework to manage hooks in other extensions",
     ExtensionFeatureOptions.DEFAULT
+            .withGui(true)
 )
