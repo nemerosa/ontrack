@@ -7,4 +7,6 @@ interface HookRecordQueryService {
     fun findById(id: String): HookRecord?
 
     fun findByFilter(filter: HookRecordQueryFilter, offset: Int, size: Int): PaginatedList<HookRecord>
+
+    fun deleteByFilter(filter: HookRecordQueryFilter)
 }

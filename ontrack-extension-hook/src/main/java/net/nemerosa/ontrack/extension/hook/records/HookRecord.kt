@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.hook.records
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.hook.HookRequest
 import net.nemerosa.ontrack.extension.hook.HookResponse
+import net.nemerosa.ontrack.graphql.support.TypeRef
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.apache.commons.lang3.exception.ExceptionUtils
 import java.time.LocalDateTime
@@ -14,6 +15,7 @@ data class HookRecord(
         @APIDescription("Reference to the handler of this hook")
         val hook: String,
         @APIDescription("Body of the hook request")
+        @TypeRef
         val request: HookRequest,
         @APIDescription("Start time of the processing")
         val startTime: LocalDateTime,
@@ -26,6 +28,7 @@ data class HookRecord(
         @APIDescription("End time of the processing")
         val endTime: LocalDateTime?,
         @APIDescription("Response returned by the hook")
+        @TypeRef
         val response: HookResponse?,
 ) {
     fun withEndTime() = HookRecord(

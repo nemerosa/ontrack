@@ -17,6 +17,15 @@ class HookRecordStoreImpl(
         )
     }
 
+    override fun deleteByFilter(filter: HookRecordQueryFilter) {
+        val (query, queryVariables) = getQueryForFilter(filter)
+        store.deleteWithFilter(
+                STORE,
+                query,
+                queryVariables,
+        )
+    }
+
     override fun save(recordId: String, code: (HookRecord) -> HookRecord) {
         val oldRecord = getRecord(recordId)
         val newRecord = code(oldRecord)
@@ -28,6 +37,20 @@ class HookRecordStoreImpl(
 
     override fun findByFilter(filter: HookRecordQueryFilter, offset: Int, size: Int): PaginatedList<HookRecord> {
 
+        val (query, queryVariables) = getQueryForFilter(filter)
+
+        return store.paginatedFilter(
+                store = STORE,
+                type = HookRecord::class,
+                offset = offset,
+                size = size,
+                query = query,
+                queryVariables = queryVariables,
+                orderQuery = "ORDER BY data::jsonb->>'startTime' DESC",
+        )
+    }
+
+    private fun getQueryForFilter(filter: HookRecordQueryFilter): Pair<String, Map<String, *>> {
         val queries = mutableListOf<String>()
         val queryVariables = mutableMapOf<String, String>()
 
@@ -53,15 +76,7 @@ class HookRecordStoreImpl(
 
         val query = queries.joinToString(" AND ") { "( $it )" }
 
-        return store.paginatedFilter(
-                store = STORE,
-                type = HookRecord::class,
-                offset = offset,
-                size = size,
-                query = query,
-                queryVariables = queryVariables,
-                orderQuery = "ORDER BY data::jsonb->>'startTime' DESC",
-        )
+        return query to queryVariables
     }
 
     private fun getRecord(recordId: String): HookRecord =

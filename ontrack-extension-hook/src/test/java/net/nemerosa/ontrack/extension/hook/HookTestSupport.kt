@@ -63,4 +63,8 @@ class HookTestSupport(
         }
     }
 
+    fun clearRecords(hook: String = "test") {
+        hookRecordQueryService.deleteByFilter(HookRecordQueryFilter(hook = hook))
+    }
+
 }
