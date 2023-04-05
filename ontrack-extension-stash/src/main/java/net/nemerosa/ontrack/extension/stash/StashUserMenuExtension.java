@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.extension.stash;
 
 import net.nemerosa.ontrack.extension.api.UserMenuExtension;
+import net.nemerosa.ontrack.extension.api.UserMenuExtensionGroups;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import net.nemerosa.ontrack.model.security.GlobalFunction;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.support.Action;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,8 +26,10 @@ public class StashUserMenuExtension extends AbstractExtension implements UserMen
         return GlobalSettings.class;
     }
 
+    @NotNull
     @Override
     public Action getAction() {
-        return Action.of("stash-configurations", "Bitbucket Server configurations", "configurations");
+        return Action.of("stash-configurations", "Bitbucket Server configurations", "configurations")
+                .withGroup(UserMenuExtensionGroups.configuration);
     }
 }

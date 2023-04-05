@@ -18,7 +18,7 @@ class GitHubConfigurationPage extends AbstractHeaderPage {
         "index.html#/extension/github/configurations"
     }
 
-    public GitHubConfigurationDialog createConfiguration(Closure closure) {
+    GitHubConfigurationDialog createConfiguration(Closure closure) {
         def command = browser.findElement(By.id("github-configuration-create"))
         command.click()
         GitHubConfigurationDialog dialog = new GitHubConfigurationDialog(browser).waitFor()

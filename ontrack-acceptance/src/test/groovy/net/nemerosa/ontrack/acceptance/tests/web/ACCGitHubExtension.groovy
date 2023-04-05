@@ -24,7 +24,7 @@ class ACCGitHubExtension extends AcceptanceTestClient {
             // Screenshot after login
             browser.screenshot 'github-after-login'
             // Goes to the GitHub configuration page
-            def configurationPage = homePage.selectUserMenu(GitHubConfigurationPage, 'github-configurations-link')
+            def configurationPage = homePage.selectUserMenu(GitHubConfigurationPage, 'github-configurations')
             // Screenshot after login
             browser.screenshot 'github-configuration-page-before'
             // Creates a configuration

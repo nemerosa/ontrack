@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.api.UserMenuExtension;
+import net.nemerosa.ontrack.extension.api.UserMenuExtensionGroups;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
@@ -83,7 +84,10 @@ public class UserController extends AbstractResourceController {
     private ConnectedAccount userMenu(ConnectedAccount user) {
         // Settings
         if (securityService.isGlobalFunctionGranted(GlobalSettings.class)) {
-            user.add(Action.of("settings", "Settings", "settings"));
+            user.add(
+                    Action.of("settings", "Settings", "settings")
+                            .withGroup(UserMenuExtensionGroups.system)
+            );
         }
         // Access to the user profile
         if (securityService.isLogged()) {
@@ -97,25 +101,49 @@ public class UserController extends AbstractResourceController {
         }
         // Account management
         if (securityService.isGlobalFunctionGranted(AccountManagement.class) || securityService.isGlobalFunctionGranted(AccountGroupManagement.class)) {
-            user.add(Action.of("admin-accounts", "Account management", "admin-accounts"));
+            user.add(
+                    Action.of("admin-accounts", "Account management", "admin-accounts")
+                            .withGroup(UserMenuExtensionGroups.security)
+            );
         }
         // Management of predefined validation stamps and promotion levels
         if (securityService.isGlobalFunctionGranted(GlobalSettings.class)) {
-            user.add(Action.of("admin-predefined-validation-stamps", "Predefined validation stamps", "admin-predefined-validation-stamps"));
-            user.add(Action.of("admin-predefined-promotion-levels", "Predefined promotion levels", "admin-predefined-promotion-levels"));
+            user.add(
+                    Action.of("admin-predefined-validation-stamps", "Predefined validation stamps", "admin-predefined-validation-stamps")
+                            .withGroup(UserMenuExtensionGroups.configuration)
+            );
+            user.add(
+                    Action.of("admin-predefined-promotion-levels", "Predefined promotion levels", "admin-predefined-promotion-levels")
+                            .withGroup(UserMenuExtensionGroups.configuration)
+            );
         }
         // Management of labels
         if (securityService.isGlobalFunctionGranted(LabelManagement.class)) {
-            user.add(Action.of("admin-labels", "Labels", "admin-labels"));
+            user.add(
+                    Action.of("admin-labels", "Labels", "admin-labels")
+                            .withGroup(UserMenuExtensionGroups.configuration)
+            );
         }
         // Contributions from extensions
         ConnectedAccount contributed = userMenuExtensions(user);
         // Admin tools
         if (securityService.isGlobalFunctionGranted(ApplicationManagement.class)) {
-            contributed.add(Action.of("admin-health", "System health", "admin-health"));
-            contributed.add(Action.of("admin-extensions", "System extensions", "admin-extensions"));
-            contributed.add(Action.of("admin-jobs", "System jobs", "admin-jobs"));
-            contributed.add(Action.of("admin-log-entries", "Log entries", "admin-log-entries"));
+            contributed.add(
+                    Action.of("admin-health", "System health", "admin-health")
+                            .withGroup(UserMenuExtensionGroups.system)
+            );
+            contributed.add(
+                    Action.of("admin-extensions", "System extensions", "admin-extensions")
+                            .withGroup(UserMenuExtensionGroups.system)
+            );
+            contributed.add(
+                    Action.of("admin-jobs", "System jobs", "admin-jobs")
+                            .withGroup(UserMenuExtensionGroups.system)
+            );
+            contributed.add(
+                    Action.of("admin-log-entries", "Log entries", "admin-log-entries")
+                            .withGroup(UserMenuExtensionGroups.system)
+            );
         }
         // OK
         return contributed;

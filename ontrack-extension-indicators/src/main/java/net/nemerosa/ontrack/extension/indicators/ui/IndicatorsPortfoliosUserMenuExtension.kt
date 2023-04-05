@@ -8,17 +8,15 @@ import net.nemerosa.ontrack.model.security.GlobalFunction
 import net.nemerosa.ontrack.model.support.Action
 import org.springframework.stereotype.Component
 
-/**
- * User menu to access the management of indicators.
- */
 @Component
-class IndicatorsManagementUserMenuExtension(
+class IndicatorsPortfoliosUserMenuExtension(
     extension: IndicatorsExtensionFeature,
 ) : AbstractExtension(extension), UserMenuExtension {
 
-    override fun getAction(): Action =
-        Action.of("indicators-management", "Indicators", "indicators-management")
+    override val action: Action =
+        Action.of("indicators-portfolios", "Portfolios", "portfolios")
+            .withGroup(IndicatorsUserMenuExtensionGroups.indicators)
 
-    override fun getGlobalFunction(): Class<out GlobalFunction> = IndicatorPortfolioAccess::class.java
+    override val globalFunction: Class<out GlobalFunction> = IndicatorPortfolioAccess::class.java
 
 }

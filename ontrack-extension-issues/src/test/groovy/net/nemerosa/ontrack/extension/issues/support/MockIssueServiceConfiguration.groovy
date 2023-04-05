@@ -5,6 +5,10 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import org.mockito.Mockito
 
+/**
+ * Use the Kotlin class
+ */
+@Deprecated
 class MockIssueServiceConfiguration implements IssueServiceConfiguration {
 
     public static final MockIssueServiceConfiguration INSTANCE = new MockIssueServiceConfiguration('default')

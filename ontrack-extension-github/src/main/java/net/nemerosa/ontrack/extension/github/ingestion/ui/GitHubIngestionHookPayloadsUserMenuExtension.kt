@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.ui
 
 import net.nemerosa.ontrack.extension.api.UserMenuExtension
+import net.nemerosa.ontrack.extension.api.UserMenuExtensionGroups
 import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.security.GlobalFunction
@@ -14,12 +15,13 @@ class GitHubIngestionHookPayloadsUserMenuExtension(
     extensionFeature: GitHubExtensionFeature
 ) : AbstractExtension(extensionFeature), UserMenuExtension {
 
-    override fun getAction() = Action(
+    override val action = Action(
         id = "ingestion-hook-payloads",
         name = "GitHub Ingestion Hook Payloads",
         type = ActionType.LINK,
         uri = "ingestion-hook-payloads",
+        group = UserMenuExtensionGroups.information,
     )
 
-    override fun getGlobalFunction(): Class<out GlobalFunction> = GlobalSettings::class.java
+    override val globalFunction: Class<out GlobalFunction> = GlobalSettings::class.java
 }

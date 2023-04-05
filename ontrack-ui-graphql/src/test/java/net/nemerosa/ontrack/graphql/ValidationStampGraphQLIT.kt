@@ -1,32 +1,34 @@
 package net.nemerosa.ontrack.graphql
 
-import net.nemerosa.ontrack.extension.general.validation.CHML
-import net.nemerosa.ontrack.extension.general.validation.CHMLLevel
-import net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType
-import net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataTypeConfig
+import net.nemerosa.ontrack.extension.general.validation.*
+import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp
 import net.nemerosa.ontrack.model.structure.config
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertPresent
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 /**
  * Integration tests around the `validationStamp` root query.
  */
-class ValidationStampGraphQLIT : AbstractQLKTITJUnit4Support() {
+class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var chmlValidationDataType: CHMLValidationDataType
+
+    @Autowired
+    private lateinit var testSummaryValidationDataType: TestSummaryValidationDataType
 
     @Test
     fun `Creation of a plain validation stamp`() {
         asAdmin {
             project {
                 branch {
-                    run("""
+                    run(
+                        """
                         mutation {
                             setupValidationStamp(input: {
                                 project: "${project.name}",
@@ -41,7 +43,8 @@ class ValidationStampGraphQLIT : AbstractQLKTITJUnit4Support() {
                                 }
                             }
                         }
-                    """).let { data ->
+                    """
+                    ).let { data ->
                         val node = assertNoUserError(data, "setupValidationStamp")
                         assertTrue(node.path("validationStamp").path("id").asInt() != 0, "VS created")
 
@@ -60,7 +63,8 @@ class ValidationStampGraphQLIT : AbstractQLKTITJUnit4Support() {
             project {
                 branch {
                     val vs = validationStamp()
-                    run("""
+                    run(
+                        """
                         mutation {
                             setupValidationStamp(input: {
                                 project: "${project.name}",
@@ -76,7 +80,8 @@ class ValidationStampGraphQLIT : AbstractQLKTITJUnit4Support() {
                                 }
                             }
                         }
-                    """).let { data ->
+                    """
+                    ).let { data ->
                         val node = assertNoUserError(data, "setupValidationStamp")
                         assertEquals(vs.id(), node.path("validationStamp").path("id").asInt(), "VS updated")
 
@@ -91,11 +96,68 @@ class ValidationStampGraphQLIT : AbstractQLKTITJUnit4Support() {
     }
 
     @Test
+    fun `Update a validation stamp after it has been provisioned from a predefined stamp`() {
+        asAdmin {
+            val vsName = uid("vs_")
+            val description = "Description for $vsName"
+            project {
+                branch {
+                    // Predefined validation stamp of type "test summary"
+                    predefinedValidationStampService.newPredefinedValidationStamp(
+                        PredefinedValidationStamp.of(NameDescription.nd(vsName, description))
+                            .withDataType(
+                                testSummaryValidationDataType.config(
+                                    TestSummaryValidationConfig(warningIfSkipped = false)
+                                )
+                            )
+                    )
+                    // Using GraphQL to setup a validation stamp based on this
+                    // Doing that twice since we want an update to keep the predefined attributes
+                    repeat(2) {
+                        run(
+                            """
+                                mutation {
+                                    setupValidationStamp(input: {
+                                        project: "${project.name}",
+                                        branch: "$name",
+                                        validation: "$vsName",
+                                        description: ""
+                                    }) {
+                                        validationStamp {
+                                            id
+                                        }
+                                        errors {
+                                            message
+                                        }
+                                    }
+                                }
+                            """
+                        ) { data ->
+                            val node = assertNoUserError(data, "setupValidationStamp")
+                            // Checks the validation stamp has the predefined attributes
+                            val id = node.path("validationStamp").path("id").asInt()
+                            val vs = structureService.getValidationStamp(ID.of(id))
+                            assertEquals(vsName, vs.name)
+                            assertEquals(description, vs.description)
+                            assertNotNull(vs.dataType, "Data type is set") {
+                                assertNotNull("test-summary", it.descriptor.id)
+                                val config = assertIs<TestSummaryValidationConfig>(it.config)
+                                assertFalse(config.warningIfSkipped)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Creation of a CHML validation stamp`() {
         asAdmin {
             project {
                 branch {
-                    run("""
+                    run(
+                        """
                         mutation {
                             setupValidationStamp(input: {
                                 project: "${project.name}",
@@ -117,14 +179,17 @@ class ValidationStampGraphQLIT : AbstractQLKTITJUnit4Support() {
                                 }
                             }
                         }
-                    """).let { data ->
+                    """
+                    ).let { data ->
                         val node = assertNoUserError(data, "setupValidationStamp")
                         assertTrue(node.path("validationStamp").path("id").asInt() != 0, "VS created")
 
                         assertPresent(structureService.findValidationStampByName(project.name, name, "test")) {
                             assertEquals("test", it.name)
-                            assertEquals("net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType",
-                                it.dataType?.descriptor?.id)
+                            assertEquals(
+                                "net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType",
+                                it.dataType?.descriptor?.id
+                            )
                             assertEquals(
                                 CHMLValidationDataTypeConfig(
                                     warningLevel = CHMLLevel(CHML.HIGH, 1),
@@ -150,8 +215,10 @@ class ValidationStampGraphQLIT : AbstractQLKTITJUnit4Support() {
                                 warningLevel = CHMLLevel(CHML.CRITICAL, 1),
                                 failedLevel = CHMLLevel(CHML.CRITICAL, 10)
                             )
-                        ))
-                    run("""
+                        )
+                    )
+                    run(
+                        """
                         mutation {
                             setupValidationStamp(input: {
                                 project: "${project.name}",
@@ -173,14 +240,17 @@ class ValidationStampGraphQLIT : AbstractQLKTITJUnit4Support() {
                                 }
                             }
                         }
-                    """).let { data ->
+                    """
+                    ).let { data ->
                         val node = assertNoUserError(data, "setupValidationStamp")
                         assertEquals(vs.id(), node.path("validationStamp").path("id").asInt(), "VS updated")
 
                         assertPresent(structureService.findValidationStampByName(project.name, name, vs.name)) {
                             assertEquals(vs.name, it.name)
-                            assertEquals("net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType",
-                                it.dataType?.descriptor?.id)
+                            assertEquals(
+                                "net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType",
+                                it.dataType?.descriptor?.id
+                            )
                             assertEquals(
                                 CHMLValidationDataTypeConfig(
                                     warningLevel = CHMLLevel(CHML.HIGH, 1),
@@ -202,7 +272,8 @@ class ValidationStampGraphQLIT : AbstractQLKTITJUnit4Support() {
             predefinedValidationStamp(vsName, "Predefined")
             project {
                 branch {
-                    run("""
+                    run(
+                        """
                         mutation {
                             setupValidationStamp(input: {
                                 project: "${project.name}",
@@ -217,7 +288,8 @@ class ValidationStampGraphQLIT : AbstractQLKTITJUnit4Support() {
                                 }
                             }
                         }
-                    """).let { data ->
+                    """
+                    ).let { data ->
                         val node = assertNoUserError(data, "setupValidationStamp")
                         assertTrue(node.path("validationStamp").path("id").asInt() != 0, "VS created")
 
@@ -235,15 +307,18 @@ class ValidationStampGraphQLIT : AbstractQLKTITJUnit4Support() {
     fun `Creation of a validation stamp based on a typed predefined one`() {
         asAdmin {
             val vsName = uid("pvs")
-            predefinedValidationStamp(vsName, "Predefined", dataType = chmlValidationDataType.config(
-                CHMLValidationDataTypeConfig(
-                    warningLevel = CHMLLevel(CHML.CRITICAL, 1),
-                    failedLevel = CHMLLevel(CHML.CRITICAL, 10)
+            predefinedValidationStamp(
+                vsName, "Predefined", dataType = chmlValidationDataType.config(
+                    CHMLValidationDataTypeConfig(
+                        warningLevel = CHMLLevel(CHML.CRITICAL, 1),
+                        failedLevel = CHMLLevel(CHML.CRITICAL, 10)
+                    )
                 )
-            ))
+            )
             project {
                 branch {
-                    run("""
+                    run(
+                        """
                         mutation {
                             setupValidationStamp(input: {
                                 project: "${project.name}",
@@ -258,15 +333,18 @@ class ValidationStampGraphQLIT : AbstractQLKTITJUnit4Support() {
                                 }
                             }
                         }
-                    """).let { data ->
+                    """
+                    ).let { data ->
                         val node = assertNoUserError(data, "setupValidationStamp")
                         assertTrue(node.path("validationStamp").path("id").asInt() != 0, "VS created")
 
                         assertPresent(structureService.findValidationStampByName(project.name, name, vsName)) {
                             assertEquals(vsName, it.name)
                             assertEquals("Predefined", it.description)
-                            assertEquals("net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType",
-                                it.dataType?.descriptor?.id)
+                            assertEquals(
+                                "net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType",
+                                it.dataType?.descriptor?.id
+                            )
                             assertEquals(
                                 CHMLValidationDataTypeConfig(
                                     warningLevel = CHMLLevel(CHML.CRITICAL, 1),
@@ -291,11 +369,13 @@ class ValidationStampGraphQLIT : AbstractQLKTITJUnit4Support() {
                 vs.id()
             }
         }
-        val data = run("""{
+        val data = run(
+            """{
             validationStamp(id: $vsId) {
                 name
             }
-        }""")
+        }"""
+        )
 
         val vs = data["validationStamp"]
         assertTrue(vs.isNull, "No validation stamp")
@@ -305,11 +385,13 @@ class ValidationStampGraphQLIT : AbstractQLKTITJUnit4Support() {
     @Test
     fun `Validation stamp by ID`() {
         val vs = doCreateValidationStamp()
-        val data = run("""{
+        val data = run(
+            """{
             validationStamp(id: ${vs.id}) {
                 name
             }
-        }""")
+        }"""
+        )
 
         val name = data["validationStamp"]["name"].asText()
         assertEquals(vs.name, name)
