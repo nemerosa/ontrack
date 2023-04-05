@@ -16,6 +16,7 @@ dependencies {
     implementation("jakarta.annotation:jakarta.annotation-api")
 
     testImplementation(project(":ontrack-it-utils"))
+    testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
