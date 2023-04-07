@@ -105,6 +105,18 @@ data class QueueRecord(
         history = history,
     )
 
+    fun withStartTime(startTime: LocalDateTime) = QueueRecord(
+        state = state,
+        queuePayload = queuePayload,
+        startTime = startTime,
+        endTime = endTime,
+        routingKey = routingKey,
+        queueName = queueName,
+        actualPayload = actualPayload,
+        exception = exception,
+        history = history,
+    )
+
     companion object {
         fun create(queuePayload: QueuePayload): QueueRecord {
             val time = Time.now()

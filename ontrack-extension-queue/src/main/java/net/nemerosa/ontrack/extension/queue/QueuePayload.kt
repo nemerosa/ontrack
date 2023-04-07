@@ -9,7 +9,7 @@ import java.util.*
 import kotlin.reflect.KClass
 
 @APIDescription("Payload for a message sent on a queue for processing")
-class QueuePayload private constructor(
+class QueuePayload(
     @APIDescription("Unique ID of the message")
     val id: String,
     @APIDescription("ID of the target processor")
