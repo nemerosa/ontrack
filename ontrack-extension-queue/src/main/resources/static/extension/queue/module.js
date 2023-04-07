@@ -9,7 +9,7 @@ angular.module('ontrack.extension.queue', [
             controller: 'QueueRecordsCtrl'
         });
     })
-    .controller('QueueRecordsCtrl', function ($scope, $http, ot, otGraphqlService) {
+    .controller('QueueRecordsCtrl', function ($scope, $http, ot, otAlertService, otGraphqlService) {
         const view = ot.view();
         view.title = "Queue messages";
         view.breadcrumbs = ot.homeBreadcrumbs();
@@ -151,6 +151,25 @@ angular.module('ontrack.extension.queue', [
                 size = $scope.pageInfo.nextPage.size;
                 loadRecords(false);
             }
+        };
+
+        $scope.onPurge = () => {
+            otAlertService.confirm({
+                title: "Purging the queue records",
+                message: "Do you really want to remove all the records of the messages?"
+            }).then(() => {
+                return otGraphqlService.pageGraphQLCallWithPayloadErrors(`
+                    mutation {
+                        purgeQueueRecords {
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                `, {}, 'purgeQueueRecords');
+            }).then(() => {
+                loadRecords(true);
+            });
         };
     })
 ;
