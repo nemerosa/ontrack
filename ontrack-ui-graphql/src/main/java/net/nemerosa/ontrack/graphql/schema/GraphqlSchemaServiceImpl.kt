@@ -13,7 +13,8 @@ class GraphqlSchemaServiceImpl(
         private val interfaces: List<GQLInterface>,
         private val enums: List<GQLEnum>,
         private val rootQueries: List<GQLRootQuery>,
-        private val mutationProviders: List<MutationProvider>
+        private val mutationProviders: List<MutationProvider>,
+        private val contributors: List<GQLContributor>,
 ) : GraphqlSchemaService {
 
     override val schema: GraphQLSchema by lazy {
@@ -28,6 +29,7 @@ class GraphqlSchemaServiceImpl(
         dictionary.addAll(interfaces.map { it.createInterface() })
         dictionary.addAll(enums.map { it.createEnum() })
         dictionary.addAll(inputTypes.map { it.createInputType(dictionary) })
+        dictionary.addAll(contributors.flatMap { it.contribute(cache) })
         val mutationType = createMutationType(dictionary)
         return GraphQLSchema.newSchema()
                 .additionalTypes(dictionary)
@@ -89,14 +91,16 @@ class GraphqlSchemaServiceImpl(
                         MutationInputValidationException.asUserError(cv)
                     })
                 }
+
                 is UserException -> {
                     val exception = ex::class.java.name
                     val error = UserError(
-                        message = ex.message ?: exception,
-                        exception = exception
+                            message = ex.message ?: exception,
+                            exception = exception
                     )
                     mapOf("errors" to listOf(error))
                 }
+
                 else -> {
                     throw ex
                 }

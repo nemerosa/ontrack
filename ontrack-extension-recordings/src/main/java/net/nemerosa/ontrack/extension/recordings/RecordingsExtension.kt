@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.recordings
 
 import com.fasterxml.jackson.databind.JsonNode
+import graphql.schema.GraphQLFieldDefinition
+import graphql.schema.GraphQLType
+import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.model.extension.Extension
 
 /**
@@ -31,5 +34,17 @@ interface RecordingsExtension<R : Recording> : Extension {
      * Creates the JSON representation of the recording so that it can be stored.
      */
     fun toJson(recording: R): JsonNode
+
+    /**
+     * Additional types needed for the extension
+     */
+    val graphQLContributions: Set<GraphQLType> get() = emptySet()
+
+    /**
+     * Gets the list of fields to set in the record.
+     *
+     * Each field will get an instance of the record [R] as a source.
+     */
+    fun graphQLRecordFields(cache: GQLTypeCache): List<GraphQLFieldDefinition>
 
 }

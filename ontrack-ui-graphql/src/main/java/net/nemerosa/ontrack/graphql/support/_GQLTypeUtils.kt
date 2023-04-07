@@ -54,10 +54,10 @@ fun TypeBuilder.idField(property: KProperty<ID>, description: String? = null): G
             }
     }
 
-fun TypeBuilder.dateField(name: String, description: String): GraphQLObjectType.Builder = field {
+fun TypeBuilder.dateField(name: String, description: String, nullable: Boolean = true): GraphQLObjectType.Builder = field {
     it.name(name)
         .description(description)
-        .type(GQLScalarLocalDateTime.INSTANCE)
+        .type(nullableOutputType(GQLScalarLocalDateTime.INSTANCE, nullable))
 }
 
 fun TypeBuilder.jsonField(property: KProperty<Any?>, description: String? = null): GraphQLObjectType.Builder =

@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.queue.QueuePayload
 import net.nemerosa.ontrack.extension.recordings.Recording
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIIgnore
 import java.time.LocalDateTime
 
 @APIDescription("Recording a queuing event.")
@@ -14,9 +15,11 @@ data class QueueRecord(
     @APIDescription("Payload for the queue message")
     val queuePayload: QueuePayload,
     @APIDescription("Time of creation")
-    val startTime: LocalDateTime,
+    @APIIgnore("Managed by the top recordings record")
+    override val startTime: LocalDateTime,
     @APIDescription("End of processing")
-    val endTime: LocalDateTime?,
+    @APIIgnore("Managed by the top recordings record")
+    override val endTime: LocalDateTime?,
     @APIDescription("Queue routing key being used")
     val routingKey: String?,
     @APIDescription("Queue where the message was stored")
@@ -28,6 +31,8 @@ data class QueueRecord(
     @APIDescription("History of the states")
     val history: List<QueueRecordHistory>,
 ): Recording {
+
+    override val id: String = queuePayload.id
 
     fun withState(state: QueueRecordState) = QueueRecord(
         state = state,
