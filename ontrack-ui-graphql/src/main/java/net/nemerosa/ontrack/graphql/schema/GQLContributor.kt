@@ -7,6 +7,6 @@ import graphql.schema.GraphQLType
  */
 interface GQLContributor {
 
-    fun contribute(cache: GQLTypeCache): Set<GraphQLType>
+    fun contribute(cache: GQLTypeCache, dictionary: MutableSet<GraphQLType>): Set<GraphQLType>
 
 }

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.recordings
 
 import com.fasterxml.jackson.databind.JsonNode
 import graphql.schema.GraphQLFieldDefinition
+import graphql.schema.GraphQLInputObjectField
 import graphql.schema.GraphQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.model.extension.Extension
@@ -46,5 +47,10 @@ interface RecordingsExtension<R : Recording> : Extension {
      * Each field will get an instance of the record [R] as a source.
      */
     fun graphQLRecordFields(cache: GQLTypeCache): List<GraphQLFieldDefinition>
+
+    /**
+     * List of the input fields for the filter on records
+     */
+    fun graphQLRecordFilterFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = emptyList()
 
 }

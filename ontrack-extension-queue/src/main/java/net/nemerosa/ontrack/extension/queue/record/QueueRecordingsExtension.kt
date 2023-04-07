@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.queue.record
 
 import com.fasterxml.jackson.databind.JsonNode
 import graphql.schema.GraphQLFieldDefinition
+import graphql.schema.GraphQLInputObjectField
+import graphql.schema.GraphQLType
 import net.nemerosa.ontrack.extension.queue.QueueExtensionFeature
 import net.nemerosa.ontrack.extension.recordings.RecordingsExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
@@ -24,4 +26,6 @@ class QueueRecordingsExtension(
     override fun graphQLRecordFields(cache: GQLTypeCache): List<GraphQLFieldDefinition> =
             GraphQLBeanConverter.asObjectFields(QueueRecord::class, GQLTypeCache())
 
+    override fun graphQLRecordFilterFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> =
+            GraphQLBeanConverter.asInputFields(QueueRecordQueryFilter::class, dictionary)
 }
