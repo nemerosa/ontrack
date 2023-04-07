@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.queue.QueuePayload
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import java.time.LocalDateTime
 
+@Deprecated("Use the recordings service")
 interface QueueRecordStore {
     fun start(queuePayload: QueuePayload)
 

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.queue.record
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.queue.QueuePayload
+import net.nemerosa.ontrack.extension.recordings.Recording
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import java.time.LocalDateTime
 
@@ -26,7 +27,7 @@ data class QueueRecord(
     val exception: String?,
     @APIDescription("History of the states")
     val history: List<QueueRecordHistory>,
-) {
+): Recording {
 
     fun withState(state: QueueRecordState) = QueueRecord(
         state = state,

@@ -2,63 +2,66 @@ package net.nemerosa.ontrack.extension.queue.record
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.queue.QueuePayload
+import net.nemerosa.ontrack.extension.recordings.RecordingsService
 import net.nemerosa.ontrack.json.asJson
 import org.apache.commons.lang3.exception.ExceptionUtils
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
-abstract class AbstractQueueRecordService(
-    private val queueRecordStore: QueueRecordStore,
+@Service
+@Transactional
+class QueueRecordServiceImpl(
+        private val queueRecordingsExtension: QueueRecordingsExtension,
+        private val recordingsService: RecordingsService,
 ) : QueueRecordService {
 
-    protected val logger: Logger = LoggerFactory.getLogger(this::class.java)
-
     override fun start(queuePayload: QueuePayload) {
-        queueRecordStore.start(queuePayload)
+        val record = QueueRecord.create(queuePayload)
+        recordingsService.record(queueRecordingsExtension, record)
     }
 
     override fun setRouting(queuePayload: QueuePayload, routingKey: String) {
-        queueRecordStore.save(queuePayload) {
+        recordingsService.updateRecord(queueRecordingsExtension, queuePayload.id) {
             it.withRoutingKey(routingKey).withState(QueueRecordState.ROUTING_READY)
         }
     }
 
     override fun sent(queuePayload: QueuePayload) {
-        queueRecordStore.save(queuePayload) {
+        recordingsService.updateRecord(queueRecordingsExtension, queuePayload.id) {
             it.withState(QueueRecordState.SENT)
         }
     }
 
     override fun received(queuePayload: QueuePayload, queue: String?) {
-        queueRecordStore.save(queuePayload) {
+        recordingsService.updateRecord(queueRecordingsExtension, queuePayload.id) {
             it.withState(QueueRecordState.RECEIVED).withQueue(queue)
         }
     }
 
     override fun parsed(queuePayload: QueuePayload, payload: Any) {
-        queueRecordStore.save(queuePayload) {
+        recordingsService.updateRecord(queueRecordingsExtension, queuePayload.id) {
             it.withActualPayload(payload.asJson()).withState(QueueRecordState.PARSED)
         }
     }
 
     override fun processing(queuePayload: QueuePayload) {
-        queueRecordStore.save(queuePayload) {
+        recordingsService.updateRecord(queueRecordingsExtension, queuePayload.id) {
             it.withState(QueueRecordState.PROCESSING)
         }
     }
 
     override fun completed(queuePayload: QueuePayload) {
-        queueRecordStore.save(queuePayload) {
+        recordingsService.updateRecord(queueRecordingsExtension, queuePayload.id) {
             it.withState(QueueRecordState.COMPLETED)
-                .withEndTime(Time.now())
+                    .withEndTime(Time.now())
         }
     }
 
     override fun errored(queuePayload: QueuePayload, exception: Exception) {
-        queueRecordStore.save(queuePayload) {
+        recordingsService.updateRecord(queueRecordingsExtension, queuePayload.id) {
             it.withState(QueueRecordState.ERRORED)
-                .withEndTime(Time.now())
-                .withException(reducedStackTrace(exception))
+                    .withEndTime(Time.now())
+                    .withException(reducedStackTrace(exception))
         }
     }
 
@@ -66,7 +69,7 @@ abstract class AbstractQueueRecordService(
         private const val MAX_STACK_HEIGHT = 20
 
         fun reducedStackTrace(error: Throwable) =
-            ExceptionUtils.getStackFrames(error).take(MAX_STACK_HEIGHT).joinToString("\n")
+                ExceptionUtils.getStackFrames(error).take(MAX_STACK_HEIGHT).joinToString("\n")
     }
 
 }

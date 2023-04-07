@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional(readOnly = true)
 class QueueRecordQueryServiceImpl(
+        private val queueRecordingsExtension: QueueRecordingsExtension,
         private val securityService: SecurityService,
         private val queueRecordStore: QueueRecordStore,
 ) : QueueRecordQueryService {
