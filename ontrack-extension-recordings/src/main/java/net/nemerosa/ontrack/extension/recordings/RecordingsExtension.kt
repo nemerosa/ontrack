@@ -23,6 +23,11 @@ interface RecordingsExtension<R : Recording> : Extension {
     val id: String
 
     /**
+     * Short display name
+     */
+    val displayName: String
+
+    /**
      * Creates the JSON representation of the recording so that it can be stored.
      */
     fun toJson(recording: R): JsonNode
