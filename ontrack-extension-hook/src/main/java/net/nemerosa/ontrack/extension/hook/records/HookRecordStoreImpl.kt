@@ -2,7 +2,9 @@ package net.nemerosa.ontrack.extension.hook.records
 
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.support.StorageService
+import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 
 @Component
 class HookRecordStoreImpl(
@@ -48,6 +50,29 @@ class HookRecordStoreImpl(
                 queryVariables = queryVariables,
                 orderQuery = "ORDER BY data::jsonb->>'startTime' DESC",
         )
+    }
+
+    override fun removeAllBefore(retentionDate: LocalDateTime, nonRunningOnly: Boolean): Int =
+            if (nonRunningOnly) {
+                store.deleteWithFilter(
+                        store = STORE,
+                        query = "data::jsonb->>'endTime' IS NOT NULL AND data::jsonb->>'startTime' <= :beforeTime",
+                        queryVariables = mapOf(
+                                "beforeTime" to AbstractJdbcRepository.dateTimeForDB(retentionDate)
+                        )
+                )
+            } else {
+                store.deleteWithFilter(
+                        store = STORE,
+                        query = "data::jsonb->>'startTime' <= :beforeTime",
+                        queryVariables = mapOf(
+                                "beforeTime" to AbstractJdbcRepository.dateTimeForDB(retentionDate)
+                        )
+                )
+            }
+
+    override fun removeAll() {
+        store.deleteWithFilter(STORE)
     }
 
     private fun getQueryForFilter(filter: HookRecordQueryFilter): Pair<String, Map<String, *>> {

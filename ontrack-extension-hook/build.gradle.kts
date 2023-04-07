@@ -15,9 +15,12 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation(project(":ontrack-ui-graphql"))
+    implementation(project(":ontrack-extension-casc"))
+    implementation(project(":ontrack-repository-support"))
 
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
 
     testRuntimeOnly(project(":ontrack-service"))
