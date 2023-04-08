@@ -66,7 +66,7 @@ class GQLTypeValidationStamp(
                                 cache = cache,
                                 fieldName = "validationRunsPaginated",
                                 fieldDescription = "Paginated list of validation runs",
-                                itemType = validationRun,
+                                itemType = validationRun.typeName,
                                 itemListCounter = { environment, validationStamp ->
                                     val buildId: Int? = environment.getArgument<Int>("buildId")
                                     if (buildId != null) {

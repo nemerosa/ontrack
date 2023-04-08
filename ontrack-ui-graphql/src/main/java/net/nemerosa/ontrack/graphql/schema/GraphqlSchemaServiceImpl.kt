@@ -13,6 +13,7 @@ class GraphqlSchemaServiceImpl(
         private val interfaces: List<GQLInterface>,
         private val enums: List<GQLEnum>,
         private val rootQueries: List<GQLRootQuery>,
+        private val rootQueriesPlus: List<GQLRootQueries>,
         private val mutationProviders: List<MutationProvider>,
         private val contributors: List<GQLContributor>,
 ) : GraphqlSchemaService {
@@ -43,7 +44,10 @@ class GraphqlSchemaServiceImpl(
                 .name(QUERY)
                 // Root queries
                 .fields(
-                        rootQueries.map { it.fieldDefinition }
+                        rootQueries.map { it.getFieldDefinition() }
+                )
+                .fields(
+                        rootQueriesPlus.flatMap { it.fieldDefinitions }
                 )
                 // OK
                 .build()

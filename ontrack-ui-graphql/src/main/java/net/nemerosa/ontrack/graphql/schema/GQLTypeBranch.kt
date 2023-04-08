@@ -72,7 +72,7 @@ class GQLTypeBranch(
                 cache = cache,
                 fieldName = "buildsPaginated",
                 fieldDescription = "Gets a list of paginated builds for this branch.",
-                itemType = build,
+                itemType = build.typeName,
                 arguments = listOf(
                     // Standard filter
                     GraphQLArgument.newArgument()

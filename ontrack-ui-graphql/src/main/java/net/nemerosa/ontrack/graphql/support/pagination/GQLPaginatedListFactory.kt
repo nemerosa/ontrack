@@ -1,11 +1,7 @@
 package net.nemerosa.ontrack.graphql.support.pagination
 
 import graphql.Scalars.GraphQLInt
-import graphql.schema.DataFetchingEnvironment
-import graphql.schema.GraphQLArgument
-import graphql.schema.GraphQLFieldDefinition
-import graphql.schema.GraphQLObjectType
-import net.nemerosa.ontrack.graphql.schema.GQLType
+import graphql.schema.*
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.pagination.PageRequest
@@ -43,7 +39,7 @@ class GQLPaginatedListFactory(
             cache: GQLTypeCache,
             fieldName: String,
             fieldDescription: String,
-            itemType: GQLType,
+            itemType: String,
             itemPaginatedListProvider: (env: DataFetchingEnvironment, source: P, offset: Int, size: Int) -> PaginatedList<T>,
             arguments: List<GraphQLArgument> = emptyList(),
             additionalFields: List<GraphQLFieldDefinition> = emptyList(),
@@ -84,7 +80,7 @@ class GQLPaginatedListFactory(
             cache: GQLTypeCache,
             fieldName: String,
             fieldDescription: String,
-            itemType: GQLType,
+            itemType: String,
             itemListCounter: (DataFetchingEnvironment, P) -> Int,
             itemListProvider: (DataFetchingEnvironment, P, Int, Int) -> List<T>,
             arguments: List<GraphQLArgument> = emptyList()
@@ -113,7 +109,7 @@ class GQLPaginatedListFactory(
             cache: GQLTypeCache,
             fieldName: String,
             fieldDescription: String,
-            itemType: GQLType,
+            itemType: String,
             arguments: List<GraphQLArgument>,
             additionalFields: List<GraphQLFieldDefinition> = emptyList(),
     ): GraphQLFieldDefinition.Builder =
@@ -143,10 +139,10 @@ class GQLPaginatedListFactory(
      */
     private fun createPaginatedList(
             cache: GQLTypeCache,
-            itemType: GQLType,
+            itemType: String,
             additionalFields: List<GraphQLFieldDefinition> = emptyList(),
     ): GraphQLObjectType {
-        val paginatedListTypeName = "${itemType.typeName}Paginated"
+        val paginatedListTypeName = "${itemType}Paginated"
         return cache.getOrCreate(
                 paginatedListTypeName
         ) {
@@ -160,7 +156,7 @@ class GQLPaginatedListFactory(
                     .field {
                         it.name("pageItems")
                                 .description("Items in the current page")
-                                .type(listType(itemType.typeRef))
+                                .type(listType(GraphQLTypeReference(itemType)))
                     }
                     .fields(additionalFields)
                     .build()

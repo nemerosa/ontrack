@@ -102,7 +102,7 @@ class GQLTypeBuild(
                                 cache = cache,
                                 fieldName = "validationRunsPaginated",
                                 fieldDescription = "Paginated list of validation runs",
-                                itemType = validationRun,
+                                itemType = validationRun.typeName,
                                 arguments = listOf(
                                     newArgument()
                                         .name(ARG_SORTING_MODE)
@@ -160,7 +160,7 @@ class GQLTypeBuild(
                                 cache = cache,
                                 fieldName = "using",
                                 fieldDescription = "List of builds being used by this one.",
-                                itemType = this,
+                                itemType = this.typeName,
                                 arguments = listOf(
                                         newArgument()
                                                 .name("project")
@@ -190,7 +190,7 @@ class GQLTypeBuild(
                                 cache = cache,
                                 fieldName = "usedBy",
                                 fieldDescription = "List of builds using this one.",
-                                itemType = this,
+                                itemType = this.typeName,
                                 arguments = listOf(
                                         newArgument()
                                                 .name("project")

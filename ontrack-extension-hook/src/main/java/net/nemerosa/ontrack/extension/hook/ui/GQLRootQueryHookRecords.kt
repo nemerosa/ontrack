@@ -25,7 +25,7 @@ class GQLRootQueryHookRecords(
                     cache = GQLTypeCache(),
                     fieldName = "hookRecords",
                     fieldDescription = "Getting a paginated list of records received by the hooks.",
-                    itemType = gqlTypeHookRecord,
+                    itemType = gqlTypeHookRecord.typeName,
                     itemPaginatedListProvider = { env, _, offset, size ->
                         getPaginatedList(env, offset, size)
                     },

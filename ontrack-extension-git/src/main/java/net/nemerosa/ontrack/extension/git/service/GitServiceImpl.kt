@@ -105,29 +105,30 @@ class GitServiceImpl(
             }
     }
 
-    override fun collectJobRegistrations(): Stream<JobRegistration> {
-        val jobs = ArrayList<JobRegistration>()
-        // Indexation of repositories, based on projects actually linked
-        forEachConfiguredProject({ project, configuration ->
-            if (!project.isDisabled) {
-                jobs.add(getGitIndexationJobRegistration(configuration, project))
-            }
-        })
-        // Synchronisation of branch builds with tags when applicable
-        forEachConfiguredBranch({ branch, branchConfiguration ->
-            if (!branch.isDisabled && !branch.project.isDisabled) {
-                // Build/tag sync job
-                if (branchConfiguration.buildTagInterval > 0 && branchConfiguration.buildCommitLink?.link is IndexableBuildGitCommitLink<*>) {
-                    jobs.add(
-                        JobRegistration.of(createBuildSyncJob(branch))
-                            .everyMinutes(branchConfiguration.buildTagInterval.toLong())
-                    )
+    override val jobRegistrations: Collection<JobRegistration>
+        get() {
+            val jobs = mutableListOf<JobRegistration>()
+            // Indexation of repositories, based on projects actually linked
+            forEachConfiguredProject { project, configuration ->
+                if (!project.isDisabled) {
+                    jobs.add(getGitIndexationJobRegistration(configuration, project))
                 }
             }
-        })
-        // OK
-        return jobs.stream()
-    }
+            // Synchronisation of branch builds with tags when applicable
+            forEachConfiguredBranch { branch, branchConfiguration ->
+                if (!branch.isDisabled && !branch.project.isDisabled) {
+                    // Build/tag sync job
+                    if (branchConfiguration.buildTagInterval > 0 && branchConfiguration.buildCommitLink?.link is IndexableBuildGitCommitLink<*>) {
+                        jobs.add(
+                                JobRegistration.of(createBuildSyncJob(branch))
+                                        .everyMinutes(branchConfiguration.buildTagInterval.toLong())
+                        )
+                    }
+                }
+            }
+            // OK
+            return jobs
+        }
 
     override fun isBranchConfiguredForGit(branch: Branch): Boolean {
         return getBranchConfiguration(branch) != null

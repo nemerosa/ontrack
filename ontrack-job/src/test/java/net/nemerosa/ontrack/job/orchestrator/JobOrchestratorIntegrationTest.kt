@@ -164,9 +164,8 @@ class JobOrchestratorIntegrationTest : AbstractJobTest() {
 
         private val jobs: MutableMap<String, Job> = mutableMapOf()
 
-        override fun collectJobRegistrations(): Stream<JobRegistration> {
-            return jobs.values.map { JobRegistration.of(it).withSchedule(Schedule.EVERY_DAY) }.stream()
-        }
+        override val jobRegistrations: Collection<JobRegistration> =
+                jobs.values.map { JobRegistration.of(it).withSchedule(Schedule.EVERY_DAY) }
 
         operator fun plusAssign(name: String) {
             jobs[name] = ConfigurableJob(name)

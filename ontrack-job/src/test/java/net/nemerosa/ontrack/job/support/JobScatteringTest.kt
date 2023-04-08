@@ -14,26 +14,26 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class JobScatteringTest: AbstractJobTest() {
+class JobScatteringTest : AbstractJobTest() {
 
     private fun createJobScheduler(
-        scattering: Boolean,
-        scatteringRatio: Double
+            scattering: Boolean,
+            scatteringRatio: Double
     ) = DefaultJobScheduler(
-        jobDecorator = NOPJobDecorator.INSTANCE,
-        scheduler = scheduler,
-        jobListener = NOPJobListener.INSTANCE,
-        initiallyPaused = false,
-        jobExecutorService = jobPool,
-        scattering = scattering,
-        scatteringRatio = scatteringRatio
+            jobDecorator = NOPJobDecorator.INSTANCE,
+            scheduler = scheduler,
+            jobListener = NOPJobListener.INSTANCE,
+            initiallyPaused = false,
+            jobExecutorService = jobPool,
+            scattering = scattering,
+            scatteringRatio = scatteringRatio
     )
 
     @Test
     fun scatteredScheduleDisabled() {
         val scheduler = createJobScheduler(
-            scattering = false,
-            scatteringRatio = 1.0
+                scattering = false,
+                scatteringRatio = 1.0
         )
         val job = ConfigurableJob()
         scheduler.schedule(job, everyMinutes(30))
@@ -52,8 +52,8 @@ class JobScatteringTest: AbstractJobTest() {
     @Test
     fun scatteredScheduleEnabled() {
         val scheduler = createJobScheduler(
-            scattering = true,
-            scatteringRatio = 0.5
+                scattering = true,
+                scatteringRatio = 0.5
         )
         val job = ConfigurableJob()
         scheduler.schedule(job, everyMinutes(30))
@@ -74,8 +74,8 @@ class JobScatteringTest: AbstractJobTest() {
     @Test
     fun scatteredScheduleEnabledWithInitialDelay() {
         val scheduler = createJobScheduler(
-            scattering = true,
-            scatteringRatio = 0.5
+                scattering = true,
+                scatteringRatio = 0.5
         )
         val job = ConfigurableJob()
         scheduler.schedule(job, everyMinutes(30).after(10))
@@ -96,8 +96,8 @@ class JobScatteringTest: AbstractJobTest() {
     @Test
     fun scatteredScheduleEnabledWithNoSchedule() {
         val scheduler = createJobScheduler(
-            scattering = true,
-            scatteringRatio = 0.5
+                scattering = true,
+                scatteringRatio = 0.5
         )
         val job = ConfigurableJob()
         scheduler.schedule(job, Schedule.NONE)
@@ -117,8 +117,8 @@ class JobScatteringTest: AbstractJobTest() {
     fun scatteringInSameType() {
         // Scheduler
         val scheduler = createJobScheduler(
-            scattering = true,
-            scatteringRatio = 1.0
+                scattering = true,
+                scatteringRatio = 1.0
         )
         // Creates a list of jobs with a weak key
         val jobs = (1..100).map {
@@ -126,18 +126,19 @@ class JobScatteringTest: AbstractJobTest() {
         }
         // Orchestration of all those jobs every 6 hours
         val jobOrchestratorSupplier = listOf(
-            JobOrchestratorSupplier {
-                jobs.map {
-                    JobRegistration.of(it).everyMinutes(360L)
-                }.stream()
-            }
+                object : JobOrchestratorSupplier {
+                    override val jobRegistrations: Collection<JobRegistration>
+                        get() = jobs.map {
+                            JobRegistration.of(it).everyMinutes(360L)
+                        }
+                }
         )
         // Orchestrator
         val orchestrator = JobOrchestrator(
-            scheduler,
-            "Orchestrator",
-            jobOrchestratorSupplier,
-            mockk(relaxed = true)
+                scheduler,
+                "Orchestrator",
+                jobOrchestratorSupplier,
+                mockk(relaxed = true)
         )
         // Scheduling the orchestrator (manual mode)
         scheduler.schedule(orchestrator, Schedule.NONE)
@@ -145,10 +146,10 @@ class JobScatteringTest: AbstractJobTest() {
         orchestrator.orchestrate(JobRunListener.out())
         // Getting the actual schedules of the jobs
         val actualSchedules = jobs
-            .mapNotNull { scheduler.getJobStatus(it.key).getOrNull() }
-            .map(JobStatus::actualSchedule)
+                .mapNotNull { scheduler.getJobStatus(it.key).getOrNull() }
+                .map(JobStatus::actualSchedule)
         val initialPeriods = actualSchedules
-            .map(Schedule::initialPeriod)
+                .map(Schedule::initialPeriod)
         initialPeriods.forEach(Consumer { l: Long? -> println("--> $l") })
         // Checks that all jobs have been scheduled
         assertEquals(jobs.size.toLong(), initialPeriods.size.toLong(), "All jobs have been scheduled")

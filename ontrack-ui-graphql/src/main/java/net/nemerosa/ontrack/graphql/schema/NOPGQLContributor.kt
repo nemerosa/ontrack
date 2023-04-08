@@ -6,6 +6,6 @@ import org.springframework.stereotype.Component
 @Component
 class NOPGQLContributor : GQLContributor {
 
-    override fun contribute(): Set<GraphQLType> = emptySet()
+    override fun contribute(cache: GQLTypeCache, dictionary: MutableSet<GraphQLType>): Set<GraphQLType> = emptySet()
 
 }

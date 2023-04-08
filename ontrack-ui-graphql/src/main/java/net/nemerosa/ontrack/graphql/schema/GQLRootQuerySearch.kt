@@ -30,7 +30,7 @@ class GQLRootQuerySearch(
                 cache = GQLTypeCache(),
                 fieldName = "search",
                 fieldDescription = "Performs a search in Ontrack",
-                itemType = searchResult,
+                itemType = searchResult.typeName,
                 arguments = listOf(
                         GraphQLArgument.newArgument().name(ARG_SEARCH_TOKEN).description("Query string").type(GraphQLNonNull(GraphQLString)).build(),
                         GraphQLArgument.newArgument().name(ARG_SEARCH_TYPE).description("Result type").type(GraphQLString).build()

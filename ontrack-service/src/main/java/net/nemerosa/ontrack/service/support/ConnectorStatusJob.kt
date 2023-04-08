@@ -28,12 +28,12 @@ class ConnectorStatusJob(
                 }
         )
 
-    override fun collectJobRegistrations(): Stream<JobRegistration> =
-            connectorStatusIndicators.map {
-                createJob(it)
-            }.map {
-                JobRegistration.of(it).withSchedule(Schedule.everyMinutes(5))
-            }.stream()
+    override val jobRegistrations: Collection<JobRegistration>
+        get() = connectorStatusIndicators.map {
+            createJob(it)
+        }.map {
+            JobRegistration.of(it).withSchedule(Schedule.everyMinutes(5))
+        }
 
     private fun createJob(connectorStatusIndicator: ConnectorStatusIndicator) = object : Job {
 

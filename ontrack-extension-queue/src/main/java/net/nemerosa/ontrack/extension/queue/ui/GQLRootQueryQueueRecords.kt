@@ -25,23 +25,23 @@ class GQLRootQueryQueueRecords(
 ) : GQLRootQuery {
 
     override fun getFieldDefinition(): GraphQLFieldDefinition =
-        gqlPaginatedListFactory.createPaginatedField<Any?, QueueRecord>(
-            cache = GQLTypeCache(),
-            fieldName = "queueRecords",
-            fieldDescription = "Getting a paginated list of queue messages.",
-            itemType = gqlTypeQueueRecord,
-            itemPaginatedListProvider = { env, _, offset, size ->
-                getPaginatedList(env, offset, size)
-            },
-            arguments = listOf(
-                stringArgument(ARG_ID, "Queue message ID"),
-                stringArgument(ARG_PROCESSOR, "Queue processor"),
-                enumArgument<QueueRecordState>(ARG_STATE, "Queue message state"),
-                stringArgument(ARG_ROUTING, "Routing key"),
-                stringArgument(ARG_QUEUE, "Queue name"),
-                stringArgument(ARG_TEXT, "Text in the payload"),
+            gqlPaginatedListFactory.createPaginatedField<Any?, QueueRecord>(
+                    cache = GQLTypeCache(),
+                    fieldName = "queueRecords",
+                    fieldDescription = "Getting a paginated list of queue messages.",
+                    itemType = gqlTypeQueueRecord.typeName,
+                    itemPaginatedListProvider = { env, _, offset, size ->
+                        getPaginatedList(env, offset, size)
+                    },
+                    arguments = listOf(
+                            stringArgument(ARG_ID, "Queue message ID"),
+                            stringArgument(ARG_PROCESSOR, "Queue processor"),
+                            enumArgument<QueueRecordState>(ARG_STATE, "Queue message state"),
+                            stringArgument(ARG_ROUTING, "Routing key"),
+                            stringArgument(ARG_QUEUE, "Queue name"),
+                            stringArgument(ARG_TEXT, "Text in the payload"),
+                    )
             )
-        )
 
     private fun getPaginatedList(env: DataFetchingEnvironment, offset: Int, size: Int): PaginatedList<QueueRecord> {
         val filter = QueueRecordQueryFilter(

@@ -21,11 +21,10 @@ class TimeSinceEventJob(
         private val timeSinceEventConfigurationProperties: TimeSinceEventConfigurationProperties,
 ) : JobOrchestratorSupplier {
 
-    override fun collectJobRegistrations(): Stream<JobRegistration> =
-            structureService.projectList
-                    .filter { it.isEligibleForTSE }
-                    .map { it.createTimeSinceEventJobRegistration() }
-                    .stream()
+    override val jobRegistrations: Collection<JobRegistration>
+        get() = structureService.projectList
+                .filter { it.isEligibleForTSE }
+                .map { it.createTimeSinceEventJobRegistration() }
 
     private val Project.isEligibleForTSE: Boolean
         get() = !isDisabled && propertyService.hasProperty(this, BranchingModelPropertyType::class.java)
@@ -41,8 +40,8 @@ class TimeSinceEventJob(
 
         override fun getKey(): JobKey =
                 DeliveryMetricsJobs.DM_JOB_CATEGORY
-                    .getType("time-since-event").withName("Time since events")
-                    .getKey(name) // Project name as key
+                        .getType("time-since-event").withName("Time since events")
+                        .getKey(name) // Project name as key
 
         override fun getDescription(): String =
                 """$name time since events"""

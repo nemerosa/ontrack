@@ -118,7 +118,7 @@ class GQLTypeProject(
                                 cache = cache,
                                 fieldName = "validationRuns",
                                 fieldDescription = "Searching for validation runs in the project",
-                                itemType = validationRun,
+                                itemType = validationRun.typeName,
                                 itemPaginatedListProvider = { environment, project: Project, offset, size ->
                                     findValidationsRuns(environment, project, offset, size)
                                 },
