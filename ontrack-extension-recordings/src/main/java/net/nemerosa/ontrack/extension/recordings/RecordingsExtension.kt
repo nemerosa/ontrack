@@ -30,6 +30,12 @@ interface RecordingsExtension<R : Recording, F : Any> : Extension {
     val id: String
 
     /**
+     * Prefix used for names of GraphQL elements (the first letter will be transformed to lower or upper case
+     * depending on the context)
+     */
+    val graphQLPrefix: String
+
+    /**
      * Short display name
      */
     val displayName: String

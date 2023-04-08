@@ -22,7 +22,7 @@ class RecordingsMutations(
 
     private fun <R : Recording, F : Any> createPurgeMutation(extension: RecordingsExtension<R, F>): Mutation =
             unitNoInputMutation(
-                    name = "purge${extension.id.replaceFirstChar { it.uppercase() }}Recordings",
+                    name = "purge${extension.graphQLPrefix.replaceFirstChar { it.uppercase() }}Recordings",
                     description = "Purging all records for ${extension.displayName}"
             ) {
                 recordingsCleanupService.purge(extension)

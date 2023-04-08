@@ -19,6 +19,8 @@ class QueueRecordingsExtension(
 
     override val id: String = "queue-recordings"
 
+    override val graphQLPrefix: String = "QueueRecordings"
+
     override val displayName: String = "Queue messages"
 
     override fun toJson(recording: QueueRecord): JsonNode = recording.asJson()

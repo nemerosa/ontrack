@@ -91,9 +91,9 @@ class GQLContributorRecordings(
                     // Ok
                     .build()
 
-    private val <R : Recording, F: Any> RecordingsExtension<R, F>.prefix: String get() = id.replaceFirstChar { it.titlecase() }
+    private val <R : Recording, F: Any> RecordingsExtension<R, F>.prefix: String get() = graphQLPrefix.replaceFirstChar { it.titlecase() }
 
-    private val <R : Recording, F: Any> RecordingsExtension<R, F>.lowerDisplayName: String get() = id.replaceFirstChar { it.lowercase() }
+    private val <R : Recording, F: Any> RecordingsExtension<R, F>.lowerDisplayName: String get() = displayName.replaceFirstChar { it.lowercase() }
 
     companion object {
         private const val ARG_FILTER = "filter"
