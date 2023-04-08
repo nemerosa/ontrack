@@ -14,6 +14,9 @@ class RecordingsStoreImpl(
         storageService.store(store, recording.id, recording)
     }
 
+    override fun findById(store: String, id: String): StoredRecording? =
+            storageService.find(store, id, StoredRecording::class)
+
     override fun removeAllBefore(store: String, retentionDate: LocalDateTime, nonRunningOnly: Boolean) {
         if (nonRunningOnly) {
             storageService.deleteWithFilter(

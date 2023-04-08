@@ -21,8 +21,4 @@ class DefaultRecordingsService(recordingsStore: RecordingsStore) : AbstractRecor
     fun logging() {
         logger.info("[recordings] Using production recordings service")
     }
-
-    override fun <R : Recording> updateRecord(extension: RecordingsExtension<R>, id: String, updating: (R) -> R) {
-        TODO("Not yet implemented")
-    }
 }

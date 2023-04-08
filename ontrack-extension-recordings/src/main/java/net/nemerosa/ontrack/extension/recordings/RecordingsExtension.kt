@@ -53,4 +53,9 @@ interface RecordingsExtension<R : Recording> : Extension {
      */
     fun graphQLRecordFilterFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = emptyList()
 
+    /**
+     * Given a stored JSON, parses it into the extension data.
+     */
+    fun fromJson(data: JsonNode): R
+
 }
