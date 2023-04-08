@@ -31,7 +31,7 @@ class RecordingsUserMenuListExtension(
         override val action: Action = Action.of(
                 id = "recordings-${extension.id}",
                 name = "${extension.displayName} recordings",
-                uri = "extension/${extension.feature.id}/recordings",
+                uri = "list/${extension.id}",
         ).withGroup(UserMenuExtensionGroups.information)
 
     }

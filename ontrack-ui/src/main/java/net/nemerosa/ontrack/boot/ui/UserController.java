@@ -171,8 +171,8 @@ public class UserController extends AbstractResourceController {
                 Class<? extends GlobalFunction> fn = extension.getGlobalFunction();
                 if (fn == null || securityService.isGlobalFunctionGranted(fn)) {
                     // Adds the menu entry
-                    // Does NOT prepend the extension ID
-                    user.add(extension.getAction());
+                    // Prepends the extension ID
+                    user.add(resolveExtensionAction(extension));
                 }
             }
         }

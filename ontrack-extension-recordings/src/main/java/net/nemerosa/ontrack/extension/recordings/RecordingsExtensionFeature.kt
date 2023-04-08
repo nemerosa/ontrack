@@ -10,4 +10,5 @@ class RecordingsExtensionFeature : AbstractExtensionFeature(
         "Recordings",
         "Used by extensions which need to record messages",
         ExtensionFeatureOptions.DEFAULT
+                .withGui(true)
 )
