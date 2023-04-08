@@ -58,4 +58,8 @@ class RecordingsStoreImpl(
             )
         }
     }
+
+    override fun removeAll(store: String) {
+        storageService.deleteWithFilter(store)
+    }
 }

@@ -29,4 +29,8 @@ class RecordingsCleanupServiceImpl(
         val cleanupDate = retentionDate.minus(cleanupDuration)
         recordingsStore.removeAllBefore(extension.id, cleanupDate, nonRunningOnly = false)
     }
+
+    override fun <R : Recording, F : Any> purge(extension: RecordingsExtension<R, F>) {
+        recordingsStore.removeAll(extension.id)
+    }
 }

@@ -19,4 +19,6 @@ interface RecordingsStore {
             size: Int,
     ): PaginatedList<StoredRecording>
 
+    fun removeAll(store: String)
+
 }
