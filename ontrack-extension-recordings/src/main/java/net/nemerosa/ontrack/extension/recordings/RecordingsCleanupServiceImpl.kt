@@ -15,7 +15,7 @@ class RecordingsCleanupServiceImpl(
         private val recordingsStore: RecordingsStore,
 ) : RecordingsCleanupService {
 
-    override fun <R : Recording> cleanup(extension: RecordingsExtension<R>) {
+    override fun <R : Recording, F : Any> cleanup(extension: RecordingsExtension<R, F>) {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
         // Configuration
         val config = recordingsConfigProperties.cleanup[extension.id]

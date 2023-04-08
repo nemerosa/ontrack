@@ -2,8 +2,6 @@ package net.nemerosa.ontrack.extension.queue.record
 
 import com.fasterxml.jackson.databind.JsonNode
 import graphql.schema.GraphQLFieldDefinition
-import graphql.schema.GraphQLInputObjectField
-import graphql.schema.GraphQLType
 import net.nemerosa.ontrack.extension.queue.QueueExtensionFeature
 import net.nemerosa.ontrack.extension.recordings.RecordingsExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
@@ -12,11 +10,12 @@ import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import org.springframework.stereotype.Component
+import kotlin.reflect.KClass
 
 @Component
 class QueueRecordingsExtension(
         queueExtensionFeature: QueueExtensionFeature
-) : AbstractExtension(queueExtensionFeature), RecordingsExtension<QueueRecord> {
+) : AbstractExtension(queueExtensionFeature), RecordingsExtension<QueueRecord, QueueRecordQueryFilter> {
 
     override val id: String = "queue-recordings"
 
@@ -29,6 +28,42 @@ class QueueRecordingsExtension(
     override fun graphQLRecordFields(cache: GQLTypeCache): List<GraphQLFieldDefinition> =
             GraphQLBeanConverter.asObjectFields(QueueRecord::class, GQLTypeCache())
 
-    override fun graphQLRecordFilterFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> =
-            GraphQLBeanConverter.asInputFields(QueueRecordQueryFilter::class, dictionary)
+    override val filterType: KClass<QueueRecordQueryFilter> = QueueRecordQueryFilter::class
+
+    override fun filterQuery(filter: QueueRecordQueryFilter, queryVariables: MutableMap<String, Any?>): List<String> {
+        val queries = mutableListOf<String>()
+
+        if (!filter.id.isNullOrBlank()) {
+            queries += "data::jsonb->'queuePayload'->>'id' = :id"
+            queryVariables["id"] = filter.id
+        }
+
+        if (!filter.processor.isNullOrBlank()) {
+            queries += "data::jsonb->'queuePayload'->>'processor' = :processor"
+            queryVariables["processor"] = filter.processor
+        }
+
+        if (filter.state != null) {
+            queries += "data::jsonb->>'state' = :state"
+            queryVariables["state"] = filter.state.name
+        }
+
+        if (!filter.routingKey.isNullOrBlank()) {
+            queries += "data::jsonb->>'routingKey' = :routingKey"
+            queryVariables["routingKey"] = filter.routingKey
+        }
+
+        if (!filter.queueName.isNullOrBlank()) {
+            queries += "data::jsonb->>'queueName' = :queueName"
+            queryVariables["queueName"] = filter.queueName
+        }
+
+        if (!filter.text.isNullOrBlank()) {
+            queries += "(data::jsonb->'queuePayload'->>'body' LIKE :text) OR (data::jsonb->>'actualPayload' LIKE :text)"
+            queryVariables["text"] = "%${filter.text}%"
+        }
+
+        return queries
+    }
+
 }

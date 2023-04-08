@@ -4,12 +4,15 @@ import graphql.schema.*
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.recordings.Recording
 import net.nemerosa.ontrack.extension.recordings.RecordingsExtension
+import net.nemerosa.ontrack.extension.recordings.RecordingsQueryService
 import net.nemerosa.ontrack.graphql.schema.GQLContributor
 import net.nemerosa.ontrack.graphql.schema.GQLRootQueries
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.graphql.support.typedArgument
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseInto
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import org.springframework.stereotype.Component
 
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Component
 class GQLContributorRecordings(
         private val extensionManager: ExtensionManager,
         private val gqlPaginatedListFactory: GQLPaginatedListFactory,
+        private val recordingsQueryService: RecordingsQueryService,
 ) : GQLContributor, GQLRootQueries {
 
     override fun contribute(cache: GQLTypeCache, dictionary: MutableSet<GraphQLType>): Set<GraphQLType> {
@@ -35,7 +39,7 @@ class GQLContributorRecordings(
             extension.createRootQuery()
         }
 
-    private fun <R : Recording> RecordingsExtension<R>.createRootQuery(): GraphQLFieldDefinition =
+    private fun <R : Recording, F: Any> RecordingsExtension<R, F>.createRootQuery(): GraphQLFieldDefinition =
             gqlPaginatedListFactory.createPaginatedField<Any?, R>(
                     cache = GQLTypeCache(),
                     fieldName = "${prefix}Recordings",
@@ -49,15 +53,19 @@ class GQLContributorRecordings(
                     )
             )
 
-    private fun <R : Recording> RecordingsExtension<R>.getPaginatedList(
+    private fun <R : Recording, F: Any> RecordingsExtension<R, F>.getPaginatedList(
             environment: DataFetchingEnvironment,
             offset: Int,
             size: Int
     ): PaginatedList<R> {
-        TODO()
+        // Parsing of the filter
+        val filterJson = environment.getArgument<Any?>(ARG_FILTER)?.asJson()
+        val filter = filterJson?.run { parseInto(filterType) }
+        // Pagination
+        return recordingsQueryService.findByFilter(this, filter, offset, size)
     }
 
-    private fun <R : Recording> RecordingsExtension<R>.contribute(cache: GQLTypeCache, dictionary: MutableSet<GraphQLType>): Set<GraphQLType> =
+    private fun <R : Recording, F: Any> RecordingsExtension<R, F>.contribute(cache: GQLTypeCache, dictionary: MutableSet<GraphQLType>): Set<GraphQLType> =
             graphQLContributions + setOf(
                     // Record
                     createRecordType(cache),
@@ -65,14 +73,14 @@ class GQLContributorRecordings(
                     createFilterInput(dictionary),
             )
 
-    private fun <R : Recording> RecordingsExtension<R>.createFilterInput(dictionary: MutableSet<GraphQLType>): GraphQLInputObjectType =
+    private fun <R : Recording, F: Any> RecordingsExtension<R, F>.createFilterInput(dictionary: MutableSet<GraphQLType>): GraphQLInputObjectType =
             GraphQLInputObjectType.newInputObject()
                     .name("${prefix}RecordingFilterInput")
                     .description("Recording filter input for $lowerDisplayName")
-                    .fields(graphQLRecordFilterFields(dictionary))
+                    .fields(GraphQLBeanConverter.asInputFields(filterType, dictionary))
                     .build()
 
-    private fun <R : Recording> RecordingsExtension<R>.createRecordType(cache: GQLTypeCache): GraphQLObjectType =
+    private fun <R : Recording, F: Any> RecordingsExtension<R, F>.createRecordType(cache: GQLTypeCache): GraphQLObjectType =
             GraphQLObjectType.newObject()
                     .name("${prefix}Recording")
                     .description("Recording for $lowerDisplayName")
@@ -83,9 +91,9 @@ class GQLContributorRecordings(
                     // Ok
                     .build()
 
-    private val <R : Recording> RecordingsExtension<R>.prefix: String get() = id.replaceFirstChar { it.titlecase() }
+    private val <R : Recording, F: Any> RecordingsExtension<R, F>.prefix: String get() = id.replaceFirstChar { it.titlecase() }
 
-    private val <R : Recording> RecordingsExtension<R>.lowerDisplayName: String get() = id.replaceFirstChar { it.lowercase() }
+    private val <R : Recording, F: Any> RecordingsExtension<R, F>.lowerDisplayName: String get() = id.replaceFirstChar { it.lowercase() }
 
     companion object {
         private const val ARG_FILTER = "filter"

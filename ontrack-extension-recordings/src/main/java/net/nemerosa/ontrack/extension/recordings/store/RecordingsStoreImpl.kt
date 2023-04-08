@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.recordings.store
 
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.support.StorageService
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Component
@@ -16,6 +17,27 @@ class RecordingsStoreImpl(
 
     override fun findById(store: String, id: String): StoredRecording? =
             storageService.find(store, id, StoredRecording::class)
+
+    override fun findByFilter(
+            store: String,
+            queries: List<String>,
+            queryVariables: MutableMap<String, Any?>,
+            offset: Int,
+            size: Int,
+    ): PaginatedList<StoredRecording> {
+
+        val query = queries.joinToString(" AND ") { "( $it )" }
+
+        return storageService.paginatedFilter(
+                store = store,
+                type = StoredRecording::class,
+                offset = offset,
+                size = size,
+                query = query,
+                queryVariables = queryVariables,
+                orderQuery = "ORDER BY data::jsonb->>'startTime' DESC",
+        )
+    }
 
     override fun removeAllBefore(store: String, retentionDate: LocalDateTime, nonRunningOnly: Boolean) {
         if (nonRunningOnly) {

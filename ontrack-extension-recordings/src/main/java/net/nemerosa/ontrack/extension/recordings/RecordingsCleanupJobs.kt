@@ -17,12 +17,12 @@ class RecordingsCleanupJobs(
                     createCleanupJobRegistration(extension)
                 }
 
-    private fun createCleanupJobRegistration(extension: RecordingsExtension<*>) = JobRegistration(
+    private fun createCleanupJobRegistration(extension: RecordingsExtension<*, *>) = JobRegistration(
             job = createCleanupJob(extension),
             schedule = Schedule.EVERY_DAY,
     )
 
-    private fun <R : Recording> createCleanupJob(extension: RecordingsExtension<R>) = object : Job {
+    private fun <R : Recording, F : Any> createCleanupJob(extension: RecordingsExtension<R, F>) = object : Job {
 
         override fun getKey(): JobKey =
                 RecordingsJobs.category.getType("recordings-cleanup")

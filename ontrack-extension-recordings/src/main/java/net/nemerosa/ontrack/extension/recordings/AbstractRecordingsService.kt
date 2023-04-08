@@ -1,15 +1,16 @@
 package net.nemerosa.ontrack.extension.recordings
 
 import net.nemerosa.ontrack.extension.recordings.store.RecordingsStore
-import net.nemerosa.ontrack.extension.recordings.store.StoredRecording
+import net.nemerosa.ontrack.extension.recordings.store.toRecording
+import net.nemerosa.ontrack.extension.recordings.store.toStoredRecording
 
 abstract class AbstractRecordingsService(
         private val recordingsStore: RecordingsStore,
 ) : RecordingsService {
 
-    override fun <R : Recording> record(extension: RecordingsExtension<R>, recording: R) {
+    override fun <R : Recording, F : Any> record(extension: RecordingsExtension<R, F>, recording: R) {
         // Gets the storage representation for the recordings
-        val storedRecording = toStoredRecording(extension, recording)
+        val storedRecording = recording.toStoredRecording(extension)
         // Saving the recordings
         recordingsStore.save(
                 store = extension.id,
@@ -17,18 +18,10 @@ abstract class AbstractRecordingsService(
         )
     }
 
-    private fun <R : Recording> toStoredRecording(extension: RecordingsExtension<R>, recording: R) =
-            StoredRecording(
-                    id = recording.id,
-                    startTime = recording.startTime,
-                    endTime = recording.endTime,
-                    data = extension.toJson(recording),
-            )
-
-    override fun <R : Recording> updateRecord(extension: RecordingsExtension<R>, id: String, updating: (R) -> R) {
+    override fun <R : Recording, F : Any> updateRecord(extension: RecordingsExtension<R, F>, id: String, updating: (R) -> R) {
         val storedRecording = recordingsStore.findById(extension.id, id)
                 ?: throw RecordingNotFoundException(extension.id, id)
-        val recording = extension.fromJson(storedRecording.data)
+        val recording = storedRecording.toRecording(extension)
         val newRecording = updating(recording)
         record(extension, newRecording)
     }

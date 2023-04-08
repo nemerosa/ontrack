@@ -2,10 +2,10 @@ package net.nemerosa.ontrack.extension.recordings
 
 import com.fasterxml.jackson.databind.JsonNode
 import graphql.schema.GraphQLFieldDefinition
-import graphql.schema.GraphQLInputObjectField
 import graphql.schema.GraphQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.model.extension.Extension
+import kotlin.reflect.KClass
 
 /**
  * Extension to define a schema for recording messages.
@@ -18,8 +18,11 @@ import net.nemerosa.ontrack.model.extension.Extension
  * * some GraphQL types, queries and mutations
  * * a UI user menu extension
  * * a UI directive for a page showing all the records
+ *
+ * @param R Type of the recordings
+ * @param F Type of filter
  */
-interface RecordingsExtension<R : Recording> : Extension {
+interface RecordingsExtension<R : Recording, F : Any> : Extension {
 
     /**
      * Unique ID for the extension (used for storage keys and other elements)
@@ -49,13 +52,18 @@ interface RecordingsExtension<R : Recording> : Extension {
     fun graphQLRecordFields(cache: GQLTypeCache): List<GraphQLFieldDefinition>
 
     /**
-     * List of the input fields for the filter on records
+     * Type of the filter
      */
-    fun graphQLRecordFilterFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = emptyList()
+    val filterType: KClass<F>
 
     /**
      * Given a stored JSON, parses it into the extension data.
      */
     fun fromJson(data: JsonNode): R
+
+    /**
+     * Gets the JSON queries to run for the filter
+     */
+    fun filterQuery(filter: F, queryVariables: MutableMap<String, Any?>): List<String>
 
 }

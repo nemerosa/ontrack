@@ -2,6 +2,6 @@ package net.nemerosa.ontrack.extension.recordings
 
 interface RecordingsCleanupService {
 
-    fun <R : Recording> cleanup(extension: RecordingsExtension<R>)
+    fun <R : Recording, F : Any> cleanup(extension: RecordingsExtension<R, F>)
 
 }
