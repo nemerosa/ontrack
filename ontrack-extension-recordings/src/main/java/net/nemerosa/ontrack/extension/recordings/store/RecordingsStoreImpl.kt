@@ -11,12 +11,15 @@ class RecordingsStoreImpl(
         private val storageService: StorageService,
 ) : RecordingsStore {
 
+    private fun store(store: String) =
+            "${StoredRecording::class.java.name}.$store"
+
     override fun save(store: String, recording: StoredRecording) {
-        storageService.store(store, recording.id, recording)
+        storageService.store(store(store), recording.id, recording)
     }
 
     override fun findById(store: String, id: String): StoredRecording? =
-            storageService.find(store, id, StoredRecording::class)
+            storageService.find(store(store), id, StoredRecording::class)
 
     override fun findByFilter(
             store: String,
@@ -29,7 +32,7 @@ class RecordingsStoreImpl(
         val query = queries.joinToString(" AND ") { "( $it )" }
 
         return storageService.paginatedFilter(
-                store = store,
+                store = store(store),
                 type = StoredRecording::class,
                 offset = offset,
                 size = size,
@@ -42,7 +45,7 @@ class RecordingsStoreImpl(
     override fun removeAllBefore(store: String, retentionDate: LocalDateTime, nonRunningOnly: Boolean) {
         if (nonRunningOnly) {
             storageService.deleteWithFilter(
-                    store = store,
+                    store = store(store),
                     query = "data::jsonb->>'endTime' IS NOT NULL AND data::jsonb->>'startTime' <= :beforeTime",
                     queryVariables = mapOf(
                             "beforeTime" to AbstractJdbcRepository.dateTimeForDB(retentionDate)
@@ -50,7 +53,7 @@ class RecordingsStoreImpl(
             )
         } else {
             storageService.deleteWithFilter(
-                    store = store,
+                    store = store(store),
                     query = "data::jsonb->>'startTime' <= :beforeTime",
                     queryVariables = mapOf(
                             "beforeTime" to AbstractJdbcRepository.dateTimeForDB(retentionDate)
@@ -60,6 +63,6 @@ class RecordingsStoreImpl(
     }
 
     override fun removeAll(store: String) {
-        storageService.deleteWithFilter(store)
+        storageService.deleteWithFilter(store(store))
     }
 }

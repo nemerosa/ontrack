@@ -50,16 +50,18 @@ angular.module('ontrack.extension.queue', [
                 $offset: Int!,
                 $size: Int!,
             ) {
-                queueRecordings(filter: {
-                    id: $id,
-                    processor: $processor,
-                    state: $state,
-                    routing: $routing,
-                    queue: $queue,
-                    text: $text,
+                queueRecordings(
+                    filter: {
+                        id: $id,
+                        processor: $processor,
+                        state: $state,
+                        routingKey: $routing,
+                        queueName: $queue,
+                        text: $text
+                    }, 
                     offset: $offset,
                     size: $size,
-                }) {
+                ) {
                     pageInfo {
                         nextPage {
                             offset
@@ -90,8 +92,8 @@ angular.module('ontrack.extension.queue', [
 
         const loadRecordsInfo = () => {
             return otGraphqlService.pageGraphQLCall(queryInfo).then(data => {
-                 $scope.processors = data.queueRecordFilterInfo.processors;
-                 $scope.states = data.queueRecordFilterInfo.states;
+                $scope.processors = data.queueRecordFilterInfo.processors;
+                $scope.states = data.queueRecordFilterInfo.states;
             });
         };
 
@@ -115,11 +117,11 @@ angular.module('ontrack.extension.queue', [
             };
             otGraphqlService.pageGraphQLCall(query, variables).then(data => {
                 if (reset) {
-                    $scope.messages = data.queueRecordingsRecordings.pageItems;
+                    $scope.messages = data.queueRecordings.pageItems;
                 } else {
-                    $scope.messages = $scope.messages.concat(data.queueRecordingsRecordings.pageItems);
+                    $scope.messages = $scope.messages.concat(data.queueRecordings.pageItems);
                 }
-                $scope.pageInfo = data.queueRecordingsRecordings.pageInfo;
+                $scope.pageInfo = data.queueRecordings.pageInfo;
             }).finally(() => {
                 $scope.loading = false;
             });
