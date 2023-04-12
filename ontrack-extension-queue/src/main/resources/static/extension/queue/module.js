@@ -50,7 +50,7 @@ angular.module('ontrack.extension.queue', [
                 $offset: Int!,
                 $size: Int!,
             ) {
-                queueRecordingsRecordings(
+                queueRecordings(filter: {
                     id: $id,
                     processor: $processor,
                     state: $state,
@@ -59,7 +59,7 @@ angular.module('ontrack.extension.queue', [
                     text: $text,
                     offset: $offset,
                     size: $size,
-                ) {
+                }) {
                     pageInfo {
                         nextPage {
                             offset

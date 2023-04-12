@@ -17,9 +17,9 @@ class QueueRecordingsExtension(
         queueExtensionFeature: QueueExtensionFeature
 ) : AbstractExtension(queueExtensionFeature), RecordingsExtension<QueueRecord, QueueRecordQueryFilter> {
 
-    override val id: String = "queue-recordings"
+    override val id: String = "queue"
 
-    override val graphQLPrefix: String = "QueueRecordings"
+    override val graphQLPrefix: String = "Queue"
 
     override val displayName: String = "Queue messages"
 
@@ -36,32 +36,32 @@ class QueueRecordingsExtension(
         val queries = mutableListOf<String>()
 
         if (!filter.id.isNullOrBlank()) {
-            queries += "data::jsonb->'queuePayload'->>'id' = :id"
+            queries += "data::jsonb->>'id' = :id"
             queryVariables["id"] = filter.id
         }
 
         if (!filter.processor.isNullOrBlank()) {
-            queries += "data::jsonb->'queuePayload'->>'processor' = :processor"
+            queries += "data::jsonb->'data'->'queuePayload'->>'processor' = :processor"
             queryVariables["processor"] = filter.processor
         }
 
         if (filter.state != null) {
-            queries += "data::jsonb->>'state' = :state"
+            queries += "data::jsonb->'data'->>'state' = :state"
             queryVariables["state"] = filter.state.name
         }
 
         if (!filter.routingKey.isNullOrBlank()) {
-            queries += "data::jsonb->>'routingKey' = :routingKey"
+            queries += "data::jsonb->'data'->>'routingKey' = :routingKey"
             queryVariables["routingKey"] = filter.routingKey
         }
 
         if (!filter.queueName.isNullOrBlank()) {
-            queries += "data::jsonb->>'queueName' = :queueName"
+            queries += "data::jsonb->'data'->>'queueName' = :queueName"
             queryVariables["queueName"] = filter.queueName
         }
 
         if (!filter.text.isNullOrBlank()) {
-            queries += "(data::jsonb->'queuePayload'->>'body' LIKE :text) OR (data::jsonb->>'actualPayload' LIKE :text)"
+            queries += "(data::jsonb->'data'->'queuePayload'->>'body' LIKE :text) OR (data::jsonb->'data'->>'actualPayload' LIKE :text)"
             queryVariables["text"] = "%${filter.text}%"
         }
 
