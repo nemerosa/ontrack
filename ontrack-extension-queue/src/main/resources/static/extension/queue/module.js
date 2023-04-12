@@ -50,7 +50,7 @@ angular.module('ontrack.extension.queue', [
                 $offset: Int!,
                 $size: Int!,
             ) {
-                queueRecords(
+                queueRecordingsRecordings(
                     id: $id,
                     processor: $processor,
                     state: $state,
@@ -67,9 +67,9 @@ angular.module('ontrack.extension.queue', [
                         }
                     }
                     pageItems {
+                        id
                         state
                         queuePayload {
-                            id
                             processor
                             body
                         }
@@ -115,11 +115,11 @@ angular.module('ontrack.extension.queue', [
             };
             otGraphqlService.pageGraphQLCall(query, variables).then(data => {
                 if (reset) {
-                    $scope.messages = data.queueRecords.pageItems;
+                    $scope.messages = data.queueRecordingsRecordings.pageItems;
                 } else {
-                    $scope.messages = $scope.messages.concat(data.queueRecords.pageItems);
+                    $scope.messages = $scope.messages.concat(data.queueRecordingsRecordings.pageItems);
                 }
-                $scope.pageInfo = data.queueRecords.pageInfo;
+                $scope.pageInfo = data.queueRecordingsRecordings.pageInfo;
             }).finally(() => {
                 $scope.loading = false;
             });
@@ -160,13 +160,13 @@ angular.module('ontrack.extension.queue', [
             }).then(() => {
                 return otGraphqlService.pageGraphQLCallWithPayloadErrors(`
                     mutation {
-                        purgeQueueRecords {
+                        purgeQueueRecordingsRecordings {
                             errors {
                                 message
                             }
                         }
                     }
-                `, {}, 'purgeQueueRecords');
+                `, {}, 'purgeQueueRecordingsRecordings');
             }).then(() => {
                 loadRecords(true);
             });
