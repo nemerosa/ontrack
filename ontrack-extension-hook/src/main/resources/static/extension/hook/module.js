@@ -46,11 +46,13 @@ angular.module('ontrack.extension.hook', [
                 $offset: Int!,
                 $size: Int!,
             ) {
-                hookRecords(
-                    id: $id,
-                    hook: $hook,
-                    state: $state,
-                    text: $text,
+                hookRecordings(
+                    filter: {
+                        id: $id,
+                        hook: $hook,
+                        state: $state,
+                        text: $text,
+                    },
                     offset: $offset,
                     size: $size,
                 ) {
@@ -109,11 +111,11 @@ angular.module('ontrack.extension.hook', [
             };
             otGraphqlService.pageGraphQLCall(query, variables).then(data => {
                 if (reset) {
-                    $scope.messages = data.hookRecords.pageItems;
+                    $scope.messages = data.hookRecordings.pageItems;
                 } else {
-                    $scope.messages = $scope.messages.concat(data.hookRecords.pageItems);
+                    $scope.messages = $scope.messages.concat(data.hookRecordings.pageItems);
                 }
-                $scope.pageInfo = data.hookRecords.pageInfo;
+                $scope.pageInfo = data.hookRecordings.pageInfo;
             }).finally(() => {
                 $scope.loading = false;
             });

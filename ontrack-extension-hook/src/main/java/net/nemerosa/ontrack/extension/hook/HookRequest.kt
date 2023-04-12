@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.hook
 
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIIgnore
 
 @APIDescription("Request received by a hook")
 data class HookRequest(

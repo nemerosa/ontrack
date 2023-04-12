@@ -263,7 +263,7 @@ object GraphQLBeanConverter {
                                         getTypeName(propertyKClass)
                                     ) { asObjectType(propertyKClass, cache) }
                                 } else {
-                                    throw IllegalStateException("Only Java classes are supported.")
+                                    throw IllegalStateException("Only Java classes are supported: $javaType")
                                 }
                             }
                         }
