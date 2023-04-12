@@ -2,16 +2,24 @@ package net.nemerosa.ontrack.extension.hook
 
 import net.nemerosa.ontrack.extension.hook.records.HookRecord
 import net.nemerosa.ontrack.extension.hook.records.HookRecordQueryFilter
-import net.nemerosa.ontrack.extension.hook.records.HookRecordQueryService
+import net.nemerosa.ontrack.extension.hook.records.HookRecordingsExtension
+import net.nemerosa.ontrack.extension.recordings.RecordingsCleanupJobs
+import net.nemerosa.ontrack.extension.recordings.RecordingsCleanupService
+import net.nemerosa.ontrack.extension.recordings.RecordingsQueryService
+import net.nemerosa.ontrack.extension.recordings.RecordingsService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.format
 import org.springframework.stereotype.Component
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 @Component
 class HookTestSupport(
         private val hookController: HookController,
-        private val hookRecordQueryService: HookRecordQueryService,
+        private val recordingsQueryService: RecordingsQueryService,
+        private val recordingsCleanupService: RecordingsCleanupService,
+        private val recordingsService: RecordingsService,
+        private val hookRecordingsExtension: HookRecordingsExtension,
         private val testHookEndpointExtension: TestHookEndpointExtension,
 ) {
 
@@ -49,11 +57,22 @@ class HookTestSupport(
         }
     }
 
+    fun assertRecordNotPresent(id: String, message: String) {
+        val record = recordingsQueryService.findById(hookRecordingsExtension, id)
+        assertNull(record, message)
+    }
+
+    fun assertRecordPresent(id: String, message: String) {
+        val record = recordingsQueryService.findById(hookRecordingsExtension, id)
+        assertNotNull(record, message)
+    }
+
     fun assertLatestHookRecord(
             hook: String,
             code: (HookRecord) -> Unit
     ) {
-        val record = hookRecordQueryService.findByFilter(
+        val record = recordingsQueryService.findByFilter(
+                extension = hookRecordingsExtension,
                 filter = HookRecordQueryFilter(hook = hook),
                 offset = 0,
                 size = 1
@@ -63,8 +82,12 @@ class HookTestSupport(
         }
     }
 
+    fun record(record: HookRecord) {
+        recordingsService.record(hookRecordingsExtension, record)
+    }
+
     fun clearRecords(hook: String = "test") {
-        hookRecordQueryService.deleteByFilter(HookRecordQueryFilter(hook = hook))
+        recordingsCleanupService.cleanup(hookRecordingsExtension)
     }
 
 }

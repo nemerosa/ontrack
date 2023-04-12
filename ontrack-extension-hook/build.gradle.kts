@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":ontrack-extension-recordings"))
     implementation(project(":ontrack-repository-support"))
 
+    testImplementation(project(":ontrack-test-utils"))
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))

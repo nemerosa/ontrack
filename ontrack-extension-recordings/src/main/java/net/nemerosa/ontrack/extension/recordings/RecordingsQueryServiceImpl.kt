@@ -15,6 +15,11 @@ class RecordingsQueryServiceImpl(
         private val recordingsStore: RecordingsStore,
 ) : RecordingsQueryService {
 
+    override fun <R : Recording, F : Any> findById(extension: RecordingsExtension<R, F>, id: String): R? {
+        securityService.checkGlobalFunction(ApplicationManagement::class.java)
+        return recordingsStore.findById(extension.id, id)?.toRecording(extension)
+    }
+
     override fun <R : Recording, F : Any> findByFilter(
             extension: RecordingsExtension<R, F>,
             filter: F?,

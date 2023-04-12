@@ -26,7 +26,7 @@ class HookGraphQLIT : AbstractQLKTITSupport() {
             // Getting the last record for this hook
             run("""
                 {
-                    hookRecords(hook: "test", size: 1) {
+                    hookRecording(filter: {hook: "test"}, size: 1) {
                         pageItems {
                             id
                             hook
@@ -92,7 +92,7 @@ class HookGraphQLIT : AbstractQLKTITSupport() {
             // Getting the last record for this hook
             run("""
                 {
-                    hookRecords(hook: "test", state: ERROR, size: 2) {
+                    hookRecordings(filter: {hook: "test", state: ERROR}, size: 2) {
                         pageItems {
                             request {
                                 body

@@ -4,7 +4,9 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.hook.HookRequest
 import net.nemerosa.ontrack.extension.hook.HookResponse
 import net.nemerosa.ontrack.extension.hook.HookResponseType
+import net.nemerosa.ontrack.extension.hook.HookTestSupport
 import net.nemerosa.ontrack.extension.hook.settings.HookSettings
+import net.nemerosa.ontrack.extension.recordings.RecordingsCleanupJobs
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.job.JobRunListener
 import org.junit.jupiter.api.Test
@@ -12,15 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.Duration
 import java.util.*
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 
 class HookRecordCleanupJobIT : AbstractDSLTestSupport() {
 
     @Autowired
-    private lateinit var hookRecordStore: HookRecordStore
+    private lateinit var hookTestSupport: HookTestSupport
 
     @Autowired
-    private lateinit var hookRecordCleanupJob: HookRecordCleanupJob
+    private lateinit var recordingsCleanupJobs: RecordingsCleanupJobs
 
     private val ref = Time.now()
 
@@ -56,26 +57,18 @@ class HookRecordCleanupJobIT : AbstractDSLTestSupport() {
                 val afterRetentionRunning = createPayload(daysBefore = 5, running = true)
                 val afterRetentionNotRunning = createPayload(daysBefore = 5, running = false)
                 // Running the cleanup
-                hookRecordCleanupJob.startingJobs.first().job.task.run(JobRunListener.out())
+                assertNotNull(recordingsCleanupJobs.jobRegistrations.find { it.job.key.id == "hook" }?.job, "Hook cleanup job") { job ->
+                    job.task.run(JobRunListener.out())
+                }
                 // Checking the state of records
-                assertRecordNotPresent(beforeCleanupRunning, "Running record before the cleanup cutoff must be deleted")
-                assertRecordNotPresent(beforeCleanupNotRunning, "Not running record before the cleanup cutoff must be deleted")
-                assertRecordPresent(beforeRetentionRunning, "Running record before the retention cutoff must NOT be deleted")
-                assertRecordNotPresent(beforeRetentionNotRunning, "Not running record before the retention cutoff must be deleted")
-                assertRecordPresent(afterRetentionRunning, "Running record after the retention cutoff must NOT be deleted")
-                assertRecordPresent(afterRetentionNotRunning, "Not running record after the retention cutoff must NOT be deleted")
+                hookTestSupport.assertRecordNotPresent(beforeCleanupRunning, "Running record before the cleanup cutoff must be deleted")
+                hookTestSupport.assertRecordNotPresent(beforeCleanupNotRunning, "Not running record before the cleanup cutoff must be deleted")
+                hookTestSupport.assertRecordPresent(beforeRetentionRunning, "Running record before the retention cutoff must NOT be deleted")
+                hookTestSupport.assertRecordNotPresent(beforeRetentionNotRunning, "Not running record before the retention cutoff must be deleted")
+                hookTestSupport.assertRecordPresent(afterRetentionRunning, "Running record after the retention cutoff must NOT be deleted")
+                hookTestSupport.assertRecordPresent(afterRetentionNotRunning, "Not running record after the retention cutoff must NOT be deleted")
             }
         }
-    }
-
-    private fun assertRecordNotPresent(id: String, message: String) {
-        val record = hookRecordStore.findById(id)
-        assertNull(record, message)
-    }
-
-    private fun assertRecordPresent(id: String, message: String) {
-        val record = hookRecordStore.findById(id)
-        assertNotNull(record, message)
     }
 
     private fun createPayload(
@@ -115,7 +108,7 @@ class HookRecordCleanupJobIT : AbstractDSLTestSupport() {
                 }
         )
 
-        hookRecordStore.save(record)
+        hookTestSupport.record(record)
 
         return record.id
     }

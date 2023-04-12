@@ -28,7 +28,7 @@ class QueueRecordingsExtension(
     override fun fromJson(data: JsonNode): QueueRecord = data.parse()
 
     override fun graphQLRecordFields(cache: GQLTypeCache): List<GraphQLFieldDefinition> =
-            GraphQLBeanConverter.asObjectFields(QueueRecord::class, GQLTypeCache())
+            GraphQLBeanConverter.asObjectFields(QueueRecord::class, cache)
 
     override val filterType: KClass<QueueRecordQueryFilter> = QueueRecordQueryFilter::class
 
