@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.api.UserMenuExtension;
 import net.nemerosa.ontrack.extension.api.UserMenuExtensionGroups;
-import net.nemerosa.ontrack.extension.api.UserMenuListExtension;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
@@ -161,19 +160,6 @@ public class UserController extends AbstractResourceController {
                 // Adds the menu entry
                 // Prepends the extension ID
                 user.add(resolveExtensionAction(extension));
-            }
-        }
-        // Gets the list of user menu list extensions
-        Collection<UserMenuListExtension> extensionLists = extensionManager.getExtensions(UserMenuListExtension.class);
-        for (UserMenuListExtension extensionList: extensionLists) {
-            for (UserMenuExtension extension : extensionList.getUserMenuExtensions()) {
-                // Granted?
-                Class<? extends GlobalFunction> fn = extension.getGlobalFunction();
-                if (fn == null || securityService.isGlobalFunctionGranted(fn)) {
-                    // Adds the menu entry
-                    // Prepends the extension ID
-                    user.add(resolveExtensionAction(extension));
-                }
             }
         }
         // OK

@@ -39,21 +39,21 @@ class GQLContributorRecordings(
             extension.createRootQuery()
         }
 
-    private fun <R : Recording, F: Any> RecordingsExtension<R, F>.createRootQuery(): GraphQLFieldDefinition =
+    private fun <R : Recording, F : Any> RecordingsExtension<R, F>.createRootQuery(): GraphQLFieldDefinition =
             gqlPaginatedListFactory.createPaginatedField<Any?, R>(
                     cache = GQLTypeCache(),
-                    fieldName = "${prefix}Recordings",
+                    fieldName = "${graphQLPrefix.replaceFirstChar { it.lowercase() }}Recordings",
                     fieldDescription = "List of recordings for $lowerDisplayName",
-                    itemType = "${prefix}Recording",
+                    itemType = "${graphQLPrefix}Recording",
                     itemPaginatedListProvider = { env, _, offset, size ->
                         getPaginatedList(env, offset, size)
                     },
                     arguments = listOf(
-                            typedArgument(ARG_FILTER, "${prefix}RecordingFilterInput", "Filter", nullable = true)
+                            typedArgument(ARG_FILTER, "${graphQLPrefix}RecordingFilterInput", "Filter", nullable = true)
                     )
             )
 
-    private fun <R : Recording, F: Any> RecordingsExtension<R, F>.getPaginatedList(
+    private fun <R : Recording, F : Any> RecordingsExtension<R, F>.getPaginatedList(
             environment: DataFetchingEnvironment,
             offset: Int,
             size: Int
@@ -65,7 +65,7 @@ class GQLContributorRecordings(
         return recordingsQueryService.findByFilter(this, filter, offset, size)
     }
 
-    private fun <R : Recording, F: Any> RecordingsExtension<R, F>.contribute(cache: GQLTypeCache, dictionary: MutableSet<GraphQLType>): Set<GraphQLType> =
+    private fun <R : Recording, F : Any> RecordingsExtension<R, F>.contribute(cache: GQLTypeCache, dictionary: MutableSet<GraphQLType>): Set<GraphQLType> =
             graphQLContributions + setOf(
                     // Record
                     createRecordType(cache),
@@ -73,16 +73,16 @@ class GQLContributorRecordings(
                     createFilterInput(dictionary),
             )
 
-    private fun <R : Recording, F: Any> RecordingsExtension<R, F>.createFilterInput(dictionary: MutableSet<GraphQLType>): GraphQLInputObjectType =
+    private fun <R : Recording, F : Any> RecordingsExtension<R, F>.createFilterInput(dictionary: MutableSet<GraphQLType>): GraphQLInputObjectType =
             GraphQLInputObjectType.newInputObject()
-                    .name("${prefix}RecordingFilterInput")
+                    .name("${graphQLPrefix}RecordingFilterInput")
                     .description("Recording filter input for $lowerDisplayName")
                     .fields(GraphQLBeanConverter.asInputFields(filterType, dictionary))
                     .build()
 
-    private fun <R : Recording, F: Any> RecordingsExtension<R, F>.createRecordType(cache: GQLTypeCache): GraphQLObjectType =
+    private fun <R : Recording, F : Any> RecordingsExtension<R, F>.createRecordType(cache: GQLTypeCache): GraphQLObjectType =
             GraphQLObjectType.newObject()
-                    .name("${prefix}Recording")
+                    .name("${graphQLPrefix}Recording")
                     .description("Recording for $lowerDisplayName")
                     // Common fields
                     .fields(GraphQLBeanConverter.asObjectFields(Recording::class, cache))
@@ -91,9 +91,7 @@ class GQLContributorRecordings(
                     // Ok
                     .build()
 
-    private val <R : Recording, F: Any> RecordingsExtension<R, F>.prefix: String get() = graphQLPrefix.replaceFirstChar { it.titlecase() }
-
-    private val <R : Recording, F: Any> RecordingsExtension<R, F>.lowerDisplayName: String get() = displayName.replaceFirstChar { it.lowercase() }
+    private val <R : Recording, F : Any> RecordingsExtension<R, F>.lowerDisplayName: String get() = displayName.replaceFirstChar { it.lowercase() }
 
     companion object {
         private const val ARG_FILTER = "filter"
