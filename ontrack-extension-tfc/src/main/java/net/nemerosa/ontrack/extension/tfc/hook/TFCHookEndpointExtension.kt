@@ -66,6 +66,7 @@ class TFCHookEndpointExtension(
         payload: TFCHookPayload,
         notification: TFCHookPayloadNotification
     ): QueueDispatchResult = when (notification.trigger) {
+        "verification" -> verification(notification)
         "run:completed" -> processRun(parameters, payload, notification)
         "run:errored" -> processRun(parameters, payload, notification)
         else -> ignoredTrigger(notification)
@@ -101,15 +102,15 @@ class TFCHookEndpointExtension(
         }
     }
 
+    private fun verification(notification: TFCHookPayloadNotification) = QueueDispatchResult(
+        type = QueueDispatchResultType.PROCESSED,
+        message = "Notification trigger ${notification.trigger} has been processed",
+        id = null,
+    )
+
     private fun ignoredTrigger(notification: TFCHookPayloadNotification) = QueueDispatchResult(
         type = QueueDispatchResultType.IGNORED,
         message = "Notification trigger ${notification.trigger} is not processed",
         id = null,
-    )
-
-    private data class HookNotificationProcessing(
-        val type: HookResponseType,
-        val message: String?,
-        val id: String?,
     )
 }
