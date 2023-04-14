@@ -21,9 +21,9 @@ import java.time.LocalDateTime
  */
 @Component
 class AutoVersioningAuditStoreImpl(
-    private val entityDataStore: EntityDataStore,
-    private val helper: AutoVersioningAuditStoreHelper,
-    private val securityService: SecurityService,
+        private val entityDataStore: EntityDataStore,
+        private val helper: AutoVersioningAuditStoreHelper,
+        private val securityService: SecurityService,
 ) : AutoVersioningAuditStore {
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningAuditStoreImpl::class.java)
@@ -44,18 +44,18 @@ class AutoVersioningAuditStoreImpl(
          * * whose state is running and not processing
          */
         val filter = AutoVersioningAuditQueryFilter(
-            source = order.sourceProject,
-            project = order.branch.project.name,
-            branch = order.branch.name,
-            states = AutoVersioningAuditState.runningAndNotProcessingStates,
+                source = order.sourceProject,
+                project = order.branch.project.name,
+                branch = order.branch.name,
+                states = AutoVersioningAuditState.runningAndNotProcessingStates,
         )
         findByFilter(filter).forEach { entry ->
             logger.debug("Cancelling $entry")
             addState(
-                targetBranch = entry.order.branch,
-                uuid = entry.order.uuid,
-                queue = null,
-                state = AutoVersioningAuditState.PROCESSING_CANCELLED,
+                    targetBranch = entry.order.branch,
+                    uuid = entry.order.uuid,
+                    queue = null,
+                    state = AutoVersioningAuditState.PROCESSING_CANCELLED,
             )
         }
     }
@@ -63,96 +63,98 @@ class AutoVersioningAuditStoreImpl(
     override fun create(order: AutoVersioningOrder, routing: String) {
         val signature = signature()
         entityDataStore.addObject(
-            order.branch,
-            STORE_CATEGORY,
-            order.uuid,
-            signature,
-            null,
-            order.run {
-                AutoVersioningAuditStoreData(
-                    sourceProject = sourceProject,
-                    targetPaths = targetPaths,
-                    targetRegex = targetRegex,
-                    targetProperty = targetProperty,
-                    targetPropertyRegex = targetPropertyRegex,
-                    targetPropertyType = targetPropertyType,
-                    targetVersion = targetVersion,
-                    autoApproval = autoApproval,
-                    upgradeBranchPattern = upgradeBranchPattern,
-                    postProcessing = postProcessing,
-                    postProcessingConfig = postProcessingConfig,
-                    validationStamp = validationStamp,
-                    autoApprovalMode = autoApprovalMode,
-                    states = listOf(
-                        AutoVersioningAuditEntryState(
-                            signature = signature,
-                            state = AutoVersioningAuditState.CREATED,
-                            data = emptyMap()
-                        )
-                    ),
-                    routing = routing,
-                    queue = null,
-                )
-            }
+                order.branch,
+                STORE_CATEGORY,
+                order.uuid,
+                signature,
+                null,
+                order.run {
+                    AutoVersioningAuditStoreData(
+                            uuid = uuid,
+                            sourceProject = sourceProject,
+                            targetPaths = targetPaths,
+                            targetRegex = targetRegex,
+                            targetProperty = targetProperty,
+                            targetPropertyRegex = targetPropertyRegex,
+                            targetPropertyType = targetPropertyType,
+                            targetVersion = targetVersion,
+                            autoApproval = autoApproval,
+                            upgradeBranchPattern = upgradeBranchPattern,
+                            postProcessing = postProcessing,
+                            postProcessingConfig = postProcessingConfig,
+                            validationStamp = validationStamp,
+                            autoApprovalMode = autoApprovalMode,
+                            states = listOf(
+                                    AutoVersioningAuditEntryState(
+                                            signature = signature,
+                                            state = AutoVersioningAuditState.CREATED,
+                                            data = emptyMap()
+                                    )
+                            ),
+                            routing = routing,
+                            queue = null,
+                    )
+                }
         )
     }
 
     override fun addState(
-        targetBranch: Branch,
-        uuid: String,
-        queue: String?,
-        state: AutoVersioningAuditState,
-        vararg data: Pair<String, String>,
+            targetBranch: Branch,
+            uuid: String,
+            queue: String?,
+            state: AutoVersioningAuditState,
+            vararg data: Pair<String, String>,
     ) {
         val record =
-            entityDataStore.findLastByCategoryAndName(targetBranch, STORE_CATEGORY, uuid, Time.now()).getOrNull()
+                entityDataStore.findLastByCategoryAndName(targetBranch, STORE_CATEGORY, uuid, Time.now()).getOrNull()
         if (record != null) {
             var initialData: AutoVersioningAuditStoreData = record.data.parse()
             val signature = signature()
             val newState = AutoVersioningAuditEntryState(
-                signature = signature,
-                state = state,
-                data = data.toMap()
+                    signature = signature,
+                    state = state,
+                    data = data.toMap()
             )
 
             if (queue != null) {
                 initialData = initialData.run {
                     AutoVersioningAuditStoreData(
-                        sourceProject = sourceProject,
-                        targetPaths = targetPaths,
-                        targetRegex = targetRegex,
-                        targetProperty = targetProperty,
-                        targetPropertyRegex = targetPropertyRegex,
-                        targetPropertyType = targetPropertyType,
-                        targetVersion = targetVersion,
-                        autoApproval = autoApproval,
-                        upgradeBranchPattern = upgradeBranchPattern,
-                        postProcessing = postProcessing,
-                        postProcessingConfig = postProcessingConfig,
-                        validationStamp = validationStamp,
-                        autoApprovalMode = autoApprovalMode,
-                        states = states,
-                        routing = routing,
-                        queue = queue,
+                            uuid = uuid,
+                            sourceProject = sourceProject,
+                            targetPaths = targetPaths,
+                            targetRegex = targetRegex,
+                            targetProperty = targetProperty,
+                            targetPropertyRegex = targetPropertyRegex,
+                            targetPropertyType = targetPropertyType,
+                            targetVersion = targetVersion,
+                            autoApproval = autoApproval,
+                            upgradeBranchPattern = upgradeBranchPattern,
+                            postProcessing = postProcessing,
+                            postProcessingConfig = postProcessingConfig,
+                            validationStamp = validationStamp,
+                            autoApprovalMode = autoApprovalMode,
+                            states = states,
+                            routing = routing,
+                            queue = queue,
                     )
                 }
             }
 
             val newData = initialData.addState(newState)
             entityDataStore.replaceOrAddObject(
-                targetBranch,
-                STORE_CATEGORY,
-                uuid,
-                signature,
-                null,
-                newData
+                    targetBranch,
+                    STORE_CATEGORY,
+                    uuid,
+                    signature,
+                    null,
+                    newData
             )
         }
     }
 
     override fun findByUUID(targetBranch: Branch, uuid: String): AutoVersioningAuditEntry? {
         return entityDataStore.getByFilter(
-            EntityDataStoreFilter(entity = targetBranch, category = STORE_CATEGORY, name = uuid)
+                EntityDataStoreFilter(entity = targetBranch, category = STORE_CATEGORY, name = uuid)
         ).firstOrNull()?.toEntry()
     }
 
@@ -165,44 +167,44 @@ class AutoVersioningAuditStoreImpl(
     }
 
     override fun removeAllBefore(retentionDate: LocalDateTime, nonRunningOnly: Boolean): Int =
-        entityDataStore.deleteByFilter(
-            EntityDataStoreFilter(
-                category = STORE_CATEGORY,
-                beforeTime = retentionDate
-            ).withJsonFilter(
-                "json::jsonb->>'running' = :running",
-                "running" to (!nonRunningOnly).toString()
+            entityDataStore.deleteByFilter(
+                    EntityDataStoreFilter(
+                            category = STORE_CATEGORY,
+                            beforeTime = retentionDate
+                    ).withJsonFilter(
+                            "json::jsonb->>'running' = :running",
+                            "running" to (!nonRunningOnly).toString()
+                    )
             )
-        )
 
     override fun removeAll() {
         entityDataStore.deleteByCategoryBefore(STORE_CATEGORY, Time.now().plusDays(1))
     }
 
     private fun EntityDataStoreRecord.toEntry() =
-        data.parse<AutoVersioningAuditStoreData>().run {
-            AutoVersioningAuditEntry(
-                order = AutoVersioningOrder(
-                    uuid = this@toEntry.name,
-                    branch = this@toEntry.entity as Branch,
-                    sourceProject = sourceProject,
-                    targetPaths = targetPaths,
-                    targetRegex = targetRegex,
-                    targetProperty = targetProperty,
-                    targetPropertyRegex = targetPropertyRegex,
-                    targetPropertyType = targetPropertyType,
-                    targetVersion = targetVersion,
-                    autoApproval = autoApproval,
-                    upgradeBranchPattern = upgradeBranchPattern,
-                    postProcessing = postProcessing,
-                    postProcessingConfig = postProcessingConfig,
-                    validationStamp = validationStamp,
-                    autoApprovalMode = autoApprovalMode,
-                ),
-                audit = states,
-                routing = routing,
-                queue = queue,
-            )
-        }
+            data.parse<AutoVersioningAuditStoreData>().run {
+                AutoVersioningAuditEntry(
+                        order = AutoVersioningOrder(
+                                uuid = this@toEntry.name,
+                                branch = this@toEntry.entity as Branch,
+                                sourceProject = sourceProject,
+                                targetPaths = targetPaths,
+                                targetRegex = targetRegex,
+                                targetProperty = targetProperty,
+                                targetPropertyRegex = targetPropertyRegex,
+                                targetPropertyType = targetPropertyType,
+                                targetVersion = targetVersion,
+                                autoApproval = autoApproval,
+                                upgradeBranchPattern = upgradeBranchPattern,
+                                postProcessing = postProcessing,
+                                postProcessingConfig = postProcessingConfig,
+                                validationStamp = validationStamp,
+                                autoApprovalMode = autoApprovalMode,
+                        ),
+                        audit = states,
+                        routing = routing,
+                        queue = queue,
+                )
+            }
 
 }

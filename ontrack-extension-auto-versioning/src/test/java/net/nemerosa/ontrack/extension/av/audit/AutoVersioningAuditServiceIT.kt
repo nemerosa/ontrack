@@ -162,7 +162,7 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
                         entry,
                         audit(
                             AutoVersioningAuditState.ERROR,
-                            "error" to AbstractAutoVersioningAuditService.reducedStackTrace(error)
+                            "error" to AutoVersioningAuditServiceImpl.reducedStackTrace(error)
                         ),
                         audit(AutoVersioningAuditState.PR_CREATING, "branch" to "feature/version-2.0.0"),
                         audit(

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.av.queue
 
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditService
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningRecordingsExtension
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.metrics.AutoVersioningMetricsService
@@ -30,7 +31,8 @@ class AutoVersioningQueueProcessor(
         val entry = recordingsQueryService.findById(autoVersioningRecordingsExtension, payload.uuid)
         if (entry == null) {
             error("No audit entry found upon receiving the processing order")
-        } else if (!entry.mostRecentState.state.isRunning) {
+        } else if (!entry.mostRecentState.isRunning) {
+            // FIXME Cancelling of queue messages at extension level
             logger.debug("Cancelled order, not processing. {}", entry)
             return
         }

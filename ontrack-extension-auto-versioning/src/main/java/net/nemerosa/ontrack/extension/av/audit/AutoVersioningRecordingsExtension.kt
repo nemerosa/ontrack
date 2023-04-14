@@ -12,7 +12,7 @@ import kotlin.reflect.KClass
 @Component
 class AutoVersioningRecordingsExtension(
         extensionFeature: AutoVersioningExtensionFeature,
-): AbstractExtension(extensionFeature), RecordingsExtension<AutoVersioningAuditEntry, AutoVersioningAuditQueryFilter> {
+): AbstractExtension(extensionFeature), RecordingsExtension<AutoVersioningAuditStoreData, AutoVersioningAuditQueryFilter> {
 
     override val id: String = "auto-versioning"
 
@@ -26,7 +26,7 @@ class AutoVersioningRecordingsExtension(
 
     override val filterType: KClass<AutoVersioningAuditQueryFilter> = AutoVersioningAuditQueryFilter::class
 
-    override fun fromJson(data: JsonNode): AutoVersioningAuditEntry {
+    override fun fromJson(data: JsonNode): AutoVersioningAuditStoreData {
         TODO("Not yet implemented")
     }
 
@@ -34,7 +34,7 @@ class AutoVersioningRecordingsExtension(
         TODO("Not yet implemented")
     }
 
-    override fun toJson(recording: AutoVersioningAuditEntry): JsonNode {
+    override fun toJson(recording: AutoVersioningAuditStoreData): JsonNode {
         TODO("Not yet implemented")
     }
 }
