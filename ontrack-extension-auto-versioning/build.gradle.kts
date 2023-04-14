@@ -21,6 +21,8 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation(project(":ontrack-extension-notifications"))
+    implementation(project(":ontrack-extension-queue"))
+    implementation(project(":ontrack-extension-recordings"))
 
     testImplementation(project(":ontrack-extension-general"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
@@ -28,6 +30,8 @@ dependencies {
     testImplementation(project(path = ":ontrack-extension-scm", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-general", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-queue", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-recordings", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-notifications", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
 
