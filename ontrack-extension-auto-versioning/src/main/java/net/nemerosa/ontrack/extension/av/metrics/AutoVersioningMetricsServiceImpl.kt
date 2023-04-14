@@ -13,19 +13,17 @@ class AutoVersioningMetricsServiceImpl(
     private val meterRegistry: MeterRegistry,
 ) : AutoVersioningMetricsService {
 
-    override fun onQueuing(order: AutoVersioningOrder, routingKey: String) {
+    override fun onQueuing(order: AutoVersioningOrder) {
         meterRegistry.increment(
             order,
-            AutoVersioningMetrics.Queue.producedCount,
-            AutoVersioningMetrics.Tags.ROUTING_KEY to routingKey,
+            AutoVersioningMetrics.Queue.producedCount
         )
     }
 
-    override fun onReceiving(order: AutoVersioningOrder, queue: String?) {
+    override fun onReceiving(order: AutoVersioningOrder) {
         meterRegistry.increment(
             order,
-            AutoVersioningMetrics.Queue.consumedCount,
-            AutoVersioningMetrics.Tags.QUEUE to (queue ?: "-"),
+            AutoVersioningMetrics.Queue.consumedCount
         )
     }
 

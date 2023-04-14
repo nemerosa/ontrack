@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.av.dispatcher
 
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
+import net.nemerosa.ontrack.extension.av.metrics.AutoVersioningMetricsService
 import net.nemerosa.ontrack.extension.av.model.AutoVersioningConfiguredBranches
 import net.nemerosa.ontrack.extension.av.model.PromotionEvent
 import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueueProcessor
@@ -14,6 +15,7 @@ import java.util.*
 class AutoVersioningDispatcherImpl(
         private val securityService: SecurityService,
         private val queueDispatcher: QueueDispatcher,
+        private val autoVersioningMetricsService: AutoVersioningMetricsService,
         private val autoVersioningQueueProcessor: AutoVersioningQueueProcessor,
 ) : AutoVersioningDispatcher {
     override fun dispatch(configuredBranches: AutoVersioningConfiguredBranches) {
@@ -23,6 +25,7 @@ class AutoVersioningDispatcherImpl(
                 configuredBranch.configurations.forEach { config ->
                     val order = createAutoVersioningOrder(configuredBranches.promotionEvent, branch, config)
                     // Posts the event on the queue
+                    autoVersioningMetricsService.onQueuing(order)
                     queueDispatcher.dispatch(autoVersioningQueueProcessor, order)
                 }
             }

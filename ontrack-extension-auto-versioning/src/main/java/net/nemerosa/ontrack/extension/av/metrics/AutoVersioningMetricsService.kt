@@ -6,8 +6,8 @@ import net.nemerosa.ontrack.extension.av.processing.AutoVersioningProcessingOutc
 
 interface AutoVersioningMetricsService {
 
-    fun onQueuing(order: AutoVersioningOrder, routingKey: String)
-    fun onReceiving(order: AutoVersioningOrder, queue: String?)
+    fun onQueuing(order: AutoVersioningOrder)
+    fun onReceiving(order: AutoVersioningOrder)
 
     fun processingTiming(
         order: AutoVersioningOrder,
