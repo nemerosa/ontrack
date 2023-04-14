@@ -28,15 +28,15 @@ class TFCHookIT : AbstractDSLTestSupport() {
                     queueTestSupport.withSyncQueuing {
                         tfcTestSupport.withNoSignature {
                             val response = hookTestSupport.hook(
-                                hook = "tfc",
-                                body = TFCFixtures.hookPayload(),
-                                parameters = mapOf(
-                                    "project" to project.name,
-                                    "branch" to branch.name,
-                                    "build" to name,
-                                    "validation" to vs.name,
-                                ),
-                                headers = emptyMap(),
+                                    hook = "tfc",
+                                    body = TFCFixtures.hookPayload(),
+                                    parameters = mapOf(
+                                            "project" to project.name,
+                                            "branch" to branch.name,
+                                            "build" to name,
+                                            "validation" to vs.name,
+                                    ),
+                                    headers = emptyMap(),
                             )
                             // Processed, because running in sync mode
                             assertEquals(HookResponseType.PROCESSED, response.type)
@@ -45,6 +45,28 @@ class TFCHookIT : AbstractDSLTestSupport() {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Verification hook`() {
+        tfcTestSupport.withNoSignature {
+            queueTestSupport.withSyncQueuing {
+                val response = hookTestSupport.hook(
+                        hook = "tfc",
+                        body = TFCFixtures.hookPayload(
+                                trigger = "verification",
+                        ),
+                        parameters = mapOf(
+                                "project" to "project",
+                                "branch" to "branch",
+                                "build" to "build",
+                                "validation" to "validation",
+                        ),
+                        headers = emptyMap(),
+                )
+                assertEquals(HookResponseType.PROCESSED, response.type)
             }
         }
     }

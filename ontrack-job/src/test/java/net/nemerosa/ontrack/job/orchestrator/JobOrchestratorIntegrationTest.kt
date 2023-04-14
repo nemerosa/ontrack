@@ -164,7 +164,7 @@ class JobOrchestratorIntegrationTest : AbstractJobTest() {
 
         private val jobs: MutableMap<String, Job> = mutableMapOf()
 
-        override val jobRegistrations: Collection<JobRegistration> =
+        override val jobRegistrations: Collection<JobRegistration> get() =
                 jobs.values.map { JobRegistration.of(it).withSchedule(Schedule.EVERY_DAY) }
 
         operator fun plusAssign(name: String) {

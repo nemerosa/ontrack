@@ -9,6 +9,7 @@ object TFCFixtures {
         runId: String = "run-6nGLT9zSLchkCV4A",
         workspaceName: String = "workspace-name",
         organizationName: String = "org-name",
+        trigger: String = "run:completed",
     ) = TFCHookPayload(
         notificationConfigurationId = "any",
         runUrl = "https://app.terraform.io/app/$organizationName/$workspaceName/runs/$runId",
