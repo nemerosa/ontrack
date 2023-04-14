@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.av.audit
 import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures.createOrder
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.recordings.RecordingsCleanupService
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -16,7 +17,10 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
     private lateinit var autoVersioningAuditQueryService: AutoVersioningAuditQueryService
 
     @Autowired
-    private lateinit var autoVersioningAuditCleanupService: AutoVersioningAuditCleanupService
+    private lateinit var autoVersioningRecordingsExtension: AutoVersioningRecordingsExtension
+
+    @Autowired
+    private lateinit var recordingsCleanupService: RecordingsCleanupService
 
     @Test
     fun `Last orders for a branch`() {
@@ -315,7 +319,7 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
         val source = project()
 
         // Clears all audit entries
-        autoVersioningAuditCleanupService.purge()
+        recordingsCleanupService.cleanup(autoVersioningRecordingsExtension)
 
         val project1 = project()
         val project2 = project()

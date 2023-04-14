@@ -4,7 +4,11 @@ import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.recordings.RecordingsService
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.apache.commons.lang3.exception.ExceptionUtils
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
+@Service
+@Transactional
 class AutoVersioningAuditServiceImpl(
         private val autoVersioningRecordingsExtension: AutoVersioningRecordingsExtension,
         private val recordingsService: RecordingsService,

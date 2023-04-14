@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures.createOrder
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.recordings.RecordingsCleanupService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
 import org.junit.jupiter.api.Test
@@ -16,7 +17,10 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
     private lateinit var autoVersioningAuditService: AutoVersioningAuditService
 
     @Autowired
-    private lateinit var autoVersioningAuditCleanupService: AutoVersioningAuditCleanupService
+    private lateinit var autoVersioningRecordingsExtension: AutoVersioningRecordingsExtension
+
+    @Autowired
+    private lateinit var recordingsCleanupService: RecordingsCleanupService
 
     @Autowired
     private lateinit var meterRegistry: MeterRegistry
@@ -27,7 +31,7 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
         project {
             branch {
                 // Purge existing audit entries
-                autoVersioningAuditCleanupService.purge()
+                recordingsCleanupService.cleanup(autoVersioningRecordingsExtension)
                 // In queue
                 create(source) {
                     autoVersioningAuditService.onQueuing(it, "routing", cancelling = false)
@@ -168,8 +172,8 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                 }
                 // Collects the metrics
                 val gauges =
-                    meterRegistry.find(AutoVersioningAuditMetrics.autoVersioningAuditState)
-                        .gauges()
+                        meterRegistry.find(AutoVersioningAuditMetrics.autoVersioningAuditState)
+                                .gauges()
                 val taggedGauges = gauges.associateBy {
                     val tag = it.id.getTag("state") ?: throw IllegalStateException("Null tag")
                     AutoVersioningAuditState.valueOf(tag)
@@ -178,24 +182,24 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                     gauge.value()
                 }
                 assertEquals(
-                    mapOf(
-                        AutoVersioningAuditState.CREATED to 1.0,
-                        AutoVersioningAuditState.RECEIVED to 2.0,
-                        AutoVersioningAuditState.ERROR to 3.0,
-                        AutoVersioningAuditState.PROCESSING_START to 4.0,
-                        AutoVersioningAuditState.PROCESSING_ABORTED to 5.0,
-                        AutoVersioningAuditState.PROCESSING_CANCELLED to 0.0,
-                        AutoVersioningAuditState.PROCESSING_CREATING_BRANCH to 6.0,
-                        AutoVersioningAuditState.PROCESSING_UPDATING_FILE to 7.0,
-                        AutoVersioningAuditState.POST_PROCESSING_START to 8.0,
-                        AutoVersioningAuditState.POST_PROCESSING_END to 9.0,
-                        AutoVersioningAuditState.PR_CREATING to 10.0,
-                        AutoVersioningAuditState.PR_MERGED to 11.0,
-                        AutoVersioningAuditState.PR_CREATED to 12.0,
-                        AutoVersioningAuditState.PR_APPROVED to 13.0,
-                        AutoVersioningAuditState.PR_TIMEOUT to 14.0,
-                    ),
-                    stateValues
+                        mapOf(
+                                AutoVersioningAuditState.CREATED to 1.0,
+                                AutoVersioningAuditState.RECEIVED to 2.0,
+                                AutoVersioningAuditState.ERROR to 3.0,
+                                AutoVersioningAuditState.PROCESSING_START to 4.0,
+                                AutoVersioningAuditState.PROCESSING_ABORTED to 5.0,
+                                AutoVersioningAuditState.PROCESSING_CANCELLED to 0.0,
+                                AutoVersioningAuditState.PROCESSING_CREATING_BRANCH to 6.0,
+                                AutoVersioningAuditState.PROCESSING_UPDATING_FILE to 7.0,
+                                AutoVersioningAuditState.POST_PROCESSING_START to 8.0,
+                                AutoVersioningAuditState.POST_PROCESSING_END to 9.0,
+                                AutoVersioningAuditState.PR_CREATING to 10.0,
+                                AutoVersioningAuditState.PR_MERGED to 11.0,
+                                AutoVersioningAuditState.PR_CREATED to 12.0,
+                                AutoVersioningAuditState.PR_APPROVED to 13.0,
+                                AutoVersioningAuditState.PR_TIMEOUT to 14.0,
+                        ),
+                        stateValues
                 )
             }
         }
