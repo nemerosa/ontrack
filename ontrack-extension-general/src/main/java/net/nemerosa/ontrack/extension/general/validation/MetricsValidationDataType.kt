@@ -71,6 +71,8 @@ class MetricsValidationDataType(
     override fun getMetrics(data: MetricsValidationData): Map<String, *>? =
         data.metrics
 
+    override fun getMetricNames(): List<String>? = null
+
     override fun getNumericMetrics(data: MetricsValidationData): Map<String, Double> = data.metrics
 
     class MetricsValidationDataForm(

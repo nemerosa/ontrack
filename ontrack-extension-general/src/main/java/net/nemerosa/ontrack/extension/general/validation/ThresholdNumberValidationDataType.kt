@@ -50,6 +50,8 @@ class ThresholdNumberValidationDataType(
         return mapOf("value" to data)
     }
 
+    override fun getMetricNames(): List<String>? = listOf("value")
+
     override fun getNumericMetrics(data: Int): Map<String, Double> {
         return mapOf("value" to data.toDouble())
     }

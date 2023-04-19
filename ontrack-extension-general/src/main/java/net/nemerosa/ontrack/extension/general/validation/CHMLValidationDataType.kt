@@ -143,6 +143,8 @@ class CHMLValidationDataType(
         )
     }
 
+    override fun getMetricNames(): List<String> = CHML.values().map { it.name.lowercase() }
+
     override fun getNumericMetrics(data: CHMLValidationDataTypeData): Map<String, Double> {
         return mapOf(
             "critical" to (data.levels[CHML.CRITICAL] ?: 0).toDouble(),

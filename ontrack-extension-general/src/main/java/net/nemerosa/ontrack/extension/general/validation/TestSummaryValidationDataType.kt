@@ -96,6 +96,10 @@ class TestSummaryValidationDataType(
         )
     }
 
+    override fun getMetricNames(): List<String>? = listOf(
+            "passed", "skipped", "failed", "total"
+    )
+
     override fun getNumericMetrics(data: TestSummaryValidationData): Map<String, Double> {
         return mapOf(
             "passed" to data.passed.toDouble(),

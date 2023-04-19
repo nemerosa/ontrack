@@ -14,16 +14,15 @@ class MetricsChart(
         const val TYPE = "metrics"
 
         fun compute(
-            items: List<MetricsChartItemData>,
-            interval: Interval,
-            period: String,
+                names: List<String>?,
+                items: List<MetricsChartItemData>,
+                interval: Interval,
+                period: String,
         ): MetricsChart {
             // Period based formatting
             val intervalPeriod = parseIntervalPeriod(period)
             // Gets all the intervals for the given period
             val intervals = interval.split(intervalPeriod)
-
-            //
 
             // Group the metrics per interval and take the average
             val metricNames = mutableSetOf<String>()
@@ -57,11 +56,11 @@ class MetricsChart(
 
             // Chart
             return MetricsChart(
-                dates = intervals.map {
-                    intervalPeriod.format(it.start)
-                },
-                metricNames = metricNames.sorted(),
-                metricValues = metricValues,
+                    dates = intervals.map {
+                        intervalPeriod.format(it.start)
+                    },
+                    metricNames = names ?: metricNames.sorted(),
+                    metricValues = metricValues,
             )
         }
     }
@@ -69,6 +68,6 @@ class MetricsChart(
 }
 
 data class MetricsChartItemData(
-    val timestamp: LocalDateTime,
-    val metrics: Map<String, Double>,
+        val timestamp: LocalDateTime,
+        val metrics: Map<String, Double>,
 )

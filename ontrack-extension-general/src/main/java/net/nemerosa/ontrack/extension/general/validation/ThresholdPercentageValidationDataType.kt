@@ -59,6 +59,8 @@ class ThresholdPercentageValidationDataType(
         return mapOf("percentage" to data)
     }
 
+    override fun getMetricNames(): List<String>? = listOf("percentage")
+
     override fun getNumericMetrics(data: Int): Map<String, Double> {
         return mapOf("percentage" to data.toDouble())
     }
