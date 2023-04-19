@@ -5,9 +5,9 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import java.time.LocalDateTime
 
 class MetricsChart(
-    val dates: List<String>,
-    val metricNames: List<String>,
-    val metricValues: List<Map<String, Double>>,
+        @Suppress("unused") val dates: List<String>,
+        @Suppress("unused") val metricNames: List<String>,
+        @Suppress("unused") val metricValues: List<Map<String, Double>>,
 ) : Chart {
 
     companion object {
@@ -42,7 +42,7 @@ class MetricsChart(
                     }
                 }
                 // Getting the average per metric
-                metricsValues.mapValues { (metric, values) ->
+                metricsValues.mapValues { (_, values) ->
                     val stats = DescriptiveStatistics()
                     values.forEach { stats.addValue(it) }
                     stats.mean
