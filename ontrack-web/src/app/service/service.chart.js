@@ -408,10 +408,7 @@ angular.module('ot.service.chart', [
 
                     metricValues.forEach(point => {
                         metricNames.forEach(metricName => {
-                            let value = point[metricName];
-                            if (!value) {
-                                value = 0.0;
-                            }
+                            const value = point[metricName];
                             chartData.data[metricName].push(value);
                         });
                     });

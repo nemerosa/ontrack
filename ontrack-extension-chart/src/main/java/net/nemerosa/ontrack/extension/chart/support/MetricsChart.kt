@@ -31,21 +31,27 @@ class MetricsChart(
                 val itemsInInterval = items.filter { item ->
                     item.timestamp in internalInterval
                 }.map { it.metrics }
-                // Values per metrics name
-                val metricsValues = mutableMapOf<String, MutableList<Double>>()
-                itemsInInterval.forEach { metrics ->
-                    metrics.forEach { (metric, value) ->
-                        metricNames.add(metric)
-                        metricsValues
-                            .getOrPut(metric) { mutableListOf() }
-                            .add(value)
-                    }
+                // If no item in the interval, does not return any data
+                if (itemsInInterval.isEmpty()) {
+                    emptyMap()
                 }
-                // Getting the average per metric
-                metricsValues.mapValues { (_, values) ->
-                    val stats = DescriptiveStatistics()
-                    values.forEach { stats.addValue(it) }
-                    stats.mean
+                // Values per metrics name
+                else {
+                    val metricsValues = mutableMapOf<String, MutableList<Double>>()
+                    itemsInInterval.forEach { metrics ->
+                        metrics.forEach { (metric, value) ->
+                            metricNames.add(metric)
+                            metricsValues
+                                    .getOrPut(metric) { mutableListOf() }
+                                    .add(value)
+                        }
+                    }
+                    // Getting the average per metric
+                    metricsValues.mapValues { (_, values) ->
+                        val stats = DescriptiveStatistics()
+                        values.forEach { stats.addValue(it) }
+                        stats.mean
+                    }
                 }
             }
 
