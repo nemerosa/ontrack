@@ -10,6 +10,9 @@ import java.time.LocalDateTime
 data class AutoVersioningAuditStoreData(
         val uuid: String,
         val sourceProject: String,
+        val branchProjectName: String,
+        val branchName: String,
+        val branchId: Int,
         val targetPaths: List<String>,
         val targetRegex: String?,
         val targetProperty: String?,
@@ -42,6 +45,9 @@ data class AutoVersioningAuditStoreData(
 
     fun addState(newState: AutoVersioningAuditEntryState) = AutoVersioningAuditStoreData(
             uuid = uuid,
+            branchProjectName = branchProjectName,
+            branchName = branchName,
+            branchId = branchId,
             sourceProject = sourceProject,
             targetPaths = targetPaths,
             targetRegex = targetRegex,

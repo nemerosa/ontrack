@@ -81,6 +81,7 @@ class AutoVersioningAuditStoreJdbcHelper(
         select: String = "SELECT * ",
         limits: Boolean = true,
     ): String {
+        TODO("Will be removed")
         // Base query
         var query = """
             WHERE S.CATEGORY = '${AutoVersioningAuditStoreConstants.STORE_CATEGORY}'
@@ -149,11 +150,6 @@ class AutoVersioningAuditStoreJdbcHelper(
             }
         }
 
-        // Final query
-        var sql = "$select FROM ENTITY_DATA_STORE S $joins $query"
-        if (limits) {
-            sql += " ORDER BY S.ID DESC LIMIT ${filter.count} OFFSET ${filter.offset}"
-        }
-        return sql
+        return "sql"
     }
 }

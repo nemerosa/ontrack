@@ -6,8 +6,6 @@ interface AutoVersioningAuditQueryService {
 
     fun findByUUID(branch: Branch, uuid: String): AutoVersioningAuditEntry?
 
-    fun findByFilter(filter: AutoVersioningAuditQueryFilter): List<AutoVersioningAuditEntry>
-
-    fun countByFilter(filter: AutoVersioningAuditQueryFilter): Int
+    fun findByFilter(filter: AutoVersioningAuditQueryFilter, offset: Int = 0, size: Int = 10): List<AutoVersioningAuditEntry>
 
 }

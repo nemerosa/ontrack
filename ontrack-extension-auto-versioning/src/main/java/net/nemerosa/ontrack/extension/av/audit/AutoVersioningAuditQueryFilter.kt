@@ -17,35 +17,4 @@ class AutoVersioningAuditQueryFilter(
     val routing: String? = null,
     @APIDescription("Actual queue the order was posted to")
     val queue: String? = null,
-    val offset: Int = 0,
-    val count: Int = 10
-) {
-    fun withOffset(value: Int) = AutoVersioningAuditQueryFilter(
-        project = project,
-        branch = branch,
-        uuid = uuid,
-        state = state,
-        states = states,
-        running = running,
-        source = source,
-        version = version,
-        routing = routing,
-        queue = queue,
-        offset = value,
-        count = count
-    )
-    fun withCount(value: Int) = AutoVersioningAuditQueryFilter(
-        project = project,
-        branch = branch,
-        uuid = uuid,
-        state = state,
-        states = states,
-        source = source,
-        running = running,
-        version = version,
-        routing = routing,
-        queue = queue,
-        offset = offset,
-        count = value
-    )
-}
+)

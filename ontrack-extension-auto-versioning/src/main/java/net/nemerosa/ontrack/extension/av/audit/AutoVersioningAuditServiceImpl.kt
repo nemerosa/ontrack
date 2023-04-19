@@ -26,6 +26,9 @@ class AutoVersioningAuditServiceImpl(
         val record = order.run {
             AutoVersioningAuditStoreData(
                     uuid = uuid,
+                    branchProjectName = order.branch.project.name,
+                    branchName = order.branch.name,
+                    branchId = order.branch.id(),
                     sourceProject = sourceProject,
                     targetPaths = targetPaths,
                     targetRegex = targetRegex,
@@ -67,6 +70,9 @@ class AutoVersioningAuditServiceImpl(
 
     private fun AutoVersioningAuditStoreData.withQueue(queue: String) = AutoVersioningAuditStoreData(
             uuid = uuid,
+            branchProjectName = branchProjectName,
+            branchName = branchName,
+            branchId = branchId,
             sourceProject = sourceProject,
             targetPaths = targetPaths,
             targetRegex = targetRegex,

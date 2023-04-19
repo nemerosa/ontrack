@@ -61,41 +61,7 @@ class AutoVersioningAuditStoreImpl(
     }
 
     override fun create(order: AutoVersioningOrder, routing: String) {
-        val signature = signature()
-        entityDataStore.addObject(
-                order.branch,
-                STORE_CATEGORY,
-                order.uuid,
-                signature,
-                null,
-                order.run {
-                    AutoVersioningAuditStoreData(
-                            uuid = uuid,
-                            sourceProject = sourceProject,
-                            targetPaths = targetPaths,
-                            targetRegex = targetRegex,
-                            targetProperty = targetProperty,
-                            targetPropertyRegex = targetPropertyRegex,
-                            targetPropertyType = targetPropertyType,
-                            targetVersion = targetVersion,
-                            autoApproval = autoApproval,
-                            upgradeBranchPattern = upgradeBranchPattern,
-                            postProcessing = postProcessing,
-                            postProcessingConfig = postProcessingConfig,
-                            validationStamp = validationStamp,
-                            autoApprovalMode = autoApprovalMode,
-                            states = listOf(
-                                    AutoVersioningAuditEntryState(
-                                            signature = signature,
-                                            state = AutoVersioningAuditState.CREATED,
-                                            data = emptyMap()
-                                    )
-                            ),
-                            routing = routing,
-                            queue = null,
-                    )
-                }
-        )
+        TODO("Will be removed")
     }
 
     override fun addState(
@@ -105,51 +71,7 @@ class AutoVersioningAuditStoreImpl(
             state: AutoVersioningAuditState,
             vararg data: Pair<String, String>,
     ) {
-        val record =
-                entityDataStore.findLastByCategoryAndName(targetBranch, STORE_CATEGORY, uuid, Time.now()).getOrNull()
-        if (record != null) {
-            var initialData: AutoVersioningAuditStoreData = record.data.parse()
-            val signature = signature()
-            val newState = AutoVersioningAuditEntryState(
-                    signature = signature,
-                    state = state,
-                    data = data.toMap()
-            )
-
-            if (queue != null) {
-                initialData = initialData.run {
-                    AutoVersioningAuditStoreData(
-                            uuid = uuid,
-                            sourceProject = sourceProject,
-                            targetPaths = targetPaths,
-                            targetRegex = targetRegex,
-                            targetProperty = targetProperty,
-                            targetPropertyRegex = targetPropertyRegex,
-                            targetPropertyType = targetPropertyType,
-                            targetVersion = targetVersion,
-                            autoApproval = autoApproval,
-                            upgradeBranchPattern = upgradeBranchPattern,
-                            postProcessing = postProcessing,
-                            postProcessingConfig = postProcessingConfig,
-                            validationStamp = validationStamp,
-                            autoApprovalMode = autoApprovalMode,
-                            states = states,
-                            routing = routing,
-                            queue = queue,
-                    )
-                }
-            }
-
-            val newData = initialData.addState(newState)
-            entityDataStore.replaceOrAddObject(
-                    targetBranch,
-                    STORE_CATEGORY,
-                    uuid,
-                    signature,
-                    null,
-                    newData
-            )
-        }
+        TODO("Will be removed")
     }
 
     override fun findByUUID(targetBranch: Branch, uuid: String): AutoVersioningAuditEntry? {
