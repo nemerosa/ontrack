@@ -374,6 +374,7 @@ angular.module('ot.service.chart', [
                         return {
                             name: metric,
                             type: 'line',
+                            connectNulls: true,
                             data: chartData.data[metric]
                         };
                     });
