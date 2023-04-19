@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.YesNo
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
+import net.nemerosa.ontrack.model.structure.MetricsColors
 import net.nemerosa.ontrack.model.structure.NumericValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
@@ -98,6 +99,13 @@ class TestSummaryValidationDataType(
 
     override fun getMetricNames(): List<String>? = listOf(
             "passed", "skipped", "failed", "total"
+    )
+
+    override fun getMetricColors(): List<String>? = listOf(
+            MetricsColors.SUCCESS,
+            MetricsColors.WARNING,
+            MetricsColors.FAILURE,
+            MetricsColors.NEUTRAL,
     )
 
     override fun getNumericMetrics(data: TestSummaryValidationData): Map<String, Double> {

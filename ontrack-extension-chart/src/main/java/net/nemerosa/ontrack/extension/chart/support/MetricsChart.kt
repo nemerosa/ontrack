@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 class MetricsChart(
         @Suppress("unused") val dates: List<String>,
         @Suppress("unused") val metricNames: List<String>,
+        @Suppress("unused") val metricColors: List<String>?,
         @Suppress("unused") val metricValues: List<Map<String, Double>>,
 ) : Chart {
 
@@ -15,6 +16,7 @@ class MetricsChart(
 
         fun compute(
                 names: List<String>?,
+                colors: List<String>?,
                 items: List<MetricsChartItemData>,
                 interval: Interval,
                 period: String,
@@ -60,6 +62,7 @@ class MetricsChart(
                         intervalPeriod.format(it.start)
                     },
                     metricNames = names ?: metricNames.sorted(),
+                    metricColors = colors,
                     metricValues = metricValues,
             )
         }

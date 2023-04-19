@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.selection
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
+import net.nemerosa.ontrack.model.structure.MetricsColors
 import net.nemerosa.ontrack.model.structure.NumericValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
@@ -144,6 +145,13 @@ class CHMLValidationDataType(
     }
 
     override fun getMetricNames(): List<String> = CHML.values().map { it.name.lowercase() }
+
+    override fun getMetricColors(): List<String>? = listOf(
+            MetricsColors.FAILURE,
+            MetricsColors.WARNING,
+            MetricsColors.NEUTRAL,
+            MetricsColors.SUCCESS,
+    )
 
     override fun getNumericMetrics(data: CHMLValidationDataTypeData): Map<String, Double> {
         return mapOf(

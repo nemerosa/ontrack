@@ -10,6 +10,13 @@ interface NumericValidationDataType<C, T> : ValidationDataType<C, T> {
     fun getMetricNames(): List<String>?
 
     /**
+     * Optional list of colors
+     *
+     * @return Color palette for the metrics (if not a default)
+     */
+    fun getMetricColors(): List<String>? = null
+
+    /**
      * Gets some metrics about this data.
      */
     fun getNumericMetrics(data: T): Map<String, Double>

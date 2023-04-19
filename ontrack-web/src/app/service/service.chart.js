@@ -382,6 +382,7 @@ angular.module('ot.service.chart', [
                 onData: (data, chartData, options) => {
                     chartData.categories.length = 0;
                     const metricNames = data.getChart.metricNames;
+                    const metricColors = data.getChart.metricColors;
                     chartData.categories.push(...metricNames);
 
                     if (metricNames.length > 4) {
@@ -392,6 +393,10 @@ angular.module('ot.service.chart', [
                         options.legend.selectorPosition = 'start';
                     } else {
                         options.legend.type = 'plain';
+                    }
+
+                    if (metricColors) {
+                        options.color = metricColors;
                     }
 
                     metricNames.forEach(metricName => {

@@ -47,6 +47,7 @@ class ValidationStampMetricsChartProvider(
                 ?.validationStamp?.dataType?.descriptor?.id
                 ?: return MetricsChart.compute(
                         names = emptyList(),
+                        colors = emptyList(),
                         items = emptyList(),
                         interval = options.actualInterval,
                         period = options.period,
@@ -55,6 +56,7 @@ class ValidationStampMetricsChartProvider(
                 ?.takeIf { it is NumericValidationDataType }
                 ?: return MetricsChart.compute(
                         names = emptyList(),
+                        colors = emptyList(),
                         items = emptyList(),
                         interval = options.actualInterval,
                         period = options.period,
@@ -77,6 +79,7 @@ class ValidationStampMetricsChartProvider(
         // Creating the chart
         return MetricsChart.compute(
                 names = dataType.getMetricNames(),
+                colors = dataType.getMetricColors(),
                 items = items,
                 interval = options.actualInterval,
                 period = options.period,
