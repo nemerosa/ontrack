@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.casc.ui
 
 import net.nemerosa.ontrack.extension.api.UserMenuExtension
+import net.nemerosa.ontrack.extension.api.UserMenuExtensionGroups
 import net.nemerosa.ontrack.extension.casc.CascExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.security.GlobalFunction
@@ -14,12 +15,13 @@ class CascUserMenuExtension(
     extensionFeature: CascExtensionFeature,
 ) : AbstractExtension(extensionFeature), UserMenuExtension {
 
-    override fun getAction() = Action(
+    override val action = Action(
         id = "casc-control",
         name = "Configuration as Code",
         type = ActionType.LINK,
-        uri = "casc-control"
+        uri = "casc-control",
+        group = UserMenuExtensionGroups.system,
     )
 
-    override fun getGlobalFunction(): Class<out GlobalFunction> = GlobalSettings::class.java
+    override val globalFunction: Class<out GlobalFunction> = GlobalSettings::class.java
 }

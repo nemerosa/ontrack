@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.influxdb
 
 import net.nemerosa.ontrack.extension.api.UserMenuExtension
+import net.nemerosa.ontrack.extension.api.UserMenuExtensionGroups
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.security.ApplicationManagement
 import net.nemerosa.ontrack.model.security.GlobalFunction
@@ -16,11 +17,11 @@ import org.springframework.stereotype.Component
 class InfluxDBExtensionUserMenuExtension(extensionFeature: InfluxDBExtensionFeature) :
     AbstractExtension(extensionFeature), UserMenuExtension {
 
-    override fun getGlobalFunction(): Class<out GlobalFunction> = ApplicationManagement::class.java
+    override val globalFunction: Class<out GlobalFunction> = ApplicationManagement::class.java
 
-    override fun getAction(): Action = Action.of(
-        "status",
-        "InfluxDB status",
-        "status"
-    )
+    override val action: Action = Action.of(
+        id = "status",
+        name = "InfluxDB status",
+        uri = "status"
+    ).withGroup(UserMenuExtensionGroups.system)
 }

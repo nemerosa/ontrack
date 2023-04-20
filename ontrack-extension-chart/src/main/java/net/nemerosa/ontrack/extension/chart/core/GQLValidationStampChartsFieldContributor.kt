@@ -31,7 +31,7 @@ class GQLValidationStampChartsFieldContributor(
                         val providers = chartRegistry.getProvidersForSubjectClass(ValidationStamp::class)
                         providers.mapNotNull { provider ->
                             provider.getChartDefinition(vs)
-                        }
+                        }.sortedBy { it.title }
                     }
                     .build()
             )

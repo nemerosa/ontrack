@@ -30,6 +30,9 @@ const ontrack = angular.module('ontrack', [
         'ot.directive.validationStampFilter',
         'ot.directive.promotionLevels',
         'ot.directive.validationStamps',
+        'ot.directive.userMenu',
+        'ot.directive.userMenuAction',
+        'ot.directive.userMenuGroup',
         // Dialogs
         'ot.dialog.applicationInfo',
         // Services
@@ -199,16 +202,6 @@ const ontrack = angular.module('ontrack', [
 
             $log.debug('[app] Initialising the app controller...');
 
-            // Logout
-            $scope.logout = function () {
-                ot.call($http.post("logout", {})).then(function () {
-                    location.href = '/login?logout';
-                });
-            };
-
-            // User menu filter
-            $scope.userMenuFilter = '';
-
             /**
              * Application info mgt
              */
@@ -241,6 +234,21 @@ const ontrack = angular.module('ontrack', [
             };
             $scope.closeNotification = function () {
                 $rootScope.notification = undefined;
+            };
+
+            // User menu state
+            $scope.userMenu = {
+                active: false
+            };
+
+            // Toggling the user menu
+            $scope.toggleUserMenu = () => {
+                $scope.userMenu.active = !$scope.userMenu.active;
+            };
+
+            // Closing the menu
+            $scope.onUserMenuClosing = () => {
+                $scope.userMenu.active = false;
             };
 
             // User menu actions

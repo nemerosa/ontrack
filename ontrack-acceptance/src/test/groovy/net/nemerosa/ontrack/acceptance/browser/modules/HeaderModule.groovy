@@ -10,7 +10,7 @@ class HeaderModule extends AbstractModule {
     }
 
     String getUserName() {
-        $('#header-user-menu').text
+        $('#header-user-name').text
     }
 
 }

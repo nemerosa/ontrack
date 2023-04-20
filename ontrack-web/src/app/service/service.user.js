@@ -28,6 +28,64 @@ angular.module('ot.service.user', [
                 function success(userResource) {
                     $log.debug('[user] load user: ', userResource);
                     $log.debug('[user] logged: ', userResource.present);
+                    // Grouping the actions per groups
+                    const ungrouped = [];
+                    const groupIndex = {};
+                    userResource.actions.forEach(action => {
+                        const groupName = action.group;
+                        if (groupName) {
+                            let group = groupIndex[groupName];
+                            if (!group) {
+                                group = {
+                                    name: groupName,
+                                    actions: []
+                                };
+                                groupIndex[groupName] = group;
+                            }
+                            action.menuType = 'action';
+                            group.actions.push(action);
+                        } else {
+                            ungrouped.push(action);
+                        }
+                    });
+                    // Sorting the groups
+                    const groups = [];
+                    for (const [_, group] of Object.entries(groupIndex)) {
+                        groups.push(group);
+                    }
+                    groups.sort((a, b) => {
+                        const na = a.name;
+                        const nb = b.name;
+                        if (na < nb) {
+                            return -1;
+                        } else if (na > nb) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    });
+                    // Inside the groups, sort the actions alphabetically
+                    groups.forEach(group => {
+                        group.actions.sort((a, b) => {
+                            const na = a.name;
+                            const nb = b.name;
+                            if (na < nb) {
+                                return -1;
+                            } else if (na > nb) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        });
+                    });
+                    // Building the final menu
+                    const menu = {
+                        groups: groups,
+                        actions: ungrouped
+                    };
+                    // Puts the menu into the user object
+                    userResource.menu = menu;
+
                     // Saves the user in the root scope
                     $rootScope.user = userResource;
                     // Clears the error

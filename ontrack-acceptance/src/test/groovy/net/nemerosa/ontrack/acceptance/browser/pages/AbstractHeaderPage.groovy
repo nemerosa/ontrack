@@ -34,7 +34,7 @@ abstract class AbstractHeaderPage extends AbstractPage {
     /**
      * Navigates to a user menu item using its ID and returns the target page
      */
-    def <P extends Page> P selectUserMenu(Class<P> pageClass, String id) {
+    def <P extends Page> P selectUserMenu(Class<P> pageClass, String id, boolean waitForNoOverlay = true) {
         // Clicks on the user menu
         userMenu.click()
         // Item to select
@@ -43,6 +43,12 @@ abstract class AbstractHeaderPage extends AbstractPage {
         browser.waitUntil(id) { item.displayed }
         // Clicks on the item
         item.click()
+        // Waiting for the overlay to fully disappear
+        if (waitForNoOverlay) {
+            browser.waitUntil("User menu overlay to be gone") {
+                !browser.findElement(By.id('user-menu-overlay')).displayed
+            }
+        }
         // Selects the page
         P page = browser.page(pageClass)
         // Waits for the page
@@ -52,7 +58,7 @@ abstract class AbstractHeaderPage extends AbstractPage {
     }
 
     UserProfilePage goToUserProfile() {
-        return selectUserMenu(UserProfilePage, "user-profile-link")
+        return selectUserMenu(UserProfilePage, "user-profile")
     }
 
     APIPage goToAPI() {
@@ -67,6 +73,6 @@ abstract class AbstractHeaderPage extends AbstractPage {
     }
 
     LoginPage logout() {
-        return selectUserMenu(LoginPage, "user-logout")
+        return selectUserMenu(LoginPage, "user-logout", false)
     }
 }

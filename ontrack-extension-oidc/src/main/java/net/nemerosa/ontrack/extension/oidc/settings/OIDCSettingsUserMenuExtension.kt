@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.oidc.settings
 
 import net.nemerosa.ontrack.extension.api.UserMenuExtension
+import net.nemerosa.ontrack.extension.api.UserMenuExtensionGroups
 import net.nemerosa.ontrack.extension.oidc.OIDCExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.security.GlobalFunction
@@ -13,9 +14,10 @@ class OIDCSettingsUserMenuExtension(
         extensionFeature: OIDCExtensionFeature
 ) : AbstractExtension(extensionFeature), UserMenuExtension {
 
-    override fun getAction(): Action =
+    override val action: Action =
             Action.of("oidc-settings", "OIDC providers", "oidc-settings")
+                .withGroup(UserMenuExtensionGroups.security)
 
-    override fun getGlobalFunction(): Class<out GlobalFunction> =
+    override val globalFunction: Class<out GlobalFunction> =
             GlobalSettings::class.java
 }

@@ -4,45 +4,6 @@ angular.module('ontrack.extension.indicators', [
     'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
-        $stateProvider.state('indicators-management', {
-            url: '/extension/indicators/indicators-management',
-            templateUrl: 'extension/indicators/indicators-management.tpl.html',
-            controller: 'IndicatorsManagementCtrl'
-        });
-    })
-    .controller('IndicatorsManagementCtrl', function ($scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
-        $scope.loadingIndicatorsManagement = false;
-
-        const view = ot.view();
-        view.title = "Indicators";
-        view.commands = [
-            ot.viewCloseCommand('/home')
-        ];
-
-        const query = `
-            {
-              indicatorsManagement {
-                portfolios
-                configuration
-                categories
-                types
-                views
-              }
-            }
-        `;
-
-        const loadIndicatorsManagement = () => {
-            $scope.loadingIndicatorsManagement = true;
-            otGraphqlService.pageGraphQLCall(query).then((data) => {
-                $scope.indicatorsManagement = data.indicatorsManagement;
-            }).finally(() => {
-                $scope.loadingIndicatorsManagement = false;
-            });
-        };
-
-        loadIndicatorsManagement();
-    })
-    .config(function ($stateProvider) {
         $stateProvider.state('configurable-indicators', {
             url: '/extension/indicators/configurable-indicators',
             templateUrl: 'extension/indicators/configurable-indicators.tpl.html',

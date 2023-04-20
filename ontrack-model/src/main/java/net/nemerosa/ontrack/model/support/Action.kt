@@ -3,15 +3,18 @@ package net.nemerosa.ontrack.model.support
 import java.net.URI
 
 class Action(
-        val id: String,
-        val name: String,
-        val type: ActionType,
-        val uri: String
+    val id: String,
+    val name: String,
+    val type: ActionType,
+    val uri: String,
+    /**
+     * Group this action must be put into.
+     */
+    val group: String? = null,
 ) {
 
-    fun withUri(uri: String): Action {
-        return of(id, name, uri)
-    }
+    fun withUri(uri: String): Action = Action(id, name, type, uri, group)
+    fun withGroup(group: String): Action = Action(id, name, type, uri, group)
 
     companion object {
 
