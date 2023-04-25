@@ -22,7 +22,7 @@ class AutoVersioningAuditStoreJdbcHelper(
             """
                SELECT COUNT(ID)
                FROM ENTITY_DATA_STORE
-               WHERE CATEGORY = '${AutoVersioningAuditStoreConstants.STORE_CATEGORY}'
+               WHERE CATEGORY = 'TODO'
                AND JSON::JSONB->>'mostRecentState' = :state 
             """,
             params("state", state.name),
@@ -84,7 +84,7 @@ class AutoVersioningAuditStoreJdbcHelper(
         TODO("Will be removed")
         // Base query
         var query = """
-            WHERE S.CATEGORY = '${AutoVersioningAuditStoreConstants.STORE_CATEGORY}'
+            WHERE S.CATEGORY = 'TODO'
         """
         var joins = ""
 

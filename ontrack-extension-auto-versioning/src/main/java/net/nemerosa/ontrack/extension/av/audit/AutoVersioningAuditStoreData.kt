@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
 import net.nemerosa.ontrack.extension.recordings.Recording
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import java.time.LocalDateTime
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@APIDescription("Auto versioning recording")
 data class AutoVersioningAuditStoreData(
         val uuid: String,
         val sourceProject: String,

@@ -4,6 +4,7 @@ package net.nemerosa.ontrack.extension.av.audit
  * Helper to supplement the fact that the entity data store of Ontrack
  * does not allow for queries outside of entities.
  */
+@Deprecated("Use recordings interface")
 interface AutoVersioningAuditStoreHelper {
 
     /**
