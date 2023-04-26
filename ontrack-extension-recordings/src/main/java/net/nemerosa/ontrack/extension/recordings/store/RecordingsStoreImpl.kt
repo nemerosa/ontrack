@@ -42,6 +42,15 @@ class RecordingsStoreImpl(
         )
     }
 
+    override fun countByFilter(store: String, queries: List<String>, queryVariables: MutableMap<String, Any?>): Int {
+        val query = queries.joinToString(" AND ") { "( $it )" }
+        return storageService.count(
+                store = store(store),
+                query = query,
+                queryVariables = queryVariables,
+        )
+    }
+
     override fun removeAllBefore(store: String, retentionDate: LocalDateTime, nonRunningOnly: Boolean) {
         if (nonRunningOnly) {
             storageService.deleteWithFilter(

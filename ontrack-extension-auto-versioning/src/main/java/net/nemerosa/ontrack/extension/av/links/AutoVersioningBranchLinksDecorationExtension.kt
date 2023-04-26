@@ -21,18 +21,18 @@ import org.springframework.stereotype.Component
  */
 @Component
 class AutoVersioningBranchLinksDecorationExtension(
-    extensionFeature: AutoVersioningExtensionFeature,
-    private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
-    private val autoVersioningAuditQueryService: AutoVersioningAuditQueryService,
-    private val uriBuilder: URIBuilder,
+        extensionFeature: AutoVersioningExtensionFeature,
+        private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
+        private val autoVersioningAuditQueryService: AutoVersioningAuditQueryService,
+        private val uriBuilder: URIBuilder,
 ) : AbstractExtension(extensionFeature), BranchLinksDecorationExtension {
 
     override val id: String = "auto_versioning"
 
     override fun getDecoration(
-        source: BranchLinksNode,
-        target: BranchLinksNode,
-        direction: BranchLinksDirection,
+            source: BranchLinksNode,
+            target: BranchLinksNode,
+            direction: BranchLinksDirection,
     ): BranchLinksDecoration? {
         // Gets the correct dependency order
         val parent: Branch
@@ -42,6 +42,7 @@ class AutoVersioningBranchLinksDecorationExtension(
                 parent = source.branch
                 dependency = target.branch
             }
+
             BranchLinksDirection.USED_BY -> {
                 parent = target.branch
                 dependency = source.branch
@@ -49,75 +50,76 @@ class AutoVersioningBranchLinksDecorationExtension(
         }
         // Looks for the auto versioning configuration in the parent for the given source branch
         autoVersioningConfigurationService.getAutoVersioning(parent)
-            ?.configurations
-            ?.find {
-                it.sourceProject == dependency.project.name &&
-                        dependency.name.matches(it.sourceBranch.toRegex())
-            }
-            ?: return null// No auto versioning config on this link ==> no decoration
+                ?.configurations
+                ?.find {
+                    it.sourceProject == dependency.project.name &&
+                            dependency.name.matches(it.sourceBranch.toRegex())
+                }
+                ?: return null// No auto versioning config on this link ==> no decoration
         // Gets the last audit between those two builds
         val entry = autoVersioningAuditQueryService.findByFilter(
-            AutoVersioningAuditQueryFilter(
-                project = parent.project.name,
-                branch = parent.name,
-                source = dependency.project.name,
-                count = 1
-            )
+                filter = AutoVersioningAuditQueryFilter(
+                        project = parent.project.name,
+                        branch = parent.name,
+                        source = dependency.project.name,
+                ),
+                size = 1,
         ).firstOrNull()
         // Converts the last entry to a decoration
         return entry?.toDecoration(direction)
     }
 
     private fun AutoVersioningAuditEntry.toDecoration(direction: BranchLinksDirection) = BranchLinksDecoration(
-        feature = feature.featureDescription,
-        id = id,
-        text = mostRecentState.state.name,
-        description = decorationDescription(this),
-        icon = decorationIcon(mostRecentState.state),
-        url = decorationUrl(this, direction)
+            feature = feature.featureDescription,
+            id = id,
+            text = mostRecentState.state.name,
+            description = decorationDescription(this),
+            icon = decorationIcon(mostRecentState.state),
+            url = decorationUrl(this, direction)
     )
 
     private fun decorationDescription(autoVersioningAuditEntry: AutoVersioningAuditEntry): String =
-        "Auto version of <b>${autoVersioningAuditEntry.order.branch.project.name}/${autoVersioningAuditEntry.order.branch.name}</b> to <b>${autoVersioningAuditEntry.order.sourceProject}</b> version <b>${autoVersioningAuditEntry.order.targetVersion}</b>"
+            "Auto version of <b>${autoVersioningAuditEntry.order.branch.project.name}/${autoVersioningAuditEntry.order.branch.name}</b> to <b>${autoVersioningAuditEntry.order.sourceProject}</b> version <b>${autoVersioningAuditEntry.order.targetVersion}</b>"
 
     private fun decorationUrl(
-        autoVersioningAuditEntry: AutoVersioningAuditEntry,
-        direction: BranchLinksDirection,
+            autoVersioningAuditEntry: AutoVersioningAuditEntry,
+            direction: BranchLinksDirection,
     ): String =
-        when (direction) {
-            BranchLinksDirection.USING -> uriBuilder.page("extension/collibra/auto-versioning-audit/branch/${autoVersioningAuditEntry.order.branch.project.name}/${autoVersioningAuditEntry.order.branch.name}")
-                .toString()
-            BranchLinksDirection.USED_BY -> uriBuilder.page("extension/collibra/auto-versioning-audit/source/${autoVersioningAuditEntry.order.sourceProject}")
-                .toString()
-        }
+            when (direction) {
+                BranchLinksDirection.USING -> uriBuilder.page("extension/collibra/auto-versioning-audit/branch/${autoVersioningAuditEntry.order.branch.project.name}/${autoVersioningAuditEntry.order.branch.name}")
+                        .toString()
+
+                BranchLinksDirection.USED_BY -> uriBuilder.page("extension/collibra/auto-versioning-audit/source/${autoVersioningAuditEntry.order.sourceProject}")
+                        .toString()
+            }
 
     private fun decorationIcon(state: AutoVersioningAuditState): String =
-        when (state) {
+            when (state) {
 
-            AutoVersioningAuditState.CREATED -> "created"
-            AutoVersioningAuditState.RECEIVED -> "received"
+                AutoVersioningAuditState.CREATED -> "created"
+                AutoVersioningAuditState.RECEIVED -> "received"
 
-            AutoVersioningAuditState.PROCESSING_START,
-            AutoVersioningAuditState.PROCESSING_CREATING_BRANCH,
-            AutoVersioningAuditState.POST_PROCESSING_END,
-            AutoVersioningAuditState.PROCESSING_UPDATING_FILE,
-            -> "processing"
+                AutoVersioningAuditState.PROCESSING_START,
+                AutoVersioningAuditState.PROCESSING_CREATING_BRANCH,
+                AutoVersioningAuditState.POST_PROCESSING_END,
+                AutoVersioningAuditState.PROCESSING_UPDATING_FILE,
+                -> "processing"
 
-            AutoVersioningAuditState.POST_PROCESSING_START -> "post_processing"
+                AutoVersioningAuditState.POST_PROCESSING_START -> "post_processing"
 
-            AutoVersioningAuditState.PR_CREATING -> "pr_creating"
+                AutoVersioningAuditState.PR_CREATING -> "pr_creating"
 
-            AutoVersioningAuditState.PR_CREATED,
-            AutoVersioningAuditState.PR_MERGED,
-            AutoVersioningAuditState.PR_APPROVED,
-            -> "processed"
+                AutoVersioningAuditState.PR_CREATED,
+                AutoVersioningAuditState.PR_MERGED,
+                AutoVersioningAuditState.PR_APPROVED,
+                -> "processed"
 
-            AutoVersioningAuditState.ERROR -> "error"
+                AutoVersioningAuditState.ERROR -> "error"
 
-            AutoVersioningAuditState.PR_TIMEOUT -> "timeout"
+                AutoVersioningAuditState.PR_TIMEOUT -> "timeout"
 
-            AutoVersioningAuditState.PROCESSING_ABORTED -> "aborted"
-            AutoVersioningAuditState.PROCESSING_CANCELLED -> "cancelled"
-        }
+                AutoVersioningAuditState.PROCESSING_ABORTED -> "aborted"
+                AutoVersioningAuditState.PROCESSING_CANCELLED -> "cancelled"
+            }
 
 }

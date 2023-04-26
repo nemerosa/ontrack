@@ -19,6 +19,12 @@ interface RecordingsStore {
             size: Int,
     ): PaginatedList<StoredRecording>
 
+    fun countByFilter(
+            store: String,
+            queries: List<String>,
+            queryVariables: MutableMap<String, Any?>,
+    ): Int
+
     fun removeAll(store: String)
 
 }

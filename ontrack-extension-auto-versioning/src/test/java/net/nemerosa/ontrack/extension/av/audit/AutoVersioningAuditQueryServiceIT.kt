@@ -34,9 +34,9 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
                     }
                 }
                 val entries = autoVersioningAuditQueryService.findByFilter(
-                    AutoVersioningAuditQueryFilter(
-                        project = project.name, branch = name
-                    )
+                        AutoVersioningAuditQueryFilter(
+                                project = project.name, branch = name
+                        )
                 )
                 val actualVersions = entries.map { it.order.targetVersion }
                 val expectedVersions = orders.takeLast(10).reversed().map { it.targetVersion }
@@ -57,10 +57,10 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
                     }
                 }
                 val entries = autoVersioningAuditQueryService.findByFilter(
-                    AutoVersioningAuditQueryFilter(
-                        project = project.name, branch = name,
-                        count = 5
-                    )
+                        filter = AutoVersioningAuditQueryFilter(
+                                project = project.name, branch = name,
+                        ),
+                        size = 5,
                 )
                 val actualVersions = entries.map { it.order.targetVersion }
                 val expectedVersions = orders.takeLast(5).reversed().map { it.targetVersion }
@@ -81,18 +81,18 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
                     }
                 }
                 val entries = autoVersioningAuditQueryService.findByFilter(
-                    AutoVersioningAuditQueryFilter(
-                        project = project.name, branch = name,
+                        filter = AutoVersioningAuditQueryFilter(
+                                project = project.name, branch = name,
+                        ),
                         offset = 10,
-                        count = 5
-                    )
+                        size = 5,
                 )
                 val actualVersions = entries.map { it.order.targetVersion }
                 val expectedVersions = orders.dropLast(10).takeLast(5).reversed().map { it.targetVersion }
                 assertEquals(
-                    expectedVersions,
-                    actualVersions,
-                    "Returned the last 5 orders after the last 10 for this branch"
+                        expectedVersions,
+                        actualVersions,
+                        "Returned the last 5 orders after the last 10 for this branch"
                 )
             }
         }
@@ -110,10 +110,10 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
                     }
                 }
                 val entries = autoVersioningAuditQueryService.findByFilter(
-                    AutoVersioningAuditQueryFilter(
-                        project = project.name, branch = name,
-                        uuid = orders[10].uuid
-                    )
+                        AutoVersioningAuditQueryFilter(
+                                project = project.name, branch = name,
+                                uuid = orders[10].uuid
+                        )
                 )
                 val actualVersions = entries.map { it.order.targetVersion }
                 val expectedVersions = listOf(orders[10].targetVersion)
@@ -134,10 +134,10 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
                     }
                 }
                 val entries = autoVersioningAuditQueryService.findByFilter(
-                    AutoVersioningAuditQueryFilter(
-                        project = project.name, branch = name,
-                        version = orders[10].targetVersion
-                    )
+                        AutoVersioningAuditQueryFilter(
+                                project = project.name, branch = name,
+                                version = orders[10].targetVersion
+                        )
                 )
                 val actualVersions = entries.map { it.order.targetVersion }
                 val expectedVersions = listOf(orders[10].targetVersion)
@@ -160,14 +160,14 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
                     }
                 }
                 val entries = autoVersioningAuditQueryService.findByFilter(
-                    AutoVersioningAuditQueryFilter(
-                        project = project.name, branch = name,
-                        state = AutoVersioningAuditState.CREATED
-                    )
+                        AutoVersioningAuditQueryFilter(
+                                project = project.name, branch = name,
+                                state = AutoVersioningAuditState.CREATED
+                        )
                 )
                 val actualVersions = entries.map { it.order.targetVersion }
                 val expectedVersions =
-                    orders.filterIndexed { index, _ -> (index + 1) % 2 != 0 }.reversed().map { it.targetVersion }
+                        orders.filterIndexed { index, _ -> (index + 1) % 2 != 0 }.reversed().map { it.targetVersion }
                 assertEquals(expectedVersions, actualVersions)
             }
         }
@@ -187,11 +187,11 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
                     }
                 }
                 val entries = autoVersioningAuditQueryService.findByFilter(
-                    AutoVersioningAuditQueryFilter(
-                        project = project.name, branch = name,
-                        state = AutoVersioningAuditState.CREATED,
-                        version = orders[8].targetVersion
-                    )
+                        AutoVersioningAuditQueryFilter(
+                                project = project.name, branch = name,
+                                state = AutoVersioningAuditState.CREATED,
+                                version = orders[8].targetVersion
+                        )
                 )
                 val actualVersions = entries.map { it.order.targetVersion }
                 val expectedVersions = listOf(orders[8].targetVersion)
@@ -217,10 +217,10 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
                     }
                 }
                 val entries = autoVersioningAuditQueryService.findByFilter(
-                    AutoVersioningAuditQueryFilter(
-                        project = project.name, branch = name,
-                        source = sourceB.name
-                    )
+                        AutoVersioningAuditQueryFilter(
+                                project = project.name, branch = name,
+                                source = sourceB.name
+                        )
                 )
                 val actualVersions = entries.map { it.order.targetVersion }
                 val expectedVersions = ordersB.reversed().map { it.targetVersion }
@@ -250,9 +250,9 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
             }
 
             autoVersioningAuditQueryService.findByFilter(
-                AutoVersioningAuditQueryFilter(
-                    project = name, branch = null
-                )
+                    AutoVersioningAuditQueryFilter(
+                            project = name, branch = null
+                    )
             ).let { entries ->
                 val actualVersions = entries.map { it.order.targetVersion }
                 val expectedVersions = orders.reversed().map { it.targetVersion }
@@ -260,10 +260,10 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
             }
 
             autoVersioningAuditQueryService.findByFilter(
-                AutoVersioningAuditQueryFilter(
-                    project = name, branch = null,
-                    count = 7
-                )
+                    filter = AutoVersioningAuditQueryFilter(
+                            project = name, branch = null,
+                    ),
+                    size = 7,
             ).let { entries ->
                 val actualVersions = entries.map { it.order.targetVersion }
                 val expectedVersions = orders.reversed().take(7).map { it.targetVersion }
@@ -271,10 +271,10 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
             }
 
             autoVersioningAuditQueryService.findByFilter(
-                AutoVersioningAuditQueryFilter(
-                    project = name, branch = null,
-                    version = orders[2].targetVersion
-                )
+                    AutoVersioningAuditQueryFilter(
+                            project = name, branch = null,
+                            version = orders[2].targetVersion
+                    )
             ).let { entries ->
                 val actualVersions = entries.map { it.order.targetVersion }
                 val expectedVersions = listOf(orders[2].targetVersion)
@@ -304,9 +304,9 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
                 }
             }
             val entries = autoVersioningAuditQueryService.findByFilter(
-                AutoVersioningAuditQueryFilter(
-                    project = name
-                )
+                    AutoVersioningAuditQueryFilter(
+                            project = name
+                    )
             )
             val actualVersions = entries.map { it.order.targetVersion }
             val expectedVersions = orders.takeLast(10).reversed().map { it.targetVersion }
