@@ -5,6 +5,7 @@ import graphql.Scalars.*
 import graphql.schema.*
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.listInputType
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.apache.commons.lang3.reflect.FieldUtils
 import org.springframework.beans.BeanUtils
@@ -16,8 +17,7 @@ import java.lang.reflect.ParameterizedType
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.jvm.internal.Reflection
-import kotlin.reflect.KClass
-import kotlin.reflect.KType
+import kotlin.reflect.*
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaType
@@ -199,8 +199,18 @@ object GraphQLBeanConverter {
                     // with its name equal to the simple Java type name
                     GraphQLTypeReference(javaType.simpleName)
                 } else {
+                    val jsonType = property.findAnnotation<JSONType>()
                     val typeRef = property.findAnnotation<TypeRef>()
-                    if (typeRef != null) {
+                    if (jsonType != null) {
+                        field.dataFetcher { env ->
+                            val source = env.getSource<Any>()
+                            @Suppress("UNCHECKED_CAST")
+                            val value = (property as KProperty1<Any,Any?>).get(source)
+                            value?.asJson()
+                        }
+                        // JSON type
+                        GQLScalarJSON.INSTANCE
+                    } else if (typeRef != null) {
                         if (javaType is Class<*>) {
                             if (typeRef.embedded) {
                                 cache.getOrCreate(javaType.simpleName) {

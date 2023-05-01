@@ -8,10 +8,10 @@ apply<OntrackExtensionPlugin>()
 
 dependencies {
     api(project(":ontrack-extension-support"))
+    api(project(":ontrack-rabbitmq"))
 
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-repository-support"))
-    implementation(project(":ontrack-rabbitmq"))
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-extension-recordings"))
     implementation("io.micrometer:micrometer-core")

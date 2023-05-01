@@ -56,7 +56,7 @@ class QueueConfigProperties {
         queueProcessor: QueueProcessor<T>,
         payload: T
     ): String {
-        val prefix = "ontrack.queue.${queueProcessor.id}.routing"
+        val prefix = queueProcessor.queueRoutingPrefix
         val scale = specific[queueProcessor.id]?.scale ?: 1
         return if (scale > 1) {
             val identifier = queueProcessor.getRoutingIdentifier(payload)

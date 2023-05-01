@@ -9,6 +9,7 @@ enum class QueueRecordState {
     SENT,
     RECEIVED,
     PARSED,
+    CANCELLED,
     PROCESSING,
     COMPLETED,
     ERRORED

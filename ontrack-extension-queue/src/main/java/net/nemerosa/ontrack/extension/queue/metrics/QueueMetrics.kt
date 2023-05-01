@@ -9,4 +9,9 @@ object QueueMetrics {
     const val processErrored = "ontrack_extension_queue_process_errored"
     const val processTime = "ontrack_extension_queue_process_time"
 
+    /**
+     * Pending items into the queue
+     */
+    const val pending = "ontrack_extension_queue_pending"
+
 }

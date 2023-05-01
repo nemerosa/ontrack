@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.queue.metrics.queueMessageReceived
 import net.nemerosa.ontrack.extension.queue.metrics.queueProcessCompleted
 import net.nemerosa.ontrack.extension.queue.metrics.queueProcessErrored
 import net.nemerosa.ontrack.extension.queue.metrics.queueProcessTime
+import net.nemerosa.ontrack.extension.queue.queueNamePrefix
 import net.nemerosa.ontrack.extension.queue.record.QueueRecordService
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -24,12 +25,12 @@ import org.springframework.stereotype.Component
 
 @Component
 class QueueListener(
-    private val queueConfigProperties: QueueConfigProperties,
-    private val queueProcessors: List<QueueProcessor<*>>,
-    private val securityService: SecurityService,
-    private val applicationLogService: ApplicationLogService,
-    private val queueRecordService: QueueRecordService,
-    private val meterRegistry: MeterRegistry,
+        private val queueConfigProperties: QueueConfigProperties,
+        private val queueProcessors: List<QueueProcessor<*>>,
+        private val securityService: SecurityService,
+        private val applicationLogService: ApplicationLogService,
+        private val queueRecordService: QueueRecordService,
+        private val meterRegistry: MeterRegistry,
 ) : RabbitListenerConfigurer {
 
     override fun configureRabbitListeners(registrar: RabbitListenerEndpointRegistrar) {
@@ -39,36 +40,29 @@ class QueueListener(
     }
 
     private fun configureListener(
-        registrar: RabbitListenerEndpointRegistrar,
-        queueProcessor: QueueProcessor<*>
+            registrar: RabbitListenerEndpointRegistrar,
+            queueProcessor: QueueProcessor<*>
     ) {
         // Default listeners
         val scale = queueConfigProperties.specific[queueProcessor.id]?.scale ?: 1
-        if (scale > 1) {
-            (1..scale).forEach { no ->
-                val index = no - 1 // Starting at 0
-                registrar.registerEndpoint(
-                    createDefaultListener(queueProcessor, index)
-                )
-            }
-        } else {
+        (0 until scale).forEach { index ->
             registrar.registerEndpoint(
-                createDefaultListener(queueProcessor, 0)
+                    createDefaultListener(queueProcessor, index)
             )
         }
     }
 
     private fun createDefaultListener(
-        queueProcessor: QueueProcessor<*>,
-        index: Int,
+            queueProcessor: QueueProcessor<*>,
+            index: Int,
     ): RabbitListenerEndpoint {
-        val queue = "ontrack.queue.${queueProcessor.id}.$index"
+        val queue = "${queueProcessor.queueNamePrefix}.$index"
         return SimpleRabbitListenerEndpoint().configure(queue, queueProcessor)
     }
 
     private fun SimpleRabbitListenerEndpoint.configure(
-        queue: String,
-        queueProcessor: QueueProcessor<*>
+            queue: String,
+            queueProcessor: QueueProcessor<*>
     ): SimpleRabbitListenerEndpoint {
         id = queue
         setQueueNames(queue)
@@ -78,10 +72,10 @@ class QueueListener(
     }
 
     private fun <T : Any> createMessageListener(queueProcessor: QueueProcessor<T>) =
-        QPMessageListener<T>(queueProcessor)
+            QPMessageListener<T>(queueProcessor)
 
     private inner class QPMessageListener<T : Any>(
-        private val queueProcessor: QueueProcessor<T>
+            private val queueProcessor: QueueProcessor<T>
     ) : MessageListener {
         override fun onMessage(message: Message) {
             try {
@@ -100,6 +94,13 @@ class QueueListener(
                 val payload = qp.parse(queueProcessor.payloadType)
                 queueRecordService.parsed(qp, payload)
 
+                // Check for processing
+                val cancelReason = queueProcessor.isCancelled(payload)
+                if (cancelReason != null) {
+                    queueRecordService.cancelled(qp, cancelReason)
+                    return
+                }
+
                 // Processing
                 securityService.asAdmin {
                     queueRecordService.processing(qp)
@@ -117,14 +118,14 @@ class QueueListener(
                 }
             } catch (any: Throwable) {
                 applicationLogService.log(
-                    ApplicationLogEntry.error(
-                        any,
-                        NameDescription.nd(
-                            "queue-error",
-                            "Catch-all error in queue processing"
-                        ),
-                        "Uncaught error during the queue processing"
-                    ).withDetail("id", queueProcessor.id)
+                        ApplicationLogEntry.error(
+                                any,
+                                NameDescription.nd(
+                                        "queue-error",
+                                        "Catch-all error in queue processing"
+                                ),
+                                "Uncaught error during the queue processing"
+                        ).withDetail("id", queueProcessor.id)
                 )
             }
         }

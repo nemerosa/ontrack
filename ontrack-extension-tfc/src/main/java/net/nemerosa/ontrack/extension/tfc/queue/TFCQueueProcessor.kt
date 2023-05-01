@@ -18,6 +18,8 @@ class TFCQueueProcessor(
 
     override val payloadType: KClass<RunPayload> = RunPayload::class
 
+    override fun isCancelled(payload: RunPayload): String? = null
+
     override fun process(payload: RunPayload) {
         val status = when (payload.trigger) {
             "run:completed" -> when (payload.runStatus) {

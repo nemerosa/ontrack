@@ -2,14 +2,16 @@ package net.nemerosa.ontrack.extension.queue.config
 
 import net.nemerosa.ontrack.extension.queue.QueueConfigProperties
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
+import net.nemerosa.ontrack.extension.queue.queueNamePrefix
+import net.nemerosa.ontrack.extension.queue.queueRoutingPrefix
 import org.springframework.amqp.core.*
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
 class QueueConfiguration(
-    private val queueConfigProperties: QueueConfigProperties,
-    private val queueProcessors: List<QueueProcessor<*>>,
+        private val queueConfigProperties: QueueConfigProperties,
+        private val queueProcessors: List<QueueProcessor<*>>,
 ) {
 
     @Bean
@@ -24,39 +26,30 @@ class QueueConfiguration(
     }
 
     private fun declareQueueProcessor(
-        declarables: MutableList<Declarable>,
-        processor: QueueProcessor<*>
+            declarables: MutableList<Declarable>,
+            processor: QueueProcessor<*>
     ) {
         val id = processor.id
         // Topic
-        val topic = "ontrack.queue.$id"
+        val topic = processor.queueNamePrefix
         val exchange = DirectExchange(topic)
         declarables += exchange
 
         // Default queues
-        val prefix = "ontrack.queue.$id"
+        val prefix = processor.queueNamePrefix
         val scale = queueConfigProperties.specific[id]?.scale ?: 1
-        if (scale > 1) {
-            (1..scale).forEach { no ->
-                val index = no - 1 // Starting at 0
-                val queue = Queue("$prefix.$index", true)
-                val binding = BindingBuilder
+        (0 until scale).forEach { index ->
+            val queue = Queue("$prefix.$index", true)
+            val binding = BindingBuilder
                     .bind(queue)
                     .to(exchange)
-                    .with("$prefix.routing.$index")
-                declarables += queue
-                declarables += binding
-            }
-        } else {
-            val defaultQueue = Queue("$prefix.0", true).apply {
-                declarables += this
-            }
-            // Catch-all binding
-            declarables += BindingBuilder
-                .bind(defaultQueue)
-                .to(exchange)
-                .with("$prefix.routing.0")
+                    .with("${processor.queueRoutingPrefix}.$index")
+            declarables += queue
+            declarables += binding
         }
+
+        // Specific queues
+        processor.specificConfiguration(exchange, declarables)
     }
 
 }

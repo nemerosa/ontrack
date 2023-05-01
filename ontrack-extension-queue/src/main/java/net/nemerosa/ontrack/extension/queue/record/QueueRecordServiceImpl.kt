@@ -44,6 +44,12 @@ class QueueRecordServiceImpl(
         }
     }
 
+    override fun cancelled(queuePayload: QueuePayload, cancelReason: String) {
+        recordingsService.updateRecord(queueRecordingsExtension, queuePayload.id) {
+            it.withException(cancelReason).withState(QueueRecordState.CANCELLED)
+        }
+    }
+
     override fun processing(queuePayload: QueuePayload) {
         recordingsService.updateRecord(queueRecordingsExtension, queuePayload.id) {
             it.withState(QueueRecordState.PROCESSING)

@@ -13,9 +13,9 @@ interface QueueRecordService {
 
     fun received(queuePayload: QueuePayload, queue: String?)
     fun parsed(queuePayload: QueuePayload, payload: Any)
+    fun cancelled(queuePayload: QueuePayload, cancelReason: String)
     fun processing(queuePayload: QueuePayload)
     fun completed(queuePayload: QueuePayload)
     fun errored(queuePayload: QueuePayload, exception: Exception)
-
 
 }

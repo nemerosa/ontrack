@@ -22,4 +22,12 @@ interface RecordingsQueryService {
             size: Int,
     ): PaginatedList<R>
 
+    /**
+     * Gets a count of recordings.
+     */
+    fun <R : Recording, F : Any> countByFilter(
+            extension: RecordingsExtension<R, F>,
+            filter: F?,
+    ): Int
+
 }

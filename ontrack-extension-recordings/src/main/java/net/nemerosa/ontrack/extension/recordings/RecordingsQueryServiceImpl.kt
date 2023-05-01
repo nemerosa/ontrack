@@ -20,6 +20,17 @@ class RecordingsQueryServiceImpl(
         return recordingsStore.findById(extension.id, id)?.toRecording(extension)
     }
 
+    override fun <R : Recording, F : Any> countByFilter(extension: RecordingsExtension<R, F>, filter: F?): Int {
+        securityService.checkGlobalFunction(ApplicationManagement::class.java)
+        val queryVariables = mutableMapOf<String, Any?>()
+        val queries = if (filter != null) {
+            extension.filterQuery(filter, queryVariables)
+        } else {
+            emptyList()
+        }
+        return recordingsStore.countByFilter(extension.id, queries, queryVariables)
+    }
+
     override fun <R : Recording, F : Any> findByFilter(
             extension: RecordingsExtension<R, F>,
             filter: F?,
