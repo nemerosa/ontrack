@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.recordings.RecordingsQueryService
 import net.nemerosa.ontrack.extension.recordings.RecordingsService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.format
+import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -21,6 +22,7 @@ class HookTestSupport(
         private val recordingsService: RecordingsService,
         private val hookRecordingsExtension: HookRecordingsExtension,
         private val testHookEndpointExtension: TestHookEndpointExtension,
+        private val securityService: SecurityService,
 ) {
 
     fun hook(
@@ -58,12 +60,16 @@ class HookTestSupport(
     }
 
     fun assertRecordNotPresent(id: String, message: String) {
-        val record = recordingsQueryService.findById(hookRecordingsExtension, id)
+        val record = securityService.asAdmin {
+            recordingsQueryService.findById(hookRecordingsExtension, id)
+        }
         assertNull(record, message)
     }
 
     fun assertRecordPresent(id: String, message: String) {
-        val record = recordingsQueryService.findById(hookRecordingsExtension, id)
+        val record = securityService.asAdmin {
+            recordingsQueryService.findById(hookRecordingsExtension, id)
+        }
         assertNotNull(record, message)
     }
 
@@ -71,12 +77,14 @@ class HookTestSupport(
             hook: String,
             code: (HookRecord) -> Unit
     ) {
-        val record = recordingsQueryService.findByFilter(
-                extension = hookRecordingsExtension,
-                filter = HookRecordQueryFilter(hook = hook),
-                offset = 0,
-                size = 1
-        ).pageItems.firstOrNull()
+        val record = securityService.asAdmin {
+            recordingsQueryService.findByFilter(
+                    extension = hookRecordingsExtension,
+                    filter = HookRecordQueryFilter(hook = hook),
+                    offset = 0,
+                    size = 1
+            ).pageItems.firstOrNull()
+        }
         assertNotNull(record, "Found a hook record with hook = $hook") {
             code(it)
         }

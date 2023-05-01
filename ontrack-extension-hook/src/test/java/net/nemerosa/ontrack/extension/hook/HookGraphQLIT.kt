@@ -26,7 +26,7 @@ class HookGraphQLIT : AbstractQLKTITSupport() {
             // Getting the last record for this hook
             run("""
                 {
-                    hookRecording(filter: {hook: "test"}, size: 1) {
+                    hookRecordings(filter: {hook: "test"}, size: 1) {
                         pageItems {
                             id
                             hook
@@ -50,7 +50,7 @@ class HookGraphQLIT : AbstractQLKTITSupport() {
                     }
                 }
             """) { data ->
-                val record = data.path("hookRecords").path("pageItems").firstOrNull()
+                val record = data.path("hookRecordings").path("pageItems").firstOrNull()
                 assertNotNull(record, "At least one record") {
                     assertEquals("test", it.getRequiredTextField("hook"))
                     it.path("request").let { request ->
@@ -102,7 +102,7 @@ class HookGraphQLIT : AbstractQLKTITSupport() {
                     }
                 }
             """) { data ->
-                val records = data.path("hookRecords").path("pageItems")
+                val records = data.path("hookRecordings").path("pageItems")
                 assertEquals(1, records.size(), "Only one record returned")
                 val record = records.first()
                 assertEquals("\"Testing GraphQL with an error\"", record.path("request").getRequiredTextField("body"))

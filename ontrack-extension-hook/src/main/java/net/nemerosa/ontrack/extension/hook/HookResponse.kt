@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.hook
 
+import net.nemerosa.ontrack.graphql.support.JSONType
 import net.nemerosa.ontrack.model.annotations.APIDescription
 
 /**
@@ -16,5 +17,6 @@ data class HookResponse(
          * Additional information (non structured, will typically be rendered as JSON)
          */
         @APIDescription("Additional information (non structured, will typically be rendered as JSON)")
+        @JSONType
         val info: Any?,
 )
