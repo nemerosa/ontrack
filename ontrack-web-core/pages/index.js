@@ -1,6 +1,6 @@
 import Head from 'next/head'
 
-export default function Index() {
+export default function HomePage() {
     return (
         <>
             <Head>
