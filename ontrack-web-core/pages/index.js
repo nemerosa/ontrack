@@ -1,4 +1,5 @@
 import Head from 'next/head'
+import MainLayout from "@components/layouts/MainLayout";
 
 export default function HomePage() {
     return (
@@ -7,7 +8,9 @@ export default function HomePage() {
                 <title>Ontrack</title>
             </Head>
             <main>
-                Test
+                <MainLayout>
+                    Home page
+                </MainLayout>
             </main>
         </>
     )
