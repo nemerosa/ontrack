@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import MainLayout from "@components/layouts/MainLayout";
+import HomeView from "@components/views/HomeView";
 
 export default function HomePage() {
     return (
@@ -9,7 +10,7 @@ export default function HomePage() {
             </Head>
             <main>
                 <MainLayout>
-                    Home page
+                    <HomeView/>
                 </MainLayout>
             </main>
         </>
