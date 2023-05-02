@@ -1,6 +1,7 @@
 import {Avatar, Image, Space, Typography} from "antd";
 import {UserOutlined} from "@ant-design/icons";
 import Link from "next/link";
+import UserMenu, {useUserMenu} from "@components/layouts/UserMenu";
 
 const {Text} = Typography;
 
@@ -11,6 +12,12 @@ function NavBarText({text}) {
 }
 
 export default function NavBar() {
+
+    const userMenu = useUserMenu();
+
+    const openUserMenu = () => {
+        userMenu.setOpen(true)
+    }
 
     return (
         <>
@@ -30,12 +37,18 @@ export default function NavBar() {
                     <NavBarText text="Search component"/>
                     <NavBarText text="App messages"/>
                     <NavBarText text="User name"/>
-                    <Avatar icon={<UserOutlined/>} style={{
-                        backgroundColor: 'white',
-                        color: 'black',
-                    }}/>
+                    <Avatar icon={<UserOutlined/>}
+                            onClick={openUserMenu}
+                            style={{
+                                backgroundColor: 'white',
+                                color: 'black',
+                                cursor: 'pointer',
+                            }}
+                    />
                 </Space>
             </div>
+
+            <UserMenu userMenu={userMenu}/>
         </>
     )
 }
