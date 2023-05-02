@@ -1,5 +1,7 @@
-import {Image, Space} from "antd";
+import {Image, Space, Typography} from "antd";
 import Link from "next/link";
+
+const {Text} = Typography;
 
 export default function NavBar() {
     return (
@@ -9,7 +11,10 @@ export default function NavBar() {
                 <Link href="/">
                     <Image width={32} src="/ontrack-128.png" preview={false}/>
                 </Link>
-                {/* TODO Title + link to home page */}
+                {/* Title + link to home page */}
+                <Link href="/">
+                    <Text style={{color: "white", fontSize: '175%', verticalAlign: 'middle'}}>Ontrack</Text>
+                </Link>
                 {/* TODO Search component */}
                 {/* TODO Application messages */}
                 {/* TODO User name */}
