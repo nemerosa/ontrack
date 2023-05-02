@@ -1,6 +1,6 @@
-import {Button, Dropdown, Image, Space, Typography} from "antd";
+import {Avatar, Image, Space, Typography} from "antd";
 import Link from "next/link";
-import {MenuOutlined} from "@ant-design/icons";
+import {UserOutlined} from "@ant-design/icons";
 
 const {Text} = Typography;
 
@@ -29,9 +29,7 @@ export default function NavBar() {
                 {/* TODO Application messages */}
                 {/* TODO User name */}
                 {/* User menu (drawer) */}
-                <Dropdown menu={{items}} trigger={['click']}>
-                    <Button icon={<MenuOutlined/>}/>
-                </Dropdown>
+                <Avatar icon={<UserOutlined/>} style={{backgroundColor: 'white', color: 'black'}}/>
             </Space>
         </>
     )
