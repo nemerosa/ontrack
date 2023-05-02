@@ -24,7 +24,7 @@ class RecordingsStoreImpl(
     override fun findByFilter(
             store: String,
             queries: List<String>,
-            queryVariables: MutableMap<String, Any?>,
+            queryVariables: Map<String, Any?>,
             offset: Int,
             size: Int,
     ): PaginatedList<StoredRecording> {
@@ -42,7 +42,7 @@ class RecordingsStoreImpl(
         )
     }
 
-    override fun countByFilter(store: String, queries: List<String>, queryVariables: MutableMap<String, Any?>): Int {
+    override fun countByFilter(store: String, queries: List<String>, queryVariables: Map<String, Any?>): Int {
         val query = queries.joinToString(" AND ") { "( $it )" }
         return storageService.count(
                 store = store(store),

@@ -14,7 +14,7 @@ interface RecordingsStore {
     fun findByFilter(
             store: String,
             queries: List<String>,
-            queryVariables: MutableMap<String, Any?>,
+            queryVariables: Map<String, Any?>,
             offset: Int,
             size: Int,
     ): PaginatedList<StoredRecording>
@@ -22,7 +22,7 @@ interface RecordingsStore {
     fun countByFilter(
             store: String,
             queries: List<String>,
-            queryVariables: MutableMap<String, Any?>,
+            queryVariables: Map<String, Any?>,
     ): Int
 
     fun removeAll(store: String)
