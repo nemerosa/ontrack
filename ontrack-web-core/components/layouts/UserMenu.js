@@ -2,8 +2,6 @@ import {Drawer, Menu, Space, Typography} from "antd";
 import {useState} from "react";
 import {LogoutOutlined, SettingOutlined, UserOutlined} from "@ant-design/icons";
 
-const {Text} = Typography;
-
 export function useUserMenu() {
     const [open, setOpen] = useState(false);
 
