@@ -1,9 +1,19 @@
-import {Image, Space, Typography} from "antd";
+import {Button, Dropdown, Image, Space, Typography} from "antd";
 import Link from "next/link";
+import {MenuOutlined} from "@ant-design/icons";
 
 const {Text} = Typography;
 
 export default function NavBar() {
+
+    const items = [
+        {
+            key: 'logout',
+            label: 'Logout',
+        }
+    ];
+
+    // noinspection JSValidateTypes
     return (
         <>
             <Space direction="horizontal" size={16}>
@@ -18,7 +28,10 @@ export default function NavBar() {
                 {/* TODO Search component */}
                 {/* TODO Application messages */}
                 {/* TODO User name */}
-                {/* TODO User menu (drawer) */}
+                {/* User menu (drawer) */}
+                <Dropdown menu={{items}} trigger={['click']}>
+                    <Button icon={<MenuOutlined/>}/>
+                </Dropdown>
             </Space>
         </>
     )
