@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Form, Input, Modal} from "antd";
+import {Form, Input, Modal, Switch} from "antd";
 
 export function useNewProjectDialog() {
     const [open, setOpen] = useState(false)
@@ -78,6 +78,11 @@ export default function NewProjectDialog({newProjectDialog}) {
                                ]}
                     >
                         <Input placeholder="Project description" allowClear/>
+                    </Form.Item>
+                    <Form.Item name="disabled"
+                               label="Disabled"
+                    >
+                        <Switch/>
                     </Form.Item>
                 </Form>
             </Modal>
