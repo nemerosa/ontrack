@@ -1,4 +1,5 @@
 import MainPage from "@components/layouts/MainPage";
+import ProjectList from "@components/projects/ProjectList";
 
 export default function HomeView() {
     return (
@@ -6,7 +7,7 @@ export default function HomeView() {
             <MainPage
                 title="Home"
             >
-                Home view
+                <ProjectList/>
             </MainPage>
         </>
     )

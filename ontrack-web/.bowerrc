@@ -1,4 +1,5 @@
 {
   "directory": "vendor",
-  "json": "bower.json"
+  "json": "bower.json",
+  "registry": "https://bower.herokuapp.com"
 }
