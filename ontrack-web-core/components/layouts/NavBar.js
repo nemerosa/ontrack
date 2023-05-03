@@ -30,7 +30,7 @@ export default function NavBar() {
             }}>
                 <Space direction="horizontal" size={16}>
                     {
-                        homeLink(<Image width={32} src="/ontrack-128.png" preview={false}/>)
+                        homeLink(<Image alt="Logo Ontrack" width={32} src="/ontrack-128.png" preview={false}/>)
                     }
                     {
                         homeLink(<Text

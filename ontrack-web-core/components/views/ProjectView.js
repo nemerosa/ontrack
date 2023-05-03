@@ -31,7 +31,7 @@ export default function ProjectView({id}) {
     }, [id])
 
     const commands = [
-        <CloseCommand href={homeUri()}/>
+        <CloseCommand key="close" href={homeUri()}/>
     ]
 
     return (

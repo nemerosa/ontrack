@@ -19,6 +19,7 @@ export default function HomeView() {
 
     const commands = [
         <Command
+            key="new-project"
             icon={<PlusOutlined/>}
             text="New project"
             action={newProject}
