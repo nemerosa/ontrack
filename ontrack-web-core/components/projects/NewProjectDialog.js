@@ -2,6 +2,7 @@ import {useState} from "react";
 import {Form, Input, Modal, Switch} from "antd";
 import graphQLCall, {getUserErrors} from "@client/graphQLCall";
 import {gql} from "graphql-request";
+import FormErrors from "@components/form/FormErrors";
 
 export function useNewProjectDialog({onSuccess}) {
     const [open, setOpen] = useState(false)
@@ -122,6 +123,7 @@ export default function NewProjectDialog({newProjectDialog}) {
                         <Switch/>
                     </Form.Item>
                 </Form>
+                <FormErrors errors={formErrors}/>
             </Modal>
         </>
     )
