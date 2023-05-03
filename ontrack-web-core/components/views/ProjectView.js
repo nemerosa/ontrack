@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import Head from "next/head";
+import {projectTitle} from "@components/common/Titles";
 
 export default function ProjectView({id}) {
 
@@ -27,7 +28,7 @@ export default function ProjectView({id}) {
     return (
         <>
             <Head>
-                <title>Ontrack | {project.name}</title>
+                {projectTitle(project)}
             </Head>
             <MainPage
                 title={project.name}
