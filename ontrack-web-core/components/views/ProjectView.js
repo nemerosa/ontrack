@@ -5,6 +5,8 @@ import {gql} from "graphql-request";
 import Head from "next/head";
 import {projectTitle} from "@components/common/Titles";
 import {projectBreadcrumbs} from "@components/common/Breadcrumbs";
+import {CloseCommand} from "@components/common/Commands";
+import {homeUri} from "@components/common/Links";
 
 export default function ProjectView({id}) {
 
@@ -28,6 +30,10 @@ export default function ProjectView({id}) {
         }
     }, [id])
 
+    const commands = [
+        <CloseCommand href={homeUri()}/>
+    ]
+
     return (
         <>
             <Head>
@@ -36,6 +42,7 @@ export default function ProjectView({id}) {
             <MainPage
                 title={project.name}
                 breadcrumbs={projectBreadcrumbs(project)}
+                commands={commands}
             >
                 {project.name}
             </MainPage>

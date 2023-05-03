@@ -1,9 +1,9 @@
-import {Breadcrumb, Layout, theme, Typography} from "antd";
+import {Layout, theme} from "antd";
+import MainPageBar from "@components/layouts/MainPageBar";
 
 const {Content} = Layout;
-const {Text} = Typography;
 
-export default function MainPage({title, breadcrumbs, children}) {
+export default function MainPage({title, breadcrumbs, commands, children}) {
 
     const {
         token: {colorBgContainer},
@@ -24,22 +24,11 @@ export default function MainPage({title, breadcrumbs, children}) {
                         background: colorBgContainer,
                     }}
                 >
-                    <Breadcrumb
-                        style={{
-                            margin: '16px 0',
-                        }}
-                    >
-                        {
-                            breadcrumbs ?
-                                breadcrumbs.map((item, index) => {
-                                    return <Breadcrumb.Item key={index}>{item}</Breadcrumb.Item>
-                                }) :
-                                undefined
-                        }
-                        {/*<Breadcrumb.Item>Home</Breadcrumb.Item>*/}
-                        {/*<Breadcrumb.Item>List</Breadcrumb.Item>*/}
-                        <Breadcrumb.Item><Text strong>{title}</Text></Breadcrumb.Item>
-                    </Breadcrumb>
+                    <MainPageBar
+                        breadcrumbs={breadcrumbs}
+                        title={title}
+                        commands={commands}
+                    />
                     {children}
                 </Content>
             </Layout>
