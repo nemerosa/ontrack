@@ -1,8 +1,9 @@
 import {Avatar, Image, Space, Typography} from "antd";
 import {UserOutlined} from "@ant-design/icons";
-import Link from "next/link";
 import UserMenu, {useUserMenu} from "@components/layouts/UserMenu";
 import {homeLink} from "@components/common/Links";
+import {useContext} from "react";
+import {UserContext} from "@components/providers/UserProvider";
 
 const {Text} = Typography;
 
@@ -14,6 +15,7 @@ function NavBarText({text}) {
 
 export default function NavBar() {
 
+    const user = useContext(UserContext);
     const userMenu = useUserMenu();
 
     const openUserMenu = () => {
@@ -31,13 +33,14 @@ export default function NavBar() {
                         homeLink(<Image width={32} src="/ontrack-128.png" preview={false}/>)
                     }
                     {
-                        homeLink(<Text style={{color: "white", fontSize: '175%', verticalAlign: 'middle'}}>Ontrack</Text>)
+                        homeLink(<Text
+                            style={{color: "white", fontSize: '175%', verticalAlign: 'middle'}}>Ontrack</Text>)
                     }
                 </Space>
                 <Space direction="horizontal" size={8}>
                     <NavBarText text="Search component"/>
                     <NavBarText text="App messages"/>
-                    <NavBarText text="User name"/>
+                    <NavBarText text={user?.account?.fullName}/>
                     <Avatar icon={<UserOutlined/>}
                             onClick={openUserMenu}
                             style={{

@@ -11,19 +11,21 @@ export default function ProjectView({id}) {
     const [project, setProject] = useState({})
 
     useEffect(() => {
-        graphQLCall(
-            gql`
-                query GetProject($id: Int!) {
-                    projects(id: $id) {
-                        id
-                        name
+        if (id) {
+            graphQLCall(
+                gql`
+                    query GetProject($id: Int!) {
+                        projects(id: $id) {
+                            id
+                            name
+                        }
                     }
-                }
-            `,
-            {id}
-        ).then(data => {
-            setProject(data.projects[0])
-        })
+                `,
+                {id}
+            ).then(data => {
+                setProject(data.projects[0])
+            })
+        }
     }, [id])
 
     return (

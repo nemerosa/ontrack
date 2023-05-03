@@ -1,7 +1,7 @@
 import {createContext, useEffect, useState} from "react";
 import restCall from "@client/restCall";
 
-export const UserContext = createContext({});
+export const UserContext = createContext({user: {}});
 
 const UserContextProvider = ({children}) => {
     const [user, setUser] = useState({});
