@@ -1,9 +1,17 @@
 import Link from "next/link";
 
-const prefix = '';
+const uiConfig = {
+    // Production prefix
+    prefix: '/ui',
+};
+
+if (process.env.NEXT_PUBLIC_LOCAL === 'true') {
+    // Development prefix
+    uiConfig.prefix = ''
+}
 
 export function homeUri() {
-    return `${prefix}/`
+    return `${uiConfig.prefix}/`
 }
 
 export function homeLink(text) {
@@ -11,7 +19,7 @@ export function homeLink(text) {
 }
 
 export function projectUri(project) {
-    return `${prefix}/project/${project.id}`
+    return `${uiConfig.prefix}/project/${project.id}`
 }
 
 export function projectLink(project, text) {
