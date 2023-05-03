@@ -38,8 +38,8 @@ export default function NavBar() {
                     }
                 </Space>
                 <Space direction="horizontal" size={8}>
-                    <NavBarText text="Search component"/>
-                    <NavBarText text="App messages"/>
+                    {/* TODO <NavBarText text="Search component"/>*/}
+                    {/* TODO <NavBarText text="App messages"/>*/}
                     <NavBarText text={user?.account?.fullName}/>
                     <Avatar icon={<UserOutlined/>}
                             onClick={openUserMenu}
