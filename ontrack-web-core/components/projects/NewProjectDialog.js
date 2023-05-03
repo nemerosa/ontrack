@@ -24,7 +24,12 @@ export default function NewProjectDialog({newProjectDialog}) {
     const [formErrors, setFormErrors] = useState([]);
     const [loading, setLoading] = useState(false)
 
+    const clearData = () => {
+        form.resetFields()
+    }
+
     const onCancel = () => {
+        form.resetFields()
         newProjectDialog.setOpen(false)
     }
 
@@ -60,6 +65,7 @@ export default function NewProjectDialog({newProjectDialog}) {
                 setFormErrors(errors)
             } else {
                 newProjectDialog.setOpen(false)
+                form.resetFields()
                 if (newProjectDialog.onSuccess) {
                     newProjectDialog.onSuccess()
                 }
