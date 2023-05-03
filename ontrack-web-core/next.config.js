@@ -2,6 +2,7 @@
 const nextConfig = {
     reactStrictMode: false,
     output: "export",
+    basePath: "/ui",
     images: {
         unoptimized: true,
     },
