@@ -14,6 +14,7 @@ import org.springframework.security.config.web.servlet.invoke
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
+import org.springframework.web.cors.CorsConfiguration
 
 @Configuration
 @EnableWebSecurity
@@ -64,6 +65,8 @@ class WebSecurityConfig {
                 authorize("/hook/secured/**", permitAll)
                 authorize(anyRequest, authenticated)
             }
+            // TODO CORS only for development
+            cors{}
             // Requires BASIC authentication
             httpBasic { }
             // Token based authentication (for API only)
