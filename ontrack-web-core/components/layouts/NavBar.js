@@ -1,9 +1,10 @@
-import {Avatar, Image, Space, Typography} from "antd";
+import {Avatar, Space, Typography} from "antd";
 import {UserOutlined} from "@ant-design/icons";
 import UserMenu, {useUserMenu} from "@components/layouts/UserMenu";
 import {homeLink} from "@components/common/Links";
 import {useContext} from "react";
 import {UserContext} from "@components/providers/UserProvider";
+import Image from 'next/image';
 
 const {Text} = Typography;
 
@@ -30,7 +31,7 @@ export default function NavBar() {
             }}>
                 <Space direction="horizontal" size={16}>
                     {
-                        homeLink(<Image alt="Logo Ontrack" width={32} src="/ontrack-128.png" preview={false}/>)
+                        homeLink(<Image alt="Logo Ontrack" width={32} src="/ontrack-128.png"/>)
                     }
                     {
                         homeLink(<Text
