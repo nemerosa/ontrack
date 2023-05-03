@@ -26,7 +26,7 @@ class TFCHookIT : AbstractDSLTestSupport() {
                 val vs = validationStamp()
                 build {
                     queueTestSupport.withSyncQueuing {
-                        tfcTestSupport.withNoSignature {
+                        tfcTestSupport.forTesting {
                             val response = hookTestSupport.hook(
                                     hook = "tfc",
                                     body = TFCFixtures.hookPayload(),
@@ -51,7 +51,7 @@ class TFCHookIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Verification hook`() {
-        tfcTestSupport.withNoSignature {
+        tfcTestSupport.forTesting {
             queueTestSupport.withSyncQueuing {
                 val response = hookTestSupport.hook(
                         hook = "tfc",
