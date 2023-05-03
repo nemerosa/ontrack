@@ -67,6 +67,18 @@ export default function NewProjectDialog({newProjectDialog}) {
                     >
                         <Input placeholder="Project name" allowClear/>
                     </Form.Item>
+                    <Form.Item name="description"
+                               label="Description"
+                               rules={[
+                                   {
+                                       max: 500,
+                                       type: 'string',
+                                       message: 'Project description must be 500 characters long at a maximum.',
+                                   },
+                               ]}
+                    >
+                        <Input placeholder="Project description" allowClear/>
+                    </Form.Item>
                 </Form>
             </Modal>
         </>
