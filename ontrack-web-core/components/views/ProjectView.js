@@ -4,6 +4,7 @@ import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import Head from "next/head";
 import {projectTitle} from "@components/common/Titles";
+import {projectBreadcrumbs} from "@components/common/Breadcrumbs";
 
 export default function ProjectView({id}) {
 
@@ -32,6 +33,7 @@ export default function ProjectView({id}) {
             </Head>
             <MainPage
                 title={project.name}
+                breadcrumbs={projectBreadcrumbs(project)}
             >
                 {project.name}
             </MainPage>

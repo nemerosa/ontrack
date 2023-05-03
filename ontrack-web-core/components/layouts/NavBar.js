@@ -2,6 +2,7 @@ import {Avatar, Image, Space, Typography} from "antd";
 import {UserOutlined} from "@ant-design/icons";
 import Link from "next/link";
 import UserMenu, {useUserMenu} from "@components/layouts/UserMenu";
+import {homeLink} from "@components/common/Links";
 
 const {Text} = Typography;
 
@@ -26,12 +27,12 @@ export default function NavBar() {
                 justifyContent: 'space-between',
             }}>
                 <Space direction="horizontal" size={16}>
-                    <Link href="/">
-                        <Image width={32} src="/ontrack-128.png" preview={false}/>
-                    </Link>
-                    <Link href="/">
-                        <Text style={{color: "white", fontSize: '175%', verticalAlign: 'middle'}}>Ontrack</Text>
-                    </Link>
+                    {
+                        homeLink(<Image width={32} src="/ontrack-128.png" preview={false}/>)
+                    }
+                    {
+                        homeLink(<Text style={{color: "white", fontSize: '175%', verticalAlign: 'middle'}}>Ontrack</Text>)
+                    }
                 </Space>
                 <Space direction="horizontal" size={8}>
                     <NavBarText text="Search component"/>
