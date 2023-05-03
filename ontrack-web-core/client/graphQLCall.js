@@ -1,22 +1,12 @@
 import {GraphQLClient} from "graphql-request";
+import clientConfig from "@client/clientConfig";
 
-let graphQLClient;
+const config = clientConfig()
 
-if (process.env.NEXT_PUBLIC_LOCAL === 'true') {
-    const graphQLUrl = "http://localhost:8080/graphql";
-    const graphQLUsername = "admin";
-    const graphQLPassword = "admin";
-
-    const graphQLToken = btoa(`${graphQLUsername}:${graphQLPassword}`);
-
-    graphQLClient = new GraphQLClient(graphQLUrl, {
-        headers: {
-            Authorization: `Basic ${graphQLToken}`
-        }
+const graphQLClient = new GraphQLClient(
+    `${config.url}/graphql`, {
+        headers: config.headers,
     });
-} else {
-    graphQLClient = new GraphQLClient("/graphql", {});
-}
 
 /**
  * Checking for user errors under a node

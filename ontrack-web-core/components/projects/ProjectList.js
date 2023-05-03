@@ -27,7 +27,7 @@ export default function ProjectList() {
     return (
         <>
             <Space direction="horizontal" size={16} wrap>
-                { projects.map(project => <ProjectBox project={project}/> ) }
+                { projects.map(project => <ProjectBox key={project.id} project={project}/> ) }
             </Space>
         </>
     )
