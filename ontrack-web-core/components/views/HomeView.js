@@ -2,11 +2,13 @@ import MainPage from "@components/layouts/MainPage";
 import ProjectList from "@components/projects/ProjectList";
 import {Command} from "@components/common/Commands";
 import {PlusOutlined} from "@ant-design/icons";
+import NewProjectDialog, {useNewProjectDialog} from "@components/projects/NewProjectDialog";
 
 export default function HomeView() {
 
+    const newProjectDialog = useNewProjectDialog()
     const newProject = () => {
-        alert("New project")
+        newProjectDialog.start()
     }
 
     const commands = [
@@ -25,6 +27,9 @@ export default function HomeView() {
             >
                 <ProjectList/>
             </MainPage>
+            <NewProjectDialog
+                newProjectDialog={newProjectDialog}
+            />
         </>
     )
 }
