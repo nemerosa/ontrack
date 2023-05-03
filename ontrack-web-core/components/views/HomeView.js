@@ -1,12 +1,18 @@
 import MainPage from "@components/layouts/MainPage";
-import ProjectList from "@components/projects/ProjectList";
+import ProjectList, {useProjectList} from "@components/projects/ProjectList";
 import {Command} from "@components/common/Commands";
 import {PlusOutlined} from "@ant-design/icons";
 import NewProjectDialog, {useNewProjectDialog} from "@components/projects/NewProjectDialog";
 
 export default function HomeView() {
 
-    const newProjectDialog = useNewProjectDialog()
+    const projectList = useProjectList()
+
+    const newProjectDialog = useNewProjectDialog({
+        onSuccess: () => {
+            projectList.refresh()
+        }
+    })
     const newProject = () => {
         newProjectDialog.start()
     }
@@ -25,7 +31,9 @@ export default function HomeView() {
                 title="Home"
                 commands={commands}
             >
-                <ProjectList/>
+                <ProjectList
+                    projectList={projectList}
+                />
             </MainPage>
             <NewProjectDialog
                 newProjectDialog={newProjectDialog}

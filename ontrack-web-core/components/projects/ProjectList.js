@@ -4,7 +4,17 @@ import {gql} from "graphql-request";
 import ProjectBox from "@components/projects/ProjectBox";
 import {Space} from "antd";
 
-export default function ProjectList() {
+export function useProjectList() {
+    const [projectsReload, setProjectReload] = useState(0)
+    return {
+        projectsReload: projectsReload,
+        refresh: () => {
+            setProjectReload(projectsReload + 1)
+        },
+    }
+}
+
+export default function ProjectList({projectList}) {
 
     const [projects, setProjects] = useState([])
 
@@ -22,7 +32,7 @@ export default function ProjectList() {
         ).then(data => {
             setProjects(data.projects)
         })
-    }, [])
+    }, [projectList.projectsReload])
 
     return (
         <>

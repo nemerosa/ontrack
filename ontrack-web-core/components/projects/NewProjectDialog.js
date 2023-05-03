@@ -1,7 +1,9 @@
 import {useState} from "react";
 import {Form, Input, Modal, Switch} from "antd";
+import graphQLCall, {getUserErrors} from "@client/graphQLCall";
+import {gql} from "graphql-request";
 
-export function useNewProjectDialog() {
+export function useNewProjectDialog({onSuccess}) {
     const [open, setOpen] = useState(false)
     return {
         open,
@@ -10,7 +12,8 @@ export function useNewProjectDialog() {
             // TODO Reset data
             // Opens the dialog
             setOpen(true)
-        }
+        },
+        onSuccess: onSuccess,
     }
 }
 
@@ -29,6 +32,39 @@ export default function NewProjectDialog({newProjectDialog}) {
         setFormErrors([])
         try {
             const values = await form.validateFields()
+            values.description = values.description ? values.description : ''
+            values.disabled = values.disabled ? values.disabled : false
+            const data = await graphQLCall(
+                gql`
+                    mutation CreateProject(
+                        $name: String!,
+                        $description: String,
+                        $disabled: Boolean!,
+                    ) {
+                        createProject(input: {
+                            name: $name,
+                            description: $description,
+                            disabled: $disabled,
+                        }) {
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                `,
+                values
+            )
+            const errors = getUserErrors(data.createProject)
+            if (errors) {
+                setFormErrors(errors)
+            } else {
+                newProjectDialog.setOpen(false)
+                if (newProjectDialog.onSuccess) {
+                    newProjectDialog.onSuccess()
+                }
+            }
+        } catch (ignored) {
+            //
         } finally {
             setLoading(false)
         }
@@ -81,6 +117,7 @@ export default function NewProjectDialog({newProjectDialog}) {
                     </Form.Item>
                     <Form.Item name="disabled"
                                label="Disabled"
+                               valuePropName="checked"
                     >
                         <Switch/>
                     </Form.Item>
