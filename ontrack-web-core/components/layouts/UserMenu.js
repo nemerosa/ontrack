@@ -97,7 +97,20 @@ export default function UserMenu({userMenu}) {
                     return 0;
                 }
             });
-            // TODO Sorting items in groups
+            // Sorting items in groups
+            groups.forEach(group => {
+                group.children.sort((a, b) => {
+                    const na = a.label;
+                    const nb = b.label;
+                    if (na < nb) {
+                        return -1;
+                    } else if (na > nb) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                })
+            })
             // Groups in the menu
             menu.push(...groups)
             // Separator
