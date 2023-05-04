@@ -1,6 +1,7 @@
 import {CloseOutlined} from "@ant-design/icons";
 import {Button, Space, Typography} from "antd";
 import Link from "next/link";
+import {homeUri} from "@components/common/Links";
 
 export function Command({icon, text, href, action}) {
     return <Button
@@ -19,4 +20,8 @@ export function Command({icon, text, href, action}) {
 
 export function CloseCommand({href}) {
     return <Command icon={<CloseOutlined/>} href={href}/>
+}
+
+export function CloseToHomeCommand() {
+    return <CloseCommand href={homeUri()}/>
 }
