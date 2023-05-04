@@ -11,10 +11,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.web.filter.ShallowEtagHeaderFilter
-import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer
-import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
-import org.springframework.web.servlet.config.annotation.CorsRegistry
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import org.springframework.web.servlet.config.annotation.*
 import javax.annotation.PostConstruct
 import javax.servlet.DispatcherType
 
@@ -81,6 +78,10 @@ class WebConfig(
         ).forEach {
             registry.addMapping(it).allowedMethods(*ALLOWED_API_METHODS.toTypedArray())
         }
+    }
+
+    override fun addViewControllers(registry: ViewControllerRegistry) {
+        registry.addViewController("/ui").setViewName("forward:/ui/index.html")
     }
 
     companion object {
