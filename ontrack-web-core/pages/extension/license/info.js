@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import restCall from "@client/restCall";
 import {Alert} from "antd";
-import SimplePage from "@components/layouts/SimplePage";
+import StandardPage from "@components/layouts/StandardPage";
 
 export default function ExtensionLicenseInfoPage() {
 
@@ -14,7 +14,7 @@ export default function ExtensionLicenseInfoPage() {
     }, [])
 
     return (
-        <SimplePage
+        <StandardPage
             pageTitle="License info">
             {
                 !license &&
@@ -39,6 +39,6 @@ export default function ExtensionLicenseInfoPage() {
                     </dd>
                 </dl>
             }
-        </SimplePage>
+        </StandardPage>
     )
 }

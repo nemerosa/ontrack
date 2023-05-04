@@ -5,7 +5,7 @@ import MainPage from "@components/layouts/MainPage";
 import {homeBreadcrumbs} from "@components/common/Breadcrumbs";
 import {CloseToHomeCommand} from "@components/common/Commands";
 
-export default function SimplePage({
+export default function StandardPage({
                                        pageTitle,
                                        breadcrumbs = homeBreadcrumbs(),
                                        commands = [
