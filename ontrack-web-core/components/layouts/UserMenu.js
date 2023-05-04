@@ -22,6 +22,22 @@ export default function UserMenu({userMenu}) {
     const user = useContext(UserContext)
     const [items, setItems] = useState([])
 
+    const createMenuItem = (action) => {
+        return {
+            key: action.id,
+            label: action.name,
+            onClick: () => {
+                if (action.type === 'LINK' && action.uri) {
+                    // TODO Legacy vs. Next UI
+                    // noinspection JSIgnoredPromiseFromCall
+                    router.push(action.uri)
+                } else {
+                    console.log(`Unsupported action type ${action.type} for action ${action.id} (${action.name}).`)
+                }
+            }
+        }
+    }
+
     useEffect(() => {
         if (user?.actions) {
             // Menu
@@ -42,20 +58,9 @@ export default function UserMenu({userMenu}) {
                         }
                         groupIndex[groupName] = group
                     }
+                    group.children.push(createMenuItem(action))
                 } else {
-                    topLevelActions.push({
-                        key: action.id,
-                        label: action.name,
-                        onClick: () => {
-                            if (action.type === 'LINK' && action.uri) {
-                                // TODO Legacy vs. Next UI
-                                // noinspection JSIgnoredPromiseFromCall
-                                router.push(action.uri)
-                            } else {
-                                console.log(`Unsupported action type ${action.type} for action ${action.id} (${action.name}).`)
-                            }
-                        }
-                    })
+                    topLevelActions.push(createMenuItem(action))
                 }
             })
             // Top level actions at the start
