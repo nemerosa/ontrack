@@ -1,8 +1,14 @@
 import Link from "next/link";
+import clientConfig from "@client/clientConfig";
 
 const uiConfig = {
     prefix: '',
 };
+
+export function legacyUri() {
+    const config = clientConfig()
+    return `${config.url}/`
+}
 
 export function homeUri() {
     return `${uiConfig.prefix}/`

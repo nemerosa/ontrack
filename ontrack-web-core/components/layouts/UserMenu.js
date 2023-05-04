@@ -1,6 +1,8 @@
 import {Drawer, Menu} from "antd";
 import {useState} from "react";
-import {LogoutOutlined, SettingOutlined, UserOutlined} from "@ant-design/icons";
+import {LogoutOutlined, PoweroffOutlined, SettingOutlined, UserOutlined} from "@ant-design/icons";
+import Link from "next/link";
+import {legacyUri} from "@components/common/Links";
 
 export function useUserMenu() {
     const [open, setOpen] = useState(false);
@@ -24,6 +26,9 @@ export default function UserMenu({userMenu}) {
             icon: <UserOutlined/>,
         },
         {
+            type: 'divider'
+        },
+        {
             key: 'system',
             label: "System",
             icon: <SettingOutlined/>,
@@ -37,6 +42,17 @@ export default function UserMenu({userMenu}) {
                     label: "Global subscriptions",
                 },
             ],
+        },
+        {
+            type: 'divider'
+        },
+        {
+            key: 'legacy',
+            label: "Legacy UI",
+            icon: <Link href={legacyUri()}><PoweroffOutlined /></Link>,
+        },
+        {
+            type: 'divider'
         },
         {
             key: 'logout',
