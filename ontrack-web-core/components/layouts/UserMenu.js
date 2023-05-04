@@ -26,14 +26,24 @@ export default function UserMenu({userMenu}) {
         if (user?.actions) {
             // Menu
             const menu = []
-            const groups = {}
+            const topLevelActions = []
+            const groupIndex = {}
             // Building the menu from the user actions
             user.actions.forEach(action => {
                 const groupName = action.group
                 if (groupName) {
-
+                    let group = groupIndex[groupName]
+                    if (!group) {
+                        group = {
+                            key: groupName,
+                            label: groupName,
+                            // TODO icon
+                            children: [],
+                        }
+                        groupIndex[groupName] = group
+                    }
                 } else {
-                    menu.push({
+                    topLevelActions.push({
                         key: action.id,
                         label: action.name,
                         onClick: () => {
@@ -48,8 +58,27 @@ export default function UserMenu({userMenu}) {
                     })
                 }
             })
-            // TODO Sorting root menu items
+            // Top level actions at the start
+            menu.push(...topLevelActions)
+            // Sorting the groups
+            const groups = [];
+            for (const [_, group] of Object.entries(groupIndex)) {
+                groups.push(group);
+            }
+            groups.sort((a, b) => {
+                const na = a.key;
+                const nb = b.key;
+                if (na < nb) {
+                    return -1;
+                } else if (na > nb) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
             // TODO Sorting items in groups
+            // Groups in the menu
+            menu.push(...groups)
             // Separator
             menu.push({
                 type: 'divider',
