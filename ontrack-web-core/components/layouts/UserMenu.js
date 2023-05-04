@@ -46,7 +46,11 @@ export default function UserMenu({userMenu}) {
                 if (action.type === 'LINK' && action.uri) {
                     // TODO Legacy vs. Next UI
                     // noinspection JSIgnoredPromiseFromCall
-                    router.push(action.uri)
+                    let uri = action.uri
+                    if (!uri.startsWith('/')) {
+                        uri = '/' + uri
+                    }
+                    router.push(uri)
                 } else {
                     console.log(`Unsupported action type ${action.type} for action ${action.id} (${action.name}).`)
                 }
