@@ -1,6 +1,14 @@
 import {Drawer, Menu} from "antd";
 import {useContext, useEffect, useState} from "react";
-import {LogoutOutlined, PoweroffOutlined} from "@ant-design/icons";
+import {
+    AppstoreOutlined,
+    CheckCircleOutlined,
+    InfoCircleOutlined,
+    LogoutOutlined,
+    PoweroffOutlined,
+    SecurityScanOutlined,
+    SettingOutlined
+} from "@ant-design/icons";
 import {UserContext} from "@components/providers/UserProvider";
 import {logout} from "@client/login";
 import {legacyUri} from "@components/common/Links";
@@ -21,6 +29,14 @@ export default function UserMenu({userMenu}) {
 
     const user = useContext(UserContext)
     const [items, setItems] = useState([])
+
+    const groupIcons = {
+        Configuration: <AppstoreOutlined/>,
+        Indicators: <CheckCircleOutlined/>,
+        Information: <InfoCircleOutlined/>,
+        Security: <SecurityScanOutlined/>,
+        System: <SettingOutlined/>,
+    }
 
     const createMenuItem = (action) => {
         return {
@@ -53,7 +69,7 @@ export default function UserMenu({userMenu}) {
                         group = {
                             key: groupName,
                             label: groupName,
-                            // TODO icon
+                            icon: groupIcons[groupName],
                             children: [],
                         }
                         groupIndex[groupName] = group
