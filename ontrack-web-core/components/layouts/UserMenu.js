@@ -1,8 +1,9 @@
 import {Drawer, Menu} from "antd";
 import {useContext, useEffect, useState} from "react";
-import {LogoutOutlined} from "@ant-design/icons";
+import {LogoutOutlined, PoweroffOutlined} from "@ant-design/icons";
 import {UserContext} from "@components/providers/UserProvider";
 import {logout} from "@client/login";
+import {legacyUri} from "@components/common/Links";
 
 export function useUserMenu() {
     const [open, setOpen] = useState(false);
@@ -22,16 +23,32 @@ export default function UserMenu({userMenu}) {
         // Menu
         const menu = []
         // TODO Building the menu from the user actions
-        // TODO Adding predefined "Legacy UI"
+        // Separator
+        menu.push({
+            type: 'divider',
+        })
+        // Adding predefined "Legacy UI"
+        menu.push({
+            key: 'legacy',
+            label: "Legacy UI",
+            icon: <PoweroffOutlined/>,
+            onClick: () => {
+                location.href = legacyUri()
+            }
+        })
+        // Separator
+        menu.push({
+            type: 'divider',
+        })
         // Adding predefined "Sign out"
         // Not working in local development mode
         menu.push({
             key: 'logout',
             label: "Sign out",
+            icon: <LogoutOutlined/>,
             onClick: () => {
                 logout()
             },
-            icon: <LogoutOutlined/>,
         })
         // Registers the menu
         setItems(menu)
