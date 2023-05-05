@@ -7,13 +7,16 @@ import {projectTitle} from "@components/common/Titles";
 import {projectBreadcrumbs} from "@components/common/Breadcrumbs";
 import {CloseCommand} from "@components/common/Commands";
 import {homeUri} from "@components/common/Links";
+import LoadingContainer from "@components/common/LoadingContainer";
 
 export default function ProjectView({id}) {
 
+    const [loadingProject, setLoadingProject] = useState(true)
     const [project, setProject] = useState({})
 
     useEffect(() => {
         if (id) {
+            setLoadingProject(true)
             graphQLCall(
                 gql`
                     query GetProject($id: Int!) {
@@ -26,6 +29,7 @@ export default function ProjectView({id}) {
                 {id}
             ).then(data => {
                 setProject(data.projects[0])
+                setLoadingProject(false)
             })
         }
     }, [id])
@@ -44,7 +48,9 @@ export default function ProjectView({id}) {
                 breadcrumbs={projectBreadcrumbs(project)}
                 commands={commands}
             >
-                {project.name}
+                <LoadingContainer loading={loadingProject} tip="Loading project">
+                    {project.name}
+                </LoadingContainer>
             </MainPage>
         </>
     )

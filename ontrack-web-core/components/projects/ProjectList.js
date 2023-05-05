@@ -3,6 +3,7 @@ import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import ProjectBox from "@components/projects/ProjectBox";
 import {Space} from "antd";
+import LoadingContainer from "@components/common/LoadingContainer";
 
 export function useProjectList() {
     const [projectsReload, setProjectReload] = useState(0)
@@ -16,9 +17,11 @@ export function useProjectList() {
 
 export default function ProjectList({projectList}) {
 
+    const [loadingProjects, setLoadingProjects] = useState(true)
     const [projects, setProjects] = useState([])
 
     useEffect(() => {
+        setLoadingProjects(true)
         graphQLCall(
             gql`
                 query GetProjects {
@@ -31,14 +34,17 @@ export default function ProjectList({projectList}) {
             `
         ).then(data => {
             setProjects(data.projects)
+            setLoadingProjects(false)
         })
     }, [projectList.projectsReload])
 
     return (
         <>
-            <Space direction="horizontal" size={16} wrap>
-                { projects.map(project => <ProjectBox key={project.id} project={project}/> ) }
-            </Space>
+            <LoadingContainer loading={loadingProjects} tip="Loading projects">
+                <Space direction="horizontal" size={16} wrap>
+                    {projects.map(project => <ProjectBox key={project.id} project={project}/>)}
+                </Space>
+            </LoadingContainer>
         </>
     )
 }
