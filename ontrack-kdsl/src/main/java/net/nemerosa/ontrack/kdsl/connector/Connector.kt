@@ -41,4 +41,12 @@ interface Connector {
         body: Any? = null,
     )
 
+    /**
+     * Deletes a payload to a relative URL.
+     */
+    fun delete(
+        path: String,
+        headers: Map<String, String> = emptyMap()
+    )
+
 }

@@ -44,6 +44,16 @@ abstract class TypedMutationProvider protected constructor(
     ): Mutation = UnitTypedMutation(name, description, input, outputFields, fetcher)
 
     /**
+     * Builds a mutation which does not return anything and has no parameter.
+     */
+    fun unitNoInputMutation(
+            name: String,
+            description: String,
+            outputFields: List<GraphQLFieldDefinition> = emptyList(),
+            fetcher: () -> Unit
+    ): Mutation = UnitNoInputMutation(name, description, outputFields, fetcher)
+
+    /**
      * Re-ified version of [unitMutation].
      */
     inline fun <reified I : Any> unitMutation(
@@ -118,6 +128,22 @@ abstract class TypedMutationProvider protected constructor(
             val input = mutationInput(input, env)
             validateInput(input)
             fetcher(input)
+            // Nothing to return
+            return Unit
+        }
+    }
+
+    inner class UnitNoInputMutation(
+            override val name: String,
+            override val description: String,
+            override val outputFields: List<GraphQLFieldDefinition>,
+            private val fetcher: () -> Unit
+    ) : Mutation {
+
+        override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = emptyList()
+
+        override fun fetch(env: DataFetchingEnvironment): Any {
+            fetcher()
             // Nothing to return
             return Unit
         }

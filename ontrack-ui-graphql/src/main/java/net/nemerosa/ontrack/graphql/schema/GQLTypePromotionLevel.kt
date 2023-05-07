@@ -65,7 +65,7 @@ class GQLTypePromotionLevel(
                             cache = cache,
                             fieldName = "promotionRunsPaginated",
                             fieldDescription = "Paginated list of promotion runs",
-                            itemType = promotionRun,
+                            itemType = promotionRun.typeName,
                             arguments = listOf(
                                     dateTimeArgument(ARG_BEFORE_DATE, "Keeps only runs before this data / time"),
                                     dateTimeArgument(ARG_AFTER_DATE, "Keeps only runs after this data / time"),

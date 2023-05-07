@@ -97,7 +97,7 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
         return ID.of(id);
     }
 
-    protected static @Nullable
+    public static @Nullable
     String dateTimeForDB(@Nullable LocalDateTime time) {
         return Time.forStorage(time);
     }

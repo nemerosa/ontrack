@@ -23,6 +23,25 @@ fun stringArgument(
     .build()
 
 /**
+ * Creates a typed (input) GraphQL argument.
+ *
+ * @param name Name of the argument
+ * @param typeName Name of the input
+ * @param description Description of the argument
+ * @param nullable If the argument is nullable or not
+ */
+fun typedArgument(
+    name: String,
+    typeName: String,
+    description: String,
+    nullable: Boolean = true,
+): GraphQLArgument = GraphQLArgument.newArgument()
+    .name(name)
+    .description(description)
+    .type(nullableInputType(GraphQLTypeReference(typeName), nullable))
+    .build()
+
+/**
  * Creates a `Int` GraphQL argument.
  *
  * @param name Name of the argument

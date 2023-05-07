@@ -53,7 +53,7 @@ class GQLTypeWebhook(
                     cache = cache,
                     fieldName = "exchanges",
                     fieldDescription = "Exchanges for this webhook",
-                    itemType = gqlTypeWebhookExchange,
+                    itemType = gqlTypeWebhookExchange.typeName,
                     arguments = listOf(
                         GraphQLArgument.newArgument()
                             .name(ARG_EXCHANGES_FILTER)

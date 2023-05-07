@@ -28,12 +28,10 @@ class SonarQubeMeasuresJobSupplier(
         private val SONARQUBE_COLLECTION_JOB = SonarQubeExtensionFeature.SONARQUBE_JOB_CATEGORY.getType("sonarqube-collection").withName("Collection of SonarQube measures")
     }
 
-    override fun collectJobRegistrations(): Stream<JobRegistration> {
-        return structureService.projectList
+    override val jobRegistrations: Collection<JobRegistration>
+        get() = structureService.projectList
                 .filter { propertyService.hasProperty(it, SonarQubePropertyType::class.java) }
                 .map { createSonarQubeMeasuresJob(it) }
-                .stream()
-    }
 
     private fun createSonarQubeMeasuresJob(project: Project): JobRegistration =
             JobRegistration.of(

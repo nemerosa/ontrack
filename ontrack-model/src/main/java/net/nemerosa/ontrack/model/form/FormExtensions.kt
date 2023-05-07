@@ -4,12 +4,17 @@ import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.annotations.getPropertyLabel
 import kotlin.reflect.KProperty1
 
-fun <T> Form.textField(property: KProperty1<T, String?>, value: String?): Form =
+fun <T> Form.textField(
+    property: KProperty1<T, String?>,
+    value: String?,
+    readOnly: Boolean = false,
+): Form =
     with(
         Text.of(property.name)
             .label(getPropertyLabel(property))
             .help(getPropertyDescription(property))
             .optional(property.returnType.isMarkedNullable)
+            .readOnly(readOnly)
             .value(value)
     )
 

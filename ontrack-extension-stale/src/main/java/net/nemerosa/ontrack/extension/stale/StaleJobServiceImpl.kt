@@ -26,16 +26,12 @@ class StaleJobServiceImpl(
         extensionManager.getExtensions(StaleBranchCheck::class.java).toSet()
     }
 
-    override fun collectJobRegistrations(): Stream<JobRegistration> {
-        // Gets all projects...
-        return structureService.projectList
+    override val jobRegistrations: Collection<JobRegistration>
+        get() = structureService.projectList
                 // ... which have a StaleProperty
                 .filter { project -> isProjectEligible(project) }
                 // ... and associates a job with them
                 .map { project -> createStaleJob(project) }
-                // ... as a stream
-                .stream()
-    }
 
     private fun isProjectEligible(project: Project) = checks.any { it.isProjectEligible(project) }
 

@@ -65,6 +65,8 @@ services:
       # ... auto versioning
       ONTRACK_EXTENSION_AUTOVERSIONING_QUEUE_PROJECTS: "test-av-routing"
       ONTRACK_EXTENSION_AUTOVERSIONING_QUEUE_SCALE: 10
+      # ... TFC hook signature check disabled
+      ONTRACK_EXTENSION_TFC_HOOK_SIGNATURE_DISABLED: "true"
       # General configuration
       JAVA_OPTIONS: "-Xmx2048m -Xms2048m"
       # Database

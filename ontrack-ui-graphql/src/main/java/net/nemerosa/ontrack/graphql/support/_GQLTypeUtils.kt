@@ -9,6 +9,8 @@ import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIName
 import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.support.NameValue
+import net.nemerosa.ontrack.model.support.toNameValues
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
@@ -52,10 +54,10 @@ fun TypeBuilder.idField(property: KProperty<ID>, description: String? = null): G
             }
     }
 
-fun TypeBuilder.dateField(name: String, description: String): GraphQLObjectType.Builder = field {
+fun TypeBuilder.dateField(name: String, description: String, nullable: Boolean = true): GraphQLObjectType.Builder = field {
     it.name(name)
         .description(description)
-        .type(GQLScalarLocalDateTime.INSTANCE)
+        .type(nullableOutputType(GQLScalarLocalDateTime.INSTANCE, nullable))
 }
 
 fun TypeBuilder.jsonField(property: KProperty<Any?>, description: String? = null): GraphQLObjectType.Builder =
@@ -154,6 +156,18 @@ fun TypeBuilder.stringField(property: KProperty<String?>, description: String? =
             .description(getPropertyDescription(property, description))
             .type(nullableOutputType(GraphQLString, property.returnType.isMarkedNullable))
     }
+
+fun TypeBuilder.nameValuesFromMapField(property: KProperty<Map<String,String>>, description: String? = null): GraphQLObjectType.Builder =
+        field {
+            it.name(getPropertyName(property))
+                    .description(getPropertyDescription(property))
+                    .type(listType(GraphQLTypeReference(NameValue::class.java.simpleName)))
+                    .dataFetcher { env ->
+                        val source = env.getSource<Any>()
+                        val map = property.call(source)
+                        map.toNameValues()
+                    }
+        }
 
 fun TypeBuilder.classField(property: KProperty<Class<*>?>, description: String? = null): GraphQLObjectType.Builder =
     field {

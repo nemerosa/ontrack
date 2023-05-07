@@ -30,7 +30,7 @@ class GQLRootQueryEventSubscriptions(
             cache = GQLTypeCache(),
             fieldName = "eventSubscriptions",
             fieldDescription = "List of event subscriptions",
-            itemType = gqlTypeEventSubscriptionPayload,
+            itemType = gqlTypeEventSubscriptionPayload.typeName,
             arguments = listOf(
                 GraphQLArgument.newArgument()
                     .name("filter")
