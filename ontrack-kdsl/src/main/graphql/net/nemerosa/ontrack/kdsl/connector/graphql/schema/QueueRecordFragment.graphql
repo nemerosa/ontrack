@@ -1,4 +1,4 @@
-fragment QueueRecordData on QueueRecord {
+fragment QueueRecordData on QueueRecording {
     state
     queuePayload {
         id

@@ -8,33 +8,34 @@ import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 class QueueMgt(connector: Connector) : Connected(connector) {
 
     fun findQueueRecordByID(queueID: String): QueueRecord? =
-        graphqlConnector.query(
-            QueueGetRecordQuery.builder()
-                .id(queueID)
-                .build()
-        )?.queueRecord()?.fragments()?.queueRecordData()?.run {
-            QueueRecord(
-                state = QueueRecordState.valueOf(state().name),
-                queuePayload = queuePayload().run {
-                    QueuePayload(
-                        id = id(),
-                        processor = processor(),
-                        body = body(),
-                    )
-                },
-                startTime = startTime(),
-                endTime = endTime(),
-                routingKey = routingKey(),
-                queueName = queueName(),
-                actualPayload = actualPayload(),
-                exception = exception(),
-                history = history().map {
-                    QueueRecordHistory(
-                        state = QueueRecordState.valueOf(it.state().name),
-                        time = it.time(),
-                    )
-                }
-            )
-        }
+            graphqlConnector.query(
+                    QueueGetRecordQuery.builder()
+                            .id(queueID)
+                            .build()
+            )?.queueRecordings()?.pageItems()?.firstOrNull()
+                    ?.fragments()?.queueRecordData()?.run {
+                        QueueRecord(
+                                state = QueueRecordState.valueOf(state().name),
+                                queuePayload = queuePayload().run {
+                                    QueuePayload(
+                                            id = id(),
+                                            processor = processor(),
+                                            body = body(),
+                                    )
+                                },
+                                startTime = startTime(),
+                                endTime = endTime(),
+                                routingKey = routingKey(),
+                                queueName = queueName(),
+                                actualPayload = actualPayload(),
+                                exception = exception(),
+                                history = history().map {
+                                    QueueRecordHistory(
+                                            state = QueueRecordState.valueOf(it.state().name),
+                                            time = it.time(),
+                                    )
+                                }
+                        )
+                    }
 
 }
