@@ -51,7 +51,7 @@ For the parameters of the Webhook URL, there are 4 possible parameters:
 |Name of the project in Ontrack. It must exist.
 
 |`branch` (optional)
-|Name of the branch in Ontrack. If set, it must exist.
+|Name of the branch in Ontrack. If set, it must exist. If this parameter is not set, the build will be search among all the branches of the project.
 
 |`build` (required)
 |Name of the build in Ontrack. It must exist. If the project is configured to use labels for the builds, then this parameter is considered a label.
