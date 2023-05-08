@@ -80,3 +80,18 @@ In this case, the value following `@` represents a variable of the Terraform Clo
 ====
 This variable must exist and must not be sensitive.
 ====
+
+When using variable references, Ontrack will contact Terraform Cloud in order to get the values for the referenced variables.
+
+To this purpose, you need to define a _TFC Configuration_:
+
+* go to the user menu, at _TFC configurations_
+* _Create a configuration_
+* Name: anything meaningful
+* URL: set to `https://app.terraform.io` by default, put something else when using Terraform Enterprise
+* Token: generate a _user token_ in Terraform Cloud
+
+[NOTE]
+====
+The mapping between the calls from the hook and the associated TFC configuration will be based on the URL.
+====
