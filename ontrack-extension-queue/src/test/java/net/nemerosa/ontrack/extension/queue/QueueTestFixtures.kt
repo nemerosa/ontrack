@@ -12,6 +12,7 @@ object QueueTestFixtures {
     fun queueRecord(
             state: QueueRecordState = QueueRecordState.COMPLETED,
             processor: String = "test",
+            queueName: String? = "queue",
     ): QueueRecord {
         val id = UUID.randomUUID().toString()
         val payload = mapOf("message" to "Sample message").asJson()
@@ -26,7 +27,7 @@ object QueueTestFixtures {
                 startTime = time,
                 endTime = time,
                 routingKey = "routing",
-                queueName = "queue",
+                queueName = queueName,
                 actualPayload = payload,
                 exception = null,
                 history = listOf(
