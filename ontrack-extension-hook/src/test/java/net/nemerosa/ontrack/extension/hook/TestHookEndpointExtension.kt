@@ -29,6 +29,7 @@ class TestHookEndpointExtension(
             return HookResponse(
                     type = HookResponseType.PROCESSED,
                     info = null,
+                    infoLink = null,
             )
         }
     }

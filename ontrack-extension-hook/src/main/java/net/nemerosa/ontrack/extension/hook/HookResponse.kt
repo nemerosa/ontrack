@@ -17,6 +17,12 @@ data class HookResponse(
          * Additional information (non structured, will typically be rendered as JSON)
          */
         @APIDescription("Additional information (non structured, will typically be rendered as JSON)")
+        @Deprecated("Prefer using infoLink")
         @JSONType
-        val info: Any?,
+        val info: Any? = null,
+        /**
+         * Structured additional information
+         */
+        @APIDescription("Structured additional information")
+        val infoLink: HookInfoLink?
 )

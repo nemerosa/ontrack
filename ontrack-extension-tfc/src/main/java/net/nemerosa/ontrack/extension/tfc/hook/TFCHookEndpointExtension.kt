@@ -58,7 +58,7 @@ class TFCHookEndpointExtension(
             processNotification(parameters, payload, notification)
         }
         // OK
-        return results.toHookResponse()
+        return results.toHookResponse(queueProcessor)
     }
 
     private fun processNotification(

@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.tfc.queue
 
+import net.nemerosa.ontrack.extension.hook.HookInfoLinkExtension
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
+import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.extension.tfc.TFCExtensionFeature
 import net.nemerosa.ontrack.extension.tfc.service.RunPayload
 import net.nemerosa.ontrack.extension.tfc.service.TFCService
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
@@ -9,8 +12,9 @@ import kotlin.reflect.KClass
 
 @Component
 class TFCQueueProcessor(
-    private val tfcService: TFCService,
-) : QueueProcessor<RunPayload> {
+        extension: TFCExtensionFeature,
+        private val tfcService: TFCService,
+) : AbstractExtension(extension), QueueProcessor<RunPayload>, HookInfoLinkExtension {
 
     override val id: String = "tfc"
 
@@ -31,10 +35,10 @@ class TFCQueueProcessor(
             else -> ValidationRunStatusID.STATUS_WARNING
         }
         tfcService.validate(
-            params = payload.parameters,
-            status = status,
-            workspaceId = payload.workspaceId,
-            runUrl = payload.runUrl,
+                params = payload.parameters,
+                status = status,
+                workspaceId = payload.workspaceId,
+                runUrl = payload.runUrl,
         )
     }
 

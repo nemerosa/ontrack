@@ -1,14 +1,18 @@
 package net.nemerosa.ontrack.extension.hook.queue
 
+import net.nemerosa.ontrack.extension.hook.HookInfoLinkExtension
 import net.nemerosa.ontrack.extension.hook.HookResponse
 import net.nemerosa.ontrack.extension.hook.HookResponseType
+import net.nemerosa.ontrack.extension.hook.createHookInfoLink
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatchResult
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatchResultType
 
 /**
  * Converts a list of queuing dispatching results to a hook response.
  */
-fun List<QueueDispatchResult>.toHookResponse(): HookResponse {
+fun List<QueueDispatchResult>.toHookResponse(
+        extension: HookInfoLinkExtension,
+): HookResponse {
 
     val type: HookResponseType
     val types = map { it.type }
@@ -21,7 +25,8 @@ fun List<QueueDispatchResult>.toHookResponse(): HookResponse {
     }
 
     return HookResponse(
-        type = type,
-        info = this,
+            type = type,
+            info = this,
+            infoLink = extension.createHookInfoLink(this),
     )
 }
