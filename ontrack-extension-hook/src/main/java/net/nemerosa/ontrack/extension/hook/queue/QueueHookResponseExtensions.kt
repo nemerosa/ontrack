@@ -10,8 +10,8 @@ import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatchResultType
 /**
  * Converts a list of queuing dispatching results to a hook response.
  */
-fun List<QueueDispatchResult>.toHookResponse(
-        extension: HookInfoLinkExtension,
+fun <T> List<QueueDispatchResult>.toHookResponse(
+        extension: HookInfoLinkExtension<List<QueueDispatchResult>>,
 ): HookResponse {
 
     val type: HookResponseType

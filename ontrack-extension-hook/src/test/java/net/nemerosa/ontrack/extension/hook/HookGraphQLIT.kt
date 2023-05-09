@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.hook
 
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.json.getRequiredTextField
+import net.nemerosa.ontrack.test.assertJsonNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -64,6 +65,61 @@ class HookGraphQLIT : AbstractQLKTITSupport() {
                     }
                     assertEquals("SUCCESS", it.getRequiredTextField("state"))
                     assertEquals("PROCESSED", it.path("response").path("type").asText())
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Accessing the hook records info links using GraphQL`() {
+        asAdmin {
+            // Calling the test hook
+            hookTestSupport.testHook(
+                    body = "Testing GraphQL",
+                    parameters = mapOf(
+                            "test" to "xxx",
+                    )
+            )
+            // Getting the last record for this hook
+            run("""
+                {
+                    hookRecordings(filter: {hook: "test"}, size: 1) {
+                        pageItems {
+                            id
+                            hook
+                            request {
+                                body
+                                parameters {
+                                    name
+                                    value
+                                }
+                            }
+                            startTime
+                            state
+                            message
+                            exception
+                            endTime
+                            response {
+                                type
+                                infoLink {
+                                    feature
+                                    id
+                                    data
+                                }
+                            }
+                        }
+                    }
+                }
+            """) { data ->
+                val record = data.path("hookRecordings").path("pageItems").firstOrNull()
+                assertNotNull(record, "At least one record") {
+                    assertEquals("test", it.getRequiredTextField("hook"))
+                    val infoLink = it.path("response").path("infoLink")
+                    assertJsonNotNull(infoLink, "Info link is present") {
+                        assertEquals("test", getRequiredTextField("feature"))
+                        assertEquals("test", getRequiredTextField("id"))
+                        assertEquals("""Processing: "Testing GraphQL"""", getRequiredTextField("data"))
+                    }
                 }
             }
         }

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.tfc.queue
 
 import net.nemerosa.ontrack.extension.hook.HookInfoLinkExtension
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
+import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatchResult
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.tfc.TFCExtensionFeature
 import net.nemerosa.ontrack.extension.tfc.service.RunPayload
@@ -14,7 +15,7 @@ import kotlin.reflect.KClass
 class TFCQueueProcessor(
         extension: TFCExtensionFeature,
         private val tfcService: TFCService,
-) : AbstractExtension(extension), QueueProcessor<RunPayload>, HookInfoLinkExtension {
+) : AbstractExtension(extension), QueueProcessor<RunPayload>, HookInfoLinkExtension<List<QueueDispatchResult>> {
 
     override val id: String = "tfc"
 

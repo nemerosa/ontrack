@@ -21,11 +21,11 @@ import kotlin.reflect.KProperty0
 
 @Component
 class TFCHookEndpointExtension(
-    private val cachedSettingsService: CachedSettingsService,
-    private val tfcConfigProperties: TFCConfigProperties,
-    private val queueDispatcher: QueueDispatcher,
-    private val queueProcessor: TFCQueueProcessor,
-    extensionFeature: TFCExtensionFeature,
+        private val cachedSettingsService: CachedSettingsService,
+        private val tfcConfigProperties: TFCConfigProperties,
+        private val queueDispatcher: QueueDispatcher,
+        private val queueProcessor: TFCQueueProcessor,
+        extensionFeature: TFCExtensionFeature,
 ) : AbstractExtension(extensionFeature), HookEndpointExtension {
 
     private val logger: Logger = LoggerFactory.getLogger(TFCHookEndpointExtension::class.java)
@@ -41,9 +41,9 @@ class TFCHookEndpointExtension(
         } else {
             val token = cachedSettingsService.getCachedSettings(TFCSettings::class.java).token
             HookSignature.checkSignature(
-                request.body,
-                request.getRequiredHeader("X-TFE-Notification-Signature"),
-                token
+                    request.body,
+                    request.getRequiredHeader("X-TFE-Notification-Signature"),
+                    token
             )
         }
     }
@@ -58,13 +58,13 @@ class TFCHookEndpointExtension(
             processNotification(parameters, payload, notification)
         }
         // OK
-        return results.toHookResponse(queueProcessor)
+        return results.toHookResponse<List<QueueDispatchResult>>(queueProcessor)
     }
 
     private fun processNotification(
-        parameters: TFCParameters,
-        payload: TFCHookPayload,
-        notification: TFCHookPayloadNotification
+            parameters: TFCParameters,
+            payload: TFCHookPayload,
+            notification: TFCHookPayloadNotification
     ): QueueDispatchResult = when (notification.trigger) {
         "verification" -> verification(notification)
         "run:completed" -> processRun(parameters, payload, notification)
@@ -73,21 +73,21 @@ class TFCHookEndpointExtension(
     }
 
     private fun processRun(
-        parameters: TFCParameters,
-        hook: TFCHookPayload,
-        notification: TFCHookPayloadNotification
+            parameters: TFCParameters,
+            hook: TFCHookPayload,
+            notification: TFCHookPayloadNotification
     ): QueueDispatchResult {
         // Queue payload
         val payload = RunPayload(
-            parameters = parameters,
-            runUrl = payload(hook::runUrl),
-            runId = payload(hook::runId),
-            workspaceId = payload(hook::workspaceId),
-            workspaceName = payload(hook::workspaceName),
-            organizationName = payload(hook::organizationName),
-            message = payload(notification::message),
-            trigger = payload(notification::trigger),
-            runStatus = payload(notification::runStatus),
+                parameters = parameters,
+                runUrl = payload(hook::runUrl),
+                runId = payload(hook::runId),
+                workspaceId = payload(hook::workspaceId),
+                workspaceName = payload(hook::workspaceName),
+                organizationName = payload(hook::organizationName),
+                message = payload(notification::message),
+                trigger = payload(notification::trigger),
+                runStatus = payload(notification::runStatus),
         )
         // Launching the processing on a queue dispatcher
         return queueDispatcher.dispatch(queueProcessor, payload)
@@ -103,14 +103,14 @@ class TFCHookEndpointExtension(
     }
 
     private fun verification(notification: TFCHookPayloadNotification) = QueueDispatchResult(
-        type = QueueDispatchResultType.PROCESSED,
-        message = "Notification trigger ${notification.trigger} has been processed",
-        id = null,
+            type = QueueDispatchResultType.PROCESSED,
+            message = "Notification trigger ${notification.trigger} has been processed",
+            id = null,
     )
 
     private fun ignoredTrigger(notification: TFCHookPayloadNotification) = QueueDispatchResult(
-        type = QueueDispatchResultType.IGNORED,
-        message = "Notification trigger ${notification.trigger} is not processed",
-        id = null,
+            type = QueueDispatchResultType.IGNORED,
+            message = "Notification trigger ${notification.trigger} is not processed",
+            id = null,
     )
 }

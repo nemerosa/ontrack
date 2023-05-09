@@ -4,8 +4,8 @@ import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.hook.HookResponse
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter
 import net.nemerosa.ontrack.graphql.support.enumField
+import net.nemerosa.ontrack.graphql.support.field
 import net.nemerosa.ontrack.graphql.support.getTypeDescription
 import net.nemerosa.ontrack.graphql.support.jsonField
 import org.springframework.stereotype.Component
@@ -20,5 +20,6 @@ class GQLTypeHookResponse : GQLType {
             .description(getTypeDescription(HookResponse::class))
             .enumField(HookResponse::type)
             .jsonField(HookResponse::info)
+            .field(HookResponse::infoLink)
             .build()
 }
