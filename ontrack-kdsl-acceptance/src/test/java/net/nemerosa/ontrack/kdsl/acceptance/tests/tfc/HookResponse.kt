@@ -24,7 +24,7 @@ data class HookResponse(
     @get:JsonIgnore
     val queueID: String
         get() =
-            if (infoLink != null && infoLink.feature == "tfc" && infoLink.id == "tfc" && infoLink.data.isArray) {
+            if (infoLink != null && infoLink.feature == "hook" && infoLink.id == "queue" && infoLink.data.isArray) {
                 val results = infoLink.data.map {
                     it.parse<QueueDispatchResult>()
                 }

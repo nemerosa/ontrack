@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.tfc.hook
 
 import net.nemerosa.ontrack.extension.hook.*
+import net.nemerosa.ontrack.extension.hook.queue.QueueHookInfoLinkExtension
 import net.nemerosa.ontrack.extension.hook.queue.toHookResponse
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatchResult
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatchResultType
@@ -25,6 +26,7 @@ class TFCHookEndpointExtension(
         private val tfcConfigProperties: TFCConfigProperties,
         private val queueDispatcher: QueueDispatcher,
         private val queueProcessor: TFCQueueProcessor,
+        private val queueHookInfoLinkExtension: QueueHookInfoLinkExtension,
         extensionFeature: TFCExtensionFeature,
 ) : AbstractExtension(extensionFeature), HookEndpointExtension {
 
@@ -58,7 +60,7 @@ class TFCHookEndpointExtension(
             processNotification(parameters, payload, notification)
         }
         // OK
-        return results.toHookResponse<List<QueueDispatchResult>>(queueProcessor)
+        return results.toHookResponse<List<QueueDispatchResult>>(queueHookInfoLinkExtension)
     }
 
     private fun processNotification(
