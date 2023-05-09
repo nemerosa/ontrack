@@ -79,7 +79,11 @@ angular.module('ontrack.extension.hook', [
                         exception
                         response {
                             type
-                            info
+                            infoLink {
+                                feature
+                                id
+                                data
+                            }
                         }
                     }
                 }
