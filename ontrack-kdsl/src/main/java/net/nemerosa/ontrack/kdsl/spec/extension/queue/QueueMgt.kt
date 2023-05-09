@@ -7,6 +7,10 @@ import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
 class QueueMgt(connector: Connector) : Connected(connector) {
 
+    val mock: MockQueueMgt by lazy {
+        MockQueueMgt(connector)
+    }
+
     fun findQueueRecordByID(queueID: String): QueueRecord? =
             graphqlConnector.query(
                     QueueGetRecordQuery.builder()
