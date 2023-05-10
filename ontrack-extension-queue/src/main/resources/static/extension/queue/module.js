@@ -92,6 +92,11 @@ angular.module('ontrack.extension.queue', [
                             state
                             time
                         }
+                        source {
+                            feature
+                            id
+                            data
+                        }
                     }
                 }
             }
@@ -188,6 +193,19 @@ angular.module('ontrack.extension.queue', [
             }).then(() => {
                 loadRecords(true);
             });
+        };
+    })
+    .directive('otQueueSource', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/queue/directive.queueSource.tpl.html',
+            scope: {
+                source: '='
+            },
+            controller: function ($scope) {
+                $scope.getTemplatePath = (source) =>
+                    `extension/${source.feature}/queueSource/${source.id}.tpl.html`;
+            }
         };
     })
 ;

@@ -176,6 +176,12 @@
                             </table>
                         </div>
                     </div>
+                    <div class="form-group" ng-if="message.source">
+                        <label class="col-sm-1 control-label">Source</label>
+                        <div class="col-sm-11">
+                            <ot-queue-source source="message.source"/>
+                        </div>
+                    </div>
                 </form>
             </td>
         </tr>
