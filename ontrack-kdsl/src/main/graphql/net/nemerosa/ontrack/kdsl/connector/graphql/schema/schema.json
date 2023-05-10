@@ -16196,6 +16196,65 @@
         },
         {
           "kind": "OBJECT",
+          "name": "HookInfoLink",
+          "description": "HookInfoLink",
+          "fields": [
+            {
+              "name": "data",
+              "description": "JSON data as understood by the HookInfoLinkExtension",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "JSON",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "feature",
+              "description": "ID of the ExtensionFeature which provides the information.",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": "ID of the HookInfoLinkExtension which provides the information.",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
           "name": "HookRecordFilterInfo",
           "description": "HookRecordFilterInfo",
           "fields": [
@@ -16612,6 +16671,18 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "JSON",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "infoLink",
+              "description": "Structured additional information",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "HookInfoLink",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -32332,6 +32403,18 @@
               "deprecationReason": null
             },
             {
+              "name": "source",
+              "description": "Source of the message",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "QueueSource",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "state",
               "description": "State of the queuing",
               "args": [],
@@ -32459,6 +32542,65 @@
                       "name": "QueueRecording"
                     }
                   }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "QueueSource",
+          "description": "QueueSource",
+          "fields": [
+            {
+              "name": "data",
+              "description": "JSON data as understood by the QueueSourceExtension",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "JSON",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "feature",
+              "description": "ID of the ExtensionFeature which provides the information.",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": "ID of the QueueSourceExtension which provides the information.",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
                 }
               },
               "isDeprecated": false,

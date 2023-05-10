@@ -24,4 +24,19 @@ class ACCQueueProcessing : AbstractACCDSLNotificationsTestSupport() {
         }
     }
 
+    @Test
+    fun `Queue records have a source`() {
+        val message = uid("msg_")
+        val id = queueSupport.postMockMessage(message)
+        // Waits for the processing to be completed
+        queueSupport.waitForQueueRecordToBe(id, QueueRecordState.COMPLETED)
+        // Gets the records and checks the queueName
+        assertNotNull(ontrack.queue.findQueueRecordByID(id), "Queue record present") { record ->
+            assertNotNull(record.source, "Queue source is set") { source ->
+                assertEquals("queue", source.feature)
+                assertEquals("post", source.id)
+            }
+        }
+    }
+
 }

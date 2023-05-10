@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.tfc
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.queue.QueueACCTestSupport
@@ -10,6 +11,7 @@ import net.nemerosa.ontrack.kdsl.connector.parse
 import net.nemerosa.ontrack.kdsl.spec.Build
 import net.nemerosa.ontrack.kdsl.spec.configurations.configurations
 import net.nemerosa.ontrack.kdsl.spec.extension.queue.QueueRecordState
+import net.nemerosa.ontrack.kdsl.spec.extension.queue.queue
 import net.nemerosa.ontrack.kdsl.spec.extension.tfc.TFCConfiguration
 import net.nemerosa.ontrack.kdsl.spec.extension.tfc.TFCSettings
 import net.nemerosa.ontrack.kdsl.spec.extension.tfc.tfc
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class ACCTFCValidation : AbstractACCDSLTestSupport() {
 
@@ -29,15 +32,15 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
                 build {
                     // Payload
                     val payload =
-                        resourceAsText("/tfc/run-completed-applied.json")
-                            .parseAsJson()
+                            resourceAsText("/tfc/run-completed-applied.json")
+                                    .parseAsJson()
                     // Sending the payload to the hook
                     withTfcHookEnabled {
                         withTfcConfiguration {
                             val response = sendPayloadToHook(
-                                ref = this,
-                                validation = vs.name,
-                                payload = payload,
+                                    ref = this,
+                                    validation = vs.name,
+                                    payload = payload,
                             )
                             // Gets the queue ID
                             val queueID = response.queueID
@@ -48,6 +51,15 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
                             val run = getValidationRuns(vs.name, 1).firstOrNull()
                             assertNotNull(run, "Validation was done") {
                                 assertEquals("PASSED", it.lastStatus.id)
+                            }
+                            // Checks the queue source
+                            assertNotNull(ontrack.queue.findQueueRecordByID(queueID), "Queue record available") { record ->
+                                assertNotNull(record.source, "Queue record source available") { source ->
+                                    assertEquals("hook", source.feature)
+                                    assertEquals("hook", source.id)
+                                    assertEquals("tfc", source.data.getRequiredTextField("hook"))
+                                    assertTrue(source.data.getRequiredTextField("id").isNotBlank(), "Hook record ID is set")
+                                }
                             }
                         }
                     }
@@ -64,15 +76,15 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
                 build {
                     // Payload
                     val payload =
-                        resourceAsText("/tfc/run-errored.json")
-                            .parseAsJson()
+                            resourceAsText("/tfc/run-errored.json")
+                                    .parseAsJson()
                     // Sending the payload to the hook
                     withTfcHookEnabled {
                         withTfcConfiguration {
                             val response = sendPayloadToHook(
-                                ref = this,
-                                validation = vs.name,
-                                payload = payload,
+                                    ref = this,
+                                    validation = vs.name,
+                                    payload = payload,
                             )
                             // Gets the queue ID
                             val queueID = response.queueID
@@ -99,16 +111,16 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
                 build("4.5.3") { // Hardcoded in MockingTFCClientFactory
                     // Payload
                     val payload =
-                        resourceAsText("/tfc/run-completed-applied.json")
-                            .parseAsJson()
+                            resourceAsText("/tfc/run-completed-applied.json")
+                                    .parseAsJson()
                     // Sending the payload to the hook
                     withTfcHookEnabled {
                         withTfcConfiguration {
                             val response = sendPayloadToHook(
-                                ref = this,
-                                build = "@ontrack_version", // Hardcoded in MockingTFCClientFactory
-                                validation = vs.name,
-                                payload = payload,
+                                    ref = this,
+                                    build = "@ontrack_version", // Hardcoded in MockingTFCClientFactory
+                                    validation = vs.name,
+                                    payload = payload,
                             )
                             // Gets the queue ID
                             val queueID = response.queueID
@@ -135,16 +147,16 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
                 build("4.5.3") { // Hardcoded in MockingTFCClientFactory
                     // Payload
                     val payload =
-                        resourceAsText("/tfc/run-completed-applied.json")
-                            .parseAsJson()
+                            resourceAsText("/tfc/run-completed-applied.json")
+                                    .parseAsJson()
                     // Sending the payload to the hook
                     withTfcHookEnabled {
                         withTfcConfiguration {
                             val response = sendPayloadToHook(
-                                ref = this,
-                                build = "@unknown_variable", // Not managed by MockingTFCClientFactory
-                                validation = vs.name,
-                                payload = payload,
+                                    ref = this,
+                                    build = "@unknown_variable", // Not managed by MockingTFCClientFactory
+                                    validation = vs.name,
+                                    payload = payload,
                             )
                             // Gets the queue ID
                             val queueID = response.queueID
@@ -164,9 +176,9 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
     private fun withTfcConfiguration(code: () -> Unit) {
         val name = uid("tfc_")
         val config = TFCConfiguration(
-            name = name,
-            url = "https://app.terraform.io",
-            token = "xxx"
+                name = name,
+                url = "https://app.terraform.io",
+                token = "xxx"
         )
         try {
             ontrack.configurations.tfc.create(config)
@@ -180,10 +192,10 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
         val old = ontrack.settings.tfc.get()
         try {
             ontrack.settings.tfc.set(
-                TFCSettings(
-                    enabled = true,
-                    token = old.token,
-                )
+                    TFCSettings(
+                            enabled = true,
+                            token = old.token,
+                    )
             )
             code()
         } finally {
@@ -192,19 +204,19 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
     }
 
     private fun sendPayloadToHook(
-        ref: Build,
-        project: String = ref.branch.project.name,
-        branch: String = ref.branch.name,
-        build: String = ref.name,
-        validation: String,
-        payload: JsonNode,
+            ref: Build,
+            project: String = ref.branch.project.name,
+            branch: String = ref.branch.name,
+            build: String = ref.name,
+            validation: String,
+            payload: JsonNode,
     ): HookResponse {
         val response = rawConnector().post(
-            "/hook/secured/tfc?project=$project&branch=$branch&build=$build&validation=$validation",
-            headers = mapOf(
-                "X-TFE-Notification-Signature" to "signature-is-not-checked",
-            ),
-            body = payload,
+                "/hook/secured/tfc?project=$project&branch=$branch&build=$build&validation=$validation",
+                headers = mapOf(
+                        "X-TFE-Notification-Signature" to "signature-is-not-checked",
+                ),
+                body = payload,
         )
         // Payload: response checks
         assertEquals(200, response.statusCode)

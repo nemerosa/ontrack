@@ -15,4 +15,9 @@ fragment QueueRecordData on QueueRecording {
         state
         time
     }
+    source {
+        feature
+        id
+        data
+    }
 }

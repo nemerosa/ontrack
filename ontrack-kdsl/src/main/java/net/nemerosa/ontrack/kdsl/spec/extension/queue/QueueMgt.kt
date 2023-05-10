@@ -38,7 +38,14 @@ class QueueMgt(connector: Connector) : Connected(connector) {
                                             state = QueueRecordState.valueOf(it.state().name),
                                             time = it.time(),
                                     )
-                                }
+                                },
+                                source = source()?.run {
+                                    QueueSource(
+                                            feature = feature(),
+                                            id = id(),
+                                            data = data(),
+                                    )
+                                },
                         )
                     }
 
