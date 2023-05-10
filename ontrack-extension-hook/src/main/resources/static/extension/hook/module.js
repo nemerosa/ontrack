@@ -151,4 +151,17 @@ angular.module('ontrack.extension.hook', [
             }
         };
     })
+    .directive('otHookInfoLink', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/hook/directive.hookInfoLink.tpl.html',
+            scope: {
+                infoLink: '='
+            },
+            controller: function ($scope) {
+                $scope.getTemplatePath = (infoLink) =>
+                    `extension/${infoLink.feature}/hookInfoLink/${infoLink.id}.tpl.html`;
+            }
+        };
+    })
 ;

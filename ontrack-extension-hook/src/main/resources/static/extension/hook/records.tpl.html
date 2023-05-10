@@ -158,7 +158,7 @@
                     <div class="form-group" ng-if="message.response.infoLink">
                         <label class="col-sm-1 control-label">Response info</label>
                         <div class="col-sm-11">
-                            <textarea class="form-control" readonly rows="9">{{ message.response.infoLink }}</textarea>
+                            <ot-hook-info-link info-link="message.response.infoLink"/>
                         </div>
                     </div>
                 </form>
