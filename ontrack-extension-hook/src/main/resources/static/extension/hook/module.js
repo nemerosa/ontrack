@@ -9,7 +9,14 @@ angular.module('ontrack.extension.hook', [
             controller: 'HookRecordsCtrl'
         });
     })
-    .controller('HookRecordsCtrl', function ($scope, $http, ot, otGraphqlService) {
+    .controller('HookRecordsCtrl', function ($location, $scope, $http, ot, otGraphqlService) {
+
+        const id = $location.search().id;
+        let preselect = false;
+        if (id) {
+            preselect = true;
+        }
+
         const view = ot.view();
         view.title = "Hook messages";
         view.breadcrumbs = ot.homeBreadcrumbs();
@@ -18,7 +25,7 @@ angular.module('ontrack.extension.hook', [
         ];
 
         $scope.filter = {
-            id: undefined,
+            id: id,
             hook: undefined,
             state: undefined,
             text: undefined
@@ -120,6 +127,15 @@ angular.module('ontrack.extension.hook', [
                     $scope.messages = $scope.messages.concat(data.hookRecordings.pageItems);
                 }
                 $scope.pageInfo = data.hookRecordings.pageInfo;
+                // Preselection
+                if (preselect) {
+                    $scope.messages.forEach(message => {
+                        if (message.id === id) {
+                            message.details = true;
+                        }
+                    });
+                    preselect = false;
+                }
             }).finally(() => {
                 $scope.loading = false;
             });
