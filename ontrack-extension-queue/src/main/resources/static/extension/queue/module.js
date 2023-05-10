@@ -9,7 +9,14 @@ angular.module('ontrack.extension.queue', [
             controller: 'QueueRecordsCtrl'
         });
     })
-    .controller('QueueRecordsCtrl', function ($scope, $http, ot, otAlertService, otGraphqlService) {
+    .controller('QueueRecordsCtrl', function ($location, $scope, $http, ot, otAlertService, otGraphqlService) {
+
+        const id = $location.search().id;
+        let preselect = false;
+        if (id) {
+            preselect = true;
+        }
+
         const view = ot.view();
         view.title = "Queue messages";
         view.breadcrumbs = ot.homeBreadcrumbs();
@@ -18,7 +25,7 @@ angular.module('ontrack.extension.queue', [
         ];
 
         $scope.filter = {
-            id: undefined,
+            id: id,
             processor: undefined,
             state: undefined,
             text: undefined,
@@ -122,6 +129,15 @@ angular.module('ontrack.extension.queue', [
                     $scope.messages = $scope.messages.concat(data.queueRecordings.pageItems);
                 }
                 $scope.pageInfo = data.queueRecordings.pageInfo;
+                // Preselection
+                if (preselect) {
+                    $scope.messages.forEach(message => {
+                        if (message.id === id) {
+                            message.details = true;
+                        }
+                    });
+                    preselect = false;
+                }
             }).finally(() => {
                 $scope.loading = false;
             });

@@ -1,7 +1,7 @@
 <span
         ng-repeat="link in infoLink.data"
 >
-    <a class="btn btn-default">
+    <a href="/#/extension/queue/records?id={{ link.id }}" class="btn btn-default">
         <i class="fa fa-cogs"></i>
         Queue message {{ link.type | lowercase }}
         <code>{{ link.id }}</code>
