@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatchResult
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
+import net.nemerosa.ontrack.extension.queue.source.PostQueueSourceExtension
+import net.nemerosa.ontrack.extension.queue.source.createQueueSource
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.json.parseInto
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component
 class QueueMutations(
         private val queueDispatcher: QueueDispatcher,
         private val securityService: SecurityService,
+        private val postQueueSourceExtension: PostQueueSourceExtension,
         queueProcessors: List<QueueProcessor<*>>,
 ) : TypedMutationProvider() {
 
@@ -38,6 +41,8 @@ class QueueMutations(
 
     private fun <T : Any> dispatch(processor: QueueProcessor<T>, payload: JsonNode): QueueDispatchResult {
         val typedPayload = payload.parseInto(processor.payloadType)
-        return queueDispatcher.dispatch(processor, typedPayload)
+        return queueDispatcher.dispatch(processor, typedPayload,
+                source = postQueueSourceExtension.createQueueSource("")
+        )
     }
 }

@@ -64,7 +64,7 @@ class HookController(
         // Processing
         return try {
             val result = meterRegistry.time(HookMetrics.time, "hook" to hook) {
-                endpoint.process(request)
+                endpoint.process(recordId, request)
             } ?: error("Processing did not return any result")
             meterRegistry.hookSuccess(hook)
             hookRecordService.onSuccess(recordId, result)

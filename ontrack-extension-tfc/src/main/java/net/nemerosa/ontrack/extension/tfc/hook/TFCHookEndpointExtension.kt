@@ -1,11 +1,14 @@
 package net.nemerosa.ontrack.extension.tfc.hook
 
 import net.nemerosa.ontrack.extension.hook.*
+import net.nemerosa.ontrack.extension.hook.queue.HookQueueSourceData
+import net.nemerosa.ontrack.extension.hook.queue.HookQueueSourceExtension
 import net.nemerosa.ontrack.extension.hook.queue.QueueHookInfoLinkExtension
 import net.nemerosa.ontrack.extension.hook.queue.toHookResponse
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatchResult
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatchResultType
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
+import net.nemerosa.ontrack.extension.queue.source.createQueueSource
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.tfc.TFCConfigProperties
 import net.nemerosa.ontrack.extension.tfc.TFCExtensionFeature
@@ -27,6 +30,7 @@ class TFCHookEndpointExtension(
         private val queueDispatcher: QueueDispatcher,
         private val queueProcessor: TFCQueueProcessor,
         private val queueHookInfoLinkExtension: QueueHookInfoLinkExtension,
+        private val hookQueueSourceExtension: HookQueueSourceExtension,
         extensionFeature: TFCExtensionFeature,
 ) : AbstractExtension(extensionFeature), HookEndpointExtension {
 
@@ -50,31 +54,33 @@ class TFCHookEndpointExtension(
         }
     }
 
-    override fun process(request: HookRequest): HookResponse {
+    override fun process(recordId: String, request: HookRequest): HookResponse {
         // Getting the parameters from the URL
         val parameters = request.parseParameters<TFCParameters>()
         // Parsing the body
         val payload = request.parseBodyAsJson<TFCHookPayload>()
         // Processes each notification separately
         val results = payload.notifications.map { notification ->
-            processNotification(parameters, payload, notification)
+            processNotification(recordId, parameters, payload, notification)
         }
         // OK
         return results.toHookResponse<List<QueueDispatchResult>>(queueHookInfoLinkExtension)
     }
 
     private fun processNotification(
+            recordId: String,
             parameters: TFCParameters,
             payload: TFCHookPayload,
             notification: TFCHookPayloadNotification
     ): QueueDispatchResult = when (notification.trigger) {
         "verification" -> verification(notification)
-        "run:completed" -> processRun(parameters, payload, notification)
-        "run:errored" -> processRun(parameters, payload, notification)
+        "run:completed" -> processRun(recordId, parameters, payload, notification)
+        "run:errored" -> processRun(recordId, parameters, payload, notification)
         else -> ignoredTrigger(notification)
     }
 
     private fun processRun(
+            recordId: String,
             parameters: TFCParameters,
             hook: TFCHookPayload,
             notification: TFCHookPayloadNotification
@@ -92,7 +98,16 @@ class TFCHookEndpointExtension(
                 runStatus = payload(notification::runStatus),
         )
         // Launching the processing on a queue dispatcher
-        return queueDispatcher.dispatch(queueProcessor, payload)
+        return queueDispatcher.dispatch(
+                queueProcessor = queueProcessor,
+                payload = payload,
+                source = hookQueueSourceExtension.createQueueSource(
+                        HookQueueSourceData(
+                                hook = id,
+                                id = recordId,
+                        )
+                )
+                )
     }
 
     private fun payload(property: KProperty0<String?>): String {

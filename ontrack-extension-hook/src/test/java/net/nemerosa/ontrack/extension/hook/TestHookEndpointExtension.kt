@@ -23,7 +23,7 @@ class TestHookEndpointExtension(
         }
     }
 
-    override fun process(request: HookRequest): HookResponse {
+    override fun process(recordId: String, request: HookRequest): HookResponse {
         if (error) {
             throw RuntimeException("Error during the processing.")
         } else {

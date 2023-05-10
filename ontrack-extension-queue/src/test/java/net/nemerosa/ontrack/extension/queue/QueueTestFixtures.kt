@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.queue.record.QueueRecord
 import net.nemerosa.ontrack.extension.queue.record.QueueRecordHistory
 import net.nemerosa.ontrack.extension.queue.record.QueueRecordState
+import net.nemerosa.ontrack.extension.queue.source.createQueueSource
 import net.nemerosa.ontrack.json.asJson
 import java.util.*
 
@@ -35,7 +36,8 @@ object QueueTestFixtures {
                                 state = QueueRecordState.COMPLETED,
                                 time = time,
                         )
-                )
+                ),
+                source = TestQueueSourceExtension.instance.createQueueSource("")
         )
     }
 

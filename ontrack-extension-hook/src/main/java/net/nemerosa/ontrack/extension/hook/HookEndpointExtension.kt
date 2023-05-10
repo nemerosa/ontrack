@@ -27,7 +27,11 @@ interface HookEndpointExtension : Extension {
 
     /**
      * Processes the hook request.
+     *
+     * @param recordId Unique ID for the request
+     * @param request Request to process
+     * @return Hook processing response
      */
-    fun process(request: HookRequest): HookResponse
+    fun process(recordId: String, request: HookRequest): HookResponse
 
 }

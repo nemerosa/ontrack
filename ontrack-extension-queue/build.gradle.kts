@@ -20,6 +20,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
 
     testImplementation(project(":ontrack-it-utils"))
+    testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-recordings", configuration = "tests"))

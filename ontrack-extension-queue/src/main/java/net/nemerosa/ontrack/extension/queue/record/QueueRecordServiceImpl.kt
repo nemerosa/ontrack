@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.queue.record
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.queue.QueuePayload
+import net.nemerosa.ontrack.extension.queue.source.QueueSource
 import net.nemerosa.ontrack.extension.recordings.RecordingsService
 import net.nemerosa.ontrack.json.asJson
 import org.apache.commons.lang3.exception.ExceptionUtils
@@ -15,8 +16,8 @@ class QueueRecordServiceImpl(
         private val recordingsService: RecordingsService,
 ) : QueueRecordService {
 
-    override fun start(queuePayload: QueuePayload) {
-        val record = QueueRecord.create(queuePayload)
+    override fun start(queuePayload: QueuePayload, source: QueueSource?) {
+        val record = QueueRecord.create(queuePayload, source)
         recordingsService.record(queueRecordingsExtension, record)
     }
 
