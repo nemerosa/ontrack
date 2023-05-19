@@ -6,19 +6,22 @@ package net.nemerosa.ontrack.extension.tfc.service
 data class TFCParameters(
         val project: String,
         val branch: String?,
-        val build: String,
+        val build: String?,
+        val promotion: String?,
         val validation: String,
 ) {
     fun hasVariables(): Boolean =
             isVar(project) ||
                     isVar(branch) ||
                     isVar(build) ||
+                    isVar(promotion) ||
                     isVar(validation)
 
     fun expand(variables: Map<String, String>, workspaceId: String) = TFCParameters(
             project = expand(project, variables, workspaceId),
             branch = branch?.let { expand(branch, variables, workspaceId) },
-            build = expand(build, variables, workspaceId),
+            build = build?.let { expand(build, variables, workspaceId) },
+            promotion = promotion?.let { expand(promotion, variables, workspaceId) },
             validation = expand(validation, variables, workspaceId),
     )
 

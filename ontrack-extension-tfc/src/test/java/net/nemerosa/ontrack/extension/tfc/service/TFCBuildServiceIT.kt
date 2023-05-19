@@ -28,6 +28,7 @@ class TFCBuildServiceIT : AbstractDSLTestSupport() {
                                         project = project.name,
                                         branch = branch.name,
                                         build = name,
+                                        promotion = null,
                                         validation = "vs",
                                 )
                         )
@@ -51,6 +52,7 @@ class TFCBuildServiceIT : AbstractDSLTestSupport() {
                                         project = project.name,
                                         branch = "release/1.1",
                                         build = name,
+                                        promotion = null,
                                         validation = "vs",
                                 )
                         )
@@ -76,6 +78,7 @@ class TFCBuildServiceIT : AbstractDSLTestSupport() {
                                         project = project.name,
                                         branch = branch.name,
                                         build = "1.1.0",
+                                        promotion = null,
                                         validation = "vs",
                                 )
                         )
@@ -101,6 +104,7 @@ class TFCBuildServiceIT : AbstractDSLTestSupport() {
                                         project = project.name,
                                         branch = "release/1.1",
                                         build = "1.1.0",
+                                        promotion = null,
                                         validation = "vs",
                                 )
                         )
@@ -124,6 +128,7 @@ class TFCBuildServiceIT : AbstractDSLTestSupport() {
                                         project = project.name,
                                         branch = null,
                                         build = name,
+                                        promotion = null,
                                         validation = "vs",
                                 )
                         )
@@ -149,12 +154,66 @@ class TFCBuildServiceIT : AbstractDSLTestSupport() {
                                         project = project.name,
                                         branch = null,
                                         build = "1.1.0",
+                                        promotion = null,
                                         validation = "vs",
                                 )
                         )
                         assertNotNull(build, "Build found") {
                             assertEquals(this.id, it.id, "Build OK")
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Build with branch and no build`() {
+        asAdmin {
+            project {
+                branch {
+                    build()
+                    build {
+                        val build = tfcBuildService.findBuild(
+                                TFCParameters(
+                                        project = project.name,
+                                        branch = branch.name,
+                                        build = null,
+                                        promotion = null,
+                                        validation = "vs",
+                                )
+                        )
+                        assertNotNull(build, "Build found") {
+                            assertEquals(this.id, it.id, "Build OK")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Build with branch and no build and promotion`() {
+        asAdmin {
+            project {
+                branch {
+                    val pl = promotionLevel()
+                    build()
+                    val candidate = build {
+                        promote(pl)
+                    }
+                    build()
+                    val build = tfcBuildService.findBuild(
+                            TFCParameters(
+                                    project = project.name,
+                                    branch = name,
+                                    build = null,
+                                    promotion = pl.name,
+                                    validation = "vs",
+                            )
+                    )
+                    assertNotNull(build, "Build found") {
+                        assertEquals(candidate.id, it.id, "Build OK")
                     }
                 }
             }
