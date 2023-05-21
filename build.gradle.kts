@@ -259,6 +259,7 @@ configure(coreProjects) p@{
         imports {
             mavenBom(SpringBootPlugin.BOM_COORDINATES) {
                 bomProperty("kotlin.version", Versions.kotlinVersion)
+                bomProperty("kotlin-coroutines.version", Versions.kotlinCoroutinesVersion)
             }
         }
         dependencies {
