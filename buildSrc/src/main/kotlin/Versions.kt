@@ -2,7 +2,7 @@
  * List of versions to use
  */
 object Versions {
-    const val springBootVersion = "2.7.3"
+    const val springBootVersion = "2.7.12"
     const val kotlinVersion = "1.7.10"
     const val kotlinCoroutinesVersion = "1.6.4"
     const val jjwtVersion = "0.11.2"
