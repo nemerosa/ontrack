@@ -1,5 +1,5 @@
 # Base
-FROM azul/zulu-openjdk:11.0.12
+FROM azul/zulu-openjdk:17.0.6
 
 # Makes sure all tools for the build are installed
 RUN apt-get update && apt-get install -y \

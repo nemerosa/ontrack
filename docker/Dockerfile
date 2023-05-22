@@ -15,7 +15,7 @@
 #        password: ontrack
 
 # Base
-FROM azul/zulu-openjdk:11.0.16.1
+FROM azul/zulu-openjdk:17.0.6
 
 # Meta-information
 MAINTAINER Damien Coraboeuf <damien.coraboeuf@nemerosa.com>

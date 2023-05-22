@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
  */
 @Component
 class ElasticSearchIndexationJobs(
-        private val searchIndexers: List<SearchIndexer<*>>,
+        private val searchIndexers: List<SearchIndexer<SearchItem>>,
         private val elasticSearchService: SearchIndexService,
         private val jobScheduler: JobScheduler
 ) : JobProvider {

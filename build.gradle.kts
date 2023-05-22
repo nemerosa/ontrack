@@ -137,7 +137,7 @@ configure(javaProjects) p@{
     apply(plugin = "signing")
 
     // Java level
-    java.sourceCompatibility = JavaVersion.VERSION_11
+    java.sourceCompatibility = JavaVersion.VERSION_17
 
 }
 
@@ -314,7 +314,7 @@ configure(coreProjects) p@{
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
-            jvmTarget = "11"
+            jvmTarget = "17"
             freeCompilerArgs = listOf("-Xjsr305=strict")
         }
     }
