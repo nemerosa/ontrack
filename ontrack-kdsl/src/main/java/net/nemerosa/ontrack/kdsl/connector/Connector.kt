@@ -21,6 +21,7 @@ interface Connector {
     fun get(
         path: String,
         headers: Map<String, String> = emptyMap(),
+        noAuth: Boolean = false,
     ): ConnectorResponse
 
     /**

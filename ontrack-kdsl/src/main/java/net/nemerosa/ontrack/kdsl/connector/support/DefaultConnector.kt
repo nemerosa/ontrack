@@ -11,26 +11,34 @@ import org.springframework.web.client.postForEntity
 import java.nio.charset.Charset
 
 class DefaultConnector(
-    override val url: String,
-    private val defaultHeaders: Map<String, String> = emptyMap(),
+        override val url: String,
+        private val defaultHeaders: Map<String, String> = emptyMap(),
 ) : Connector {
 
-    override val token: String?
-        get() = defaultHeaders["X-Ontrack-Token"]
+    companion object {
+        const val X_ONTRACK_TOKEN = "X-Ontrack-Token"
+    }
 
-    override fun get(path: String, headers: Map<String, String>): ConnectorResponse {
-        val response = restTemplate(headers).getForEntity<ByteArray>(path)
+    override val token: String?
+        get() = defaultHeaders[X_ONTRACK_TOKEN]
+
+    override fun get(
+            path: String,
+            headers: Map<String, String>,
+            noAuth: Boolean,
+    ): ConnectorResponse {
+        val response = restTemplate(headers, noAuth).getForEntity<ByteArray>(path)
         return RestTemplateConnectorResponse(response)
     }
 
     class RestTemplateConnectorResponse(
-        private val response: ResponseEntity<ByteArray>,
+            private val response: ResponseEntity<ByteArray>,
     ) : ConnectorResponse {
         override val statusCode: Int
             get() = response.statusCodeValue
         override val body: ConnectorResponseBody = object : ConnectorResponseBody {
             override fun asText(charset: Charset): String =
-                response.body?.toString(charset) ?: ""
+                    response.body?.toString(charset) ?: ""
         }
     }
 
@@ -48,11 +56,14 @@ class DefaultConnector(
     }
 
     private fun restTemplate(
-        headers: Map<String, String>,
+            headers: Map<String, String>,
+            noAuth: Boolean = false,
     ): RestTemplate {
         var builder = RestTemplateBuilder().rootUri(url)
         defaultHeaders.forEach { (name, value) ->
-            builder = builder.defaultHeader(name, value)
+            if ((name != "Authorization" && name != X_ONTRACK_TOKEN) || !noAuth) {
+                builder = builder.defaultHeader(name, value)
+            }
         }
         headers.forEach { (name, value) ->
             builder = builder.defaultHeader(name, value)
