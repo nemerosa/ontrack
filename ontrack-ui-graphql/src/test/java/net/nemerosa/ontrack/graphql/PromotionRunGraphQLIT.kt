@@ -1,10 +1,47 @@
 package net.nemerosa.ontrack.graphql
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class PromotionRunGraphQLIT : AbstractQLKTITJUnit4Support() {
+class PromotionRunGraphQLIT : AbstractQLKTITSupport() {
+
+    @Test
+    fun `Promotion run reference to build and validation stamp`() {
+        project {
+            branch {
+                val pl = promotionLevel()
+                build {
+                    val run = promote(pl)
+                    run("""{
+                        promotionRuns(id: ${run.id}) {
+                            build {
+                                id
+                            }
+                            promotionLevel {
+                                id
+                                branch {
+                                    id
+                                    project {
+                                        id
+                                    }
+                                }
+                            }
+                        }
+                    }""") { data ->
+                        val p = data.path("promotionRuns").first()
+                        assertEquals(
+                                id(),
+                                p.path("build").path("id").asInt()
+                        )
+                        val plNode = p.path("promotionLevel")
+                        assertEquals(pl.id(), plNode.path("id").asInt())
+                        assertEquals(pl.project.id(), plNode.path("branch").path("project").path("id").asInt())
+                    }
+                }
+            }
+        }
+    }
 
     @Test
     fun `Creating a promotion run where build is identified by ID`() {

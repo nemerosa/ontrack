@@ -106,14 +106,12 @@ class CombinedIssueServiceExtension(
     }
 
     override fun getIssue(issueServiceConfiguration: IssueServiceConfiguration, issueKey: String): Issue? {
-        return getConfiguredIssueServices(issueServiceConfiguration)
-                .mapNotNull { configuredIssueService ->
-                    configuredIssueService.issueServiceExtension.getIssue(
-                            configuredIssueService.issueServiceConfiguration,
-                            issueKey
-                    )
-                }
-                .firstOrNull()
+        return getConfiguredIssueServices(issueServiceConfiguration).firstNotNullOfOrNull { configuredIssueService ->
+            configuredIssueService.issueServiceExtension.getIssue(
+                    configuredIssueService.issueServiceConfiguration,
+                    issueKey
+            )
+        }
     }
 
     override fun exportFormats(issueServiceConfiguration: IssueServiceConfiguration): List<ExportFormat> {
@@ -141,19 +139,19 @@ class CombinedIssueServiceExtension(
         // Concatenates the content
         return ExportedIssues(
                 request.format,
-                exportedIssues.joinToString("") { it.content }
+                exportedIssues.mapNotNull { exportedIssue ->
+                    exportedIssue.content.takeIf { it.isNotBlank() }
+                }.joinToString("\n")
         )
     }
 
     override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String): Optional<String> {
-        return getConfiguredIssueServices(issueServiceConfiguration)
-                .mapNotNull { configuredIssueService ->
-                    configuredIssueService.issueServiceExtension.getIssueId(
-                            configuredIssueService.issueServiceConfiguration,
-                            token
-                    ).getOrNull()
-                }
-                .firstOrNull().asOptional()
+        return getConfiguredIssueServices(issueServiceConfiguration).firstNotNullOfOrNull { configuredIssueService ->
+            configuredIssueService.issueServiceExtension.getIssueId(
+                    configuredIssueService.issueServiceConfiguration,
+                    token
+            ).getOrNull()
+        }.asOptional()
     }
 
     companion object {
