@@ -5,8 +5,8 @@ plugins {
 
 description = "DSL for Ontrack."
 
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-java.targetCompatibility = JavaVersion.VERSION_1_8
+java.sourceCompatibility = JavaVersion.VERSION_11
+java.targetCompatibility = JavaVersion.VERSION_11
 
 /**
  * Dependencies of the DSL module must be carefully controlled
@@ -15,10 +15,10 @@ java.targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
     api("com.fasterxml.jackson.core:jackson-databind:2.8.9")
-    api("org.codehaus.groovy:groovy:2.5.8")
-    api("org.codehaus.groovy:groovy-json:2.5.8")
+    api("org.codehaus.groovy:groovy-all:2.5.22")
+    api("org.codehaus.groovy:groovy-json:2.5.22")
 
-    implementation("org.codehaus.groovy:groovy-templates:2.5.8")
+    implementation("org.codehaus.groovy:groovy-templates:2.5.22")
     implementation("org.slf4j:slf4j-api:1.7.25")
     implementation("org.apache.httpcomponents:httpclient:4.5.3")
     implementation("org.apache.httpcomponents:httpcore:4.4.6")

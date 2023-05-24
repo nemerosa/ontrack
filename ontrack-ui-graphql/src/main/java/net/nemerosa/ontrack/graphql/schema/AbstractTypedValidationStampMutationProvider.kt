@@ -21,10 +21,10 @@ abstract class AbstractTypedValidationStampMutationProvider<C>(
 
     override val mutations: List<Mutation>
         get() = listOf(
-            createTypedValidationStampMutation()
+                TypedValidationStampMutation()
         )
 
-    private fun createTypedValidationStampMutation() = object : Mutation {
+    private inner class TypedValidationStampMutation : Mutation {
 
         override val name: String = "setup${mutationFragmentName}ValidationStamp"
         override val description: String = "Creates or updates a $mutationFragmentName validation stamp"
