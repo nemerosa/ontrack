@@ -12,7 +12,7 @@ import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
 import net.nemerosa.ontrack.test.TestUtils
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 class GitLabFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {

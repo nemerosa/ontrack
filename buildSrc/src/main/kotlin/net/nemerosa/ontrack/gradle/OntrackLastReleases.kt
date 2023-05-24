@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.gradle
 
-import net.nemerosa.ontrack.dsl.v4.Build
+import com.fasterxml.jackson.databind.JsonNode
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
@@ -20,45 +20,55 @@ open class OntrackLastReleases : AbstractOntrackTask() {
     var releaseBranchPattern: String = "release-.*"
 
     @Internal
-    var releases: List<Build> = emptyList()
+    var releases: List<String> = emptyList()
 
     @TaskAction
     fun run() {
         logger.info("Getting the last releases")
+        // Release branch regex
+        val releaseBranchRegex = "release-$releaseBranchPattern"
+        logger.debug("releaseBranchRegex={}", releaseBranchRegex)
         // Gets the Ontrack client
-        val ontrack = getOntrackClient(false)
-        // Gets the Ontrack project
-        val project = ontrack.project(ontrackProject)
-        // List of releases
-        val result = mutableListOf<Build>()
-        // Patterns
-        val releaseBranchRegex = "release-$releaseBranchPattern".toRegex()
-        val releaseBuildRegex = "${releaseBranchPattern}\\.[\\d]+".toRegex()
-        logger.debug("releaseBranchRegex=$releaseBranchRegex")
-        logger.debug("releaseBuildRegex=$releaseBuildRegex")
-        // Gets all branches
+        val ontrack = getOntrackClient(true)
+        // Running the GraphQL query to get all last RELEASE builds on the last release branches
+        val data = ontrack.graphQL(
+                """
+                    query LastReleases(
+                        ${'$'}ontrackProject: String!,
+                        ${'$'}releaseBranchRegex: String!,
+                        ${'$'}ontrackReleasePromotionLevel: String!,
+                    ) {
+                      projects(name: ${'$'}ontrackProject) {
+                        branches(name: ${'$'}releaseBranchRegex) {
+                          builds(filter: {withPromotionLevel: ${'$'}ontrackReleasePromotionLevel, count: 1}) {
+                            name
+                          }
+                        }
+                      }
+                    }
+                """,
+                mapOf(
+                        "ontrackProject" to ontrackProject,
+                        "releaseBranchRegex" to releaseBranchRegex,
+                        "ontrackReleasePromotionLevel" to ontrackReleasePromotionLevel
+                )
+        )
+        // Collecting all build names
+        val result = mutableListOf<String>()
         var count = 0
-        project.branches.forEach { branch ->
-            // Only release/ branches
-            if (count < releaseCount && branch.name.matches(releaseBranchRegex) && !branch.isDisabled) {
-                logger.debug("Scanning branch ${branch.name}...")
-                // ... and gets the last RELEASE build for each of them
-                val builds = branch.standardFilter(mapOf(
-                        "count" to 1,
-                        "withPromotionLevel" to ontrackReleasePromotionLevel
-                ))
-                if (builds.isNotEmpty()) {
-                    val build = builds.first()
-                    logger.debug("Candidate build: ${build.name}")
-                    if (build.name.matches(releaseBuildRegex)) {
-                        logger.debug("Matched build: ${build.name}")
-                        result += build
-                        count++
+        val branches: JsonNode = data.path("projects").path(0).path("branches")
+        branches.forEach { branch ->
+                    if (count < releaseCount) {
+                        val buildName = branch.path("builds").path(0)
+                                ?.path("name")?.asText()
+                        if (!buildName.isNullOrBlank()) {
+                            result.add(buildName)
+                            count++
+                        }
                     }
                 }
-            }
-        }
-        logger.info("Releases: ${ result.map { it.name } }")
+        // OK
+        logger.info("Releases: $result")
         this.releases = result
     }
 

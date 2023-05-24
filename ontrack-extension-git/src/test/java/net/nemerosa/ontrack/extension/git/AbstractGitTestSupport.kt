@@ -24,7 +24,6 @@ import net.nemerosa.ontrack.model.support.NoConfig
 import net.nemerosa.ontrack.test.TestUtils
 import org.springframework.beans.factory.annotation.Autowired
 import java.lang.Thread.sleep
-import java.util.function.Consumer
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull

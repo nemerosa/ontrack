@@ -429,6 +429,7 @@ pipeline {
                         -PgitHubToken=${GITHUB_TOKEN} \\
                         -PgitHubCommit=${GIT_COMMIT} \\
                         -PgitHubChangeLogReleaseBranch=${ONTRACK_BRANCH_NAME} \\
+                        -PgitHubChangeLogCurrentBuild=${ONTRACK_BUILD_NAME} \\
                         release
                 '''
 

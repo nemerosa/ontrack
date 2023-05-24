@@ -16,12 +16,7 @@ of links:
 
 image::images/property-build-links-dialog.png[Build links input,400]
 
-Note that:
-
-* usually, you'll probably edit those links in an automated process using the
-<<dsl,DSL>>
-* you cannot define or see links to builds for which the project is not
-accessible to you
+Note that you cannot define or see links to builds for which the project is not accessible to you
 
 [[builds-links-graph]]
 ==== Visualising the build graph

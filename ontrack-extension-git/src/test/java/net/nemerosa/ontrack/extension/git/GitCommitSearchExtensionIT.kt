@@ -1,11 +1,8 @@
 package net.nemerosa.ontrack.extension.git
 
-import net.nemerosa.ontrack.model.structure.SearchIndexService
 import net.nemerosa.ontrack.model.structure.SearchRequest
-import net.nemerosa.ontrack.model.structure.SearchService
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.TestPropertySource
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 

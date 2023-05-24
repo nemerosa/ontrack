@@ -13,7 +13,7 @@ import org.springframework.test.context.TestPropertySource
             "ontrack.config.search.index.immediate=true"
         ]
 )
-abstract class AbstractGitSearchTestSupport : AbstractGitTestJUnit4Support() {
+abstract class AbstractGitSearchTestSupport : AbstractGitTestSupport() {
 
     @Autowired
     protected lateinit var searchIndexService: SearchIndexService

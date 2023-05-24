@@ -2,15 +2,11 @@ package net.nemerosa.ontrack.extension.git.graphql
 
 import net.nemerosa.ontrack.extension.git.AbstractGitSearchTestSupport
 import net.nemerosa.ontrack.extension.git.GitCommitSearchExtension
-import net.nemerosa.ontrack.extension.git.GitIssueSearchExtension
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
 class GitIssueInfoGraphQLIT : AbstractGitSearchTestSupport() {
-
-    @Autowired
-    private lateinit var gitIssueSearchExtension: GitIssueSearchExtension
 
     @Autowired
     private lateinit var gitCommitSearchExtension: GitCommitSearchExtension
@@ -44,23 +40,24 @@ class GitIssueInfoGraphQLIT : AbstractGitSearchTestSupport() {
                     // Looks for issue 2
                     val data = asUserWithView {
                         run("""
-                    query IssueInfo(${'$'}issue: String!) {
-                        gitIssueInfo(issue: ${'$'}issue) {
-                            commitInfo {
-                                uiCommit {
-                                  annotatedMessage
-                                }
-                                branchInfosList {
-                                  branchInfoList {
-                                    firstBuild {
-                                      name
+                            query IssueInfo(${'$'}issue: String!) {
+                                gitIssueInfo(issue: ${'$'}issue) {
+                                    commitInfo {
+                                        uiCommit {
+                                          annotatedMessage
+                                        }
+                                        branchInfosList {
+                                          branchInfoList {
+                                            firstBuild {
+                                              name
+                                            }
+                                          }
+                                        }
                                     }
-                                  }
                                 }
                             }
-                        }
-                    }
-                """, mapOf("issue" to "#2"))
+                            """, mapOf("issue" to "#2")
+                        )
                     }
                     val commitInfo = data.path("gitIssueInfo").path("commitInfo")
                     assertEquals("""Issue <a href="http://issue/2">#2</a> and <a href="http://issue/3">#3</a>""", commitInfo.path("uiCommit").path("annotatedMessage").asText())
