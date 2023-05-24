@@ -1,116 +1,100 @@
-package net.nemerosa.ontrack.extension.git.resource;
+package net.nemerosa.ontrack.extension.git.resource
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import net.nemerosa.ontrack.extension.git.model.BasicGitActualConfiguration;
-import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration;
-import net.nemerosa.ontrack.extension.git.model.GitBuildInfo;
-import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
-import net.nemerosa.ontrack.extension.git.service.GitService;
-import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration;
-import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
-import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
-import net.nemerosa.ontrack.ui.resource.DefaultResourceContext;
-import net.nemerosa.ontrack.ui.resource.ResourceObjectMapper;
-import net.nemerosa.ontrack.ui.resource.ResourceObjectMapperFactory;
-import org.junit.Before;
-import org.junit.Test;
+import com.fasterxml.jackson.databind.JsonNode
+import io.mockk.every
+import io.mockk.mockk
+import net.nemerosa.ontrack.extension.git.model.*
+import net.nemerosa.ontrack.extension.git.service.GitService
+import net.nemerosa.ontrack.extension.issues.mock.TestIssueServiceConfiguration
+import net.nemerosa.ontrack.extension.scm.model.SCMBuildView
+import net.nemerosa.ontrack.it.MockSecurityService
+import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.ui.controller.MockURIBuilder
+import net.nemerosa.ontrack.ui.resource.DefaultResourceContext
+import net.nemerosa.ontrack.ui.resource.ResourceObjectMapper
+import net.nemerosa.ontrack.ui.resource.ResourceObjectMapperFactory
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
+import kotlin.test.assertEquals
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+class GitChangeLogResourceDecoratorTest {
 
-import static net.nemerosa.ontrack.json.JsonUtils.array;
-import static net.nemerosa.ontrack.json.JsonUtils.object;
-import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+    private lateinit var mapper: ResourceObjectMapper
+    private lateinit var gitService: GitService
 
-public class GitChangeLogResourceDecoratorTest {
-
-    private ResourceObjectMapper mapper;
-    private GitService gitService;
-
-    @Before
-    public void before() {
-        SecurityService securityService = mock(SecurityService.class);
-        gitService = mock(GitService.class);
-        mapper = new ResourceObjectMapperFactory().resourceObjectMapper(
-                new DefaultResourceContext(new MockURIBuilder(), securityService),
-                new GitChangeLogResourceDecorator(gitService)
-        );
+    @BeforeEach
+    fun before() {
+        val securityService: SecurityService = MockSecurityService()
+        gitService = mockk<GitService>()
+        mapper = ResourceObjectMapperFactory().resourceObjectMapper(
+                DefaultResourceContext(MockURIBuilder(), securityService),
+                GitChangeLogResourceDecorator(gitService)
+        )
     }
 
     @Test
-    public void gitChangeLogWithIssues() throws JsonProcessingException {
-        Signature signature = Signature.of(LocalDateTime.of(2014, 12, 5, 21, 53), "user");
-        Project project = Project.of(nd("P", "Project")).withId(ID.of(1)).withSignature(signature);
-        Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(10)).withSignature(signature);
-
-        List<BuildView> buildView = Stream.of(1, 2)
-                .map(it -> BuildView.of(
-                        Build.of(
-                                branch,
-                                nd(String.valueOf(it), "Build " + it),
-                                signature
-                        ).withId(
-                                ID.of(it)
-                        )
-                        )
-                )
-                .collect(Collectors.toList());
-
-        GitChangeLog changeLog = new GitChangeLog(
+    fun gitChangeLogWithIssues() {
+        val signature = Signature.of(LocalDateTime.of(2014, 12, 5, 21, 53), "user")
+        val project: Project = Project.of(NameDescription.nd("P", "Project")).withId(ID.of(1)).withSignature(signature)
+        val branch: Branch = Branch.of(project, NameDescription.nd("B", "Branch")).withId(ID.of(10)).withSignature(signature)
+        val buildView: List<BuildView> = listOf(1, 2)
+                .map { it: Int ->
+                    BuildView.of(
+                            Build.of(
+                                    branch,
+                                    NameDescription.nd(it.toString(), "Build $it"),
+                                    signature
+                            ).withId(
+                                    ID.of(it)
+                            )
+                    )
+                }
+        val changeLog = GitChangeLog(
                 "uuid",
                 project,
-                new SCMBuildView<>(
-                        buildView.get(0),
+                SCMBuildView<GitBuildInfo>(
+                        buildView[0],
                         GitBuildInfo.INSTANCE
                 ),
-                new SCMBuildView<>(
-                        buildView.get(1),
+                SCMBuildView<GitBuildInfo>(
+                        buildView[1],
                         GitBuildInfo.INSTANCE
                 ),
                 false
-        );
-
-        when(gitService.getProjectConfiguration(project)).thenReturn(
-                new BasicGitActualConfiguration(
-                        BasicGitConfiguration.empty().withName("MyConfig").withIssueServiceConfigurationIdentifier("mock:MyTest"),
-                        MockIssueServiceConfiguration.configuredIssueService("MyTest")
-                )
-        );
-
-        ObjectNode signatureObject = object()
+        )
+        every {
+            gitService.getProjectConfiguration(project)
+        } returns BasicGitActualConfiguration(
+                BasicGitConfiguration.empty().withName("MyConfig").withIssueServiceConfigurationIdentifier("mock:MyTest"),
+                TestIssueServiceConfiguration.configuredIssueService("MyTest")
+        )
+        val signatureObject = JsonUtils.`object`()
                 .with("time", "2014-12-05T21:53:00Z")
-                .with("user", object()
+                .with("user", JsonUtils.`object`()
                         .with("name", "user")
                         .end())
-                .end();
-
+                .end()
         assertResourceJson(
                 mapper,
-                object()
-                        .with("project", object()
+                JsonUtils.`object`()
+                        .with("project", JsonUtils.`object`()
                                 .with("id", 1)
                                 .with("name", "P")
                                 .with("description", "Project")
                                 .with("disabled", false)
                                 .with("signature", signatureObject)
                                 .end())
-                        .with("scmBuildFrom", object()
-                                .with("buildView", object()
-                                        .with("build", object()
+                        .with("scmBuildFrom", JsonUtils.`object`()
+                                .with("buildView", JsonUtils.`object`()
+                                        .with("build", JsonUtils.`object`()
                                                 .with("id", 1)
                                                 .with("name", "1")
                                                 .with("description", "Build 1")
                                                 .with("signature", signatureObject)
-                                                .with("branch", object()
+                                                .with("branch", JsonUtils.`object`()
                                                         .with("id", 10)
                                                         .with("name", "B")
                                                         .with("description", "Branch")
@@ -118,22 +102,22 @@ public class GitChangeLogResourceDecoratorTest {
                                                         .with("signature", signatureObject)
                                                         .end())
                                                 .end())
-                                        .with("decorations", array().end())
-                                        .with("promotionRuns", array().end())
-                                        .with("validationStampRunViews", array().end())
+                                        .with("decorations", JsonUtils.array().end())
+                                        .with("promotionRuns", JsonUtils.array().end())
+                                        .with("validationStampRunViews", JsonUtils.array().end())
                                         .end())
-                                .with("scm", object()
+                                .with("scm", JsonUtils.`object`()
                                         .with("placeholder", "")
                                         .end())
                                 .end())
-                        .with("scmBuildTo", object()
-                                .with("buildView", object()
-                                        .with("build", object()
+                        .with("scmBuildTo", JsonUtils.`object`()
+                                .with("buildView", JsonUtils.`object`()
+                                        .with("build", JsonUtils.`object`()
                                                 .with("id", 2)
                                                 .with("name", "2")
                                                 .with("description", "Build 2")
                                                 .with("signature", signatureObject)
-                                                .with("branch", object()
+                                                .with("branch", JsonUtils.`object`()
                                                         .with("id", 10)
                                                         .with("name", "B")
                                                         .with("description", "Branch")
@@ -141,11 +125,11 @@ public class GitChangeLogResourceDecoratorTest {
                                                         .with("signature", signatureObject)
                                                         .end())
                                                 .end())
-                                        .with("decorations", array().end())
-                                        .with("promotionRuns", array().end())
-                                        .with("validationStampRunViews", array().end())
+                                        .with("decorations", JsonUtils.array().end())
+                                        .with("promotionRuns", JsonUtils.array().end())
+                                        .with("validationStampRunViews", JsonUtils.array().end())
                                         .end())
-                                .with("scm", object()
+                                .with("scm", JsonUtils.`object`()
                                         .with("placeholder", "")
                                         .end())
                                 .end())
@@ -161,74 +145,68 @@ public class GitChangeLogResourceDecoratorTest {
                         .with("_exportIssues", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLog:IssueChangeLogExportRequest%28format%3D%27text%27%2C+grouping%3D%27%27%2C+exclude%3D%27%27%2C+altGroup%3D%27Other%27%29")
                         .end(),
                 changeLog
-        );
+        )
     }
 
     @Test
-    public void gitChangeLogWithoutIssues() throws JsonProcessingException {
-
-        Signature signature = Signature.of(LocalDateTime.of(2014, 12, 5, 21, 53), "user");
-
-        Project project = Project.of(nd("P", "Project")).withId(ID.of(1)).withSignature(signature);
-        Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(10)).withSignature(signature);
-
-        List<BuildView> buildView = Stream.of(1, 2)
-                .map(it -> BuildView.of(
-                        Build.of(
-                                branch,
-                                nd(String.valueOf(it), "Build " + it),
-                                signature
-                        ).withId(ID.of(it))
-                        )
-                )
-                .collect(Collectors.toList());
-
-        GitChangeLog changeLog = new GitChangeLog(
+    fun gitChangeLogWithoutIssues() {
+        val signature = Signature.of(LocalDateTime.of(2014, 12, 5, 21, 53), "user")
+        val project: Project = Project.of(NameDescription.nd("P", "Project")).withId(ID.of(1)).withSignature(signature)
+        val branch: Branch = Branch.of(project, NameDescription.nd("B", "Branch")).withId(ID.of(10)).withSignature(signature)
+        val buildView: List<BuildView> = listOf(1, 2)
+                .map { it: Int ->
+                    BuildView.of(
+                            Build.of(
+                                    branch,
+                                    NameDescription.nd(it.toString(), "Build $it"),
+                                    signature
+                            ).withId(ID.of(it))
+                    )
+                }
+        val changeLog = GitChangeLog(
                 "uuid",
                 project,
-                new SCMBuildView<>(
-                        buildView.get(0),
+                SCMBuildView<GitBuildInfo>(
+                        buildView[0],
                         GitBuildInfo.INSTANCE
                 ),
-                new SCMBuildView<>(
-                        buildView.get(1),
+                SCMBuildView<GitBuildInfo>(
+                        buildView[1],
                         GitBuildInfo.INSTANCE
                 ),
                 false
-        );
-
-        when(gitService.getProjectConfiguration(project)).thenReturn(
-                new BasicGitActualConfiguration(
+        )
+        every {
+            gitService.getProjectConfiguration(project)
+        } returns
+                BasicGitActualConfiguration(
                         BasicGitConfiguration.empty().withName("MyConfig").withIssueServiceConfigurationIdentifier("mock:MyTest"),
                         null
                 )
-        );
-
-        ObjectNode signatureObject = object()
+        val signatureObject = JsonUtils.`object`()
                 .with("time", "2014-12-05T21:53:00Z")
-                .with("user", object()
+                .with("user", JsonUtils.`object`()
                         .with("name", "user")
                         .end())
-                .end();
-
+                .end()
         assertResourceJson(
                 mapper,
-                object()
-                        .with("project", object()
+                JsonUtils.`object`()
+                        .with("project", JsonUtils.`object`()
                                 .with("id", 1)
                                 .with("name", "P")
                                 .with("description", "Project")
                                 .with("disabled", false)
                                 .with("signature", signatureObject)
                                 .end())
-                        .with("scmBuildFrom", object()
-                                .with("buildView", object()
-                                        .with("build", object()
+                        .with("scmBuildFrom", JsonUtils.`object`()
+                                .with("buildView", JsonUtils.`object`()
+                                        .with("build", JsonUtils.`object`()
                                                 .with("id", 1)
                                                 .with("name", "1")
                                                 .with("description", "Build 1")
                                                 .with("signature", signatureObject)
-                                                .with("branch", object()
+                                                .with("branch", JsonUtils.`object`()
                                                         .with("id", 10)
                                                         .with("name", "B")
                                                         .with("description", "Branch")
@@ -236,22 +214,22 @@ public class GitChangeLogResourceDecoratorTest {
                                                         .with("signature", signatureObject)
                                                         .end())
                                                 .end())
-                                        .with("decorations", array().end())
-                                        .with("promotionRuns", array().end())
-                                        .with("validationStampRunViews", array().end())
+                                        .with("decorations", JsonUtils.array().end())
+                                        .with("promotionRuns", JsonUtils.array().end())
+                                        .with("validationStampRunViews", JsonUtils.array().end())
                                         .end())
-                                .with("scm", object()
+                                .with("scm", JsonUtils.`object`()
                                         .with("placeholder", "")
                                         .end())
                                 .end())
-                        .with("scmBuildTo", object()
-                                .with("buildView", object()
-                                        .with("build", object()
+                        .with("scmBuildTo", JsonUtils.`object`()
+                                .with("buildView", JsonUtils.`object`()
+                                        .with("build", JsonUtils.`object`()
                                                 .with("id", 2)
                                                 .with("name", "2")
                                                 .with("description", "Build 2")
                                                 .with("signature", signatureObject)
-                                                .with("branch", object()
+                                                .with("branch", JsonUtils.`object`()
                                                         .with("id", 10)
                                                         .with("name", "B")
                                                         .with("description", "Branch")
@@ -259,11 +237,11 @@ public class GitChangeLogResourceDecoratorTest {
                                                         .with("signature", signatureObject)
                                                         .end())
                                                 .end())
-                                        .with("decorations", array().end())
-                                        .with("promotionRuns", array().end())
-                                        .with("validationStampRunViews", array().end())
+                                        .with("decorations", JsonUtils.array().end())
+                                        .with("promotionRuns", JsonUtils.array().end())
+                                        .with("validationStampRunViews", JsonUtils.array().end())
                                         .end())
-                                .with("scm", object()
+                                .with("scm", JsonUtils.`object`()
                                         .with("placeholder", "")
                                         .end())
                                 .end())
@@ -279,14 +257,16 @@ public class GitChangeLogResourceDecoratorTest {
                         .with("_exportIssues", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLog:IssueChangeLogExportRequest%28format%3D%27text%27%2C+grouping%3D%27%27%2C+exclude%3D%27%27%2C+altGroup%3D%27Other%27%29")
                         .end(),
                 changeLog
-        );
+        )
     }
 
-    private static void assertResourceJson(ResourceObjectMapper mapper, JsonNode expectedJson, Object o) throws JsonProcessingException {
-        assertEquals(
-                mapper.getObjectMapper().writeValueAsString(expectedJson),
-                mapper.write(o)
-        );
-    }
+    companion object {
 
+        private fun assertResourceJson(mapper: ResourceObjectMapper, expectedJson: JsonNode, o: Any) {
+            assertEquals(
+                    mapper.objectMapper.writeValueAsString(expectedJson),
+                    mapper.write(o)
+            )
+        }
+    }
 }

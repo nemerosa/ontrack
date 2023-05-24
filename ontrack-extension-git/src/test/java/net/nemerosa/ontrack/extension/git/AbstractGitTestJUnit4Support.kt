@@ -10,8 +10,8 @@ import net.nemerosa.ontrack.extension.git.property.*
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.git.support.*
+import net.nemerosa.ontrack.extension.issues.mock.TestIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.model.toIdentifier
-import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.git.support.GitRepo
@@ -123,7 +123,7 @@ abstract class AbstractGitTestJUnit4Support : AbstractQLKTITJUnit4Support() {
             gitConfigurationService.newConfiguration(
                     BasicGitConfiguration.empty()
                             .withName(gitConfigurationName)
-                            .withIssueServiceConfigurationIdentifier(MockIssueServiceConfiguration.INSTANCE.toIdentifier().format())
+                            .withIssueServiceConfigurationIdentifier(TestIssueServiceConfiguration.INSTANCE.toIdentifier().format())
                             .withRemote("file://${repo.dir.absolutePath}")
             )
         }

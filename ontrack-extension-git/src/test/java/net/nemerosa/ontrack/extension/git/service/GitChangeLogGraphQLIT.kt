@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
-import net.nemerosa.ontrack.extension.issues.support.MockIssue
-import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceExtension
-import net.nemerosa.ontrack.extension.issues.support.MockIssueStatus
+import net.nemerosa.ontrack.extension.issues.mock.TestIssue
+import net.nemerosa.ontrack.extension.issues.mock.TestIssueServiceExtension
+import net.nemerosa.ontrack.extension.issues.mock.TestIssueStatus
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.structure.Branch
@@ -22,11 +22,11 @@ import kotlin.test.assertEquals
 class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
 
     @Autowired
-    private lateinit var mockIssueServiceExtension: MockIssueServiceExtension
+    private lateinit var testIssueServiceExtension: TestIssueServiceExtension
 
     @BeforeEach
     fun before() {
-        mockIssueServiceExtension.resetIssues()
+        testIssueServiceExtension.resetIssues()
     }
 
     private fun doTest(testCode: (Branch) -> Unit) {
@@ -176,10 +176,10 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
         altGroup: String? = null,
         exclude: String? = null,
     ) {
-        mockIssueServiceExtension.register(
-            MockIssue(1, MockIssueStatus.CLOSED, "bug"),
-            MockIssue(2, MockIssueStatus.CLOSED, "feature"),
-            MockIssue(3, MockIssueStatus.OPEN, "feature"),
+        testIssueServiceExtension.register(
+            TestIssue(1, TestIssueStatus.CLOSED, "bug"),
+            TestIssue(2, TestIssueStatus.CLOSED, "feature"),
+            TestIssue(3, TestIssueStatus.OPEN, "feature"),
         )
 
         val input = if (format != null || grouping != null || altGroup != null || exclude != null) {

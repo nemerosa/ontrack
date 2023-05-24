@@ -1,18 +1,18 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
-import net.nemerosa.ontrack.extension.issues.support.MockIssue
-import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceExtension
-import net.nemerosa.ontrack.extension.issues.support.MockIssueStatus
-import org.junit.Test
+import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.issues.mock.TestIssue
+import net.nemerosa.ontrack.extension.issues.mock.TestIssueServiceExtension
+import net.nemerosa.ontrack.extension.issues.mock.TestIssueStatus
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class GitIssueSearchIT : AbstractGitTestJUnit4Support() {
+class GitIssueSearchIT : AbstractGitTestSupport() {
 
     @Autowired
-    private lateinit var mockIssueServiceExtension: MockIssueServiceExtension
+    private lateinit var testIssueServiceExtension: TestIssueServiceExtension
 
     @Test
     fun `Issue search on one branch`() {
@@ -112,8 +112,8 @@ class GitIssueSearchIT : AbstractGitTestJUnit4Support() {
                 }
 
                 // Issue service
-                val issue2 = MockIssue(2, MockIssueStatus.OPEN, "feature")
-                mockIssueServiceExtension.register(issue2)
+                val issue2 = TestIssue(2, TestIssueStatus.OPEN, "feature")
+                testIssueServiceExtension.register(issue2)
 
                 // Issue info
                 val info = asUserWithView(this).call {
