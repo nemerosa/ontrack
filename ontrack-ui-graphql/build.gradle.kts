@@ -1,5 +1,4 @@
 plugins {
-    groovy
     `java-library`
 }
 
@@ -19,7 +18,6 @@ dependencies {
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-model", configuration = "tests"))
-    testImplementation("org.codehaus.groovy:groovy")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(project(":ontrack-repository-impl"))
     testImplementation(project(":ontrack-extension-general"))

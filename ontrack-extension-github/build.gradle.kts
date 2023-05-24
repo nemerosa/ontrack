@@ -27,7 +27,6 @@ dependencies {
     testImplementation(project(":ontrack-test-utils"))
     testImplementation(project(":ontrack-it-utils"))
     testImplementation("org.springframework.boot:spring-boot-starter-actuator")
-    testImplementation("org.codehaus.groovy:groovy")
     testImplementation(project(":ontrack-repository"))
     testImplementation(project(path = ":ontrack-extension-issues", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))

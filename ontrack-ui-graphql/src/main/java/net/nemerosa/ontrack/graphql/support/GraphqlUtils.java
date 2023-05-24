@@ -4,8 +4,6 @@ import graphql.schema.*;
 import net.nemerosa.ontrack.model.structure.Entity;
 import net.nemerosa.ontrack.model.structure.ID;
 import org.apache.commons.lang3.EnumUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -23,30 +21,6 @@ public final class GraphqlUtils {
 
     public static final String ID = "id";
     public static final String NAME = "name";
-    public static final String DISABLED = "disabled";
-    public static final String DESCRIPTION = "description";
-    public static final String STD_LIST_ARG_FIRST = "first";
-    public static final String STD_LIST_ARG_LAST = "last";
-
-    public static GraphQLFieldDefinition idField() {
-        return newFieldDefinition()
-                .name(ID)
-                .type(new GraphQLNonNull(GraphQLInt))
-                .dataFetcher(environment -> {
-                    Object source = environment.getSource();
-                    if (source instanceof Entity) {
-                        ID id = ((Entity) source).getId();
-                        return id != null ? id.get() : null;
-                    } else {
-                        return null;
-                    }
-                })
-                .build();
-    }
-
-    public static GraphQLFieldDefinition nameField() {
-        return nameField("");
-    }
 
     public static GraphQLFieldDefinition nameField(String description) {
         return newFieldDefinition()
@@ -64,29 +38,6 @@ public final class GraphqlUtils {
                 .build();
     }
 
-    public static GraphQLFieldDefinition disabledField() {
-        return newFieldDefinition()
-                .name(DISABLED)
-                .type(new GraphQLNonNull(GraphQLBoolean))
-                .build();
-    }
-
-    public static GraphQLFieldDefinition descriptionField() {
-        return newFieldDefinition()
-                .name(DESCRIPTION)
-                .type(GraphQLString)
-                .build();
-    }
-
-    public static <E extends Enum<E>> GraphQLOutputType newEnumType(Class<E> enumClass) {
-        GraphQLEnumType.Builder builder = GraphQLEnumType.newEnum()
-                .name(enumClass.getSimpleName());
-        for (E e : EnumUtils.getEnumList(enumClass)) {
-            builder = builder.value(e.name(), e);
-        }
-        return builder.build();
-    }
-
     /**
      * Returns a non-null list of non-null types
      *
@@ -101,15 +52,6 @@ public final class GraphqlUtils {
                         )
                 )
         );
-    }
-
-    public static OptionalInt getIntArgument(DataFetchingEnvironment environment, @SuppressWarnings("SameParameterValue") String name) {
-        Object value = environment.getArgument(name);
-        if (value instanceof Integer) {
-            return OptionalInt.of((Integer) value);
-        } else {
-            return OptionalInt.empty();
-        }
     }
 
     public static boolean getBooleanArgument(DataFetchingEnvironment environment, String name, @SuppressWarnings("SameParameterValue") boolean defaultValue) {
@@ -180,63 +122,4 @@ public final class GraphqlUtils {
         };
     }
 
-    public static String lowerCamelCase(String text) {
-        if (text == null) {
-            return null;
-        } else if (StringUtils.isBlank(text)) {
-            return "";
-        } else {
-            return StringUtils.uncapitalize(
-                    StringUtils.remove(
-                            WordUtils.capitalizeFully(
-                                    StringUtils.replacePattern(
-                                            text,
-                                            "[^A-Za-z0-9]",
-                                            " "
-                                    ),
-                                    ' '),
-                            " ")
-            );
-        }
-    }
-
-    public static List<GraphQLArgument> stdListArguments() {
-        return Arrays.asList(
-                GraphQLArgument.newArgument()
-                        .name(STD_LIST_ARG_FIRST)
-                        .description("Number of items to return from the beginning of the list")
-                        .type(GraphQLInt)
-                        .build(),
-                GraphQLArgument.newArgument()
-                        .name(STD_LIST_ARG_LAST)
-                        .description("Number of items to return from the end of the list")
-                        .type(GraphQLInt)
-                        .build()
-        );
-    }
-
-    public static <T> List<T> stdListArgumentsFilter(List<T> list, DataFetchingEnvironment environment) {
-        OptionalInt first = getIntArgument(environment, STD_LIST_ARG_FIRST);
-        OptionalInt last = getIntArgument(environment, STD_LIST_ARG_LAST);
-        if (first.isPresent()) {
-            if (last.isPresent()) {
-                throw new IllegalStateException(
-                        String.format(
-                                "Only one of `%s` or `%s` is expected as argument",
-                                STD_LIST_ARG_FIRST,
-                                STD_LIST_ARG_LAST
-                        )
-                );
-            } else {
-                // First items...
-                return list.subList(0, Math.min(list.size(), first.getAsInt()));
-            }
-        } else if (last.isPresent()) {
-            // Last items
-            return list.subList(Math.max(0, list.size() - last.getAsInt()), list.size());
-        } else {
-            // No range
-            return list;
-        }
-    }
 }

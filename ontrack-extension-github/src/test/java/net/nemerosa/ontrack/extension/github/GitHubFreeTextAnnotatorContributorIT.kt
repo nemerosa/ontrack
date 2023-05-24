@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.github
 
+import net.nemerosa.ontrack.extension.issues.mock.TestIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.model.toIdentifier
-import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import org.junit.Test
 
-class GitHubFreeTextAnnotatorContributorIT : AbstractGitHubTestJUnit4Support() {
+class GitHubFreeTextAnnotatorContributorIT : AbstractGitHubTestSupport() {
 
     @Test
     fun `GitHub Git configuration`() {
@@ -40,7 +40,7 @@ class GitHubFreeTextAnnotatorContributorIT : AbstractGitHubTestJUnit4Support() {
     @Test
     fun `GitHub configuration with an issue service`() {
         project {
-            gitHubConfig(issueServiceConfigurationIdentifier = MockIssueServiceConfiguration.INSTANCE.toIdentifier()
+            gitHubConfig(issueServiceConfigurationIdentifier = TestIssueServiceConfiguration.INSTANCE.toIdentifier()
                 .format())
             expects("Text with #123" to """Text with <a href="http://issue/123">#123</a>""")
         }

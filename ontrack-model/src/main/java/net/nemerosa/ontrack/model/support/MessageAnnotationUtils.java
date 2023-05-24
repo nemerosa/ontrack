@@ -70,7 +70,7 @@ public final class MessageAnnotationUtils {
                                     if (annotation.isText()) {
                                         nodes.add(factory.leaf(Markup.text(annotation.getText())));
                                     } else {
-                                        Node<Markup> child = factory.leaf(Markup.of(annotation.getType(), annotation.getAttributes()));
+                                        Node<Markup> child = factory.leaf(Markup.of(annotation.type, annotation.getAttributes()));
                                         if (annotation.hasText()) {
                                             child.append(
                                                     factory.leaf(Markup.text(annotation.getText()))
