@@ -295,10 +295,10 @@ configure(coreProjects) p@{
         "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinCoroutinesVersion}")
         "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${Versions.kotlinCoroutinesVersion}")
         // Lombok
-        "compileOnly"("org.projectlombok:lombok:1.18.10")
-        "annotationProcessor"("org.projectlombok:lombok:1.18.10")
-        "testCompileOnly"("org.projectlombok:lombok:1.18.10")
-        "testAnnotationProcessor"("org.projectlombok:lombok:1.18.10")
+        "compileOnly"("org.projectlombok:lombok:1.18.26")
+        "annotationProcessor"("org.projectlombok:lombok:1.18.26")
+        "testCompileOnly"("org.projectlombok:lombok:1.18.26")
+        "testAnnotationProcessor"("org.projectlombok:lombok:1.18.26")
         // Testing
         "testImplementation"("org.springframework.boot:spring-boot-starter-test")
         "testImplementation"("org.junit.vintage:junit-vintage-engine") {
