@@ -40,8 +40,6 @@ class GitCommitSearchExtension(
 
     private val logger: Logger = LoggerFactory.getLogger(GitCommitSearchExtension::class.java)
 
-    private val shaPattern = Pattern.compile("[a-f0-9]{40}|[a-f0-9]{7}")
-
     override val searchResultType = SearchResultType(
             extensionFeature.featureDescription,
             GIT_COMMIT_SEARCH_RESULT_TYPE,
@@ -70,7 +68,7 @@ class GitCommitSearchExtension(
         val traceCommits = ontrackConfigProperties.search.index.logging &&
                 ontrackConfigProperties.search.index.tracing &&
                 logger.isDebugEnabled
-        gitService.forEachConfiguredProject(BiConsumer { project, gitConfiguration ->
+        gitService.forEachConfiguredProject { project, gitConfiguration ->
             logger.info("[search][indexation][git-commits] project=${project.name}")
             val issueConfig: ConfiguredIssueService? = gitConfiguration.configuredIssueService
             val projectIssueKeys = mutableSetOf<String>()
@@ -81,7 +79,7 @@ class GitCommitSearchExtension(
                     commitCount++
                     // Logging
                     if (traceCommits) {
-                        logger.info("[search][indexation][git-commits] project=${project.name} commit=${commit.shortId} message=${commit.shortMessage}")
+                        logger.debug("[search][indexation][git-commits] project=${project.name} commit=${commit.shortId} message=${commit.shortMessage}")
                     }
                     // Indexation of the message
                     val item = GitCommitSearchItem(project, gitConfiguration, commit)
@@ -101,7 +99,7 @@ class GitCommitSearchExtension(
                 logger.info("[search][indexation][git-commits] project=${project.name} issues=${projectIssueKeys.size} Git issues have been found.")
                 gitIssueSearchExtension.processIssueKeys(project, issueConfig, projectIssueKeys)
             }
-        })
+        }
     }
 
     override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? {

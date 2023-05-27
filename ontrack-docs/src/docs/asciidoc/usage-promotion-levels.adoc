@@ -134,6 +134,4 @@ name will follow this procedure:
 branch and is then used
 * in any other case, an error is displayed
 
-IMPORTANT: The auto creation of promotion levels is available only through the
-<<dsl,DSL>> or through the API. It is not accessible through the GUI, where
-only the promotion levels of the branch can be selected for a build promotion.
+IMPORTANT: The auto creation of promotion levels is available only through the API. It is not accessible through the GUI, where only the promotion levels of the branch can be selected for a build promotion.

@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.github
 
 import net.nemerosa.ontrack.extension.issues.mock.TestIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.model.toIdentifier
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class GitHubFreeTextAnnotatorContributorIT : AbstractGitHubTestSupport() {
 

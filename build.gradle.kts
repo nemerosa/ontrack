@@ -138,6 +138,7 @@ configure(javaProjects) p@{
 
     // Java level
     java.sourceCompatibility = JavaVersion.VERSION_17
+    java.targetCompatibility = JavaVersion.VERSION_17
 
 }
 
@@ -609,11 +610,11 @@ val prepareGitHubRelease by tasks.registering(Copy::class) {
 }
 
 val gitHubChangeLogReleaseBranch: String by project
-val gitHubChangeLogReleaseBranchFilter: String by project
+val gitHubChangeLogCurrentBuild: String by project
 
 val githubReleaseChangeLog by tasks.registering(OntrackChangeLog::class) {
     ontrackReleaseBranch = gitHubChangeLogReleaseBranch
-    ontrackReleaseFilter = gitHubChangeLogReleaseBranchFilter
+    ontrackCurrentBuild = gitHubChangeLogCurrentBuild
     format = "text"
 }
 
@@ -650,7 +651,7 @@ val githubRelease by tasks.named("githubRelease") {
 
 val slackReleaseChangeLog by tasks.registering(OntrackChangeLog::class) {
     ontrackReleaseBranch = gitHubChangeLogReleaseBranch
-    ontrackReleaseFilter = gitHubChangeLogReleaseBranchFilter
+    ontrackCurrentBuild = gitHubChangeLogCurrentBuild
     format = "slack"
 }
 
@@ -687,12 +688,12 @@ val release by tasks.registering {
 
 val siteOntrackLast3Releases by tasks.registering(OntrackLastReleases::class) {
     releaseCount = 1
-    releaseBranchPattern = "3\\.[\\d]+"
+    releaseBranchPattern = "3\\.\\d+"
 }
 
 val siteOntrackLast4Releases by tasks.registering(OntrackLastReleases::class) {
     releaseCount = 2
-    releaseBranchPattern = "4\\.[\\d]+"
+    releaseBranchPattern = "4\\.\\d+"
 }
 
 val sitePagesDocJs by tasks.registering {
@@ -702,7 +703,7 @@ val sitePagesDocJs by tasks.registering {
     doLast {
         val allReleases = siteOntrackLast4Releases.get().releases +
                 siteOntrackLast3Releases.get().releases
-        val allVersions = allReleases.joinToString(",") { "'${it.name}'" }
+        val allVersions = allReleases.joinToString(",") { "'$it'" }
         project.file("ontrack-site/src/main/web/output/assets/web/assets/ontrack/doc.js").writeText(
                 """const releases = [$allVersions];"""
         )

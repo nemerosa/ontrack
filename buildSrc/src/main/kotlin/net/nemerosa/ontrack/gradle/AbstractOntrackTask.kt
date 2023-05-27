@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.gradle
 
-import net.nemerosa.ontrack.dsl.v4.Ontrack
-import net.nemerosa.ontrack.dsl.v4.OntrackConnection
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
+
+import net.nemerosa.ontrack.gradle.client.OntrackClient
 
 abstract class AbstractOntrackTask : DefaultTask() {
 
@@ -11,21 +11,21 @@ abstract class AbstractOntrackTask : DefaultTask() {
     var ontrackUrl: String = project.properties["ontrackUrl"] as? String? ?: "http://localhost:8080"
 
     @Input
-    var ontrackUser: String = project.properties["ontrackUser"] as? String? ?: "admin"
+    var ontrackToken: String? = project.properties["ontrackToken"] as? String?
 
-    @Input
-    var ontrackPassword: String = project.properties["ontrackPassword"] as? String? ?: "admin"
-
-    protected fun getOntrackClient(logging: Boolean = true): Ontrack =
-            OntrackConnection.create(ontrackUrl)
-                    .authenticate(ontrackUser, ontrackPassword)
-                    .run {
-                        if (logging) {
-                            logger {
-                                logger.debug(it)
-                            }
-                        } else {
-                            this
+    protected fun getOntrackClient(logging: Boolean = true): OntrackClient =
+            OntrackClient(
+                    url = ontrackUrl,
+                    token = ontrackToken
+                            ?: error("Ontrack connection is required. Please set the `ontrackToken` Gradle property."),
+                    logger = if (logging) {
+                        {
+                            logger.info(it)
                         }
-                    }.build()
+                    } else {
+                        {
+                            // NOP
+                        }
+                    }
+            )
 }

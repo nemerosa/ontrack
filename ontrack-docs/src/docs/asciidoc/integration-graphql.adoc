@@ -54,35 +54,6 @@ You can `POST` this file to the Ontrack GraphQL end point, for example:
 curl -X POST --user user http://localhost:8080/graphql --data @query.json -H "Content-Type: application/json"
 ----
 
-[[integration-graphql-dsl]]
-=== Using the DSL
-
-The simplest way is to use the <<dsl,Ontrack DSL>> to run a query:
-
-[source,groovy]
-----
-def result = ontrack.graphQLQuery(
-   '''{
-      projects (id: $projectId) {
-         id
-         branches {
-            id
-            name
-         }
-      }
-   }''',
-   [
-      projectId: 10,
-   ]
-)
-
-assert result.errors != null && result.errors.empty
-assert result.data.projects.size() == 1
-assert result.data.projects.get(0).id == 10
-----
-
-See the <<dsl-ontrack-graphQLQuery,`graphQLQuery`>> documentation for more details.
-
 [[integration-graphql-graphiql]]
 === GraphiQL support
 

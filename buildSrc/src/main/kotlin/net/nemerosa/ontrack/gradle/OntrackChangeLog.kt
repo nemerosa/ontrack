@@ -11,13 +11,13 @@ open class OntrackChangeLog : AbstractOntrackTask() {
     var ontrackProject: String = "ontrack"
 
     @Input
-    var ontrackReleasePromotionLevel: String = "RELEASE"
-
-    @Input
     var ontrackReleaseBranch: String = ""
 
     @Input
-    var ontrackReleaseFilter: String = ""
+    var ontrackCurrentBuild: String = ""
+
+    @Input
+    var ontrackReleasePromotionLevel: String = "RELEASE"
 
     @Input
     var format: String = "text"
@@ -30,35 +30,66 @@ open class OntrackChangeLog : AbstractOntrackTask() {
         if (ontrackReleaseBranch.isBlank()) throw GradleException("Missing ontrackReleaseBranch property")
         logger.info("Getting the Ontrack log for $ontrackProject since last $ontrackReleasePromotionLevel on branch $ontrackReleaseBranch")
         // Gets the Ontrack client
-        val ontrack = getOntrackClient()
-        // Gest the Ontrack project
-        val project = ontrack.project(ontrackProject)
-        // Gets the last build on the branch to release
-        logger.info("ontrackReleaseBranch = $ontrackReleaseBranch")
-        val lastBuild = project.search(mapOf("branchName" to ontrackReleaseBranch)).firstOrNull()
-            ?: error("Cannot find the last build on branch $ontrackReleaseBranch")
-        // Gets the last release
-        val lastRelease = project.search(mapOf(
-                "branchName" to ontrackReleaseFilter,
-                "promotionName" to ontrackReleasePromotionLevel)).firstOrNull()
-        if (lastRelease != null) {
-            // Gets the change log
-            val changeLog = lastBuild.getChangeLog(lastRelease)
-            // Exports the issues
-            this.changeLog = changeLog.exportIssues(
+        val ontrack = getOntrackClient(true)
+
+        // Gets the current branch last build (the one being built probably)
+        // and the last released build
+
+        val data = ontrack.graphQL(
+                """
+                    query LastBuilds(
+                        ${'$'}ontrackProject: String!,
+                        ${'$'}ontrackReleaseBranch: String!,
+                        ${'$'}ontrackCurrentBuild: String!,
+                        ${'$'}ontrackReleasePromotionLevel: String!,
+                    ) {
+                      currentBuilds: builds(project: ${'$'}ontrackProject, branch: ${'$'}ontrackReleaseBranch, name: ${'$'}ontrackCurrentBuild) {
+                        id
+                      }
+                      lastReleasesBuilds: builds(project: ${'$'}ontrackProject, branch: ${'$'}ontrackReleaseBranch, buildBranchFilter: {
+                        withPromotionLevel: ${'$'}ontrackReleasePromotionLevel,
+                        count: 1
+                      }) {
+                        id
+                      }
+                    }
+                """,
                 mapOf(
-                    "format" to format,
-                    "groups" to mapOf(
-                        "Features" to listOf("type: feature"),
-                        "Enhancements" to listOf("type: enhancement"),
-                        "Bugs" to listOf("type: bug")
-                    ),
-                    "exclude" to emptyList<String>()
+                        "ontrackProject" to ontrackProject,
+                        "ontrackReleaseBranch" to ontrackReleaseBranch,
+                        "ontrackCurrentBuild" to ontrackCurrentBuild,
+                        "ontrackReleasePromotionLevel" to ontrackReleasePromotionLevel
                 )
+        )
+        val lastBuildId = data.path("currentBuilds").path(0)
+                .path("id").asInt()
+        val lastReleaseId = data.path("lastReleasesBuilds").path(0)
+                .path("id").asInt()
+
+        logger.info("Ontrack last build ID = $lastBuildId")
+        logger.info("Ontrack last release ID = $lastReleaseId")
+
+        if (lastBuildId != 0 && lastReleaseId != 0 && lastBuildId != lastReleaseId) {
+            val changeLog = ontrack.graphQL(
+                    """
+                       {
+                          gitChangeLog(from: $lastReleaseId, to: $lastBuildId) {
+                            export(request: {
+                              format: "$format",
+                              grouping: "Features=feature|Enhancements=enhancement|Bugs=bug"
+                            })
+                          }
+                        }
+                    """
             )
+            this.changeLog = changeLog.path("gitChangeLog").path("export").asText()
         } else {
+            // No change log
             this.changeLog = ""
         }
+
+        // OK
+        logger.info("Changelog:\n$changeLog")
     }
 
 }

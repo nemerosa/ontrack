@@ -65,9 +65,6 @@ Additional, two regular expressions can be used to add further protection agains
 * the first one ("includes") is used to select the branches which are _not_ eligible to disabling and deletion
 * the second expression ("excludes") can be used to refine the first expression, by matching branches which still must be disabled or deleted.
 
-Note that the _Stale branches_ property can also be set programmatically using
-the <<dsl-projectproperties-stale,DSL>>.
-
 // ==== Validation stamp filters
 include::feature-validation-stamp-filters.adoc[]
 

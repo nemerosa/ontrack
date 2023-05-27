@@ -12,13 +12,13 @@ import java.util.*
 
 @Component
 class TestIssueServiceExtension(
-    extensionFeature: TestIssueServiceFeature,
-    private val issueExportServiceFactory: IssueExportServiceFactory,
+        extensionFeature: TestIssueServiceFeature,
+        private val issueExportServiceFactory: IssueExportServiceFactory,
 ) : AbstractIssueServiceExtension(
-    extensionFeature,
-    "test",
-    "Test issues",
-    issueExportServiceFactory
+        extensionFeature,
+        "test",
+        "Test issues",
+        issueExportServiceFactory
 ) {
 
     /**
@@ -43,20 +43,27 @@ class TestIssueServiceExtension(
     }
 
     override fun getConfigurationList(): List<IssueServiceConfiguration> =
-        listOf(TestIssueServiceConfiguration.INSTANCE)
+            listOf(TestIssueServiceConfiguration.INSTANCE)
 
     override fun getConfigurationByName(name: String?): IssueServiceConfiguration? =
-        if (name == TestIssueServiceConfiguration.INSTANCE.name) {
-            TestIssueServiceConfiguration.INSTANCE
-        } else {
-            null
-        }
+            if (name == TestIssueServiceConfiguration.INSTANCE.name) {
+                TestIssueServiceConfiguration.INSTANCE
+            } else {
+                null
+            }
 
     override fun validIssueToken(token: String): Boolean = token.matches("#(\\d+)".toRegex())
 
+    override fun getDisplayKey(issueServiceConfiguration: IssueServiceConfiguration, key: String): String =
+            if (key.startsWith("#")) {
+                key
+            } else {
+                "#$key"
+            }
+
     override fun extractIssueKeysFromMessage(
-        issueServiceConfiguration: IssueServiceConfiguration?,
-        message: String?
+            issueServiceConfiguration: IssueServiceConfiguration?,
+            message: String?
     ): MutableSet<String> {
         val result = mutableSetOf<String>()
         if (!message.isNullOrBlank()) {
@@ -71,25 +78,25 @@ class TestIssueServiceExtension(
 
     override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration?): Optional<MessageAnnotator> {
         return Optional.of(
-            RegexMessageAnnotator("#(\\d+)") { token ->
-                MessageAnnotation.of("a")
-                    .attr("href", "http://issue/${token.substring(1)}")
-                    .text(token)
-            }
+                RegexMessageAnnotator("#(\\d+)") { token ->
+                    MessageAnnotation.of("a")
+                            .attr("href", "http://issue/${token.substring(1)}")
+                            .text(token)
+                }
         )
     }
 
     override fun getLinkForAllIssues(
-        issueServiceConfiguration: IssueServiceConfiguration?,
-        issues: MutableList<Issue>?
+            issueServiceConfiguration: IssueServiceConfiguration?,
+            issues: MutableList<Issue>?
     ): String? = null
 
     override fun getIssue(issueServiceConfiguration: IssueServiceConfiguration, issueKey: String): Issue? {
         val key = getIssueId(issueKey)
-        return issues.get(key) ?: TestIssue(
-            key,
-            TestIssueStatus.OPEN,
-            "bug"
+        return issues[key] ?: TestIssue(
+                key,
+                TestIssueStatus.OPEN,
+                "bug"
         )
     }
 
@@ -107,8 +114,8 @@ class TestIssueServiceExtension(
     }
 
     override fun getIssueTypes(
-        issueServiceConfiguration: IssueServiceConfiguration,
-        issue: Issue
+            issueServiceConfiguration: IssueServiceConfiguration,
+            issue: Issue
     ): Set<String> = if (issue is TestIssue && issue.type != null) {
         setOf(issue.type)
     } else {
