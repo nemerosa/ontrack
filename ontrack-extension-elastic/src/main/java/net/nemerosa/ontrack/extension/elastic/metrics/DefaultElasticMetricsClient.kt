@@ -24,6 +24,7 @@ import org.elasticsearch.client.RequestOptions
 import org.elasticsearch.client.RestClient
 import org.elasticsearch.client.RestHighLevelClient
 import org.elasticsearch.client.RestHighLevelClientBuilder
+import org.elasticsearch.client.indices.GetIndexRequest
 import org.elasticsearch.index.query.MultiMatchQueryBuilder
 import org.elasticsearch.search.builder.SearchSourceBuilder
 import org.slf4j.Logger
@@ -238,11 +239,17 @@ class DefaultElasticMetricsClient(
 
     override fun dropIndex() {
         if (elasticMetricsConfigProperties.allowDrop) {
-            logger.info("Dropping the ${elasticMetricsConfigProperties.index.name} index before re-export")
-            client.indices().delete(
-                DeleteIndexRequest(elasticMetricsConfigProperties.index.name),
-                RequestOptions.DEFAULT
+            val indexExists = client.indices().exists(
+                    GetIndexRequest(elasticMetricsConfigProperties.index.name),
+                    RequestOptions.DEFAULT
             )
+            if (indexExists) {
+                logger.info("Dropping the ${elasticMetricsConfigProperties.index.name} index before re-export")
+                client.indices().delete(
+                        DeleteIndexRequest(elasticMetricsConfigProperties.index.name),
+                        RequestOptions.DEFAULT
+                )
+            }
         }
     }
 
