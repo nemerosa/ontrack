@@ -1,5 +1,5 @@
 # Base
-FROM azul/zulu-openjdk:11.0.6
+FROM azul/zulu-openjdk:17.0.6
 
 # Directory for the test results
 VOLUME /ontrack/acceptance/output
