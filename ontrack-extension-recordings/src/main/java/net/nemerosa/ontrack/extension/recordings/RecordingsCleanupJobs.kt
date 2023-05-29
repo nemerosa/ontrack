@@ -22,7 +22,11 @@ class RecordingsCleanupJobs(
             schedule = Schedule.EVERY_DAY,
     )
 
-    private fun <R : Recording, F : Any> createCleanupJob(extension: RecordingsExtension<R, F>) = object : Job {
+    private fun <R : Recording, F : Any> createCleanupJob(extension: RecordingsExtension<R, F>) = RecordingsCleanupJob(extension)
+
+    inner class RecordingsCleanupJob<R : Recording, F : Any>(
+            private val extension: RecordingsExtension<R, F>
+    ) : Job {
 
         override fun getKey(): JobKey =
                 RecordingsJobs.category.getType("recordings-cleanup")
