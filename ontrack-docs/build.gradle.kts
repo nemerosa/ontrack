@@ -1,16 +1,16 @@
-import org.asciidoctor.gradle.jvm.AsciidoctorPdfTask
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
+import org.asciidoctor.gradle.jvm.pdf.AsciidoctorPdfTask
 
 plugins {
-    id("org.asciidoctor.jvm.convert") version "2.3.0"
-    id("org.asciidoctor.jvm.pdf") version "2.3.0"
+    id("org.asciidoctor.jvm.convert") version "3.3.2"
+    id("org.asciidoctor.jvm.pdf") version "3.3.2"
 }
 
 if (project.hasProperty("documentation")) {
 
     asciidoctorj {
         modules {
-            diagram.setVersion("1.5.4.1")
+            diagram.use()
         }
     }
 
