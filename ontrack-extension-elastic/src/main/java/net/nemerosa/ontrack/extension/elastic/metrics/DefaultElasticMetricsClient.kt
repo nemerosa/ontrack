@@ -1,5 +1,11 @@
 package net.nemerosa.ontrack.extension.elastic.metrics
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType
+import co.elastic.clients.elasticsearch.core.BulkRequest
+import co.elastic.clients.json.jackson.JacksonJsonpMapper
+import co.elastic.clients.transport.rest_client.RestClientTransport
+import com.fasterxml.jackson.databind.node.ObjectNode
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.binder.MeterBinder
 import kotlinx.coroutines.*
@@ -15,18 +21,7 @@ import org.apache.http.auth.AuthScope
 import org.apache.http.auth.Credentials
 import org.apache.http.auth.UsernamePasswordCredentials
 import org.apache.http.impl.client.BasicCredentialsProvider
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest
-import org.elasticsearch.action.bulk.BulkRequest
-import org.elasticsearch.action.index.IndexRequest
-import org.elasticsearch.action.search.SearchRequest
-import org.elasticsearch.client.RequestOptions
 import org.elasticsearch.client.RestClient
-import org.elasticsearch.client.RestHighLevelClient
-import org.elasticsearch.client.RestHighLevelClientBuilder
-import org.elasticsearch.client.indices.GetIndexRequest
-import org.elasticsearch.index.query.MultiMatchQueryBuilder
-import org.elasticsearch.search.builder.SearchSourceBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -41,14 +36,14 @@ import kotlin.concurrent.withLock
 @DelicateCoroutinesApi
 @Component
 @ConditionalOnProperty(
-    prefix = ElasticMetricsConfigProperties.ELASTIC_METRICS_PREFIX,
-    name = ["enabled"],
-    havingValue = "true",
-    matchIfMissing = false,
+        prefix = ElasticMetricsConfigProperties.ELASTIC_METRICS_PREFIX,
+        name = ["enabled"],
+        havingValue = "true",
+        matchIfMissing = false,
 )
 class DefaultElasticMetricsClient(
-    private val elasticMetricsConfigProperties: ElasticMetricsConfigProperties,
-    private val defaultClient: RestHighLevelClient,
+        private val elasticMetricsConfigProperties: ElasticMetricsConfigProperties,
+        private val defaultLowLevelClient: RestClient,
 ) : ElasticMetricsClient, MeterBinder {
 
     private val logger: Logger = LoggerFactory.getLogger(DefaultElasticMetricsClient::class.java)
@@ -100,14 +95,16 @@ class DefaultElasticMetricsClient(
                 val indexName = elasticMetricsConfigProperties.index.name
                 entries.forEach { entry ->
                     val source = entry.asJson().toJsonMap()
-                    client.index(
-                        IndexRequest(indexName).id(entry.computeId()).source(source),
-                        RequestOptions.DEFAULT
-                    )
+                    client.index {
+                        it.index(indexName)
+                                .id(entry.computeId())
+                                .document(source)
+                    }
                 }
                 // ... and flushing immediately
-                val refreshRequest = RefreshRequest(indexName)
-                client.indices().refresh(refreshRequest, RequestOptions.DEFAULT)
+                client.indices().refresh {
+                    it.index(indexName)
+                }
             } else {
                 runBlocking {
                     launch {
@@ -205,18 +202,27 @@ class DefaultElasticMetricsClient(
                     buffer.clear()
                     // Creating the bulk request
                     val indexName = elasticMetricsConfigProperties.index.name
-                    val request = BulkRequest()
+                    val br = BulkRequest.Builder()
                     entries.forEach {
                         val source = it.asJson().toJsonMap()
-                        request.add(IndexRequest(indexName).id(it.computeId()).source(source))
+                        br.operations { op ->
+                            op.index { idx ->
+                                idx.index(indexName)
+                                        .id(it.computeId())
+                                        .document(source)
+                            }
+                        }
                     }
                     // Bulk request execution
+                    val request = br.build()
                     registry?.time<Unit>(ElasticMetricsClientMetrics.time) {
                         try {
-                            debug("Sending the bulk request (${request.numberOfActions()})")
-                            val response = client.bulk(request, RequestOptions.DEFAULT)
-                            if (response.hasFailures()) {
-                                val errorMessage = response.buildFailureMessage()
+                            debug("Sending the bulk request (${request.operations().size})")
+                            val response = client.bulk(request)
+                            if (response.errors()) {
+                                val errorMessage = response.items()
+                                        .mapNotNull { it.error() }
+                                        .joinToString("\n") { it.reason() }
                                 logger.error("Errors while exporting metrics to ElasticSearch. $errorMessage")
                                 registry?.increment(ElasticMetricsClientMetrics.errors)
                             }
@@ -239,102 +245,94 @@ class DefaultElasticMetricsClient(
 
     override fun dropIndex() {
         if (elasticMetricsConfigProperties.allowDrop) {
-            val indexExists = client.indices().exists(
-                    GetIndexRequest(elasticMetricsConfigProperties.index.name),
-                    RequestOptions.DEFAULT
-            )
+            val indexExists = client.indices().exists {
+                it.index(elasticMetricsConfigProperties.index.name)
+            }.value()
             if (indexExists) {
                 logger.info("Dropping the ${elasticMetricsConfigProperties.index.name} index before re-export")
-                client.indices().delete(
-                        DeleteIndexRequest(elasticMetricsConfigProperties.index.name),
-                        RequestOptions.DEFAULT
-                )
+                client.indices().delete {
+                    it.index(elasticMetricsConfigProperties.index.name)
+                }
             }
         }
     }
 
     override fun rawSearch(
-        token: String,
-        offset: Int,
-        size: Int,
+            token: String,
+            offset: Int,
+            size: Int,
     ): SearchNodeResults {
-        val esRequest = SearchRequest().source(
-            SearchSourceBuilder().query(
-                MultiMatchQueryBuilder(token).type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
-            ).from(
-                offset
-            ).size(
-                size
-            )
-        ).indices(elasticMetricsConfigProperties.index.name)
-
         // Getting the result of the search
-        val response = client.search(esRequest, RequestOptions.DEFAULT)
+        val response = client.search({ s ->
+            s.index(elasticMetricsConfigProperties.index.name)
+                    .query { q ->
+                        q.multiMatch { mm -> mm.query(token).type(TextQueryType.BestFields) }
+                    }.from(offset).size(size)
+        }, ObjectNode::class.java)
 
         // Pagination information
-        val responseHits = response.hits
-        val totalHits = responseHits.totalHits?.value ?: 0
+        val responseHits = response.hits()
+        val totalHits = responseHits.total()?.value() ?: 0
 
         // Hits as JSON nodes
-        val hits = responseHits.hits.map {
+        val hits = responseHits.hits().map {
             SearchResultNode(
-                it.index,
-                it.id,
-                it.score.toDouble(),
-                it.sourceAsMap
+                    it.index(),
+                    it.id(),
+                    it.score() ?: 0.0,
+                    it.source()?.toJsonMap() ?: emptyMap(),
             )
         }
 
         // Transforming into search results
         return SearchNodeResults(
-            items = hits,
-            offset = offset,
-            total = totalHits.toInt(),
-            message = when {
-                totalHits <= 0 -> "The number of total matches is not known and pagination is not possible."
-                else -> null
-            }
+                items = hits,
+                offset = offset,
+                total = totalHits.toInt(),
+                message = when {
+                    totalHits <= 0 -> "The number of total matches is not known and pagination is not possible."
+                    else -> null
+                }
         )
     }
 
-    private val client: RestHighLevelClient by lazy {
-        when (elasticMetricsConfigProperties.target) {
+    private val client: ElasticsearchClient by lazy {
+        val restClient = when (elasticMetricsConfigProperties.target) {
             // Using the main ES instance
-            ElasticMetricsTarget.MAIN -> defaultClient
+            ElasticMetricsTarget.MAIN -> defaultLowLevelClient
             // Using the custom ES instance
             ElasticMetricsTarget.CUSTOM -> customClient()
         }
+        val transport = RestClientTransport(restClient, JacksonJsonpMapper())
+        ElasticsearchClient(transport)
     }
 
-    private fun customClient(): RestHighLevelClient {
+    private fun customClient(): RestClient {
         val hosts = elasticMetricsConfigProperties.custom.uris.map { value ->
             val uri = URI(value)
             HttpHost.create(
-                URI(
-                    uri.scheme, null, uri.host, uri.port, uri.path, uri.query, uri.fragment
-                ).toString()
+                    URI(
+                            uri.scheme, null, uri.host, uri.port, uri.path, uri.query, uri.fragment
+                    ).toString()
             )
         }
         val builder = RestClient.builder(*hosts.toTypedArray())
         if (!elasticMetricsConfigProperties.custom.username.isNullOrBlank()) {
             builder.setHttpClientConfigCallback {
                 it.setDefaultCredentialsProvider(
-                    BasicCredentialsProvider().apply {
-                        val credentials: Credentials = UsernamePasswordCredentials(
-                            elasticMetricsConfigProperties.custom.username,
-                            elasticMetricsConfigProperties.custom.password
-                        )
-                        setCredentials(AuthScope.ANY, credentials)
-                    }
+                        BasicCredentialsProvider().apply {
+                            val credentials: Credentials = UsernamePasswordCredentials(
+                                    elasticMetricsConfigProperties.custom.username,
+                                    elasticMetricsConfigProperties.custom.password
+                            )
+                            setCredentials(AuthScope.ANY, credentials)
+                        }
                 )
             }
         }
         if (elasticMetricsConfigProperties.custom.pathPrefix != null) {
             builder.setPathPrefix(elasticMetricsConfigProperties.custom.pathPrefix)
         }
-        val client = builder.build()
-        return RestHighLevelClientBuilder(client)
-            .setApiCompatibilityMode(elasticMetricsConfigProperties.apiCompatibilityMode)
-            .build()
+        return builder.build()
     }
 }

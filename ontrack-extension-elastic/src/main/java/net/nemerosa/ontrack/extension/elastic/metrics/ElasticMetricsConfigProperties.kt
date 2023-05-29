@@ -48,6 +48,7 @@ class ElasticMetricsConfigProperties {
      *
      * See https://www.elastic.co/guide/en/elasticsearch/client/java-rest/7.17/java-rest-high-compatibility.html
      */
+    @Deprecated("Ontrack is now used the Java ES client and the compatibility mode is always enabled")
     var apiCompatibilityMode: Boolean = false
 
     /**
