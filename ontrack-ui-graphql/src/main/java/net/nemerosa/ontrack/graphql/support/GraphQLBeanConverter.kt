@@ -357,14 +357,14 @@ object GraphQLBeanConverter {
         return when {
             // Raw Kotlin
             Int::class.java.isAssignableFrom(type) -> GraphQLInt
-            Long::class.java.isAssignableFrom(type) -> GraphQLLong
+            Long::class.java.isAssignableFrom(type) -> GraphQLInt
             Double::class.java.isAssignableFrom(type) -> GraphQLFloat
             Float::class.java.isAssignableFrom(type) -> GraphQLFloat
             Boolean::class.java.isAssignableFrom(type) -> GraphQLBoolean
             String::class.java.isAssignableFrom(type) -> GraphQLString
             // Java equivalents
             java.lang.Integer::class.java.isAssignableFrom(type) -> GraphQLInt
-            java.lang.Long::class.java.isAssignableFrom(type) -> GraphQLLong
+            java.lang.Long::class.java.isAssignableFrom(type) -> GraphQLInt
             java.lang.Double::class.java.isAssignableFrom(type) -> GraphQLFloat
             java.lang.Float::class.java.isAssignableFrom(type) -> GraphQLFloat
             java.lang.Boolean::class.java.isAssignableFrom(type) -> GraphQLBoolean
