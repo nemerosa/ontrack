@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.service.security
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.model.extension.*
-import net.nemerosa.ontrack.model.support.StartupService
 import org.jgrapht.alg.cycle.CycleDetector
 import org.jgrapht.graph.DefaultDirectedGraph
 import org.jgrapht.graph.DefaultEdge
@@ -16,29 +15,16 @@ import org.springframework.stereotype.Service
 
 @Service
 class ExtensionManagerImpl(
-    private val applicationContext: ApplicationContext
-) : ExtensionManager, StartupService {
+        private val applicationContext: ApplicationContext
+) : ExtensionManager {
 
     private val logger: Logger = LoggerFactory.getLogger(ExtensionManager::class.java)
 
-    private lateinit var extensions: Collection<Extension>
-
-    override fun getName(): String = javaClass.simpleName
-
-    override fun startupOrder(): Int = StartupService.SYSTEM
-
-    /**
-     * Startup: loads the extensions & features from the application context.
-     *
-     *
-     * This cannot be done at construction time because of dependency cycle between
-     * some extensions that need access to the extension manager.
-     */
-    override fun start() {
+    private val extensions: Collection<Extension> by lazy {
         logger.info("[extensions] Loading the extensions")
-        extensions = applicationContext.getBeansOfType(Extension::class.java).values
+        val extensions = applicationContext.getBeansOfType(Extension::class.java).values
         val extensionFeatures: Collection<ExtensionFeature> = applicationContext.getBeansOfType(
-            ExtensionFeature::class.java
+                ExtensionFeature::class.java
         ).values
         logger.info("[extensions] Number of loaded extension features: {}", extensionFeatures.size)
         logger.info("[extensions] Number of loaded extensions: {}", extensions.size)
@@ -48,6 +34,8 @@ class ExtensionManagerImpl(
         }
         // Detects cycles (by forcing the load of the extension list)
         extensionList
+        // OK
+        extensions
     }
 
     override fun <T : Extension> getExtensions(extensionType: Class<T>): Collection<T> {
@@ -59,14 +47,14 @@ class ExtensionManagerImpl(
     override val extensionList: ExtensionList by lazy {
         // Gets the list of all extensions
         val extensionFeatures = applicationContext.getBeansOfType(
-            ExtensionFeature::class.java
+                ExtensionFeature::class.java
         ).values
-            .map(ExtensionFeature::featureDescription)
-            .sortedBy { it.name }
+                .map(ExtensionFeature::featureDescription)
+                .sortedBy { it.name }
 
         // Computing the dependencies
         val g = DefaultDirectedGraph<String, DefaultEdge>(
-            DefaultEdge::class.java
+                DefaultEdge::class.java
         )
 
         // Adds the extensions as vertexes
@@ -122,9 +110,9 @@ class ExtensionManagerImpl(
 
             // OK
             ExtensionList(
-                order
-                    .map { index.getValue(it) }
-                    .map { convert(it) }
+                    order
+                            .map { index.getValue(it) }
+                            .map { convert(it) }
             )
         }
     }
@@ -135,7 +123,7 @@ class ExtensionManagerImpl(
      */
     private fun convert(extensionFeatureDescription: ExtensionFeatureDescription): ExtensionFeatureDescription {
         val devProfile = applicationContext.environment.acceptsProfiles(
-            Profiles.of(RunProfile.DEV)
+                Profiles.of(RunProfile.DEV)
         )
         return if (devProfile) {
             extensionFeatureDescription
