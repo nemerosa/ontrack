@@ -48,7 +48,18 @@ pipeline {
                 ontrackCliSetup(
                     autoValidationStamps: true,
                     promotions: [
+                        BRONZE: [
+                            validations: [
+                                'BUILD',
+                                'KDSL.ACCEPTANCE',
+                                'ACCEPTANCE',
+                                'VAULT',
+                            ],
+                        ],
                         RELEASE: [
+                            promotions: [
+                                'BRONZE',
+                            ],
                             validations: [
                                 'GITHUB.RELEASE',
                             ]
