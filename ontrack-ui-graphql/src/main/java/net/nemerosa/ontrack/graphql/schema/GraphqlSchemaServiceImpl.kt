@@ -5,6 +5,7 @@ import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.common.UserException
 import net.nemerosa.ontrack.graphql.support.MutationInputValidationException
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class GraphqlSchemaServiceImpl(
@@ -75,10 +76,14 @@ class GraphqlSchemaServiceImpl(
         return GraphQLFieldDefinition.newFieldDefinition()
                 .name(mutation.name)
                 .description(mutation.description)
-                .argument {
-                    it.name("input")
-                            .description("Input for the mutation")
-                            .type(inputType)
+                .apply {
+                    if (inputType != null) {
+                        argument {
+                            it.name("input")
+                                    .description("Input for the mutation")
+                                    .type(inputType)
+                        }
+                    }
                 }
                 .type(outputType)
                 .dataFetcher { env -> mutationFetcher(mutation, env) }
@@ -125,15 +130,19 @@ class GraphqlSchemaServiceImpl(
                     .build()
                     .apply { dictionary.add(this) }
 
-    private fun createMutationInputType(mutation: Mutation, dictionary: MutableSet<GraphQLType>): GraphQLInputType =
-            GraphQLInputObjectType.newInputObject()
-                    .name("${mutation.typePrefix}Input")
-                    .description("Input type for the ${mutation.name} mutation.")
-                    .fields(mutation.inputFields(dictionary))
-                    .build()
-                    .apply { dictionary.add(this) }
+    private fun createMutationInputType(mutation: Mutation, dictionary: MutableSet<GraphQLType>): GraphQLInputType? =
+            mutation.inputFields(dictionary)
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { fields ->
+                        GraphQLInputObjectType.newInputObject()
+                                .name("${mutation.typePrefix}Input")
+                                .description("Input type for the ${mutation.name} mutation.")
+                                .fields(fields)
+                                .build()
+                                .apply { dictionary.add(this) }
+                    }
 
-    private val Mutation.typePrefix: String get() = name.capitalize()
+    private val Mutation.typePrefix: String get() = name.replaceFirstChar { it.titlecase() }
 
     companion object {
         const val QUERY = "Query"
