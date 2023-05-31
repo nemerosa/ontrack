@@ -13,7 +13,7 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertNotPresent
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.access.AccessDeniedException
+import org.springframework.graphql.execution.ErrorType
 import kotlin.test.*
 
 class ProjectGraphQLIT : AbstractQLKTITSupport() {
@@ -32,9 +32,7 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Project by ID and name is not authorised`() {
-        assertFailsWith<IllegalStateException> {
-            run("""{projects(id: 1, name: "test") { name }}""")
-        }
+        runWithError("""{projects(id: 1, name: "test") { name }}""", errorClassification = ErrorType.BAD_REQUEST)
     }
 
     @Test
@@ -1026,15 +1024,9 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
         // Creates a project
         val project = doCreateProject()
         // Looks for this project by name, with a not authorized user
-        assertFailsWith(AccessDeniedException::class, "Access denied") {
-            withNoGrantViewToAll {
-                asUser().call {
-                    run("""{
-                |  projects(name: "${project.name}") {
-                |    id
-                |  }
-                |}""".trimMargin())
-                }
+        withNoGrantViewToAll {
+            asUser().execute {
+                runWithError("""{ projects(name: "${project.name}") { id } }""", errorClassification = ErrorType.FORBIDDEN)
             }
         }
     }

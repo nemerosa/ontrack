@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertJsonNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.graphql.execution.ErrorType
 import kotlin.test.*
 
 class BranchGraphQLIT : AbstractQLKTITSupport() {
@@ -34,9 +35,7 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Branch by ID and project is not allowed`() {
-        assertFailsWith<IllegalStateException> {
-            run("""{branches (id: 1, project: "test") { name } }""")
-        }
+        runWithError("""{branches (id: 1, project: "test") { name } }""", errorClassification = ErrorType.BAD_REQUEST)
     }
 
     @Test

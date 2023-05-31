@@ -1,23 +1,26 @@
 package net.nemerosa.ontrack.graphql
 
 import com.fasterxml.jackson.databind.JsonNode
-import graphql.GraphQL
-import net.nemerosa.ontrack.graphql.schema.GraphqlSchemaService
+import com.fasterxml.jackson.databind.node.ObjectNode
 import net.nemerosa.ontrack.graphql.schema.UserError
-import net.nemerosa.ontrack.graphql.support.exception
 import net.nemerosa.ontrack.it.links.AbstractBranchLinksTestJUnit4Support
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.test.TestUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.graphql.ExecutionGraphQlService
+import org.springframework.graphql.support.DefaultExecutionGraphQlRequest
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 import kotlin.test.fail
 
 @Deprecated(message = "JUnit is deprecated", replaceWith = ReplaceWith("AbstractQLKTITSupport"))
 abstract class AbstractQLKTITJUnit4Support : AbstractBranchLinksTestJUnit4Support() {
 
     @Autowired
-    private lateinit var schemaService: GraphqlSchemaService
+    private lateinit var executionGraphQlService: ExecutionGraphQlService
 
     fun run(query: String, variables: Map<String, *> = emptyMap<String, Any>()): JsonNode {
         // Task to run
@@ -31,31 +34,32 @@ abstract class AbstractQLKTITJUnit4Support : AbstractBranchLinksTestJUnit4Suppor
     }
 
     fun run(query: String, variables: Map<String, *> = emptyMap<String, Any>(), code: (data: JsonNode) -> Unit) {
-        run(query, variables).let { data ->
-            code(data)
-        }
+        code(run(query, variables))
     }
 
-    private fun internalRun(query: String, variables: Map<String, *> = emptyMap<String, Any>()): JsonNode {
-        val result = GraphQL
-            .newGraphQL(schemaService.schema)
-            .build()
-            .execute {
-                it.query(query).variables(variables)
-            }
-        val error = result.exception
-        if (error != null) {
-            throw error
-        } else if (result.errors != null && !result.errors.isEmpty()) {
-            fail(result.errors.joinToString("\n") { it.message })
-        } else {
-            val data: Any? = result.getData()
-            if (data != null) {
-                return JsonUtils.format(data)
-            } else {
-                fail("No data was returned and no error was thrown.")
-            }
+    private fun internalRun(
+            query: String,
+            variables: Map<String, *> = emptyMap<String, Any>(),
+    ): JsonNode {
+        val result = executionGraphQlService.execute(
+                DefaultExecutionGraphQlRequest(
+                        /* document = */ query,
+                        /* operationName = */ null,
+                        /* variables = */ variables,
+                        /* extensions = */ null,
+                        /* id = */ TestUtils.uid("gql_"),
+                        /* locale = */ null,
+                )
+        ).block()
+
+        assertNotNull(result)
+        if (result.errors.isNotEmpty()) {
+            fail(
+                    result.errors.joinToString("\n") { it.message ?: "Unknown error" }
+            )
         }
+        val data = result.getData<Any>().asJson()
+        return assertIs<ObjectNode>(data)
     }
 
     protected fun assertNoUserError(data: JsonNode, userNodeName: String): JsonNode {
@@ -64,11 +68,11 @@ abstract class AbstractQLKTITJUnit4Support : AbstractBranchLinksTestJUnit4Suppor
         if (!errors.isNullOrNullNode() && errors.isArray && errors.size() > 0) {
             errors.forEach { error: JsonNode ->
                 error.path("exception")
-                    .takeIf { !it.isNullOrNullNode() }
-                    ?.let { println("Error exception: ${it.asText()}") }
+                        .takeIf { !it.isNullOrNullNode() }
+                        ?.let { println("Error exception: ${it.asText()}") }
                 error.path("location")
-                    .takeIf { !it.isNullOrNullNode() }
-                    ?.let { println("Error location: ${it.asText()}") }
+                        .takeIf { !it.isNullOrNullNode() }
+                        ?.let { println("Error location: ${it.asText()}") }
                 fail(error.path("message").asText())
             }
         }
@@ -76,10 +80,10 @@ abstract class AbstractQLKTITJUnit4Support : AbstractBranchLinksTestJUnit4Suppor
     }
 
     protected fun assertUserError(
-        data: JsonNode,
-        userNodeName: String,
-        message: String? = null,
-        exception: String? = null
+            data: JsonNode,
+            userNodeName: String,
+            message: String? = null,
+            exception: String? = null
     ) {
         val errors = data.path(userNodeName).path("errors")
         if (errors.isNullOrNullNode()) {

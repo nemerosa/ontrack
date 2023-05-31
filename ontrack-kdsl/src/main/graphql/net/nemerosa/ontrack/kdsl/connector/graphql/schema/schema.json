@@ -1,5 +1,4 @@
 {
-  "errors": [],
   "data": {
     "__schema": {
       "queryType": {
@@ -19457,7 +19456,7 @@
         {
           "kind": "SCALAR",
           "name": "JSON",
-          "description": "Custom JSON value",
+          "description": "JSON node",
           "fields": null,
           "inputFields": null,
           "interfaces": null,
@@ -20150,7 +20149,7 @@
         {
           "kind": "SCALAR",
           "name": "Long",
-          "description": "Long type",
+          "description": "Long signed integer",
           "fields": null,
           "inputFields": null,
           "interfaces": null,
@@ -20256,6 +20255,18 @@
           "name": "Mutation",
           "description": null,
           "fields": [
+            {
+              "name": "ping",
+              "description": "Basic test service",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
             {
               "name": "createBranch",
               "description": "Creates a new branch",
@@ -24491,18 +24502,7 @@
             {
               "name": "purgeHookRecordings",
               "description": "Purging all records for Hook messages",
-              "args": [
-                {
-                  "name": "input",
-                  "description": "Input for the mutation",
-                  "type": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "PurgeHookRecordingsInput",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
+              "args": [],
               "type": {
                 "kind": "OBJECT",
                 "name": "PurgeHookRecordingsPayload",
@@ -24514,18 +24514,7 @@
             {
               "name": "purgeQueueRecordings",
               "description": "Purging all records for Queue messages",
-              "args": [
-                {
-                  "name": "input",
-                  "description": "Input for the mutation",
-                  "type": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "PurgeQueueRecordingsInput",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
+              "args": [],
               "type": {
                 "kind": "OBJECT",
                 "name": "PurgeQueueRecordingsPayload",
@@ -24537,18 +24526,7 @@
             {
               "name": "reloadCasc",
               "description": "Reload the configuration from the CasC files",
-              "args": [
-                {
-                  "name": "input",
-                  "description": "Input for the mutation",
-                  "type": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "ReloadCascInput",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
+              "args": [],
               "type": {
                 "kind": "OBJECT",
                 "name": "ReloadCascPayload",
@@ -29859,16 +29837,6 @@
           "possibleTypes": null
         },
         {
-          "kind": "INPUT_OBJECT",
-          "name": "PurgeHookRecordingsInput",
-          "description": "Input type for the purgeHookRecordings mutation.",
-          "fields": null,
-          "inputFields": [],
-          "interfaces": null,
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
           "kind": "OBJECT",
           "name": "PurgeHookRecordingsPayload",
           "description": "Output type for the purgeHookRecordings mutation.",
@@ -29898,16 +29866,6 @@
               "ofType": null
             }
           ],
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
-          "kind": "INPUT_OBJECT",
-          "name": "PurgeQueueRecordingsInput",
-          "description": "Input type for the purgeQueueRecordings mutation.",
-          "fields": null,
-          "inputFields": [],
-          "interfaces": null,
           "enumValues": null,
           "possibleTypes": null
         },
@@ -29950,6 +29908,18 @@
           "description": null,
           "fields": [
             {
+              "name": "ping",
+              "description": "Basic test service",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "accountGroups",
               "description": null,
               "args": [
@@ -29985,18 +29955,15 @@
                 }
               ],
               "type": {
-                "kind": "NON_NULL",
+                "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "LIST",
+                  "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "AccountGroup"
-                    }
+                    "kind": "OBJECT",
+                    "name": "AccountGroup",
+                    "ofType": null
                   }
                 }
               },
@@ -30039,18 +30006,15 @@
                 }
               ],
               "type": {
-                "kind": "NON_NULL",
+                "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "LIST",
+                  "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "Account"
-                    }
+                    "kind": "OBJECT",
+                    "name": "Account",
+                    "ofType": null
                   }
                 }
               },
@@ -30147,18 +30111,15 @@
                 }
               ],
               "type": {
-                "kind": "NON_NULL",
+                "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "LIST",
+                  "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "Branch"
-                    }
+                    "kind": "OBJECT",
+                    "name": "Branch",
+                    "ofType": null
                   }
                 }
               },
@@ -30303,18 +30264,15 @@
                 }
               ],
               "type": {
-                "kind": "NON_NULL",
+                "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "LIST",
+                  "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "Build"
-                    }
+                    "kind": "OBJECT",
+                    "name": "Build",
+                    "ofType": null
                   }
                 }
               },
@@ -30500,18 +30458,15 @@
                 }
               ],
               "type": {
-                "kind": "NON_NULL",
+                "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "LIST",
+                  "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "Project"
-                    }
+                    "kind": "OBJECT",
+                    "name": "Project",
+                    "ofType": null
                   }
                 }
               },
@@ -32656,16 +32611,6 @@
           ],
           "inputFields": null,
           "interfaces": [],
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
-          "kind": "INPUT_OBJECT",
-          "name": "ReloadCascInput",
-          "description": "Input type for the reloadCasc mutation.",
-          "fields": null,
-          "inputFields": [],
-          "interfaces": null,
           "enumValues": null,
           "possibleTypes": null
         },
@@ -43321,29 +43266,6 @@
           "possibleTypes": null
         },
         {
-          "kind": "OBJECT",
-          "name": "UserRootActions",
-          "description": "List of actions authorized to the user",
-          "fields": [
-            {
-              "name": "projectCreate",
-              "description": null,
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            }
-          ],
-          "inputFields": null,
-          "interfaces": [],
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
           "kind": "INPUT_OBJECT",
           "name": "ValidateBuildByIdWithCHMLInput",
           "description": "Input type for the validateBuildByIdWithCHML mutation.",
@@ -46786,12 +46708,16 @@
           "fields": [
             {
               "name": "name",
-              "description": null,
+              "description": "The __Directive type represents a Directive that a server supports.",
               "args": [],
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -46809,19 +46735,38 @@
               "deprecationReason": null
             },
             {
+              "name": "isRepeatable",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "locations",
               "description": null,
               "args": [],
               "type": {
-                "kind": "LIST",
+                "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
-                  "kind": "NON_NULL",
+                  "kind": "LIST",
                   "name": null,
                   "ofType": {
-                    "kind": "ENUM",
-                    "name": "__DirectiveLocation",
-                    "ofType": null
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "__DirectiveLocation"
+                    }
                   }
                 }
               },
@@ -46874,6 +46819,12 @@
             {
               "name": "MUTATION",
               "description": "Indicates the directive is valid on mutations.",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "SUBSCRIPTION",
+              "description": "Indicates the directive is valid on subscriptions.",
               "isDeprecated": false,
               "deprecationReason": null
             },
@@ -47079,7 +47030,18 @@
             {
               "name": "args",
               "description": null,
-              "args": [],
+              "args": [
+                {
+                  "name": "includeDeprecated",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": "false"
+                }
+              ],
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -47200,6 +47162,30 @@
             },
             {
               "name": "defaultValue",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "isDeprecated",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "deprecationReason",
               "description": null,
               "args": [],
               "type": {
@@ -47475,7 +47461,18 @@
             {
               "name": "inputFields",
               "description": null,
-              "args": [],
+              "args": [
+                {
+                  "name": "includeDeprecated",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": "false"
+                }
+              ],
               "type": {
                 "kind": "LIST",
                 "name": null,
@@ -47631,7 +47628,7 @@
         },
         {
           "name": "deprecated",
-          "description": "Marks the field or enum value as deprecated",
+          "description": "Marks the field, argument, input field or enum value as deprecated",
           "args": [
             {
               "name": "reason",
@@ -47673,7 +47670,5 @@
         }
       ]
     }
-  },
-  "extensions": null,
-  "dataPresent": true
+  }
 }

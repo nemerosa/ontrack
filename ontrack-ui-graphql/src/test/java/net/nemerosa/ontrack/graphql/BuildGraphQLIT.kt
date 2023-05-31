@@ -16,6 +16,7 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertJsonNotNull
 import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.jupiter.api.Test
+import org.springframework.graphql.execution.ErrorType
 import java.time.LocalDateTime
 import kotlin.test.*
 
@@ -29,14 +30,14 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         val branch = doCreateBranch()
         val build = asUser().withProjectFunction(branch, BuildCreate::class.java).call {
             structureService.newBuild(
-                Build.of(
-                    branch,
-                    nd("1", ""),
-                    Signature.of(
-                        LocalDateTime.of(2016, 11, 25, 14, 43),
-                        "test"
+                    Build.of(
+                            branch,
+                            nd("1", ""),
+                            Signature.of(
+                                    LocalDateTime.of(2016, 11, 25, 14, 43),
+                                    "test"
+                            )
                     )
-                )
             )
         }
 
@@ -170,13 +171,16 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
     fun `By branch not found`() {
         project {
             val name = uid("B")
-            assertFailsWith<BranchNotFoundException> {
-                run(
+            run(
                     """{
-                        builds(project: "${project.name}", branch: "$name") {
-                            name
-                        }
-                    }"""
+                    builds(project: "${project.name}", branch: "$name") {
+                        name
+                    }
+                }"""
+            ) { data ->
+                assertTrue(
+                        data["builds"].isEmpty,
+                        "No build is returned"
                 )
             }
         }
@@ -198,14 +202,14 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
     @Test
     fun `By project not found`() {
         val name = uid("P")
-        assertFailsWith<ProjectNotFoundException> {
-            run(
+        run(
                 """{
                     builds(project: "$name") {
                         name
                     }
                 }"""
-            )
+        ) { data ->
+            assertTrue(data["builds"].isEmpty, "No build is returned")
         }
     }
 
@@ -285,16 +289,14 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         val pl = doCreatePromotionLevel(branch, nd("PL", ""))
         doPromote(build1, pl, "")
         // Query
-        assertFailsWith<IllegalStateException> {
-            run(
+        runWithError(
                 """{
-                    builds( 
-                            buildBranchFilter: {withPromotionLevel: "PL"}) {
+                    builds(buildBranchFilter: {withPromotionLevel: "PL"}) {
                         id
                     }
-                }"""
-            )
-        }
+                }""",
+                errorClassification = ErrorType.BAD_REQUEST
+        )
     }
 
     @Test
@@ -302,16 +304,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         // Builds
         doCreateBuild()
         // Query
-        assertFailsWith<IllegalStateException> {
-            run(
+        runWithError(
                 """{
-                    builds( 
-                            buildProjectFilter: {promotionName: "PL"}) {
-                        id
-                    }
-                }"""
-            )
-        }
+                builds( 
+                        buildProjectFilter: {promotionName: "PL"}) {
+                    id
+                }
+            }""",
+                errorClassification = ErrorType.BAD_REQUEST
+        )
     }
 
     @Test
@@ -358,8 +359,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     """)
                     // Checks the build has been created
                     assertNotNull(
-                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
-                        "Build has been created")
+                            structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                            "Build has been created")
                     // Checks the data
                     val build = data["createBuild"]["build"]
                     assertTrue(build["id"].asInt() > 0, "ID is set")
@@ -393,12 +394,12 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     """, mapOf(
-                        "runInfo" to runInfo.asJson().toJsonMap()
+                            "runInfo" to runInfo.asJson().toJsonMap()
                     ))
                     // Checks the build has been created
                     assertNotNull(
-                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
-                        "Build has been created")
+                            structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                            "Build has been created")
                     // Checks the data
                     val node = assertNoUserError(data, "createBuild")
                     val build = node["build"]
@@ -491,8 +492,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     """)
                     // Checks the build has been created
                     assertNotNull(
-                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
-                        "Build has been created")
+                            structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                            "Build has been created")
                     // Checks the data
                     val build = data["createBuild"]["build"]
                     assertTrue(build["id"].asInt() > 0, "ID is set")
@@ -524,8 +525,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     """)
                     // Checks the build has been created
                     assertNotNull(
-                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
-                        "Build has been created")
+                            structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                            "Build has been created")
                     // Checks the data
                     val build = data["createBuild"]["build"]
                     assertTrue(build["id"].asInt() > 0, "ID is set")
@@ -737,8 +738,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     """)
                     // Checks the build has been created
                     assertNotNull(
-                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
-                        "Build has been created")
+                            structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                            "Build has been created")
                     // Checks the data
                     val build = data["createBuildOrGet"]["build"]
                     assertTrue(build["id"].asInt() > 0, "ID is set")
@@ -770,8 +771,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     """)
                     // Checks the build has been created
                     assertNotNull(
-                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
-                        "Build has been created")
+                            structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                            "Build has been created")
                     // Checks the data
                     val build = data["createBuildOrGet"]["build"]
                     assertTrue(build["id"].asInt() > 0, "ID is set")
@@ -804,8 +805,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     """)
                     // Checks the build has been created
                     assertNotNull(
-                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
-                        "Build has been created")
+                            structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                            "Build has been created")
                     // Checks the data
                     val build = data["createBuildOrGet"]["build"]
                     assertEquals(existing.id(), build["id"].asInt(), "ID is the same")
@@ -838,8 +839,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     """)
                     // Checks the build has been created
                     assertNotNull(
-                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
-                        "Build has been created")
+                            structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                            "Build has been created")
                     // Checks the data
                     val build = data["createBuildOrGet"]["build"]
                     assertEquals(existing.id(), build["id"].asInt(), "ID is the same")
@@ -890,8 +891,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                         this["builds"][0]["using"]["pageItems"].map { it["name"].asText() }.toSet()
                     }.run {
                         assertEquals(
-                            setOf("1.0", "2.0", "3.0"),
-                            this
+                                setOf("1.0", "2.0", "3.0"),
+                                this
                         )
                     }
 
@@ -909,8 +910,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                         this["builds"][0]["using"]["pageItems"].map { it["name"].asText() }.toSet()
                     }.run {
                         assertEquals(
-                            setOf("1.0", "2.0"),
-                            this
+                                setOf("1.0", "2.0"),
+                                this
                         )
                     }
 
@@ -928,8 +929,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                         this["builds"][0]["using"]["pageItems"].map { it["name"].asText() }.toSet()
                     }.run {
                         assertEquals(
-                            setOf("2.0"),
-                            this
+                                setOf("2.0"),
+                                this
                         )
                     }
                 }
@@ -982,8 +983,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
             }.run {
                 assertEquals(
-                    setOf("1.0", "2.0", "3.0"),
-                    this
+                        setOf("1.0", "2.0", "3.0"),
+                        this
                 )
             }
             // No filter, first one only
@@ -1000,8 +1001,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
             }.run {
                 assertEquals(
-                    setOf("3.0"),
-                    this
+                        setOf("3.0"),
+                        this
                 )
             }
             // Project restriction, all of them
@@ -1018,8 +1019,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
             }.run {
                 assertEquals(
-                    setOf("1.0", "2.0"),
-                    this
+                        setOf("1.0", "2.0"),
+                        this
                 )
             }
             // Project restriction, first one
@@ -1036,8 +1037,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
             }.run {
                 assertEquals(
-                    setOf("2.0"),
-                    this
+                        setOf("2.0"),
+                        this
                 )
             }
             // Branch restriction
@@ -1054,8 +1055,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
             }.run {
                 assertEquals(
-                    setOf("2.0"),
-                    this
+                        setOf("2.0"),
+                        this
                 )
             }
         }
@@ -1231,8 +1232,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     // Dependencies Ids
                     val dependencies = data["builds"][0]["using"]["pageItems"].map { it["id"].asInt() }
                     assertEquals(
-                        setOf(dep1.id(), dep2.id()),
-                        dependencies.toSet()
+                            setOf(dep1.id(), dep2.id()),
+                            dependencies.toSet()
                     )
                 }
             }
@@ -1386,13 +1387,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                             }
                             val expectedRunIds = runs.map { it.id() }
                             assertEquals(
-                                expectedRunIds, actualRunIds,
-                                "Runs are sorted"
+                                    expectedRunIds, actualRunIds,
+                                    "Runs are sorted"
                             )
                             assertEquals(
-                                listOf(100, 90, 80),
-                                runTimes,
-                                "Correctly sorted run times"
+                                    listOf(100, 90, 80),
+                                    runTimes,
+                                    "Correctly sorted run times"
                             )
                         }
                     }
