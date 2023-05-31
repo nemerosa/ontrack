@@ -24,4 +24,9 @@ class GQLTypeCache {
      */
     operator fun get(name: String): GraphQLObjectType? = index[name]
 
+    /**
+     * List of types in the cache
+     */
+    val types: Collection<GraphQLObjectType> get() = index.values
+
 }

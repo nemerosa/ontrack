@@ -2,10 +2,12 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.schema.*
 import graphql.schema.GraphQLObjectType.newObject
+import graphql.schema.idl.RuntimeWiring
+import graphql.schema.idl.SchemaGenerator
+import graphql.schema.idl.TypeDefinitionRegistry
 import net.nemerosa.ontrack.common.UserException
 import net.nemerosa.ontrack.graphql.support.MutationInputValidationException
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class GraphqlSchemaServiceImpl(
@@ -19,11 +21,14 @@ class GraphqlSchemaServiceImpl(
         private val contributors: List<GQLContributor>,
 ) : GraphqlSchemaService {
 
-    override val schema: GraphQLSchema by lazy {
-        createSchema()
-    }
+    override fun createSchema(typeDefinitionRegistry: TypeDefinitionRegistry, runtimeWiring: RuntimeWiring): GraphQLSchema {
 
-    private fun createSchema(): GraphQLSchema {
+        // IDL schema
+        val idlSchema = SchemaGenerator().makeExecutableSchema(typeDefinitionRegistry, runtimeWiring)
+
+        val queryType = idlSchema.queryType
+        val mutationType = idlSchema.mutationType
+
         // All types
         val cache = GQLTypeCache()
         val dictionary = mutableSetOf<GraphQLType>()
@@ -32,39 +37,38 @@ class GraphqlSchemaServiceImpl(
         dictionary.addAll(enums.map { it.createEnum() })
         dictionary.addAll(inputTypes.map { it.createInputType(dictionary) })
         dictionary.addAll(contributors.flatMap { it.contribute(cache, dictionary) })
-        val mutationType = createMutationType(dictionary)
-        return GraphQLSchema.newSchema()
-                .additionalTypes(dictionary)
-                .query(createQueryType())
-                .mutation(mutationType)
-                .build()
-    }
 
-    private fun createQueryType(): GraphQLObjectType {
-        return newObject()
-                .name(QUERY)
-                // Root queries
-                .fields(
-                        rootQueries.map { it.getFieldDefinition() }
-                )
-                .fields(
-                        rootQueriesPlus.flatMap { it.fieldDefinitions }
-                )
-                // OK
-                .build()
-    }
+        // Merging the computed schema & the IDL one
 
-    private fun createMutationType(dictionary: MutableSet<GraphQLType>): GraphQLObjectType {
-        return newObject()
-                .name(MUTATION)
-                // Root mutations
-                .fields(
-                        mutationProviders.flatMap { provider ->
-                            provider.mutations.map { mutation -> createMutation(mutation, dictionary) }
-                        }
-                )
-                // OK
-                .build()
+        return idlSchema.transform { builder ->
+            // Root queries
+            builder.query(
+                    queryType.transform { qb ->
+                        qb.fields(
+                                rootQueries.map { it.getFieldDefinition() }
+                        )
+                        qb.fields(
+                                rootQueriesPlus.flatMap { it.fieldDefinitions }
+                        )
+                    }
+            )
+            //  Mutations
+            builder.mutation(
+                    mutationType.transform { mb ->
+                        mb.fields(
+                                mutationProviders.flatMap { provider ->
+                                    provider.mutations.map { mutation ->
+                                        createMutation(mutation, dictionary)
+                                    }
+                                }
+                        )
+                    }
+            )
+            // Adds all types in the cache
+            builder.additionalTypes(cache.types.toSet())
+            // Adds all types in the dictionary
+            builder.additionalTypes(dictionary)
+        }
     }
 
     private fun createMutation(mutation: Mutation, dictionary: MutableSet<GraphQLType>): GraphQLFieldDefinition {

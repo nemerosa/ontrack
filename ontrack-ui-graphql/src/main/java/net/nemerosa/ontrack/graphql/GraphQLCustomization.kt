@@ -11,8 +11,8 @@ class GraphQLCustomization(
 ) : GraphQlSourceBuilderCustomizer {
 
     override fun customize(builder: GraphQlSource.SchemaResourceBuilder) {
-        builder.schemaFactory { _, _ ->
-            graphqlSchemaService.schema
+        builder.schemaFactory { typeDefinitionRegistry, runtimeWiring ->
+            graphqlSchemaService.createSchema(typeDefinitionRegistry, runtimeWiring)
         }
     }
 
