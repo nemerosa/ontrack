@@ -99,6 +99,15 @@ fun listType(itemType: GraphQLOutputType, nullable: Boolean = false, nullableIte
     )
 
 /**
+ * List type using a type name
+ */
+fun listType(itemTypeName: String, nullable: Boolean = false, nullableItem: Boolean = false): GraphQLOutputType =
+    nullableType(
+        GraphQLList(nullableType(GraphQLTypeReference(itemTypeName), nullableItem)),
+        nullable
+    )
+
+/**
  * Argument to get the first N elements in a list field
  */
 const val STD_LIST_ARG_FIRST = "first"

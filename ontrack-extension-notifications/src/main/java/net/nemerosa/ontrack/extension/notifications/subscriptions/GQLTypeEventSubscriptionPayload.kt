@@ -8,6 +8,8 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.*
+import net.nemerosa.ontrack.model.annotations.getAPITypeName
+import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import org.springframework.stereotype.Component
 
 @Component
@@ -18,7 +20,7 @@ class GQLTypeEventSubscriptionPayload(
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType = GraphQLObjectType.newObject()
         .name(typeName)
-        .description(getDescription(EventSubscriptionPayload::class))
+        .description(getAPITypeName(EventSubscriptionPayload::class))
         .stringField(EventSubscriptionPayload::id)
         .stringField(EventSubscriptionPayload::channel)
         .field {
