@@ -4,9 +4,9 @@ import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInputType
 import graphql.schema.GraphQLType
 import graphql.schema.GraphQLTypeReference
-import net.nemerosa.ontrack.graphql.support.getDescription
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.annotations.getAPITypeName
 import net.nemerosa.ontrack.model.structure.BuildSearchForm
 import org.springframework.stereotype.Component
 
@@ -19,7 +19,7 @@ class GQLInputBuildSearchForm : GQLInputType<BuildSearchForm> {
 
     override fun createInputType(dictionary: MutableSet<GraphQLType>): GraphQLInputType = GraphQLInputObjectType.newInputObject()
         .name(typeName)
-        .description(getDescription(BuildSearchForm::class))
+        .description(getAPITypeName(BuildSearchForm::class))
         .field(intInputField(BuildSearchForm::maximumCount, nullable = true))
         .field(stringInputField(BuildSearchForm::branchName))
         .field(stringInputField(BuildSearchForm::buildName))

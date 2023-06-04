@@ -2,8 +2,8 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars.*
 import graphql.schema.*
-import net.nemerosa.ontrack.graphql.support.getPropertyDescription
 import net.nemerosa.ontrack.graphql.support.nullableInputType
+import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import kotlin.reflect.KProperty
 
 fun requiredStringInputField(
@@ -121,7 +121,7 @@ fun inputField(
     description: String? = null,
     nullable: Boolean? = null
 ): GraphQLInputObjectField {
-    val actualDescription = description ?: getPropertyDescription(property)
+    val actualDescription = getPropertyDescription(property, description)
     return GraphQLInputObjectField.newInputObjectField()
         .name(property.name)
         .description(actualDescription)

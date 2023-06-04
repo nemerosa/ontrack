@@ -6,10 +6,11 @@ dependencies {
     api(project(":ontrack-ui-support"))
     api(project(":ontrack-tx"))
     api("com.graphql-java:graphql-java")
+    api("org.springframework.graphql:spring-graphql")
 
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-graphql")
     implementation("org.springframework:spring-tx")
-    implementation("org.springframework:spring-web")
-    implementation("org.springframework:spring-webmvc")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.security:spring-security-core")
     implementation("org.apache.commons:commons-lang3")

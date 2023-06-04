@@ -4,9 +4,9 @@ import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.support.getDescription
 import net.nemerosa.ontrack.graphql.support.stringField
 import net.nemerosa.ontrack.graphql.support.toNotNull
+import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import org.springframework.stereotype.Component
 
 @Component
@@ -21,15 +21,15 @@ class GQLGitHubRepository(
         .description("GitHub repository")
         .stringField(
             Repository::name.name,
-            getDescription(Repository::name),
+            getPropertyDescription(Repository::name),
         )
         .stringField(
             Repository::htmlUrl.name,
-            getDescription(Repository::htmlUrl),
+                getPropertyDescription(Repository::htmlUrl),
         )
         .field {
             it.name(Repository::owner.name)
-                .description(getDescription(Repository::owner))
+                .description(getPropertyDescription(Repository::owner))
                 .type(gqlGitHubOwner.typeRef.toNotNull())
         }
         .build()

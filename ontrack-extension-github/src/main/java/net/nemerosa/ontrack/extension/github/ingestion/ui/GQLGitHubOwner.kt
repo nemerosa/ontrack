@@ -4,8 +4,8 @@ import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Owner
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.support.getDescription
 import net.nemerosa.ontrack.graphql.support.stringField
+import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import org.springframework.stereotype.Component
 
 @Component
@@ -18,7 +18,7 @@ class GQLGitHubOwner : GQLType {
         .description("GitHub owner")
         .stringField(
             Owner::login.name,
-            getDescription(Owner::login),
+            getPropertyDescription(Owner::login),
         )
         .build()
 }

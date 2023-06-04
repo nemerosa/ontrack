@@ -7,6 +7,9 @@ import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.listInputType
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.getAPITypeName
+import net.nemerosa.ontrack.model.annotations.getPropertyDescription
+import net.nemerosa.ontrack.model.annotations.getPropertyName
 import org.apache.commons.lang3.reflect.FieldUtils
 import org.springframework.beans.BeanUtils
 import java.beans.PropertyDescriptor
@@ -19,6 +22,7 @@ import java.util.UUID
 import kotlin.jvm.internal.Reflection
 import kotlin.reflect.*
 import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.isSuperclassOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaType
 
@@ -169,7 +173,7 @@ object GraphQLBeanConverter {
 
     fun asObjectTypeBuilder(type: KClass<*>, cache: GQLTypeCache): GraphQLObjectType.Builder =
         GraphQLObjectType.newObject()
-            .name(getTypeName(type))
+            .name(getAPITypeName(type))
             .description(getTypeDescription(type))
             .fields(asObjectFields(type, cache))
 
@@ -255,7 +259,7 @@ object GraphQLBeanConverter {
                                         val elementScalarType = getScalarType(elementKClass.java)
                                         val elementGraphQLType = elementScalarType
                                             ?: cache.getOrCreate(
-                                                getTypeName(elementKClass)
+                                                getAPITypeName(elementKClass)
                                             ) { asObjectType(elementKClass, cache) }
                                         GraphQLList(elementGraphQLType.toNotNull())
                                     } else {
@@ -270,7 +274,7 @@ object GraphQLBeanConverter {
                                     val propertyKClass = Reflection.createKotlinClass(javaType)
                                     // Tries to convert to an object type
                                     cache.getOrCreate(
-                                        getTypeName(propertyKClass)
+                                        getAPITypeName(propertyKClass)
                                     ) { asObjectType(propertyKClass, cache) }
                                 } else {
                                     throw IllegalStateException("Only Java classes are supported: $javaType")
@@ -292,79 +296,18 @@ object GraphQLBeanConverter {
         return fields
     }
 
-    @JvmOverloads
-    @Deprecated("Use Kotlin equivalent")
-    fun asObjectType(type: Class<*>, cache: GQLTypeCache, exclusions: Set<String>? = null): GraphQLObjectType {
-        @Suppress("DEPRECATION")
-        return asObjectTypeBuilder(type, cache, exclusions).build()
-    }
-
-    @Deprecated("Use Kotlin equivalent")
-    fun asObjectTypeBuilder(type: Class<*>, cache: GQLTypeCache, exclusions: Set<String>?): GraphQLObjectType.Builder {
-        var builder: GraphQLObjectType.Builder = GraphQLObjectType.newObject()
-            .name(type.simpleName)
-        // Actual exclusions
-        val actualExclusions = HashSet(DEFAULT_EXCLUSIONS)
-        if (exclusions != null) {
-            actualExclusions.addAll(exclusions)
-        }
-        // Gets the properties for the type
-        for (descriptor in BeanUtils.getPropertyDescriptors(type)) {
-            if (descriptor.readMethod != null) {
-                val name = descriptor.name
-                // Excludes some names by defaults
-                if (!actualExclusions.contains(name)) {
-                    val description = getDescription(type, descriptor)
-                    val propertyType = descriptor.propertyType
-                    val scalarType = getScalarType(propertyType)
-                    if (scalarType != null) {
-                        builder = builder.field { field ->
-                            field
-                                .name(name)
-                                .description(description)
-                                .type(scalarType)
-                        }
-                    } else if (propertyType is Map<*, *> || propertyType is Collection<*>) {
-                        throw IllegalArgumentException(
-                            String.format(
-                                "Maps and collections are not supported yet: %s in %s",
-                                name,
-                                type.name
-                            )
-                        )
-                    } else {
-                        // Tries to convert to an object type
-                        // Note: caching might be needed here...
-                        @Suppress("DEPRECATION")
-                        val propertyObjectType = cache.getOrCreate(
-                            propertyType.simpleName
-                        ) { asObjectType(propertyType, cache) }
-                        builder = builder.field { field ->
-                            field
-                                .name(name)
-                                .description(description)
-                                .type(propertyObjectType)
-                        }
-                    }// Maps & collections not supported yet
-                }
-            }
-        }
-        // OK
-        return builder
-    }
-
     internal fun getScalarType(type: Class<*>): GraphQLScalarType? {
         return when {
             // Raw Kotlin
             Int::class.java.isAssignableFrom(type) -> GraphQLInt
-            Long::class.java.isAssignableFrom(type) -> GraphQLLong
+            Long::class.java.isAssignableFrom(type) -> GQLScalarLong.INSTANCE
             Double::class.java.isAssignableFrom(type) -> GraphQLFloat
             Float::class.java.isAssignableFrom(type) -> GraphQLFloat
             Boolean::class.java.isAssignableFrom(type) -> GraphQLBoolean
             String::class.java.isAssignableFrom(type) -> GraphQLString
             // Java equivalents
             java.lang.Integer::class.java.isAssignableFrom(type) -> GraphQLInt
-            java.lang.Long::class.java.isAssignableFrom(type) -> GraphQLLong
+            java.lang.Long::class.java.isAssignableFrom(type) -> GQLScalarLong.INSTANCE
             java.lang.Double::class.java.isAssignableFrom(type) -> GraphQLFloat
             java.lang.Float::class.java.isAssignableFrom(type) -> GraphQLFloat
             java.lang.Boolean::class.java.isAssignableFrom(type) -> GraphQLBoolean
@@ -377,7 +320,7 @@ object GraphQLBeanConverter {
         }
     }
 
-    fun getScalarType(type: KType): GraphQLScalarType? {
+    private fun getScalarType(type: KType): GraphQLScalarType? {
         val javaType = type.javaType
         return if (javaType is Class<*>) {
             getScalarType(javaType)
@@ -415,7 +358,7 @@ object GraphQLBeanConverter {
     }
 }
 
-private fun getDescription(type: Class<*>, descriptor: PropertyDescriptor): String? {
+private fun getTypeDescription(type: Class<*>, descriptor: PropertyDescriptor): String? {
     val readMethod: Method? = descriptor.readMethod
     if (readMethod != null) {
         val annotation: APIDescription? = readMethod.getAnnotation(APIDescription::class.java)
