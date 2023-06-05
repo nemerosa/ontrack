@@ -47,6 +47,14 @@ pipeline {
                 scmSkip(deleteBuild: false)
                 ontrackCliSetup(
                     autoValidationStamps: true,
+                    validations: [
+                        [
+                            name: 'KDSL.ACCEPTANCE',
+                            tests: [
+                                warningIfSkipped: false,
+                            ],
+                        ],
+                    ],
                     promotions: [
                         BRONZE: [
                             validations: [
