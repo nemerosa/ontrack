@@ -71,7 +71,8 @@ pipeline {
                             validations: [
                                 'GITHUB.RELEASE',
                             ]
-                        ]
+                        ],
+                        PRODUCTION: [:],
                     ]
                 )
             }
