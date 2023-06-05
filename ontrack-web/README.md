@@ -17,4 +17,3 @@ You can also monitor the changes in web resources and make the browser reload th
 This command is blocking.
 
 > Note that your browser must support [LiveReload](http://livereload.com/).
-
