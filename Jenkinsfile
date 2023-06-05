@@ -436,7 +436,7 @@ pipeline {
                         --console plain \\
                         --stacktrace \\
                         -PontrackUser=${ONTRACK_USR} \\
-                        -PontrackPassword=${ONTRACK_PSW} \\
+                        -PontrackToken=${ONTRACK_PSW} \\
                         -PgitHubToken=${GITHUB_TOKEN} \\
                         -PgitHubCommit=${GIT_COMMIT} \\
                         -PgitHubChangeLogReleaseBranch=${ONTRACK_BRANCH_NAME} \\
