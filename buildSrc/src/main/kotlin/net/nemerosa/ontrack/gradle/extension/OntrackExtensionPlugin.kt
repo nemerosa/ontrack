@@ -26,8 +26,8 @@ class OntrackExtensionPlugin : Plugin<Project> {
 
         target.apply<NodePlugin>()
         target.configure<NodeExtension> {
-            version = "8.10.0"
-            npmVersion = "5.7.1"
+            version = "20.2.0"
+            npmVersion = "9.6.6"
             isDownload = true
         }
 

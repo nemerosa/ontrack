@@ -49,7 +49,12 @@ var TEMPLATE_HEADER = 'angular.module("<%= module %>"<%= standalone %>).run(["$l
 gulp.task('js:templates', function () {
     return gulp.src(templateSources)
         .pipe(debug({title: 'templates:input:'}))
-        .pipe(templateCache({module: 'ontrack-extension-' + options.extension + '-templates', standalone: true, root: '', templateHeader: TEMPLATE_HEADER}))
+        .pipe(templateCache({
+            module: 'ontrack-extension-' + options.extension + '-templates',
+            standalone: true,
+            root: '',
+            templateHeader: TEMPLATE_HEADER
+        }))
         .pipe(gulp.dest(buildTemplates))
         .pipe(debug({title: 'templates:output:'}))
         ;
@@ -70,8 +75,9 @@ gulp.task('js:lint', function () {
  * Converted files
  */
 
-gulp.task('js:conversion', ['js:lint'], function () {
-    return gulp.src(jsSources)
+gulp.task('js:conversion', gulp.series(
+    'js:lint',
+    () => gulp.src(jsSources)
         .pipe(debug({title: 'js:conversion:input'}))
         .pipe(babel({
             "presets": [
@@ -82,22 +88,27 @@ gulp.task('js:conversion', ['js:lint'], function () {
             ]
         }))
         .pipe(gulp.dest(buildConverted))
-        .pipe(debug({title: 'js:conversion:output'}));
-});
+        .pipe(debug({title: 'js:conversion:output'}))
+))
 
 // Sorted and annotated Angular files
 
-gulp.task('js', ['js:lint', 'js:templates', 'js:conversion'], function () {
-    return gulp.src([buildTemplates + '/*.js', buildConverted  + '/**/*.js'])
-        .pipe(debug({title: 'js:input'}))
-        .pipe(ngAnnotate())
-        .pipe(ngFilesort())
-        .pipe(uglify())
-        .pipe(concat('module.js'))
-        .pipe(gulp.dest(buildDist))
-        .pipe(debug({title: 'js:output'}));
-});
+gulp.task('js', gulp.series(
+    'js:lint',
+    'js:templates',
+    'js:conversion',
+    function () {
+        return gulp.src([buildTemplates + '/*.js', buildConverted + '/**/*.js'])
+            .pipe(debug({title: 'js:input'}))
+            .pipe(ngAnnotate())
+            .pipe(ngFilesort())
+            .pipe(uglify())
+            .pipe(concat('module.js'))
+            .pipe(gulp.dest(buildDist))
+            .pipe(debug({title: 'js:output'}))
+    }
+))
 
 // Default build
 
-gulp.task('default', ['js']);
+gulp.task('default', gulp.series('js'));
