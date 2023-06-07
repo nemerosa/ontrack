@@ -129,7 +129,7 @@ class OntrackExtensionPlugin : Plugin<Project> {
                 rename { "${ontrack.id(project)}.properties" }
             }
             exclude("static/**/*.js")
-            exclude("static/**/*.html")
+            // exclude("static/**/*.html")
         }
 
     }
