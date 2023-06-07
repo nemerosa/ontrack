@@ -22,6 +22,7 @@ spring:
         enabled: true
       printer:
         enabled: true
+      locations: "classpath*:graphql/**"
 
 # Compression of web resources
 server:
