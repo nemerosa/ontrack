@@ -121,7 +121,7 @@ val generateVersionInfo by tasks.registering {
         file.writeText("""
             # This file is generated at build time to contain version information
             # Do not edit it, do not commit it
-            ontrack.ersion.date = $timestamp
+            ontrack.version.date = $timestamp
             ontrack.version.display = ${info.display}
             ontrack.version.full = ${info.full}
             ontrack.version.branch = ${info.branchId}
