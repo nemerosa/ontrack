@@ -41,8 +41,8 @@ plugins {
     id("nebula.deb") version "8.1.0"
     id("nebula.rpm") version "8.1.0"
     id("org.sonarqube") version "2.5"
-    id("com.avast.gradle.docker-compose") version "0.14.3"
-    id("com.bmuschko.docker-remote-api") version "6.4.0"
+    id("com.avast.gradle.docker-compose") version "0.16.12"
+    id("com.bmuschko.docker-remote-api") version "9.3.1"
     id("org.springframework.boot") version Versions.springBootVersion apply false
     id("io.freefair.aggregate-javadoc") version "4.1.2"
     id("com.github.breadmoirai.github-release") version "2.2.11"
@@ -87,8 +87,8 @@ val itProject: String by project
 
 configure<ComposeExtension> {
     createNested("integrationTest").apply {
-        useComposeFiles = listOf("compose/docker-compose-it.yml")
-        projectName = itProject
+        useComposeFiles.addAll(listOf("compose/docker-compose-it.yml"))
+        setProjectName(itProject)
     }
 }
 
@@ -456,10 +456,10 @@ val dockerBuild by tasks.registering(DockerBuildImage::class) {
 
 dockerCompose {
     createNested("local").apply {
-        useComposeFiles = listOf("compose/docker-compose-local.yml")
-        projectName = "ci"
-        captureContainersOutputToFiles = project.file("${project.buildDir}/local-logs")
-        tcpPortsToIgnoreWhenWaiting = listOf(8083, 8086)
+        useComposeFiles.set(listOf("compose/docker-compose-local.yml"))
+        setProjectName("ci")
+        captureContainersOutputToFiles.set(project.file("${project.buildDir}/local-logs"))
+        tcpPortsToIgnoreWhenWaiting.set(listOf(8083, 8086))
     }
 }
 
@@ -494,11 +494,11 @@ val devPostgresPort: String by project
 
 dockerCompose {
     createNested("dev").apply {
-        useComposeFiles = listOf("compose/docker-compose-dev.yml")
-        projectName = "dev"
-        captureContainersOutputToFiles = project.file("${project.buildDir}/dev-logs")
-        environment["POSTGRES_NAME"] = devPostgresName
-        environment["POSTGRES_PORT"] = devPostgresPort
+        useComposeFiles.set(listOf("compose/docker-compose-dev.yml"))
+        setProjectName("dev")
+        captureContainersOutputToFiles.set(project.file("${project.buildDir}/dev-logs"))
+        environment.put("POSTGRES_NAME", devPostgresName)
+        environment.put("POSTGRES_PORT", devPostgresPort)
     }
 }
 
