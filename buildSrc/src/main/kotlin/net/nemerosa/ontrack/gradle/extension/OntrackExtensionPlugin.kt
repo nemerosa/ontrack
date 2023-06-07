@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.gradle.extension
 
-import com.moowork.gradle.node.NodeExtension
-import com.moowork.gradle.node.NodePlugin
-import com.moowork.gradle.node.npm.NpmInstallTask
-import com.moowork.gradle.node.task.NodeTask
+import com.github.gradle.node.NodeExtension
+import com.github.gradle.node.NodePlugin
+import com.github.gradle.node.npm.task.NpmInstallTask
+import com.github.gradle.node.task.NodeTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.jvm.tasks.Jar
@@ -26,9 +26,9 @@ class OntrackExtensionPlugin : Plugin<Project> {
 
         target.apply<NodePlugin>()
         target.configure<NodeExtension> {
-            version = "20.2.0"
-            npmVersion = "9.6.6"
-            isDownload = true
+            version.set("20.2.0")
+            npmVersion.set("9.6.6")
+            download.set(true)
         }
 
         /**
@@ -45,7 +45,7 @@ class OntrackExtensionPlugin : Plugin<Project> {
         val copyPackageJson by target.tasks.registering {
             doLast {
                 logger.info("[ontrack] Copies the package.json file to ${target.projectDir}")
-                OntrackExtensionPlugin::class.java.getResourceAsStream("/extension/package.json").copyTo(
+                OntrackExtensionPlugin::class.java.getResourceAsStream("/extension/package.json")!!.copyTo(
                         target.file("package.json").outputStream()
                 )
             }
@@ -54,7 +54,7 @@ class OntrackExtensionPlugin : Plugin<Project> {
         val copyGulpFile by target.tasks.registering {
             doLast {
                 logger.info("[ontrack] Copies the gulpfile.js file to ${target.projectDir}")
-                OntrackExtensionPlugin::class.java.getResourceAsStream("/extension/gulpfile.js").copyTo(
+                OntrackExtensionPlugin::class.java.getResourceAsStream("/extension/gulpfile.js")!!.copyTo(
                         target.file("gulpfile.js").outputStream()
                 )
             }
@@ -62,7 +62,7 @@ class OntrackExtensionPlugin : Plugin<Project> {
 
         target.tasks.named<NpmInstallTask>("npmInstall") {
             dependsOn(copyPackageJson)
-            setWorkingDir(target.projectDir)
+            workingDir.set(target.projectDir)
             inputs.file(target.file("package.json"))
             outputs.dir(target.file("node_modules"))
         }
@@ -85,15 +85,15 @@ class OntrackExtensionPlugin : Plugin<Project> {
                 logger.info("[ontrack] Generating web resources of ${ontrack.id(project)} in ${target.buildDir}")
             }
 
-            setWorkingDir(target.projectDir)
-            script = target.file("node_modules/gulp/bin/gulp.js")
-            addArgs(
+            workingDir.set(target.projectDir)
+            script.set(target.file("node_modules/gulp/bin/gulp.js"))
+            args.set(listOf(
                     "default",
                     "--extension", ontrack.id(project),
-                    "--version", target.version,
-                    "--src", target.file("src/main/resources/static"),
-                    "--target", target.buildDir
-            )
+                    "--version", target.version.toString(),
+                    "--src", target.file("src/main/resources/static").absolutePath,
+                    "--target", target.buildDir.absolutePath
+            ))
         }
 
         /**
