@@ -1,50 +1,47 @@
 /**
  * Gulp script used to package the web resources of an extension
  */
-
-var gulp = require('gulp');
-var concat = require('gulp-concat');
-var jshint = require('gulp-jshint');
-var uglify = require('gulp-uglify');
-var templateCache = require('gulp-angular-templatecache');
-var ngAnnotate = require('gulp-ng-annotate');
-var ngFilesort = require('gulp-angular-filesort');
-var debug = require('gulp-debug');
-var minimist = require('minimist');
-var babel = require("gulp-babel");
+const gulp = require('gulp');
+const concat = require('gulp-concat');
+const jshint = require('gulp-jshint');
+const uglify = require('gulp-uglify');
+const templateCache = require('gulp-angular-templatecache');
+const ngAnnotate = require('gulp-ng-annotate');
+const ngFilesort = require('gulp-angular-filesort');
+const debug = require('gulp-debug');
+const babel = require("gulp-babel");
 
 // Arguments
 
-var knownOptions = {
-    string: ['extension', 'version', 'src', 'target'],
-    default: {version: 'snapshot'}
-};
-
-var options = minimist(process.argv.slice(2), knownOptions);
+const options = {
+    version: process.env.VERSION,
+    src: process.env.SRC,
+    extension: process.env.EXTENSION,
+    target: process.env.TARGET,
+}
 
 // Sources
 
-var src = options.src;
+const src = options.src;
 
-var templateSources = src + '/**/*.html';
-var jsSources = src + '/**/*.js';
+const templateSources = src + '/**/*.html';
+const jsSources = src + '/**/*.js';
 
 // Targets
 
-var build = options.target;
+const build = options.target;
 
-var buildConverted = build + '/converted';
-var buildPath = build + '/web';
-var buildTemplates = buildPath + '/templates';
-var buildDist = buildPath + '/dist';
+const buildConverted = build + '/converted';
+const buildPath = build + '/web';
+const buildTemplates = buildPath + '/templates';
+const buildDist = buildPath + '/dist';
 
 // NG templates
 // By default, the 'gulp-angular-templatecache' registers a `run` hook into the main application module. But when
 // we load the extensions, it's already too late and this methid won't be run.
 // We have to explicitly register a module and have its initialisation being run.
 
-var TEMPLATE_HEADER = 'angular.module("<%= module %>"<%= standalone %>).run(["$log", "$templateCache", function($log, $templateCache) { ' +
-    '$log.info("Loading templates for ' + options.extension + ' @ ' + options.version + '");';
+const TEMPLATE_HEADER = `angular.module("<%= module %>"<%= standalone %>).run(["$log", "$templateCache", function($log, $templateCache) { $log.info("Loading templates for ${options.extension} @ ${options.version}");`;
 
 gulp.task('js:templates', function () {
     return gulp.src(templateSources)

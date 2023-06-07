@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.gradle.extension
 import com.github.gradle.node.NodeExtension
 import com.github.gradle.node.NodePlugin
 import com.github.gradle.node.npm.task.NpmInstallTask
-import com.github.gradle.node.task.NodeTask
+import com.github.gradle.node.npm.task.NpmTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.jvm.tasks.Jar
@@ -71,7 +71,7 @@ class OntrackExtensionPlugin : Plugin<Project> {
          * Gulp call
          */
 
-        val web by target.tasks.registering(NodeTask::class) {
+        val web by target.tasks.registering(NpmTask::class) {
             dependsOn(target.tasks.named("npmInstall"))
             dependsOn(copyGulpFile)
 
@@ -86,14 +86,15 @@ class OntrackExtensionPlugin : Plugin<Project> {
             }
 
             workingDir.set(target.projectDir)
-            script.set(target.file("node_modules/gulp/bin/gulp.js"))
-            args.set(listOf(
-                    "default",
-                    "--extension", ontrack.id(project),
-                    "--version", target.version.toString(),
-                    "--src", target.file("src/main/resources/static").absolutePath,
-                    "--target", target.buildDir.absolutePath
-            ))
+            environment.putAll(
+                mapOf(
+                    "EXTENSION" to ontrack.id(project),
+                    "VERSION" to target.version.toString(),
+                    "SRC" to target.file("src/main/resources/static").absolutePath,
+                    "TARGET" to target.buildDir.absolutePath,
+                )
+            )
+            args.set(listOf("gulp"))
         }
 
         /**

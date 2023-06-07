@@ -22,7 +22,6 @@
     "gulp-uglify": "^3.0.2",
     "gulp-ng-annotate": "^2.1.0",
     "gulp-angular-filesort": "^1.2.1",
-    "minimist": "^1.2.8",
     "babel-core": "^6.26.3",
     "gulp-babel": "^7.0.1",
     "gulp-sourcemaps": "^3.0.0",
