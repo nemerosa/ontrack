@@ -9,7 +9,7 @@ plugins {
 apply(plugin = "org.springframework.boot")
 apply(plugin = "com.bmuschko.docker-remote-api")
 
-val seleniumVersion = "4.7.2"
+val seleniumVersion = "4.9.1"
 
 dependencies {
     implementation("org.codehaus.groovy:groovy")
@@ -24,7 +24,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter")
 
     testImplementation("org.influxdb:influxdb-java")
-    testImplementation("org.keycloak:keycloak-admin-client:12.0.4")
+    testImplementation("org.keycloak:keycloak-admin-client:21.1.1")
 
     testImplementation("org.seleniumhq.selenium:selenium-java:$seleniumVersion")
     testImplementation("org.seleniumhq.selenium:selenium-support:$seleniumVersion")

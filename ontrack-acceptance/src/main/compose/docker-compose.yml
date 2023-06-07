@@ -25,7 +25,7 @@ services:
     image: influxdb:1.8.6
 
    keycloak:
-      image: quay.io/keycloak/keycloak:12.0.4
+      image: quay.io/keycloak/keycloak:21.1.1
       environment:
          KEYCLOAK_USER: admin
          KEYCLOAK_PASSWORD: admin
@@ -72,7 +72,7 @@ services:
          # Notifications
          ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_ENABLED: "false"
    selenium:
-      image: "selenium/standalone-chrome:108.0"
+      image: "selenium/standalone-chrome:113.0"
       shm_size: 2g
       environment:
          SE_OPTS: "--log-level INFO"

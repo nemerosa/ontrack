@@ -451,7 +451,7 @@ val dockerBuild by tasks.registering(DockerBuildImage::class) {
 }
 
 /**
- * Acceptance tasks
+ * Acceptance tasks running from the JAR
  */
 
 dockerCompose {
@@ -484,6 +484,23 @@ tasks.register("localAcceptanceTest", RemoteAcceptanceTest::class) {
     dependsOn("localComposeUp")
     dependsOn(":ontrack-acceptance:assemble")
     finalizedBy("localComposeDown")
+}
+
+/**
+ * Acceptance tests running as Docker Compose
+ */
+
+dockerCompose {
+    createNested("acceptance").apply {
+        useComposeFiles.set(listOf("ontrack-acceptance/src/main/compose/docker-compose.yml"))
+        setProjectName("acceptance")
+        tcpPortsToIgnoreWhenWaiting.set(listOf(8083, 8086))
+    }
+}
+
+tasks.named<ComposeUp>("acceptanceComposeUp") {
+    dependsOn(":ontrack-acceptance:dockerBuild")
+    dependsOn(":dockerBuild")
 }
 
 /**

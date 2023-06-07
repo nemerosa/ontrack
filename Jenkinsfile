@@ -202,6 +202,7 @@ pipeline {
                 timeout(time: 25, unit: 'MINUTES') {
                     sh '''
                         cd ontrack-acceptance/src/main/compose
+                        mkdir -p build
                         docker-compose \\
                             --project-name local \\
                             --file docker-compose.yml \\
@@ -231,7 +232,7 @@ pipeline {
                     archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/build/**", allowEmptyArchive: true)
                     sh '''
                         rm -rf build/acceptance
-                        mkdir -p build
+                        mkdir -p build/acceptance
                         cp -r ontrack-acceptance/src/main/compose/build build/acceptance
                         '''
                     ontrackCliValidateTests(
