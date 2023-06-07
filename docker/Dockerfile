@@ -68,5 +68,5 @@ ENTRYPOINT ["/opt/ontrack/start.sh"]
 COPY ontrack.jar /opt/ontrack/
 
 # Healthcheck
-HEALTHCHECK --interval=1m --timeout=10s \
+HEALTHCHECK --interval=10s --timeout=10s \
   CMD curl -f http://localhost:8800/manage/info || exit 1
