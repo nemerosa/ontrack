@@ -14,7 +14,8 @@
   },
   "scripts": {
     "bower": "bower install --allow-root",
-    "dev": "gulp dev"
+    "dev": "gulp dev",
+    "prod": "gulp"
   },
   "devDependencies": {
     "bower": "^1.8.14",
@@ -24,7 +25,6 @@
     "gulp-concat": "^2.6.1",
     "gulp-livereload": "^4.0.2",
     "gulp-inject": "^5.0.5",
-    "minimist": "^1.2.8",
     "gulp-debug": "^4.0.0",
     "gulp-jshint": "^2.1.0",
     "gulp-angular-templatecache": "^3.0.1",

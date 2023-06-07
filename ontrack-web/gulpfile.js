@@ -11,18 +11,12 @@ const templateCache = require('gulp-angular-templatecache');
 const ngAnnotate = require('gulp-ng-annotate');
 const ngFilesort = require('gulp-angular-filesort');
 const debug = require('gulp-debug');
-const minimist = require('minimist');
 const babel = require("gulp-babel");
 const sourcemaps = require('gulp-sourcemaps');
 
 // Arguments
 
-const knownOptions = {
-    string: 'version',
-    default: {version: 'snapshot'}
-};
-
-const options = minimist(process.argv.slice(2), knownOptions);
+const version = process.env.VERSION
 
 // Paths
 
@@ -141,7 +135,7 @@ gulp.task('js:concat', gulp.series(
         jsSource.push(buildAngular + '/*.js');
         return gulp.src(jsSource)
             .pipe(debug({title: 'js:concat:input'}))
-            .pipe(concat('ci-' + options.version + '.js'))
+            .pipe(concat('ci-' + version + '.js'))
             .pipe(uglify())
             .pipe(gulp.dest(outputJs))
             .pipe(debug({title: 'js:concat:output'}))
@@ -156,7 +150,7 @@ gulp.task('less', function () {
         .pipe(debug({title: 'less:input:'}))
         .pipe(less())
         .pipe(debug({title: 'less:output:'}))
-        .pipe(concat('ci-' + options.version + '.css'))
+        .pipe(concat('ci-' + version + '.css'))
         .pipe(gulp.dest(buildCss))
         .pipe(liveReload());
 });
@@ -173,7 +167,7 @@ gulp.task('css:concat', function () {
     )
         .pipe(debug({title: 'css:concat:input'}))
         .pipe(minifyCss())
-        .pipe(concat('ci-' + options.version + '.css'))
+        .pipe(concat('ci-' + version + '.css'))
         .pipe(debug({title: 'css:concat:output'}))
         .pipe(gulp.dest(outputCss));
 });

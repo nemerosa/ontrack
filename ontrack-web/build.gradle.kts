@@ -1,4 +1,5 @@
 import com.github.gradle.node.NodeExtension
+import com.github.gradle.node.npm.task.NpmTask
 import com.github.gradle.node.task.NodeTask
 
 plugins {
@@ -41,17 +42,16 @@ tasks.named<Delete>("clean") {
 
 // Web packaging
 
-val dev by tasks.registering(NodeTask::class) {
+val dev by tasks.registering(NpmTask::class) {
     dependsOn(bowerInstall)
-    script.set(file("node_modules/gulp/bin/gulp.js"))
-    args.set(listOf("dev"))
+    args.set(listOf("run", "dev"))
 }
 
-val prod by tasks.registering(NodeTask::class) {
+val prod by tasks.registering(NpmTask::class) {
     dependsOn(bowerInstall)
-    script.set(file("node_modules/gulp/bin/gulp.js"))
+    environment.put("VERSION", version.toString())
     args.set(
-        listOf("default", "--version", version.toString())
+        listOf("run", "prod")
     )
     inputs.dir("src")
     inputs.file("bower.json")
