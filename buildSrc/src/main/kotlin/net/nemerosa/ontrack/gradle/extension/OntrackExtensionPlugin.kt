@@ -94,7 +94,7 @@ class OntrackExtensionPlugin : Plugin<Project> {
                     "TARGET" to target.buildDir.absolutePath,
                 )
             )
-            args.set(listOf("gulp"))
+            args.set(listOf("run", "web"))
         }
 
         /**
