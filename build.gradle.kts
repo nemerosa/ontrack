@@ -482,6 +482,7 @@ tasks.register("localAcceptanceTest", RemoteAcceptanceTest::class) {
     acceptanceTimeout = 300
     acceptanceImplicitWait = 30
     dependsOn("localComposeUp")
+    dependsOn(":ontrack-acceptance:assemble")
     finalizedBy("localComposeDown")
 }
 
