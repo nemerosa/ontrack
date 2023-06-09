@@ -207,7 +207,8 @@ pipeline {
                             --project-name local \\
                             --file docker-compose.yml \\
                             up \\
-                            --exit-code-from ontrack_acceptance
+                            --exit-code-from ontrack_acceptance \\
+                            > docker-compose-acceptance.log
                         '''
                 }
             }
@@ -227,8 +228,7 @@ pipeline {
                             --file docker-compose.yml \\
                             logs selenium > docker-compose-acceptance-selenium.log
                     '''
-                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance-ontrack.log", allowEmptyArchive: true)
-                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance-selenium.log", allowEmptyArchive: true)
+                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/*.log", allowEmptyArchive: true)
                     archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/build/**", allowEmptyArchive: true)
                     sh '''
                         rm -rf build/acceptance
