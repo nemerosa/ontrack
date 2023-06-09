@@ -216,13 +216,17 @@ pipeline {
                 always {
                     sh '''
                         cd ontrack-acceptance/src/main/compose
+
                         docker-compose  \\
                             --project-name local \\
                             --file docker-compose.yml \\
                             logs ontrack > docker-compose-acceptance-ontrack.log
-                    '''
-                    sh '''
-                        cd ontrack-acceptance/src/main/compose
+
+                        docker-compose  \\
+                            --project-name local \\
+                            --file docker-compose.yml \\
+                            logs ontrack_acceptance > docker-compose-acceptance-ontrack_acceptance.log
+
                         docker-compose  \\
                             --project-name local \\
                             --file docker-compose.yml \\
