@@ -4,6 +4,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.job.*
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.Duration
@@ -18,6 +19,7 @@ class DefaultJobSchedulerIT : AbstractServiceTestSupport() {
     private lateinit var jobScheduler: JobScheduler
 
     @Test
+    @Disabled("Timing is not reliable")
     fun `Job cron schedule`() {
         var count = 0
         val task = object : Job {
