@@ -177,6 +177,7 @@ pipeline {
                             -Dorg.gradle.jvmargs=-Xmx2048m \\
                             --stacktrace \\
                             --console plain \\
+                            --parallel \\
                             :ontrack-kdsl-acceptance:kdslAcceptanceTest
                         '''
                 }
@@ -210,6 +211,7 @@ pipeline {
                             -Dorg.gradle.jvmargs=-Xmx3072m \\
                             --stacktrace \\
                             --console plain \\
+                            --parallel \\
                             :ontrack-acceptance:acceptanceTest
                         '''
                 }
