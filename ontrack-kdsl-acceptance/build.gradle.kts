@@ -66,7 +66,6 @@ tasks.named<Test>("test") {
 
 // Running the acceptance tests
 
-
 val kdslAcceptanceTest by tasks.registering(Test::class) {
     useJUnitPlatform()
     mustRunAfter("test")

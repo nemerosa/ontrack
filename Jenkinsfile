@@ -8,9 +8,14 @@ pipeline {
 
     parameters {
         booleanParam(
-                name: 'SKIP_ACCEPTANCE',
+                name: 'SKIP_KDSL_ACCEPTANCE',
                 defaultValue: false,
-                description: 'Skipping acceptance tests'
+                description: 'Skipping KDSL acceptance tests'
+        )
+        booleanParam(
+                name: 'SKIP_LEGACY_ACCEPTANCE',
+                defaultValue: false,
+                description: 'Skipping legacy acceptance tests'
         )
     }
 
@@ -152,7 +157,7 @@ pipeline {
                     branch 'master'
                 }
                 expression {
-                    return !params.SKIP_ACCEPTANCE
+                    return !params.SKIP_KDSL_ACCEPTANCE
                 }
             }
             environment {
@@ -195,111 +200,29 @@ pipeline {
                     branch 'master'
                 }
                 expression {
-                    return !params.SKIP_ACCEPTANCE
+                    return !params.SKIP_LEGACY_ACCEPTANCE
                 }
             }
             steps {
-                timeout(time: 25, unit: 'MINUTES') {
+                timeout(time: 30, unit: 'MINUTES') {
                     sh '''
-                        cd ontrack-acceptance/src/main/compose
-                        mkdir -p build
-                        docker-compose \\
-                            --project-name local \\
-                            --file docker-compose.yml \\
-                            up \\
-                            --exit-code-from ontrack_acceptance \\
-                            > docker-compose-acceptance.log
+                        ./gradlew \\
+                            -Dorg.gradle.jvmargs=-Xmx3072m \\
+                            --stacktrace \\
+                            --console plain \\
+                            :ontrack-acceptance:acceptanceTest
                         '''
                 }
             }
             post {
                 always {
-                    sh '''
-                        cd ontrack-acceptance/src/main/compose
-
-                        docker-compose  \\
-                            --project-name local \\
-                            --file docker-compose.yml \\
-                            logs ontrack > docker-compose-acceptance-ontrack.log
-
-                        docker-compose  \\
-                            --project-name local \\
-                            --file docker-compose.yml \\
-                            logs ontrack_acceptance > docker-compose-acceptance-ontrack_acceptance.log
-
-                        docker-compose  \\
-                            --project-name local \\
-                            --file docker-compose.yml \\
-                            logs selenium > docker-compose-acceptance-selenium.log
-                    '''
-                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/*.log", allowEmptyArchive: true)
-                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/build/**", allowEmptyArchive: true)
-                    sh '''
-                        rm -rf build/acceptance
-                        mkdir -p build/acceptance
-                        cp -r ontrack-acceptance/src/main/compose/build build/acceptance
-                        '''
                     ontrackCliValidateTests(
-                        stamp: 'ACCEPTANCE',
-                        pattern: 'build/acceptance/*.xml',
+                            stamp: 'ACCEPTANCE',
+                            pattern: 'ontrack-acceptance/build/test-results/**/*.xml',
                     )
                 }
-                cleanup {
-                    sh '''
-                        cd ontrack-acceptance/src/main/compose
-                        docker-compose \\
-                            --project-name local \\
-                            --file docker-compose.yml \\
-                            down --volumes
-                    '''
-                }
-            }
-        }
-
-        stage('Local Vault tests') {
-            when {
-                not {
-                    branch "master"
-                }
-                expression {
-                    return !params.SKIP_ACCEPTANCE
-                }
-            }
-            steps {
-                timeout(time: 25, unit: 'MINUTES') {
-                    // Cleanup
-                    sh ' rm -rf ontrack-acceptance/src/main/compose/build '
-                    // Launches the tests
-                    sh '''
-                        cd ontrack-acceptance/src/main/compose
-                        docker-compose \\
-                            --project-name vault \\
-                            --file docker-compose-vault.yml \\
-                            up \\
-                            --exit-code-from ontrack_acceptance
-                    '''
-                }
-            }
-            post {
-                always {
-                    sh '''
-                        mkdir -p build
-                        rm -rf build/vault
-                        cp -r ontrack-acceptance/src/main/compose/build build/vault
-                    '''
-                    ontrackCliValidateTests(
-                            stamp: 'VAULT',
-                            pattern: 'build/vault/*.xml',
-                    )
-                }
-                cleanup {
-                    sh '''
-                        cd ontrack-acceptance/src/main/compose
-                        docker-compose \\
-                            --project-name vault \\
-                            --file docker-compose-vault.yml \\
-                            down --volumes
-                    '''
+                failure {
+                    archiveArtifacts(artifacts: "ontrack-acceptance/build/logs/**", allowEmptyArchive: true)
                 }
             }
         }
