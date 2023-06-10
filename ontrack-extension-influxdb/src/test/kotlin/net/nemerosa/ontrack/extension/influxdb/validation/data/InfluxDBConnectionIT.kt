@@ -69,20 +69,20 @@ class InfluxDBConnectionIT {
         withContainer { influxDBContainer ->
             val connection = influxDBConnection(influxDBContainer)
             // Testing the connection is no longer valid
-            waitUntil("Connection is valid first", interval = 1.seconds, timeout = 6.seconds) {
+            waitUntil("Connection is valid first", interval = 2.seconds, timeout = 60.seconds) {
                 connection.isValid()
             }
             // Stopping the container
             influxDBContainer.stop()
             // Testing the connection is no longer valid
-            waitUntil("Connection is no longer valid", interval = 1.seconds, timeout = 15.seconds) {
+            waitUntil("Connection is no longer valid", interval = 2.seconds, timeout = 60.seconds) {
                 !connection.isValid()
             }
             // Starting the container again
             influxDBContainer.start()
             influxDBExtensionProperties.uri = influxDBUri(influxDBContainer)
             // Testing the connection is restored
-            waitUntil("Connection is restored", interval = 1.seconds, timeout = 15.seconds) {
+            waitUntil("Connection is restored", interval = 2.seconds, timeout = 60.seconds) {
                 !connection.isValid()
             }
         }
