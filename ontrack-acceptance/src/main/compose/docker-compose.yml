@@ -24,14 +24,14 @@ services:
    influxdb:
     image: influxdb:1.8.6
 
-   keycloak:
-      image: quay.io/keycloak/keycloak:21.1.1
-      command:
-         -  start-dev
-      environment:
-         KEYCLOAK_USER: admin
-         KEYCLOAK_PASSWORD: admin
-         DB_VENDOR: h2
+#   keycloak:
+#      image: quay.io/keycloak/keycloak:21.1.1
+#      command:
+#         -  start-dev
+#      environment:
+#         KEYCLOAK_USER: admin
+#         KEYCLOAK_PASSWORD: admin
+#         DB_VENDOR: h2
 
    # Rabbit MQ
    rabbitmq:
