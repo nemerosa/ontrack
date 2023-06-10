@@ -26,6 +26,8 @@ services:
 
    keycloak:
       image: quay.io/keycloak/keycloak:21.1.1
+      command:
+         -  start-dev
       environment:
          KEYCLOAK_USER: admin
          KEYCLOAK_PASSWORD: admin
@@ -72,7 +74,7 @@ services:
          # Notifications
          ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_ENABLED: "false"
    selenium:
-      image: "selenium/standalone-chrome:113.0"
+      image: "seleniarm/standalone-chromium:112.0"
       shm_size: 2g
       environment:
          SE_OPTS: "--log-level INFO"
