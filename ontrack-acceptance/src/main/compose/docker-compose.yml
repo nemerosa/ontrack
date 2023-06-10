@@ -51,8 +51,8 @@ services:
             condition: service_started
          influxdb:
            condition: service_started
-         keycloak:
-            condition: service_started
+#         keycloak:
+#            condition: service_started
          elasticsearch:
            condition: service_started
       environment:
@@ -83,8 +83,8 @@ services:
       depends_on:
          ontrack:
             condition: service_healthy
-         keycloak:
-            condition: service_started
+#         keycloak:
+#            condition: service_started
          selenium:
             condition: service_started
       environment:
@@ -94,7 +94,7 @@ services:
          ONTRACK_ACCEPTANCE_IMPLICIT_WAIT: 60
          ONTRACK_ACCEPTANCE_TARGET_URL: http://ontrack:8080
          ONTRACK_ACCEPTANCE_INFLUXDB_URI: http://influxdb:8086
-         ONTRACK_ACCEPTANCE_KEYCLOAK_URI: http://keycloak:8080
+#         ONTRACK_ACCEPTANCE_KEYCLOAK_URI: http://keycloak:8080
          JAVA_OPTIONS: "-Xmx3072m -Xms3072m"
       volumes:
          - "./build:/ontrack/acceptance/output:rw"
