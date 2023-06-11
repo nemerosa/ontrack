@@ -5,8 +5,14 @@ import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.json.getRequiredBooleanField
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.context.TestPropertySource
 import kotlin.test.assertTrue
 
+@TestPropertySource(
+    properties = [
+        "spring.graphql.schema.locations=classpath*:graphql/**/",
+    ]
+)
 class NotificationsGraphQLControllerIT : AbstractQLKTITSupport() {
 
     @Autowired
