@@ -1,39 +1,43 @@
-package net.nemerosa.ontrack.model.security;
+package net.nemerosa.ontrack.model.security
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import net.nemerosa.ontrack.model.preferences.Preferences;
-import net.nemerosa.ontrack.model.structure.Entity;
-import net.nemerosa.ontrack.model.support.Action;
+import net.nemerosa.ontrack.model.preferences.Preferences
+import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityDefined
+import net.nemerosa.ontrack.model.support.Action
 
-import java.util.ArrayList;
-import java.util.List;
+open class ConnectedAccount(
+    val account: Account?,
+    val preferences: Preferences,
+    private val actions: MutableList<Action> = mutableListOf(),
+) {
 
-@Data
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class ConnectedAccount {
+    val isLogged: Boolean
+        get() = account != null
 
-    private final Account account;
-    private final Preferences preferences;
-    private final List<Action> actions = new ArrayList<>();
-
-    public static ConnectedAccount none() {
-        return new ConnectedAccount(null, new Preferences());
+    fun add(action: Action): ConnectedAccount {
+        actions.add(action)
+        return this
     }
 
-    public static ConnectedAccount of(Account account, Preferences preferences) {
-        Entity.isEntityDefined(account, "Account must be defined");
-        return new ConnectedAccount(account, preferences);
+    fun filterActions() = ConnectedAccount(
+        account = account,
+        preferences = preferences,
+        actions = actions.filter { it.enabled }.toMutableList(),
+    )
+
+    @Suppress("unused")
+    fun getActions(): List<Action> {
+        return actions
     }
 
-    public boolean isLogged() {
-        return account != null;
-    }
+    companion object {
 
-    public ConnectedAccount add(Action action) {
-        actions.add(action);
-        return this;
-    }
+        @JvmStatic
+        fun none(): ConnectedAccount = ConnectedAccount(null, Preferences())
 
+        @JvmStatic
+        fun of(account: Account?, preferences: Preferences): ConnectedAccount {
+            isEntityDefined(account, "Account must be defined")
+            return ConnectedAccount(account, preferences)
+        }
+    }
 }

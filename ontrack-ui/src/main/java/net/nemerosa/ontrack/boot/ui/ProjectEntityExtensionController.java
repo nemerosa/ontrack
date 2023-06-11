@@ -47,6 +47,7 @@ public class ProjectEntityExtensionController extends AbstractProjectEntityContr
                         .map(x -> x.getAction(getEntity(entityType, id)).map(action -> resolveExtensionAction(x, action)))
                         .filter(Optional::isPresent)
                         .map(Optional::get)
+                        .filter(Action::getEnabled)
                         .collect(Collectors.toList()),
                 uri(MvcUriComponentsBuilder.on(getClass()).getActions(entityType, id))
         );

@@ -1,0 +1,10 @@
+"""Notification settings"""
+type NotificationSettings {
+    """Are the notifications enabled for this Ontrack instance?"""
+    enabled: Boolean!
+}
+
+extend type Query {
+    """Notification settings"""
+    notificationSettings: NotificationSettings
+}

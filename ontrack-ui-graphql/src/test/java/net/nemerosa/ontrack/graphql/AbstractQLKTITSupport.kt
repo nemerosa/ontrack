@@ -14,11 +14,17 @@ import org.springframework.graphql.ExecutionGraphQlResponse
 import org.springframework.graphql.ExecutionGraphQlService
 import org.springframework.graphql.ResponseError
 import org.springframework.graphql.support.DefaultExecutionGraphQlRequest
+import org.springframework.test.context.TestPropertySource
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.fail
 
+@TestPropertySource(
+    properties = [
+        "spring.graphql.schema.locations=classpath*:graphql/**"
+    ]
+)
 abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
 
     @Autowired

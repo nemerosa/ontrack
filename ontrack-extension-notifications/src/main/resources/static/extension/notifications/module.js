@@ -830,4 +830,18 @@ angular.module('ontrack.extension.notifications', [
             loadDeliveries();
         };
     })
+    .directive('otExtensionNotificationsSettingsNotice', function (otGraphqlService) {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/notifications/directive.settingsNotice.tpl.html',
+            scope: {},
+            controller: function ($scope) {
+                $scope.notificationSettingsLoaded = false;
+                otGraphqlService.pageGraphQLCall(`{ notificationSettings { enabled } }`).then(data => {
+                    $scope.notificationSettingsEnabled = data.notificationSettings.enabled;
+                    $scope.notificationSettingsLoaded = true;
+                });
+            }
+        };
+    })
 ;
