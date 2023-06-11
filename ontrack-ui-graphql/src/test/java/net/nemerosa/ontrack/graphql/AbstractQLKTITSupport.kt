@@ -20,20 +20,15 @@ import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.fail
 
-@TestPropertySource(
-    properties = [
-        "spring.graphql.schema.locations=classpath*:graphql/**"
-    ]
-)
 abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
 
     @Autowired
     private lateinit var executionGraphQlService: ExecutionGraphQlService
 
     private fun <T> authenticatedRun(
-            query: String,
-            variables: Map<String, Any?> = emptyMap(),
-            responseProcessing: (response: ExecutionGraphQlResponse) -> T,
+        query: String,
+        variables: Map<String, Any?> = emptyMap(),
+        responseProcessing: (response: ExecutionGraphQlResponse) -> T,
     ): T {
         // Task to run
         val code = { internalRun(query, variables, responseProcessing) }
@@ -46,23 +41,23 @@ abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
     }
 
     fun run(
-            query: String,
-            variables: Map<String, Any?> = emptyMap()
+        query: String,
+        variables: Map<String, Any?> = emptyMap()
     ): JsonNode = authenticatedRun(query, variables, ::assertNoErrors)
 
     fun run(
-            query: String,
-            variables: Map<String, Any?> = emptyMap(),
-            code: (data: JsonNode) -> Unit = {},
+        query: String,
+        variables: Map<String, Any?> = emptyMap(),
+        code: (data: JsonNode) -> Unit = {},
     ) {
         code(authenticatedRun(query, variables, ::assertNoErrors))
     }
 
     fun runWithError(
-            query: String,
-            variables: Map<String, Any?> = emptyMap(),
-            errorClassification: ErrorClassification? = null,
-            errorMessage: String? = null,
+        query: String,
+        variables: Map<String, Any?> = emptyMap(),
+        errorClassification: ErrorClassification? = null,
+        errorMessage: String? = null,
     ) {
         authenticatedRun(query, variables) { response ->
             val errors = response.errors
@@ -87,7 +82,8 @@ abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
                 } else {
                     "At least one error with message = $errorMessage and type = $errorClassification is expected."
                 }
-                val failMessage = "$failMessageTitle\n\nbut error was:\n\n* type = ${error.errorType}\n* message = ${error.message}"
+                val failMessage =
+                    "$failMessageTitle\n\nbut error was:\n\n* type = ${error.errorType}\n* message = ${error.message}"
                 if (errorClassification != null) {
                     assertEquals(errorClassification, error.errorType, failMessage)
                 }
@@ -101,7 +97,7 @@ abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
     private fun assertNoErrors(response: ExecutionGraphQlResponse): JsonNode {
         if (response.errors.isNotEmpty()) {
             fail(
-                    response.errors.joinToString("\n") { it.message ?: "Unknown error" }
+                response.errors.joinToString("\n") { it.message ?: "Unknown error" }
             )
         }
         val data = response.getData<Any>().asJson()
@@ -109,19 +105,19 @@ abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
     }
 
     private fun <T> internalRun(
-            query: String,
-            variables: Map<String, Any?> = emptyMap(),
-            responseProcessing: (response: ExecutionGraphQlResponse) -> T,
+        query: String,
+        variables: Map<String, Any?> = emptyMap(),
+        responseProcessing: (response: ExecutionGraphQlResponse) -> T,
     ): T {
         val result = executionGraphQlService.execute(
-                DefaultExecutionGraphQlRequest(
-                        /* document = */ query,
-                        /* operationName = */ null,
-                        /* variables = */ variables,
-                        /* extensions = */ null,
-                        /* id = */ uid("gql_"),
-                        /* locale = */ null,
-                )
+            DefaultExecutionGraphQlRequest(
+                /* document = */ query,
+                /* operationName = */ null,
+                /* variables = */ variables,
+                /* extensions = */ null,
+                /* id = */ uid("gql_"),
+                /* locale = */ null,
+            )
         ).block()
         assertNotNull(result)
         return responseProcessing(result)
@@ -133,11 +129,11 @@ abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
         if (!errors.isNullOrNullNode() && errors.isArray && errors.size() > 0) {
             errors.forEach { error: JsonNode ->
                 error.path("exception")
-                        .takeIf { !it.isNullOrNullNode() }
-                        ?.let { println("Error exception: ${it.asText()}") }
+                    .takeIf { !it.isNullOrNullNode() }
+                    ?.let { println("Error exception: ${it.asText()}") }
                 error.path("location")
-                        .takeIf { !it.isNullOrNullNode() }
-                        ?.let { println("Error location: ${it.asText()}") }
+                    .takeIf { !it.isNullOrNullNode() }
+                    ?.let { println("Error location: ${it.asText()}") }
                 fail(error.path("message").asText())
             }
         }
@@ -145,10 +141,10 @@ abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
     }
 
     protected fun assertUserError(
-            data: JsonNode,
-            userNodeName: String,
-            message: String? = null,
-            exception: String? = null
+        data: JsonNode,
+        userNodeName: String,
+        message: String? = null,
+        exception: String? = null
     ) {
         val errors = data.path(userNodeName).path("errors")
         if (errors.isNullOrNullNode()) {
