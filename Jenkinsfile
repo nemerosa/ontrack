@@ -66,7 +66,6 @@ pipeline {
                                 'BUILD',
                                 'KDSL.ACCEPTANCE',
                                 'ACCEPTANCE',
-                                'VAULT',
                             ],
                         ],
                         RELEASE: [
