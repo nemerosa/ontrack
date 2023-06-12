@@ -38,7 +38,8 @@ import static net.nemerosa.ontrack.test.TestUtils.uid;
         properties = {
                 "spring.rabbitmq.host=localhost",
                 "spring.rabbitmq.username=ontrack",
-                "spring.rabbitmq.password=ontrack"
+                "spring.rabbitmq.password=ontrack",
+                "spring.graphql.schema.locations=classpath*:graphql/**",
         }
 )
 public abstract class AbstractITTestSupport {

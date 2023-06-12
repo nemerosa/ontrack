@@ -3,14 +3,14 @@ package net.nemerosa.ontrack.extension.github.ingestion.payload
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.model.support.StorageService
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class IngestionHookPayloadCleanupJobIT : AbstractDSLTestJUnit4Support() {
+class IngestionHookPayloadCleanupJobIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var job: IngestionHookPayloadCleanupJob

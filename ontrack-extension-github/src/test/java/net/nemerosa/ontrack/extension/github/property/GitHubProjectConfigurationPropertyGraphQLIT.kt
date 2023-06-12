@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.github.property
 
-import net.nemerosa.ontrack.extension.github.AbstractGitHubTestJUnit4Support
-import org.junit.Test
+import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class GitHubProjectConfigurationPropertyGraphQLIT : AbstractGitHubTestJUnit4Support() {
+class GitHubProjectConfigurationPropertyGraphQLIT : AbstractGitHubTestSupport() {
 
     @Test
     fun `Setting a GitHub configuration on a project identified by name with generic mutation`() {

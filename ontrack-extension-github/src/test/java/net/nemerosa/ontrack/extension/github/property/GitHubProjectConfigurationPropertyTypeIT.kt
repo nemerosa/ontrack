@@ -1,14 +1,14 @@
 package net.nemerosa.ontrack.extension.github.property
 
-import net.nemerosa.ontrack.extension.github.AbstractGitHubTestJUnit4Support
+import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
 import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.assertIs
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertNotNull
 
-class GitHubProjectConfigurationPropertyTypeIT : AbstractGitHubTestJUnit4Support() {
+class GitHubProjectConfigurationPropertyTypeIT : AbstractGitHubTestSupport() {
 
     @Autowired
     private lateinit var gitHubConfigurator: GitHubConfigurator

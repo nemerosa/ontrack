@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.extension.github.casc
 
-import net.nemerosa.ontrack.extension.casc.AbstractCascTestJUnit4Support
+import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.test.TestUtils
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class GitHubEngineConfigurationCascIT : AbstractCascTestJUnit4Support() {
+class GitHubEngineConfigurationCascIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var gitHubConfigurationService: GitHubConfigurationService
