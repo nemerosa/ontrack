@@ -17,9 +17,9 @@ RUN add-apt-repository --yes ppa:git-core/ppa \
     && rm -rf /var/lib/apt/lists/*
 
 # S3 Cmd line tool
-RUN curl --fail --silent -L https://github.com/s3tools/s3cmd/releases/download/v2.1.0/s3cmd-2.1.0.tar.gz --output s3cmd.tar.gz \
+RUN curl --fail --silent -L https://github.com/s3tools/s3cmd/releases/download/v2.3.0/s3cmd-2.3.0.tar.gz --output s3cmd.tar.gz \
     && tar -xvzf s3cmd.tar.gz \
-    && cd s3cmd-2.1.0 \
+    && cd s3cmd-2.3.0 \
     && python3 setup.py install
 
 # Installing Docker
@@ -29,7 +29,7 @@ RUN mv docker/* /usr/bin/
 RUN chmod +x /usr/bin/docker
 
 # Installs Docker Compose
-RUN curl --fail --silent -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-`uname -s`-`uname -m` > /usr/bin/docker-compose
+RUN curl --fail --silent -L https://github.com/docker/compose/releases/download/v2.18.1/docker-compose-`uname -s`-`uname -m` > /usr/bin/docker-compose
 RUN chmod +x /usr/bin/docker-compose
 
 # Git configuration
