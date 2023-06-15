@@ -492,7 +492,7 @@ pipeline {
                         --console plain \\
                         --stacktrace \\
                         -PontrackUser=${ONTRACK_USR} \\
-                        -PontrackPassword=${ONTRACK_PSW} \\
+                        -PontrackToken=${ONTRACK_PSW} \\
                         -PontrackVersion=${ONTRACK_VERSION} \\
                         -PontrackGitHubUri=${GITHUB_URI} \\
                         site
