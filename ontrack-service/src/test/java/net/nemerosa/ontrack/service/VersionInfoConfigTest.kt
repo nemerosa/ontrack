@@ -1,35 +1,33 @@
-package net.nemerosa.ontrack.service;
+package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.model.support.VersionInfoConfig;
-import org.junit.Test;
+import net.nemerosa.ontrack.model.support.VersionInfoConfig
+import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
-import java.time.LocalDateTime;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-public class VersionInfoConfigTest {
-
+class VersionInfoConfigTest {
+    
     @Test
-    public void parseDate_null() throws Exception {
-        assertNotNull(VersionInfoConfig.parseDate(null));
+    fun parseDate_null() {
+        assertNotNull(VersionInfoConfig.parseDate(null))
     }
 
     @Test
-    public void parseDate_blank() throws Exception {
-        assertNotNull(VersionInfoConfig.parseDate(""));
+    fun parseDate_blank() {
+        assertNotNull(VersionInfoConfig.parseDate(""))
     }
 
     @Test
-    public void parseDate_incorrect() throws Exception {
-        assertNotNull(VersionInfoConfig.parseDate("2014-12-01"));
+    fun parseDate_incorrect() {
+        assertNotNull(VersionInfoConfig.parseDate("2014-12-01"))
     }
 
     @Test
-    public void parseDate_correct() throws Exception {
+    fun parseDate_correct() {
         assertEquals(
-                LocalDateTime.of(2014, 7, 13, 8, 34, 30),
-                VersionInfoConfig.parseDate("2014-07-13T08:34:30")
-        );
+            LocalDateTime.of(2014, 7, 13, 8, 34, 30),
+            VersionInfoConfig.parseDate("2014-07-13T08:34:30")
+        )
     }
 }
