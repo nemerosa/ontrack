@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 import kotlin.reflect.KClass
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
 
@@ -550,6 +551,27 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         filterBuilder(data)
         val filter = data.build()
         return BuildSearchAssertion(this, filter)
+    }
+
+    /**
+     * Checking that a build has been validated
+     */
+    protected fun assertValidated(
+        build: Build,
+        validationStamp: ValidationStamp,
+        status: ValidationRunStatusID? = ValidationRunStatusID.STATUS_PASSED,
+    ) {
+        val run = structureService.getValidationRunsForBuildAndValidationStamp(
+            build, validationStamp, 0, 1
+        ).firstOrNull()
+        assertNotNull(run, "Build has been validated") {
+            if (status != null) {
+                assertEquals(
+                    status,
+                    it.lastStatus.statusID
+                )
+            }
+        }
     }
 
     /**

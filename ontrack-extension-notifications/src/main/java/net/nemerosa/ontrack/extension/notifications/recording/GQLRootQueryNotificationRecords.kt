@@ -21,7 +21,7 @@ class GQLRootQueryNotificationRecords(
             cache = GQLTypeCache(),
             fieldName = "notificationRecords",
             fieldDescription = "Access to the notification recordings",
-            itemType = gqlTypeNotificationRecord,
+            itemType = gqlTypeNotificationRecord.typeName,
             arguments = listOf(
                 GraphQLArgument.newArgument()
                     .name(ARG_FILTER_RESULT_TYPE)

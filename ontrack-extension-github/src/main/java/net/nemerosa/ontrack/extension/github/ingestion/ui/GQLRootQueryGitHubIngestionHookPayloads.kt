@@ -27,7 +27,7 @@ class GQLRootQueryGitHubIngestionHookPayloads(
             cache = GQLTypeCache(),
             fieldName = "gitHubIngestionHookPayloads",
             fieldDescription = "List of payloads received by the GitHub Ingestion Hook payload",
-            itemType = gqlGitHubIngestionHookPayload,
+            itemType = gqlGitHubIngestionHookPayload.typeName,
             arguments = listOf(
                 GraphQLArgument.newArgument()
                     .name(ARG_STATUSES)

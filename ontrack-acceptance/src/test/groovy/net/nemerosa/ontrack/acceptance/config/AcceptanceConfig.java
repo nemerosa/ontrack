@@ -173,7 +173,7 @@ public class AcceptanceConfig {
         c.setUrl(env("ontrack.acceptance.url", c.getUrl(), "Ontrack URL"));
         c.setSeleniumGridUrl(env("ontrack.acceptance.selenium-grid-url", c.getSeleniumGridUrl(), "Selenium Grid URL"));
         c.setSeleniumBrowserName(env("ontrack.acceptance.selenium-browser-name", c.getSeleniumBrowserName(), "Selenium Browser Name"));
-        c.setSeleniumGridUrl(env("ontrack.acceptance.selenium-target-url", c.getSeleniumTargetUrl(), "Selenium Target URL"));
+        c.setSeleniumTargetUrl(env("ontrack.acceptance.selenium-target-url", c.getSeleniumTargetUrl(), "Selenium Target URL"));
         c.setDisableSsl(envAsBoolean("ontrack.acceptance.disable-ssl", c.isDisableSsl(), "Disabling SSL"));
         c.setAdmin(env("ontrack.acceptance.admin", c.getAdmin(), "Admin password"));
         c.setContext(env("ontrack.acceptance.context", c.getContext(), "Test context"));

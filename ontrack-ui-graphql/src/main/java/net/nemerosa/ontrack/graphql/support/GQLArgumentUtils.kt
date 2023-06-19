@@ -4,6 +4,7 @@ import graphql.Scalars.*
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.graphql.exceptions.ArgumentMismatchException
 import java.util.*
 
 /**
@@ -20,6 +21,25 @@ fun stringArgument(
     .name(name)
     .description(description)
     .type(nullableInputType(GraphQLString, nullable))
+    .build()
+
+/**
+ * Creates a typed (input) GraphQL argument.
+ *
+ * @param name Name of the argument
+ * @param typeName Name of the input
+ * @param description Description of the argument
+ * @param nullable If the argument is nullable or not
+ */
+fun typedArgument(
+    name: String,
+    typeName: String,
+    description: String,
+    nullable: Boolean = true,
+): GraphQLArgument = GraphQLArgument.newArgument()
+    .name(name)
+    .description(description)
+    .type(nullableInputType(GraphQLTypeReference(typeName), nullable))
     .build()
 
 /**
@@ -92,7 +112,9 @@ fun dateTimeArgument(
 fun checkArgList(environment: DataFetchingEnvironment, vararg args: String) {
     val actualArgs: Set<String> = environment.arguments.filterValues { it != null }.keys
     val expectedArgs: Set<String> = args.toSet()
-    check(actualArgs == expectedArgs) {
-        "Expected this list of arguments: $expectedArgs, but was: $actualArgs"
+    if (actualArgs != expectedArgs) {
+        throw ArgumentMismatchException(
+            "Expected this list of arguments: $expectedArgs, but was: $actualArgs"
+        )
     }
 }

@@ -15,6 +15,14 @@ spring:
   # Default profile
   profiles:
     default: prod
+  # GraphQL
+  graphql:
+    schema:
+      introspection:
+        enabled: true
+      printer:
+        enabled: true
+      locations: "classpath*:graphql/**"
 
 # Compression of web resources
 server:

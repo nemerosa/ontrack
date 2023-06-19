@@ -1,0 +1,14 @@
+mutation PostQueue(
+    $processor: String!,
+    $payload: JSON!,
+) {
+    postQueue(input: {
+        processor: $processor,
+        payload: $payload,
+    }) {
+        queueDispatchResult {
+            id
+        }
+        ...PayloadUserErrors
+    }
+}

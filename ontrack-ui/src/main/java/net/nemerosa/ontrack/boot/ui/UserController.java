@@ -145,8 +145,8 @@ public class UserController extends AbstractResourceController {
                             .withGroup(UserMenuExtensionGroups.system)
             );
         }
-        // OK
-        return contributed;
+        // Filtering the user actions
+        return contributed.filterActions();
     }
 
     private ConnectedAccount userMenuExtensions(ConnectedAccount user) {

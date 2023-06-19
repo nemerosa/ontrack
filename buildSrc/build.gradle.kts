@@ -11,11 +11,7 @@ repositories {
 dependencies {
     implementation(gradleApi())
     implementation(gradleKotlinDsl())
-    implementation("com.github.node-gradle:gradle-node-plugin:2.2.3")
-    implementation("org.apache.httpcomponents:httpclient:4.5.3")
-    implementation("org.apache.httpcomponents:httpcore:4.4.6")
-    implementation("net.nemerosa.ontrack:ontrack-dsl-v4:4.0.22") {
-        exclude(module = "groovy")
-        exclude(module = "groovy-json")
-    }
+    implementation("com.github.node-gradle:gradle-node-plugin:5.0.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.5")
+    implementation("org.apache.httpcomponents:httpclient:4.5.14")
 }

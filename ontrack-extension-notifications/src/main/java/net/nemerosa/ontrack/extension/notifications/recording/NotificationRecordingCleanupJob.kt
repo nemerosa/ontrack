@@ -9,25 +9,26 @@ import java.util.stream.Stream
 
 @Component
 class NotificationRecordingCleanupJob(
-    private val cachedSettingsService: CachedSettingsService,
-    private val notificationRecordingService: NotificationRecordingService,
+        private val cachedSettingsService: CachedSettingsService,
+        private val notificationRecordingService: NotificationRecordingService,
 ) : JobOrchestratorSupplier {
 
-    override fun collectJobRegistrations(): Stream<JobRegistration> = listOf(
-        createNotificationRecordingCleanupJobRegistration()
-    ).stream()
+    override val jobRegistrations: Collection<JobRegistration>
+        get() = listOf(
+                createNotificationRecordingCleanupJobRegistration()
+        )
 
     private fun createNotificationRecordingCleanupJobRegistration() = JobRegistration(
-        job = createNotificationRecordingCleanupJob(),
-        schedule = Schedule.everySeconds(cachedSettingsService.getCachedSettings(NotificationRecordingSettings::class.java).cleanupIntervalSeconds),
+            job = createNotificationRecordingCleanupJob(),
+            schedule = Schedule.everySeconds(cachedSettingsService.getCachedSettings(NotificationRecordingSettings::class.java).cleanupIntervalSeconds),
     )
 
     private fun createNotificationRecordingCleanupJob() = object : Job {
 
         override fun getKey(): JobKey =
-            NotificationsJobs.category
-                .getType("recording-cleanup").withName("Notification recordings cleanup")
-                .getKey("main")
+                NotificationsJobs.category
+                        .getType("recording-cleanup").withName("Notification recordings cleanup")
+                        .getKey("main")
 
         override fun getTask() = JobRun {
             val settings = cachedSettingsService.getCachedSettings(NotificationRecordingSettings::class.java)
@@ -35,7 +36,7 @@ class NotificationRecordingCleanupJob(
         }
 
         override fun getDescription(): String =
-            "Cleanup of notification recordings"
+                "Cleanup of notification recordings"
 
         override fun isDisabled(): Boolean = false
     }

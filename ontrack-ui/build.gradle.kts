@@ -77,6 +77,10 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-delivery-metrics"))
     runtimeOnly(project(":ontrack-extension-auto-versioning"))
     runtimeOnly(project(":ontrack-extension-license"))
+    runtimeOnly(project(":ontrack-extension-tfc"))
+    runtimeOnly(project(":ontrack-extension-recordings"))
+    runtimeOnly(project(":ontrack-extension-hook"))
+    runtimeOnly(project(":ontrack-extension-queue"))
 }
 
 /**
@@ -128,7 +132,7 @@ val generateVersionInfo by tasks.registering {
         file.writeText("""
             # This file is generated at build time to contain version information
             # Do not edit it, do not commit it
-            ontrack.ersion.date = $timestamp
+            ontrack.version.date = $timestamp
             ontrack.version.display = ${info.display}
             ontrack.version.full = ${info.full}
             ontrack.version.branch = ${info.branchId}

@@ -30,7 +30,7 @@ class ACCDSLGraphQL extends AbstractACCDSL {
             }
         }""")
 
-        assert result.errors != null && result.errors.empty
+        assert result.errors == null
         assert result.data.projects.size() == 1
         assert result.data.projects.get(0).id == projectId
         assert result.data.projects.get(0).branches.size() == 2

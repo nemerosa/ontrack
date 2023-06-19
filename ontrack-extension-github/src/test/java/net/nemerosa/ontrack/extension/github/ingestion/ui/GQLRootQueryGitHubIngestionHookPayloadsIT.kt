@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayl
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.parse
 import org.junit.jupiter.api.Test
+import org.springframework.graphql.execution.ErrorType
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -17,12 +18,12 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestSupport()
     @Test
     fun `Getting a payload by UUID`() {
         val payload = IngestionHookFixtures.sampleWorkflowRunIngestionPayload(
-            message = "Sample payload",
+                message = "Sample payload",
         )
         asAdmin {
             ingestionHookPayloadStorage.store(payload, "sample source")
             run(
-                """
+                    """
                     {
                      gitHubIngestionHookPayloads(uuid: "${payload.uuid}") {
                         pageItems {
@@ -45,7 +46,7 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestSupport()
                 """
             ).let { data ->
                 val item =
-                    data.path("gitHubIngestionHookPayloads").path("pageItems").first().parse<IngestionHookPayload>()
+                        data.path("gitHubIngestionHookPayloads").path("pageItems").first().parse<IngestionHookPayload>()
                 assertEquals(payload.uuid, item.uuid)
                 assertEquals("sample source", item.source)
             }
@@ -55,142 +56,148 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestSupport()
     @Test
     fun `Getting a payload by UUID is protected`() {
         val payload = IngestionHookFixtures.sampleWorkflowRunIngestionPayload(
-            message = "Sample payload",
+                message = "Sample payload",
         )
         asAdmin {
             ingestionHookPayloadStorage.store(payload, "source")
         }
         asUser {
-            assertFailsWith<AccessDeniedException> {
-                run(
+            runWithError(
                     """
-                        {
-                         gitHubIngestionHookPayloads(uuid: "${payload.uuid}") {
-                            pageItems {
-                                uuid
-                            }
-                         }
+                    {
+                     gitHubIngestionHookPayloads(uuid: "${payload.uuid}") {
+                        pageItems {
+                            uuid
                         }
-                    """
-                )
-            }
+                     }
+                    }
+                """,
+                    errorClassification = ErrorType.FORBIDDEN
+            )
         }
     }
 
     @Test
     fun `Getting the list of payloads`() {
         testPayloads(
-            expected = (40 downTo 21).toList(),
+                expected = (40 downTo 21).toList(),
         )
     }
 
     @Test
     fun `Getting the list of payloads is protected`() {
-        assertFailsWith<AccessDeniedException> {
-            testPayloads(
+        testPayloads(
                 expected = (40 downTo 21).toList(),
                 security = { code ->
                     asUser {
                         code()
                     }
-                }
-            )
-        }
+                },
+                expectingError = ErrorType.FORBIDDEN
+        )
     }
 
     @Test
     fun `Paginating the list of payloads`() {
         testPayloads(
-            offset = 20,
-            size = 10,
-            expected = (20 downTo 11).toList(),
+                offset = 20,
+                size = 10,
+                expected = (20 downTo 11).toList(),
         )
     }
 
     @Test
     fun `Filtering the list of payloads on a status`() {
         testPayloads(
-            size = 5,
-            statuses = listOf(IngestionHookPayloadStatus.ERRORED),
-            expected = listOf(39, 35, 31, 27, 23)
+                size = 5,
+                statuses = listOf(IngestionHookPayloadStatus.ERRORED),
+                expected = listOf(39, 35, 31, 27, 23)
         )
     }
 
     @Test
     fun `Filtering the list of payloads on several statuses`() {
         testPayloads(
-            size = 5,
-            statuses = listOf(IngestionHookPayloadStatus.ERRORED, IngestionHookPayloadStatus.COMPLETED),
-            expected = listOf(39, 38, 35, 34, 31)
+                size = 5,
+                statuses = listOf(IngestionHookPayloadStatus.ERRORED, IngestionHookPayloadStatus.COMPLETED),
+                expected = listOf(39, 38, 35, 34, 31)
         )
     }
 
     @Test
     fun `Filtering the list of payloads on the repository`() {
         testPayloads(
-            repository = "repository-0",
-            expected = listOf(2, 1)
+                repository = "repository-0",
+                expected = listOf(2, 1)
         )
     }
 
     @Test
     fun `Filtering the list of payloads on the owner`() {
         testPayloads(
-            owner = "owner-0",
-            expected = listOf(4, 3, 2, 1)
+                owner = "owner-0",
+                expected = listOf(4, 3, 2, 1)
         )
     }
 
     private fun testPayloads(
-        offset: Int? = null,
-        size: Int? = null,
-        statuses: List<IngestionHookPayloadStatus>? = null,
-        repository: String? = null,
-        owner: String? = null,
-        expected: List<Int>,
-        security: (code: () -> Unit) -> Unit = { code -> asAdmin { code() } },
+            offset: Int? = null,
+            size: Int? = null,
+            statuses: List<IngestionHookPayloadStatus>? = null,
+            repository: String? = null,
+            owner: String? = null,
+            expected: List<Int>,
+            expectingError: ErrorType? = null,
+            security: (code: () -> Unit) -> Unit = { code -> asAdmin { code() } },
     ) {
         asAdmin {
             createPayloads()
         }
         security {
-            run(
-                """
-                    query Payloads(
-                        ${'$'}offset: Int,
-                        ${'$'}size: Int,
-                        ${'$'}statuses: [IngestionHookPayloadStatus!],
-                        ${'$'}repository: String,
-                        ${'$'}owner: String,
+            val query = """
+                query Payloads(
+                    ${'$'}offset: Int,
+                    ${'$'}size: Int,
+                    ${'$'}statuses: [IngestionHookPayloadStatus!],
+                    ${'$'}repository: String,
+                    ${'$'}owner: String,
+                ) {
+                    gitHubIngestionHookPayloads(
+                        offset: ${'$'}offset,
+                        size: ${'$'}size,
+                        statuses: ${'$'}statuses,
+                        repository: ${'$'}repository,
+                        owner: ${'$'}owner,
                     ) {
-                        gitHubIngestionHookPayloads(
-                            offset: ${'$'}offset,
-                            size: ${'$'}size,
-                            statuses: ${'$'}statuses,
-                            repository: ${'$'}repository,
-                            owner: ${'$'}owner,
-                        ) {
-                            pageItems {
-                                message
-                            }
+                        pageItems {
+                            message
                         }
                     }
-                """, mapOf(
+                }
+            """
+            val variables = mapOf(
                     "offset" to offset,
                     "size" to size,
                     "statuses" to statuses,
                     "repository" to repository,
                     "owner" to owner,
-                )
-            ).let { data ->
-                assertEquals(
-                    expected.map { no ->
-                        "Payload #$no"
-                    },
-                    data.path("gitHubIngestionHookPayloads").path("pageItems").map { node ->
-                        node.getRequiredTextField("message")
-                    }
-                )
+            )
+
+            if (expectingError != null) {
+                runWithError(query, variables, errorClassification = expectingError)
+            } else {
+                run(
+                        query, variables
+                ).let { data ->
+                    assertEquals(
+                            expected.map { no ->
+                                "Payload #$no"
+                            },
+                            data.path("gitHubIngestionHookPayloads").path("pageItems").map { node ->
+                                node.getRequiredTextField("message")
+                            }
+                    )
+                }
             }
         }
     }
@@ -206,11 +213,11 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestSupport()
                 else -> IngestionHookPayloadStatus.ERRORED
             }
             IngestionHookFixtures.sampleWorkflowRunIngestionPayload(
-                repoName = "repository-${no / 3}",
-                owner = "owner-${no / 5}",
-                timestamp = ref.minusDays(1).plusSeconds(no.toLong()),
-                message = "Payload #$no",
-                status = status,
+                    repoName = "repository-${no / 3}",
+                    owner = "owner-${no / 5}",
+                    timestamp = ref.minusDays(1).plusSeconds(no.toLong()),
+                    message = "Payload #$no",
+                    status = status,
             )
         }
         payloads.forEach { payload ->

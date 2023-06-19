@@ -23,11 +23,10 @@ class IndexableGitCommitJob(
         private val gitRepositoryClientFactory: GitRepositoryClientFactory
 ) : JobOrchestratorSupplier {
 
-    override fun collectJobRegistrations(): Stream<JobRegistration> {
-        return securityService.asAdmin {
+    override val jobRegistrations: Collection<JobRegistration>
+        get() = securityService.asAdmin {
             structureService
                     .projectList
-                    .asSequence()
                     .filter { project ->
                         gitService.getProjectConfiguration(project) != null
                     }
@@ -37,9 +36,7 @@ class IndexableGitCommitJob(
                                 createIndexableGitCommitJobRegistration(project, overrides = false, schedule = Schedule.EVERY_DAY)
                         )
                     }
-                    .asStream()
         }
-    }
 
     private fun createIndexableGitCommitJobRegistration(project: Project, overrides: Boolean, schedule: Schedule): JobRegistration =
             JobRegistration.of(

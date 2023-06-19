@@ -1,22 +1,307 @@
 package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.extension.api.support.*
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.BranchFavouriteService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.assertJsonNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import org.springframework.graphql.execution.ErrorType
+import kotlin.test.*
 
 class BranchGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var branchFavouriteService: BranchFavouriteService
+
+    @Test
+    fun `Branch by ID`() {
+        project {
+            branch {
+                run("""{branches (id: ${id}) { name } }""") { data ->
+                    assertEquals(
+                            name,
+                            data.path("branches").first()
+                                    .path("name").asText()
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Branch by ID and project is not allowed`() {
+        runWithError("""{branches (id: 1, project: "test") { name } }""", errorClassification = ErrorType.BAD_REQUEST)
+    }
+
+    @Test
+    fun `Branch by project`() {
+        project {
+            branch("B1")
+            branch("B2")
+            run("""{branches (project: "${name}") { name } }""") { data ->
+                assertEquals(
+                        listOf("B2", "B1"),
+                        data.path("branches").map { it.path("name").asText() }
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Branch by project and name`() {
+        project {
+            branch("B1")
+            branch("B2")
+            branch("C1")
+            run("""{branches (project: "${project.name}", name: "C.*") { name } }""") { data ->
+                assertEquals(
+                        listOf("C1"),
+                        data.path("branches").map { it.path("name").asText() }
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Branch signature`() {
+        project {
+            branch {
+                run("""{branches (id: ${id}) { creation { user time } } }""") { data ->
+                    val branch = data.path("branches").first()
+                    val user = branch.path("creation").path("user").asText()
+                    assertTrue(user.isNotBlank(), "User is defined")
+                    val time = branch.path("creation").path("time").asText()
+                    assertEquals('T', time[10])
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Branch without decorations`() {
+        project {
+            branch {
+                run("""{
+                    branches (id: ${id}) {
+                        decorations {
+                            decorationType
+                            data
+                            error
+                        }
+                    }   
+                }""") { data ->
+                    val decorations = data.path("branches").first()
+                            .path("decorations")
+                    assertJsonNotNull(decorations) {
+                        assertTrue(isEmpty)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Branch with decorations`() {
+        project {
+            branch {
+                setProperty(this, TestDecoratorPropertyType::class.java, TestDecorationData("XXX", true))
+                run("""{
+                    branches (id: ${id}) {
+                        decorations {
+                            decorationType
+                            data
+                            error
+                        }
+                    }   
+                }""") { data ->
+                    val decoration = data.path("branches").first()
+                            .path("decorations").first()
+                    assertEquals(TestDecorator::class.java.name, decoration.path("decorationType").asText())
+                    assertEquals("XXX", decoration.path("data").path("value").asText())
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Branch with filtered decorations and match`() {
+        project {
+            branch {
+                setProperty(this, TestDecoratorPropertyType::class.java, TestDecorationData("XXX", true))
+                run("""{
+                    branches (id: ${id}) {
+                        decorations(type: "${TestDecorator::class.java.name}") {
+                            decorationType
+                            data
+                            error
+                        }
+                    }   
+                }""") { data ->
+                    val decoration = data.path("branches").first()
+                            .path("decorations").first()
+                    assertEquals(TestDecorator::class.java.name, decoration.path("decorationType").asText())
+                    assertEquals("XXX", decoration.path("data").path("value").asText())
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Branch with filtered decorations and no match`() {
+        project {
+            branch {
+                setProperty(this, TestDecoratorPropertyType::class.java, TestDecorationData("XXX", true))
+                run("""{
+                    branches (id: ${id}) {
+                        decorations(type: "unknown.Decorator") {
+                            decorationType
+                            data
+                            error
+                        }
+                    }   
+                }""") { data ->
+                    val decorations = data.path("branches").first()
+                            .path("decorations")
+                    assertTrue(decorations.isEmpty)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Promotion level branch reference`() {
+        project {
+            branch {
+                val pl = promotionLevel()
+                run("""{
+                    branches (id: ${pl.branch.id}) {
+                        promotionLevels {
+                            branch {
+                                id
+                                project {
+                                    id
+                                }
+                            }
+                        }
+                    }
+                }""") { data ->
+                    val p = data.path("branches").first()
+                            .path("promotionLevels").first()
+                    assertEquals(pl.branch.id(), p.path("branch").path("id").asInt())
+                    assertEquals(pl.project.id(), p.path("branch").path("project").path("id").asInt())
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Validation stamp branch reference`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                run("""{
+                    branches (id: ${vs.branch.id}) {
+                        validationStamps {
+                            branch {
+                                id
+                                project {
+                                    id
+                                }
+                            }
+                        }
+                    }
+                }""") { data ->
+                    val v = data.path("branches").first()
+                            .path("validationStamps").first()
+                    assertEquals(vs.branch.id(), v.path("branch").path("id").asInt())
+                    assertEquals(vs.project.id(), v.path("branch").path("project").path("id").asInt())
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Branches filtered by property type`() {
+        // Branches
+        val p1 = doCreateBranch()
+        /*val p2 = */ doCreateBranch()
+        val p3 = doCreateBranch()
+        val p4 = doCreateBranch()
+        // Properties
+        setProperty(p1, TestSimplePropertyType::class.java, TestSimpleProperty("P1"))
+        setProperty(p3, TestSimplePropertyType::class.java, TestSimpleProperty("P3"))
+        setProperty(p4, TestSimplePropertyType::class.java, TestSimpleProperty("X1"))
+        // Looks for projects having this property
+        run("""{
+            branches(withProperty: {type: "${TestSimplePropertyType::class.java.name}"}) {
+                name
+            }
+        }""") { data ->
+            assertEquals(
+                    setOf(p1.name, p3.name, p4.name),
+                    data.path("branches")
+                            .map { it.path("name").asText() }
+                            .toSet()
+            )
+        }
+    }
+
+    @Test
+    fun `Branches filtered by property type and value pattern`() {
+        // Branches
+        val p1 = doCreateBranch()
+        /*def p2 = */ doCreateBranch()
+        val p3 = doCreateBranch()
+        val p4 = doCreateBranch()
+        // Properties
+        setProperty(p1, TestSimplePropertyType::class.java, TestSimpleProperty("P1"))
+        setProperty(p3, TestSimplePropertyType::class.java, TestSimpleProperty("P3"))
+        setProperty(p4, TestSimplePropertyType::class.java, TestSimpleProperty("X1"))
+        // Looks for projects having this property
+        run("""{
+            branches(withProperty: {type: "${TestSimplePropertyType::class.java.name}", value: "P"}) {
+                name
+            }
+        }""") { data ->
+            assertEquals(
+                    setOf(p1.name, p3.name),
+                    data.path("branches")
+                            .map { it.path("name").asText() }
+                            .toSet()
+            )
+        }
+    }
+
+    @Test
+    fun `Branches filtered by property type and value`() {
+        // Branches
+        val p1 = doCreateBranch()
+        /*def p2 = */ doCreateBranch()
+        val p3 = doCreateBranch()
+        val p4 = doCreateBranch()
+        // Properties
+        setProperty(p1, TestSimplePropertyType::class.java, TestSimpleProperty("P1"))
+        setProperty(p3, TestSimplePropertyType::class.java, TestSimpleProperty("P3"))
+        setProperty(p4, TestSimplePropertyType::class.java, TestSimpleProperty("X1"))
+        // Looks for projects having this property
+        run("""{
+            branches(withProperty: {type: "${TestSimplePropertyType::class.java.name}", value: "P1"}) {
+                name
+            }
+        }""") { data ->
+            assertEquals(
+                    setOf(p1.name),
+                    data.path("branches")
+                            .map { it.path("name").asText() }
+                            .toSet()
+            )
+        }
+    }
 
     @Test
     fun `Creating a branch for a project name`() {
@@ -194,7 +479,7 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
         asAdmin {
             project {
                 val data = run(
-                    """
+                        """
                         mutation  {
                             createBranchOrGet(input: {projectId: $id, name: "main"}) {
                                 branch {
@@ -222,7 +507,7 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
         asAdmin {
             project {
                 val data = run(
-                    """
+                        """
                         mutation  {
                             createBranchOrGet(input: {projectName: "$name", name: "main"}) {
                                 branch {
@@ -251,7 +536,7 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
             project {
                 val branch = branch(name = "main")
                 val data = run(
-                    """
+                        """
                         mutation  {
                             createBranchOrGet(input: {projectId: $id, name: "main"}) {
                                 branch {
@@ -281,7 +566,7 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
             project {
                 val branch = branch(name = "main")
                 val data = run(
-                    """
+                        """
                         mutation  {
                             createBranchOrGet(input: {projectName: "$name", name: "main"}) {
                                 branch {
@@ -336,8 +621,8 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
         }
         val branchIds: Set<Int> = data["branches"].map { it["id"].asInt() }.toSet()
         assertEquals(
-            setOf(branch1.id(), branch2.id()),
-            branchIds
+                setOf(branch1.id(), branch2.id()),
+                branchIds
         )
     }
 
@@ -363,8 +648,8 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
             }
             val branchIds: Set<Int> = data["branches"].map { it["id"].asInt() }.toSet()
             assertEquals(
-                setOf(fav.id()),
-                branchIds
+                    setOf(fav.id()),
+                    branchIds
             )
         }
     }
@@ -381,8 +666,8 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
 
         val data = run("""{branches (name: "$name") { id } }""")
         assertEquals(
-            setOf(b1.id(), b2.id()),
-            data["branches"].map { it["id"].asInt() }.toSet()
+                setOf(b1.id(), b2.id()),
+                data["branches"].map { it["id"].asInt() }.toSet()
         )
     }
 

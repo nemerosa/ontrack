@@ -33,7 +33,7 @@ class JobOrchestrator(
         val registrations = transactionTemplate.execute {
             jobOrchestratorSuppliers.flatMap {
                 try {
-                    it.collectJobRegistrations().toList()
+                    it.jobRegistrations
                 } catch (any: Exception) {
                     // Does not collect the jobs for this collector for now, but marks the exception
                     logger.error("Cannot collect jobs for ${it::class.java.name}", any)

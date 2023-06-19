@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.git.reporting
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
-import net.nemerosa.ontrack.extension.issues.support.MockIssue
-import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceExtension
-import net.nemerosa.ontrack.extension.issues.support.MockIssueStatus
+import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.issues.mock.TestIssue
+import net.nemerosa.ontrack.extension.issues.mock.TestIssueServiceExtension
+import net.nemerosa.ontrack.extension.issues.mock.TestIssueStatus
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -23,10 +23,10 @@ import kotlin.test.assertNull
  * | 1.0   | Failed | Failed with #3 closed | Passed              |
  * ```
  */
-class IssueReportingIT : AbstractGitTestJUnit4Support() {
+class IssueReportingIT : AbstractGitTestSupport() {
 
     @Autowired
-    private lateinit var mockIssueServiceExtension: MockIssueServiceExtension
+    private lateinit var testIssueServiceExtension: TestIssueServiceExtension
 
     @Test
     fun `Getting last open issues on a branch`() {
@@ -355,10 +355,10 @@ class IssueReportingIT : AbstractGitTestJUnit4Support() {
             commits(1)
         } and { repo, _ ->
             // Registers the issues
-            mockIssueServiceExtension.resetIssues()
-            mockIssueServiceExtension.register(
-                    MockIssue(3, MockIssueStatus.CLOSED, "bug"),
-                    MockIssue(4, MockIssueStatus.OPEN, "bug")
+            testIssueServiceExtension.resetIssues()
+            testIssueServiceExtension.register(
+                    TestIssue(3, TestIssueStatus.CLOSED, "bug"),
+                    TestIssue(4, TestIssueStatus.OPEN, "bug")
             )
             // Project & branch
             val project = project {

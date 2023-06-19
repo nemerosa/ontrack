@@ -16,9 +16,10 @@ dependencies {
 apollo {
     @Suppress("UnstableApiUsage")
     customTypeMapping.set(mapOf(
-        "LocalDateTime" to "java.time.LocalDateTime",
-        "UUID" to "java.util.UUID",
-        "JSON" to "com.fasterxml.jackson.databind.JsonNode"
+            "LocalDateTime" to "java.time.LocalDateTime",
+            "UUID" to "java.util.UUID",
+            "JSON" to "com.fasterxml.jackson.databind.JsonNode",
+            "Long" to "java.lang.Long"
     ))
 }
 

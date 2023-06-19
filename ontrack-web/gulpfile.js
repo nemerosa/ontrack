@@ -1,67 +1,60 @@
-var gulp = require('gulp');
-var less = require('gulp-less');
-var minifyCss = require('gulp-minify-css');
-var concat = require('gulp-concat');
-var liveReload = require('gulp-livereload');
-var inject = require('gulp-inject');
-var jshint = require('gulp-jshint');
-var uglify = require('gulp-uglify');
-var series = require('stream-series');
-var templateCache = require('gulp-angular-templatecache');
-var ngAnnotate = require('gulp-ng-annotate');
-var ngFilesort = require('gulp-angular-filesort');
-var debug = require('gulp-debug');
-var minimist = require('minimist');
-var del = require('del');
-var babel = require("gulp-babel");
-var sourcemaps = require('gulp-sourcemaps');
+const gulp = require('gulp');
+const less = require('gulp-less');
+const minifyCss = require('gulp-minify-css');
+const concat = require('gulp-concat');
+const liveReload = require('gulp-livereload');
+const inject = require('gulp-inject');
+const jshint = require('gulp-jshint');
+const uglify = require('gulp-uglify');
+const series = require('stream-series');
+const templateCache = require('gulp-angular-templatecache');
+const ngAnnotate = require('gulp-ng-annotate');
+const ngFilesort = require('gulp-angular-filesort');
+const debug = require('gulp-debug');
+const babel = require("gulp-babel");
+const sourcemaps = require('gulp-sourcemaps');
 
 // Arguments
 
-var knownOptions = {
-    string: 'version',
-    default: {version: 'snapshot'}
-};
-
-var options = minimist(process.argv.slice(2), knownOptions);
+const version = process.env.VERSION
 
 // Paths
 
-var web = 'src';
-var webPath = './' + web;
-var assetResources = webPath + '/assets/**';
-var extensionAssetResources = [webPath + '/extension/**/*.png'];
+const web = 'src';
+const webPath = './' + web;
+const assetResources = webPath + '/assets/**';
+const extensionAssetResources = [webPath + '/extension/**/*.png'];
 
-var graphiqlIndexResource = webPath + '/graphiql.html';
+const graphiqlIndexResource = webPath + '/graphiql.html';
 
-var lessResources = webPath + '/less/*.less';
+const lessResources = webPath + '/less/*.less';
 
-var jsResources = webPath + '/app/**/*.js';
+const jsResources = webPath + '/app/**/*.js';
 
-var templateResources = webPath + '/app/**/*.html';
+const templateResources = webPath + '/app/**/*.html';
 
-var indexResource = webPath + '/index.html';
-var vendor = './vendor';
+const indexResource = webPath + '/index.html';
+const vendor = './vendor';
 
-var build = 'build/web';
+const build = 'build/web';
 
-var buildPath = build + '/dev';
-var buildTemplates = buildPath + '/templates';
-var buildConvertedJs = buildPath + '/converted';
-var buildAngular = buildPath + '/angular';
-var buildCss = buildPath + '/css';
+const buildPath = build + '/dev';
+const buildTemplates = buildPath + '/templates';
+const buildConvertedJs = buildPath + '/converted';
+const buildAngular = buildPath + '/angular';
+const buildCss = buildPath + '/css';
 
-var outputPath = build + '/prod';
-var output = './' + outputPath;
-var outputCss = './' + outputPath + '/css';
-var outputJs = './' + outputPath + '/js';
-var outputFonts = './' + outputPath + '/fonts';
-var outputAssets = './' + outputPath + '/assets';
-var outputExtensionAssets = './' + outputPath + '/extension/';
+const outputPath = build + '/prod';
+const output = './' + outputPath;
+const outputCss = './' + outputPath + '/css';
+const outputJs = './' + outputPath + '/js';
+const outputFonts = './' + outputPath + '/fonts';
+const outputAssets = './' + outputPath + '/assets';
+const outputExtensionAssets = './' + outputPath + '/extension/';
 
 // Vendor resources
 
-var vendorJsResources = [
+const vendorJsResources = [
     'jquery/dist/jquery.js',
     'jquery-ui/jquery-ui.js',
     'angular/angular.js',
@@ -78,17 +71,11 @@ var vendorJsResources = [
     return vendor + '/' + rel;
 });
 
-var vendorCssResources = [
+const vendorCssResources = [
     'angular-multi-select/angular-multi-select.css',
     'angular-taglist/css/angular-taglist-directive.css'
 ].map(function (rel) {
     return vendor + '/' + rel;
-});
-
-// Cleaning
-
-gulp.task('clean', function () {
-    return del([build]);
 });
 
 // Javascript handling
@@ -114,19 +101,23 @@ gulp.task('templates', function () {
  * Converted files
  */
 
-gulp.task('js:conversion', ['lint'], function () {
-    return gulp.src(jsResources)
+gulp.task('js:conversion', gulp.series(
+    'lint',
+    () => gulp.src(jsResources)
         .pipe(debug({title: 'js:conversion:input'}))
         .pipe(babel())
         .pipe(gulp.dest(buildConvertedJs))
-        .pipe(debug({title: 'js:conversion:output'}));
-});
+        .pipe(debug({title: 'js:conversion:output'}))
+));
 
 /**
  * Sorted and annotated Angular files
  */
-gulp.task('js:angular', ['lint', 'js:conversion', 'templates'], function () {
-    return gulp.src([buildTemplates + '/*.js', buildConvertedJs + '/**/*.js'])
+gulp.task('js:angular', gulp.series(
+    'lint',
+    'js:conversion',
+    'templates',
+    () => gulp.src([buildTemplates + '/*.js', buildConvertedJs + '/**/*.js'])
         .pipe(debug({title: 'js:angular:input'}))
         .pipe(ngAnnotate())
         .pipe(ngFilesort())
@@ -134,20 +125,23 @@ gulp.task('js:angular', ['lint', 'js:conversion', 'templates'], function () {
         .pipe(concat('ci-angular.js'))
         .pipe(sourcemaps.write("."))
         .pipe(gulp.dest(buildAngular))
-        .pipe(debug({title: 'js:angular:output'}));
-});
+        .pipe(debug({title: 'js:angular:output'}))
+))
 
-gulp.task('js:concat', ['js:angular'], function () {
-    var jsSource = vendorJsResources;
-    jsSource.push(buildAngular + '/*.js');
-    return gulp.src(jsSource)
-        .pipe(debug({title: 'js:concat:input'}))
-        .pipe(concat('ci-' + options.version + '.js'))
-        .pipe(uglify())
-        .pipe(gulp.dest(outputJs))
-        .pipe(debug({title: 'js:concat:output'}))
-        ;
-});
+gulp.task('js:concat', gulp.series(
+    'js:angular',
+    () => {
+        const jsSource = vendorJsResources;
+        jsSource.push(buildAngular + '/*.js');
+        return gulp.src(jsSource)
+            .pipe(debug({title: 'js:concat:input'}))
+            .pipe(concat('ci-' + version + '.js'))
+            .pipe(uglify())
+            .pipe(gulp.dest(outputJs))
+            .pipe(debug({title: 'js:concat:output'}))
+            ;
+    }
+))
 
 // Translating Less into Minified CSS
 
@@ -156,7 +150,7 @@ gulp.task('less', function () {
         .pipe(debug({title: 'less:input:'}))
         .pipe(less())
         .pipe(debug({title: 'less:output:'}))
-        .pipe(concat('ci-' + options.version + '.css'))
+        .pipe(concat('ci-' + version + '.css'))
         .pipe(gulp.dest(buildCss))
         .pipe(liveReload());
 });
@@ -173,7 +167,7 @@ gulp.task('css:concat', function () {
     )
         .pipe(debug({title: 'css:concat:input'}))
         .pipe(minifyCss())
-        .pipe(concat('ci-' + options.version + '.css'))
+        .pipe(concat('ci-' + version + '.css'))
         .pipe(debug({title: 'css:concat:output'}))
         .pipe(gulp.dest(outputCss));
 });
@@ -208,65 +202,74 @@ gulp.task('extensionAssets', function () {
 
 // Injection in index.html
 
-gulp.task('index:dev', ['less', 'fonts', 'js:conversion', 'templates'], function () {
-    var cssSources = gulp.src([buildCss + '/*.css'], {read: false});
-    var vendorJsSources = gulp.src(vendorJsResources, {read: false});
-    var vendorCssSources = gulp.src(vendorCssResources, {read: false});
-    var appSources = gulp.src([buildTemplates + '/*.js', buildConvertedJs + '/**/*.js']).pipe(ngFilesort());
+gulp.task('index:dev', gulp.series(
+    'less',
+    'fonts',
+    'js:conversion',
+    'templates',
+    () => {
+        const cssSources = gulp.src([buildCss + '/*.css'], {read: false});
+        const vendorJsSources = gulp.src(vendorJsResources, {read: false});
+        const vendorCssSources = gulp.src(vendorCssResources, {read: false});
+        const appSources = gulp.src([buildTemplates + '/*.js', buildConvertedJs + '/**/*.js']).pipe(ngFilesort());
 
-    return gulp.src(indexResource)
-        .pipe(debug({title: 'index:dev:input'}))
-        .pipe(inject(
-            series(
-                cssSources,
-                vendorJsSources,
-                vendorCssSources,
-                appSources
-            ),
-            {relative: false, ignorePath: [outputPath, web, buildPath], addRootSlash: false}))
-        .pipe(gulp.dest(buildPath))
-        .pipe(debug({title: 'index:dev:output'}))
-        .pipe(liveReload());
-});
+        return gulp.src(indexResource)
+            .pipe(debug({title: 'index:dev:input'}))
+            .pipe(inject(
+                series(
+                    cssSources,
+                    vendorJsSources,
+                    vendorCssSources,
+                    appSources
+                ),
+                {relative: false, ignorePath: [outputPath, web, buildPath], addRootSlash: false}))
+            .pipe(gulp.dest(buildPath))
+            .pipe(debug({title: 'index:dev:output'}))
+            .pipe(liveReload());
+    }
+))
 
-gulp.task('index:prod', ['css:concat', 'assets', 'fonts', 'templates', 'js:concat'], function () {
-    var cssSources = gulp.src([outputCss + '/*.css'], {read: false});
-    var jsSources = gulp.src(outputJs + '/*.js', {read: false});
+gulp.task('index:prod', gulp.series(
+    'css:concat',
+    'assets',
+    'fonts',
+    'templates',
+    'js:concat',
+    () => {
+        const cssSources = gulp.src([outputCss + '/*.css'], {read: false});
+        const jsSources = gulp.src(outputJs + '/*.js', {read: false});
 
-    return gulp.src(indexResource)
-        .pipe(debug({title: 'index:prod:input'}))
-        .pipe(inject(
-            series(
-                cssSources,
-                jsSources
-            ),
-            {relative: false, ignorePath: [outputPath, web, buildPath], addRootSlash: false}))
-        .pipe(gulp.dest(output))
-        .pipe(debug({title: 'index:prod:output'}));
-});
+        return gulp.src(indexResource)
+            .pipe(debug({title: 'index:prod:input'}))
+            .pipe(inject(
+                series(
+                    cssSources,
+                    jsSources
+                ),
+                {relative: false, ignorePath: [outputPath, web, buildPath], addRootSlash: false}))
+            .pipe(gulp.dest(output))
+            .pipe(debug({title: 'index:prod:output'}));
+    }
+))
 
 // Injection in graphiql.html
 
-gulp.task('graphiql:dev', [], function () {
-    return gulp.src(graphiqlIndexResource)
-        .pipe(debug({title: 'graphiql:dev:input'}))
-        .pipe(gulp.dest(buildPath))
-        .pipe(debug({title: 'graphiql:dev:output'}))
-        .pipe(liveReload());
-});
+gulp.task('graphiql:dev', () => gulp.src(graphiqlIndexResource)
+    .pipe(debug({title: 'graphiql:dev:input'}))
+    .pipe(gulp.dest(buildPath))
+    .pipe(debug({title: 'graphiql:dev:output'}))
+    .pipe(liveReload()));
 
-gulp.task('graphiql:prod:index', [], function () {
-    return gulp.src(graphiqlIndexResource)
-        .pipe(debug({title: 'graphiql:prod:input'}))
-        .pipe(gulp.dest(output))
-        .pipe(debug({title: 'graphiql:prod:output'}));
-});
+gulp.task('graphiql:prod:index', () => gulp.src(graphiqlIndexResource)
+    .pipe(debug({title: 'graphiql:prod:input'}))
+    .pipe(gulp.dest(output))
+    .pipe(debug({title: 'graphiql:prod:output'})));
 
 // Default build
 
-gulp.task('dev', ['index:dev', 'graphiql:dev', 'fonts']);
+gulp.task('dev', gulp.series('index:dev', 'graphiql:dev', 'fonts'));
 
-gulp.task('default', ['index:prod', 'graphiql:prod:index', 'assets', 'extensionAssets', 'fonts']);
+gulp.task('default', gulp.series('index:prod', 'graphiql:prod:index', 'assets', 'extensionAssets', 'fonts'));
 
 // Watch setup
 

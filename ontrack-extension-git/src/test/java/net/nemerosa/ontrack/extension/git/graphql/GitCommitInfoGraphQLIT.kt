@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.git.GitCommitSearchExtension
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.test.TestUtils
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 

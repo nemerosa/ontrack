@@ -8,16 +8,21 @@ pipeline {
 
     parameters {
         booleanParam(
-                name: 'SKIP_ACCEPTANCE',
+                name: 'SKIP_KDSL_ACCEPTANCE',
                 defaultValue: false,
-                description: 'Skipping acceptance tests'
+                description: 'Skipping KDSL acceptance tests'
+        )
+        booleanParam(
+                name: 'SKIP_LEGACY_ACCEPTANCE',
+                defaultValue: false,
+                description: 'Skipping legacy acceptance tests'
         )
     }
 
     agent {
         docker {
             label "do && c-8"
-            image "nemerosa/ontrack-build:3.2.1"
+            image "nemerosa/ontrack-build:4.0.2"
             args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
         }
     }
@@ -47,12 +52,31 @@ pipeline {
                 scmSkip(deleteBuild: false)
                 ontrackCliSetup(
                     autoValidationStamps: true,
+                    validations: [
+                        [
+                            name: 'KDSL.ACCEPTANCE',
+                            tests: [
+                                warningIfSkipped: false,
+                            ],
+                        ],
+                    ],
                     promotions: [
+                        BRONZE: [
+                            validations: [
+                                'BUILD',
+                                'KDSL.ACCEPTANCE',
+                                'ACCEPTANCE',
+                            ],
+                        ],
                         RELEASE: [
+                            promotions: [
+                                'BRONZE',
+                            ],
                             validations: [
                                 'GITHUB.RELEASE',
                             ]
-                        ]
+                        ],
+                        PRODUCTION: [:],
                     ]
                 )
             }
@@ -132,7 +156,7 @@ pipeline {
                     branch 'master'
                 }
                 expression {
-                    return !params.SKIP_ACCEPTANCE
+                    return !params.SKIP_KDSL_ACCEPTANCE
                 }
             }
             environment {
@@ -152,6 +176,7 @@ pipeline {
                             -Dorg.gradle.jvmargs=-Xmx2048m \\
                             --stacktrace \\
                             --console plain \\
+                            --parallel \\
                             :ontrack-kdsl-acceptance:kdslAcceptanceTest
                         '''
                 }
@@ -175,208 +200,35 @@ pipeline {
                     branch 'master'
                 }
                 expression {
-                    return !params.SKIP_ACCEPTANCE
+                    return !params.SKIP_LEGACY_ACCEPTANCE
                 }
             }
             steps {
-                timeout(time: 25, unit: 'MINUTES') {
+                timeout(time: 30, unit: 'MINUTES') {
                     sh '''
-                        cd ontrack-acceptance/src/main/compose
-                        docker-compose \\
-                            --project-name local \\
-                            --file docker-compose.yml \\
-                            up \\
-                            --exit-code-from ontrack_acceptance
+                        ./gradlew \\
+                            -Dorg.gradle.jvmargs=-Xmx3072m \\
+                            --stacktrace \\
+                            --console plain \\
+                            --parallel \\
+                            :ontrack-acceptance:acceptanceTest
                         '''
                 }
             }
             post {
                 always {
-                    sh '''
-                        cd ontrack-acceptance/src/main/compose
-                        docker-compose  \\
-                            --project-name local \\
-                            --file docker-compose.yml \\
-                            logs ontrack > docker-compose-acceptance-ontrack.log
-                    '''
-                    sh '''
-                        cd ontrack-acceptance/src/main/compose
-                        docker-compose  \\
-                            --project-name local \\
-                            --file docker-compose.yml \\
-                            logs selenium > docker-compose-acceptance-selenium.log
-                    '''
-                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance-ontrack.log", allowEmptyArchive: true)
-                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance-selenium.log", allowEmptyArchive: true)
-                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/build/**", allowEmptyArchive: true)
-                    sh '''
-                        rm -rf build/acceptance
-                        mkdir -p build
-                        cp -r ontrack-acceptance/src/main/compose/build build/acceptance
-                        '''
                     ontrackCliValidateTests(
-                        stamp: 'ACCEPTANCE',
-                        pattern: 'build/acceptance/*.xml',
+                            stamp: 'ACCEPTANCE',
+                            pattern: 'ontrack-acceptance/build/test-results/**/*.xml',
                     )
                 }
-                cleanup {
-                    sh '''
-                        cd ontrack-acceptance/src/main/compose
-                        docker-compose \\
-                            --project-name local \\
-                            --file docker-compose.yml \\
-                            down --volumes
-                    '''
-                }
-            }
-        }
-
-        stage('Local Vault tests') {
-            when {
-                not {
-                    branch "master"
-                }
-                expression {
-                    return !params.SKIP_ACCEPTANCE
-                }
-            }
-            steps {
-                timeout(time: 25, unit: 'MINUTES') {
-                    // Cleanup
-                    sh ' rm -rf ontrack-acceptance/src/main/compose/build '
-                    // Launches the tests
-                    sh '''
-                        cd ontrack-acceptance/src/main/compose
-                        docker-compose \\
-                            --project-name vault \\
-                            --file docker-compose-vault.yml \\
-                            up \\
-                            --exit-code-from ontrack_acceptance
-                    '''
-                }
-            }
-            post {
-                always {
-                    sh '''
-                        mkdir -p build
-                        rm -rf build/vault
-                        cp -r ontrack-acceptance/src/main/compose/build build/vault
-                    '''
-                    ontrackCliValidateTests(
-                            stamp: 'VAULT',
-                            pattern: 'build/vault/*.xml',
-                    )
-                }
-                cleanup {
-                    sh '''
-                        cd ontrack-acceptance/src/main/compose
-                        docker-compose \\
-                            --project-name vault \\
-                            --file docker-compose-vault.yml \\
-                            down --volumes
-                    '''
+                failure {
+                    archiveArtifacts(artifacts: "ontrack-acceptance/build/logs/**", allowEmptyArchive: true)
                 }
             }
         }
 
         // We stop here for pull requests and feature branches
-
-        // OS tests
-
-//        stage('Platform tests') {
-//            when {
-//                anyOf {
-//                    branch 'release/*'
-//                }
-//            }
-//            stages {
-//                stage('CentOS7') {
-//                    steps {
-//                        timeout(time: 25, unit: 'MINUTES') {
-//                            sh '''
-//                                echo "Preparing environment..."
-//                                DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
-//                                rm -f ${DOCKER_DIR}/*.rpm
-//                                cp build/distributions/*rpm ${DOCKER_DIR}/ontrack.rpm
-//
-//                                echo "Launching test environment..."
-//                                cd ontrack-acceptance/src/main/compose
-//                                docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
-//
-//                                echo "Launching Ontrack in CentOS environment..."
-//                                CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
-//                                echo "... for container ${CONTAINER}"
-//                                docker container exec ${CONTAINER} /etc/init.d/ontrack start
-//
-//                                echo "Launching tests..."
-//                                docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
-//                            '''
-//                        }
-//                    }
-//                    post {
-//                        always {
-//                            sh '''
-//                                mkdir -p build
-//                                cp -r ontrack-acceptance/src/main/compose/build build/centos
-//                                '''
-//                            ontrackCliValidateTests(
-//                                    stamp: 'ACCEPTANCE.CENTOS.7',
-//                                    pattern: 'build/centos/*.xml',
-//                            )
-//                        }
-//                        cleanup {
-//                            sh '''
-//                                cd ontrack-acceptance/src/main/compose
-//                                docker-compose --project-name centos --file docker-compose-centos-7.yml down --volumes
-//                                '''
-//                        }
-//                    }
-//                }
-//                // Debian
-//                stage('Debian') {
-//                    steps {
-//                        timeout(time: 25, unit: 'MINUTES') {
-//                            sh '''
-//                                echo "Preparing environment..."
-//                                DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
-//                                rm -f ${DOCKER_DIR}/*.deb
-//                                cp build/distributions/*.deb ${DOCKER_DIR}/ontrack.deb
-//
-//                                echo "Launching test environment..."
-//                                cd ontrack-acceptance/src/main/compose
-//                                docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
-//
-//                                echo "Launching Ontrack in Debian environment..."
-//                                CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
-//                                echo "... for container ${CONTAINER}"
-//                                docker container exec ${CONTAINER} /etc/init.d/ontrack start
-//
-//                                echo "Launching tests..."
-//                                docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
-//                                '''
-//                        }
-//                    }
-//                    post {
-//                        always {
-//                            sh '''
-//                                mkdir -p build/debian
-//                                cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
-//                                '''
-//                            ontrackCliValidateTests(
-//                                    stamp: 'ACCEPTANCE.DEBIAN',
-//                                    pattern: 'build/debian/*.xml',
-//                            )
-//                        }
-//                        cleanup {
-//                            sh '''
-//                                cd ontrack-acceptance/src/main/compose
-//                                docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
-//                            '''
-//                        }
-//                    }
-//                }
-//            }
-//        }
 
         // Publication
 
@@ -425,10 +277,11 @@ pipeline {
                         --console plain \\
                         --stacktrace \\
                         -PontrackUser=${ONTRACK_USR} \\
-                        -PontrackPassword=${ONTRACK_PSW} \\
+                        -PontrackToken=${ONTRACK_PSW} \\
                         -PgitHubToken=${GITHUB_TOKEN} \\
                         -PgitHubCommit=${GIT_COMMIT} \\
                         -PgitHubChangeLogReleaseBranch=${ONTRACK_BRANCH_NAME} \\
+                        -PgitHubChangeLogCurrentBuild=${ONTRACK_BUILD_NAME} \\
                         release
                 '''
 

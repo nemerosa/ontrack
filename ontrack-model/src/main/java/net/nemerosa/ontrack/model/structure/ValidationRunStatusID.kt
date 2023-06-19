@@ -1,13 +1,16 @@
 package net.nemerosa.ontrack.model.structure
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import net.nemerosa.ontrack.model.annotations.APIName
 
 class ValidationRunStatusID(
         val id: String,
         val name: String,
         @JsonProperty("root")
+        @APIName("root")
         val isRoot: Boolean,
         @JsonProperty("passed")
+        @APIName("passed")
         val isPassed: Boolean,
         val followingStatuses: Collection<String> = emptyList()
 ) {

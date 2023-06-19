@@ -1,6 +1,6 @@
-import com.moowork.gradle.node.NodeExtension
-import com.moowork.gradle.node.npm.NpmInstallTask
-import com.moowork.gradle.node.task.NodeTask
+import com.github.gradle.node.NodeExtension
+import com.github.gradle.node.npm.task.NpmTask
+import com.github.gradle.node.task.NodeTask
 
 plugins {
     base
@@ -10,26 +10,26 @@ plugins {
 // Node environment
 
 configure<NodeExtension> {
-    version = "8.10.0"
-    npmVersion = "5.7.1"
-    isDownload = true
+    version.set("20.2.0")
+    npmVersion.set("9.6.6")
+    download.set(true)
 }
 
 // Installing the Bower packages
 
 val bowerInstall by tasks.registering(NodeTask::class) {
     dependsOn("npmInstall")
-    script = file("node_modules/bower/bin/bower")
+    script.set(file("node_modules/bower/bin/bower"))
     val bowerArgs = mutableListOf(
-            "--config.storage.cache=$rootDir/.gradle/bower/cache",
-            "--config.storage.packages=$rootDir/.gradle/bower/packages",
-            "--config.storage.registry=$rootDir/.gradle/bower/registry",
-            "install"
+        "--config.storage.cache=$rootDir/.gradle/bower/cache",
+        "--config.storage.packages=$rootDir/.gradle/bower/packages",
+        "--config.storage.registry=$rootDir/.gradle/bower/registry",
+        "install"
     )
     if (project.properties.containsKey("bowerOptions")) {
         bowerArgs += project.properties["bowerOptions"].toString()
     }
-    setArgs(bowerArgs)
+    args.set(bowerArgs)
     inputs.file("bower.json")
     outputs.dir("vendor")
 }
@@ -42,16 +42,17 @@ tasks.named<Delete>("clean") {
 
 // Web packaging
 
-val dev by tasks.registering(NodeTask::class) {
+val dev by tasks.registering(NpmTask::class) {
     dependsOn(bowerInstall)
-    script = file("node_modules/gulp/bin/gulp.js")
-    addArgs("dev")
+    args.set(listOf("run", "dev"))
 }
 
-val prod by tasks.registering(NodeTask::class) {
+val prod by tasks.registering(NpmTask::class) {
     dependsOn(bowerInstall)
-    script = file("node_modules/gulp/bin/gulp.js")
-    addArgs("default", "--version", version)
+    environment.put("VERSION", version.toString())
+    args.set(
+        listOf("run", "prod")
+    )
     inputs.dir("src")
     inputs.file("bower.json")
     inputs.file("package.json")
@@ -64,6 +65,6 @@ tasks.named<Task>("build") {
 
 val watch by tasks.registering(NodeTask::class) {
     dependsOn(dev)
-    script = file("node_modules/gulp/bin/gulp.js")
-    addArgs("watch")
+    script.set(file("node_modules/gulp/bin/gulp.js"))
+    args.set(listOf("watch"))
 }

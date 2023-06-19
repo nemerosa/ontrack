@@ -29,7 +29,7 @@ class GQLRootQueryProjects(
     override fun getFieldDefinition(): GraphQLFieldDefinition {
         return newFieldDefinition()
                 .name("projects")
-                .type(listType(project.typeRef))
+                .type(listType(project.typeRef, nullable = true))
                 .argument(
                         newArgument()
                                 .name(ARG_ID)

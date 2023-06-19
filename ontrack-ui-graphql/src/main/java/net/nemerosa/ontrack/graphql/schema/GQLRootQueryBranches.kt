@@ -25,7 +25,7 @@ class GQLRootQueryBranches(
     override fun getFieldDefinition(): GraphQLFieldDefinition {
         return newFieldDefinition()
                 .name("branches")
-                .type(listType(branch.typeRef))
+                .type(listType(branch.typeRef, nullable = true))
                 .argument(
                         newArgument()
                                 .name("id")

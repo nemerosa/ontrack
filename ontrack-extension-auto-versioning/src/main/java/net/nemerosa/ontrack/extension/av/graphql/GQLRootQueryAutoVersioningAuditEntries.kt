@@ -22,7 +22,7 @@ class GQLRootQueryAutoVersioningAuditEntries(
             cache = GQLTypeCache(),
             fieldName = "autoVersioningAuditEntries",
             fieldDescription = "List of audit entries for auto versioning processing orders",
-            itemType = gqlTypeAutoVersioningAuditEntry,
+            itemType = gqlTypeAutoVersioningAuditEntry.typeName,
             itemListCounter = { env, _ ->
                 val filterInput = env.getArgument<Any?>("filter")
                 val filter = filterInput?.let { gqlinputAutoVersioningAuditQueryFilter.convert(it) }

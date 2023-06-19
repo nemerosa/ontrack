@@ -17,40 +17,41 @@ import java.util.stream.Stream
 
 @Component
 class IndicatorComputingJobs(
-    private val structureService: StructureService,
-    private val computers: List<IndicatorComputer>,
-    private val indicatorComputingService: IndicatorComputingService,
-    private val meterRegistry: MeterRegistry,
-    private val applicationLogService: ApplicationLogService,
+        private val structureService: StructureService,
+        private val computers: List<IndicatorComputer>,
+        private val indicatorComputingService: IndicatorComputingService,
+        private val meterRegistry: MeterRegistry,
+        private val applicationLogService: ApplicationLogService,
 ) : JobOrchestratorSupplier {
 
     private val logger: Logger = LoggerFactory.getLogger(IndicatorComputingJobs::class.java)
 
-    override fun collectJobRegistrations(): Stream<JobRegistration> {
-        // Gets the list of projects
-        val projects = structureService.projectList
-        // Creates the list of jobs
-        return computers.flatMap { computer ->
-            createJobRegistrations(computer, projects)
-        }.stream()
-    }
+    override val jobRegistrations: Collection<JobRegistration>
+        get() {
+            // Gets the list of projects
+            val projects = structureService.projectList
+            // Creates the list of jobs
+            return computers.flatMap { computer ->
+                createJobRegistrations(computer, projects)
+            }
+        }
 
     private fun createJobRegistrations(computer: IndicatorComputer, projects: List<Project>): List<JobRegistration> {
         return if (computer.perProject) {
             projects
-                .filter { computer.isProjectEligible(it) }
-                .map { project ->
-                    JobRegistration(
-                        job = createJob(computer, project),
-                        schedule = computer.schedule
-                    )
-                }
+                    .filter { computer.isProjectEligible(it) }
+                    .map { project ->
+                        JobRegistration(
+                                job = createJob(computer, project),
+                                schedule = computer.schedule
+                        )
+                    }
         } else {
             listOf(
-                JobRegistration(
-                    job = createJob(computer, projects),
-                    schedule = computer.schedule
-                )
+                    JobRegistration(
+                            job = createJob(computer, projects),
+                            schedule = computer.schedule
+                    )
             )
         }
     }
@@ -62,7 +63,7 @@ class IndicatorComputingJobs(
         override fun getKey(): JobKey = getJobType(computer).getKey(project.name)
 
         override fun getDescription(): String =
-            "Computing indicator values by ${computer.name} for project ${project.name}"
+                "Computing indicator values by ${computer.name} for project ${project.name}"
 
         override fun getTask() = JobRun {
             compute(computer, project, allowFailure = true)
@@ -76,23 +77,23 @@ class IndicatorComputingJobs(
         override fun getKey(): JobKey = getJobType(computer).getKey("all")
 
         override fun getDescription(): String =
-            "Computing indicator values by ${computer.name} for all projects"
+                "Computing indicator values by ${computer.name} for all projects"
 
         override fun getTask() = JobRun {
             projects
-                .filter {
-                    !it.isDisabled && computer.isProjectEligible(it)
-                }
-                .forEach { project ->
-                    compute(computer, project, allowFailure = false)
-                }
+                    .filter {
+                        !it.isDisabled && computer.isProjectEligible(it)
+                    }
+                    .forEach { project ->
+                        compute(computer, project, allowFailure = false)
+                    }
         }
     }
 
     private fun compute(computer: IndicatorComputer, project: Project, allowFailure: Boolean) {
         meterRegistry.time(
-            METRIC_ONTRACK_INDICATORS_COMPUTING_MS,
-            "computer" to computer.id,
+                METRIC_ONTRACK_INDICATORS_COMPUTING_MS,
+                "computer" to computer.id,
         ) {
             try {
                 logger.info("[indicator-computing] computer=${computer.id},project=${project.name},start")
@@ -105,13 +106,13 @@ class IndicatorComputingJobs(
                     // Does not stop the job
                     // Just logs the error
                     applicationLogService.log(
-                        ApplicationLogEntry.error(
-                            any,
-                            NameDescription.nd("indicator-computing-error", "Indicator computation error"),
-                            "Error while computing ${computer.name} for project ${project.name}"
-                        )
-                            .withDetail("computer", computer.id)
-                            .withDetail("project", project.name)
+                            ApplicationLogEntry.error(
+                                    any,
+                                    NameDescription.nd("indicator-computing-error", "Indicator computation error"),
+                                    "Error while computing ${computer.name} for project ${project.name}"
+                            )
+                                    .withDetail("computer", computer.id)
+                                    .withDetail("project", project.name)
                     )
                     // Going on...
                 }
@@ -120,7 +121,7 @@ class IndicatorComputingJobs(
     }
 
     private fun getJobType(computer: IndicatorComputer): JobType =
-        CATEGORY.getType(computer.id).withName("Indicator computing for ${computer.name}")
+            CATEGORY.getType(computer.id).withName("Indicator computing for ${computer.name}")
 
     companion object {
         val CATEGORY: JobCategory = JobCategory.of("indicator-computing").withName("Indicator computing")

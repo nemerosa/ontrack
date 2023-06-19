@@ -1,19 +1,19 @@
 package net.nemerosa.ontrack.extension.github.service
 
-import net.nemerosa.ontrack.extension.github.AbstractGitHubTestJUnit4Support
+import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
 import net.nemerosa.ontrack.extension.github.model.GitHubAuthenticationType
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.model.support.ConfigurationRepository
 import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class GitHubConfigurationServiceIT : AbstractGitHubTestJUnit4Support() {
+class GitHubConfigurationServiceIT : AbstractGitHubTestSupport() {
 
     @Autowired
     private lateinit var configurationRepository: ConfigurationRepository

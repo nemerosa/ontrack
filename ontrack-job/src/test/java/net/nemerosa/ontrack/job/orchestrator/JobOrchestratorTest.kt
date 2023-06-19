@@ -33,13 +33,13 @@ class JobOrchestratorTest {
     }
 
     private fun createJobScheduler(): JobScheduler = DefaultJobScheduler(
-        jobDecorator = NOPJobDecorator.INSTANCE,
-        scheduler = taskExecutor,
-        jobExecutorService = scheduledExecutorService,
-        jobListener = OutputJobListener { x: String? -> println(x) },
-        initiallyPaused = false,
-        scattering = false,
-        scatteringRatio = 1.0
+            jobDecorator = NOPJobDecorator.INSTANCE,
+            scheduler = taskExecutor,
+            jobExecutorService = scheduledExecutorService,
+            jobListener = OutputJobListener { x: String? -> println(x) },
+            initiallyPaused = false,
+            scattering = false,
+            scatteringRatio = 1.0
     )
 
     @Test
@@ -47,12 +47,14 @@ class JobOrchestratorTest {
         val scheduler = createJobScheduler()
         val notScheduledException = Supplier { RuntimeException("Not scheduled") }
         val jobs = mutableListOf<JobRegistration>()
-        val jobOrchestrationSupplier = JobOrchestratorSupplier { jobs.stream() }
+        val jobOrchestrationSupplier = object : JobOrchestratorSupplier {
+            override val jobRegistrations: Collection<JobRegistration> = jobs
+        }
         val orchestrator = JobOrchestrator(
-            scheduler,
-            "Test",
-            setOf(jobOrchestrationSupplier),
-            mockk(relaxed = true),
+                scheduler,
+                "Test",
+                setOf(jobOrchestrationSupplier),
+                mockk(relaxed = true),
         )
         val key = orchestrator.key
 

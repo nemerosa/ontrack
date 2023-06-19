@@ -21,12 +21,12 @@ import java.util.stream.Stream
 
 @Service
 class ArtifactoryPromotionSyncServiceImpl(
-    private val structureService: StructureService,
-    private val propertyService: PropertyService,
-    private val artifactoryClientFactory: ArtifactoryClientFactory,
-    private val configurationService: ArtifactoryConfigurationService,
-    private val artifactoryConfProperties: ArtifactoryConfProperties,
-    private val securityService: SecurityService,
+        private val structureService: StructureService,
+        private val propertyService: PropertyService,
+        private val artifactoryClientFactory: ArtifactoryClientFactory,
+        private val configurationService: ArtifactoryConfigurationService,
+        private val artifactoryConfProperties: ArtifactoryConfProperties,
+        private val securityService: SecurityService,
 ) : ArtifactoryPromotionSyncService, JobOrchestratorSupplier, ConfigurationServiceListener<ArtifactoryConfiguration> {
 
     private val logger = LoggerFactory.getLogger(ArtifactoryPromotionSyncServiceImpl::class.java)
@@ -35,12 +35,12 @@ class ArtifactoryPromotionSyncServiceImpl(
         configurationService.addConfigurationServiceListener(this)
     }
 
-    override fun collectJobRegistrations(): Stream<JobRegistration> {
-        return if (artifactoryConfProperties.buildSyncDisabled) {
-            Stream.empty()
+    override val jobRegistrations: Collection<JobRegistration>
+        get() = if (artifactoryConfProperties.buildSyncDisabled) {
+            emptyList()
         } else if (configurationService.configurations.isEmpty()) {
             // No Artifactory configuration is created, so it's not even needed to look for configured branches
-            Stream.empty()
+            emptyList()
         } else {
             securityService.asAdmin {
                 val jobs = mutableListOf<JobRegistration>()
@@ -53,11 +53,10 @@ class ArtifactoryPromotionSyncServiceImpl(
                         }
                     }
                 }
-                // As a stream
-                jobs.stream()
+                // OK
+                jobs
             }
         }
-    }
 
     fun scheduleArtifactoryBuildSync(branch: Branch): JobRegistration {
         val property = propertyService.getProperty(branch, ArtifactoryPromotionSyncPropertyType::class.java).value
@@ -70,24 +69,24 @@ class ArtifactoryPromotionSyncServiceImpl(
 
     private fun getBranchSyncJob(branch: Branch): Job {
         return propertyService.getProperty(branch, ArtifactoryPromotionSyncPropertyType::class.java).value
-            ?.let { _: ArtifactoryPromotionSyncProperty ->
-                object : AbstractBranchJob(
-                    structureService, branch) {
-                    override fun getKey(): JobKey =
-                        getBranchSyncJobKey(branch)
+                ?.let { _: ArtifactoryPromotionSyncProperty ->
+                    object : AbstractBranchJob(
+                            structureService, branch) {
+                        override fun getKey(): JobKey =
+                                getBranchSyncJobKey(branch)
 
-                    override fun getTask(): JobRun =
-                        JobRun { runListener: JobRunListener -> sync(branch, runListener) }
+                        override fun getTask(): JobRun =
+                                JobRun { runListener: JobRunListener -> sync(branch, runListener) }
 
-                    override fun getDescription(): String =
-                        "Synchronisation of promotions with Artifactory for branch ${branch.project.name}/${branch.name}"
+                        override fun getDescription(): String =
+                                "Synchronisation of promotions with Artifactory for branch ${branch.project.name}/${branch.name}"
 
-                    override fun isValid(): Boolean =
-                        super.isValid() &&
-                                propertyService.hasProperty(branch, ArtifactoryPromotionSyncPropertyType::class.java)
+                        override fun isValid(): Boolean =
+                                super.isValid() &&
+                                        propertyService.hasProperty(branch, ArtifactoryPromotionSyncPropertyType::class.java)
+                    }
                 }
-            }
-            ?: throw IllegalStateException("Branch not configured for Artifactory")
+                ?: throw IllegalStateException("Branch not configured for Artifactory")
     }
 
     override fun sync(branch: Branch, listener: JobRunListener) {
@@ -98,19 +97,19 @@ class ArtifactoryPromotionSyncServiceImpl(
         val buildNameFilter = syncProperty.value.buildNameFilter
         val configuration: ArtifactoryConfiguration = syncProperty.value.configuration
         val log =
-            "Sync branch ${branch.project.name}/${branch.name} with Artifactory build $buildName ($buildNameFilter)"
+                "Sync branch ${branch.project.name}/${branch.name} with Artifactory build $buildName ($buildNameFilter)"
         logger.info("[artifactory-sync] {}", log)
         listener.message(log)
         // Build name filter
         val buildNamePattern = Pattern.compile(
-            StringUtils.replace(StringUtils.replace(buildNameFilter, ".", "\\."), "*", ".*")
+                StringUtils.replace(StringUtils.replace(buildNameFilter, ".", "\\."), "*", ".*")
         )
         // Gets an Artifactory client
         val client = artifactoryClientFactory.getClient(configuration)
         // Gets all the build numbers for the specified build name
         val buildNumbers = client.getBuildNumbers(buildName)
-            // ... and filter them
-            .filter { name: String -> buildNamePattern.matcher(name).matches() }
+                // ... and filter them
+                .filter { name: String -> buildNamePattern.matcher(name).matches() }
         // Synchronises the promotion levels for each build
         for (buildNumber in buildNumbers) {
             syncBuild(branch, buildName, buildNumber, client, listener)
@@ -118,24 +117,24 @@ class ArtifactoryPromotionSyncServiceImpl(
     }
 
     override fun syncBuild(
-        branch: Branch,
-        artifactoryBuildName: String,
-        buildName: String,
-        client: ArtifactoryClient,
-        listener: JobRunListener,
+            branch: Branch,
+            artifactoryBuildName: String,
+            buildName: String,
+            client: ArtifactoryClient,
+            listener: JobRunListener,
     ) {
         // Looks for the build
         val buildOpt = structureService.findBuildByName(
-            branch.project.name,
-            branch.name,
-            buildName
+                branch.project.name,
+                branch.name,
+                buildName
         )
         if (buildOpt.isPresent) {
             // Log
             val log = String.format("Sync branch %s/%s for Artifactory build %s",
-                branch.project.name,
-                branch.name,
-                buildName)
+                    branch.project.name,
+                    branch.name,
+                    buildName)
             logger.debug("[artifactory-sync] {}", log)
             listener.message(log)
             // Gets the build information from Artifactory
@@ -147,29 +146,29 @@ class ArtifactoryPromotionSyncServiceImpl(
                 val statusName = artifactoryStatus.name
                 // Looks for an existing promotion level with the same name on the branch
                 val promotionLevelOpt = structureService.findPromotionLevelByName(
-                    branch.project.name,
-                    branch.name,
-                    statusName
+                        branch.project.name,
+                        branch.name,
+                        statusName
                 )
                 if (promotionLevelOpt.isPresent) {
                     // Looks for an existing promotion run for the build
                     val runOpt = structureService.getLastPromotionRunForBuildAndPromotionLevel(buildOpt.get(),
-                        promotionLevelOpt.get())
+                            promotionLevelOpt.get())
                     if (!runOpt.isPresent) {
                         // No existing promotion, we can promote safely
                         logger.info("[artifactory-sync] Promote {}/{}/{} to {}",
-                            branch.project.name,
-                            branch.name,
-                            buildName,
-                            statusName)
+                                branch.project.name,
+                                branch.name,
+                                buildName,
+                                statusName)
                         // Actual promotion
                         structureService.newPromotionRun(
-                            PromotionRun.of(
-                                buildOpt.get(),
-                                promotionLevelOpt.get(),
-                                Signature.of(artifactoryStatus.user).withTime(artifactoryStatus.timestamp),
-                                "Promoted from Artifactory"
-                            )
+                                PromotionRun.of(
+                                        buildOpt.get(),
+                                        promotionLevelOpt.get(),
+                                        Signature.of(artifactoryStatus.user).withTime(artifactoryStatus.timestamp),
+                                        "Promoted from Artifactory"
+                                )
                         )
                     }
                 }
@@ -179,6 +178,6 @@ class ArtifactoryPromotionSyncServiceImpl(
 
     companion object {
         private val ARTIFACTORY_BUILD_SYNC_JOB = JobCategory.of("artifactory").withName("Artifactory")
-            .getType("build-sync").withName("Artifactory Build synchronisation")
+                .getType("build-sync").withName("Artifactory Build synchronisation")
     }
 }

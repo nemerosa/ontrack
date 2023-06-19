@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
-import net.nemerosa.ontrack.graphql.support.getDescription
+import net.nemerosa.ontrack.model.annotations.getAPITypeName
 import net.nemerosa.ontrack.model.preferences.Preferences
 import net.nemerosa.ontrack.model.preferences.PreferencesService
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -56,7 +56,7 @@ class GQLTypePreferences : GQLType {
     override fun createType(cache: GQLTypeCache): GraphQLObjectType =
         GraphQLObjectType.newObject()
             .name(typeName)
-            .description(getDescription(Preferences::class))
+            .description(getAPITypeName(Preferences::class))
             .fields(GraphQLBeanConverter.asObjectFields(Preferences::class, cache))
             .build()
 

@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.extension.github.ingestion.payload
 
-import com.fasterxml.jackson.databind.JsonNode
-
 interface IngestionHookSignatureService {
 
     /**

@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
  */
 @Component
 class ElasticSearchIndexationJobs(
-        private val searchIndexers: List<SearchIndexer<*>>,
+        private val searchIndexers: List<SearchIndexer<SearchItem>>,
         private val elasticSearchService: SearchIndexService,
         private val jobScheduler: JobScheduler
 ) : JobProvider {
@@ -69,7 +69,12 @@ class ElasticSearchIndexationJobs(
             schedule = searchIndexer.indexerSchedule
     )
 
-    private fun <T : SearchItem> createIndexationJob(indexer: SearchIndexer<T>) = object : Job {
+    private fun <T : SearchItem> createIndexationJob(indexer: SearchIndexer<T>) = ElasticSearchIndexationJob(indexer)
+
+    private inner class ElasticSearchIndexationJob<T : SearchItem>(
+            private val indexer: SearchIndexer<T>,
+    ) : Job {
+
         override fun isDisabled(): Boolean = false
 
         override fun getKey(): JobKey =

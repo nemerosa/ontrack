@@ -41,8 +41,8 @@ plugins {
     id("nebula.deb") version "8.1.0"
     id("nebula.rpm") version "8.1.0"
     id("org.sonarqube") version "2.5"
-    id("com.avast.gradle.docker-compose") version "0.14.3"
-    id("com.bmuschko.docker-remote-api") version "6.4.0"
+    id("com.avast.gradle.docker-compose") version "0.16.12"
+    id("com.bmuschko.docker-remote-api") version "9.3.1"
     id("org.springframework.boot") version Versions.springBootVersion apply false
     id("io.freefair.aggregate-javadoc") version "4.1.2"
     id("com.github.breadmoirai.github-release") version "2.2.11"
@@ -87,8 +87,8 @@ val itProject: String by project
 
 configure<ComposeExtension> {
     createNested("integrationTest").apply {
-        useComposeFiles = listOf("compose/docker-compose-it.yml")
-        projectName = itProject
+        useComposeFiles.addAll(listOf("compose/docker-compose-it.yml"))
+        setProjectName(itProject)
     }
 }
 
@@ -138,7 +138,8 @@ configure(javaProjects) p@{
     apply(plugin = "signing")
 
     // Java level
-    java.sourceCompatibility = JavaVersion.VERSION_11
+    java.sourceCompatibility = JavaVersion.VERSION_17
+    java.targetCompatibility = JavaVersion.VERSION_17
 
 }
 
@@ -260,6 +261,7 @@ configure(coreProjects) p@{
         imports {
             mavenBom(SpringBootPlugin.BOM_COORDINATES) {
                 bomProperty("kotlin.version", Versions.kotlinVersion)
+                bomProperty("kotlin-coroutines.version", Versions.kotlinCoroutinesVersion)
             }
         }
         dependencies {
@@ -270,7 +272,6 @@ configure(coreProjects) p@{
             dependency("org.apache.commons:commons-math3:3.6.1")
             dependency("args4j:args4j:2.33")
             dependency("org.jgrapht:jgrapht-core:1.3.0")
-            dependency("com.graphql-java:graphql-java:15.0")
             dependency("com.opencsv:opencsv:5.2")
             dependency("org.testcontainers:testcontainers:1.16.2")
             dependency("org.jetbrains.kotlin:kotlin-test:${Versions.kotlinVersion}")
@@ -295,10 +296,10 @@ configure(coreProjects) p@{
         "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinCoroutinesVersion}")
         "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${Versions.kotlinCoroutinesVersion}")
         // Lombok
-        "compileOnly"("org.projectlombok:lombok:1.18.10")
-        "annotationProcessor"("org.projectlombok:lombok:1.18.10")
-        "testCompileOnly"("org.projectlombok:lombok:1.18.10")
-        "testAnnotationProcessor"("org.projectlombok:lombok:1.18.10")
+        "compileOnly"("org.projectlombok:lombok:1.18.26")
+        "annotationProcessor"("org.projectlombok:lombok:1.18.26")
+        "testCompileOnly"("org.projectlombok:lombok:1.18.26")
+        "testAnnotationProcessor"("org.projectlombok:lombok:1.18.26")
         // Testing
         "testImplementation"("org.springframework.boot:spring-boot-starter-test")
         "testImplementation"("org.junit.vintage:junit-vintage-engine") {
@@ -314,7 +315,7 @@ configure(coreProjects) p@{
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
-            jvmTarget = "11"
+            jvmTarget = "17"
             freeCompilerArgs = listOf("-Xjsr305=strict")
         }
     }
@@ -451,15 +452,15 @@ val dockerBuild by tasks.registering(DockerBuildImage::class) {
 }
 
 /**
- * Acceptance tasks
+ * Acceptance tasks running from the JAR
  */
 
 dockerCompose {
     createNested("local").apply {
-        useComposeFiles = listOf("compose/docker-compose-local.yml")
-        projectName = "ci"
-        captureContainersOutputToFiles = project.file("${project.buildDir}/local-logs")
-        tcpPortsToIgnoreWhenWaiting = listOf(8083, 8086)
+        useComposeFiles.set(listOf("compose/docker-compose-local.yml"))
+        setProjectName("ci")
+        captureContainersOutputToFiles.set(project.file("${project.buildDir}/local-logs"))
+        tcpPortsToIgnoreWhenWaiting.set(listOf(8083, 8086))
     }
 }
 
@@ -482,7 +483,25 @@ tasks.register("localAcceptanceTest", RemoteAcceptanceTest::class) {
     acceptanceTimeout = 300
     acceptanceImplicitWait = 30
     dependsOn("localComposeUp")
+    dependsOn(":ontrack-acceptance:assemble")
     finalizedBy("localComposeDown")
+}
+
+/**
+ * Acceptance tests running as Docker Compose
+ */
+
+dockerCompose {
+    createNested("acceptance").apply {
+        useComposeFiles.set(listOf("ontrack-acceptance/src/main/compose/docker-compose.yml"))
+        setProjectName("acceptance")
+        tcpPortsToIgnoreWhenWaiting.set(listOf(8083, 8086))
+    }
+}
+
+tasks.named<ComposeUp>("acceptanceComposeUp") {
+    dependsOn(":ontrack-acceptance:dockerBuild")
+    dependsOn(":dockerBuild")
 }
 
 /**
@@ -494,11 +513,11 @@ val devPostgresPort: String by project
 
 dockerCompose {
     createNested("dev").apply {
-        useComposeFiles = listOf("compose/docker-compose-dev.yml")
-        projectName = "dev"
-        captureContainersOutputToFiles = project.file("${project.buildDir}/dev-logs")
-        environment["POSTGRES_NAME"] = devPostgresName
-        environment["POSTGRES_PORT"] = devPostgresPort
+        useComposeFiles.set(listOf("compose/docker-compose-dev.yml"))
+        setProjectName("dev")
+        captureContainersOutputToFiles.set(project.file("${project.buildDir}/dev-logs"))
+        environment.put("POSTGRES_NAME", devPostgresName)
+        environment.put("POSTGRES_PORT", devPostgresPort)
     }
 }
 
@@ -609,11 +628,11 @@ val prepareGitHubRelease by tasks.registering(Copy::class) {
 }
 
 val gitHubChangeLogReleaseBranch: String by project
-val gitHubChangeLogReleaseBranchFilter: String by project
+val gitHubChangeLogCurrentBuild: String by project
 
 val githubReleaseChangeLog by tasks.registering(OntrackChangeLog::class) {
     ontrackReleaseBranch = gitHubChangeLogReleaseBranch
-    ontrackReleaseFilter = gitHubChangeLogReleaseBranchFilter
+    ontrackCurrentBuild = gitHubChangeLogCurrentBuild
     format = "text"
 }
 
@@ -650,7 +669,7 @@ val githubRelease by tasks.named("githubRelease") {
 
 val slackReleaseChangeLog by tasks.registering(OntrackChangeLog::class) {
     ontrackReleaseBranch = gitHubChangeLogReleaseBranch
-    ontrackReleaseFilter = gitHubChangeLogReleaseBranchFilter
+    ontrackCurrentBuild = gitHubChangeLogCurrentBuild
     format = "slack"
 }
 
@@ -687,12 +706,12 @@ val release by tasks.registering {
 
 val siteOntrackLast3Releases by tasks.registering(OntrackLastReleases::class) {
     releaseCount = 1
-    releaseBranchPattern = "3\\.[\\d]+"
+    releaseBranchPattern = "3\\.\\d+"
 }
 
 val siteOntrackLast4Releases by tasks.registering(OntrackLastReleases::class) {
     releaseCount = 2
-    releaseBranchPattern = "4\\.[\\d]+"
+    releaseBranchPattern = "4\\.\\d+"
 }
 
 val sitePagesDocJs by tasks.registering {
@@ -702,7 +721,7 @@ val sitePagesDocJs by tasks.registering {
     doLast {
         val allReleases = siteOntrackLast4Releases.get().releases +
                 siteOntrackLast3Releases.get().releases
-        val allVersions = allReleases.joinToString(",") { "'${it.name}'" }
+        val allVersions = allReleases.joinToString(",") { "'$it'" }
         project.file("ontrack-site/src/main/web/output/assets/web/assets/ontrack/doc.js").writeText(
                 """const releases = [$allVersions];"""
         )

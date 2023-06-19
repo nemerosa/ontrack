@@ -14,9 +14,3 @@ include::configuration-properties.adoc[]
 // include::appendix-postgres-flyway.adoc[]
 
 // include::appendix-postgres-production-data.adoc[]
-
-// [[dsl-doc]]
-// === DSL Reference
-
-// This documented in generated
-// include::generated/dsl-index.adoc[]

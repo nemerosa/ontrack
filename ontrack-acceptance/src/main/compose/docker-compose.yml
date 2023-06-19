@@ -1,6 +1,7 @@
 version: "2.1"
 
 services:
+
    postgres:
     image: postgres:11
     environment:
@@ -9,9 +10,6 @@ services:
       POSTGRES_PASSWORD: ontrack
    elasticsearch:
       image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
-      ports:
-         - "9200:9200"
-         - "9300:9300"
       environment:
          - "discovery.type=single-node"
          - bootstrap.memory_lock=true
@@ -23,13 +21,8 @@ services:
 
    influxdb:
     image: influxdb:1.8.6
-
-   keycloak:
-      image: quay.io/keycloak/keycloak:12.0.4
-      environment:
-         KEYCLOAK_USER: admin
-         KEYCLOAK_PASSWORD: admin
-         DB_VENDOR: h2
+    ports:
+       - "8086"
 
    # Rabbit MQ
    rabbitmq:
@@ -38,21 +31,20 @@ services:
       environment:
          RABBITMQ_DEFAULT_USER: ontrack
          RABBITMQ_DEFAULT_PASS: ontrack
-      ports:
-         - "15672:15672"
-         - "5672:5672"
 
    ontrack:
       image: "nemerosa/ontrack:${VERSION:-latest}"
       depends_on:
          postgres:
             condition: service_started
-         influxdb:
-           condition: service_started
-         keycloak:
-            condition: service_started
          elasticsearch:
-           condition: service_started
+            condition: service_started
+         rabbitmq:
+            condition: service_started
+         influxdb:
+            condition: service_started
+      ports:
+         - "8080"
       environment:
          PROFILE: acceptance
          ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
@@ -61,6 +53,7 @@ services:
          # InfluxDB being enabled
          ONTRACK_INFLUXDB_ENABLED: "true"
          ONTRACK_INFLUXDB_URI: "http://influxdb:8086"
+         ONTRACK_INFLUXDB_PREFIX: "ontrack_acceptance"
          # Elastic search
          ONTRACK_CONFIG_SEARCH_ENGINE: "elasticsearch"
          ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
@@ -71,28 +64,11 @@ services:
          SPRING_RABBITMQ_PASSWORD: ontrack
          # Notifications
          ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_ENABLED: "false"
+
    selenium:
-      image: "selenium/standalone-chrome:108.0"
+      image: "seleniarm/standalone-chromium:112.0"
       shm_size: 2g
+      ports:
+         - "4444"
       environment:
          SE_OPTS: "--log-level INFO"
-   ontrack_acceptance:
-      image: "nemerosa/ontrack-acceptance:${VERSION:-latest}"
-      depends_on:
-         ontrack:
-            condition: service_healthy
-         keycloak:
-            condition: service_started
-         selenium:
-            condition: service_started
-      environment:
-         ONTRACK_ACCEPTANCE_SELENIUM_GRID_URL: http://selenium:4444/wd/hub
-         ONTRACK_ACCEPTANCE_SELENIUM_BROWSER_NAME: chrome
-         ONTRACK_ACCEPTANCE_SELENIUM_TARGET_URL: http://ontrack:8080
-         ONTRACK_ACCEPTANCE_IMPLICIT_WAIT: 60
-         ONTRACK_ACCEPTANCE_TARGET_URL: http://ontrack:8080
-         ONTRACK_ACCEPTANCE_INFLUXDB_URI: http://influxdb:8086
-         ONTRACK_ACCEPTANCE_KEYCLOAK_URI: http://keycloak:8080
-         JAVA_OPTIONS: "-Xmx3072m -Xms3072m"
-      volumes:
-         - "./build:/ontrack/acceptance/output:rw"

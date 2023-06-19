@@ -1,0 +1,21 @@
+{
+  "payload_version": 1,
+  "notification_configuration_id": "nc-cnAB5mRWj26nk1ee",
+  "run_url": "https://app.terraform.io/app/#organizationName/#workspaceName/runs/#runId",
+  "run_id": "#runId",
+  "run_message": "Testing the apply",
+  "run_created_at": "2023-03-24T19:14:23.000Z",
+  "run_created_by": "dcoraboeuf",
+  "workspace_id": "#workspaceId",
+  "workspace_name": "#workspaceName",
+  "organization_name": "#organizationName",
+  "notifications": [
+    {
+      "message": "Run Errored",
+      "trigger": "run:errored",
+      "run_status": "applied",
+      "run_updated_at": "2023-03-24T19:17:01.000Z",
+      "run_updated_by": null
+    }
+  ]
+}

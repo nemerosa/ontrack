@@ -2,7 +2,7 @@ ontrack
 =======
 
 [![codecov](https://codecov.io/gh/nemerosa/ontrack/branch/develop/graph/badge.svg)](https://codecov.io/gh/nemerosa/ontrack)
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/nemerosa/ontrack)
+[![Slack chat](https://img.shields.io/badge/slack-ontrack-brightgreen.svg?logo=slack)](https://ontrack-run.slack.com/)
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/nemerosa/ontrack.svg)](http://isitmaintained.com/project/nemerosa/ontrack "Average time to resolve an issue")
 
 # [Continuous delivery monitoring](https://nemerosa.github.io/ontrack).

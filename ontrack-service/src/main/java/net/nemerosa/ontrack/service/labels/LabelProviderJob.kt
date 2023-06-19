@@ -28,20 +28,19 @@ class LabelProviderJob(
                 .getType("label-provider").withName("Label Provider")
     }
 
-    override fun collectJobRegistrations(): Stream<JobRegistration> {
+    override val jobRegistrations: Collection<JobRegistration> get() {
         val settings: LabelProviderJobSettings = settingsService.getCachedSettings(LabelProviderJobSettings::class.java)
         return if (settings.enabled) {
             if (settings.perProject) {
                 securityService.asAdmin {
                     structureService.projectList
                             .map { createLabelProviderJobRegistrationForProject(it, settings) }
-                            .stream()
                 }
             } else {
-                sequenceOf(createLabelProviderJobRegistration(settings)).asStream()
+                listOf(createLabelProviderJobRegistration(settings))
             }
         } else {
-            emptySequence<JobRegistration>().asStream()
+            emptyList()
         }
     }
 

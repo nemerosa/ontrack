@@ -1,0 +1,9 @@
+type Query {
+    """Basic test service"""
+    ping: String
+}
+
+type Mutation {
+    """Basic test service"""
+    ping: String
+}

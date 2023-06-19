@@ -21,10 +21,10 @@ dependencies {
 
 configure<ComposeExtension> {
     createNested("kdslAcceptanceTest").apply {
-        useComposeFiles = listOf("src/test/compose/docker-compose.yml")
-        projectName = "kdsl"
-        environment["ONTRACK_VERSION"] = project.version.toString()
-        captureContainersOutputToFiles = file("build/logs/containers")
+        useComposeFiles.addAll(listOf("src/test/compose/docker-compose.yml"))
+        setProjectName("kdsl")
+        environment.put("ONTRACK_VERSION", project.version.toString())
+        captureContainersOutputToFiles.set(file("build/logs/containers"))
     }
 }
 
@@ -65,7 +65,6 @@ tasks.named<Test>("test") {
 }
 
 // Running the acceptance tests
-
 
 val kdslAcceptanceTest by tasks.registering(Test::class) {
     useJUnitPlatform()

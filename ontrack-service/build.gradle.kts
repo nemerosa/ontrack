@@ -1,5 +1,4 @@
 plugins {
-    groovy
     `java-library`
 }
 
@@ -25,7 +24,6 @@ dependencies {
 
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
-    testImplementation("org.codehaus.groovy:groovy")
 
     testRuntimeOnly(project(":ontrack-repository-impl"))
     testRuntimeOnly("io.micrometer:micrometer-registry-prometheus")

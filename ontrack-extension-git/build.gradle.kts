@@ -1,7 +1,6 @@
 import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
 
 plugins {
-    groovy
     `java-library`
 }
 
@@ -27,8 +26,7 @@ dependencies {
     testImplementation(project(path = ":ontrack-extension-issues", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-scm", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
-    testImplementation("org.codehaus.groovy:groovy")
-    
+
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
     testRuntimeOnly("org.springframework.boot:spring-boot-starter-web")

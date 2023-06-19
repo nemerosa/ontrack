@@ -6,7 +6,8 @@ import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.field
-import net.nemerosa.ontrack.graphql.support.getDescription
+import net.nemerosa.ontrack.model.annotations.getAPITypeName
+import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.links.BranchLinksEdge
 import org.springframework.stereotype.Component
 
@@ -26,13 +27,13 @@ class GQLTypeBranchLinksEdge(
     override fun createType(cache: GQLTypeCache): GraphQLObjectType =
         GraphQLObjectType.newObject()
             .name(TYPENAME)
-            .description(getDescription(BranchLinksEdge::class))
+            .description(getAPITypeName(BranchLinksEdge::class))
             .field(BranchLinksEdge::direction, gqlEnumBranchLinksDirection.getTypeRef())
             .field(BranchLinksEdge::linkedTo, GQLTypeBranchLinksNode.TYPENAME)
             // TODO V4 Use listField
             .field {
                 it.name(BranchLinksEdge::decorations.name)
-                    .description(getDescription(BranchLinksEdge::decorations))
+                    .description(getPropertyDescription(BranchLinksEdge::decorations))
                     .type(
                         GraphQLNonNull(
                             GraphQLList(

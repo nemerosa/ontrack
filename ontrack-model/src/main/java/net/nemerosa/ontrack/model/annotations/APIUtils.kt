@@ -5,12 +5,6 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
 
-@Deprecated("Use getPropertyDescription")
-fun getDescription(property: KProperty<*>, defaultDescription: String? = null): String =
-    defaultDescription
-        ?: property.findAnnotation<APIDescription>()?.value
-        ?: "${property.name} property"
-
 /**
  * Getting the description for a property.
  *

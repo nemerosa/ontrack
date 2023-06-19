@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicatorAttributeType
 import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicatorService
 import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicatorState
-import net.nemerosa.ontrack.graphql.support.getDescription
 import net.nemerosa.ontrack.json.getTextField
+import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Int
 import net.nemerosa.ontrack.model.form.Text
@@ -38,13 +38,13 @@ class ConfigurableIndicatorController(
             .with(
                 YesNo.of(ConfigurableIndicatorState::enabled.name)
                     .label("Enabled")
-                    .help(getDescription(ConfigurableIndicatorState::enabled))
+                    .help(getPropertyDescription(ConfigurableIndicatorState::enabled))
                     .value(configurableIndicatorState?.enabled)
             )
             .with(
                 Text.of(ConfigurableIndicatorState::link.name)
                     .label("Link")
-                    .help(getDescription(ConfigurableIndicatorState::link))
+                    .help(getPropertyDescription(ConfigurableIndicatorState::link))
                     .optional()
                     .value(configurableIndicatorState?.link)
             )

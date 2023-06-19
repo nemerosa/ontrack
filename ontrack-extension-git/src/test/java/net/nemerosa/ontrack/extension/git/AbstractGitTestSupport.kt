@@ -10,8 +10,8 @@ import net.nemerosa.ontrack.extension.git.property.*
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.git.support.*
+import net.nemerosa.ontrack.extension.issues.mock.TestIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.model.toIdentifier
-import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.git.support.GitRepo
@@ -24,7 +24,6 @@ import net.nemerosa.ontrack.model.support.NoConfig
 import net.nemerosa.ontrack.test.TestUtils
 import org.springframework.beans.factory.annotation.Autowired
 import java.lang.Thread.sleep
-import java.util.function.Consumer
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -122,7 +121,7 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
             gitConfigurationService.newConfiguration(
                     BasicGitConfiguration.empty()
                             .withName(gitConfigurationName)
-                            .withIssueServiceConfigurationIdentifier(MockIssueServiceConfiguration.INSTANCE.toIdentifier().format())
+                            .withIssueServiceConfigurationIdentifier(TestIssueServiceConfiguration.INSTANCE.toIdentifier().format())
                             .withRemote("file://${repo.dir.absolutePath}")
             )
         }

@@ -21,6 +21,7 @@ interface Connector {
     fun get(
         path: String,
         headers: Map<String, String> = emptyMap(),
+        noAuth: Boolean = false,
     ): ConnectorResponse
 
     /**
@@ -39,6 +40,14 @@ interface Connector {
         path: String,
         headers: Map<String, String> = emptyMap(),
         body: Any? = null,
+    )
+
+    /**
+     * Deletes a payload to a relative URL.
+     */
+    fun delete(
+        path: String,
+        headers: Map<String, String> = emptyMap()
     )
 
 }

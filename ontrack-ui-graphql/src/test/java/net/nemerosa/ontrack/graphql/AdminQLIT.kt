@@ -6,12 +6,12 @@ import net.nemerosa.ontrack.it.support.TestAuthenticationSourceProvider
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.TokensService
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.access.AccessDeniedException
+import org.springframework.graphql.execution.ErrorType
 import kotlin.test.*
 
-class AdminQLIT : AbstractQLKTITJUnit4Support() {
+class AdminQLIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var mappingService: AccountGroupMappingService
@@ -25,19 +25,27 @@ class AdminQLIT : AbstractQLKTITJUnit4Support() {
     private val JsonNode.name: String? get() = get("name").asText()
     private val JsonNode.id: Int get() = get("id").asInt()
 
-    @Test(expected = AccessDeniedException::class)
+    @Test
     fun `List of groups needs authorisation`() {
-        run("""{ accountGroups { id } }""")
+        runWithError(
+                """{ accountGroups { id } }""",
+                errorMessage = "Global function 'AccountGroupManagement' is not granted.",
+                errorClassification = ErrorType.FORBIDDEN,
+        )
     }
 
-    @Test(expected = AccessDeniedException::class)
+    @Test
     fun `List of accounts needs authorisation`() {
-        run("""{ accounts { id } }""")
+        runWithError(
+                """{ accounts { id } }""",
+                errorMessage = "Global function 'AccountManagement' is not granted.",
+                errorClassification = ErrorType.FORBIDDEN,
+        )
     }
 
     @Test
     fun `List of groups`() {
-        asUser().with(AccountGroupManagement::class.java).call {
+        asUser().with(AccountGroupManagement::class.java).execute {
             val g = accountService.createGroup(AccountGroupInput(uid("G"), "")).id()
             val data = run("""{ accountGroups { id name } }""")
             assertNotNull(data["accountGroups"].find { it["id"].asInt() == g })
@@ -678,12 +686,12 @@ class AdminQLIT : AbstractQLKTITJUnit4Support() {
                 // Creates a group and a mapping
                 val adminGroup = doCreateAccountGroupWithGlobalRole(Roles.GLOBAL_ADMINISTRATOR)
                 mappingService.newMapping(account.authenticationSource, AccountGroupMappingInput(
-                    "provided-admin",
-                    adminGroup.id
+                        "provided-admin",
+                        adminGroup.id
                 ))
                 // Queries them
                 run(
-                    """
+                        """
                         {
                             accounts(id: ${account.id}) {
                                 contributedGroups {
@@ -696,14 +704,14 @@ class AdminQLIT : AbstractQLKTITJUnit4Support() {
                 ).let { data ->
                     val accountNode = data.path("accounts").first()
                     assertEquals(
-                        setOf(adminGroup.name),
-                        accountNode.path("contributedGroups").map { it.path("name").asText() }.toSet(),
-                        "Expected contributed groups"
+                            setOf(adminGroup.name),
+                            accountNode.path("contributedGroups").map { it.path("name").asText() }.toSet(),
+                            "Expected contributed groups"
                     )
                     assertEquals(
-                        providedGroupNames,
-                        accountNode.path("providedGroups").map { it.asText() }.toSet(),
-                        "Expected provided groups"
+                            providedGroupNames,
+                            accountNode.path("providedGroups").map { it.asText() }.toSet(),
+                            "Expected provided groups"
                     )
                 }
             }

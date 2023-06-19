@@ -321,7 +321,7 @@ class Config {
                 ]
         )
         def labels = result.data.labels
-        if (labels.size > 0) {
+        if (labels.size() > 0) {
             return new Label(ontrack, labels.first())
         } else {
             return null

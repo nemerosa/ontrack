@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.graphql
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 /**
  * Management of build links using GraphQL.
  */
-class BuildLinksGraphQLIT : AbstractQLKTITJUnit4Support() {
+class BuildLinksGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Linking a build to another build using names`() {

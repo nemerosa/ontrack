@@ -1,17 +1,17 @@
 package net.nemerosa.ontrack.extension.jenkins.indicator
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
+import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.extension.indicators.computing.*
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueType
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTypeConfig
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class JenkinsPipelineFileIndicatorComputerIT : AbstractGitTestJUnit4Support() {
+class JenkinsPipelineFileIndicatorComputerIT : AbstractGitTestSupport() {
 
     @Autowired
     private lateinit var computer: JenkinsPipelineFileIndicatorComputer

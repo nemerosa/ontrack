@@ -7,45 +7,45 @@ import java.util.*
 /**
  * UUID scalar type.
  */
-class GQLScalarUUID private constructor() : GraphQLScalarType(
-    "UUID",
-    "UUID",
-    object : Coercing<UUID, String?> {
+object GQLScalarUUID {
+    val INSTANCE: GraphQLScalarType = GraphQLScalarType.newScalar()
+            .name("UUID")
+            .description("UUID")
+            .coercing(
+                    object : Coercing<UUID, String?> {
 
-        override fun serialize(dataFetcherResult: Any): String? =
-            if (dataFetcherResult is UUID) {
-                dataFetcherResult.toString()
-            } else {
-                throw CoercingSerializeException("Cannot serialize ${dataFetcherResult::class.java} into a string")
-            }
+                        override fun serialize(dataFetcherResult: Any): String =
+                                if (dataFetcherResult is UUID) {
+                                    dataFetcherResult.toString()
+                                } else {
+                                    throw CoercingSerializeException("Cannot serialize ${dataFetcherResult::class.java} into a string")
+                                }
 
-        override fun parseValue(input: Any): UUID =
-            when (input) {
-                is String -> try {
-                    parse(input)
-                } catch (ex: IllegalArgumentException) {
-                    throw CoercingParseValueException("Cannot parse value: $input", ex)
-                }
-                else -> throw CoercingParseValueException("Cannot parse value: $input")
-            }
+                        override fun parseValue(input: Any): UUID =
+                                when (input) {
+                                    is String -> try {
+                                        parse(input)
+                                    } catch (ex: IllegalArgumentException) {
+                                        throw CoercingParseValueException("Cannot parse value: $input", ex)
+                                    }
 
-        override fun parseLiteral(input: Any): UUID =
-            when (input) {
-                is StringValue -> try {
-                    parse(input.value)
-                } catch (ex: IllegalArgumentException) {
-                    throw CoercingParseLiteralException("Cannot parse literal: $input", ex)
-                }
-                else -> throw CoercingParseLiteralException("Cannot parse literal: $input")
-            }
+                                    else -> throw CoercingParseValueException("Cannot parse value: $input")
+                                }
 
-        private fun parse(input: String): UUID =
-            UUID.fromString(input)
-    }
-) {
+                        override fun parseLiteral(input: Any): UUID =
+                                when (input) {
+                                    is StringValue -> try {
+                                        parse(input.value)
+                                    } catch (ex: IllegalArgumentException) {
+                                        throw CoercingParseLiteralException("Cannot parse literal: $input", ex)
+                                    }
 
-    companion object {
-        val INSTANCE = GQLScalarUUID()
-    }
+                                    else -> throw CoercingParseLiteralException("Cannot parse literal: $input")
+                                }
 
+                        private fun parse(input: String): UUID =
+                                UUID.fromString(input)
+                    }
+            )
+            .build()
 }

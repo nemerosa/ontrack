@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.asOptional
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.parseInto
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.support.StorageService
 import net.nemerosa.ontrack.repository.StorageRepository
 import org.springframework.stereotype.Service
@@ -58,6 +59,40 @@ class StorageServiceImpl(
 
     override fun count(store: String, context: String, query: String?, queryVariables: Map<String, *>?): Int =
         repository.count(store, context, query, queryVariables)
+
+    override fun <T : Any> paginatedFilter(
+        store: String,
+        type: KClass<T>,
+        offset: Int,
+        size: Int,
+        context: String,
+        query: String?,
+        queryVariables: Map<String, *>?,
+        orderQuery: String?
+    ): PaginatedList<T> {
+        val items = filter(
+            store = store,
+            type = type,
+            offset = offset,
+            size = size,
+            context = context,
+            query = query,
+            queryVariables = queryVariables,
+            orderQuery = orderQuery
+        )
+        val total = repository.count(
+            store = store,
+            context = context,
+            query = query,
+            queryVariables = queryVariables,
+        )
+        return PaginatedList.create(
+            items = items,
+            offset = offset,
+            pageSize = size,
+            total = total,
+        )
+    }
 
     override fun <T : Any> filter(
         store: String,

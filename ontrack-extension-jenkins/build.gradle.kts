@@ -17,7 +17,6 @@ dependencies {
 
     implementation("org.apache.commons:commons-lang3")
 
-    testImplementation("org.codehaus.groovy:groovy")
     testImplementation(project(":ontrack-test-utils"))
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(":ontrack-extension-git"))

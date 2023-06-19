@@ -11,10 +11,14 @@ class Action(
      * Group this action must be put into.
      */
     val group: String? = null,
+    /**
+     * Is this action enabled?
+     */
+    val enabled: Boolean = true,
 ) {
 
-    fun withUri(uri: String): Action = Action(id, name, type, uri, group)
-    fun withGroup(group: String): Action = Action(id, name, type, uri, group)
+    fun withUri(uri: String): Action = Action(id, name, type, uri, group, enabled)
+    fun withGroup(group: String): Action = Action(id, name, type, uri, group, enabled)
 
     companion object {
 

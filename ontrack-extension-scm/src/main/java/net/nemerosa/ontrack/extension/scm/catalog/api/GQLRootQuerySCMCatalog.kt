@@ -24,7 +24,7 @@ class GQLRootQuerySCMCatalog(
                     cache = GQLTypeCache(),
                     fieldName = "scmCatalog",
                     fieldDescription = "List of SCM catalog entries and/or orphan projects",
-                    itemType = scmCatalogEntry,
+                    itemType = scmCatalogEntry.typeName,
                     itemListCounter = { env, _ -> loadSCMCatalogEntries(env, 0, Int.MAX_VALUE).size },
                     itemListProvider = { env, _, offset, size -> loadSCMCatalogEntries(env, offset, size) },
                     arguments = listOf(

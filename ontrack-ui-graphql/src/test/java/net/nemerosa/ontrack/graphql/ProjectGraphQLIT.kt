@@ -1,23 +1,480 @@
 package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
+import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.model.security.ProjectCreation
 import net.nemerosa.ontrack.model.structure.BranchFavouriteService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
+import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertNotPresent
-import net.nemerosa.ontrack.test.TestUtils
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.access.AccessDeniedException
+import org.springframework.graphql.execution.ErrorType
 import kotlin.test.*
 
-class ProjectGraphQLIT : AbstractQLKTITJUnit4Support() {
+class ProjectGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var branchFavouriteService: BranchFavouriteService
+
+    @Test
+    fun `Project by ID`() {
+        project {
+            run("{projects(id: ${id}) { name }}") { data ->
+                assertEquals(name, data.path("projects").first().path("name").asText())
+            }
+        }
+    }
+
+    @Test
+    fun `Project by ID and name is not authorised`() {
+        runWithError("""{projects(id: 1, name: "test") { name }}""", errorClassification = ErrorType.BAD_REQUEST)
+    }
+
+    @Test
+    fun `Project by name`() {
+        project {
+            run("""{projects(name: "$name") { id }}""") { data ->
+                assertEquals(
+                        id(),
+                        data.path("projects").first().path("id").asInt()
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Project branches`() {
+        project {
+            branch("B1")
+            branch("B2")
+            run("{projects(id: ${id}) { name branches { name } }}") { data ->
+                assertEquals(
+                        listOf("B2", "B1"),
+                        data.path("projects").first()
+                                .path("branches")
+                                .map {
+                                    it.path("name").asText()
+                                }
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Branch by name`() {
+        project {
+            branch("B1")
+            branch("B2")
+            run("""{projects(id: ${id}) { name branches(name: "B2") { name } }}""") { data ->
+                assertEquals(
+                        listOf("B2"),
+                        data.path("projects").first()
+                                .path("branches")
+                                .map {
+                                    it.path("name").asText()
+                                }
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Branch by regular expression`() {
+        project {
+            branch("11.8.3")
+            branch("11.9.0")
+            run("""{projects(id: ${id}) { name branches(name: "11\\.9\\.*") { name } } }""") { data ->
+                assertEquals(
+                        listOf("11.9.0"),
+                        data.path("projects").first()
+                                .path("branches")
+                                .map {
+                                    it.path("name").asText()
+                                }
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Promotion levels for a branch`() {
+        project {
+            branch {
+                (1..5).forEach { no ->
+                    promotionLevel("PL$no", "Promotion level $no")
+                }
+                run("""{
+                    projects (id: ${project.id}) {
+                        branches (name: "$name") {
+                            promotionLevels {
+                                name
+                            }
+                        }
+                    }
+                }""") { data ->
+                    assertEquals(
+                            (1..5).map { "PL$it" },
+                            data.path("projects").first()
+                                    .path("branches").first()
+                                    .path("promotionLevels")
+                                    .map {
+                                        it.path("name").asText()
+                                    }
+                    )
+                }
+            }
+
+        }
+    }
+
+    @Test
+    fun `Validation stamps for a branch`() {
+        project {
+            branch {
+                (1..5).forEach { no ->
+                    validationStamp("VS$no", description = "Validation stamp $no")
+                }
+                run("""{
+                    projects (id: ${project.id}) {
+                        branches (name: "$name") {
+                            validationStamps {
+                                name
+                            }
+                        }
+                    }
+                }""") { data ->
+                    assertEquals(
+                            (1..5).map { "VS$it" },
+                            data.path("projects").first()
+                                    .path("branches").first()
+                                    .path("validationStamps")
+                                    .map {
+                                        it.path("name").asText()
+                                    }
+                    )
+                }
+            }
+
+        }
+    }
+
+    @Test
+    fun `Promotion runs for a promotion level`() {
+        project {
+            branch {
+                val pl = promotionLevel()
+                (1..5).forEach {
+                    build("$it") {
+                        if (it % 2 == 0) {
+                            promote(pl)
+                        }
+                    }
+                }
+                run("""{
+                    projects (id: ${project.id}) {
+                        branches (name: "$name") {
+                            promotionLevels {
+                                name
+                                promotionRuns {
+                                    build {
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }""") { data ->
+                    assertEquals(
+                            listOf("4", "2"),
+                            data.path("projects").first()
+                                    .path("branches").first()
+                                    .path("promotionLevels").first()
+                                    .path("promotionRuns").map {
+                                        it.path("build").path("name").asText()
+                                    }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Validation runs for a validation stamp`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                (1..5).forEach {
+                    build("$it") {
+                        if (it % 2 == 0) {
+                            validate(vs)
+                        }
+                    }
+                }
+                run("""{
+                    projects (id: ${project.id}) {
+                        branches (name: "$name") {
+                            validationStamps {
+                                name
+                                validationRuns {
+                                    build {
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }""") { data ->
+                    assertEquals(
+                            listOf("4", "2"),
+                            data.path("projects").first()
+                                    .path("branches").first()
+                                    .path("validationStamps").first()
+                                    .path("validationRuns").map {
+                                        it.path("build").path("name").asText()
+                                    }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Promotion runs for a build`() {
+        project {
+            branch {
+                val pl1 = promotionLevel("PL1")
+                val pl2 = promotionLevel("PL2")
+                build("1") {
+                    promote(pl1)
+                    promote(pl2)
+                }
+                run("""{
+                    projects (id: ${project.id}) {
+                        branches (name: "$name") {
+                            builds(count: 1) {
+                                promotionRuns {
+                                    promotionLevel {
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }""") { data ->
+                    assertEquals(
+                            listOf("PL2", "PL1"),
+                            data.path("projects").first()
+                                    .path("branches").first()
+                                    .path("builds").first()
+                                    .path("promotionRuns").map {
+                                        it.path("promotionLevel").path("name").asText()
+                                    }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Filtered promotion runs for a build`() {
+        project {
+            branch {
+                val pl1 = promotionLevel("PL1")
+                val pl2 = promotionLevel("PL2")
+                build("1") {
+                    promote(pl1)
+                    promote(pl2)
+                }
+                run("""{
+                    projects (id: ${project.id}) {
+                        branches (name: "$name") {
+                            builds(count: 1) {
+                                promotionRuns(promotion: "PL1") {
+                                    promotionLevel {
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }""") { data ->
+                    assertEquals(
+                            listOf("PL1"),
+                            data.path("projects").first()
+                                    .path("branches").first()
+                                    .path("builds").first()
+                                    .path("promotionRuns").map {
+                                        it.path("promotionLevel").path("name").asText()
+                                    }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Filtered list of promotion runs for a promotion level`() {
+        project {
+            branch {
+                val pl = promotionLevel()
+                (1..20).forEach {
+                    build("$it") {
+                        if (it % 2 == 0) {
+                            promote(pl)
+                        }
+                    }
+                }
+                run("""{
+                    projects (id: ${project.id}) {
+                        branches (name: "$name") {
+                            promotionLevels {
+                                name
+                                promotionRuns(first: 5) {
+                                    build {
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }""") { data ->
+                    assertEquals(
+                            listOf("20", "18", "16", "14", "12"),
+                            data.path("projects").first()
+                                    .path("branches").first()
+                                    .path("promotionLevels").first()
+                                    .path("promotionRuns").map {
+                                        it.path("build").path("name").asText()
+                                    }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Last promotion runs for a promotion level`() {
+        project {
+            branch {
+                val pl = promotionLevel()
+                (1..20).forEach {
+                    build("$it") {
+                        if (it % 2 == 0) {
+                            promote(pl)
+                        }
+                    }
+                }
+                run("""{
+                    projects (id: ${project.id}) {
+                        branches (name: "$name") {
+                            promotionLevels {
+                                name
+                                promotionRuns(last: 3) {
+                                    build {
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }""") { data ->
+                    assertEquals(
+                            listOf("6", "4", "2"),
+                            data.path("projects").first()
+                                    .path("branches").first()
+                                    .path("promotionLevels").first()
+                                    .path("promotionRuns").map {
+                                        it.path("build").path("name").asText()
+                                    }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Projects filtered by property type`() {
+        // Projects
+        val p1 = project {
+            setProperty(this, TestSimplePropertyType::class.java, TestSimpleProperty("P1"))
+        }
+        /*def p2 = */ project()
+        val p3 = project {
+            setProperty(this, TestSimplePropertyType::class.java, TestSimpleProperty("P3"))
+        }
+        val p4 = project {
+            setProperty(this, TestSimplePropertyType::class.java, TestSimpleProperty("X1"))
+        }
+        // Looks for projects having this property
+        run("""{
+            projects(withProperty: {type: "${TestSimplePropertyType::class.java.name}"}) {
+                name
+            }
+        }""") { data ->
+            assertEquals(
+                    setOf(p1.name, p3.name, p4.name),
+                    data.path("projects").map { it.path("name").asText() }.toSet()
+            )
+        }
+    }
+
+    @Test
+    fun `Projects filtered by property type and value pattern`() {
+        // Projects
+        val p1 = project {
+            setProperty(this, TestSimplePropertyType::class.java, TestSimpleProperty("P1"))
+        }
+        /* val p2 = */ project()
+        val p3 = project {
+            setProperty(this, TestSimplePropertyType::class.java, TestSimpleProperty("P3"))
+        }
+        /* val p4 = */ project {
+            setProperty(this, TestSimplePropertyType::class.java, TestSimpleProperty("X1"))
+        }
+        // Looks for projects having this property
+        run("""{
+            projects(withProperty: {type: "${TestSimplePropertyType::class.java.name}", value: "P"}) {
+                name
+            }
+        }""") { data ->
+            assertEquals(
+                    setOf(p1.name, p3.name),
+                    data.path("projects").map { it.path("name").asText() }.toSet()
+            )
+        }
+    }
+
+    @Test
+    fun `Projects filtered by property type and value`() {
+        // Projects
+        val p1 = project {
+            setProperty(this, TestSimplePropertyType::class.java, TestSimpleProperty("P1"))
+        }
+        /* val p2 = */ project()
+        /* val p3 = */ project {
+            setProperty(this, TestSimplePropertyType::class.java, TestSimpleProperty("P3"))
+        }
+        /* val p4 = */ project {
+            setProperty(this, TestSimplePropertyType::class.java, TestSimpleProperty("X1"))
+        }
+        // Looks for projects having this property
+        run("""{
+            projects(withProperty: {type: "${TestSimplePropertyType::class.java.name}", value: "P1"}) {
+                name
+            }
+        }""") { data ->
+            assertEquals(
+                    setOf(p1.name),
+                    data.path("projects").map { it.path("name").asText() }.toSet()
+            )
+        }
+    }
+
     @Test
     fun `Looking for projects using a pattern`() {
         val rootA = TestUtils.uid("P")
@@ -36,8 +493,8 @@ class ProjectGraphQLIT : AbstractQLKTITJUnit4Support() {
             }""").let { data ->
                 val names = data.path("projects").map { it.path("name").asText() }
                 assertEquals(
-                    (0..4).map { "X$rootA$it" },
-                    names
+                        (0..4).map { "X$rootA$it" },
+                        names
                 )
             }
         }
@@ -62,8 +519,8 @@ class ProjectGraphQLIT : AbstractQLKTITJUnit4Support() {
                 }""").let { data ->
                     val names = data.path("projects").map { it.path("name").asText() }
                     assertEquals(
-                        (0..2).map { "X$rootA$it" },
-                        names
+                            (0..2).map { "X$rootA$it" },
+                            names
                     )
                 }
             }
@@ -90,10 +547,10 @@ class ProjectGraphQLIT : AbstractQLKTITJUnit4Support() {
                         it.path("name").asText()
                     }
                     assertEquals(
-                        names,
-                        (19 downTo 10).map {
-                            "1.$it"
-                        }
+                            names,
+                            (19 downTo 10).map {
+                                "1.$it"
+                            }
                     )
                 }
             }
@@ -217,7 +674,7 @@ class ProjectGraphQLIT : AbstractQLKTITJUnit4Support() {
             withNoGrantViewToAll {
                 asUserWithView {
                     val data = run(
-                        """
+                            """
                                 mutation CreateProject(${'$'}name: String!) {
                                     createProjectOrGet(input: {name: ${'$'}name}) {
                                         project {
@@ -249,7 +706,7 @@ class ProjectGraphQLIT : AbstractQLKTITJUnit4Support() {
         withNoGrantViewToAll {
             asUserWith<ProjectCreation> {
                 val data = run(
-                    """
+                        """
                         mutation CreateProject(${'$'}name: String!) {
                             createProjectOrGet(input: {name: ${'$'}name}) {
                                 project {
@@ -269,8 +726,8 @@ class ProjectGraphQLIT : AbstractQLKTITJUnit4Support() {
                 val error = data["createProjectOrGet"]["errors"][0]
                 assertEquals("Project name already exists: ${project.name}", error["message"].asText())
                 assertEquals(
-                    "net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException",
-                    error["exception"].asText()
+                        "net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException",
+                        error["exception"].asText()
                 )
                 assertTrue(data["createProjectOrGet"]["project"].isNullOrNullNode(), "Project not returned")
             }
@@ -282,7 +739,7 @@ class ProjectGraphQLIT : AbstractQLKTITJUnit4Support() {
         asUserWith<ProjectCreation> {
             val name = uid("P")
             val data = run(
-                """
+                    """
                     mutation CreateProject(${'$'}name: String!) {
                         createProjectOrGet(input: {name: ${'$'}name}) {
                             project {
@@ -547,8 +1004,8 @@ class ProjectGraphQLIT : AbstractQLKTITJUnit4Support() {
             }
             val branchIds: Set<Int> = data["projects"][0]["branches"].map { it["id"].asInt() }.toSet()
             assertEquals(
-                setOf(fav.id()),
-                branchIds
+                    setOf(fav.id()),
+                    branchIds
             )
         }
     }
@@ -567,15 +1024,9 @@ class ProjectGraphQLIT : AbstractQLKTITJUnit4Support() {
         // Creates a project
         val project = doCreateProject()
         // Looks for this project by name, with a not authorized user
-        assertFailsWith(AccessDeniedException::class, "Access denied") {
-            withNoGrantViewToAll {
-                asUser().call {
-                    run("""{
-                |  projects(name: "${project.name}") {
-                |    id
-                |  }
-                |}""".trimMargin())
-                }
+        withNoGrantViewToAll {
+            asUser().execute {
+                runWithError("""{ projects(name: "${project.name}") { id } }""", errorClassification = ErrorType.FORBIDDEN)
             }
         }
     }
@@ -643,15 +1094,57 @@ class ProjectGraphQLIT : AbstractQLKTITJUnit4Support() {
                         }
                     }""")
                     val validationRunStatuses =
-                        data["projects"][0]["branches"][0]["validationStamps"][0]["validationRuns"][0]["validationRunStatuses"]
+                            data["projects"][0]["branches"][0]["validationStamps"][0]["validationRuns"][0]["validationRunStatuses"]
                     assertEquals(
-                        listOf("EXPLAINED", "INVESTIGATING", "FAILED"),
-                        validationRunStatuses.map { it["statusID"]["id"].asText() }
+                            listOf("EXPLAINED", "INVESTIGATING", "FAILED"),
+                            validationRunStatuses.map { it["statusID"]["id"].asText() }
                     )
                     assertEquals(
-                        listOf("Explained", "Investigating", "Validation failed"),
-                        validationRunStatuses.map { it["description"].asText() }
+                            listOf("Explained", "Investigating", "Validation failed"),
+                            validationRunStatuses.map { it["description"].asText() }
                     )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Project creation time`() {
+        project {
+            run("""{
+                projects(id: $id) {
+                    name
+                    creation {
+                        time
+                    }
+                }
+            }""") { data ->
+                assertEquals(name, data.path("projects").first().path("name").asText())
+                val time = data.path("projects").first().path("creation").path("time").asText()
+                assertTrue(time.isNotBlank(), "Creation date has been set")
+            }
+        }
+    }
+
+    @Test
+    fun `Branch creation time`() {
+        project {
+            branch {
+                run("""{
+                    projects(id: ${project.id}) {
+                        name
+                        branches {
+                            name
+                            creation {
+                                time
+                            }
+                        }
+                    }
+                }""") { data ->
+                    val branch = data.path("projects").first()
+                            .path("branches").first()
+                    val time = branch.path("creation").path("time").asText()
+                    assertTrue(time.isNotBlank(), "Creation date has been set")
                 }
             }
         }

@@ -3,18 +3,18 @@ package net.nemerosa.ontrack.extension.git.model
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
+import net.nemerosa.ontrack.extension.issues.mock.TestIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.model.toIdentifier
-import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class BasicGitFreeTextAnnotatorContributorIT : AbstractDSLTestJUnit4Support() {
+class BasicGitFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var gitConfigurationService: GitConfigurationService
@@ -40,7 +40,7 @@ class BasicGitFreeTextAnnotatorContributorIT : AbstractDSLTestJUnit4Support() {
     @Test
     fun `Git configuration with an issue service`() {
         project {
-            basicGitConfig(issueServiceConfigurationIdentifier = MockIssueServiceConfiguration.INSTANCE.toIdentifier().format())
+            basicGitConfig(issueServiceConfigurationIdentifier = TestIssueServiceConfiguration.INSTANCE.toIdentifier().format())
             expects("Text with #123" to """Text with <a href="http://issue/123">#123</a>""")
         }
     }

@@ -420,10 +420,10 @@ class JobSchedulingTest : AbstractJobTest() {
                     scheduler,
                     "Orchestrator",
                     listOf(
-                            JobOrchestratorSupplier {
-                                listOf(
+                            object : JobOrchestratorSupplier {
+                                override val jobRegistrations: Collection<JobRegistration> = listOf(
                                         JobRegistration.of(job).withSchedule(Schedule.EVERY_SECOND)
-                                ).stream()
+                                )
                             }
 
                     ),
