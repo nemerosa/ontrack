@@ -1,5 +1,5 @@
 import {Typography} from "antd";
-import {StarFilled, StarOutlined} from "@ant-design/icons";
+import {FaRegStar, FaStar} from "react-icons/fa";
 
 const {Text} = Typography;
 
@@ -9,8 +9,8 @@ export default function Favourite({value}) {
             <Text style={{color: "orange"}}>
                 {
                     value ?
-                        <StarFilled/> :
-                        <StarOutlined/>
+                        <FaStar/> :
+                        <FaRegStar/>
                 }
             </Text>
         </>

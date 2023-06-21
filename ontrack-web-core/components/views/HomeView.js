@@ -1,8 +1,8 @@
 import MainPage from "@components/layouts/MainPage";
 import ProjectList, {useProjectList} from "@components/projects/ProjectList";
 import {Command} from "@components/common/Commands";
-import {PlusOutlined} from "@ant-design/icons";
 import NewProjectDialog, {useNewProjectDialog} from "@components/projects/NewProjectDialog";
+import {FaPlus} from "react-icons/fa";
 
 export default function HomeView() {
 
@@ -20,7 +20,7 @@ export default function HomeView() {
     const commands = [
         <Command
             key="new-project"
-            icon={<PlusOutlined/>}
+            icon={<FaPlus/>}
             text="New project"
             action={newProject}
         />,

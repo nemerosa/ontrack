@@ -1,10 +1,10 @@
 import {Avatar, Space, Typography} from "antd";
-import {UserOutlined} from "@ant-design/icons";
 import UserMenu, {useUserMenu} from "@components/layouts/UserMenu";
 import {homeLink} from "@components/common/Links";
 import {useContext} from "react";
 import {UserContext} from "@components/providers/UserProvider";
 import SimpleImage from "@components/common/SimpleImage";
+import {FaRegUser} from "react-icons/fa";
 
 const {Text} = Typography;
 
@@ -42,7 +42,7 @@ export default function NavBar() {
                     {/* TODO <NavBarText text="Search component"/>*/}
                     {/* TODO <NavBarText text="App messages"/>*/}
                     <NavBarText text={user?.account?.fullName}/>
-                    <Avatar icon={<UserOutlined/>}
+                    <Avatar icon={<FaRegUser/>}
                             onClick={openUserMenu}
                             style={{
                                 backgroundColor: 'white',

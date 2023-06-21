@@ -1,18 +1,10 @@
 import {Drawer, Menu} from "antd";
 import {useContext, useEffect, useState} from "react";
-import {
-    AppstoreOutlined,
-    CheckCircleOutlined,
-    InfoCircleOutlined,
-    LogoutOutlined,
-    PoweroffOutlined,
-    SecurityScanOutlined,
-    SettingOutlined
-} from "@ant-design/icons";
 import {UserContext} from "@components/providers/UserProvider";
 import {logout} from "@client/login";
 import {legacyUri} from "@components/common/Links";
 import {useRouter} from "next/router";
+import {FaDoorOpen, FaSignOutAlt} from "react-icons/fa";
 
 export function useUserMenu() {
     const [open, setOpen] = useState(false);
@@ -30,13 +22,13 @@ export default function UserMenu({userMenu}) {
     const user = useContext(UserContext)
     const [items, setItems] = useState([])
 
-    const groupIcons = {
-        Configuration: <AppstoreOutlined/>,
-        Indicators: <CheckCircleOutlined/>,
-        Information: <InfoCircleOutlined/>,
-        Security: <SecurityScanOutlined/>,
-        System: <SettingOutlined/>,
-    }
+    // const groupIcons = {
+    //     Configuration: <AppstoreOutlined/>,
+    //     Indicators: <CheckCircleOutlined/>,
+    //     Information: <InfoCircleOutlined/>,
+    //     Security: <SecurityScanOutlined/>,
+    //     System: <SettingOutlined/>,
+    // }
 
     const createMenuItem = (action) => {
         return {
@@ -127,7 +119,7 @@ export default function UserMenu({userMenu}) {
         menu.push({
             key: 'legacy',
             label: "Legacy UI",
-            icon: <PoweroffOutlined/>,
+            icon: <FaDoorOpen/>,
             onClick: () => {
                 location.href = legacyUri()
             }
@@ -141,7 +133,7 @@ export default function UserMenu({userMenu}) {
         menu.push({
             key: 'logout',
             label: "Sign out",
-            icon: <LogoutOutlined/>,
+            icon: <FaSignOutAlt/>,
             onClick: () => {
                 logout()
             },
