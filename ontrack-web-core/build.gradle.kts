@@ -1,4 +1,4 @@
-import com.moowork.gradle.node.npm.NpmTask
+import com.github.gradle.node.npm.task.NpmTask
 
 plugins {
     base
@@ -6,12 +6,12 @@ plugins {
 }
 
 val webInstall by tasks.registering(NpmTask::class) {
-    setArgs(listOf("install"))
+    args.set(listOf("install"))
 }
 
 val webBuild by tasks.registering(NpmTask::class) {
     dependsOn(webInstall)
-    setArgs(listOf("run", "build"))
+    args.set(listOf("run", "build"))
 }
 
 tasks.named("build") {
