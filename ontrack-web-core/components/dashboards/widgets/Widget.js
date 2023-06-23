@@ -1,9 +1,9 @@
-import {Card} from "antd";
+import {Card, Skeleton} from "antd";
 
-export default function Widget({title, children}) {
+export default function Widget({title, loading, children}) {
     return (
         <Card
-            title={title}
+            title={loading ? "Loading..." : title}
             headStyle={{
                 backgroundColor: 'lightgrey'
             }}
@@ -11,7 +11,8 @@ export default function Widget({title, children}) {
                 width: '100%'
             }}
         >
-            {children}
+            {loading && <Skeleton active/>}
+            {!loading && children}
         </Card>
     )
 }

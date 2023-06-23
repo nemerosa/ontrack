@@ -41,8 +41,7 @@ export default function LastActiveBranchesWidget({count, context, contextId}) {
     }, [count])
 
     return (
-        // TODO Loading indicator for the widget
-        <Widget title={`Last ${count} active branches`}>
+        <Widget title={`Last ${count} active branches`} loading={loading}>
             <Space direction="horizontal" size={16} wrap>
                 {branches.map(branch => <BranchBox key={branch.id} branch={branch}/>)}
             </Space>

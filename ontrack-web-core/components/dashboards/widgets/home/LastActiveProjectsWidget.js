@@ -34,8 +34,7 @@ export default function LastActiveProjectsWidget({count}) {
     }, [count])
 
     return (
-        // TODO Loading indicator for the widget
-        <Widget title={`Last ${count} active projects`}>
+        <Widget title={`Last ${count} active projects`} loading={loading}>
             <Space direction="horizontal" size={16} wrap>
                 {projects.map(project => <ProjectBox key={project.id} project={project}/>)}
             </Space>
