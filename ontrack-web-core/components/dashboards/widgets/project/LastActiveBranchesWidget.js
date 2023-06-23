@@ -7,10 +7,11 @@ import {checkContextIs} from "@components/dashboards/widgets/Widget";
 
 export default function LastActiveBranchesWidget({count, context, contextId}) {
 
+    const [branches, setBranches] = useState([])
+
     const check = checkContextIs('Last active branches', context, 'project')
     if (check) return check
 
-    const [branches, setBranches] = useState([])
     return (
         <SimpleWidget
             title={`Last ${count} active branches`}

@@ -43,7 +43,7 @@ export default function Dashboard({context, contextId = "-"}) {
             }
             loadLayout().then(() => {})
         }
-    }, [dashboard])
+    }, [dashboard, context, contextId])
 
     return (
         <>

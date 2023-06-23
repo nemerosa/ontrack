@@ -16,7 +16,7 @@ export default function DashboardWidget({widget, context, contextId}) {
             loadWidget().then(() => {
             })
         }
-    }, [widget])
+    }, [widget, context, contextId])
 
     return (
         <div style={{
