@@ -1,21 +1,17 @@
-// noinspection JSUnusedGlobalSymbols
-
-import Widget from "@components/dashboards/widgets/Widget";
-import {useEffect, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
+import {useState} from "react";
 import {gql} from "graphql-request";
 import ProjectBox from "@components/projects/ProjectBox";
 import {Space} from "antd";
+import SimpleWidget from "@components/dashboards/widgets/SimpleWidget";
 
 export default function LastActiveProjectsWidget({count}) {
 
-    const [loading, setLoading] = useState(true)
     const [projects, setProjects] = useState([])
 
-    useEffect(() => {
-        if (count) {
-            setLoading(true)
-            graphQLCall(
+    return (
+        <SimpleWidget
+            title={`Last ${count} active projects`}
+            query={
                 gql`
                     query LastActiveProjects($count: Int! = 10) {
                         lastActiveProjects(count: $count) {
@@ -25,19 +21,13 @@ export default function LastActiveProjectsWidget({count}) {
                         }
                     }
                 `
-            ).then(data => {
-                setProjects(data.lastActiveProjects)
-            }).finally(() => {
-                setLoading(false)
-            })
-        }
-    }, [count])
-
-    return (
-        <Widget title={`Last ${count} active projects`} loading={loading}>
+            }
+            variables={{}}
+            setData={data => setProjects(data.lastActiveProjects)}
+        >
             <Space direction="horizontal" size={16} wrap>
                 {projects.map(project => <ProjectBox key={project.id} project={project}/>)}
             </Space>
-        </Widget>
+        </SimpleWidget>
     )
 }
