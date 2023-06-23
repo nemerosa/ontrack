@@ -23,7 +23,7 @@ class CoreDefaultDashboardRegistration : DefaultDashboardRegistration {
         DashboardContextKeys.PROJECT to Dashboard(
             key = "project-default",
             name = "Default project dashboard",
-            layoutKey = DashboardLayouts.defaultLayout.key,
+            layoutKey = DashboardLayouts.main2ChildrenLayout.key,
             widgets = listOf(
                 LastActiveBranchesWidget().toInstance(),
                 PropertiesWidget().toInstance(),
