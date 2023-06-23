@@ -9,7 +9,7 @@ export default function StandardPage({
                                        pageTitle,
                                        breadcrumbs = homeBreadcrumbs(),
                                        commands = [
-                                           <CloseToHomeCommand/>,
+                                           <CloseToHomeCommand key="home"/>,
                                        ],
                                        children,
                                    }) {

@@ -14,7 +14,7 @@ class GQLScalarJSONTest {
 
     @Test
     fun `Parse string value`() {
-        val json = GQLScalarJSON.INSTANCE.coercing.parseValue("""{"passed":15}""")
+        val json = GQLScalarJSON.TYPE.coercing.parseValue("""{"passed":15}""")
         assertEquals(
             mapOf(
                 "passed" to 15
@@ -25,7 +25,7 @@ class GQLScalarJSONTest {
 
     @Test
     fun `Parse JSON value`() {
-        val json = GQLScalarJSON.INSTANCE.coercing.parseValue(
+        val json = GQLScalarJSON.TYPE.coercing.parseValue(
             mapOf(
                 "passed" to 15
             ).asJson()
@@ -40,7 +40,7 @@ class GQLScalarJSONTest {
 
     @Test
     fun `Parse map value`() {
-        val json = GQLScalarJSON.INSTANCE.coercing.parseValue(
+        val json = GQLScalarJSON.TYPE.coercing.parseValue(
             mapOf(
                 "passed" to 15
             )
@@ -60,7 +60,7 @@ class GQLScalarJSONTest {
                 ObjectField("value", IntValue(30.toBigInteger()))
             )
         )
-        val value = GQLScalarJSON.INSTANCE.coercing.parseLiteral(input)
+        val value = GQLScalarJSON.TYPE.coercing.parseLiteral(input)
         assertIs<ObjectNode>(value) {
             assertEquals(30, it.path("value").asInt())
         }
@@ -74,7 +74,7 @@ class GQLScalarJSONTest {
                 StringValue("two")
             )
         )
-        val value = GQLScalarJSON.INSTANCE.coercing.parseLiteral(input)
+        val value = GQLScalarJSON.TYPE.coercing.parseLiteral(input)
         assertIs<ArrayNode>(value) {
             assertEquals(
                 listOf("one", "two"),
@@ -88,7 +88,7 @@ class GQLScalarJSONTest {
         // Data as string
         val data = "Some text"
         // Serialization
-        val json = GQLScalarJSON.INSTANCE.coercing.serialize(data) as JsonNode
+        val json = GQLScalarJSON.TYPE.coercing.serialize(data) as JsonNode
         // Checks the data
         assertEquals("Some text", json.asText())
     }
@@ -98,7 +98,7 @@ class GQLScalarJSONTest {
         // Data with password
         val data = SampleConfig("user", "secret")
         // As JSON scalar
-        val json = GQLScalarJSON.INSTANCE.coercing.serialize(data) as JsonNode
+        val json = GQLScalarJSON.TYPE.coercing.serialize(data) as JsonNode
         // Checks the data
         assertEquals("user", json["user"].asText())
         assertTrue(json["password"].isNull, "Password field set to null")
@@ -109,7 +109,7 @@ class GQLScalarJSONTest {
         // Data with password
         val data = SampleData("value", SampleConfig("user", "secret"))
         // As JSON scaler
-        val json = GQLScalarJSON.INSTANCE.coercing.serialize(data) as JsonNode
+        val json = GQLScalarJSON.TYPE.coercing.serialize(data) as JsonNode
         // Checks the data
         assertEquals("value", json["value"].asText())
         assertEquals("user", json["config"]["user"].asText())
@@ -126,7 +126,7 @@ class GQLScalarJSONTest {
             )
         )
         // As JSON scaler
-        val json = GQLScalarJSON.INSTANCE.coercing.serialize(data) as JsonNode
+        val json = GQLScalarJSON.TYPE.coercing.serialize(data) as JsonNode
         // Checks the data
         assertEquals("value", json["value"].asText())
         assertEquals("user", json["configs"][0]["user"].asText())

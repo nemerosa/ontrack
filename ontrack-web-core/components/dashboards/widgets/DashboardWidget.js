@@ -1,6 +1,6 @@
 import {lazy, Suspense, useEffect, useState} from "react";
 
-export default function DashboardWidget({widget}) {
+export default function DashboardWidget({widget, context, contextId}) {
     const importWidget = widgetKey => lazy(() =>
         import(`./${widgetKey}Widget`)
     )
@@ -11,7 +11,7 @@ export default function DashboardWidget({widget}) {
         if (widget) {
             const loadWidget = async () => {
                 const LoadedWidget = await importWidget(widget.key)
-                setLoadedWidget(<LoadedWidget {...widget.config}/>)
+                setLoadedWidget(<LoadedWidget {...widget.config} context={context} contextId={contextId}/>)
             }
             loadWidget().then(() => {
             })

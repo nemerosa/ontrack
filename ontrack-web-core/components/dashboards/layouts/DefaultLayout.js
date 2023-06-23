@@ -1,16 +1,20 @@
 import {Space} from "antd";
 import DashboardWidget from "@components/dashboards/widgets/DashboardWidget";
 
-export default function DefaultLayout({widgets}) {
+export default function DefaultLayout({widgets, context, contextId}) {
     return (
         <Space direction="vertical" style={{
             width: '100%',
         }}>
-            {widgets.map(widget =>
-                <div style={{
+            {widgets.map((widget, index) =>
+                <div key={index} style={{
                     width: '100%',
                 }}>
-                    <DashboardWidget widget={widget}/>
+                    <DashboardWidget
+                        widget={widget}
+                        context={context}
+                        contextId={contextId}
+                    />
                 </div>
             )}
         </Space>

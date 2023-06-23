@@ -29,7 +29,7 @@ export default function HomeView() {
                 title="Home"
                 // commands={commands}
             >
-                <Dashboard context="home" contextId={undefined}/>
+                <Dashboard context="home"/>
             </MainPage>
             {/*<NewProjectDialog*/}
             {/*    newProjectDialog={newProjectDialog}*/}

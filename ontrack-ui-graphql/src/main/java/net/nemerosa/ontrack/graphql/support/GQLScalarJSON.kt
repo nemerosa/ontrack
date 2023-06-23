@@ -6,6 +6,7 @@ import graphql.language.*
 import graphql.schema.Coercing
 import graphql.schema.CoercingParseValueException
 import graphql.schema.GraphQLScalarType
+import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.json.ObjectMapperFactory
 import net.nemerosa.ontrack.json.asJson
 
@@ -14,9 +15,20 @@ import net.nemerosa.ontrack.json.asJson
  * JSON scalar type.
  */
 object GQLScalarJSON {
+
+    /**
+     * Name of the GraphQL type
+     */
+    const val JSON = "JSON"
+
     @JvmField
-    val INSTANCE: GraphQLScalarType = GraphQLScalarType.newScalar()
-            .name("JSON")
+    val INSTANCE = GraphQLTypeReference(JSON)
+
+    /**
+     * The actual type to register
+     */
+    val TYPE: GraphQLScalarType = GraphQLScalarType.newScalar()
+            .name(JSON)
             .description("JSON node")
             .coercing(
                     object : Coercing<JsonNode, JsonNode> {

@@ -6,7 +6,9 @@ import graphql.schema.idl.RuntimeWiring
 import graphql.schema.idl.SchemaGenerator
 import graphql.schema.idl.TypeDefinitionRegistry
 import net.nemerosa.ontrack.common.UserException
+import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
 import net.nemerosa.ontrack.graphql.support.MutationInputValidationException
+import org.springframework.graphql.execution.RuntimeWiringConfigurer
 import org.springframework.stereotype.Service
 
 @Service
@@ -19,7 +21,11 @@ class GraphqlSchemaServiceImpl(
         private val rootQueriesPlus: List<GQLRootQueries>,
         private val mutationProviders: List<MutationProvider>,
         private val contributors: List<GQLContributor>,
-) : GraphqlSchemaService {
+) : GraphqlSchemaService, RuntimeWiringConfigurer {
+
+    override fun configure(builder: RuntimeWiring.Builder) {
+        builder.scalar(GQLScalarJSON.TYPE)
+    }
 
     override fun createSchema(typeDefinitionRegistry: TypeDefinitionRegistry, runtimeWiring: RuntimeWiring): GraphQLSchema {
 

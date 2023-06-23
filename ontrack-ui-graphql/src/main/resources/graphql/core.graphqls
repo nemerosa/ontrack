@@ -7,3 +7,30 @@ type Mutation {
     """Basic test service"""
     ping: String
 }
+
+# =================================================================================
+# Scalars
+# =================================================================================
+
+scalar JSON
+
+# =================================================================================
+# Dashboards
+# =================================================================================
+
+type WidgetInstance {
+    key: String!
+    config: JSON!
+}
+
+type Dashboard {
+    key: String!
+    name: String!
+    layoutKey: String!
+    widgets: [WidgetInstance!]!
+}
+
+extend type Query {
+    """Gets the dashboard for a given context"""
+    dashboardByContext(key: String!, id: String!): Dashboard!
+}

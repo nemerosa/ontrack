@@ -43,7 +43,7 @@ object GraphQLBeanConverter {
                 val scalarType = getScalarType(property.returnType)
                 if (scalarType != null) {
                     val actualType: GraphQLInputType = if (property.returnType.isMarkedNullable) {
-                        scalarType
+                        scalarType as GraphQLInputType
                     } else {
                         GraphQLNonNull(scalarType)
                     }
@@ -92,7 +92,7 @@ object GraphQLBeanConverter {
                             if (listArguments.size == 1) {
                                 val elementType = listArguments.first().type?.javaType
                                 if (elementType is Class<*>) {
-                                    val rootType = getScalarType(elementType)
+                                    val rootType = (getScalarType(elementType) as? GraphQLInputType?)
                                         ?: if (listRef.embedded) {
                                             getOrCreateEmbeddedInputType(elementType, listRef.suffix, dictionary)
                                         } else if (elementType.isEnum) {
@@ -197,7 +197,7 @@ object GraphQLBeanConverter {
                 }
                 // Type
                 val fieldType: GraphQLOutputType = if (scalarType != null) {
-                    scalarType
+                    scalarType as GraphQLOutputType
                 } else if (javaType is Class<*> && javaType.isEnum) {
                     // For an Enum, we assume this has been declared elsewhere as a GraphQL type
                     // with its name equal to the simple Java type name
@@ -256,7 +256,7 @@ object GraphQLBeanConverter {
                                     val elementType = listArguments.first()
                                     if (elementType is Class<*>) {
                                         val elementKClass = Reflection.createKotlinClass(elementType)
-                                        val elementScalarType = getScalarType(elementKClass.java)
+                                        val elementScalarType = getScalarType(elementKClass.java) as? GraphQLOutputType?
                                         val elementGraphQLType = elementScalarType
                                             ?: cache.getOrCreate(
                                                 getAPITypeName(elementKClass)
@@ -296,7 +296,7 @@ object GraphQLBeanConverter {
         return fields
     }
 
-    internal fun getScalarType(type: Class<*>): GraphQLScalarType? {
+    internal fun getScalarType(type: Class<*>): GraphQLNamedType? {
         return when {
             // Raw Kotlin
             Int::class.java.isAssignableFrom(type) -> GraphQLInt
@@ -320,7 +320,7 @@ object GraphQLBeanConverter {
         }
     }
 
-    private fun getScalarType(type: KType): GraphQLScalarType? {
+    private fun getScalarType(type: KType): GraphQLNamedType? {
         val javaType = type.javaType
         return if (javaType is Class<*>) {
             getScalarType(javaType)

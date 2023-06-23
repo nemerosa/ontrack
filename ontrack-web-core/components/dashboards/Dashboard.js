@@ -1,24 +1,32 @@
 import {lazy, useEffect, useState, Suspense} from "react";
+import graphQLCall from "@client/graphQLCall";
+import {gql} from "graphql-request";
 
-export default function Dashboard({context, contextId}) {
+export default function Dashboard({context, contextId = "-"}) {
 
     const [dashboard, setDashboard] = useState({})
     useEffect(() => {
-        // TODO Call the dashboard API
-        setDashboard({
-            name: "Default home dashboard",
-            layout: {
-                key: "Default"
-            },
-            widgets: [
-                {
-                    key: "home/LastActiveProjects",
-                    config: {
-                        count: 20
+        if (context && contextId) {
+            graphQLCall(
+                gql`
+                    query Dashboard($context: String!, $contextId: String!) {
+                        dashboardByContext(key: $context, id: $contextId) {
+                            key
+                            name
+                            layoutKey
+                            widgets {
+                                key
+                                config
+                            }
+                        }
                     }
-                }
-            ]
-        })
+                `,
+                {context, contextId}
+            ).then(data => {
+                console.log({dashboard: data.dashboardByContext})
+                setDashboard(data.dashboardByContext)
+            })
+        }
     }, [context, contextId])
 
     const importLayout = layoutKey => lazy(() =>
@@ -28,10 +36,10 @@ export default function Dashboard({context, contextId}) {
     const [loadedLayout, setLoadedLayout] = useState(undefined)
 
     useEffect(() => {
-        if (dashboard?.layout) {
+        if (dashboard?.layoutKey) {
             const loadLayout = async () => {
-                const Layout = await importLayout(dashboard.layout.key)
-                setLoadedLayout(<Layout widgets={dashboard.widgets}/>)
+                const Layout = await importLayout(dashboard.layoutKey)
+                setLoadedLayout(<Layout widgets={dashboard.widgets} context={context} contextId={contextId}/>)
             }
             loadLayout().then(() => {})
         }

@@ -25,3 +25,11 @@ export function projectUri(project) {
 export function projectLink(project, text) {
     return <Link href={projectUri(project)}>{text ? text : project.name}</Link>
 }
+
+export function branchUri(branch) {
+    return `${uiConfig.prefix}/branch/${branch.id}`
+}
+
+export function branchLink(branch, text) {
+    return <Link href={branchUri(branch)}>{text ? text : branch.name}</Link>
+}

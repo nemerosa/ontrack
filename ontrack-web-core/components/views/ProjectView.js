@@ -8,6 +8,7 @@ import {projectBreadcrumbs} from "@components/common/Breadcrumbs";
 import {CloseCommand} from "@components/common/Commands";
 import {homeUri} from "@components/common/Links";
 import LoadingContainer from "@components/common/LoadingContainer";
+import Dashboard from "@components/dashboards/Dashboard";
 
 export default function ProjectView({id}) {
 
@@ -49,7 +50,7 @@ export default function ProjectView({id}) {
                 commands={commands}
             >
                 <LoadingContainer loading={loadingProject} tip="Loading project">
-                    {project.name}
+                    <Dashboard context="project" contextId={project.id}/>
                 </LoadingContainer>
             </MainPage>
         </>
