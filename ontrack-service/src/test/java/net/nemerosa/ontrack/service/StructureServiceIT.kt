@@ -105,10 +105,12 @@ class StructureServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `#269 Branch name of 120 characters is allowed`() {
         val project = doCreateProject()
-        doCreateBranch(project, nd(
+        doCreateBranch(
+            project, nd(
                 "b".repeat(120),
                 "Test with 120 characters"
-        ))
+            )
+        )
     }
 
     @Test
@@ -221,6 +223,94 @@ class StructureServiceIT : AbstractDSLTestSupport() {
         }
         // Checks the order
         assertEquals(listOf("1.0", "2.1", "2.0"), branches.map { it.name })
+    }
+
+    @Test
+    fun `Last active projects`() {
+        asAdmin {
+            val pa = project()
+            val pb = project()
+            val pc = project()
+
+            pa.apply {
+                branch {
+                    build()
+                }
+            }
+
+            pb.apply {
+                branch {
+                    build()
+                }
+            }
+
+            pc.apply {
+                branch {
+                    build()
+                }
+            }
+
+            pa.apply {
+                branch {
+                    build()
+                }
+            }
+
+            val projects = structureService.lastActiveProjects(3)
+            assertEquals(
+                listOf(
+                    pa.name,
+                    pc.name,
+                    pb.name,
+                ),
+                projects.map { it.name }
+            )
+        }
+    }
+
+    @Test
+    fun `Last active projects must include projects without builds`() {
+        asAdmin {
+            val pa = project()
+            val pb = project()
+            val pc = project()
+            val pd = project()
+
+            pa.apply {
+                branch {
+                    build()
+                }
+            }
+
+            pb.apply {
+                branch {
+                    build()
+                }
+            }
+
+            pc.apply {
+                branch {
+                    build()
+                }
+            }
+
+            pa.apply {
+                branch {
+                    build()
+                }
+            }
+
+            val projects = structureService.lastActiveProjects(4)
+            assertEquals(
+                listOf(
+                    pa.name,
+                    pc.name,
+                    pb.name,
+                    pd.name,
+                ),
+                projects.map { it.name }
+            )
+        }
     }
 
 }

@@ -14,6 +14,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * @deprecated Use dedicated repositories at entity level
+ */
 public interface StructureRepository {
 
     // Projects

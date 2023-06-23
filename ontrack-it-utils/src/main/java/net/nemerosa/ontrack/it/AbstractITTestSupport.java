@@ -40,6 +40,9 @@ import static net.nemerosa.ontrack.test.TestUtils.uid;
                 "spring.rabbitmq.username=ontrack",
                 "spring.rabbitmq.password=ontrack",
                 "spring.graphql.schema.locations=classpath:graphql/",
+                "spring.datasource.url=jdbc:postgresql://localhost/ontrack",
+                "spring.datasource.username=ontrack",
+                "spring.datasource.password=ontrack",
         }
 )
 public abstract class AbstractITTestSupport {

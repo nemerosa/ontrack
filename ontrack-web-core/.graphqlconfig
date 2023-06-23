@@ -9,7 +9,7 @@
           "Authorization": "Basic YWRtaW46YWRtaW4=",
           "user-agent": "JS GraphQL"
         },
-        "introspect": false
+        "introspect": true
       }
     }
   }

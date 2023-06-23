@@ -107,7 +107,7 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
         return Time.fromStorage(value);
     }
 
-    protected Signature readSignature(ResultSet rs) throws SQLException {
+    public Signature readSignature(ResultSet rs) throws SQLException {
         return readSignature(rs, "creation", "creator");
     }
 

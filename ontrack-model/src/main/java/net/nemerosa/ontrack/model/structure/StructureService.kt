@@ -523,4 +523,11 @@ interface StructureService {
 
     fun entityLoader(): BiFunction<ProjectEntityType, ID, ProjectEntity>
 
+    /**
+     * Gets the list of the most active projects
+     *
+     * @param count Maximum number of projects to return
+     */
+    fun lastActiveProjects(count: Int): List<Project>
+
 }
