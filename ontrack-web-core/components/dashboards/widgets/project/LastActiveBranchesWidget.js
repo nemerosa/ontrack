@@ -3,10 +3,12 @@ import {Space} from "antd";
 import {useState} from "react";
 import BranchBox from "@components/branches/BranchBox";
 import SimpleWidget from "@components/dashboards/widgets/SimpleWidget";
+import {checkContextIs} from "@components/dashboards/widgets/Widget";
 
 export default function LastActiveBranchesWidget({count, context, contextId}) {
 
-    // TODO Check the project context
+    const check = checkContextIs('Last active branches', context, 'project')
+    if (check) return check
 
     const [branches, setBranches] = useState([])
     return (
