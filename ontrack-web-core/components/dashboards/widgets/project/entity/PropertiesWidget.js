@@ -2,6 +2,8 @@ import {checkContextIn} from "@components/dashboards/widgets/Widget";
 import SimpleWidget from "@components/dashboards/widgets/SimpleWidget";
 import {gql} from "graphql-request";
 import {useState} from "react";
+import {Space} from "antd";
+import Property from "@components/properties/Property";
 
 export default function PropertiesWidget({context, contextId}) {
 
@@ -49,7 +51,11 @@ export default function PropertiesWidget({context, contextId}) {
             }}
             setData={data => setProperties(data.entity.properties)}
         >
-            { JSON.stringify(properties) }
+            <Space direction="vertical" size={8} style={{width: '100%'}}>
+                {
+                    properties && properties.map(property => <Property key={property.type.typeName} property={property}/>)
+                }
+            </Space>
         </SimpleWidget>
     )
 }
