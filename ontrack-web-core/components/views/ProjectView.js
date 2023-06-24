@@ -5,7 +5,7 @@ import {gql} from "graphql-request";
 import Head from "next/head";
 import {projectTitle} from "@components/common/Titles";
 import {projectBreadcrumbs} from "@components/common/Breadcrumbs";
-import {CloseCommand} from "@components/common/Commands";
+import {CloseCommand, DashboardEditCommand} from "@components/common/Commands";
 import {homeUri} from "@components/common/Links";
 import LoadingContainer from "@components/common/LoadingContainer";
 import Dashboard from "@components/dashboards/Dashboard";
@@ -36,7 +36,8 @@ export default function ProjectView({id}) {
     }, [id])
 
     const commands = [
-        <CloseCommand key="close" href={homeUri()}/>
+        <CloseCommand key="close" href={homeUri()}/>,
+        <DashboardEditCommand key="dashboard-edit"/>,
     ]
 
     return (

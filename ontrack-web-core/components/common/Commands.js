@@ -1,4 +1,4 @@
-import { FaTimes } from "react-icons/fa";
+import {FaEdit, FaTimes} from "react-icons/fa";
 import {Button, Space, Typography} from "antd";
 import Link from "next/link";
 import {homeUri} from "@components/common/Links";
@@ -8,7 +8,7 @@ export function Command({icon, text, href, action}) {
         type="text"
         onClick={action}
     >
-        {href && <Link href={href}>{icon}</Link>}
+        {href && <Link href={href}>{icon} {text}</Link>}
         {!href && <>
             <Space size={8}>
                 {icon}
@@ -19,9 +19,16 @@ export function Command({icon, text, href, action}) {
 }
 
 export function CloseCommand({href}) {
-    return <Command icon={<FaTimes/>} href={href}/>
+    return <Command icon={<FaTimes/>} href={href} text="Close"/>
 }
 
 export function CloseToHomeCommand() {
     return <CloseCommand href={homeUri()}/>
+}
+
+export function DashboardEditCommand() {
+    return <Command
+        icon={<FaEdit/>}
+        text="Edit dashboard"
+    />
 }
