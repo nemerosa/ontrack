@@ -3783,6 +3783,11 @@ type ProjectEntityInformation {
     id: Int
     "Name of the project entity"
     name: String!
+    "List of properties for this entity"
+    properties(
+        "Keeps only properties which have a value"
+        hasValue: Boolean
+    ): [Property!]!
     "Type of the project entity"
     type: ProjectEntityType!
 }

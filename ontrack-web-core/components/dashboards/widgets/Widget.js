@@ -1,7 +1,23 @@
 import {Card, Skeleton, Space, Typography} from "antd";
 
+export function checkContextIn(widget, context, expectedContexts) {
+    return checkContext(
+        widget,
+        expectedContexts.some(it => it === context),
+        "This widget cannot be used in this context."
+    )
+}
+
 export function checkContextIs(widget, context, expectedContext) {
-    if (context === expectedContext) {
+    return checkContext(
+        widget,
+        context === expectedContext,
+        "This widget cannot be used in this context."
+    )
+}
+
+export function checkContext(widget, predicate, error) {
+    if (predicate) {
         return null
     } else {
         return (
@@ -12,7 +28,7 @@ export function checkContextIs(widget, context, expectedContext) {
                 </Space>
             }
             >
-                This widget cannot be used in this context.
+                {error}
             </Widget>
         )
     }
