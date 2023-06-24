@@ -5,6 +5,7 @@ import graphql.schema.visibility.NoIntrospectionGraphqlFieldVisibility
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.ObjectProvider
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties
 import org.springframework.boot.autoconfigure.graphql.GraphQlSourceBuilderCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -29,6 +30,7 @@ class GraphQLConfiguration {
         instrumentations: ObjectProvider<Instrumentation>,
         wiringConfigurers: ObjectProvider<RuntimeWiringConfigurer>,
         sourceCustomizers: ObjectProvider<GraphQlSourceBuilderCustomizer>,
+        properties: GraphQlProperties,
     ): GraphQlSource {
         // Gets the list of schema resources
         val schemaResources: Array<Resource> = getSchemaResources(resourcePatternResolver)
@@ -47,7 +49,9 @@ class GraphQLConfiguration {
             .subscriptionExceptionResolvers(subscriptionExceptionResolvers.orderedStream().toList())
             .instrumentation(instrumentations.orderedStream().toList())
             .configureRuntimeWiring { wiring ->
-                wiring.fieldVisibility(NoIntrospectionGraphqlFieldVisibility.NO_INTROSPECTION_FIELD_VISIBILITY)
+                if (!properties.schema.introspection.isEnabled) {
+                    wiring.fieldVisibility(NoIntrospectionGraphqlFieldVisibility.NO_INTROSPECTION_FIELD_VISIBILITY)
+                }
             }
 
         wiringConfigurers.orderedStream()
