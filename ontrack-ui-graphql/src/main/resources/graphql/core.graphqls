@@ -15,6 +15,25 @@ type Mutation {
 scalar JSON
 
 # =================================================================================
+# ACL
+# =================================================================================
+
+"""A named authorization"""
+type Authorization {
+    """Name of the authorization scope"""
+    name: String!
+    """Action to authorize"""
+    action: String!
+    """Authorized?"""
+    authorized: Boolean!
+}
+
+extend type Query {
+    """Getting a list of authorizations for the authenticated user"""
+    authorizations: [Authorization!]!
+}
+
+# =================================================================================
 # Dashboards
 # =================================================================================
 
