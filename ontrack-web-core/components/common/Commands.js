@@ -2,6 +2,8 @@ import {FaEdit, FaTimes} from "react-icons/fa";
 import {Button, Space, Typography} from "antd";
 import Link from "next/link";
 import {homeUri} from "@components/common/Links";
+import {useContext} from "react";
+import {UserContext} from "@components/providers/UserProvider";
 
 export function Command({icon, text, href, action}) {
     return <Button
@@ -27,8 +29,13 @@ export function CloseToHomeCommand() {
 }
 
 export function DashboardEditCommand() {
-    return <Command
-        icon={<FaEdit/>}
-        text="Edit dashboard"
-    />
+    const user = useContext(UserContext)
+    if (user.isAuthorized('dashboard', 'edit')) {
+        return <Command
+            icon={<FaEdit/>}
+            text="Edit dashboard"
+        />
+    } else {
+        return undefined
+    }
 }
