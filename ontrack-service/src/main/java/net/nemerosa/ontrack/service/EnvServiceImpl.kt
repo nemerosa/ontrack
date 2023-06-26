@@ -4,9 +4,9 @@ import net.nemerosa.ontrack.model.exceptions.CannotCreateWorkingDirException
 import net.nemerosa.ontrack.model.structure.VersionInfo
 import net.nemerosa.ontrack.model.support.EnvService
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
-import net.nemerosa.ontrack.model.support.VersionInfoConfig
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
+import org.springframework.boot.info.BuildProperties
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
 import java.io.File
@@ -15,7 +15,7 @@ import javax.annotation.PostConstruct
 
 @Service
 class EnvServiceImpl(
-    version: VersionInfoConfig,
+    buildProperties: BuildProperties?,
     configProperties: OntrackConfigProperties,
     ctx: ApplicationContext
 ) : EnvService {
@@ -23,7 +23,23 @@ class EnvServiceImpl(
     private val logger = LoggerFactory.getLogger(EnvService::class.java)
 
     override val version: VersionInfo by lazy {
-        version.toInfo()
+        if (buildProperties != null) {
+            VersionInfo(
+                display = buildProperties.version ?: "n/a",
+                full = buildProperties.get("full") ?: "n/a",
+                branch = buildProperties.get("branch") ?: "n/a",
+                build = buildProperties.get("build") ?: "n/a",
+                commit = buildProperties.get("commit") ?: "n/a",
+            )
+        } else {
+            VersionInfo(
+                display = "local",
+                full = "local",
+                branch = "local",
+                build = "local",
+                commit = "local",
+            )
+        }
     }
 
     private val defaultProfiles: String by lazy {
@@ -64,7 +80,5 @@ class EnvServiceImpl(
         logger.info("[version] Branch:            {}", version.branch)
         logger.info("[version] Build:             {}", version.build)
         logger.info("[version] Commit:            {}", version.commit)
-        logger.info("[version] Source:            {}", version.source)
-        logger.info("[version] Source type:       {}", version.sourceType)
     }
 }

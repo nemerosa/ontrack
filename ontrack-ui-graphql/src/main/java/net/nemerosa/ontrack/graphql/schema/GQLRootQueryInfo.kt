@@ -54,7 +54,8 @@ class GQLTypeVersionInfo : GQLType {
         .name(typeName)
         .description("Version information")
         .field {
-            it.name(VersionInfo::date.name)
+            it.name("date")
+                .deprecate("Date field will be removed in V5")
                 .description("Creation date")
                 .type(GQLScalarLocalDateTime.INSTANCE)
         }
