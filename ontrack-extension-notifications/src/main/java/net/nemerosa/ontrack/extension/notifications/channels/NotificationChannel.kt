@@ -13,6 +13,12 @@ interface NotificationChannel<C> {
 
     fun validate(channelConfig: JsonNode): ValidatedNotificationChannelConfig<C>
 
+    /**
+     * Sends an event onto this channel.
+     *
+     * @param config Configuration for the channel
+     * @param event Event to send notification about
+     */
     fun publish(config: C, event: Event): NotificationResult
 
     /**

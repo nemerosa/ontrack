@@ -2,6 +2,10 @@ package net.nemerosa.ontrack.extension.slack.service
 
 import com.slack.api.Slack
 import com.slack.api.methods.MethodsClient
+import com.slack.api.model.Attachment
+import com.slack.api.model.block.Blocks.asBlocks
+import com.slack.api.model.block.Blocks.section
+import com.slack.api.model.block.composition.BlockCompositions.markdownText
 import net.nemerosa.ontrack.extension.slack.SlackSettings
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -17,7 +21,7 @@ class DefaultSlackService(
     private val applicationLogService: ApplicationLogService,
 ) : SlackService {
 
-    override fun sendNotification(channel: String, message: String): Boolean {
+    override fun sendNotification(channel: String, message: String, type: SlackNotificationType?): Boolean {
         val settings = cachedSettingsService.getCachedSettings(SlackSettings::class.java)
         val iconEmoji = settings.emoji?.takeIf { it.isNotBlank() }
         return if (settings.enabled) {
@@ -25,8 +29,30 @@ class DefaultSlackService(
             val client = getSlackClient(settings.token, settings.endpoint)
             // Sending the message
             return try {
-                val response = client.chatPostMessage {
-                    it.channel(channel).text(message).mrkdwn(true).run {
+                val response = client.chatPostMessage { req -> req
+                    .channel(channel)
+                    .attachments(
+                        listOf(
+                            Attachment.builder()
+                                .run {
+                                    val color = type?.color
+                                    if (color.isNullOrBlank()) {
+                                        this
+                                    } else {
+                                        color(color)
+                                    }
+                                }
+                                .blocks(
+                                    asBlocks(
+                                        section { section ->
+                                            section.text(markdownText(message))
+                                        }
+                                    )
+                                )
+                                .build()
+                        )
+                    )
+                    .run {
                         if (iconEmoji.isNullOrBlank()) {
                             this
                         } else {
@@ -58,7 +84,7 @@ class DefaultSlackService(
 
     fun getSlackClient(slackToken: String, endpointUrl: String? = null): MethodsClient {
         val methods = Slack.getInstance().methods(slackToken)
-        if (endpointUrl != null && endpointUrl.isNotBlank()) {
+        if (!endpointUrl.isNullOrBlank()) {
             methods.endpointUrlPrefix = endpointUrl
         }
         return methods
