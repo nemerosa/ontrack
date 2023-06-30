@@ -51,7 +51,7 @@ class EnvServiceImpl(
     }
 
     private val jdbcUrl: String by lazy {
-        ctx.environment.getProperty("spring.datasource.url") ?: error("No JDBC URL available")
+        ctx.environment.getProperty("spring.datasource.url") ?: "No JDBC URL available"
     }
 
     private val home: File by lazy {
