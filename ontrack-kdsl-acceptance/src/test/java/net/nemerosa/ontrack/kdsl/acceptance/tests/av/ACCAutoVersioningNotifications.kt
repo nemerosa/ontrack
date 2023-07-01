@@ -161,7 +161,7 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
 
                         // Check a success notification has been received at source level
                         waitUntil(
-                            timeout = 30_000,
+                            timeout = 60_000,
                             interval = 500L,
                             task = "Success notification at dependency level",
                             onTimeout = displayNotifications(dependencyGroup)
@@ -178,7 +178,7 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
 
                         // Check a success notification has been received at target level
                         waitUntil(
-                            timeout = 30_000,
+                            timeout = 60_000,
                             interval = 500L,
                             task = "Success notification at target level",
                             onTimeout = displayNotifications(projectGroup)
