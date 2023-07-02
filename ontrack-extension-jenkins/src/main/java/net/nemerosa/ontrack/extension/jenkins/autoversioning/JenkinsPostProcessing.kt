@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService
 import net.nemerosa.ontrack.extension.jenkins.JenkinsExtensionFeature
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClientFactory
+import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
@@ -42,6 +43,7 @@ class JenkinsPostProcessing(
         repositoryURI: String,
         repository: String,
         upgradeBranch: String,
+        scm: SCM,
     ) {
         // Gets the global settings
         val settings: JenkinsPostProcessingSettings =

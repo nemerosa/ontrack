@@ -1,17 +1,15 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHub
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.system.withTestGitHubRepository
+import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
 import org.junit.jupiter.api.Test
 
-@TestOnGitHub
 class ACCAutoVersioningProperties : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning based on Java properties file explicitly`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -23,7 +21,7 @@ class ACCAutoVersioningProperties : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -45,7 +43,7 @@ class ACCAutoVersioningProperties : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
                                 from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"
@@ -67,7 +65,7 @@ class ACCAutoVersioningProperties : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning based on NPM`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("package.json") {
                     """
@@ -85,7 +83,7 @@ class ACCAutoVersioningProperties : AbstractACCAutoVersioningTestSupport() {
                 val module3 = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -107,7 +105,7 @@ class ACCAutoVersioningProperties : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
                                 from = "feature/auto-upgrade-${module3.project.name}-7.3.2-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"
@@ -135,7 +133,7 @@ class ACCAutoVersioningProperties : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning based on NPM using devDependencies`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("package.json") {
                     """
@@ -153,7 +151,7 @@ class ACCAutoVersioningProperties : AbstractACCAutoVersioningTestSupport() {
                 val module3 = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -175,7 +173,7 @@ class ACCAutoVersioningProperties : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
                                 from = "feature/auto-upgrade-${module3.project.name}-7.3.2-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"

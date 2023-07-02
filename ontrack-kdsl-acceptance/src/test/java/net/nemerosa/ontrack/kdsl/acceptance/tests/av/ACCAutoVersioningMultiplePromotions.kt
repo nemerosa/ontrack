@@ -1,18 +1,15 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHub
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.system.withTestGitHubRepository
+import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
-import net.nemerosa.ontrack.kdsl.spec.extension.general.label
 import org.junit.jupiter.api.Test
 
-@TestOnGitHub
 class ACCAutoVersioningMultiplePromotions : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning from multiple promotions on the same source project`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
 
                 val app = project {
@@ -34,7 +31,7 @@ class ACCAutoVersioningMultiplePromotions : AbstractACCAutoVersioningTestSupport
 
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -60,7 +57,7 @@ class ACCAutoVersioningMultiplePromotions : AbstractACCAutoVersioningTestSupport
 
                         app.promote("SILVER")
                         waitForAutoVersioningCompletion()
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             fileContains("gradle.properties") {
                                 """
                                     dev-version = 1.2.2
@@ -73,7 +70,7 @@ class ACCAutoVersioningMultiplePromotions : AbstractACCAutoVersioningTestSupport
 
                         app.promote("GOLD")
                         waitForAutoVersioningCompletion()
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             fileContains("gradle.properties") {
                                 """
                                     dev-version = 1.2.2

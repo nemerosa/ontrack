@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHub
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.system.withTestGitHubRepository
+import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningNotification
@@ -14,13 +13,12 @@ import org.junit.jupiter.api.Test
 /**
  * Testing the notifications registered in the AV configuration.
  */
-@TestOnGitHub
 class ACCAutoVersioningConfigNotifications : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning notification for all scopes`() {
         val projectGroup = uid("tar-g-")
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     "some-version = 1.0.0"
@@ -30,7 +28,7 @@ class ACCAutoVersioningConfigNotifications : AbstractACCAutoVersioningTestSuppor
                 project {
 
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(

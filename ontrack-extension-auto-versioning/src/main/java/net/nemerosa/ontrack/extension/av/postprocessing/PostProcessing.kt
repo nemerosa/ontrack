@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.av.postprocessing
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.model.extension.Extension
 
 /**
@@ -29,6 +30,7 @@ interface PostProcessing<T> : Extension {
      * @param repositoryURI Full URI to the repository
      * @param repository Path to the repository
      * @param upgradeBranch Remote branch already containing the upgraded version
+     * @param scm The target SCM
      */
     fun postProcessing(
         config: T,
@@ -36,6 +38,7 @@ interface PostProcessing<T> : Extension {
         repositoryURI: String,
         repository: String,
         upgradeBranch: String,
+        scm: SCM,
     )
 
     /**
