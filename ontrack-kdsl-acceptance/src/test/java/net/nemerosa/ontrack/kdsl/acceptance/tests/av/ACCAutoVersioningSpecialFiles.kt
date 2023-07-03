@@ -1,18 +1,16 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHub
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.system.withTestGitHubRepository
+import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
 import org.junit.jupiter.api.Test
 import java.util.*
 
-@TestOnGitHub
 class ACCAutoVersioningSpecialFiles : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning in a very big file`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("Jenkinsfile") {
                     (listOf("@Library(\"my-library@0.1.0\") _") + (1..4000).map {
@@ -22,7 +20,7 @@ class ACCAutoVersioningSpecialFiles : AbstractACCAutoVersioningTestSupport() {
                 val library = branchWithPromotion(promotion = "GOLD")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -43,7 +41,7 @@ class ACCAutoVersioningSpecialFiles : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
                                 from = "feature/auto-upgrade-${library.project.name}-0.1.1-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"

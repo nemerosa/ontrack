@@ -33,45 +33,22 @@ object ACCProperties {
 
     }
 
-    object GitHub {
-        val organization: String? by optionalFromEnv()
-        val token: String? by optionalFromEnv()
-        val autoMergeToken: String? by optionalFromEnv()
+    object AutoVersioning {
+        @DefaultValue("120000") // 2 minutes
+        val autoVersioningCompletion: Long by longFromEnv()
+    }
 
+    object MockSCM {
         object Timeouts {
-            @DefaultValue("120000") // 2 minutes
+            @DefaultValue("30000")
             val general: Long by longFromEnv()
-            @DefaultValue("120000") // 2 minutes
-            val autoVersioningCompletion: Long by longFromEnv()
+            @DefaultValue("500")
+            val interval: Long by longFromEnv()
         }
+    }
 
-        object AutoVersioning {
-
-            object PostProcessing {
-
-                object Processor {
-                    val org: String? by optionalFromEnv()
-                    val repository: String? by optionalFromEnv()
-
-                    @DefaultValue("post-processing.yml")
-                    val workflow: String by fromEnv()
-
-                    @DefaultValue("main")
-                    val branch: String by fromEnv()
-                }
-
-                object Sample {
-                    val org: String? by optionalFromEnv()
-                    val repository: String? by optionalFromEnv()
-
-                    @DefaultValue("ontrackVersion")
-                    val property: String by fromEnv()
-                    val version: String? by optionalFromEnv()
-                }
-
-            }
-
-        }
+    object GitHub {
+        val token: String? by optionalFromEnv()
     }
 
     object InfluxDB {
