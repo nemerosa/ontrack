@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.av.postprocessing.mock
 
 import com.fasterxml.jackson.databind.JsonNode
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.av.AutoVersioningExtensionFeature
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
@@ -38,6 +40,11 @@ class MockPostProcessing(
         upgradeBranch: String,
         scm: SCM,
     ) {
+        if (config.durationMs > 0) {
+            runBlocking {
+                delay(config.durationMs)
+            }
+        }
         scm.upload(
             scmBranch = upgradeBranch,
             commit = "-",

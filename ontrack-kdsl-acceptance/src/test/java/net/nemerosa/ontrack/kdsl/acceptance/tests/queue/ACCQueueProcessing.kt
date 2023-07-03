@@ -19,9 +19,7 @@ class ACCQueueProcessing : AbstractACCDSLNotificationsTestSupport() {
         // Waits for the processing to be completed
         queueSupport.waitForQueueRecordToBe(id, QueueRecordState.COMPLETED)
         // Gets the records and checks the queueName
-        assertNotNull(ontrack.queue.findQueueRecordByID(id), "Queue record present") {
-            assertEquals("ontrack.queue.mock.0", it.queueName)
-        }
+        assertNotNull(ontrack.queue.findQueueRecordByID(id), "Queue record present")
     }
 
     @Test

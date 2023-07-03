@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
+import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.autoVersioning
@@ -33,6 +35,11 @@ class ACCAutoVersioningCancelling : AbstractACCAutoVersioningTestSupport() {
                                     targetPath = "gradle.properties",
                                     targetProperty = "some-version",
                                     targetPropertyType = "properties",
+                                    postProcessing = "mock",
+                                    postProcessingConfig = mapOf(
+                                        "postProcessingStamp" to uid("ps_"),
+                                        "durationMs" to 1_000L, // Forcing a delay in processing
+                                    ).asJson()
                                 )
                             )
                         )
@@ -70,7 +77,17 @@ class ACCAutoVersioningCancelling : AbstractACCAutoVersioningTestSupport() {
                         // Checks the previous orders have been cancelled
                         (2..4).forEach { no ->
                             waitUntil(
-                                task = "1.0.$no has been cancelled"
+                                task = "1.0.$no has been cancelled",
+                                onTimeout = {
+                                    println("Entries:")
+                                    ontrack.autoVersioning.audit.entries(
+                                        source = dependency.project.name,
+                                        project = project.name,
+                                        branch = name,
+                                    ).forEach {
+                                        println("* $it")
+                                    }
+                                }
                             ) {
                                 val entry = ontrack.autoVersioning.audit.entries(
                                     source = dependency.project.name,
