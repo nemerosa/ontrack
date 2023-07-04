@@ -1,5 +1,5 @@
 import MainPage from "@components/layouts/MainPage";
-import {CloseCommand} from "@components/common/Commands";
+import {CloseCommand, DashboardEditCommand} from "@components/common/Commands";
 import LoadingContainer from "@components/common/LoadingContainer";
 import Dashboard from "@components/dashboards/Dashboard";
 
@@ -10,6 +10,7 @@ export default function DashboardPage({
                                       }) {
 
     const commands = [
+        <DashboardEditCommand/>,
         <CloseCommand key="close" href={closeHref}/>,
     ]
 
