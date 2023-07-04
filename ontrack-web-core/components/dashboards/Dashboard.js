@@ -1,36 +1,11 @@
-import {lazy, useEffect, useState, Suspense} from "react";
-import graphQLCall from "@client/graphQLCall";
-import {gql} from "graphql-request";
-import {Alert, Button, Skeleton, Space} from "antd";
+import {lazy, Suspense, useContext, useEffect, useState} from "react";
+import {Skeleton, Space} from "antd";
+import {DashboardContext} from "@components/dashboards/DashboardContext";
+import LayoutContextProvider from "@components/dashboards/layouts/LayoutContext";
 
-export default function Dashboard({
-                                      context, contextId = "-",
-                                      editionMode, onStopEdition
-                                  }) {
+export default function Dashboard() {
 
-    const [dashboard, setDashboard] = useState({})
-    useEffect(() => {
-        if (context && contextId) {
-            graphQLCall(
-                gql`
-                    query Dashboard($context: String!, $contextId: String!) {
-                        dashboardByContext(key: $context, id: $contextId) {
-                            key
-                            name
-                            layoutKey
-                            widgets {
-                                key
-                                config
-                            }
-                        }
-                    }
-                `,
-                {context, contextId}
-            ).then(data => {
-                setDashboard(data.dashboardByContext)
-            })
-        }
-    }, [context, contextId])
+    const dashboard = useContext(DashboardContext)
 
     const importLayout = layoutKey => lazy(() =>
         import(`./layouts/${layoutKey}Layout`)
@@ -42,35 +17,32 @@ export default function Dashboard({
         if (dashboard?.layoutKey) {
             const loadLayout = async () => {
                 const Layout = await importLayout(dashboard.layoutKey)
-                setLoadedLayout(
-                    <Layout
-                        widgets={dashboard.widgets}
-                        context={context}
-                        contextId={contextId}
-                        editionMode={editionMode}
-                    />
-                )
+                setLoadedLayout(<Layout/>)
             }
             loadLayout().then(() => {
             })
         }
-    }, [dashboard, context, contextId, editionMode])
+    }, [dashboard])
 
     return (
         <>
             {dashboard && <Suspense fallback={<Skeleton active/>}>
                 <Space direction="vertical">
-                    {
-                        editionMode &&
-                        <Alert
-                            type="warning"
-                            message="Dashboard in edition mode."
-                            action={
-                                <Button size="small" danger onClick={onStopEdition}>Close edition</Button>
-                            }
-                        />
-                    }
-                    <div>{loadedLayout}</div>
+                    {/*{*/}
+                    {/*    editionMode &&*/}
+                    {/*    <Alert*/}
+                    {/*        type="warning"*/}
+                    {/*        message="Dashboard in edition mode."*/}
+                    {/*        action={*/}
+                    {/*            <Button size="small" danger onClick={onStopEdition}>Close edition</Button>*/}
+                    {/*        }*/}
+                    {/*    />*/}
+                    {/*}*/}
+                    <div>
+                        <LayoutContextProvider>
+                            {loadedLayout}
+                        </LayoutContextProvider>
+                    </div>
                 </Space>
             </Suspense>}
         </>

@@ -1,17 +1,17 @@
 import {Col, Row, Space} from "antd";
 import DashboardWidget from "@components/dashboards/widgets/DashboardWidget";
+import {LayoutContext} from "@components/dashboards/layouts/LayoutContext";
+import {useContext} from "react";
 
-export default function Main2Layout({widgets, context, contextId, editionMode}) {
+export default function Main2Layout() {
+
+    const widgets = useContext(LayoutContext)
+
     return (
         <Space direction="vertical" style={{width: '100%'}} size={16}>
             {widgets.length &&
                 <div style={{width: '100%'}}>
-                    <DashboardWidget
-                        widget={widgets[0]}
-                        context={context}
-                        contextId={contextId}
-                        editionMode={editionMode}
-                    />
+                    <DashboardWidget widget={widgets[0]}/>
                 </div>
             }
             {
@@ -22,12 +22,7 @@ export default function Main2Layout({widgets, context, contextId, editionMode}) 
                 >
                     {widgets.slice(1).map((widget, index) =>
                         <Col key={index} span={8}>
-                            <DashboardWidget
-                                widget={widget}
-                                context={context}
-                                contextId={contextId}
-                                editionMode={editionMode}
-                            />
+                            <DashboardWidget widget={widget}/>
                         </Col>
                     )}
                 </Row>

@@ -1,8 +1,8 @@
 import MainPage from "@components/layouts/MainPage";
-import {CloseCommand, DashboardEditCommand} from "@components/common/Commands";
+import {CloseCommand} from "@components/common/Commands";
 import LoadingContainer from "@components/common/LoadingContainer";
 import Dashboard from "@components/dashboards/Dashboard";
-import {useState} from "react";
+import DashboardContextProvider, {DashboardContext} from "@components/dashboards/DashboardContext";
 
 export default function DashboardPage({
                                           title, breadcrumbs, closeHref,
@@ -10,10 +10,10 @@ export default function DashboardPage({
                                           context, contextId
                                       }) {
 
-    const [editionMode, setEditionMode] = useState(false)
+    // const [editionMode, setEditionMode] = useState(false)
 
     const commands = [
-        <DashboardEditCommand editionMode={editionMode} onClick={() => setEditionMode(true)}/>,
+        // <DashboardEditCommand editionMode={editionMode} onClick={() => setEditionMode(true)}/>,
         <CloseCommand key="close" href={closeHref}/>,
     ]
 
@@ -25,12 +25,9 @@ export default function DashboardPage({
                 commands={commands}
             >
                 <LoadingContainer loading={loading}>
-                    <Dashboard
-                        context={context}
-                        contextId={contextId}
-                        editionMode={editionMode}
-                        onStopEdition={() => setEditionMode(false)}
-                    />
+                    <DashboardContextProvider context={context} contextId={contextId}>
+                        <Dashboard/>
+                    </DashboardContextProvider>
                 </LoadingContainer>
             </MainPage>
         </>

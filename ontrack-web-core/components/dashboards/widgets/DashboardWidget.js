@@ -1,7 +1,7 @@
 import {lazy, Suspense, useEffect, useState} from "react";
 import {Skeleton} from "antd";
 
-export default function DashboardWidget({widget, context, contextId, editionMode}) {
+export default function DashboardWidget({widget}) {
     const importWidget = widgetKey => lazy(() =>
         import(`./${widgetKey}Widget`)
     )
@@ -13,18 +13,13 @@ export default function DashboardWidget({widget, context, contextId, editionMode
             const loadWidget = async () => {
                 const LoadedWidget = await importWidget(widget.key)
                 setLoadedWidget(
-                    <LoadedWidget
-                        {...widget.config}
-                        context={context}
-                        contextId={contextId}
-                        editionMode={editionMode}
-                    />
+                    <LoadedWidget{...widget.config}/>
                 )
             }
             loadWidget().then(() => {
             })
         }
-    }, [widget, context, contextId, editionMode])
+    }, [widget])
 
     return (
         <div style={{

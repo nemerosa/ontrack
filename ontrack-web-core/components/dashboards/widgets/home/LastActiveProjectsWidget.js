@@ -8,7 +8,7 @@ import WidgetCommand from "@components/dashboards/commands/WidgetCommand";
 import NewProjectDialog, {useNewProjectDialog} from "@components/projects/NewProjectDialog";
 import {UserContext} from "@components/providers/UserProvider";
 
-export default function LastActiveProjectsWidget({count, editionMode}) {
+export default function LastActiveProjectsWidget({count}) {
 
     const user = useContext(UserContext)
 
@@ -42,20 +42,19 @@ export default function LastActiveProjectsWidget({count, editionMode}) {
                 title={`Last ${count} active projects`}
                 query={
                     gql`
-                    query LastActiveProjects($count: Int! = 10) {
-                        lastActiveProjects(count: $count) {
-                            id
-                            name
-                            favourite
+                        query LastActiveProjects($count: Int! = 10) {
+                            lastActiveProjects(count: $count) {
+                                id
+                                name
+                                favourite
+                            }
                         }
-                    }
-                `
+                    `
                 }
                 queryDeps={[user, projectsRefreshCount]}
                 variables={{}}
                 setData={data => setProjects(data.lastActiveProjects)}
                 getCommands={projects => getCommands(projects)}
-                editionMode={editionMode}
             >
                 <Space direction="horizontal" size={16} wrap>
                     {projects.map(project => <ProjectBox key={project.id} project={project}/>)}

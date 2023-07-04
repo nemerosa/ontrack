@@ -6,7 +6,6 @@ export default function SimpleWidget({
                                          title, query, queryDeps = [], variables,
                                          setData,
                                          getCommands,
-                                         editionMode,
                                          children
                                      }) {
     const [loading, setLoading] = useState(true)
@@ -34,7 +33,6 @@ export default function SimpleWidget({
             title={title}
             loading={loading}
             commands={commands}
-            editionMode={editionMode}
         >
             {children}
         </Widget>
