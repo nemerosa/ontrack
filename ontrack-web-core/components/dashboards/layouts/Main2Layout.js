@@ -1,7 +1,7 @@
 import {Col, Row, Space} from "antd";
 import DashboardWidget from "@components/dashboards/widgets/DashboardWidget";
 
-export default function Main2Layout({widgets, context, contextId}) {
+export default function Main2Layout({widgets, context, contextId, editionMode}) {
     return (
         <Space direction="vertical" style={{width: '100%'}} size={16}>
             {widgets.length &&
@@ -10,6 +10,7 @@ export default function Main2Layout({widgets, context, contextId}) {
                         widget={widgets[0]}
                         context={context}
                         contextId={contextId}
+                        editionMode={editionMode}
                     />
                 </div>
             }

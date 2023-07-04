@@ -1,7 +1,7 @@
 import {Space} from "antd";
 import DashboardWidget from "@components/dashboards/widgets/DashboardWidget";
 
-export default function DefaultLayout({widgets, context, contextId}) {
+export default function DefaultLayout({widgets, context, contextId, editionMode}) {
     return (
         <Space direction="vertical" style={{
             width: '100%',
@@ -14,6 +14,7 @@ export default function DefaultLayout({widgets, context, contextId}) {
                         widget={widget}
                         context={context}
                         contextId={contextId}
+                        editionMode={editionMode}
                     />
                 </div>
             )}

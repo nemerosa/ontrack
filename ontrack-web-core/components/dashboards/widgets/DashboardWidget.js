@@ -1,6 +1,7 @@
 import {lazy, Suspense, useEffect, useState} from "react";
+import {Skeleton} from "antd";
 
-export default function DashboardWidget({widget, context, contextId}) {
+export default function DashboardWidget({widget, context, contextId, editionMode}) {
     const importWidget = widgetKey => lazy(() =>
         import(`./${widgetKey}Widget`)
     )
@@ -11,7 +12,13 @@ export default function DashboardWidget({widget, context, contextId}) {
         if (widget) {
             const loadWidget = async () => {
                 const LoadedWidget = await importWidget(widget.key)
-                setLoadedWidget(<LoadedWidget {...widget.config} context={context} contextId={contextId}/>)
+                setLoadedWidget(
+                    <LoadedWidget
+                        {...widget.config}
+                        context={context}
+                        contextId={contextId}
+                    />
+                )
             }
             loadWidget().then(() => {
             })
@@ -22,8 +29,7 @@ export default function DashboardWidget({widget, context, contextId}) {
         <div style={{
             width: '100%',
         }}>
-            {/* TODO Loading indicator for the widget */}
-            {widget && <Suspense fallback={"Loading..."}>
+            {widget && <Suspense fallback={<Skeleton active/>}>
                 {loadedWidget}
             </Suspense>}
         </div>

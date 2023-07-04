@@ -43,7 +43,14 @@ export default function Dashboard({
         if (dashboard?.layoutKey) {
             const loadLayout = async () => {
                 const Layout = await importLayout(dashboard.layoutKey)
-                setLoadedLayout(<Layout widgets={dashboard.widgets} context={context} contextId={contextId}/>)
+                setLoadedLayout(
+                    <Layout
+                        widgets={dashboard.widgets}
+                        context={context}
+                        contextId={contextId}
+                        editionMode={editionMode}
+                    />
+                )
             }
             loadLayout().then(() => {
             })
