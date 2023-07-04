@@ -5,7 +5,7 @@ import BranchBox from "@components/branches/BranchBox";
 import SimpleWidget from "@components/dashboards/widgets/SimpleWidget";
 import {checkContextIs} from "@components/dashboards/widgets/Widget";
 
-export default function LastActiveBranchesWidget({count, context, contextId}) {
+export default function LastActiveBranchesWidget({count, context, contextId, editionMode}) {
 
     const [branches, setBranches] = useState([])
 
@@ -36,6 +36,7 @@ export default function LastActiveBranchesWidget({count, context, contextId}) {
             setData={data => {
                 setBranches(data.projects[0].branches)
             }}
+            editionMode={editionMode}
         >
             <Space direction="horizontal" size={16} wrap>
                 {branches.map(branch => <BranchBox key={branch.id} branch={branch}/>)}

@@ -8,7 +8,7 @@ import WidgetCommand from "@components/dashboards/commands/WidgetCommand";
 import NewProjectDialog, {useNewProjectDialog} from "@components/projects/NewProjectDialog";
 import {UserContext} from "@components/providers/UserProvider";
 
-export default function LastActiveProjectsWidget({count}) {
+export default function LastActiveProjectsWidget({count, editionMode}) {
 
     const user = useContext(UserContext)
 
@@ -55,6 +55,7 @@ export default function LastActiveProjectsWidget({count}) {
                 variables={{}}
                 setData={data => setProjects(data.lastActiveProjects)}
                 getCommands={projects => getCommands(projects)}
+                editionMode={editionMode}
             >
                 <Space direction="horizontal" size={16} wrap>
                     {projects.map(project => <ProjectBox key={project.id} project={project}/>)}

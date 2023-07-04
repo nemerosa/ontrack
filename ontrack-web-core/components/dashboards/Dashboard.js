@@ -27,7 +27,6 @@ export default function Dashboard({
                 `,
                 {context, contextId}
             ).then(data => {
-                console.log({dashboard: data.dashboardByContext})
                 setDashboard(data.dashboardByContext)
             })
         }
@@ -55,7 +54,7 @@ export default function Dashboard({
             loadLayout().then(() => {
             })
         }
-    }, [dashboard, context, contextId])
+    }, [dashboard, context, contextId, editionMode])
 
     return (
         <>

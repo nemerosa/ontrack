@@ -34,7 +34,7 @@ export function checkContext(widget, predicate, error) {
     }
 }
 
-export default function Widget({title, loading, commands, children}) {
+export default function Widget({title, loading, commands, editionMode, children}) {
     return (
         <Card
             title={loading ? "Loading..." : title}
@@ -47,7 +47,7 @@ export default function Widget({title, loading, commands, children}) {
             extra={
                 <>
                 {
-                    commands && <Space size={8}>
+                    !editionMode && commands && <Space size={8}>
                         {
                             commands.map((command, index) => <span key={index}>{command}</span>)
                         }

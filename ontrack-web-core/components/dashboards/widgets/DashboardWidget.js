@@ -17,13 +17,14 @@ export default function DashboardWidget({widget, context, contextId, editionMode
                         {...widget.config}
                         context={context}
                         contextId={contextId}
+                        editionMode={editionMode}
                     />
                 )
             }
             loadWidget().then(() => {
             })
         }
-    }, [widget, context, contextId])
+    }, [widget, context, contextId, editionMode])
 
     return (
         <div style={{

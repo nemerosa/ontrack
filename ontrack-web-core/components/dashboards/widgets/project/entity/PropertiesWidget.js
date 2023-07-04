@@ -5,7 +5,7 @@ import {useState} from "react";
 import {Space} from "antd";
 import Property from "@components/properties/Property";
 
-export default function PropertiesWidget({context, contextId}) {
+export default function PropertiesWidget({context, contextId, editionMode}) {
 
     const [properties, setProperties] = useState([])
 
@@ -50,6 +50,7 @@ export default function PropertiesWidget({context, contextId}) {
                 entityId: contextId,
             }}
             setData={data => setProperties(data.entity.properties)}
+            editionMode={editionMode}
         >
             <Space direction="vertical" size={8} style={{width: '100%'}}>
                 {
