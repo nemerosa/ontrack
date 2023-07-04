@@ -10,10 +10,11 @@ import NewProjectDialog, {useNewProjectDialog} from "@components/projects/NewPro
 export default function LastActiveProjectsWidget({count}) {
 
     const [projects, setProjects] = useState([])
+    const [projectsRefreshCount, setProjectsRefreshCount] = useState(0)
 
     const newProjectDialog = useNewProjectDialog({
         onSuccess: () => {
-            // TODO projectList.refresh()
+            setProjectsRefreshCount(projectsRefreshCount + 1)
         }
     })
 
@@ -21,7 +22,7 @@ export default function LastActiveProjectsWidget({count}) {
         newProjectDialog.start()
     }
 
-    const getCommands = (projects) => {
+    const getCommands = (/*projects*/) => {
         return [
             <WidgetCommand
                 title="Create project"
@@ -46,6 +47,7 @@ export default function LastActiveProjectsWidget({count}) {
                     }
                 `
                 }
+                queryDeps={[projectsRefreshCount]}
                 variables={{}}
                 setData={data => setProjects(data.lastActiveProjects)}
                 getCommands={projects => getCommands(projects)}

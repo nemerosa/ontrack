@@ -2,7 +2,7 @@ import graphQLCall from "@client/graphQLCall";
 import Widget from "@components/dashboards/widgets/Widget";
 import {useEffect, useState} from "react";
 
-export default function SimpleWidget({title, query, variables, setData, getCommands, children}) {
+export default function SimpleWidget({title, query, queryDeps = [], variables, setData, getCommands, children}) {
     const [loading, setLoading] = useState(true)
     const [commands, setCommands] = useState([])
 
@@ -21,7 +21,7 @@ export default function SimpleWidget({title, query, variables, setData, getComma
                 setLoading(false)
             })
         }
-    }, [])
+    }, queryDeps)
 
     return (
         <Widget
