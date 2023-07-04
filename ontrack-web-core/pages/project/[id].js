@@ -1,5 +1,4 @@
 import {useRouter} from "next/router";
-import Head from "next/head";
 import MainLayout from "@components/layouts/MainLayout";
 import ProjectView from "@components/views/ProjectView";
 
