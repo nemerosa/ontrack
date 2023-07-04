@@ -26,6 +26,7 @@ export default function Main2Layout({widgets, context, contextId, editionMode}) 
                                 widget={widget}
                                 context={context}
                                 contextId={contextId}
+                                editionMode={editionMode}
                             />
                         </Col>
                     )}

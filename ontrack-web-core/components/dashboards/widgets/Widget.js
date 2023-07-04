@@ -1,4 +1,6 @@
 import {Card, Skeleton, Space, Typography} from "antd";
+import WidgetCommand from "@components/dashboards/commands/WidgetCommand";
+import {FaPlus, FaRegEdit} from "react-icons/fa";
 
 export function checkContextIn(widget, context, expectedContexts) {
     return checkContext(
@@ -35,6 +37,11 @@ export function checkContext(widget, predicate, error) {
 }
 
 export default function Widget({title, loading, commands, editionMode, children}) {
+
+    const editWidget = () => {
+
+    }
+
     return (
         <Card
             title={loading ? "Loading..." : title}
@@ -46,13 +53,23 @@ export default function Widget({title, loading, commands, editionMode, children}
             }}
             extra={
                 <>
-                {
-                    !editionMode && commands && <Space size={8}>
-                        {
-                            commands.map((command, index) => <span key={index}>{command}</span>)
-                        }
-                    </Space>
-                }
+                    {
+                        editionMode && <Space size={8}>
+                            <WidgetCommand
+                                condition={true}
+                                title="Edit the content of this widget"
+                                icon={<FaRegEdit/>}
+                                onAction={editWidget}
+                            />
+                        </Space>
+                    }
+                    {
+                        !editionMode && commands && <Space size={8}>
+                            {
+                                commands.map((command, index) => <span key={index}>{command}</span>)
+                            }
+                        </Space>
+                    }
                 </>
             }
         >
