@@ -52,17 +52,17 @@ export default function DashboardPage({
 
     return (
         <>
-            <MainPage
-                title={title}
-                breadcrumbs={breadcrumbs}
-                commands={commands}
-            >
-                <LoadingContainer loading={loading}>
-                    <DashboardContext.Provider value={dashboard}>
+            <DashboardContext.Provider value={dashboard}>
+                <MainPage
+                    title={title}
+                    breadcrumbs={breadcrumbs}
+                    commands={commands}
+                >
+                    <LoadingContainer loading={loading}>
                         <Dashboard/>
-                    </DashboardContext.Provider>
-                </LoadingContainer>
-            </MainPage>
+                    </LoadingContainer>
+                </MainPage>
+            </DashboardContext.Provider>
         </>
     )
 }

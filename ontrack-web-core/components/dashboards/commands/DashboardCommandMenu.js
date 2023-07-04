@@ -2,8 +2,16 @@ import {Button, Dropdown, Space, Typography} from "antd";
 import {Command} from "@components/common/Commands";
 import {FaEdit, FaWindowRestore} from "react-icons/fa";
 import Link from "next/link";
+import {useContext} from "react";
+import {DashboardContext} from "@components/dashboards/DashboardPage";
 
 export default function DashboardCommandMenu() {
+
+    const dashboard = useContext(DashboardContext)
+
+    const editDashboard = () => {
+        // TODO
+    }
 
     const items = [
         {
@@ -12,6 +20,7 @@ export default function DashboardCommandMenu() {
                 <Command
                     icon={<FaEdit/>}
                     text="Edit current"
+                    action={editDashboard}
                 />
             ),
         },
