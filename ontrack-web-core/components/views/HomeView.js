@@ -6,6 +6,7 @@ export default function HomeView() {
         <DashboardPage
             title="Home"
             context="home"
+            contextId="-"
         />
     )
 }

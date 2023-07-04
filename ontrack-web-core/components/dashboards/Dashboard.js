@@ -1,7 +1,7 @@
 import {lazy, Suspense, useContext, useEffect, useState} from "react";
 import {Skeleton, Space} from "antd";
-import {DashboardContext} from "@components/dashboards/DashboardContext";
 import LayoutContextProvider from "@components/dashboards/layouts/LayoutContext";
+import {DashboardContext} from "@components/dashboards/DashboardPage";
 
 export default function Dashboard() {
 

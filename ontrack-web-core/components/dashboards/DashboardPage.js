@@ -2,8 +2,11 @@ import MainPage from "@components/layouts/MainPage";
 import {CloseCommand} from "@components/common/Commands";
 import LoadingContainer from "@components/common/LoadingContainer";
 import Dashboard from "@components/dashboards/Dashboard";
-import DashboardContextProvider, {DashboardContext} from "@components/dashboards/DashboardContext";
+import {createContext, useEffect, useState} from "react";
+import graphQLCall from "@client/graphQLCall";
+import {gql} from "graphql-request";
 
+export const DashboardContext = createContext(null)
 export default function DashboardPage({
                                           title, breadcrumbs, closeHref,
                                           loading,
@@ -11,6 +14,35 @@ export default function DashboardPage({
                                       }) {
 
     // const [editionMode, setEditionMode] = useState(false)
+
+    const [dashboard, setDashboard] = useState({context, contextId})
+
+    useEffect(() => {
+        if (context && contextId) {
+            graphQLCall(
+                gql`
+                    query Dashboard($context: String!, $contextId: String!) {
+                        dashboardByContext(key: $context, id: $contextId) {
+                            key
+                            name
+                            layoutKey
+                            widgets {
+                                key
+                                config
+                            }
+                        }
+                    }
+                `,
+                {context, contextId}
+            ).then(data => {
+                setDashboard({
+                    context,
+                    contextId,
+                    ...data.dashboardByContext
+                })
+            })
+        }
+    }, [context, contextId])
 
     const commands = [
         // <DashboardEditCommand editionMode={editionMode} onClick={() => setEditionMode(true)}/>,
@@ -25,9 +57,9 @@ export default function DashboardPage({
                 commands={commands}
             >
                 <LoadingContainer loading={loading}>
-                    <DashboardContextProvider context={context} contextId={contextId}>
+                    <DashboardContext.Provider value={dashboard}>
                         <Dashboard/>
-                    </DashboardContextProvider>
+                    </DashboardContext.Provider>
                 </LoadingContainer>
             </MainPage>
         </>

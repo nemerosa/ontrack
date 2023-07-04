@@ -1,7 +1,10 @@
-import {lazy, Suspense, useEffect, useState} from "react";
+import {lazy, Suspense, useContext, useEffect, useState} from "react";
 import {Skeleton} from "antd";
+import {DashboardContext} from "@components/dashboards/DashboardPage";
 
 export default function DashboardWidget({widget}) {
+
+    const dashboard = useContext(DashboardContext)
     const importWidget = widgetKey => lazy(() =>
         import(`./${widgetKey}Widget`)
     )
@@ -25,7 +28,7 @@ export default function DashboardWidget({widget}) {
         <div style={{
             width: '100%',
         }}>
-            {widget && <Suspense fallback={<Skeleton active/>}>
+            {dashboard && widget && <Suspense fallback={<Skeleton active/>}>
                 {loadedWidget}
             </Suspense>}
         </div>
