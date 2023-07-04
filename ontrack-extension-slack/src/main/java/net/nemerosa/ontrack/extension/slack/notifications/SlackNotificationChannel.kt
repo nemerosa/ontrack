@@ -8,7 +8,8 @@ import net.nemerosa.ontrack.extension.slack.service.SlackService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Text
+import net.nemerosa.ontrack.model.form.enumField
+import net.nemerosa.ontrack.model.form.textField
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
 
@@ -23,7 +24,7 @@ class SlackNotificationChannel(
         // Formatting the message
         val message = format(event)
         // Sending the message
-        val sent = slackService.sendNotification(config.channel, message)
+        val sent = slackService.sendNotification(config.channel, message, config.type)
         // Result
         return if (sent) {
             NotificationResult.ok()
@@ -40,12 +41,8 @@ class SlackNotificationChannel(
     override fun toText(config: SlackNotificationChannelConfig): String = config.channel
 
     override fun getForm(c: SlackNotificationChannelConfig?): Form = Form.create()
-        .with(
-            Text.of(SlackNotificationChannelConfig::channel.name)
-                .label("Channel")
-                .help("Slack channel")
-                .value(c?.channel)
-        )
+        .textField(SlackNotificationChannelConfig::channel, c?.channel)
+        .enumField(SlackNotificationChannelConfig::type, c?.type)
 
     override val type: String = "slack"
 

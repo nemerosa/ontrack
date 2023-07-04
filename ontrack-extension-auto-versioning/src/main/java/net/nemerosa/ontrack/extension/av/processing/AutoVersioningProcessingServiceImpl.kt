@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessing
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingNotFoundException
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingRegistry
 import net.nemerosa.ontrack.extension.av.properties.FilePropertyType
+import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.extension.scm.service.uploadLines
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -115,7 +116,8 @@ class AutoVersioningProcessingServiceImpl(
                                     order,
                                     repositoryURI,
                                     repository,
-                                    upgradeBranch
+                                    upgradeBranch,
+                                    scm,
                                 )
                                 logger.debug("Processing auto versioning order end of post processing: {}", order)
                                 autoVersioningAuditService.onPostProcessingEnd(order, upgradeBranch)
@@ -240,6 +242,7 @@ class AutoVersioningProcessingServiceImpl(
         repositoryURI: String,
         repository: String,
         upgradeBranch: String,
+        scm: SCM,
     ) {
         // Count
         metrics.onPostProcessingStarted(order, postProcessing)
@@ -251,7 +254,8 @@ class AutoVersioningProcessingServiceImpl(
                     order,
                     repositoryURI,
                     repository,
-                    upgradeBranch
+                    upgradeBranch,
+                    scm,
                 )
             }
             // Success
@@ -270,11 +274,12 @@ class AutoVersioningProcessingServiceImpl(
         repositoryURI: String,
         repository: String,
         upgradeBranch: String,
+        scm: SCM,
     ) {
         // Parsing and validation of the configuration
         val config: T = postProcessing.parseAndValidate(order.postProcessingConfig)
         // Launching the post processing
-        postProcessing.postProcessing(config, order, repositoryURI, repository, upgradeBranch)
+        postProcessing.postProcessing(config, order, repositoryURI, repository, upgradeBranch, scm)
     }
 
     private fun AutoVersioningOrder.replaceVersion(content: List<String>): List<String> {

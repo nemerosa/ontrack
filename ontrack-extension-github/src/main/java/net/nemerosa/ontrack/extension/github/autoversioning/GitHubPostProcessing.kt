@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
+import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -48,6 +49,7 @@ class GitHubPostProcessing(
         repositoryURI: String,
         repository: String,
         upgradeBranch: String,
+        scm: SCM,
     ) {
         // Gets the settings
         val settings = cachedSettingsService.getCachedSettings(GitHubPostProcessingSettings::class.java)

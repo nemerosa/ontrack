@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHub
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.system.withTestGitHubRepository
+import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.autoVersioning
@@ -10,12 +9,11 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-@TestOnGitHub
 class ACCAutoVersioningRouting : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning using a specific routing`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     "some-version = 1.0.0"
@@ -28,7 +26,7 @@ class ACCAutoVersioningRouting : AbstractACCAutoVersioningTestSupport() {
 
                 project(name = projectName) {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -50,7 +48,7 @@ class ACCAutoVersioningRouting : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             fileContains("gradle.properties") {
                                 "some-version = 2.0.0"
                             }
@@ -77,7 +75,7 @@ class ACCAutoVersioningRouting : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning using default routing`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     "some-version = 1.0.0"
@@ -86,7 +84,7 @@ class ACCAutoVersioningRouting : AbstractACCAutoVersioningTestSupport() {
 
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -108,7 +106,7 @@ class ACCAutoVersioningRouting : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             fileContains("gradle.properties") {
                                 "some-version = 2.0.0"
                             }

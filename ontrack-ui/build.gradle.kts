@@ -1,5 +1,6 @@
 import net.nemerosa.versioning.VersioningExtension
 import org.apache.commons.lang3.time.DateFormatUtils
+import org.springframework.boot.gradle.dsl.SpringBootExtension
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
 
@@ -118,56 +119,20 @@ val copyWebCoreResources by tasks.registering(Copy::class) {
 }
 
 /**
- * Generates the version information in a file, useable from the code
- */
-
-val generateVersionInfo by tasks.registering {
-    doLast {
-        // Version information
-        val info = rootProject.extensions.getByName<VersioningExtension>("versioning").info
-        // Current date
-        val timestamp = DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(System.currentTimeMillis())
-        // Output file
-        val file = project.file("src/main/resources/application.properties")
-        file.writeText("""
-            # This file is generated at build time to contain version information
-            # Do not edit it, do not commit it
-            ontrack.version.date = $timestamp
-            ontrack.version.display = ${info.display}
-            ontrack.version.full = ${info.full}
-            ontrack.version.branch = ${info.branchId}
-            ontrack.version.build = ${info.build}
-            ontrack.version.commit = ${info.commit}
-            ontrack.version.source = ${info.branch}
-            ontrack.version.sourceType = ${info.branchType}
-            # For the /manage/info endpoint
-            info.app.version = ${info.display}
-            info.build.date = $timestamp
-            info.build.display = ${info.display}
-            info.build.full = ${info.full}
-            info.build.branch = ${info.branchId}
-            info.build.build = ${info.build}
-            info.build.commit = ${info.commit}
-            info.build.source = ${info.branch}
-            info.build.sourceType = ${info.branchType}
-        """.trimIndent())
-    }
-}
-
-/**
  * Dependencies
  */
 
 tasks.named<Jar>("jar") {
     enabled = true
     dependsOn(copyWebResources)
-    dependsOn(generateVersionInfo)
+    dependsOn(copyWebCoreResources)
+    dependsOn("bootBuildInfo")
 }
 
 tasks.named<ProcessResources>("processResources") {
     dependsOn(copyWebResources)
     dependsOn(copyWebCoreResources)
-    dependsOn(generateVersionInfo)
+    dependsOn("bootBuildInfo")
 }
 
 tasks.named<BootRun>("bootRun") {
@@ -181,6 +146,22 @@ tasks.named<BootRun>("bootRun") {
 /**
  * Spring boot packaging
  */
+
+configure<SpringBootExtension> {
+    val info = rootProject.extensions.getByName<VersioningExtension>("versioning").info
+    buildInfo {
+        properties {
+            time = null
+            additional = mapOf(
+                "full" to info.full,
+                "branch" to info.branch,
+                "build" to info.build,
+                "commit" to info.commit,
+                "dirty" to info.dirty,
+            )
+        }
+    }
+}
 
 val bootJar = tasks.getByName<BootJar>("bootJar") {
     // Specific classifier

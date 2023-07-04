@@ -1,17 +1,15 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHub
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.system.withTestGitHubRepository
+import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
 import org.junit.jupiter.api.Test
 
-@TestOnGitHub
 class ACCAutoVersioningYAML : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning in YAML using a regular expression in a field`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("requirements.yaml") {
                     """
@@ -32,7 +30,7 @@ class ACCAutoVersioningYAML : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -55,7 +53,7 @@ class ACCAutoVersioningYAML : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
                                 from = "feature/auto-upgrade-${dependency.project.name}-0.1.2-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"
@@ -87,7 +85,7 @@ class ACCAutoVersioningYAML : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning in YAML using a direct version`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("requirements.yaml") {
                     """
@@ -104,7 +102,7 @@ class ACCAutoVersioningYAML : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -126,7 +124,7 @@ class ACCAutoVersioningYAML : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
                                 from = "feature/auto-upgrade-${dependency.project.name}-0.1.2-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"
