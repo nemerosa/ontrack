@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useContext, useState} from "react";
 import {gql} from "graphql-request";
 import ProjectBox from "@components/projects/ProjectBox";
 import {Space} from "antd";
@@ -6,8 +6,11 @@ import SimpleWidget from "@components/dashboards/widgets/SimpleWidget";
 import {FaPlus} from "react-icons/fa";
 import WidgetCommand from "@components/dashboards/commands/WidgetCommand";
 import NewProjectDialog, {useNewProjectDialog} from "@components/projects/NewProjectDialog";
+import {UserContext} from "@components/providers/UserProvider";
 
 export default function LastActiveProjectsWidget({count}) {
+
+    const user = useContext(UserContext)
 
     const [projects, setProjects] = useState([])
     const [projectsRefreshCount, setProjectsRefreshCount] = useState(0)
@@ -25,6 +28,7 @@ export default function LastActiveProjectsWidget({count}) {
     const getCommands = (/*projects*/) => {
         return [
             <WidgetCommand
+                condition={user.authorizations.project?.create}
                 title="Create project"
                 icon={<FaPlus/>}
                 onAction={createProject}
@@ -47,7 +51,7 @@ export default function LastActiveProjectsWidget({count}) {
                     }
                 `
                 }
-                queryDeps={[projectsRefreshCount]}
+                queryDeps={[user, projectsRefreshCount]}
                 variables={{}}
                 setData={data => setProjects(data.lastActiveProjects)}
                 getCommands={projects => getCommands(projects)}

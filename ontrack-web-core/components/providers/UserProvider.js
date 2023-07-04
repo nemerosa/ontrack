@@ -6,7 +6,7 @@ import {gql} from "graphql-request";
 export const UserContext = createContext({user: {}});
 
 const UserContextProvider = ({children}) => {
-    const [user, setUser] = useState({});
+    const [user, setUser] = useState({authorizations:{}});
 
     let tmpUser = {}
 
