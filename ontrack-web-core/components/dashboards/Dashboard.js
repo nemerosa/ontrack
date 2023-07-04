@@ -52,7 +52,6 @@ export default function Dashboard({
 
     return (
         <>
-            {/* TODO Loading indicator for the dashboard */}
             {dashboard && <Suspense fallback={<Skeleton active/>}>
                 <Space direction="vertical">
                     {
