@@ -1,6 +1,7 @@
 import {Card, Skeleton, Space, Typography} from "antd";
 import WidgetCommand from "@components/dashboards/commands/WidgetCommand";
-import {FaPlus, FaRegEdit} from "react-icons/fa";
+import {FaRegEdit, FaRegSave, FaWindowClose} from "react-icons/fa";
+import {useState} from "react";
 
 export function checkContextIn(widget, context, expectedContexts) {
     return checkContext(
@@ -38,8 +39,18 @@ export function checkContext(widget, predicate, error) {
 
 export default function Widget({title, loading, commands, editionMode, children}) {
 
-    const editWidget = () => {
+    const [widgetEditionMode, setWidgetEditionMode] = useState(false)
 
+    const editWidget = () => {
+        setWidgetEditionMode(true)
+    }
+
+    const saveWidgetEdition = () => {
+        setWidgetEditionMode(false)
+    }
+
+    const cancelWidgetEdition = () => {
+        setWidgetEditionMode(false)
     }
 
     return (
@@ -56,10 +67,22 @@ export default function Widget({title, loading, commands, editionMode, children}
                     {
                         editionMode && <Space size={8}>
                             <WidgetCommand
-                                condition={true}
+                                condition={!widgetEditionMode}
                                 title="Edit the content of this widget"
                                 icon={<FaRegEdit/>}
                                 onAction={editWidget}
+                            />
+                            <WidgetCommand
+                                condition={widgetEditionMode}
+                                title="Saves the changes for this widget"
+                                icon={<FaRegSave/>}
+                                onAction={saveWidgetEdition}
+                            />
+                            <WidgetCommand
+                                condition={widgetEditionMode}
+                                title="Cancels the changes for this widget"
+                                icon={<FaWindowClose/>}
+                                onAction={cancelWidgetEdition}
                             />
                         </Space>
                     }
