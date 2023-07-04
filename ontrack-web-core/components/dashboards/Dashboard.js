@@ -1,8 +1,12 @@
 import {lazy, useEffect, useState, Suspense} from "react";
 import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
+import {Alert, Skeleton, Space} from "antd";
 
-export default function Dashboard({context, contextId = "-"}) {
+export default function Dashboard({
+                                      context, contextId = "-",
+                                      editionMode
+                                  }) {
 
     const [dashboard, setDashboard] = useState({})
     useEffect(() => {
@@ -41,15 +45,22 @@ export default function Dashboard({context, contextId = "-"}) {
                 const Layout = await importLayout(dashboard.layoutKey)
                 setLoadedLayout(<Layout widgets={dashboard.widgets} context={context} contextId={contextId}/>)
             }
-            loadLayout().then(() => {})
+            loadLayout().then(() => {
+            })
         }
     }, [dashboard, context, contextId])
 
     return (
         <>
             {/* TODO Loading indicator for the dashboard */}
-            {dashboard && <Suspense fallback={"Loading..."}>
-                <div>{loadedLayout}</div>
+            {dashboard && <Suspense fallback={<Skeleton active/>}>
+                <Space direction="vertical">
+                    {
+                        editionMode &&
+                        <Alert type="warning" message="Dashboard in edition mode."/>
+                    }
+                    <div>{loadedLayout}</div>
+                </Space>
             </Suspense>}
         </>
     )

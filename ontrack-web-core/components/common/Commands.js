@@ -28,14 +28,15 @@ export function CloseToHomeCommand() {
     return <CloseCommand href={homeUri()}/>
 }
 
-export function DashboardEditCommand() {
+export function DashboardEditCommand({editionMode, onClick}) {
     const user = useContext(UserContext)
     return (
         <>
             {
-                user.authorizations?.dashboard?.edit ? <Command
+                user.authorizations?.dashboard?.edit && !editionMode ? <Command
                     icon={<FaEdit/>}
                     text="Edit dashboard"
+                    action={onClick}
                 /> : undefined
             }
         </>
