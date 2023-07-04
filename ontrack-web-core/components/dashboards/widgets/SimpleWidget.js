@@ -2,8 +2,9 @@ import graphQLCall from "@client/graphQLCall";
 import Widget from "@components/dashboards/widgets/Widget";
 import {useEffect, useState} from "react";
 
-export default function SimpleWidget({title, query, variables, setData, children}) {
+export default function SimpleWidget({title, query, variables, setData, getCommands, children}) {
     const [loading, setLoading] = useState(true)
+    const [commands, setCommands] = useState([])
 
     useEffect(() => {
         if (variables) {
@@ -13,6 +14,9 @@ export default function SimpleWidget({title, query, variables, setData, children
                 variables
             ).then(data => {
                 setData(data)
+                if (getCommands) {
+                    setCommands(getCommands(data))
+                }
             }).finally(() => {
                 setLoading(false)
             })
@@ -20,7 +24,11 @@ export default function SimpleWidget({title, query, variables, setData, children
     }, [])
 
     return (
-        <Widget title={title} loading={loading}>
+        <Widget
+            title={title}
+            loading={loading}
+            commands={commands}
+        >
             {children}
         </Widget>
     )

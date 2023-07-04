@@ -34,7 +34,7 @@ export function checkContext(widget, predicate, error) {
     }
 }
 
-export default function Widget({title, loading, children}) {
+export default function Widget({title, loading, commands, children}) {
     return (
         <Card
             title={loading ? "Loading..." : title}
@@ -44,6 +44,17 @@ export default function Widget({title, loading, children}) {
             style={{
                 width: '100%'
             }}
+            extra={
+                <>
+                {
+                    commands && <Space size={8}>
+                        {
+                            commands.map((command, index) => <span key={index}>{command}</span>)
+                        }
+                    </Space>
+                }
+                </>
+            }
         >
             {loading && <Skeleton active/>}
             {!loading && children}
