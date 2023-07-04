@@ -1,19 +1,17 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHub
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.system.withTestGitHubRepository
+import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.general.buildLinkDisplayUseLabel
 import net.nemerosa.ontrack.kdsl.spec.extension.general.label
 import org.junit.jupiter.api.Test
 
-@TestOnGitHub
 class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning on promotion`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -25,7 +23,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -46,7 +44,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
                                 from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"
@@ -68,7 +66,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning on file not found at all`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -80,7 +78,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -101,7 +99,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
 
                             // File unchanged
                             fileContains("gradle.properties") {
@@ -131,7 +129,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning on promotion for a release branch`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -143,7 +141,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(name = "release-1.0", promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -164,7 +162,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
                                 from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"
@@ -186,7 +184,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning on promotion for a release branch identified using Git`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -196,11 +194,11 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                     """.trimIndent()
                 }
                 val dependency = branchWithPromotion(name = "release-1.0", promotion = "IRON") {
-                    configuredForGitHubRepository(ontrack, "release/1.0")
+                    configuredForMockRepository("release/1.0")
                 }
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -221,7 +219,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
                                 from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"
@@ -243,7 +241,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning on promotion with empty post processing`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -255,7 +253,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -277,7 +275,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
                                 from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"
@@ -299,7 +297,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning not requested if feature disabled`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning(enabled = false) {
                 repositoryFile("gradle.properties") {
                     """
@@ -309,7 +307,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -331,7 +329,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
 
                             hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61")
 
@@ -353,7 +351,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning not requested if no match on branch`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -364,7 +362,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 val other = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -386,7 +384,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
 
                             hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61")
 
@@ -408,7 +406,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning not requested if no match on promotion`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -424,7 +422,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 }
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -446,7 +444,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
 
                             hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61")
 
@@ -468,7 +466,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning on promotion using regex for property`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("package.json") {
                     """
@@ -478,7 +476,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -499,7 +497,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
                                 from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"
@@ -519,7 +517,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning on promotion with explicit auto approval`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -531,7 +529,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -553,7 +551,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
                                 from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"
@@ -575,7 +573,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning on promotion with explicit NO auto approval`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -587,7 +585,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -609,7 +607,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             val pr = hasPR(
                                 from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"
@@ -625,7 +623,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning on promotion with custom upgrade branch with custom project`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -637,7 +635,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -659,7 +657,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
                                 from = "feature/upgrade-test-AAA-2.0.0",
                                 to = "main"
@@ -681,7 +679,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning on promotion with custom upgrade branch with default project`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -693,7 +691,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -715,9 +713,9 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/upgrade-test-AAA-2.0.0",
+                                from = "feature/upgrade-test-${dependency.project.name}-2.0.0",
                                 to = "main"
                             )
                             fileContains("gradle.properties") {
@@ -737,7 +735,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning not requested if branch not configured for Git`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -749,8 +747,8 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        project.configuredForGitHub(ontrack)
-                        // configuredForGitHubRepository(ontrack) Only the project, not the branch
+                        project.configuredForMockScm()
+                        // configuredForMockRepository() Only the project, not the branch
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -771,7 +769,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
 
                             hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61")
 
@@ -792,7 +790,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning with several source branches`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -816,7 +814,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 }
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -846,7 +844,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
                                 from = "feature/auto-upgrade-${a.project.name}-1.1.1-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"
@@ -870,7 +868,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
                                 from = "feature/auto-upgrade-${b.project.name}-2.1.0-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"
@@ -892,7 +890,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning on promotion failure in missing version`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -902,7 +900,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -923,7 +921,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
 
                             hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61")
 
@@ -952,7 +950,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning from a project using version as a label`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -968,7 +966,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 }
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -990,7 +988,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             hasPR(
                                 from = "feature/auto-upgrade-${dependency.project.name}-1.1.0-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"
@@ -1010,7 +1008,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning from a project using version as a label is not triggered when build has no label`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     """
@@ -1026,7 +1024,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
                 }
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -1049,7 +1047,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
 
                             hasNoBranch("feature/auto-upgrade-${dependency.project.name}-1.1.0-fad58de7366495db4650cfefac2fcd61")
 

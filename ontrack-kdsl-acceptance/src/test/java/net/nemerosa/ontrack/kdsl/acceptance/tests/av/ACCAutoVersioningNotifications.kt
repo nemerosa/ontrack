@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHub
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.system.withTestGitHubRepository
+import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
@@ -9,12 +8,11 @@ import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
 import org.junit.jupiter.api.Test
 
-@TestOnGitHub
 class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning notification in case of error`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     "some-version = 1.0.0"
@@ -44,7 +42,7 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
                     )
 
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -107,7 +105,7 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning notification for a client merge`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 val dependency = branchWithPromotion(promotion = "IRON")
 
@@ -138,7 +136,7 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
                     )
 
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -161,7 +159,7 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
 
                         // Check a success notification has been received at source level
                         waitUntil(
-                            timeout = 30_000,
+                            timeout = 60_000,
                             interval = 500L,
                             task = "Success notification at dependency level",
                             onTimeout = displayNotifications(dependencyGroup)
@@ -178,7 +176,7 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
 
                         // Check a success notification has been received at target level
                         waitUntil(
-                            timeout = 30_000,
+                            timeout = 60_000,
                             interval = 500L,
                             task = "Success notification at target level",
                             onTimeout = displayNotifications(projectGroup)

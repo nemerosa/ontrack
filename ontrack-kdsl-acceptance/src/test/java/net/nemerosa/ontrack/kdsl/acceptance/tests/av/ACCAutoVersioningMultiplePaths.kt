@@ -1,17 +1,15 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHub
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.system.withTestGitHubRepository
+import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
 import org.junit.jupiter.api.Test
 
-@TestOnGitHub
 class ACCAutoVersioningMultiplePaths : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning on multiple paths`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
                     "one-version = 1.0.0"
@@ -22,7 +20,7 @@ class ACCAutoVersioningMultiplePaths : AbstractACCAutoVersioningTestSupport() {
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -43,7 +41,7 @@ class ACCAutoVersioningMultiplePaths : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
                             fileContains("gradle.properties") {
                                 "one-version = 2.0.0"
                             }
@@ -60,7 +58,7 @@ class ACCAutoVersioningMultiplePaths : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning on multiple branches`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties", branch = "main") {
                     "one-version = 1.0.0"
@@ -70,8 +68,8 @@ class ACCAutoVersioningMultiplePaths : AbstractACCAutoVersioningTestSupport() {
                 }
                 val dependency = branchWithPromotion(promotion = "IRON")
                 project {
-                    val branchMain = branch {
-                        configuredForGitHubRepository(ontrack, scmBranch = "main")
+                    branch {
+                        configuredForMockRepository("main")
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -84,8 +82,8 @@ class ACCAutoVersioningMultiplePaths : AbstractACCAutoVersioningTestSupport() {
                             )
                         )
                     }
-                    val branchRelease = branch {
-                        configuredForGitHubRepository(ontrack, scmBranch = "release/1.0")
+                    branch {
+                        configuredForMockRepository(scmBranch = "release/1.0")
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -107,7 +105,7 @@ class ACCAutoVersioningMultiplePaths : AbstractACCAutoVersioningTestSupport() {
 
                     waitForAutoVersioningCompletion()
 
-                    assertThatGitHubRepository {
+                    assertThatMockScmRepository {
                         fileContains("gradle.properties", branch = "main") {
                             "one-version = 2.0.0"
                         }

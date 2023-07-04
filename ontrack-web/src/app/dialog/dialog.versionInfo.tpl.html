@@ -1,15 +1,10 @@
 <div class="modal-header">
     <h3>
         ontrack {{data.version.display}}
-        <span ng-if="data.version.sourceType != 'release'" class="fa fa-warning text-warning"></span>
     </h3>
 </div>
 <div class="modal-body">
     <h3>Version information</h3>
-    <div ng-if="data.version.sourceType != 'release'" class="alert alert-warning">
-        <span class="fa fa-warning text-warning"></span>
-        This version is not a release! Please use with care.
-    </div>
     <table class="table table-hover">
         <tbody>
         <tr>
@@ -21,20 +16,12 @@
             <td>{{data.version.full}}</td>
         </tr>
         <tr>
-            <th>Source</th>
-            <td>{{data.version.source}}</td>
-        </tr>
-        <tr>
-            <th>Type</th>
-            <td>{{data.version.sourceType}}</td>
+            <th>Branch</th>
+            <td>{{data.version.branch}}</td>
         </tr>
         <tr>
             <th>Commit</th>
             <td>{{data.version.commit}}</td>
-        </tr>
-        <tr>
-            <th>Date</th>
-            <td>{{data.version.date | date:'mediumDate' }} {{data.version.date | date:'shortTime' }}</td>
         </tr>
         </tbody>
     </table>

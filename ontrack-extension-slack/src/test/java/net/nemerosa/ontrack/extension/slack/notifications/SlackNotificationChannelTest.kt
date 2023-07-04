@@ -5,6 +5,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultType
 import net.nemerosa.ontrack.extension.slack.SlackSettings
+import net.nemerosa.ontrack.extension.slack.service.SlackNotificationType
 import net.nemerosa.ontrack.extension.slack.service.SlackService
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
@@ -48,11 +49,11 @@ class SlackNotificationChannelTest {
         every { cachedSettingsService.getCachedSettings(SlackSettings::class.java) } returns SlackSettings(
             enabled = true
         )
-        every { slackService.sendNotification(any(), any()) } returns true
-        val config = SlackNotificationChannelConfig(channel = "#test")
+        every { slackService.sendNotification(any(), any(), any()) } returns true
+        val config = SlackNotificationChannelConfig(channel = "#test", type = SlackNotificationType.SUCCESS)
         val result = channel.publish(config, event)
         verify {
-            slackService.sendNotification("#test", "Project <http://localhost:8080/#/project/1|project> has been disabled.")
+            slackService.sendNotification("#test", "Project <http://localhost:8080/#/project/1|project> has been disabled.", SlackNotificationType.SUCCESS)
         }
         assertEquals(NotificationResultType.OK, result.type)
         assertNull(result.message)
@@ -63,7 +64,7 @@ class SlackNotificationChannelTest {
         every { cachedSettingsService.getCachedSettings(SlackSettings::class.java) } returns SlackSettings(
             enabled = true
         )
-        every { slackService.sendNotification(any(), any()) } returns false // <== returning an error
+        every { slackService.sendNotification(any(), any(), any()) } returns false // <== returning an error
         val config = SlackNotificationChannelConfig(channel = "#test")
         val result = channel.publish(config, event)
         assertEquals(NotificationResultType.ERROR, result.type)

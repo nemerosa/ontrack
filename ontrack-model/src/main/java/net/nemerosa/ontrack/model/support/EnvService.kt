@@ -1,22 +1,20 @@
-package net.nemerosa.ontrack.model.support;
+package net.nemerosa.ontrack.model.support
 
-import net.nemerosa.ontrack.model.structure.VersionInfo;
+import net.nemerosa.ontrack.model.structure.VersionInfo
+import java.io.File
 
-import java.io.File;
-
-public interface EnvService {
-
+interface EnvService {
     /**
      * List of active profiles for the application
      *
      * @see net.nemerosa.ontrack.common.RunProfile
      */
-    String getProfiles();
+    val profiles: String
 
     /**
      * Version of the application
      */
-    VersionInfo getVersion();
+    val version: VersionInfo
 
     /**
      * Gets a working directory
@@ -25,6 +23,6 @@ public interface EnvService {
      * @param name    Name of the directory into this context
      * @return A directory that exists
      */
-    File getWorkingDir(String context, String name);
+    fun getWorkingDir(context: String, name: String): File
 
 }

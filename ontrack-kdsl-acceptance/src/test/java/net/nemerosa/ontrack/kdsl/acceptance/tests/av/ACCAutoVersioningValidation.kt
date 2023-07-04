@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHub
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.system.withTestGitHubRepository
+import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.autoVersioningCheck
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
@@ -11,12 +10,11 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-@TestOnGitHub
 class ACCAutoVersioningValidation : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning check reporting OK using the source code`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
 
                 repositoryFile("gradle.properties") {
@@ -32,7 +30,7 @@ class ACCAutoVersioningValidation : AbstractACCAutoVersioningTestSupport() {
 
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -66,7 +64,7 @@ class ACCAutoVersioningValidation : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning check reporting NOT OK using the source code`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
 
                 repositoryFile("gradle.properties") {
@@ -82,7 +80,7 @@ class ACCAutoVersioningValidation : AbstractACCAutoVersioningTestSupport() {
 
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -116,7 +114,7 @@ class ACCAutoVersioningValidation : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning check reporting OK using the source code using auto mode`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
 
                 repositoryFile("gradle.properties") {
@@ -132,7 +130,7 @@ class ACCAutoVersioningValidation : AbstractACCAutoVersioningTestSupport() {
 
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -166,7 +164,7 @@ class ACCAutoVersioningValidation : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning check reporting OK using build links`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
 
                 repositoryFile("gradle.properties") {
@@ -182,7 +180,7 @@ class ACCAutoVersioningValidation : AbstractACCAutoVersioningTestSupport() {
 
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -218,7 +216,7 @@ class ACCAutoVersioningValidation : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning check reporting NOT OK using build links`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
 
                 repositoryFile("gradle.properties") {
@@ -237,7 +235,7 @@ class ACCAutoVersioningValidation : AbstractACCAutoVersioningTestSupport() {
 
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -273,7 +271,7 @@ class ACCAutoVersioningValidation : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning check reporting OK using build links and auto mode`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
 
                 repositoryFile("gradle.properties") {
@@ -289,7 +287,7 @@ class ACCAutoVersioningValidation : AbstractACCAutoVersioningTestSupport() {
 
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(

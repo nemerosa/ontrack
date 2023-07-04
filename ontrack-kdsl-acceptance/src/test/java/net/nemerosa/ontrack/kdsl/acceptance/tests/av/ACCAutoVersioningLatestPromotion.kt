@@ -1,40 +1,38 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHub
-import net.nemerosa.ontrack.kdsl.acceptance.tests.github.system.withTestGitHubRepository
+import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
-import net.nemerosa.ontrack.kdsl.spec.extension.git.gitBranchConfigurationPropertyBranch
+import net.nemerosa.ontrack.kdsl.spec.extension.scm.mockScmBranchProperty
 import org.junit.jupiter.api.Test
 
-@TestOnGitHub
 class ACCAutoVersioningLatestPromotion : AbstractACCAutoVersioningTestSupport() {
 
     @Test
     fun `Auto versioning based on latest version triggers an update if on latest version`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
 
                 val release12 = project {
                     
-                    configuredForGitHub(ontrack)
+                    configuredForMockScm()
 
                     branch("release-1.0") {
-                        gitBranchConfigurationPropertyBranch = "release/1.0"
+                        mockScmBranchProperty = "release/1.0"
                         promotion("IRON")
                         build("1.0.0") {
                             promote("IRON")
                         }
                     }
                     branch("release-1.1") {
-                        gitBranchConfigurationPropertyBranch = "release/1.1"
+                        mockScmBranchProperty = "release/1.1"
                         promotion("IRON")
                         build("1.1.0") {
                             promote("IRON")
                         }
                     }
                     branch("release-1.2") {
-                        gitBranchConfigurationPropertyBranch = "release/1.2"
+                        mockScmBranchProperty = "release/1.2"
                         promotion("IRON")
                         build("1.2.0") {
                             promote("IRON")
@@ -49,7 +47,7 @@ class ACCAutoVersioningLatestPromotion : AbstractACCAutoVersioningTestSupport() 
 
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -70,7 +68,7 @@ class ACCAutoVersioningLatestPromotion : AbstractACCAutoVersioningTestSupport() 
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
 
                             hasPR(
                                 from = "feature/auto-upgrade-${release12.project.name}-1.2.1-fad58de7366495db4650cfefac2fcd61",
@@ -89,15 +87,15 @@ class ACCAutoVersioningLatestPromotion : AbstractACCAutoVersioningTestSupport() 
 
     @Test
     fun `Auto versioning based on latest version does not trigger an update if not on latest version 10 for 1x when already on 11`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
 
                 val release10 = project {
 
-                    configuredForGitHub(ontrack)
+                    configuredForMockScm()
 
                     val release10 = branch("release-1.0") {
-                        gitBranchConfigurationPropertyBranch = "release/1.0"
+                        mockScmBranchProperty = "release/1.0"
                         promotion("IRON")
                         build("1.0.0") {
                             promote("IRON")
@@ -105,14 +103,14 @@ class ACCAutoVersioningLatestPromotion : AbstractACCAutoVersioningTestSupport() 
                         this
                     }
                     branch("release-1.1") {
-                        gitBranchConfigurationPropertyBranch = "release/1.1"
+                        mockScmBranchProperty = "release/1.1"
                         promotion("IRON")
                         build("1.1.0") {
                             promote("IRON")
                         }
                     }
                     branch("release-1.2") {
-                        gitBranchConfigurationPropertyBranch = "release/1.2"
+                        mockScmBranchProperty = "release/1.2"
                         promotion("IRON")
                         build("1.2.0") {
                             promote("IRON")
@@ -128,7 +126,7 @@ class ACCAutoVersioningLatestPromotion : AbstractACCAutoVersioningTestSupport() 
 
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -149,7 +147,7 @@ class ACCAutoVersioningLatestPromotion : AbstractACCAutoVersioningTestSupport() 
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
 
                             hasNoPR(
                                 to = "main"
@@ -167,15 +165,15 @@ class ACCAutoVersioningLatestPromotion : AbstractACCAutoVersioningTestSupport() 
 
     @Test
     fun `Auto versioning based on latest version does not trigger an update if not on different version 20 for 1x`() {
-        withTestGitHubRepository {
+        withMockScmRepository(ontrack) {
             withAutoVersioning {
 
                 val release20 = project {
 
-                    configuredForGitHub(ontrack)
+                    configuredForMockScm()
 
                     branch("release-1.0") {
-                        gitBranchConfigurationPropertyBranch = "release/1.0"
+                        mockScmBranchProperty = "release/1.0"
                         promotion("IRON")
                         build("1.0.0") {
                             promote("IRON")
@@ -183,21 +181,21 @@ class ACCAutoVersioningLatestPromotion : AbstractACCAutoVersioningTestSupport() 
                         this
                     }
                     branch("release-1.1") {
-                        gitBranchConfigurationPropertyBranch = "release/1.1"
+                        mockScmBranchProperty = "release/1.1"
                         promotion("IRON")
                         build("1.1.0") {
                             promote("IRON")
                         }
                     }
                     branch("release-1.2") {
-                        gitBranchConfigurationPropertyBranch = "release/1.2"
+                        mockScmBranchProperty = "release/1.2"
                         promotion("IRON")
                         build("1.2.0") {
                             promote("IRON")
                         }
                     }
                     branch("release-2.0") {
-                        gitBranchConfigurationPropertyBranch = "release/2.0"
+                        mockScmBranchProperty = "release/2.0"
                         promotion("IRON")
                         build("2.0.0") {
                             promote("IRON")
@@ -212,7 +210,7 @@ class ACCAutoVersioningLatestPromotion : AbstractACCAutoVersioningTestSupport() 
 
                 project {
                     branch {
-                        configuredForGitHubRepository(ontrack)
+                        configuredForMockRepository()
                         setAutoVersioningConfig(
                             listOf(
                                 AutoVersioningSourceConfig(
@@ -233,7 +231,7 @@ class ACCAutoVersioningLatestPromotion : AbstractACCAutoVersioningTestSupport() 
 
                         waitForAutoVersioningCompletion()
 
-                        assertThatGitHubRepository {
+                        assertThatMockScmRepository {
 
                             hasNoPR(
                                 to = "main"

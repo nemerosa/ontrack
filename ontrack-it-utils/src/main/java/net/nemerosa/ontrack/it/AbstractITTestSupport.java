@@ -48,14 +48,6 @@ public abstract class AbstractITTestSupport {
     protected DataSource dataSource;
 
     /**
-     * Jdbc template for tests that need a direct access to the database
-     */
-    protected @NotNull
-    JdbcTemplate getJdbcTemplate() {
-        return new JdbcTemplate(dataSource);
-    }
-
-    /**
      * Named Jdbc template for tests that need a direct access to the database
      */
     protected @NotNull
