@@ -5,6 +5,7 @@ import Dashboard from "@components/dashboards/Dashboard";
 import {createContext, useEffect, useState} from "react";
 import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
+import DashboardCommandMenu from "@components/dashboards/commands/DashboardCommandMenu";
 
 export const DashboardContext = createContext(null)
 export default function DashboardPage({
@@ -45,7 +46,7 @@ export default function DashboardPage({
     }, [context, contextId])
 
     const commands = [
-        // <DashboardEditCommand editionMode={editionMode} onClick={() => setEditionMode(true)}/>,
+        <DashboardCommandMenu/>,
         <CloseCommand key="close" href={closeHref}/>,
     ]
 
