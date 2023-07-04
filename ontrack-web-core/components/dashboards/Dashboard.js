@@ -1,11 +1,11 @@
 import {lazy, useEffect, useState, Suspense} from "react";
 import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
-import {Alert, Skeleton, Space} from "antd";
+import {Alert, Button, Skeleton, Space} from "antd";
 
 export default function Dashboard({
                                       context, contextId = "-",
-                                      editionMode
+                                      editionMode, onStopEdition
                                   }) {
 
     const [dashboard, setDashboard] = useState({})
@@ -57,7 +57,15 @@ export default function Dashboard({
                 <Space direction="vertical">
                     {
                         editionMode &&
-                        <Alert type="warning" message="Dashboard in edition mode."/>
+                        <Alert
+                            type="warning"
+                            message="Dashboard in edition mode."
+                            closable={true}
+                            closeText={
+                                <Button type="default" danger>Close edition</Button>
+                            }
+                            onClose={onStopEdition}
+                        />
                     }
                     <div>{loadedLayout}</div>
                 </Space>

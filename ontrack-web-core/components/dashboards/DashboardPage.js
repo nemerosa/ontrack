@@ -29,6 +29,7 @@ export default function DashboardPage({
                         context={context}
                         contextId={contextId}
                         editionMode={editionMode}
+                        onStopEdition={() => setEditionMode(false)}
                     />
                 </LoadingContainer>
             </MainPage>
