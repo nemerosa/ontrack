@@ -66,11 +66,9 @@ export default function Dashboard({
                         <Alert
                             type="warning"
                             message="Dashboard in edition mode."
-                            closable={true}
-                            closeText={
-                                <Button type="default" danger>Close edition</Button>
+                            action={
+                                <Button size="small" danger onClick={onStopEdition}>Close edition</Button>
                             }
-                            onClose={onStopEdition}
                         />
                     }
                     <div>{loadedLayout}</div>
