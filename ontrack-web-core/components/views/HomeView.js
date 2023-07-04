@@ -4,8 +4,12 @@ import {useProjectList} from "@components/projects/ProjectList";
 import NewProjectDialog, {useNewProjectDialog} from "@components/projects/NewProjectDialog";
 import {Command, DashboardEditCommand} from "@components/common/Commands";
 import {FaPlus} from "react-icons/fa";
+import {useContext, useEffect, useState} from "react";
+import {UserContext} from "@components/providers/UserProvider";
 
 export default function HomeView() {
+
+    const user = useContext(UserContext)
 
     const projectList = useProjectList()
 
@@ -18,15 +22,27 @@ export default function HomeView() {
         newProjectDialog.start()
     }
 
-    const commands = [
-        <Command
-            key="new-project"
-            icon={<FaPlus/>}
-            text="New project"
-            action={newProject}
-        />,
-        <DashboardEditCommand key="dashboard-edit"/>,
-    ]
+    const [commands, setCommands] = useState([])
+
+    useEffect(() => {
+        if (user) {
+            const commands = []
+            if (user.authorizations?.project?.create) {
+                commands.push(
+                    <Command
+                        key="new-project"
+                        icon={<FaPlus/>}
+                        text="New project"
+                        action={newProject}
+                    />,
+                )
+            }
+            commands.push(
+                <DashboardEditCommand key="dashboard-edit"/>,
+            )
+            setCommands(commands)
+        }
+    }, [user])
 
     return (
         <>

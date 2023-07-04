@@ -9,6 +9,11 @@ data class Authorization(
     companion object {
 
         /**
+         * Common actions: creating
+         */
+        const val CREATE = "create"
+
+        /**
          * Common actions: editing
          */
         const val EDIT = "edit"

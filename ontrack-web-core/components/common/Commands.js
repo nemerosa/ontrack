@@ -30,12 +30,14 @@ export function CloseToHomeCommand() {
 
 export function DashboardEditCommand() {
     const user = useContext(UserContext)
-    if (user.isAuthorized('dashboard', 'edit')) {
-        return <Command
-            icon={<FaEdit/>}
-            text="Edit dashboard"
-        />
-    } else {
-        return undefined
-    }
+    return (
+        <>
+            {
+                user.authorizations?.dashboard?.edit ? <Command
+                    icon={<FaEdit/>}
+                    text="Edit dashboard"
+                /> : undefined
+            }
+        </>
+    )
 }
