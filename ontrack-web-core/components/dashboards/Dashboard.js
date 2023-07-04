@@ -1,11 +1,15 @@
 import {lazy, Suspense, useContext, useEffect, useState} from "react";
-import {Skeleton, Space} from "antd";
+import {Alert, Button, Skeleton, Space} from "antd";
 import LayoutContextProvider from "@components/dashboards/layouts/LayoutContext";
 import {DashboardContext} from "@components/dashboards/DashboardPage";
 
 export default function Dashboard() {
 
     const dashboard = useContext(DashboardContext)
+
+    const onStopEdition = () => {
+        // TODO dashboard.edition = false
+    }
 
     const importLayout = layoutKey => lazy(() =>
         import(`./layouts/${layoutKey}Layout`)
@@ -28,16 +32,16 @@ export default function Dashboard() {
         <>
             {dashboard && <Suspense fallback={<Skeleton active/>}>
                 <Space direction="vertical">
-                    {/*{*/}
-                    {/*    editionMode &&*/}
-                    {/*    <Alert*/}
-                    {/*        type="warning"*/}
-                    {/*        message="Dashboard in edition mode."*/}
-                    {/*        action={*/}
-                    {/*            <Button size="small" danger onClick={onStopEdition}>Close edition</Button>*/}
-                    {/*        }*/}
-                    {/*    />*/}
-                    {/*}*/}
+                    {
+                        dashboard.edition &&
+                        <Alert
+                            type="warning"
+                            message="Dashboard in edition mode."
+                            action={
+                                <Button size="small" danger onClick={onStopEdition}>Close edition</Button>
+                            }
+                        />
+                    }
                     <div>
                         <LayoutContextProvider>
                             {loadedLayout}
