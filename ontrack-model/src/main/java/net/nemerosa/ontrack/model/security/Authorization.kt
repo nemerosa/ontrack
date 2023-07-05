@@ -18,6 +18,11 @@ data class Authorization(
          */
         const val EDIT = "edit"
 
+        /**
+         * Common actions: sharing
+         */
+        const val SHARE = "share"
+
     }
 
 }

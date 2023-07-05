@@ -15,5 +15,6 @@ class DashboardAuthorizationContributor : AuthorizationContributor {
     override fun getAuthorizations(user: OntrackAuthenticatedUser): List<Authorization> =
         listOf(
             Authorization(DASHBOARD, Authorization.EDIT, user.isGranted(DashboardEdition::class.java)),
+            Authorization(DASHBOARD, Authorization.SHARE, user.isGranted(DashboardSharing::class.java)),
         )
 }
