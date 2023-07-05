@@ -36,13 +36,13 @@ class DashboardController(
      * Updates the configuration of a widget for a given dashboard
      */
     @MutationMapping
-    fun updateWidgetConfig(@Argument input: UpdateWidgetConfigInput): UpdateWidgetConfigPayload =
+    fun updateWidgetConfig(@Argument input: UpdateWidgetConfigInput): UpdateWidgetConfigPayload? =
         try {
             dashboardService.updateWidgetConfig(
                 dashboardKey = input.dashboardKey,
-                widgetKey = input.widgetKey,
+                widgetUuid = input.widgetUuid,
                 widgetConfig = input.config,
-            )?.let {
+            ).let {
                 UpdateWidgetConfigPayload(widget = it)
             }
         } catch (any: InputException) {

@@ -6,6 +6,6 @@ class DashboardKeyNotFoundException(key: String) : NotFoundException(
     "Dashboard key not found: $key"
 )
 
-class DashboardWidgetKeyNotFoundException(dashboard: Dashboard, key: String) : NotFoundException(
-    "Widget $key not found in dashboard with key ${dashboard.key}"
+class DashboardWidgetUuidNotFoundException(dashboard: Dashboard, uuid: String) : NotFoundException(
+    "Widget $uuid not found in dashboard with key ${dashboard.key}"
 )

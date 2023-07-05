@@ -12,6 +12,7 @@ class PropertiesWidget : AbstractWidget<PropertiesWidget.PropertiesWidgetConfig>
     name = "List of properties"
 ) {
     fun toInstance() = WidgetInstance(
+        uuid = "0",
         key = key,
         config = NullNode.instance,
     )

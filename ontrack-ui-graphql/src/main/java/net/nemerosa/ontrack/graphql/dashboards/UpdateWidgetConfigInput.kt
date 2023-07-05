@@ -4,6 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 
 data class UpdateWidgetConfigInput(
     val dashboardKey: String,
-    val widgetKey: String,
+    val widgetUuid: String,
     val config: JsonNode,
 )

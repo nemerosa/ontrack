@@ -21,13 +21,13 @@ class DashboardServiceImpl(
             ?: findGlobalDashboardByKey(context)
             ?: findDefaultDashboardByKey(context)
 
-    override fun updateWidgetConfig(dashboardKey: String, widgetKey: String, widgetConfig: JsonNode): Widget<*> {
+    override fun updateWidgetConfig(dashboardKey: String, widgetUuid: String, widgetConfig: JsonNode): WidgetInstance {
         val dashboard = findDashboard(dashboardKey)
             ?: throw DashboardKeyNotFoundException(dashboardKey)
         // Gets the widget within the dashboard
         val widget = dashboard.widgets.find {
-            it.key == widgetKey
-        } ?: throw DashboardWidgetKeyNotFoundException(dashboard, widgetKey)
+            it.uuid == widgetUuid
+        } ?: throw DashboardWidgetUuidNotFoundException(dashboard, widgetUuid)
         // TODO Validates the configuration for the widget
         // TODO Saves the dashboard with the new widget configuration
         // TODO Returns the widget

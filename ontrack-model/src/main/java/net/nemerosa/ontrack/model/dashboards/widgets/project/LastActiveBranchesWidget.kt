@@ -16,6 +16,7 @@ class LastActiveBranchesWidget : AbstractWidget<LastActiveBranchesWidget.LastAct
     ) : WidgetConfig
 
     fun toInstance(count: Int = 10) = WidgetInstance(
+        "0",
         key,
         LastActiveBranchesWidgetConfig(count).asJson()
     )

@@ -16,6 +16,7 @@ class LastActiveProjectsWidget : AbstractWidget<LastActiveProjectsWidget.LastAct
     ) : WidgetConfig
 
     fun toInstance(count: Int = 10) = WidgetInstance(
+        "0",
         key,
         LastActiveProjectsWidgetConfig(count).asJson()
     )

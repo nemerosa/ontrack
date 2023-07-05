@@ -58,6 +58,7 @@ extend type Query {
 # =================================================================================
 
 type WidgetInstance {
+    uuid: String!
     key: String!
     config: JSON!
 }
@@ -81,7 +82,7 @@ extend type Mutation {
 
 input UpdateWidgetConfigInput {
     dashboardKey: String!
-    widgetKey: String!
+    widgetUuid: String!
     config: JSON!
 }
 
