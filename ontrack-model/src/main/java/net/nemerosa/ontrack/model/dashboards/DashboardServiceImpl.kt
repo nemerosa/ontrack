@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.dashboards
 
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.model.dashboards.widgets.Widget
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
@@ -18,6 +20,19 @@ class DashboardServiceImpl(
             ?: findGlobalDashboardByKeyAndId(context)
             ?: findGlobalDashboardByKey(context)
             ?: findDefaultDashboardByKey(context)
+
+    override fun updateWidgetConfig(dashboardKey: String, widgetKey: String, widgetConfig: JsonNode): Widget<*> {
+        val dashboard = findDashboard(dashboardKey)
+            ?: throw DashboardKeyNotFoundException(dashboardKey)
+        // Gets the widget within the dashboard
+        val widget = dashboard.widgets.find {
+            it.key == widgetKey
+        } ?: throw DashboardWidgetKeyNotFoundException(dashboard, widgetKey)
+        // TODO Validates the configuration for the widget
+        // TODO Saves the dashboard with the new widget configuration
+        // TODO Returns the widget
+        TODO()
+    }
 
     private fun findDefaultDashboardByKey(context: DashboardContext): Dashboard? =
         defaultDashboardRegistry.findDashboard(context.key)

@@ -3,7 +3,7 @@ import {useContext, useState} from "react";
 import {DashboardContext} from "@components/dashboards/DashboardContext";
 import WidgetCommand from "@components/dashboards/commands/WidgetCommand";
 import {FaRegEdit, FaRegSave, FaWindowClose} from "react-icons/fa";
-import {WidgetContext, WidgetDispatchContext} from "@components/dashboards/widgets/WidgetContext";
+import {WidgetContext, WidgetDispatchContext, widgetFormSubmit} from "@components/dashboards/widgets/WidgetContext";
 
 export function checkContextIn(widget, expectedContexts) {
     return null
@@ -74,9 +74,7 @@ export default function Widget({title, loading, commands, form, children}) {
                                 condition={widgetContext.editionMode}
                                 title="Saves the changes for this widget"
                                 icon={<FaRegSave/>}
-                                onAction={() => widgetDispatch({
-                                    type: 'save'
-                                })}
+                                onAction={() => widgetFormSubmit(widgetContext, widgetDispatch)}
                             />
                             <WidgetCommand
                                 condition={widgetContext.editionMode}

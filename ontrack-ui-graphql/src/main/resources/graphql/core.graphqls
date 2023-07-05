@@ -9,6 +9,26 @@ type Mutation {
 }
 
 # =================================================================================
+# Payload errors (duplicate from the programmatic ones)
+# =================================================================================
+
+"Representation of an error."
+type PayloadUserError {
+    "Programmatic code to be used by client. Usually the FQCN of the corresponding exception."
+    exception: String!
+    "Additional information about the location of this error."
+    location: String
+    "The error message"
+    message: String!
+}
+
+"Interface implemented by all mutation payloads"
+interface PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
+}
+
+# =================================================================================
 # Scalars
 # =================================================================================
 
@@ -52,4 +72,22 @@ type Dashboard {
 extend type Query {
     """Gets the dashboard for a given context"""
     dashboardByContext(key: String!, id: String!): Dashboard!
+}
+
+extend type Mutation {
+    """Updates the configuration of a widget for a given dashboard"""
+    updateWidgetConfig(input: UpdateWidgetConfigInput!): UpdateWidgetConfigPayload
+}
+
+input UpdateWidgetConfigInput {
+    dashboardKey: String!
+    widgetKey: String!
+    config: JSON!
+}
+
+type UpdateWidgetConfigPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError!]
+    """Updated widget"""
+    widget: WidgetInstance
 }

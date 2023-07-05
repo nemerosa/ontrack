@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.model.dashboards
 
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.model.dashboards.widgets.Widget
+
 interface DashboardService {
 
     /**
@@ -17,5 +20,10 @@ interface DashboardService {
     fun findDashboard(
         context: DashboardContext
     ): Dashboard?
+
+    /**
+     * Updates the configuration of a widget into a dashboard.
+     */
+    fun updateWidgetConfig(dashboardKey: String, widgetKey: String, widgetConfig: JsonNode): Widget<*>
 
 }
