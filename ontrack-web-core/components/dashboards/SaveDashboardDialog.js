@@ -1,6 +1,6 @@
 import FormDialog, {useFormDialog} from "@components/form/FormDialog";
 import {gql} from "graphql-request";
-import {Alert, Form, Input} from "antd";
+import {Alert, Form, Input, Select} from "antd";
 
 export function useSaveDashboardDialog() {
     return useFormDialog({
@@ -14,11 +14,6 @@ export function useSaveDashboardDialog() {
             values.contextId = dashboard.contextId
             values.key = dashboard.key
             values.layoutKey = dashboard.layoutKey
-            // TODO From the input
-            values.userScope = "GLOBAL"
-            // TODO From the input
-            values.contextScope = "CONTEXT"
-            // Widgets
             values.widgets = dashboard.widgets
         },
         query: gql`
@@ -76,6 +71,40 @@ export function SaveDashboardDialog({saveDashboardDialog}) {
                            ]}
                 >
                     <Input placeholder="Dashboard name" allowClear/>
+                </Form.Item>
+                <Form.Item name="userScope"
+                           label="User scope"
+                >
+                    <Select
+                        defaultValue="USER"
+                        options={[
+                            {
+                                value: 'USER',
+                                label: "For current user"
+                            },
+                            {
+                                value: 'GLOBAL',
+                                label: "For all users"
+                            },
+                        ]}
+                    />
+                </Form.Item>
+                <Form.Item name="contextScope"
+                           label="Context scope"
+                >
+                    <Select
+                        defaultValue="ID"
+                        options={[
+                            {
+                                value: 'ID',
+                                label: "For current page"
+                            },
+                            {
+                                value: 'CONTEXT',
+                                label: "For all similar pages"
+                            },
+                        ]}
+                    />
                 </Form.Item>
             </FormDialog>
         </>
