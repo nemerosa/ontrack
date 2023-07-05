@@ -8,33 +8,57 @@ import {gql} from "graphql-request";
 import DashboardCommandMenu from "@components/dashboards/commands/DashboardCommandMenu";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 
-export const dashboardReducer = (dashboard, action) => {
-    switch (action.type) {
-        case 'init': {
-            return action.data
-        }
-        case 'startEdition': {
-            return {
-                ...dashboard,
-                editionMode: true,
-            }
-        }
-        case 'cancelEdition': {
-            return {
-                ...dashboard,
-                editionMode: false,
-            }
-        }
-        default: {
-            throw Error('Unknown action: ' + action.type);
-        }
-    }
-}
 export default function DashboardPage({
                                           title, breadcrumbs, closeHref,
                                           loading,
                                           context, contextId
                                       }) {
+    const dashboardReducer = (dashboard, action) => {
+        switch (action.type) {
+            case 'init': {
+                return action.data
+            }
+            case 'startEdition': {
+                return {
+                    ...dashboard,
+                    editionMode: true,
+                }
+            }
+            case 'cancelEdition': {
+                return {
+                    ...dashboard,
+                    editionMode: false,
+                }
+            }
+            case 'save-as': {
+                // Copies the current dashboard
+                const copy = {
+                    context: dashboard.context,
+                    contextId: dashboard.contextId,
+                    key: '', // Marking as new
+                    name: `Copy of ${dashboard.name}`,
+                    builtIn: false,
+                    layoutKey: dashboard.layoutKey,
+                    widgets: dashboard.widgets.map(widget => (
+                        {
+                            uuid: '', // Marking as new
+                            key: widget.key,
+                            config: action.widget && action.widget.uuid === widget.uuid ? action.widget.config : widget.config,
+                        }
+                    ))
+                }
+                console.log({
+                    dashboard,
+                    copy,
+                })
+                // dashboard.dashboardSaveAs(copy)
+                return dashboard // No change for now, just launches the save process
+            }
+            default: {
+                throw Error('Unknown action: ' + action.type);
+            }
+        }
+    }
 
     const [dashboard, dashboardDispatch] = useReducer(dashboardReducer, {})
 

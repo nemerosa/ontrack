@@ -1,6 +1,6 @@
 import {Card, Skeleton, Space, Typography} from "antd";
 import {useContext, useState} from "react";
-import {DashboardContext} from "@components/dashboards/DashboardContext";
+import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 import WidgetCommand from "@components/dashboards/commands/WidgetCommand";
 import {FaRegEdit, FaRegSave, FaWindowClose} from "react-icons/fa";
 import {WidgetContext, WidgetDispatchContext, widgetFormSubmit} from "@components/dashboards/widgets/WidgetContext";
@@ -46,6 +46,7 @@ export function checkContext(widget, predicate, error) {
 export default function Widget({title, loading, commands, form, children}) {
 
     const dashboard = useContext(DashboardContext)
+    const dashboardDispatch = useContext(DashboardDispatchContext)
     const widgetContext = useContext(WidgetContext)
     const widgetDispatch = useContext(WidgetDispatchContext)
 
@@ -74,7 +75,7 @@ export default function Widget({title, loading, commands, form, children}) {
                                 condition={widgetContext.editionMode}
                                 title="Saves the changes for this widget"
                                 icon={<FaRegSave/>}
-                                onAction={() => widgetFormSubmit(widgetContext, widgetDispatch)}
+                                onAction={() => widgetFormSubmit(widgetContext, widgetDispatch, dashboardDispatch)}
                             />
                             <WidgetCommand
                                 condition={widgetContext.editionMode}
