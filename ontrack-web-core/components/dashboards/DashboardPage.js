@@ -8,6 +8,7 @@ import {gql} from "graphql-request";
 import DashboardCommandMenu from "@components/dashboards/commands/DashboardCommandMenu";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 import {SaveDashboardDialog, useSaveDashboardDialog} from "@components/dashboards/SaveDashboardDialog";
+import {saveDashboardQuery} from "@components/dashboards/DashboardConstants";
 
 export default function DashboardPage({
                                           title, breadcrumbs, closeHref,
@@ -16,6 +17,44 @@ export default function DashboardPage({
                                       }) {
 
     const saveDashboardDialog = useSaveDashboardDialog()
+
+    const createDashboardCopy = (dashboard, action) => {
+        return {
+            context: dashboard.context,
+            contextId: dashboard.contextId,
+            key: '', // Marking as new
+            name: `Copy of ${dashboard.name}`,
+            builtIn: false,
+            layoutKey: dashboard.layoutKey,
+            widgets: dashboard.widgets.map(widget => (
+                {
+                    uuid: '', // Marking as new
+                    key: widget.key,
+                    config: action.widget && action.widget.uuid === widget.uuid ? action.widget.config : widget.config,
+                }
+            )),
+            message: action.message,
+        }
+    }
+
+    const dashboardSaveAs = (dashboard, action) => {
+        // Copies the current dashboard
+        const copy = createDashboardCopy(dashboard, action)
+        saveDashboardDialog.start(copy)
+        return dashboard // Not saved immediately
+    }
+
+    const dashboardSave = (dashboard, action) => {
+        const copy = createDashboardCopy(dashboard, action)
+        // TODO graphQLCall(
+        //     saveDashboardQuery,
+        //     {
+        //         context: copy.context,
+        //         contextId: copy.contextId,
+        //     }
+        // )
+    }
+
     const dashboardReducer = (dashboard, action) => {
         switch (action.type) {
             case 'init': {
@@ -33,25 +72,15 @@ export default function DashboardPage({
                     editionMode: false,
                 }
             }
-            case 'save-as': {
-                // Copies the current dashboard
-                const copy = {
-                    context: dashboard.context,
-                    contextId: dashboard.contextId,
-                    key: '', // Marking as new
-                    name: `Copy of ${dashboard.name}`,
-                    builtIn: false,
-                    layoutKey: dashboard.layoutKey,
-                    widgets: dashboard.widgets.map(widget => (
-                        {
-                            uuid: '', // Marking as new
-                            key: widget.key,
-                            config: action.widget && action.widget.uuid === widget.uuid ? action.widget.config : widget.config,
-                        }
-                    )),
-                    message: action.message,
+            case 'save': {
+                if (!dashboard.key) {
+                    return dashboardSaveAs(dashboard, action)
+                } else {
+                    return dashboardSave(dashboard, action)
                 }
-                saveDashboardDialog.start(copy)
+            }
+            case 'save-as': {
+                dashboardSaveAs(dashboard, action)
                 return dashboard // No change for now, just launches the save process
             }
             default: {

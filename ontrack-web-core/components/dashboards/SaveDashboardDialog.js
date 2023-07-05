@@ -1,6 +1,6 @@
 import FormDialog, {useFormDialog} from "@components/form/FormDialog";
-import {gql} from "graphql-request";
 import {Alert, Form, Input, Select} from "antd";
+import {saveDashboardQuery} from "@components/dashboards/DashboardConstants";
 
 export function useSaveDashboardDialog() {
     return useFormDialog({
@@ -16,33 +16,7 @@ export function useSaveDashboardDialog() {
             values.layoutKey = dashboard.layoutKey
             values.widgets = dashboard.widgets
         },
-        query: gql`
-            mutation SaveDashboard(
-                $context: String!,
-                $contextId: String!,
-                $userScope: DashboardContextUserScope!,
-                $contextScope: DashboardContextScope!,
-                $key: String,
-                $name: String!,
-                $layoutKey: String!,
-                $widgets: [WidgetInstanceInput!]!,
-            ) {
-                saveDashboard(input: {
-                    context: $context,
-                    contextId: $contextId,
-                    userScope: $userScope,
-                    contextScope: $contextScope,
-                    key: $key,
-                    name: $name,
-                    layoutKey: $layoutKey,
-                    widgets: $widgets,
-                }) {
-                    errors {
-                        message
-                    }
-                }
-            }
-        `,
+        query: saveDashboardQuery,
         userNode: 'saveDashboard',
     })
 }

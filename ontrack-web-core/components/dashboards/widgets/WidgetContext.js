@@ -13,18 +13,6 @@ export const widgetReducer = (widget, action) => {
                 editionMode: true,
             }
         }
-        // case 'save': {
-        //     widget.editionForm.validateFields().then(values => {
-        //         // TODO Submit the values
-        //     }).then(data => {
-        //         const errors = getUserErrors(data.xxx)
-        //         if (errors) {
-        //
-        //         }
-        //     })
-        //     // No change
-        //     return widget
-        // }
         case 'cancel': {
             widget.editionForm.resetFields()
             return {
@@ -57,7 +45,13 @@ export const widgetFormSubmit = async (widgetContext, widgetDispatch, dashboardD
             message: "You cannot save a widget configuration on a built-in dashboard and you need to create a new dashboard.",
         })
     } else {
-        // TODO Updating
+        dashboardDispatch({
+            type: 'save',
+            widget: {
+                uuid: widgetContext.widget.uuid,
+                config: values,
+            },
+        })
     }
 
     // const variables = {
