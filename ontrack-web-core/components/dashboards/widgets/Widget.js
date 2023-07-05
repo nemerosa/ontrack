@@ -3,6 +3,7 @@ import {useContext, useState} from "react";
 import {DashboardContext} from "@components/dashboards/DashboardContext";
 import WidgetCommand from "@components/dashboards/commands/WidgetCommand";
 import {FaRegEdit, FaRegSave, FaWindowClose} from "react-icons/fa";
+import {WidgetContext, WidgetDispatchContext} from "@components/dashboards/widgets/WidgetContext";
 
 export function checkContextIn(widget, expectedContexts) {
     return null
@@ -45,20 +46,8 @@ export function checkContext(widget, predicate, error) {
 export default function Widget({title, loading, commands, children}) {
 
     const dashboard = useContext(DashboardContext)
-
-    const [widgetEditionMode, setWidgetEditionMode] = useState(false)
-
-    const editWidget = () => {
-        setWidgetEditionMode(true)
-    }
-
-    const saveWidgetEdition = () => {
-        setWidgetEditionMode(false)
-    }
-
-    const cancelWidgetEdition = () => {
-        setWidgetEditionMode(false)
-    }
+    const widgetContext = useContext(WidgetContext)
+    const widgetDispatch = useContext(WidgetDispatchContext)
 
     return (
         <Card
@@ -74,22 +63,28 @@ export default function Widget({title, loading, commands, children}) {
                     {
                         dashboard.editionMode && <Space size={8}>
                             <WidgetCommand
-                                condition={!widgetEditionMode}
+                                condition={!widgetContext.editionMode}
                                 title="Edit the content of this widget"
                                 icon={<FaRegEdit/>}
-                                onAction={editWidget}
+                                onAction={() => widgetDispatch({
+                                    type: 'edit'
+                                })}
                             />
                             <WidgetCommand
-                                condition={widgetEditionMode}
+                                condition={widgetContext.editionMode}
                                 title="Saves the changes for this widget"
                                 icon={<FaRegSave/>}
-                                onAction={saveWidgetEdition}
+                                onAction={() => widgetDispatch({
+                                    type: 'save'
+                                })}
                             />
                             <WidgetCommand
-                                condition={widgetEditionMode}
+                                condition={widgetContext.editionMode}
                                 title="Cancels the changes for this widget"
                                 icon={<FaWindowClose/>}
-                                onAction={cancelWidgetEdition}
+                                onAction={() => widgetDispatch({
+                                    type: 'cancel'
+                                })}
                             />
                         </Space>
                     }
