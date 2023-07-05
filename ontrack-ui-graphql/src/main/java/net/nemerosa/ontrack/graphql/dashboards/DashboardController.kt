@@ -1,11 +1,8 @@
 package net.nemerosa.ontrack.graphql.dashboards
 
+import net.nemerosa.ontrack.common.UserException
 import net.nemerosa.ontrack.graphql.payloads.toPayloadErrors
-import net.nemerosa.ontrack.model.dashboards.Dashboard
-import net.nemerosa.ontrack.model.dashboards.DashboardContext
-import net.nemerosa.ontrack.model.dashboards.DashboardLayouts
-import net.nemerosa.ontrack.model.dashboards.DashboardService
-import net.nemerosa.ontrack.model.exceptions.InputException
+import net.nemerosa.ontrack.model.dashboards.*
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.MutationMapping
 import org.springframework.graphql.data.method.annotation.QueryMapping
@@ -34,6 +31,33 @@ class DashboardController(
         )
 
     /**
+     * Saves new dashboard
+     */
+    @MutationMapping
+    fun saveDashboard(@Argument input: SaveDashboardInput): SaveDashboardPayload? =
+        try {
+            dashboardService.saveDashboard(
+                context = DashboardContext(input.context, input.contextId),
+                userScope = input.userScope,
+                contextScope = input.contextScope,
+                key = input.key,
+                name = input.name,
+                layoutKey = input.layoutKey,
+                widgets = input.widgets.map {
+                    WidgetInstance(
+                        uuid = it.uuid ?: "",
+                        key = it.key,
+                        config = it.config,
+                    )
+                }
+            ).let {
+                SaveDashboardPayload(dashboard = it)
+            }
+        } catch (any: UserException) {
+            SaveDashboardPayload(any.toPayloadErrors())
+        }
+
+    /**
      * Updates the configuration of a widget for a given dashboard
      */
     @MutationMapping
@@ -46,7 +70,7 @@ class DashboardController(
             ).let {
                 UpdateWidgetConfigPayload(widget = it)
             }
-        } catch (any: InputException) {
+        } catch (any: UserException) {
             UpdateWidgetConfigPayload(any.toPayloadErrors())
         }
 

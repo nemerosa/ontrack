@@ -53,7 +53,8 @@ export const widgetFormSubmit = async (widgetContext, widgetDispatch, dashboardD
             widget: {
                 uuid: widgetContext.widget.uuid,
                 config: values,
-            }
+            },
+            message: "You cannot save a widget configuration on a built-in dashboard and you need to create a new dashboard.",
         })
     } else {
         // TODO Updating

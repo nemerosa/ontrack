@@ -25,4 +25,17 @@ interface DashboardService {
      */
     fun updateWidgetConfig(dashboardKey: String, widgetUuid: String, widgetConfig: JsonNode): WidgetInstance
 
+    /**
+     * Saves a dashboard
+     */
+    fun saveDashboard(
+        context: DashboardContext,
+        userScope: DashboardContextUserScope,
+        contextScope: DashboardContextScope,
+        key: String?,
+        name: String,
+        layoutKey: String,
+        widgets: List<WidgetInstance>,
+    ): Dashboard
+
 }

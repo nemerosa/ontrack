@@ -35,6 +35,7 @@ export default function LastActiveBranchesWidget({count}) {
                 }
                 variables={{
                     projectId: dashboard.contextId,
+                    count: count,
                 }}
                 setData={data => {
                     setBranches(data.projects[0].branches)

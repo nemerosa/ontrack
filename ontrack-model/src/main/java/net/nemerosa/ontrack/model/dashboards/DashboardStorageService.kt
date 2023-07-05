@@ -6,4 +6,6 @@ interface DashboardStorageService {
 
     fun updateDashboard(key: String, updating: (Dashboard) -> Dashboard): Dashboard
 
+    fun saveDashboard(dashboard: Dashboard): Dashboard
+
 }

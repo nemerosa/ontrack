@@ -71,14 +71,50 @@ type Dashboard {
     widgets: [WidgetInstance!]!
 }
 
+enum DashboardContextUserScope {
+    USER
+    GLOBAL
+}
+
+enum DashboardContextScope {
+    ID
+    CONTEXT
+}
+
 extend type Query {
     """Gets the dashboard for a given context"""
     dashboardByContext(key: String!, id: String!): Dashboard!
 }
 
 extend type Mutation {
+    """Save a dashboard"""
+    saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
     """Updates the configuration of a widget for a given dashboard"""
     updateWidgetConfig(input: UpdateWidgetConfigInput!): UpdateWidgetConfigPayload
+}
+
+input WidgetInstanceInput {
+    uuid: String
+    key: String!
+    config: JSON!
+}
+
+input SaveDashboardInput {
+    context: String!
+    contextId: String!
+    userScope: DashboardContextUserScope!
+    contextScope: DashboardContextScope!
+    key: String
+    name: String!
+    layoutKey: String!
+    widgets: [WidgetInstanceInput!]!
+}
+
+type SaveDashboardPayload {
+    "List of errors"
+    errors: [PayloadUserError!]
+    """Saved dashboard"""
+    dashboard: Dashboard
 }
 
 input UpdateWidgetConfigInput {

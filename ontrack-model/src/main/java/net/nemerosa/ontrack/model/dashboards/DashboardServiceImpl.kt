@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class DashboardServiceImpl(
@@ -19,6 +20,44 @@ class DashboardServiceImpl(
             ?: findGlobalDashboardByKeyAndId(context)
             ?: findGlobalDashboardByKey(context)
             ?: findDefaultDashboardByKey(context)
+
+    override fun saveDashboard(
+        context: DashboardContext,
+        userScope: DashboardContextUserScope,
+        contextScope: DashboardContextScope,
+        key: String?,
+        name: String,
+        layoutKey: String,
+        widgets: List<WidgetInstance>
+    ): Dashboard {
+        // Checks access rights
+        if (userScope == DashboardContextUserScope.GLOBAL) {
+            securityService.checkGlobalFunction(DashboardSharing::class.java)
+        }
+        // TODO Validates the widget configurations
+        // Saving the dashboard
+        val dashboardKey = key?.takeIf { it.isNotBlank() } ?: UUID.randomUUID().toString()
+        val dashboard = dashboardStorageService.saveDashboard(
+            Dashboard(
+                key = dashboardKey,
+                name = name,
+                layoutKey = layoutKey,
+                builtIn = false,
+                widgets = widgets.map {
+                    WidgetInstance(
+                        uuid = it.uuid.takeIf { it.isNotBlank() } ?: UUID.randomUUID().toString(),
+                        key = it.key,
+                        config = it.config,
+                    )
+                }
+            )
+        )
+        // Saving for the context
+        val contextKey = context.contextKey(userId, userScope, contextScope)
+        storageService.store(STORE, contextKey, dashboardKey)
+        // OK
+        return dashboard
+    }
 
     override fun updateWidgetConfig(dashboardKey: String, widgetUuid: String, widgetConfig: JsonNode): WidgetInstance {
         val dashboard = findDashboard(dashboardKey)
@@ -41,22 +80,22 @@ class DashboardServiceImpl(
 
     private fun findGlobalDashboardByKey(context: DashboardContext): Dashboard? =
         findDashboard(
-            "global:key:${context.key}"
+            context.contextKey(userId, DashboardContextUserScope.GLOBAL, DashboardContextScope.CONTEXT)
         )
 
     private fun findGlobalDashboardByKeyAndId(context: DashboardContext): Dashboard? =
         findDashboard(
-            "global:id:${context.key}:${context.id}"
+            context.contextKey(userId, DashboardContextUserScope.GLOBAL, DashboardContextScope.ID)
         )
 
     private fun findUserDashboardByKey(context: DashboardContext): Dashboard? =
         findDashboard(
-            "user:${userId}:key:${context.key}"
+            context.contextKey(userId, DashboardContextUserScope.USER, DashboardContextScope.CONTEXT)
         )
 
     private fun findUserDashboardByKeyAndId(context: DashboardContext): Dashboard? =
         findDashboard(
-            "user:${userId}:id:${context.key}:${context.id}"
+            context.contextKey(userId, DashboardContextUserScope.USER, DashboardContextScope.ID)
         )
 
     private val userId: String

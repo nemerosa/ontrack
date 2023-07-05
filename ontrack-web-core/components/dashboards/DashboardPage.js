@@ -7,12 +7,15 @@ import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import DashboardCommandMenu from "@components/dashboards/commands/DashboardCommandMenu";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
+import {SaveDashboardDialog, useSaveDashboardDialog} from "@components/dashboards/SaveDashboardDialog";
 
 export default function DashboardPage({
                                           title, breadcrumbs, closeHref,
                                           loading,
                                           context, contextId
                                       }) {
+
+    const saveDashboardDialog = useSaveDashboardDialog()
     const dashboardReducer = (dashboard, action) => {
         switch (action.type) {
             case 'init': {
@@ -45,13 +48,10 @@ export default function DashboardPage({
                             key: widget.key,
                             config: action.widget && action.widget.uuid === widget.uuid ? action.widget.config : widget.config,
                         }
-                    ))
+                    )),
+                    message: action.message,
                 }
-                console.log({
-                    dashboard,
-                    copy,
-                })
-                // dashboard.dashboardSaveAs(copy)
+                saveDashboardDialog.start(copy)
                 return dashboard // No change for now, just launches the save process
             }
             default: {
@@ -114,6 +114,7 @@ export default function DashboardPage({
                             <Dashboard/>
                         </LoadingContainer>
                     </MainPage>
+                    <SaveDashboardDialog saveDashboardDialog={saveDashboardDialog}/>
                 </DashboardDispatchContext.Provider>
             </DashboardContext.Provider>
         </>

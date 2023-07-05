@@ -11,6 +11,11 @@ class DashboardStorageServiceImpl(
     override fun findDashboard(key: String): Dashboard? =
         storageService.find(STORE, key, Dashboard::class)
 
+    override fun saveDashboard(dashboard: Dashboard): Dashboard {
+        storageService.store(STORE, dashboard.key, dashboard)
+        return dashboard
+    }
+
     override fun updateDashboard(key: String, updating: (Dashboard) -> Dashboard): Dashboard {
         val existing = findDashboard(key) ?: throw DashboardKeyNotFoundException(key)
         val newInstance = updating(existing)

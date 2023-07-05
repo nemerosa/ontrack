@@ -39,6 +39,7 @@ export default function LastActiveProjectsWidget({count}) {
 
     return (
         <>
+            <NewProjectDialog newProjectDialog={newProjectDialog}/>
             <SimpleWidget
                 title={`Last ${count} active projects`}
                 query={
@@ -61,9 +62,6 @@ export default function LastActiveProjectsWidget({count}) {
                     {projects.map(project => <ProjectBox key={project.id} project={project}/>)}
                 </Space>
             </SimpleWidget>
-            <NewProjectDialog
-                newProjectDialog={newProjectDialog}
-            />
         </>
     )
 }

@@ -2985,6 +2985,8 @@ type Mutation {
     purgeQueueRecordings: PurgeQueueRecordingsPayload
     "Reload the configuration from the CasC files"
     reloadCasc: ReloadCascPayload
+    "Save a dashboard"
+    saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
     "Sets the auto versioning configuration for a branch"
     setAutoVersioningConfig(
         "Input for the mutation"
@@ -4695,6 +4697,13 @@ type SCMFileChangeFilters {
     filters: [SCMFileChangeFilter!]!
 }
 
+type SaveDashboardPayload {
+    "Saved dashboard"
+    dashboard: Dashboard
+    "List of errors"
+    errors: [PayloadUserError!]
+}
+
 "Search result"
 type SearchResult {
     "Score for the search"
@@ -5940,6 +5949,16 @@ enum ConfigurableIndicatorAttributeType {
     INT
     REGEX
     REQUIRED
+}
+
+enum DashboardContextScope {
+    CONTEXT
+    ID
+}
+
+enum DashboardContextUserScope {
+    GLOBAL
+    USER
 }
 
 "State a hook request can be in"
@@ -7200,6 +7219,17 @@ input RunInfoInput {
     triggerType: String
 }
 
+input SaveDashboardInput {
+    context: String!
+    contextId: String!
+    contextScope: DashboardContextScope!
+    key: String
+    layoutKey: String!
+    name: String!
+    userScope: DashboardContextUserScope!
+    widgets: [WidgetInstanceInput!]!
+}
+
 "Input type for the setAutoVersioningConfigByName mutation."
 input SetAutoVersioningConfigByNameInput {
     "Name of the branch to configure"
@@ -8420,4 +8450,10 @@ input WebhookExchangeFilter {
     responseKeyword: String
     "Name of the webhook (regular expression)"
     webhook: String
+}
+
+input WidgetInstanceInput {
+    config: JSON!
+    key: String!
+    uuid: String
 }
