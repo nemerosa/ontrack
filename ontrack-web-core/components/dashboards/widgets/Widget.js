@@ -1,4 +1,8 @@
 import {Card, Skeleton, Space, Typography} from "antd";
+import {useContext, useState} from "react";
+import {DashboardContext} from "@components/dashboards/DashboardContext";
+import WidgetCommand from "@components/dashboards/commands/WidgetCommand";
+import {FaRegEdit, FaRegSave, FaWindowClose} from "react-icons/fa";
 
 export function checkContextIn(widget, expectedContexts) {
     return null
@@ -40,19 +44,21 @@ export function checkContext(widget, predicate, error) {
 
 export default function Widget({title, loading, commands, children}) {
 
-    // const [widgetEditionMode, setWidgetEditionMode] = useState(false)
-    //
-    // const editWidget = () => {
-    //     setWidgetEditionMode(true)
-    // }
-    //
-    // const saveWidgetEdition = () => {
-    //     setWidgetEditionMode(false)
-    // }
-    //
-    // const cancelWidgetEdition = () => {
-    //     setWidgetEditionMode(false)
-    // }
+    const dashboard = useContext(DashboardContext)
+
+    const [widgetEditionMode, setWidgetEditionMode] = useState(false)
+
+    const editWidget = () => {
+        setWidgetEditionMode(true)
+    }
+
+    const saveWidgetEdition = () => {
+        setWidgetEditionMode(false)
+    }
+
+    const cancelWidgetEdition = () => {
+        setWidgetEditionMode(false)
+    }
 
     return (
         <Card
@@ -65,30 +71,30 @@ export default function Widget({title, loading, commands, children}) {
             }}
             extra={
                 <>
-                    {/*{*/}
-                    {/*    <Space size={8}>*/}
-                    {/*        <WidgetCommand*/}
-                    {/*            condition={!widgetEditionMode}*/}
-                    {/*            title="Edit the content of this widget"*/}
-                    {/*            icon={<FaRegEdit/>}*/}
-                    {/*            onAction={editWidget}*/}
-                    {/*        />*/}
-                    {/*        <WidgetCommand*/}
-                    {/*            condition={widgetEditionMode}*/}
-                    {/*            title="Saves the changes for this widget"*/}
-                    {/*            icon={<FaRegSave/>}*/}
-                    {/*            onAction={saveWidgetEdition}*/}
-                    {/*        />*/}
-                    {/*        <WidgetCommand*/}
-                    {/*            condition={widgetEditionMode}*/}
-                    {/*            title="Cancels the changes for this widget"*/}
-                    {/*            icon={<FaWindowClose/>}*/}
-                    {/*            onAction={cancelWidgetEdition}*/}
-                    {/*        />*/}
-                    {/*    </Space>*/}
-                    {/*}*/}
                     {
-                        commands && <Space size={8}>
+                        dashboard.editionMode && <Space size={8}>
+                            <WidgetCommand
+                                condition={!widgetEditionMode}
+                                title="Edit the content of this widget"
+                                icon={<FaRegEdit/>}
+                                onAction={editWidget}
+                            />
+                            <WidgetCommand
+                                condition={widgetEditionMode}
+                                title="Saves the changes for this widget"
+                                icon={<FaRegSave/>}
+                                onAction={saveWidgetEdition}
+                            />
+                            <WidgetCommand
+                                condition={widgetEditionMode}
+                                title="Cancels the changes for this widget"
+                                icon={<FaWindowClose/>}
+                                onAction={cancelWidgetEdition}
+                            />
+                        </Space>
+                    }
+                    {
+                        !dashboard.editionMode && commands && <Space size={8}>
                             {
                                 commands.map((command, index) => <span key={index}>{command}</span>)
                             }
