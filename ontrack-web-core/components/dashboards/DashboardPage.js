@@ -71,7 +71,7 @@ export default function DashboardPage({
     }, [context, contextId])
 
     const commands = [
-        <DashboardCommandMenu/>,
+        <DashboardCommandMenu key="dashboard-commands"/>,
         <CloseCommand key="close" href={closeHref}/>,
     ]
 

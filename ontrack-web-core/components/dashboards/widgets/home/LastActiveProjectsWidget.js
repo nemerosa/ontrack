@@ -28,6 +28,7 @@ export default function LastActiveProjectsWidget({count}) {
     const getCommands = (/*projects*/) => {
         return [
             <WidgetCommand
+                key="project-create"
                 condition={user.authorizations.project?.create}
                 title="Create project"
                 icon={<FaPlus/>}
