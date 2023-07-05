@@ -1,5 +1,5 @@
 import {lazy, Suspense, useContext, useEffect, useState} from "react";
-import {Alert, Button, Skeleton, Space} from "antd";
+import {Alert, Button, Skeleton, Space, Typography} from "antd";
 import LayoutContextProvider from "@components/dashboards/layouts/LayoutContext";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 
@@ -39,7 +39,17 @@ export default function Dashboard() {
                         dashboard.editionMode &&
                         <Alert
                             type="warning"
-                            message="Dashboard in edition mode."
+                            message={
+                                <Space direction="vertical" size={8}>
+                                    <Typography.Text>Dashboard in edition mode.</Typography.Text>
+                                    {dashboard.builtIn &&
+                                        <Typography.Text strong>
+                                            You're editing a default built-in dashboard. To save your updates,
+                                            you'll need to save it with another name.
+                                        </Typography.Text>
+                                    }
+                                </Space>
+                            }
                             action={
                                 <Button size="small" danger onClick={onStopEdition}>Close edition</Button>
                             }

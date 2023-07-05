@@ -15,6 +15,7 @@ class CoreDefaultDashboardRegistration : DefaultDashboardRegistration {
         DashboardContextKeys.HOME to Dashboard(
             key = "home-default",
             name = "Default dashboard",
+            builtIn = true,
             layoutKey = DashboardLayouts.defaultLayout.key,
             widgets = listOf(
                 LastActiveProjectsWidget().toInstance(),
@@ -23,6 +24,7 @@ class CoreDefaultDashboardRegistration : DefaultDashboardRegistration {
         DashboardContextKeys.PROJECT to Dashboard(
             key = "project-default",
             name = "Default project dashboard",
+            builtIn = true,
             layoutKey = DashboardLayouts.main2ChildrenLayout.key,
             widgets = listOf(
                 LastActiveBranchesWidget().toInstance(),

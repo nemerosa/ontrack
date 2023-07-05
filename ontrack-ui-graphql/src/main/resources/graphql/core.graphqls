@@ -66,6 +66,7 @@ type WidgetInstance {
 type Dashboard {
     key: String!
     name: String!
+    builtIn: Boolean!
     layoutKey: String!
     widgets: [WidgetInstance!]!
 }

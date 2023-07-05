@@ -13,12 +13,14 @@ import com.fasterxml.jackson.databind.JsonNode
 data class Dashboard(
     val key: String,
     val name: String,
+    val builtIn: Boolean,
     val layoutKey: String,
     val widgets: List<WidgetInstance>,
 ) {
     fun updateWidgetConfig(widgetUuid: String, widgetConfig: JsonNode) = Dashboard(
         key = key,
         name = name,
+        builtIn = builtIn,
         layoutKey = layoutKey,
         widgets = widgets.map { widget ->
             if (widget.uuid == widgetUuid) {

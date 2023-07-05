@@ -28,6 +28,7 @@ class DashboardController(
         ) ?: Dashboard(
             key = "nil",
             name = "Nil dashboard since none was found",
+            builtIn = true,
             layoutKey = DashboardLayouts.defaultLayout.key,
             widgets = emptyList(),
         )

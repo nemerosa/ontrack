@@ -893,6 +893,7 @@ type CreateWebhookPayload implements Payload {
 }
 
 type Dashboard {
+    builtIn: Boolean!
     key: String!
     layoutKey: String!
     name: String!

@@ -46,6 +46,7 @@ export default function DashboardPage({
                         dashboardByContext(key: $context, id: $contextId) {
                             key
                             name
+                            builtIn
                             layoutKey
                             widgets {
                                 uuid
