@@ -34,6 +34,15 @@ class DashboardServiceImpl(
         if (userScope == DashboardContextUserScope.GLOBAL) {
             securityService.checkGlobalFunction(DashboardSharing::class.java)
         }
+        // Checks for the dashboard name unicity
+        val existingByName = storageService.filter(
+            STORE, Dashboard::class,
+            query = "data::jsonb->>'name' = :name",
+            queryVariables = mapOf("name" to name)
+        ).firstOrNull()
+        if (existingByName != null && (key.isNullOrBlank() || key != existingByName.key)) {
+            throw DashboardNameAlreadyExistsException(name)
+        }
         // TODO Validates the widget configurations
         // Saving the dashboard
         val dashboardKey = key?.takeIf { it.isNotBlank() } ?: UUID.randomUUID().toString()
