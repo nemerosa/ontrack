@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.dashboards
 
+import com.fasterxml.jackson.databind.JsonNode
+
 /**
  * A _dashboard_ is a _layout_ associated to a list of widgets.
  *
@@ -13,4 +15,17 @@ data class Dashboard(
     val name: String,
     val layoutKey: String,
     val widgets: List<WidgetInstance>,
-)
+) {
+    fun updateWidgetConfig(widgetUuid: String, widgetConfig: JsonNode) = Dashboard(
+        key = key,
+        name = name,
+        layoutKey = layoutKey,
+        widgets = widgets.map { widget ->
+            if (widget.uuid == widgetUuid) {
+                widget.updateConfig(widgetConfig)
+            } else {
+                widget
+            }
+        },
+    )
+}

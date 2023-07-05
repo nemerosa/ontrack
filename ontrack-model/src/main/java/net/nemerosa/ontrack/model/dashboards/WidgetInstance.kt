@@ -14,4 +14,10 @@ data class WidgetInstance(
     val uuid: String,
     val key: String,
     val config: JsonNode,
-)
+) {
+    fun updateConfig(widgetConfig: JsonNode) = WidgetInstance(
+        uuid = uuid,
+        key = key,
+        config = widgetConfig,
+    )
+}

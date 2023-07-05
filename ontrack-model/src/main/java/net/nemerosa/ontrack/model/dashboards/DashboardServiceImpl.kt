@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.model.dashboards
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.model.dashboards.widgets.Widget
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
@@ -29,9 +28,12 @@ class DashboardServiceImpl(
             it.uuid == widgetUuid
         } ?: throw DashboardWidgetUuidNotFoundException(dashboard, widgetUuid)
         // TODO Validates the configuration for the widget
-        // TODO Saves the dashboard with the new widget configuration
-        // TODO Returns the widget
-        TODO()
+        // Saves the dashboard with the new widget configuration
+        dashboardStorageService.updateDashboard(dashboardKey) {
+            it.updateWidgetConfig(widgetUuid, widgetConfig)
+        }
+        // Returns the updated widget instance
+        return widget.updateConfig(widgetConfig)
     }
 
     private fun findDefaultDashboardByKey(context: DashboardContext): Dashboard? =
