@@ -4,6 +4,7 @@ import {useContext, useState} from "react";
 import BranchBox from "@components/branches/BranchBox";
 import SimpleWidget from "@components/dashboards/widgets/SimpleWidget";
 import {DashboardContext} from "@components/dashboards/DashboardContext";
+import LastActiveBranchesWidgetForm from "@components/dashboards/widgets/project/LastActiveBranchesWidgetForm";
 
 export default function LastActiveBranchesWidget({count}) {
 
@@ -38,6 +39,7 @@ export default function LastActiveBranchesWidget({count}) {
                 setData={data => {
                     setBranches(data.projects[0].branches)
                 }}
+                form={<LastActiveBranchesWidgetForm count={count}/>}
             >
                 <Space direction="horizontal" size={16} wrap>
                     {branches.map(branch => <BranchBox key={branch.id} branch={branch}/>)}

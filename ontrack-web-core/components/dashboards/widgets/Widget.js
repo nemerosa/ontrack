@@ -43,7 +43,7 @@ export function checkContext(widget, predicate, error) {
     }
 }
 
-export default function Widget({title, loading, commands, children}) {
+export default function Widget({title, loading, commands, form, children}) {
 
     const dashboard = useContext(DashboardContext)
     const widgetContext = useContext(WidgetContext)
@@ -99,7 +99,8 @@ export default function Widget({title, loading, commands, children}) {
             }
         >
             {loading && <Skeleton active/>}
-            {!loading && children}
+            {!loading && !widgetContext.editionMode && children}
+            {!loading && widgetContext.editionMode && form}
         </Card>
     )
 }
