@@ -1,6 +1,6 @@
 import {lazy, Suspense, useContext, useEffect, useState} from "react";
 import {Skeleton} from "antd";
-import {DashboardContext} from "@components/dashboards/DashboardPage";
+import {DashboardContext} from "@components/dashboards/DashboardContext";
 
 export default function DashboardWidget({widget}) {
 

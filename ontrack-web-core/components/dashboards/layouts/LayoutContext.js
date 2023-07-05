@@ -1,5 +1,5 @@
 import {createContext, useContext, useEffect, useState} from "react";
-import {DashboardContext} from "@components/dashboards/DashboardPage";
+import {DashboardContext} from "@components/dashboards/DashboardContext";
 
 export const LayoutContext = createContext({widgets: []})
 

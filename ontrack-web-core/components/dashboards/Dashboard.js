@@ -1,14 +1,17 @@
 import {lazy, Suspense, useContext, useEffect, useState} from "react";
 import {Alert, Button, Skeleton, Space} from "antd";
 import LayoutContextProvider from "@components/dashboards/layouts/LayoutContext";
-import {DashboardContext} from "@components/dashboards/DashboardPage";
+import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 
 export default function Dashboard() {
 
     const dashboard = useContext(DashboardContext)
+    const dashboardDispatch = useContext(DashboardDispatchContext)
 
     const onStopEdition = () => {
-        // TODO dashboard.edition = false
+        dashboardDispatch({
+            type: 'cancelEdition',
+        })
     }
 
     const importLayout = layoutKey => lazy(() =>
@@ -33,7 +36,7 @@ export default function Dashboard() {
             {dashboard && <Suspense fallback={<Skeleton active/>}>
                 <Space direction="vertical">
                     {
-                        dashboard.edition &&
+                        dashboard.editionMode &&
                         <Alert
                             type="warning"
                             message="Dashboard in edition mode."

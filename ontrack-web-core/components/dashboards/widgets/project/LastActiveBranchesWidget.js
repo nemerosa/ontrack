@@ -3,7 +3,7 @@ import {Space} from "antd";
 import {useContext, useState} from "react";
 import BranchBox from "@components/branches/BranchBox";
 import SimpleWidget from "@components/dashboards/widgets/SimpleWidget";
-import {DashboardContext} from "@components/dashboards/DashboardPage";
+import {DashboardContext} from "@components/dashboards/DashboardContext";
 
 export default function LastActiveBranchesWidget({count}) {
 

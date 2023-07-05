@@ -1,9 +1,9 @@
 import {useContext, useState} from "react";
-import {DashboardContext} from "@components/dashboards/DashboardPage";
 import SimpleWidget from "@components/dashboards/widgets/SimpleWidget";
 import {gql} from "graphql-request";
 import {Space} from "antd";
 import Property from "@components/properties/Property";
+import {DashboardContext} from "@components/dashboards/DashboardContext";
 
 export default function PropertiesWidget() {
 

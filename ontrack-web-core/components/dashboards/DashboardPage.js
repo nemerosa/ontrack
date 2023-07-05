@@ -2,21 +2,41 @@ import MainPage from "@components/layouts/MainPage";
 import {CloseCommand} from "@components/common/Commands";
 import LoadingContainer from "@components/common/LoadingContainer";
 import Dashboard from "@components/dashboards/Dashboard";
-import {createContext, useEffect, useState} from "react";
+import {useEffect, useReducer} from "react";
 import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import DashboardCommandMenu from "@components/dashboards/commands/DashboardCommandMenu";
+import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 
-export const DashboardContext = createContext(null)
+export const dashboardReducer = (dashboard, action) => {
+    switch (action.type) {
+        case 'init': {
+            return action.data
+        }
+        case 'startEdition': {
+            return {
+                ...dashboard,
+                editionMode: true,
+            }
+        }
+        case 'cancelEdition': {
+            return {
+                ...dashboard,
+                editionMode: false,
+            }
+        }
+        default: {
+            throw Error('Unknown action: ' + action.type);
+        }
+    }
+}
 export default function DashboardPage({
                                           title, breadcrumbs, closeHref,
                                           loading,
                                           context, contextId
                                       }) {
 
-    // const [editionMode, setEditionMode] = useState(false)
-
-    const [dashboard, setDashboard] = useState({context, contextId})
+    const [dashboard, dashboardDispatch] = useReducer(dashboardReducer, {})
 
     useEffect(() => {
         if (context && contextId) {
@@ -36,10 +56,15 @@ export default function DashboardPage({
                 `,
                 {context, contextId}
             ).then(data => {
-                setDashboard({
-                    context,
-                    contextId,
-                    ...data.dashboardByContext
+                // Setting the initial state of the dashboard
+                dashboardDispatch({
+                    type: 'init',
+                    data: {
+                        context,
+                        contextId,
+                        editionMode: false,
+                        ...data.dashboardByContext,
+                    }
                 })
             })
         }
@@ -53,15 +78,17 @@ export default function DashboardPage({
     return (
         <>
             <DashboardContext.Provider value={dashboard}>
-                <MainPage
-                    title={title}
-                    breadcrumbs={breadcrumbs}
-                    commands={commands}
-                >
-                    <LoadingContainer loading={loading}>
-                        <Dashboard/>
-                    </LoadingContainer>
-                </MainPage>
+                <DashboardDispatchContext.Provider value={dashboardDispatch}>
+                    <MainPage
+                        title={title}
+                        breadcrumbs={breadcrumbs}
+                        commands={commands}
+                    >
+                        <LoadingContainer loading={loading}>
+                            <Dashboard/>
+                        </LoadingContainer>
+                    </MainPage>
+                </DashboardDispatchContext.Provider>
             </DashboardContext.Provider>
         </>
     )
