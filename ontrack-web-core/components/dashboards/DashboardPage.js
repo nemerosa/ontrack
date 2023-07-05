@@ -48,6 +48,7 @@ export default function DashboardPage({
                             name
                             layoutKey
                             widgets {
+                                uuid
                                 key
                                 config
                             }

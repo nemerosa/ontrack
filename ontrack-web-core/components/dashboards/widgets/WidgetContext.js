@@ -1,5 +1,6 @@
 import {createContext} from "react";
-import {getUserErrors} from "@client/graphQLCall";
+import graphQLCall, {getUserErrors} from "@client/graphQLCall";
+import {gql} from "graphql-request";
 
 export const WidgetContext = createContext(null)
 export const WidgetDispatchContext = createContext(null)
@@ -39,7 +40,36 @@ export const widgetReducer = (widget, action) => {
 
 export const widgetFormSubmit = (widgetContext, widgetDispatch) => {
     widgetContext.editionForm.validateFields().then(values => {
-        // TODO Submit the values
+        const variables = {
+            dashboardKey: widgetContext.dashboard.key,
+            widgetUuid: widgetContext.widget.uuid,
+            config: values,
+        }
+        graphQLCall(
+            gql`
+                mutation UpdateWidgetConfig(
+                    $dashboardKey: String!,
+                    $widgetUuid: String!,
+                    $config: JSON!,
+                ) {
+                    updateWidgetConfig(input: {
+                        dashboardKey: $dashboardKey,
+                        widgetUuid: $widgetUuid,
+                        config: $config,
+                    }) {
+                        errors {
+                            message
+                            exception
+                        }
+                        widget {
+                            uuid
+                            key
+                            config
+                        }
+                    }
+                }
+            `, variables
+        )
     }).then(data => {
         const errors = getUserErrors(data.xxx)
         if (errors) {

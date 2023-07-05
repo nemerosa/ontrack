@@ -11,6 +11,12 @@ interface Payload {
     errors: [UserError]
 }
 
+"Interface implemented by all mutation payloads"
+interface PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
+}
+
 interface ProjectEntity {
     creation: Signature
     description: String
@@ -3398,6 +3404,8 @@ type Mutation {
         "Input for the mutation"
         input: UpdateProjectInput
     ): UpdateProjectPayload
+    "Updates the configuration of a widget for a given dashboard"
+    updateWidgetConfig(input: UpdateWidgetConfigInput!): UpdateWidgetConfigPayload
     "Validates a build identified by id with CHML data"
     validateBuildByIdWithCHML(
         "Input for the mutation"
@@ -3525,6 +3533,16 @@ type PageRequest {
     offset: Int
     "Size for the page"
     size: Int
+}
+
+"Representation of an error."
+type PayloadUserError {
+    "Programmatic code to be used by client. Usually the FQCN of the corresponding exception."
+    exception: String!
+    "Additional information about the location of this error."
+    location: String
+    "The error message"
+    message: String!
 }
 
 "Output type for the postQueue mutation."
@@ -5441,6 +5459,13 @@ type UpdateProjectPayload implements Payload {
     project: Project
 }
 
+type UpdateWidgetConfigPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError!]
+    "Updated widget"
+    widget: WidgetInstance
+}
+
 "Representation of the current user"
 type User {
     "Account associated to the user"
@@ -5773,7 +5798,7 @@ type VersionInfo {
     "Git commit"
     commit: String!
     "Creation date"
-    date: LocalDateTime
+    date: LocalDateTime @deprecated(reason: "Date field will be removed in V5")
     "Display version"
     display: String!
     "Full version"
@@ -5853,6 +5878,7 @@ Dashboards
 type WidgetInstance {
     config: JSON!
     key: String!
+    uuid: String!
 }
 
 "List of ways the auto approval is managed."
@@ -8206,6 +8232,12 @@ input UpdateProjectInput {
     id: Int!
     "Project name (leave null to not change)"
     name: String
+}
+
+input UpdateWidgetConfigInput {
+    config: JSON!
+    dashboardKey: String!
+    widgetUuid: String!
 }
 
 "Input type for the validateBuildByIdWithCHML mutation."

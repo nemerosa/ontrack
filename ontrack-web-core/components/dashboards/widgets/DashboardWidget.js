@@ -10,6 +10,8 @@ export default function DashboardWidget({widget}) {
     const [editionForm] = Form.useForm()
 
     const [widgetContext, widgetDispatch] = useReducer(widgetReducer, {
+        dashboard,
+        widget,
         editionForm,
     })
     const importWidget = widgetKey => lazy(() =>
