@@ -1,14 +1,17 @@
 import {lazy, Suspense, useContext, useEffect, useReducer, useState} from "react";
-import {Skeleton} from "antd";
+import {Form, Skeleton} from "antd";
 import {DashboardContext} from "@components/dashboards/DashboardContext";
-import {dashboardReducer} from "@components/dashboards/DashboardPage";
 import {WidgetContext, WidgetDispatchContext, widgetReducer} from "@components/dashboards/widgets/WidgetContext";
 
 export default function DashboardWidget({widget}) {
 
     const dashboard = useContext(DashboardContext)
 
-    const [widgetContext, widgetDispatch] = useReducer(widgetReducer, {})
+    const [editionForm] = Form.useForm()
+
+    const [widgetContext, widgetDispatch] = useReducer(widgetReducer, {
+        editionForm,
+    })
     const importWidget = widgetKey => lazy(() =>
         import(`./${widgetKey}Widget`)
     )
