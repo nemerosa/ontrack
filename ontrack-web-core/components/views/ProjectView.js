@@ -1,11 +1,13 @@
+import MainPage from "@components/layouts/MainPage";
 import {useEffect, useState} from "react";
 import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import Head from "next/head";
 import {projectTitle} from "@components/common/Titles";
 import {projectBreadcrumbs} from "@components/common/Breadcrumbs";
+import {CloseCommand} from "@components/common/Commands";
 import {homeUri} from "@components/common/Links";
-import DashboardPage from "@components/dashboards/DashboardPage";
+import LoadingContainer from "@components/common/LoadingContainer";
 
 export default function ProjectView({id}) {
 
@@ -27,25 +29,29 @@ export default function ProjectView({id}) {
                 {id}
             ).then(data => {
                 setProject(data.projects[0])
-            }).finally(() => {
                 setLoadingProject(false)
             })
         }
     }, [id])
+
+    const commands = [
+        <CloseCommand key="close" href={homeUri()}/>
+    ]
 
     return (
         <>
             <Head>
                 {projectTitle(project)}
             </Head>
-            <DashboardPage
+            <MainPage
                 title={project.name}
                 breadcrumbs={projectBreadcrumbs(project)}
-                closeHref={homeUri()}
-                loading={loadingProject}
-                context="project"
-                contextId={project.id}
-            />
+                commands={commands}
+            >
+                <LoadingContainer loading={loadingProject} tip="Loading project">
+                    {project.name}
+                </LoadingContainer>
+            </MainPage>
         </>
     )
 }
