@@ -23,4 +23,12 @@ interface PreferencesService {
      */
     fun setPreferences(account: Account, preferences: Preferences)
 
+    /**
+     * Saves the preferences of the [account].
+     *
+     * @param account Account to set the preferences for
+     * @param preferences Account's preferences.
+     */
+    fun savePreferences(account: Account, updating: (Preferences) -> Unit)
+
 }

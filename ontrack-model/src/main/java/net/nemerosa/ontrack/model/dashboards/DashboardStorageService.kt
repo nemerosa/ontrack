@@ -10,4 +10,6 @@ interface DashboardStorageService {
 
     fun findSharedDashboards(): List<Dashboard>
 
+    fun saveDashboard(dashboard: Dashboard): Dashboard
+
 }

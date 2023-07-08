@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.model.dashboards
 
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
 
 @Service
 class DashboardStorageServiceImpl(
+    private val securityService: SecurityService,
     private val storageService: StorageService,
 ) : DashboardStorageService {
 
@@ -28,6 +30,23 @@ class DashboardStorageServiceImpl(
             size = MAX_DASHBOARDS,
             query = "data->>'userId' IS NULL",
         ).map { it.dashboard }
+
+    override fun saveDashboard(dashboard: Dashboard): Dashboard {
+        val userId = if (dashboard.userScope == DashboardContextUserScope.PRIVATE) {
+            securityService?.currentAccount?.id()
+        } else {
+            null
+        }
+        storageService.store(
+            STORE,
+            dashboard.uuid,
+            StoredDashboard(
+                userId = userId,
+                dashboard = dashboard,
+            )
+        )
+        return dashboard
+    }
 
     private data class StoredDashboard(
         val userId: Int?,

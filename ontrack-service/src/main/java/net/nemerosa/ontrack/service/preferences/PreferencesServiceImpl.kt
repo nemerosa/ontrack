@@ -23,4 +23,10 @@ class PreferencesServiceImpl(
     override fun setPreferences(account: Account, preferences: Preferences) {
         preferencesRepository.setPreferences(account.id(), preferences.asJson())
     }
+
+    override fun savePreferences(account: Account, updating: (Preferences) -> Unit) {
+        val prefs = getPreferences(account)
+        updating(prefs)
+        setPreferences(account, prefs)
+    }
 }

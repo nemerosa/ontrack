@@ -4,4 +4,5 @@ export const DashboardContext = createContext({
     dashboards: [],
     selectedDashboard: undefined,
 })
-// export const DashboardDispatchContext = createContext(null)
+
+export const DashboardDispatchContext = createContext(null)

@@ -72,7 +72,7 @@ enum DashboardContextUserScope {
 type Dashboard {
     uuid: String!
     name: String!
-    userScope: DashboardContextUserScope
+    userScope: DashboardContextUserScope!
     layoutKey: String!
     widgets: [WidgetInstance!]!
 }
@@ -82,4 +82,31 @@ extend type Query {
     userDashboard: Dashboard!
     """Gets the list of private & shared dashboards"""
     userDashboards: [Dashboard!]!
+}
+
+extend type Mutation {
+    """Saves a dashboard"""
+    saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
+}
+
+input WidgetInstanceInput {
+    uuid: String
+    key: String!
+    config: JSON!
+}
+
+input SaveDashboardInput {
+    uuid: String
+    name: String!
+    userScope: DashboardContextUserScope!
+    layoutKey: String!
+    widgets: [WidgetInstanceInput!]!
+    select: Boolean! = true
+}
+
+type SaveDashboardPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
+    """Saved dashboard"""
+    dashboard: Dashboard
 }

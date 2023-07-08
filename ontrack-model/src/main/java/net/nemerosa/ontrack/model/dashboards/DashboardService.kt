@@ -12,4 +12,9 @@ interface DashboardService {
      */
     fun userDashboards(): List<Dashboard>
 
+    /**
+     * Saves a dashboard
+     */
+    fun saveDashboard(input: SaveDashboardInput): Dashboard
+
 }

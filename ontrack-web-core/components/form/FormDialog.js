@@ -44,14 +44,15 @@ export default function FormDialog({dialog, children}) {
                 dialog.query,
                 values
             )
-            const errors = getUserErrors(data[dialog.userNode])
+            const result = data[dialog.userNode]
+            const errors = getUserErrors(result)
             if (errors) {
                 setFormErrors(errors)
             } else {
                 dialog.setOpen(false)
                 form.resetFields()
                 if (dialog.onSuccess) {
-                    dialog.onSuccess()
+                    dialog.onSuccess(result)
                 }
             }
         } catch (ignored) {
