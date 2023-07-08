@@ -5,14 +5,14 @@ export const LayoutContext = createContext({widgets: []})
 
 const LayoutContextProvider = ({children}) => {
 
-    const dashboard = useContext(DashboardContext)
+    const {selectedDashboard} = useContext(DashboardContext)
     const [widgets, setWidgets] = useState([])
 
     useEffect(() => {
-        if (dashboard) {
-            setWidgets(dashboard.widgets)
+        if (selectedDashboard) {
+            setWidgets(selectedDashboard.widgets)
         }
-    }, [dashboard])
+    }, [selectedDashboard])
 
     return <LayoutContext.Provider value={widgets}>{children}</LayoutContext.Provider>
 }
