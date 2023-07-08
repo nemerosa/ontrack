@@ -7,8 +7,7 @@ object DefaultDashboards {
     val defaultDashboard = Dashboard(
         uuid = "0",
         name = "Default dashboard",
-        builtIn = true,
-        userScope = DashboardContextUserScope.SHARED,
+        userScope = DashboardContextUserScope.BUILT_IN,
         layoutKey = DashboardLayouts.defaultLayout.key,
         widgets = listOf(
             LastActiveProjectsWidget().toDefaultInstance(),

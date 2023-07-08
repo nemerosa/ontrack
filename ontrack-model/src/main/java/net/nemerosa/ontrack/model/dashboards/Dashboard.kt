@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JsonNode
  *
  * @property uuid ID of the dashboard
  * @property name Display name for the dashboard
- * @property builtIn If this is a default dashboard which cannot be edited
  * @property userScope Private or shared dashboard
  * @property layoutKey ID of the layout to use (no configuration needed)
  * @property widgets List of widgets in this dashboard
@@ -15,7 +14,6 @@ import com.fasterxml.jackson.databind.JsonNode
 data class Dashboard(
     val uuid: String,
     val name: String,
-    val builtIn: Boolean,
     val userScope: DashboardContextUserScope,
     val layoutKey: String,
     val widgets: List<WidgetInstance>,

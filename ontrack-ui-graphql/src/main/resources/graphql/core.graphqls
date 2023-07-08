@@ -66,12 +66,12 @@ type WidgetInstance {
 enum DashboardContextUserScope {
     PRIVATE
     SHARED
+    BUILT_IN
 }
 
 type Dashboard {
     uuid: String!
     name: String!
-    builtIn: Boolean!
     userScope: DashboardContextUserScope
     layoutKey: String!
     widgets: [WidgetInstance!]!

@@ -17,7 +17,7 @@ class DashboardStorageServiceImpl(
             store = STORE,
             type = StoredDashboard::class,
             size = MAX_DASHBOARDS,
-            query = "data->>'userId' = :userId",
+            query = "CAST(data->>'userId' as int) = :userId",
             queryVariables = mapOf("userId" to id.value)
         ).map { it.dashboard }
 

@@ -6,37 +6,40 @@ import {DashboardContext, DashboardDispatchContext} from "@components/dashboards
 
 export default function DashboardCommandMenu() {
 
-    const dashboard = useContext(DashboardContext)
-    const dashboardDispatch = useContext(DashboardDispatchContext)
+    // const dashboard = useContext(DashboardContext)
+    // const dashboardDispatch = useContext(DashboardDispatchContext)
+    //
+    // const editDashboard = () => {
+    //     dashboardDispatch({
+    //         type: 'startEdition',
+    //     })
+    // }
 
-    const editDashboard = () => {
-        dashboardDispatch({
-            type: 'startEdition',
-        })
-    }
+    const items = []
 
-    const items = [
-        {
-            key: 'edit',
-            label: (
-                <Command
-                    icon={<FaEdit/>}
-                    text="Edit current"
-                    action={editDashboard}
-                />
-            ),
-        },
-    ]
+    //
+    // const items = [
+    //     {
+    //         key: 'edit',
+    //         label: (
+    //             <Command
+    //                 icon={<FaEdit/>}
+    //                 text="Edit current"
+    //                 action={editDashboard}
+    //             />
+    //         ),
+    //     },
+    // ]
 
     return (
         <>
-            <Dropdown menu={{items}} disabled={dashboard.editionMode}>
+            <Dropdown menu={{items}} /*disabled={dashboard.editionMode}*/>
                 <Button
                     type="text"
                 >
                     <Space size={8}>
                         <FaWindowRestore/>
-                        <Typography.Text disabled={dashboard.editionMode}>Dashboard</Typography.Text>
+                        <Typography.Text /* disabled={dashboard.editionMode} */>Dashboard</Typography.Text>
                     </Space>
                 </Button>
             </Dropdown>

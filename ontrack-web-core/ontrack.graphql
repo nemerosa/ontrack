@@ -893,7 +893,6 @@ type CreateWebhookPayload implements Payload {
 }
 
 type Dashboard {
-    builtIn: Boolean!
     layoutKey: String!
     name: String!
     userScope: DashboardContextUserScope
@@ -5939,6 +5938,7 @@ enum ConfigurableIndicatorAttributeType {
 }
 
 enum DashboardContextUserScope {
+    BUILT_IN
     PRIVATE
     SHARED
 }
