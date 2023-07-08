@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.model.dashboards
 
+import net.nemerosa.ontrack.model.structure.ID
+
 interface DashboardStorageService {
 
-    fun findDashboard(key: String): Dashboard?
+    fun findDashboardByUuid(uuid: String): Dashboard?
 
-    fun updateDashboard(key: String, updating: (Dashboard) -> Dashboard): Dashboard
+    fun findDashboardsByUser(id: ID): List<Dashboard>
 
-    fun saveDashboard(dashboard: Dashboard): Dashboard
+    fun findSharedDashboards(): List<Dashboard>
 
 }

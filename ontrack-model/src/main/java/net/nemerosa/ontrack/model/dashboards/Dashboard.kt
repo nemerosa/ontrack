@@ -5,29 +5,18 @@ import com.fasterxml.jackson.databind.JsonNode
 /**
  * A _dashboard_ is a _layout_ associated to a list of widgets.
  *
- * @property key ID of the dashboard
+ * @property uuid ID of the dashboard
  * @property name Display name for the dashboard
+ * @property builtIn If this is a default dashboard which cannot be edited
+ * @property userScope Private or shared dashboard
  * @property layoutKey ID of the layout to use (no configuration needed)
  * @property widgets List of widgets in this dashboard
  */
 data class Dashboard(
-    val key: String,
+    val uuid: String,
     val name: String,
     val builtIn: Boolean,
+    val userScope: DashboardContextUserScope,
     val layoutKey: String,
     val widgets: List<WidgetInstance>,
-) {
-    fun updateWidgetConfig(widgetUuid: String, widgetConfig: JsonNode) = Dashboard(
-        key = key,
-        name = name,
-        builtIn = builtIn,
-        layoutKey = layoutKey,
-        widgets = widgets.map { widget ->
-            if (widget.uuid == widgetUuid) {
-                widget.updateConfig(widgetConfig)
-            } else {
-                widget
-            }
-        },
-    )
-}
+)

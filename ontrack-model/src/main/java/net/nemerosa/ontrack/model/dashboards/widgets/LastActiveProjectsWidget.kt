@@ -1,9 +1,7 @@
-package net.nemerosa.ontrack.model.dashboards.widgets.home
+package net.nemerosa.ontrack.model.dashboards.widgets
 
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.dashboards.WidgetInstance
-import net.nemerosa.ontrack.model.dashboards.widgets.AbstractWidget
-import net.nemerosa.ontrack.model.dashboards.widgets.WidgetConfig
 import org.springframework.stereotype.Component
 
 @Component
@@ -15,7 +13,7 @@ class LastActiveProjectsWidget : AbstractWidget<LastActiveProjectsWidget.LastAct
         val count: Int = 10,
     ) : WidgetConfig
 
-    fun toInstance(count: Int = 10) = WidgetInstance(
+    fun toDefaultInstance(count: Int = 10) = WidgetInstance(
         "0",
         key,
         LastActiveProjectsWidgetConfig(count).asJson()

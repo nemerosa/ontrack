@@ -1,41 +1,15 @@
 package net.nemerosa.ontrack.model.dashboards
 
-import com.fasterxml.jackson.databind.JsonNode
-
 interface DashboardService {
 
     /**
-     * Given a [dashboard context][DashboardContext], returns, if it exists,
-     * the dashboard for it.
-     *
-     * Priority of the search is:
-     *
-     * * user preferences for the context [key][DashboardContext.key] and its [ID][DashboardContext.id]
-     * * user preferences for the context [key][DashboardContext.key]
-     * * global preferences for the context [key][DashboardContext.key] and its [ID][DashboardContext.id]
-     * * global preferences for the context [key][DashboardContext.key]
-     * * default for the context [key][DashboardContext.key]
+     * Returns the default dashboard for the current user.
      */
-    fun findDashboard(
-        context: DashboardContext
-    ): Dashboard?
+    fun userDashboard(): Dashboard
 
     /**
-     * Updates the configuration of a widget into a dashboard.
+     * Returns the list of dashboards which are accessible to the current user.
      */
-    fun updateWidgetConfig(dashboardKey: String, widgetUuid: String, widgetConfig: JsonNode): WidgetInstance
-
-    /**
-     * Saves a dashboard
-     */
-    fun saveDashboard(
-        context: DashboardContext,
-        userScope: DashboardContextUserScope,
-        contextScope: DashboardContextScope,
-        key: String?,
-        name: String,
-        layoutKey: String,
-        widgets: List<WidgetInstance>,
-    ): Dashboard
+    fun userDashboards(): List<Dashboard>
 
 }
