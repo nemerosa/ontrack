@@ -894,9 +894,10 @@ type CreateWebhookPayload implements Payload {
 
 type Dashboard {
     builtIn: Boolean!
-    key: String!
     layoutKey: String!
     name: String!
+    userScope: DashboardContextUserScope
+    uuid: String!
     widgets: [WidgetInstance!]!
 }
 
@@ -2985,8 +2986,6 @@ type Mutation {
     purgeQueueRecordings: PurgeQueueRecordingsPayload
     "Reload the configuration from the CasC files"
     reloadCasc: ReloadCascPayload
-    "Save a dashboard"
-    saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
     "Sets the auto versioning configuration for a branch"
     setAutoVersioningConfig(
         "Input for the mutation"
@@ -3407,8 +3406,6 @@ type Mutation {
         "Input for the mutation"
         input: UpdateProjectInput
     ): UpdateProjectPayload
-    "Updates the configuration of a widget for a given dashboard"
-    updateWidgetConfig(input: UpdateWidgetConfigInput!): UpdateWidgetConfigPayload
     "Validates a build identified by id with CHML data"
     validateBuildByIdWithCHML(
         "Input for the mutation"
@@ -3562,6 +3559,8 @@ type Preferences {
     branchViewVsGroups: Boolean!
     "Branch view VS names"
     branchViewVsNames: Boolean!
+    "Dashboard selected by default"
+    dashboardUuid: String
 }
 
 type Project implements ProjectEntity {
@@ -4234,8 +4233,6 @@ type Query {
         "Filter the indicators on their type ID"
         type: String
     ): [ConfigurableIndicatorTypeState!]!
-    "Gets the dashboard for a given context"
-    dashboardByContext(id: String!, key: String!): Dashboard!
     "Getting a project entity using its type and ID."
     entity(
         "ID of the entity"
@@ -4466,6 +4463,10 @@ type Query {
     settings: Settings!
     "Gets the current user"
     user: User
+    "Gets the current dashboard"
+    userDashboard: Dashboard!
+    "Gets the list of private & shared dashboards"
+    userDashboards: [Dashboard!]!
     "List of validation run statuses"
     validationRunStatusIDList: [ValidationRunStatusID!]!
     validationRuns(
@@ -4695,13 +4696,6 @@ type SCMFileChangeFilters {
     canManage: Boolean!
     "List of filters"
     filters: [SCMFileChangeFilter!]!
-}
-
-type SaveDashboardPayload {
-    "Saved dashboard"
-    dashboard: Dashboard
-    "List of errors"
-    errors: [PayloadUserError!]
 }
 
 "Search result"
@@ -5469,13 +5463,6 @@ type UpdateProjectPayload implements Payload {
     project: Project
 }
 
-type UpdateWidgetConfigPayload implements PayloadInterface {
-    "List of errors"
-    errors: [PayloadUserError!]
-    "Updated widget"
-    widget: WidgetInstance
-}
-
 "Representation of the current user"
 type User {
     "Account associated to the user"
@@ -5951,14 +5938,9 @@ enum ConfigurableIndicatorAttributeType {
     REQUIRED
 }
 
-enum DashboardContextScope {
-    CONTEXT
-    ID
-}
-
 enum DashboardContextUserScope {
-    GLOBAL
-    USER
+    PRIVATE
+    SHARED
 }
 
 "State a hook request can be in"
@@ -7219,17 +7201,6 @@ input RunInfoInput {
     triggerType: String
 }
 
-input SaveDashboardInput {
-    context: String!
-    contextId: String!
-    contextScope: DashboardContextScope!
-    key: String
-    layoutKey: String!
-    name: String!
-    userScope: DashboardContextUserScope!
-    widgets: [WidgetInstanceInput!]!
-}
-
 "Input type for the setAutoVersioningConfigByName mutation."
 input SetAutoVersioningConfigByNameInput {
     "Name of the branch to configure"
@@ -8265,12 +8236,6 @@ input UpdateProjectInput {
     name: String
 }
 
-input UpdateWidgetConfigInput {
-    config: JSON!
-    dashboardKey: String!
-    widgetUuid: String!
-}
-
 "Input type for the validateBuildByIdWithCHML mutation."
 input ValidateBuildByIdWithCHMLInput {
     "Number of critical issues"
@@ -8450,10 +8415,4 @@ input WebhookExchangeFilter {
     responseKeyword: String
     "Name of the webhook (regular expression)"
     webhook: String
-}
-
-input WidgetInstanceInput {
-    config: JSON!
-    key: String!
-    uuid: String
 }

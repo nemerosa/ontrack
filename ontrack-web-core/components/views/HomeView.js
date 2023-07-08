@@ -1,13 +1,9 @@
-import ProjectList, {useProjectList} from "@components/projects/ProjectList";
+import DashboardPage from "@components/dashboards/DashboardPage";
 
 export default function HomeView() {
-
-    const projectList = useProjectList()
-
     return (
         <>
-            <p>TODO Dashboard page</p>
-            <ProjectList projectList={projectList}/>
+            <DashboardPage title="Home"/>
         </>
     )
 }
