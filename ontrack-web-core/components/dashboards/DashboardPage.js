@@ -1,5 +1,4 @@
 import MainPage from "@components/layouts/MainPage";
-import LoadingContainer from "@components/common/LoadingContainer";
 import Dashboard from "@components/dashboards/Dashboard";
 import DashboardCommandMenu from "@components/dashboards/commands/DashboardCommandMenu";
 import {DashboardContext} from "@components/dashboards/DashboardContext";
@@ -15,33 +14,33 @@ export default function DashboardPage({
     const [selectedDashboard, setSelectedDashboard] = useState(undefined)
 
     useEffect(() => {
-           graphQLCall(
-               gql`
-                   query LoadDashboards {
-                       userDashboards {
-                           ...DashboardContent
-                       }
-                       userDashboard {
-                           ...DashboardContent
-                       }
-                   }
+        graphQLCall(
+            gql`
+                query LoadDashboards {
+                    userDashboards {
+                        ...DashboardContent
+                    }
+                    userDashboard {
+                        ...DashboardContent
+                    }
+                }
 
-                   fragment DashboardContent on Dashboard {
-                       uuid
-                       name
-                       userScope
-                       layoutKey
-                       widgets {
-                           uuid
-                           key
-                           config
-                       }
-                   }
-               `
-           ).then(data => {
-               setDashboards(data.userDashboards)
-               setSelectedDashboard(data.userDashboard)
-           })
+                fragment DashboardContent on Dashboard {
+                    uuid
+                    name
+                    userScope
+                    layoutKey
+                    widgets {
+                        uuid
+                        key
+                        config
+                    }
+                }
+            `
+        ).then(data => {
+            setDashboards(data.userDashboards)
+            setSelectedDashboard(data.userDashboard)
+        })
     }, [])
 
     const commands = [
@@ -50,15 +49,15 @@ export default function DashboardPage({
 
     return (
         <>
-            <MainPage
-                title={title}
-                breadcrumbs={[]}
-                commands={commands}
-            >
-                <DashboardContext.Provider value={{dashboards}}>
+            <DashboardContext.Provider value={{dashboards, selectedDashboard}}>
+                <MainPage
+                    title={title}
+                    breadcrumbs={[]}
+                    commands={commands}
+                >
                     <Dashboard/>
-                </DashboardContext.Provider>
-            </MainPage>
+                </MainPage>
+            </DashboardContext.Provider>
         </>
     )
 }
