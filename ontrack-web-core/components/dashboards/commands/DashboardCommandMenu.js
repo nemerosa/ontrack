@@ -11,7 +11,7 @@ export default function DashboardCommandMenu() {
 
     const selectDashboard = (dashboard) => {
         return () => {
-            // TODO
+            selectedDashboardDispatch({type: 'init', selectedDashboard: dashboard})
         }
     }
 
