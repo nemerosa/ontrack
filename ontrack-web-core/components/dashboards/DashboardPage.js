@@ -146,6 +146,16 @@ export default function DashboardPage({
                     })
                 }
             }
+            case 'addWidget': {
+                return {
+                    ...selectedDashboard,
+                    widgets: selectedDashboard.widgets.concat({
+                        uuid: '',
+                        key: action.widgetDef.key,
+                        config: action.widgetDef.defaultConfig,
+                    })
+                }
+            }
         }
     }
 

@@ -10,7 +10,7 @@ object DefaultDashboards {
         userScope = DashboardContextUserScope.BUILT_IN,
         layoutKey = DashboardLayouts.defaultLayout.key,
         widgets = listOf(
-            LastActiveProjectsWidget().toDefaultInstance(),
+            WidgetInstance.fromDefaultWidget("0", LastActiveProjectsWidget())
         )
     )
 

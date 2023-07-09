@@ -4,12 +4,14 @@ import {projectLink} from "@components/common/Links";
 
 const {Meta} = Card;
 
-export default function ProjectBox({project}) {
+export default function ProjectBox({project, displayFavourite = true}) {
     return (
         <>
             <Card>
                 <Meta
-                    avatar={<Favourite value={project.favourite}/>}
+                    avatar={
+                        displayFavourite ? <Favourite value={project.favourite}/> : undefined
+                    }
                     title={projectLink(project)}
                 />
             </Card>

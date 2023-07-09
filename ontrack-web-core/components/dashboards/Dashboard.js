@@ -4,6 +4,7 @@ import LayoutContextProvider from "@components/dashboards/layouts/LayoutContext"
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
+import SelectableWidget from "@components/dashboards/widgets/SelectableWidget";
 
 export default function Dashboard() {
 
@@ -36,6 +37,7 @@ export default function Dashboard() {
     }
 
     const [layouts, setLayouts] = useState([])
+    const [availableWidgets, setAvailableWidgets] = useState([])
     useEffect(() => {
         graphQLCall(gql`
             query DashboardLayouts {
@@ -44,9 +46,16 @@ export default function Dashboard() {
                     label: name
                     description
                 }
+                dashboardWidgets {
+                    key
+                    name
+                    description
+                    defaultConfig
+                }
             }
         `).then(data => {
             setLayouts(data.dashboardLayouts)
+            setAvailableWidgets(data.dashboardWidgets)
         })
     }, [])
 
@@ -62,6 +71,15 @@ export default function Dashboard() {
             type: 'changeLayout',
             layoutKey: key,
         })
+    }
+
+    const addWidget = (widgetDef) => {
+        return () => {
+            selectedDashboardDispatch({
+                type: 'addWidget',
+                widgetDef: widgetDef,
+            })
+        }
     }
 
     return (
@@ -105,6 +123,19 @@ export default function Dashboard() {
                                                         <Select options={layouts} onChange={onLayoutKeySelected}/>
                                                     </Form.Item>
                                                 </Form>
+                                                <p>Widgets</p>
+                                                <Row wrap gutter={[16, 16]}>
+                                                    {
+                                                        availableWidgets.map(availableWidget =>
+                                                            <Col span={12} key={availableWidget.key}>
+                                                                <SelectableWidget
+                                                                    widgetDef={availableWidget}
+                                                                    addWidget={addWidget}
+                                                                />
+                                                            </Col>
+                                                        )
+                                                    }
+                                                </Row>
                                             </Space>
                                         </Col>
                                     </Row>
