@@ -115,6 +115,8 @@ extend type Mutation {
     shareDashboard(input: ShareDashboardInput!): ShareDashboardPayload
     """Deletes a dashboard"""
     deleteDashboard(input: DeleteDashboardInput!): DeletionPayload
+    """Selects a dashboard"""
+    selectDashboard(input: SelectDashboardInput!): SelectDashboardPayload
 }
 
 input WidgetInstanceInput {
@@ -149,6 +151,11 @@ input DeleteDashboardInput {
     uuid: String!
 }
 
+input SelectDashboardInput {
+    """UUID of the dashboard to select"""
+    uuid: String!
+}
+
 type ShareDashboardPayload implements PayloadInterface {
     "List of errors"
     errors: [PayloadUserError]
@@ -157,6 +164,11 @@ type ShareDashboardPayload implements PayloadInterface {
 }
 
 type DeletionPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
+}
+
+type SelectDashboardPayload implements PayloadInterface {
     "List of errors"
     errors: [PayloadUserError]
 }

@@ -3007,6 +3007,8 @@ type Mutation {
     reloadCasc: ReloadCascPayload
     "Saves a dashboard"
     saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
+    "Selects a dashboard"
+    selectDashboard(input: SelectDashboardInput!): SelectDashboardPayload
     "Sets the auto versioning configuration for a branch"
     setAutoVersioningConfig(
         "Input for the mutation"
@@ -4765,6 +4767,11 @@ type SearchResultType {
     id: String
     "Display name for the search result"
     name: String
+}
+
+type SelectDashboardPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
 }
 
 "Service configuration or data associated with an ID"
@@ -7262,6 +7269,11 @@ input SaveDashboardInput {
     userScope: DashboardContextUserScope!
     uuid: String
     widgets: [WidgetInstanceInput!]!
+}
+
+input SelectDashboardInput {
+    "UUID of the dashboard to select"
+    uuid: String!
 }
 
 "Input type for the setAutoVersioningConfigByName mutation."

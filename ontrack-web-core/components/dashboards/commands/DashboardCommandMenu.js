@@ -4,6 +4,8 @@ import {FaCheck, FaCopy, FaEdit, FaLock, FaPlus, FaTrash, FaUserLock, FaUsers, F
 import {useContext, useEffect, useState} from "react";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 import {UserContext} from "@components/providers/UserProvider";
+import graphQLCall from "@client/graphQLCall";
+import {selectDashboardQuery} from "@components/dashboards/DashboardConstants";
 
 export default function DashboardCommandMenu() {
 
@@ -15,6 +17,7 @@ export default function DashboardCommandMenu() {
     const selectDashboard = (dashboard) => {
         return () => {
             selectedDashboardDispatch({type: 'init', selectedDashboard: dashboard})
+            graphQLCall(selectDashboardQuery, {uuid: dashboard.uuid})
         }
     }
 

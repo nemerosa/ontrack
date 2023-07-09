@@ -101,3 +101,13 @@ export const loadDashboardsQuery = gql`
         }
     }
 `
+
+export const selectDashboardQuery = gql`
+    mutation SelectDashboard($uuid: String!) {
+        selectDashboard(input: {uuid: $uuid}) {
+            errors {
+                message
+            }
+        }
+    }
+`

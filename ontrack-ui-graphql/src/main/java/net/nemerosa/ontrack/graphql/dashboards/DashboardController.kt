@@ -59,4 +59,13 @@ class DashboardController(
             DeletionPayload(any.toPayloadErrors())
         }
 
+    @MutationMapping
+    fun selectDashboard(@Argument input: SelectDashboardInput): SelectDashboardPayload =
+        try {
+            dashboardService.selectDashboard(input.uuid)
+            SelectDashboardPayload()
+        } catch (any: UserException) {
+            SelectDashboardPayload(any.toPayloadErrors())
+        }
+
 }
