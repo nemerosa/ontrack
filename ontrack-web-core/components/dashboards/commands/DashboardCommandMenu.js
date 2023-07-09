@@ -1,6 +1,6 @@
 import {Button, Dropdown, Space, Typography} from "antd";
 import {Command} from "@components/common/Commands";
-import {FaCheck, FaCopy, FaEdit, FaLock, FaUserLock, FaUsers, FaWindowRestore} from "react-icons/fa";
+import {FaCheck, FaCopy, FaEdit, FaLock, FaPlus, FaUserLock, FaUsers, FaWindowRestore} from "react-icons/fa";
 import {useContext, useEffect, useState} from "react";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 
@@ -24,6 +24,12 @@ export default function DashboardCommandMenu() {
     const editDashboard = () => {
         return () => {
             selectedDashboardDispatch({type: 'edit'})
+        }
+    }
+
+    const createDashboard = () => {
+        return () => {
+            selectedDashboardDispatch({type: 'create'})
         }
     }
 
@@ -98,6 +104,21 @@ export default function DashboardCommandMenu() {
                     icon={<FaCopy/>}
                     text="Clone current dashboard"
                     action={cloneDashboard()}
+                />
+            )
+        })
+
+        // Separator
+        menu.push({type: 'divider'})
+
+        // New dashbard
+        menu.push({
+            key: 'new',
+            label: (
+                <Command
+                    icon={<FaPlus/>}
+                    text="Create a new dashboard"
+                    action={createDashboard()}
                 />
             )
         })

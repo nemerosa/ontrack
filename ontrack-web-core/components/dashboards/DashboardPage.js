@@ -67,6 +67,24 @@ export default function DashboardPage({
                 // Not changing the selected dashboard for now, just opening the dialog
                 return selectedDashboard
             }
+            case 'create': {
+                setCopyEditionDashboard({
+                    ...selectedDashboard,
+                    editionMode: false,
+                    widgets: selectedDashboard.widgets.map(widget => ({
+                        ...widget,
+                        editionMode: false,
+                    }))
+                })
+                return {
+                    uuid: '',
+                    name: `New dashboard #${dashboards.length + 1}`,
+                    userScope: 'PRIVATE',
+                    layoutKey: 'Default',
+                    widgets: [],
+                    editionMode: true,
+                }
+            }
             case 'edit': {
                 setCopyEditionDashboard({
                     ...selectedDashboard,
