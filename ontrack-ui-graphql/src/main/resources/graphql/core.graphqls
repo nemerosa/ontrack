@@ -63,6 +63,13 @@ type WidgetInstance {
     config: JSON!
 }
 
+type Widget {
+    key: String!
+    name: String!
+    description: String!
+    defaultConfig: JSON!
+}
+
 enum DashboardContextUserScope {
     PRIVATE
     SHARED
@@ -90,6 +97,8 @@ extend type Query {
     userDashboards: [Dashboard!]!
     """List of available layouts"""
     dashboardLayouts: [DashboardLayout!]!
+    """List of available widgets"""
+    dashboardWidgets: [Widget!]!
 }
 
 extend type Mutation {
