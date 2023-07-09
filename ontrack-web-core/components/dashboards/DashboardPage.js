@@ -39,12 +39,11 @@ export default function DashboardPage({
                 return action.selectedDashboard
             }
             case 'clone': {
-                // Copying the current context
                 const copy = {
-                    ...action.dashboard,
+                    ...selectedDashboard,
                     uuid: '',
-                    name: `Copy of ${action.dashboard.name}`,
-                    widgets: action.dashboard.widgets.map(widget => ({
+                    name: `Copy of ${selectedDashboard.name}`,
+                    widgets: selectedDashboard.widgets.map(widget => ({
                         ...widget,
                         uuid: ''
                     }))
@@ -53,6 +52,18 @@ export default function DashboardPage({
                 cloneDashboardDialog.start(copy)
                 // Not changing the selected dashboard for now, just opening the dialog
                 return selectedDashboard
+            }
+            case 'edit': {
+                return {
+                    ...selectedDashboard,
+                    editionMode: true,
+                }
+            }
+            case 'stopEdition': {
+                return {
+                    ...selectedDashboard,
+                    editionMode: false
+                }
             }
         }
     }

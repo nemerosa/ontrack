@@ -15,9 +15,15 @@ export default function DashboardCommandMenu() {
         }
     }
 
-    const cloneDashboard = (dashboard) => {
+    const cloneDashboard = () => {
         return () => {
-            selectedDashboardDispatch({type: 'clone', dashboard: dashboard})
+            selectedDashboardDispatch({type: 'clone'})
+        }
+    }
+
+    const editDashboard = () => {
+        return () => {
+            selectedDashboardDispatch({type: 'edit'})
         }
     }
 
@@ -54,24 +60,13 @@ export default function DashboardCommandMenu() {
                 text = <Typography.Text>{dashboard.name}</Typography.Text>
             }
 
-            // List of commands for this entry
-            const commands = []
-            // Cloning this entry
-            commands.push(<FaCopy
-                key="clone"
-                onClick={cloneDashboard(dashboard)}
-            />)
-
             // Menu entry
             menu.push({
                 key: dashboard.uuid,
                 label: (
                     <Command
                         icon={icon}
-                        text={<Space size={8}>
-                            {text}
-                            {commands}
-                        </Space>}
+                        text={text}
                         action={selectDashboard(dashboard)}
                     />
                 )
@@ -81,6 +76,20 @@ export default function DashboardCommandMenu() {
         // Separator
         menu.push({type: 'divider'})
 
+        // Editing current
+        if (selectedDashboard && selectedDashboard.userScope !== 'BUILT_IN') {
+            menu.push({
+                key: 'edit',
+                label: (
+                    <Command
+                        icon={<FaEdit/>}
+                        text="Edit current dashboard"
+                        action={editDashboard()}
+                    />
+                )
+            })
+        }
+
         // Cloning current
         menu.push({
             key: 'clone',
@@ -88,7 +97,7 @@ export default function DashboardCommandMenu() {
                 <Command
                     icon={<FaCopy/>}
                     text="Clone current dashboard"
-                    action={cloneDashboard(selectedDashboard)}
+                    action={cloneDashboard()}
                 />
             )
         })

@@ -6,13 +6,7 @@ import {DashboardContext, DashboardDispatchContext} from "@components/dashboards
 export default function Dashboard() {
 
     const {selectedDashboard} = useContext(DashboardContext)
-    // const dashboardDispatch = useContext(DashboardDispatchContext)
-    //
-    // const onStopEdition = () => {
-    //     dashboardDispatch({
-    //         type: 'cancelEdition',
-    //     })
-    // }
+    const selectedDashboardDispatch = useContext(DashboardDispatchContext)
 
     const importLayout = layoutKey => lazy(() =>
         import(`./layouts/${layoutKey}Layout`)
@@ -31,6 +25,10 @@ export default function Dashboard() {
         }
     }, [selectedDashboard])
 
+    const onStopEdition = () => {
+        selectedDashboardDispatch({type: 'stopEdition'})
+    }
+
     return (
         <>
             {
@@ -38,6 +36,16 @@ export default function Dashboard() {
                     <Space direction="vertical" style={{
                         width: '100%'
                     }}>
+                        {
+                            selectedDashboard.editionMode &&
+                            <Alert
+                                type="warning"
+                                message="Dashboard in edition mode."
+                                action={
+                                    <Button size="small" danger onClick={onStopEdition}>Close edition</Button>
+                                }
+                            />
+                        }
                         <div>
                             <LayoutContextProvider>
                                 {loadedLayout}
