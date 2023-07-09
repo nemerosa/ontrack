@@ -5,18 +5,29 @@ import {gql} from "graphql-request";
 export const WidgetContext = createContext(null)
 export const WidgetDispatchContext = createContext(null)
 
-export const widgetReducer = (widget, action) => {
+export const widgetReducer = (widgetContext, action) => {
     switch (action.type) {
         case 'edit': {
             return {
-                ...widget,
+                ...widgetContext,
                 editionMode: true,
             }
         }
         case 'cancel': {
-            widget.editionForm.resetFields()
+            widgetContext.editionForm.resetFields()
             return {
-                ...widget,
+                ...widgetContext,
+                editionMode: false,
+            }
+        }
+        case 'done': {
+            widgetContext.editionForm.resetFields()
+            return {
+                ...widgetContext,
+                widget: {
+                    ...widgetContext.widget,
+                    config: action.config,
+                },
                 editionMode: false,
             }
         }
@@ -28,66 +39,13 @@ export const widgetReducer = (widget, action) => {
 
 export const widgetFormSubmit = async (widgetContext, widgetDispatch, dashboardDispatch) => {
     const values = await widgetContext.editionForm.validateFields()
-
-    if (widgetContext.dashboard.builtIn) {
-        // Saving as a new dashboard
-        //
-        // We need to create a copy of the current dashboard
-        // and start the "save" process
-        //
-        // This can be done using the dashboard dispatch
-        dashboardDispatch({
-            type: 'save-as',
-            widget: {
-                uuid: widgetContext.widget.uuid,
-                config: values,
-            },
-            message: "You cannot save a widget configuration on a built-in dashboard and you need to create a new dashboard.",
-        })
-    } else {
-        dashboardDispatch({
-            type: 'save',
-            widget: {
-                uuid: widgetContext.widget.uuid,
-                config: values,
-            },
-        })
-    }
-
-    // const variables = {
-    //     dashboardKey: widgetContext.dashboard.key,
-    //     widgetUuid: widgetContext.widget.uuid,
-    //     config: values,
-    // }
-    // const data = await graphQLCall(
-    //     gql`
-    //         mutation UpdateWidgetConfig(
-    //             $dashboardKey: String!,
-    //             $widgetUuid: String!,
-    //             $config: JSON!,
-    //         ) {
-    //             updateWidgetConfig(input: {
-    //                 dashboardKey: $dashboardKey,
-    //                 widgetUuid: $widgetUuid,
-    //                 config: $config,
-    //             }) {
-    //                 errors {
-    //                     message
-    //                     exception
-    //                 }
-    //                 widget {
-    //                     uuid
-    //                     key
-    //                     config
-    //                 }
-    //             }
-    //         }
-    //     `, variables
-    // )
-    // const errors = getUserErrors(data.xxx)
-    // if (errors) {
-    //     // TODO Displays the errors form through a reducer action
-    // } else {
-    //     // TODO Refreshing the widget
-    // }
+    dashboardDispatch({
+        type: 'saveWidgetConfig',
+        widget: widgetContext.widget,
+        config: values,
+    })
+    widgetDispatch({
+        type: 'done',
+        config: values,
+    })
 }

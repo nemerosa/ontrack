@@ -1,5 +1,5 @@
 import {lazy, Suspense, useContext, useEffect, useState} from "react";
-import {Alert, Button, Col, Form, Row, Select, Skeleton, Space, Typography} from "antd";
+import {Alert, Button, Col, Form, Row, Select, Skeleton, Space, Tooltip, Typography} from "antd";
 import LayoutContextProvider from "@components/dashboards/layouts/LayoutContext";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 import graphQLCall from "@client/graphQLCall";
@@ -29,6 +29,10 @@ export default function Dashboard() {
 
     const onStopEdition = () => {
         selectedDashboardDispatch({type: 'stopEdition'})
+    }
+
+    const onSaveEdition = () => {
+        selectedDashboardDispatch({type: 'saveEdition'})
     }
 
     const [layouts, setLayouts] = useState([])
@@ -67,35 +71,41 @@ export default function Dashboard() {
                     <Space direction="vertical" style={{
                         width: '100%'
                     }}>
-                        {
-                            selectedDashboard.editionMode &&
-                            <Alert
-                                type="warning"
-                                message="Dashboard in edition mode."
-                                action={
-                                    <Button size="small" danger onClick={onStopEdition}>Close edition</Button>
-                                }
-                            />
-                        }
                         <div>
                             <LayoutContextProvider>
                                 {!selectedDashboard.editionMode && loadedLayout}
                                 {
-                                    selectedDashboard.editionMode && <Row>
+                                    selectedDashboard.editionMode &&
+                                    <Row>
                                         <Col span={18}>
                                             {loadedLayout}
                                         </Col>
                                         <Col span={6} style={{
-                                            padding: '16px'
+                                            paddingLeft: '8px',
+                                            paddingRight: '8px'
                                         }}>
-                                            <Form
-                                                layout="vertical"
-                                                form={form}
-                                            >
-                                                <Form.Item name="layoutKey" label="Layout">
-                                                    <Select options={layouts} onChange={onLayoutKeySelected}/>
-                                                </Form.Item>
-                                            </Form>
+                                            <Space direction="vertical">
+                                                <Alert
+                                                    type="warning"
+                                                    message="Dashboard in edition mode."
+                                                    action={
+                                                        <Space>
+                                                            <Button size="small" type="primary" onClick={onSaveEdition}>Save
+                                                                dashboard</Button>
+                                                            <Button size="small" danger onClick={onStopEdition}>Cancel
+                                                                changes</Button>
+                                                        </Space>
+                                                    }
+                                                />
+                                                <Form
+                                                    layout="vertical"
+                                                    form={form}
+                                                >
+                                                    <Form.Item name="layoutKey" label="Layout">
+                                                        <Select options={layouts} onChange={onLayoutKeySelected}/>
+                                                    </Form.Item>
+                                                </Form>
+                                            </Space>
                                         </Col>
                                     </Row>
                                 }

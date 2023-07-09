@@ -5,32 +5,43 @@ import {DashboardContext, DashboardDispatchContext} from "@components/dashboards
 import {useEffect, useReducer, useState} from "react";
 import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
-import CloneDashboardDialog, {useCloneDashboardDialog} from "@components/dashboards/commands/CloneDashboardDialog";
+import SaveDashboardDialog, {useSaveDashboardDialog} from "@components/dashboards/commands/SaveDashboardDialog";
+import {saveDashboardQuery} from "@components/dashboards/DashboardConstants";
 
 export default function DashboardPage({
                                           title,
                                       }) {
 
-    const cloneDashboardDialog = useCloneDashboardDialog({
-        onSuccess: (result) => {
-            graphQLCall(gql`
-                query ReloadDashboards {
-                    userDashboards {
+    const reloadDashboards = (newSelection) => {
+        graphQLCall(gql`
+            query ReloadDashboards {
+                userDashboards {
+                    uuid
+                    name
+                    userScope
+                    layoutKey
+                    widgets {
                         uuid
-                        name
-                        userScope
-                        layoutKey
-                        widgets {
-                            uuid
-                            key
-                            config
-                        }
+                        key
+                        config
                     }
                 }
-            `).then(data => {
-                setDashboards(data.userDashboards)
-                selectedDashboardDispatch({type: 'init', selectedDashboard: result.dashboard})
+            }
+        `).then(data => {
+            setDashboards(data.userDashboards)
+            selectedDashboardDispatch({
+                type: 'init',
+                selectedDashboard: {
+                    ...newSelection,
+                    editionMode: false,
+                }
             })
+        })
+    }
+
+    const saveDashboardDialog = useSaveDashboardDialog({
+        onSuccess: (result) => {
+            reloadDashboards(result.dashboard)
         }
     })
 
@@ -52,7 +63,7 @@ export default function DashboardPage({
                     }))
                 }
                 // Opening the dialog
-                cloneDashboardDialog.start(copy)
+                saveDashboardDialog.start(copy)
                 // Not changing the selected dashboard for now, just opening the dialog
                 return selectedDashboard
             }
@@ -72,14 +83,49 @@ export default function DashboardPage({
             }
             case 'stopEdition': {
                 return {
-                    ...selectedDashboard,
-                    editionMode: false
+                    ...copyEditionDashboard,
+                    editionMode: false,
+                    widgets: copyEditionDashboard.widgets.map(widget => ({
+                        ...widget,
+                        editionMode: false,
+                    }))
                 }
             }
             case 'changeLayout': {
                 return {
                     ...selectedDashboard,
                     layoutKey: action.layoutKey,
+                }
+            }
+            case 'saveEdition': {
+                if (selectedDashboard.uuid) {
+                    graphQLCall(saveDashboardQuery, {
+                        uuid: selectedDashboard.uuid,
+                        name: selectedDashboard.name,
+                        userScope: selectedDashboard.userScope,
+                        layoutKey: selectedDashboard.layoutKey,
+                        widgets: selectedDashboard.widgets,
+                    }).then(() => {
+                        reloadDashboards(selectedDashboard)
+                    })
+                } else {
+                    saveDashboardDialog.start(selectedDashboard)
+                }
+                return selectedDashboard
+            }
+            case 'saveWidgetConfig': {
+                return {
+                    ...selectedDashboard,
+                    widgets: selectedDashboard.widgets.map(widget => {
+                        if (widget.uuid === action.widget.uuid) {
+                            return {
+                                ...widget,
+                                config: action.config,
+                            }
+                        } else {
+                            return widget
+                        }
+                    })
                 }
             }
         }
@@ -129,7 +175,7 @@ export default function DashboardPage({
         <>
             <DashboardContext.Provider value={{dashboards, selectedDashboard}}>
                 <DashboardDispatchContext.Provider value={selectedDashboardDispatch}>
-                    <CloneDashboardDialog cloneDashboardDialog={cloneDashboardDialog}/>
+                    <SaveDashboardDialog saveDashboardDialog={saveDashboardDialog}/>
                     <MainPage
                         title={title}
                         breadcrumbs={[]}

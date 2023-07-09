@@ -54,8 +54,8 @@ export default function LastActiveProjectsWidget({count}) {
                         }
                     `
                 }
-                queryDeps={[user, projectsRefreshCount]}
-                variables={{}}
+                queryDeps={[user, count, projectsRefreshCount]}
+                variables={{count}}
                 setData={data => setProjects(data.lastActiveProjects)}
                 getCommands={projects => getCommands(projects)}
                 form={<LastActiveProjectsWidgetForm count={count}/>}

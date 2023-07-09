@@ -4,12 +4,13 @@ import {saveDashboardQuery} from "@components/dashboards/DashboardConstants";
 import {useContext} from "react";
 import {UserContext} from "@components/providers/UserProvider";
 
-export function useCloneDashboardDialog(config) {
+export function useSaveDashboardDialog(config) {
     return useFormDialog({
         ...config,
         init: (form, copy) => {
             form.setFieldsValue({
                 name: copy.name,
+                userScope: copy.userScope,
             })
         },
         prepareValues: (values, copy) => {
@@ -22,7 +23,7 @@ export function useCloneDashboardDialog(config) {
         userNode: 'saveDashboard',
     })
 }
-export default function CloneDashboardDialog({cloneDashboardDialog}) {
+export default function SaveDashboardDialog({saveDashboardDialog}) {
 
     const user = useContext(UserContext)
 
@@ -41,7 +42,7 @@ export default function CloneDashboardDialog({cloneDashboardDialog}) {
 
     return (
         <>
-            <FormDialog dialog={cloneDashboardDialog}>
+            <FormDialog dialog={saveDashboardDialog}>
                 <Form.Item name="name"
                            label="Name"
                            rules={[
