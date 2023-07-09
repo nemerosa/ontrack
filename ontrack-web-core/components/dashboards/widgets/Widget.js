@@ -1,8 +1,8 @@
-import {Card, Skeleton, Space, Typography} from "antd";
-import {useContext, useState} from "react";
+import {Card, Skeleton, Space} from "antd";
+import {useContext} from "react";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 import WidgetCommand from "@components/dashboards/commands/WidgetCommand";
-import {FaRegEdit, FaRegSave, FaWindowClose} from "react-icons/fa";
+import {FaRegEdit, FaRegSave, FaTrash, FaWindowClose} from "react-icons/fa";
 import {WidgetContext, WidgetDispatchContext, widgetFormSubmit} from "@components/dashboards/widgets/WidgetContext";
 
 export default function Widget({title, loading, commands, form, children}) {
@@ -31,6 +31,15 @@ export default function Widget({title, loading, commands, form, children}) {
                                 icon={<FaRegEdit/>}
                                 onAction={() => widgetDispatch({
                                     type: 'edit'
+                                })}
+                            />
+                            <WidgetCommand
+                                condition={!widgetContext.editionMode}
+                                title="Remove this widget from the dashboard"
+                                icon={<FaTrash/>}
+                                onAction={() => selectedDashboardDispatch({
+                                    type: 'deleteWidget',
+                                    widgetUuid: widgetContext.widget.uuid,
                                 })}
                             />
                             <WidgetCommand

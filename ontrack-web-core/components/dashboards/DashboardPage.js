@@ -156,6 +156,12 @@ export default function DashboardPage({
                     })
                 }
             }
+            case 'deleteWidget': {
+                return {
+                    ...selectedDashboard,
+                    widgets: selectedDashboard.widgets.filter(widget => widget.uuid !== action.widgetUuid)
+                }
+            }
         }
     }
 
