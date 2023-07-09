@@ -2,9 +2,7 @@ package net.nemerosa.ontrack.graphql.dashboards
 
 import net.nemerosa.ontrack.common.UserException
 import net.nemerosa.ontrack.graphql.payloads.toPayloadErrors
-import net.nemerosa.ontrack.model.dashboards.Dashboard
-import net.nemerosa.ontrack.model.dashboards.DashboardService
-import net.nemerosa.ontrack.model.dashboards.SaveDashboardInput
+import net.nemerosa.ontrack.model.dashboards.*
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.MutationMapping
 import org.springframework.graphql.data.method.annotation.QueryMapping
@@ -20,6 +18,9 @@ class DashboardController(
 
     @QueryMapping
     fun userDashboards(): List<Dashboard> = dashboardService.userDashboards()
+
+    @QueryMapping
+    fun dashboardLayouts(): List<DashboardLayout> = DashboardLayouts.layouts
 
     @MutationMapping
     fun saveDashboard(@Argument input: SaveDashboardInput): SaveDashboardPayload =

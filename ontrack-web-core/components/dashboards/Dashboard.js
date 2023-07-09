@@ -1,7 +1,9 @@
 import {lazy, Suspense, useContext, useEffect, useState} from "react";
-import {Alert, Button, Skeleton, Space, Typography} from "antd";
+import {Alert, Button, Col, Form, Row, Select, Skeleton, Space, Typography} from "antd";
 import LayoutContextProvider from "@components/dashboards/layouts/LayoutContext";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
+import graphQLCall from "@client/graphQLCall";
+import {gql} from "graphql-request";
 
 export default function Dashboard() {
 
@@ -29,6 +31,35 @@ export default function Dashboard() {
         selectedDashboardDispatch({type: 'stopEdition'})
     }
 
+    const [layouts, setLayouts] = useState([])
+    useEffect(() => {
+        graphQLCall(gql`
+            query DashboardLayouts {
+                dashboardLayouts {
+                    value: key
+                    label: name
+                    description
+                }
+            }
+        `).then(data => {
+            setLayouts(data.dashboardLayouts)
+        })
+    }, [])
+
+    const [form] = Form.useForm()
+    useEffect(() => {
+        if (selectedDashboard) {
+            form.setFieldValue("layoutKey", selectedDashboard.layoutKey)
+        }
+    }, [selectedDashboard])
+
+    const onLayoutKeySelected = (key) => {
+        selectedDashboardDispatch({
+            type: 'changeLayout',
+            layoutKey: key,
+        })
+    }
+
     return (
         <>
             {
@@ -48,7 +79,26 @@ export default function Dashboard() {
                         }
                         <div>
                             <LayoutContextProvider>
-                                {loadedLayout}
+                                {!selectedDashboard.editionMode && loadedLayout}
+                                {
+                                    selectedDashboard.editionMode && <Row>
+                                        <Col span={18}>
+                                            {loadedLayout}
+                                        </Col>
+                                        <Col span={6} style={{
+                                            padding: '16px'
+                                        }}>
+                                            <Form
+                                                layout="vertical"
+                                                form={form}
+                                            >
+                                                <Form.Item name="layoutKey" label="Layout">
+                                                    <Select options={layouts} onChange={onLayoutKeySelected}/>
+                                                </Form.Item>
+                                            </Form>
+                                        </Col>
+                                    </Row>
+                                }
                             </LayoutContextProvider>
                         </div>
                     </Space>

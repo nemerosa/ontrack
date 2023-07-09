@@ -77,11 +77,19 @@ type Dashboard {
     widgets: [WidgetInstance!]!
 }
 
+type DashboardLayout {
+    key: String!
+    name: String!
+    description: String!
+}
+
 extend type Query {
     """Gets the current dashboard"""
     userDashboard: Dashboard!
     """Gets the list of private & shared dashboards"""
     userDashboards: [Dashboard!]!
+    """List of available layouts"""
+    dashboardLayouts: [DashboardLayout!]!
 }
 
 extend type Mutation {

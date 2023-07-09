@@ -900,6 +900,12 @@ type Dashboard {
     widgets: [WidgetInstance!]!
 }
 
+type DashboardLayout {
+    description: String!
+    key: String!
+    name: String!
+}
+
 type Decoration {
     "JSON representation of the decoration data"
     data: JSON
@@ -4234,6 +4240,8 @@ type Query {
         "Filter the indicators on their type ID"
         type: String
     ): [ConfigurableIndicatorTypeState!]!
+    "List of available layouts"
+    dashboardLayouts: [DashboardLayout!]!
     "Getting a project entity using its type and ID."
     entity(
         "ID of the entity"

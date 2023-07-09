@@ -33,6 +33,9 @@ export default function DashboardPage({
             })
         }
     })
+
+    const [copyEditionDashboard, setCopyEditionDashboard] = useState({})
+
     const selectedDashboardReducer = (selectedDashboard, action) => {
         switch (action.type) {
             case 'init': {
@@ -54,6 +57,14 @@ export default function DashboardPage({
                 return selectedDashboard
             }
             case 'edit': {
+                setCopyEditionDashboard({
+                    ...selectedDashboard,
+                    editionMode: false,
+                    widgets: selectedDashboard.widgets.map(widget => ({
+                        ...widget,
+                        editionMode: false,
+                    }))
+                })
                 return {
                     ...selectedDashboard,
                     editionMode: true,
@@ -63,6 +74,12 @@ export default function DashboardPage({
                 return {
                     ...selectedDashboard,
                     editionMode: false
+                }
+            }
+            case 'changeLayout': {
+                return {
+                    ...selectedDashboard,
+                    layoutKey: action.layoutKey,
                 }
             }
         }

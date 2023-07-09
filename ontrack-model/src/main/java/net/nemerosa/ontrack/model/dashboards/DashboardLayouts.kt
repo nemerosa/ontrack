@@ -20,10 +20,17 @@ object DashboardLayouts {
         "First widget takes the whole size, and is followed by three columns."
     )
 
+    val columns2 = DashboardLayout(
+        "Columns2",
+        "2 columns",
+        "Widgets spread on two columns."
+    )
+
     val layouts = listOf(
         defaultLayout,
         main2ChildrenLayout,
         main3ChildrenLayout,
+        columns2,
     )
 
 }
