@@ -33,3 +33,24 @@ export const saveDashboardQuery = gql`
         }
     }
 `
+
+export const shareDashboardQuery = gql`
+    mutation ShareDashboard($uuid: String!) {
+        shareDashboard(input: {uuid: $uuid}) {
+            errors {
+                message
+            }
+            dashboard {
+                uuid
+                name
+                userScope
+                layoutKey
+                widgets {
+                    uuid
+                    key
+                    config
+                }
+            }
+        }
+    }
+`

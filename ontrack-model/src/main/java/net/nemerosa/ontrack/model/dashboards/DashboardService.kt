@@ -17,4 +17,9 @@ interface DashboardService {
      */
     fun saveDashboard(input: SaveDashboardInput): Dashboard
 
+    /**
+     * Shares a dashboard
+     */
+    fun shareDashboard(input: ShareDashboardInput): Dashboard
+
 }

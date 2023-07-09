@@ -104,6 +104,8 @@ extend type Query {
 extend type Mutation {
     """Saves a dashboard"""
     saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
+    """Shares a dashboard"""
+    shareDashboard(input: ShareDashboardInput!): ShareDashboardPayload
 }
 
 input WidgetInstanceInput {
@@ -125,5 +127,17 @@ type SaveDashboardPayload implements PayloadInterface {
     "List of errors"
     errors: [PayloadUserError]
     """Saved dashboard"""
+    dashboard: Dashboard
+}
+
+input ShareDashboardInput {
+    """UUID of the dashboard to share"""
+    uuid: String!
+}
+
+type ShareDashboardPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
+    """Shared dashboard"""
     dashboard: Dashboard
 }

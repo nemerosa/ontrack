@@ -3383,6 +3383,8 @@ type Mutation {
         "Input for the mutation"
         input: SetupValidationStampInput
     ): SetupValidationStampPayload
+    "Shares a dashboard"
+    shareDashboard(input: ShareDashboardInput!): ShareDashboardPayload
     "Shares or updates a filter at project level"
     shareSCMFileChangeFilter(
         "Input for the mutation"
@@ -5387,6 +5389,13 @@ type SetupValidationStampPayload implements Payload {
     errors: [UserError]
     "Created or updated validation stamp"
     validationStamp: ValidationStamp
+}
+
+type ShareDashboardPayload implements PayloadInterface {
+    "Shared dashboard"
+    dashboard: Dashboard
+    "List of errors"
+    errors: [PayloadUserError]
 }
 
 "Output type for the shareSCMFileChangeFilter mutation."
@@ -8168,6 +8177,11 @@ input SetupValidationStampInput {
     project: String!
     "validation field"
     validation: String!
+}
+
+input ShareDashboardInput {
+    "UUID of the dashboard to share"
+    uuid: String!
 }
 
 "Input type for the shareSCMFileChangeFilter mutation."

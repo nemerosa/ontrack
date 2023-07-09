@@ -33,7 +33,7 @@ class DashboardStorageServiceImpl(
 
     override fun saveDashboard(dashboard: Dashboard): Dashboard {
         val userId = if (dashboard.userScope == DashboardContextUserScope.PRIVATE) {
-            securityService?.currentAccount?.id()
+            securityService.currentAccount?.id()
         } else {
             null
         }

@@ -3,11 +3,14 @@ import {Command} from "@components/common/Commands";
 import {FaCheck, FaCopy, FaEdit, FaLock, FaPlus, FaUserLock, FaUsers, FaWindowRestore} from "react-icons/fa";
 import {useContext, useEffect, useState} from "react";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
+import {UserContext} from "@components/providers/UserProvider";
 
 export default function DashboardCommandMenu() {
 
     const {dashboards, selectedDashboard} = useContext(DashboardContext)
     const selectedDashboardDispatch = useContext(DashboardDispatchContext)
+
+    const user = useContext(UserContext)
 
     const selectDashboard = (dashboard) => {
         return () => {
@@ -16,21 +19,19 @@ export default function DashboardCommandMenu() {
     }
 
     const cloneDashboard = () => {
-        return () => {
-            selectedDashboardDispatch({type: 'clone'})
-        }
+        selectedDashboardDispatch({type: 'clone'})
     }
 
     const editDashboard = () => {
-        return () => {
-            selectedDashboardDispatch({type: 'edit'})
-        }
+        selectedDashboardDispatch({type: 'edit'})
+    }
+
+    const shareDashboard = () => {
+        selectedDashboardDispatch({type: 'share'})
     }
 
     const createDashboard = () => {
-        return () => {
-            selectedDashboardDispatch({type: 'create'})
-        }
+        selectedDashboardDispatch({type: 'create'})
     }
 
     const [items, setItems] = useState([])
@@ -90,7 +91,21 @@ export default function DashboardCommandMenu() {
                     <Command
                         icon={<FaEdit/>}
                         text="Edit current dashboard"
-                        action={editDashboard()}
+                        action={editDashboard}
+                    />
+                )
+            })
+        }
+
+        // Sharing current
+        if (selectedDashboard && selectedDashboard.userScope === 'PRIVATE' && user.authorizations.dashboard?.share) {
+            menu.push({
+                key: 'share',
+                label: (
+                    <Command
+                        icon={<FaUsers/>}
+                        text="Share current dashboard"
+                        action={shareDashboard}
                     />
                 )
             })
@@ -103,7 +118,7 @@ export default function DashboardCommandMenu() {
                 <Command
                     icon={<FaCopy/>}
                     text="Clone current dashboard"
-                    action={cloneDashboard()}
+                    action={cloneDashboard}
                 />
             )
         })
@@ -111,20 +126,20 @@ export default function DashboardCommandMenu() {
         // Separator
         menu.push({type: 'divider'})
 
-        // New dashbard
+        // New dashboard
         menu.push({
             key: 'new',
             label: (
                 <Command
                     icon={<FaPlus/>}
                     text="Create a new dashboard"
-                    action={createDashboard()}
+                    action={createDashboard}
                 />
             )
         })
 
         setItems(menu)
-    }, [dashboards, selectedDashboard])
+    }, [dashboards, selectedDashboard, user])
 
     return (
         <>

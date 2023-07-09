@@ -6,7 +6,7 @@ import {useEffect, useReducer, useState} from "react";
 import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import SaveDashboardDialog, {useSaveDashboardDialog} from "@components/dashboards/commands/SaveDashboardDialog";
-import {saveDashboardQuery} from "@components/dashboards/DashboardConstants";
+import {saveDashboardQuery, shareDashboardQuery} from "@components/dashboards/DashboardConstants";
 
 export default function DashboardPage({
                                           title,
@@ -65,6 +65,14 @@ export default function DashboardPage({
                 // Opening the dialog
                 saveDashboardDialog.start(copy)
                 // Not changing the selected dashboard for now, just opening the dialog
+                return selectedDashboard
+            }
+            case 'share': {
+                graphQLCall(shareDashboardQuery, {
+                    uuid: selectedDashboard.uuid,
+                }).then(data => {
+                    reloadDashboards(data.shareDashboard.dashboard)
+                })
                 return selectedDashboard
             }
             case 'create': {

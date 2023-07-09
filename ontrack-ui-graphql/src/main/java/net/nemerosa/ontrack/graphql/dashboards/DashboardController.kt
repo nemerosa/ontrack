@@ -36,4 +36,12 @@ class DashboardController(
             SaveDashboardPayload(any.toPayloadErrors())
         }
 
+    @MutationMapping
+    fun shareDashboard(@Argument input: ShareDashboardInput): ShareDashboardPayload =
+        try {
+            ShareDashboardPayload(dashboard = dashboardService.shareDashboard(input))
+        } catch (any: UserException) {
+            ShareDashboardPayload(any.toPayloadErrors())
+        }
+
 }

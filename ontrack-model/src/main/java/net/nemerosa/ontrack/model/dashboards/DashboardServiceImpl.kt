@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.model.dashboards
 import net.nemerosa.ontrack.model.preferences.PreferencesService
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Service
-import java.util.UUID
+import java.util.*
 
 @Service
 class DashboardServiceImpl(
@@ -35,6 +35,22 @@ class DashboardServiceImpl(
         list.sortBy { it.name }
         // OK
         return list
+    }
+
+    override fun shareDashboard(input: ShareDashboardInput): Dashboard {
+        // Checking the rights
+        securityService.checkGlobalFunction(DashboardSharing::class.java)
+        val userId = securityService.currentAccount?.account?.id!!
+        // Gets the existing dashboard
+        val existing = dashboardStorageService.findDashboardsByUser(userId)
+            .find { it.uuid == input.uuid }
+            ?: throw DashboardUuidNotFoundException(input.uuid)
+        // Checks the scope is private
+        check(existing.userScope == DashboardContextUserScope.PRIVATE) {
+            "Expected private dashboard."
+        }
+        // Updating
+        return dashboardStorageService.saveDashboard(existing.share())
     }
 
     override fun saveDashboard(input: SaveDashboardInput): Dashboard {
