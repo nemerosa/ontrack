@@ -8,7 +8,7 @@ import {WidgetContext, WidgetDispatchContext, widgetFormSubmit} from "@component
 export default function Widget({title, loading, commands, form, children}) {
 
     const {selectedDashboard} = useContext(DashboardContext)
-    // const dashboardDispatch = useContext(DashboardDispatchContext)
+    const selectedDashboardDispatch = useContext(DashboardDispatchContext)
     const widgetContext = useContext(WidgetContext)
     const widgetDispatch = useContext(WidgetDispatchContext)
 
@@ -23,32 +23,32 @@ export default function Widget({title, loading, commands, form, children}) {
             }}
             extra={
                 <>
-                    {/*{*/}
-                    {/*    selectedDashboard.editionMode && <Space size={8}>*/}
-                    {/*        <WidgetCommand*/}
-                    {/*            condition={!widgetContext.editionMode}*/}
-                    {/*            title="Edit the content of this widget"*/}
-                    {/*            icon={<FaRegEdit/>}*/}
-                    {/*            onAction={() => widgetDispatch({*/}
-                    {/*                type: 'edit'*/}
-                    {/*            })}*/}
-                    {/*        />*/}
-                    {/*        <WidgetCommand*/}
-                    {/*            condition={widgetContext.editionMode}*/}
-                    {/*            title="Saves the changes for this widget"*/}
-                    {/*            icon={<FaRegSave/>}*/}
-                    {/*            onAction={() => widgetFormSubmit(widgetContext, widgetDispatch, dashboardDispatch)}*/}
-                    {/*        />*/}
-                    {/*        <WidgetCommand*/}
-                    {/*            condition={widgetContext.editionMode}*/}
-                    {/*            title="Cancels the changes for this widget"*/}
-                    {/*            icon={<FaWindowClose/>}*/}
-                    {/*            onAction={() => widgetDispatch({*/}
-                    {/*                type: 'cancel'*/}
-                    {/*            })}*/}
-                    {/*        />*/}
-                    {/*    </Space>*/}
-                    {/*}*/}
+                    {
+                        selectedDashboard.editionMode && <Space size={8}>
+                            <WidgetCommand
+                                condition={!widgetContext.editionMode}
+                                title="Edit the content of this widget"
+                                icon={<FaRegEdit/>}
+                                onAction={() => widgetDispatch({
+                                    type: 'edit'
+                                })}
+                            />
+                            <WidgetCommand
+                                condition={widgetContext.editionMode}
+                                title="Saves the changes for this widget"
+                                icon={<FaRegSave/>}
+                                onAction={() => widgetFormSubmit(widgetContext, widgetDispatch, selectedDashboardDispatch)}
+                            />
+                            <WidgetCommand
+                                condition={widgetContext.editionMode}
+                                title="Cancels the changes for this widget"
+                                icon={<FaWindowClose/>}
+                                onAction={() => widgetDispatch({
+                                    type: 'cancel'
+                                })}
+                            />
+                        </Space>
+                    }
                     {
                         !selectedDashboard.editionMode && commands && <Space size={8}>
                             {

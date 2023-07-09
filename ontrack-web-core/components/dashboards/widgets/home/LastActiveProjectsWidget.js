@@ -7,6 +7,7 @@ import {FaPlus} from "react-icons/fa";
 import WidgetCommand from "@components/dashboards/commands/WidgetCommand";
 import NewProjectDialog, {useNewProjectDialog} from "@components/projects/NewProjectDialog";
 import {UserContext} from "@components/providers/UserProvider";
+import LastActiveProjectsWidgetForm from "@components/dashboards/widgets/home/LastActiveProjectsWidgetForm";
 
 export default function LastActiveProjectsWidget({count}) {
 
@@ -57,6 +58,7 @@ export default function LastActiveProjectsWidget({count}) {
                 variables={{}}
                 setData={data => setProjects(data.lastActiveProjects)}
                 getCommands={projects => getCommands(projects)}
+                form={<LastActiveProjectsWidgetForm count={count}/>}
             >
                 <Space direction="horizontal" size={16} wrap>
                     {projects.map(project => <ProjectBox key={project.id} project={project}/>)}
