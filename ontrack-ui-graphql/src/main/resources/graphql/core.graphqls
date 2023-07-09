@@ -76,12 +76,19 @@ enum DashboardContextUserScope {
     BUILT_IN
 }
 
+type DashboardAuthorizations {
+    edit: Boolean!
+    share: Boolean!
+    delete: Boolean!
+}
+
 type Dashboard {
     uuid: String!
     name: String!
     userScope: DashboardContextUserScope!
     layoutKey: String!
     widgets: [WidgetInstance!]!
+    authorizations: DashboardAuthorizations!
 }
 
 type DashboardLayout {
@@ -106,6 +113,8 @@ extend type Mutation {
     saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
     """Shares a dashboard"""
     shareDashboard(input: ShareDashboardInput!): ShareDashboardPayload
+    """Deletes a dashboard"""
+    deleteDashboard(input: DeleteDashboardInput!): DeletionPayload
 }
 
 input WidgetInstanceInput {
@@ -135,9 +144,19 @@ input ShareDashboardInput {
     uuid: String!
 }
 
+input DeleteDashboardInput {
+    """UUID of the dashboard to delete"""
+    uuid: String!
+}
+
 type ShareDashboardPayload implements PayloadInterface {
     "List of errors"
     errors: [PayloadUserError]
     """Shared dashboard"""
     dashboard: Dashboard
+}
+
+type DeletionPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
 }

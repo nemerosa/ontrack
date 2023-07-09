@@ -6,7 +6,13 @@ import {useEffect, useReducer, useState} from "react";
 import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import SaveDashboardDialog, {useSaveDashboardDialog} from "@components/dashboards/commands/SaveDashboardDialog";
-import {saveDashboardQuery, shareDashboardQuery} from "@components/dashboards/DashboardConstants";
+import {
+    deleteDashboardQuery,
+    loadDashboardsQuery,
+    saveDashboardQuery,
+    shareDashboardQuery
+} from "@components/dashboards/DashboardConstants";
+import {Modal} from "antd";
 
 export default function DashboardPage({
                                           title,
@@ -72,6 +78,28 @@ export default function DashboardPage({
                     uuid: selectedDashboard.uuid,
                 }).then(data => {
                     reloadDashboards(data.shareDashboard.dashboard)
+                })
+                return selectedDashboard
+            }
+            case 'delete': {
+                Modal.confirm({
+                    title: "Deleting a dashboard",
+                    content: `Do you really want to delete the "${selectedDashboard.name}" dashboard?`,
+                    okText: "Delete",
+                    okType: "danger",
+                    onOk: () => {
+                        return graphQLCall(deleteDashboardQuery, {
+                            uuid: selectedDashboard.uuid,
+                        }).then(() => {
+                            return graphQLCall(loadDashboardsQuery)
+                        }).then(data => {
+                            setDashboards(data.userDashboards)
+                            selectedDashboardDispatch({
+                                type: 'init',
+                                selectedDashboard: data.userDashboard,
+                            })
+                        })
+                    }
                 })
                 return selectedDashboard
             }
@@ -178,28 +206,7 @@ export default function DashboardPage({
 
     useEffect(() => {
         graphQLCall(
-            gql`
-                query LoadDashboards {
-                    userDashboards {
-                        ...DashboardContent
-                    }
-                    userDashboard {
-                        ...DashboardContent
-                    }
-                }
-
-                fragment DashboardContent on Dashboard {
-                    uuid
-                    name
-                    userScope
-                    layoutKey
-                    widgets {
-                        uuid
-                        key
-                        config
-                    }
-                }
-            `
+            loadDashboardsQuery
         ).then(data => {
             setDashboards(data.userDashboards)
             selectedDashboardDispatch({

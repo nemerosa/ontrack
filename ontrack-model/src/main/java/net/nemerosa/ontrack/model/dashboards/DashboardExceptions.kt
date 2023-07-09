@@ -3,8 +3,12 @@ package net.nemerosa.ontrack.model.dashboards
 import net.nemerosa.ontrack.model.exceptions.InputException
 import net.nemerosa.ontrack.model.exceptions.NotFoundException
 
-class DashboardCannotBuiltInException: InputException(
+class DashboardCannotSaveBuiltInException: InputException(
     """Cannot save built-in dashboards."""
+)
+
+class DashboardCannotDeleteBuiltInException: InputException(
+    """Cannot delete built-in dashboards."""
 )
 
 class DashboardUuidNotFoundException(uuid: String) : NotFoundException(

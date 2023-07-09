@@ -1,6 +1,6 @@
 import {Button, Dropdown, Space, Typography} from "antd";
 import {Command} from "@components/common/Commands";
-import {FaCheck, FaCopy, FaEdit, FaLock, FaPlus, FaUserLock, FaUsers, FaWindowRestore} from "react-icons/fa";
+import {FaCheck, FaCopy, FaEdit, FaLock, FaPlus, FaTrash, FaUserLock, FaUsers, FaWindowRestore} from "react-icons/fa";
 import {useContext, useEffect, useState} from "react";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 import {UserContext} from "@components/providers/UserProvider";
@@ -20,6 +20,10 @@ export default function DashboardCommandMenu() {
 
     const cloneDashboard = () => {
         selectedDashboardDispatch({type: 'clone'})
+    }
+
+    const deleteDashboard = () => {
+        selectedDashboardDispatch({type: 'delete'})
     }
 
     const editDashboard = () => {
@@ -84,7 +88,7 @@ export default function DashboardCommandMenu() {
         menu.push({type: 'divider'})
 
         // Editing current
-        if (selectedDashboard && selectedDashboard.userScope !== 'BUILT_IN') {
+        if (selectedDashboard && selectedDashboard.authorizations?.edit) {
             menu.push({
                 key: 'edit',
                 label: (
@@ -98,7 +102,7 @@ export default function DashboardCommandMenu() {
         }
 
         // Sharing current
-        if (selectedDashboard && selectedDashboard.userScope === 'PRIVATE' && user.authorizations.dashboard?.share) {
+        if (selectedDashboard && selectedDashboard.authorizations?.share) {
             menu.push({
                 key: 'share',
                 label: (
@@ -122,6 +126,20 @@ export default function DashboardCommandMenu() {
                 />
             )
         })
+
+        // Deleting current
+        if (selectedDashboard && selectedDashboard.authorizations?.delete) {
+            menu.push({
+                key: 'delete',
+                label: (
+                    <Command
+                        icon={<FaTrash/>}
+                        text="Delete current dashboard"
+                        action={deleteDashboard}
+                    />
+                )
+            })
+        }
 
         // Separator
         menu.push({type: 'divider'})

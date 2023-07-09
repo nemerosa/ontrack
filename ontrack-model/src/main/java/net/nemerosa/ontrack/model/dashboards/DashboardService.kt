@@ -22,4 +22,19 @@ interface DashboardService {
      */
     fun shareDashboard(input: ShareDashboardInput): Dashboard
 
+    /**
+     * Deletes a dashboard
+     */
+    fun deleteDashboard(uuid: String)
+
+    /**
+     * Selects a dashboard for the current user
+     */
+    fun selectDashboard(uuid: String)
+
+    /**
+     * Gets the authorizations for a given dashboard
+     */
+    fun getAuthorizations(dashboard: Dashboard): DashboardAuthorizations
+
 }

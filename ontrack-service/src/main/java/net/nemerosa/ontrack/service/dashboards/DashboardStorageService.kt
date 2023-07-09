@@ -1,5 +1,6 @@
-package net.nemerosa.ontrack.model.dashboards
+package net.nemerosa.ontrack.service.dashboards
 
+import net.nemerosa.ontrack.model.dashboards.Dashboard
 import net.nemerosa.ontrack.model.structure.ID
 
 interface DashboardStorageService {
@@ -11,5 +12,9 @@ interface DashboardStorageService {
     fun findSharedDashboards(): List<Dashboard>
 
     fun saveDashboard(dashboard: Dashboard): Dashboard
+
+    fun deleteDashboard(uuid: String)
+
+    fun ownDashboard(uuid: String, userId: ID): Boolean
 
 }

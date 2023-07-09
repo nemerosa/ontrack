@@ -893,11 +893,18 @@ type CreateWebhookPayload implements Payload {
 }
 
 type Dashboard {
+    authorizations: DashboardAuthorizations!
     layoutKey: String!
     name: String!
     userScope: DashboardContextUserScope!
     uuid: String!
     widgets: [WidgetInstance!]!
+}
+
+type DashboardAuthorizations {
+    delete: Boolean!
+    edit: Boolean!
+    share: Boolean!
 }
 
 type DashboardLayout {
@@ -1371,6 +1378,11 @@ type DeleteValidationStampMetaInfoPropertyPayload implements Payload {
 type DeleteWebhookPayload implements Payload {
     "List of errors"
     errors: [UserError]
+}
+
+type DeletionPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
 }
 
 "Output type for the disableAccount mutation."
@@ -2668,6 +2680,8 @@ type Mutation {
         "Input for the mutation"
         input: DeleteBuildReleasePropertyByIdInput
     ): DeleteBuildReleasePropertyByIdPayload
+    "Deletes a dashboard"
+    deleteDashboard(input: DeleteDashboardInput!): DeletionPayload
     "Deleting notification records"
     deleteNotificationRecords(
         "Input for the mutation"
@@ -6526,6 +6540,11 @@ input DeleteBuildReleasePropertyInput {
     build: String!
     "Project name"
     project: String!
+}
+
+input DeleteDashboardInput {
+    "UUID of the dashboard to delete"
+    uuid: String!
 }
 
 "Input type for the deleteNotificationRecords mutation."

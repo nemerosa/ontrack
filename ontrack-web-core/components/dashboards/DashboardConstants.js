@@ -24,6 +24,11 @@ export const saveDashboardQuery = gql`
                 name
                 userScope
                 layoutKey
+                authorizations {
+                    edit
+                    share
+                    delete
+                }
                 widgets {
                     uuid
                     key
@@ -45,12 +50,54 @@ export const shareDashboardQuery = gql`
                 name
                 userScope
                 layoutKey
+                authorizations {
+                    edit
+                    share
+                    delete
+                }
                 widgets {
                     uuid
                     key
                     config
                 }
             }
+        }
+    }
+`
+export const deleteDashboardQuery = gql`
+    mutation DeleteDashboard($uuid: String!) {
+        deleteDashboard(input: {uuid: $uuid}) {
+            errors {
+                message
+            }
+        }
+    }
+`
+
+export const loadDashboardsQuery = gql`
+    query LoadDashboards {
+        userDashboards {
+            ...DashboardContent
+        }
+        userDashboard {
+            ...DashboardContent
+        }
+    }
+
+    fragment DashboardContent on Dashboard {
+        uuid
+        name
+        userScope
+        layoutKey
+        authorizations {
+            edit
+            share
+            delete
+        }
+        widgets {
+            uuid
+            key
+            config
         }
     }
 `

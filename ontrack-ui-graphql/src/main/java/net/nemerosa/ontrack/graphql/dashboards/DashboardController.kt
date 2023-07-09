@@ -1,13 +1,16 @@
 package net.nemerosa.ontrack.graphql.dashboards
 
 import net.nemerosa.ontrack.common.UserException
+import net.nemerosa.ontrack.graphql.DeletionPayload
 import net.nemerosa.ontrack.graphql.payloads.toPayloadErrors
 import net.nemerosa.ontrack.model.dashboards.*
 import net.nemerosa.ontrack.model.dashboards.widgets.Widget
 import net.nemerosa.ontrack.model.dashboards.widgets.WidgetService
+import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.MutationMapping
 import org.springframework.graphql.data.method.annotation.QueryMapping
+import org.springframework.graphql.data.method.annotation.SchemaMapping
 import org.springframework.stereotype.Controller
 
 @Controller
@@ -28,6 +31,9 @@ class DashboardController(
     @QueryMapping
     fun dashboardWidgets(): List<Widget<*>> = widgetService.findAll()
 
+    @SchemaMapping
+    fun authorizations(dashboard: Dashboard): DashboardAuthorizations = dashboardService.getAuthorizations(dashboard)
+
     @MutationMapping
     fun saveDashboard(@Argument input: SaveDashboardInput): SaveDashboardPayload =
         try {
@@ -42,6 +48,15 @@ class DashboardController(
             ShareDashboardPayload(dashboard = dashboardService.shareDashboard(input))
         } catch (any: UserException) {
             ShareDashboardPayload(any.toPayloadErrors())
+        }
+
+    @MutationMapping
+    fun deleteDashboard(@Argument input: DeleteDashboardInput): DeletionPayload =
+        try {
+            dashboardService.deleteDashboard(input.uuid)
+            DeletionPayload()
+        } catch (any: UserException) {
+            DeletionPayload(any.toPayloadErrors())
         }
 
 }

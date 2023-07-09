@@ -1,5 +1,7 @@
-package net.nemerosa.ontrack.model.dashboards
+package net.nemerosa.ontrack.service.dashboards
 
+import net.nemerosa.ontrack.model.dashboards.Dashboard
+import net.nemerosa.ontrack.model.dashboards.DashboardContextUserScope
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.support.StorageService
@@ -46,6 +48,15 @@ class DashboardStorageServiceImpl(
             )
         )
         return dashboard
+    }
+
+    override fun ownDashboard(uuid: String, userId: ID): Boolean =
+        storageService.find(STORE, uuid, StoredDashboard::class)?.run {
+            this.userId == userId.value
+        } ?: false
+
+    override fun deleteDashboard(uuid: String) {
+        storageService.delete(STORE, uuid)
     }
 
     private data class StoredDashboard(

@@ -1,7 +1,9 @@
-package net.nemerosa.ontrack.model.dashboards
+package net.nemerosa.ontrack.service.dashboards
 
+import net.nemerosa.ontrack.model.dashboards.*
 import net.nemerosa.ontrack.model.preferences.PreferencesService
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.security.isGlobalFunctionGranted
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -56,7 +58,7 @@ class DashboardServiceImpl(
     override fun saveDashboard(input: SaveDashboardInput): Dashboard {
         // No built-in
         if (input.userScope == DashboardContextUserScope.BUILT_IN) {
-            throw DashboardCannotBuiltInException()
+            throw DashboardCannotSaveBuiltInException()
         }
         // Checks rights to edit
         securityService.checkGlobalFunction(DashboardEdition::class.java)
@@ -101,5 +103,56 @@ class DashboardServiceImpl(
         }
         // OK
         return dashboard
+    }
+
+    override fun deleteDashboard(uuid: String) {
+        val existing = dashboardStorageService.findDashboardByUuid(uuid)
+            ?: throw DashboardUuidNotFoundException(uuid)
+
+        when (existing.userScope) {
+            DashboardContextUserScope.BUILT_IN -> throw DashboardCannotDeleteBuiltInException()
+            DashboardContextUserScope.SHARED -> securityService.checkGlobalFunction(DashboardSharing::class.java)
+            DashboardContextUserScope.PRIVATE -> securityService.checkGlobalFunction(DashboardEdition::class.java)
+        }
+
+        val account = securityService.currentAccount?.account
+        if (account != null) {
+            val prefs = preferencesService.getPreferences(account)
+            if (prefs.dashboardUuid == uuid) {
+                prefs.dashboardUuid = null
+                preferencesService.setPreferences(account, prefs)
+            }
+        }
+
+        dashboardStorageService.deleteDashboard(uuid)
+    }
+
+    override fun selectDashboard(uuid: String) {
+        val accessible = userDashboards().find { it.uuid == uuid }
+            ?: throw DashboardUuidNotFoundException(uuid)
+        val account = securityService.currentAccount?.account
+        if (account != null) {
+            preferencesService.savePreferences(account) {
+                it.dashboardUuid = accessible.uuid
+            }
+        }
+    }
+
+    override fun getAuthorizations(dashboard: Dashboard): DashboardAuthorizations {
+        val account = securityService.currentAccount?.account
+        return if (account != null) {
+            val ownDashboard = dashboardStorageService.ownDashboard(dashboard.uuid, account.id)
+            val editing = securityService.isGlobalFunctionGranted<DashboardEdition>()
+            val sharing = securityService.isGlobalFunctionGranted<DashboardSharing>()
+            val edit = (dashboard.userScope == DashboardContextUserScope.PRIVATE && ownDashboard && editing) ||
+                    (dashboard.userScope == DashboardContextUserScope.SHARED && sharing)
+            DashboardAuthorizations(
+                edit = edit,
+                share = dashboard.userScope == DashboardContextUserScope.PRIVATE && sharing,
+                delete = edit,
+            )
+        } else {
+            DashboardAuthorizations.NONE
+        }
     }
 }
