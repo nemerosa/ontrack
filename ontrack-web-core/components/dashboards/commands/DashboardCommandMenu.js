@@ -1,5 +1,4 @@
 import {Button, Dropdown, Space, Typography} from "antd";
-import {Command} from "@components/common/Commands";
 import {FaCheck, FaCopy, FaEdit, FaLock, FaPlus, FaTrash, FaUserLock, FaUsers, FaWindowRestore} from "react-icons/fa";
 import {useContext, useEffect, useState} from "react";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
@@ -15,10 +14,8 @@ export default function DashboardCommandMenu() {
     const user = useContext(UserContext)
 
     const selectDashboard = (dashboard) => {
-        return () => {
-            selectedDashboardDispatch({type: 'init', selectedDashboard: dashboard})
-            graphQLCall(selectDashboardQuery, {uuid: dashboard.uuid})
-        }
+        selectedDashboardDispatch({type: 'init', selectedDashboard: dashboard})
+        graphQLCall(selectDashboardQuery, {uuid: dashboard.uuid})
     }
 
     const cloneDashboard = () => {
@@ -53,13 +50,13 @@ export default function DashboardCommandMenu() {
             let icon = undefined
             switch (dashboard.userScope) {
                 case 'PRIVATE':
-                    icon = <FaUserLock/>
+                    icon = <FaUserLock title="This dashboard is visible only to you."/>
                     break
                 case 'SHARED':
-                    icon = <FaUsers/>
+                    icon = <FaUsers title="This dashboard is shared for all users."/>
                     break
                 case 'BUILT_IN':
-                    icon = <FaLock/>
+                    icon = <FaLock title="This dashboard built-in and cannot be edited."/>
                     break
             }
 
@@ -77,13 +74,9 @@ export default function DashboardCommandMenu() {
             // Menu entry
             menu.push({
                 key: dashboard.uuid,
-                label: (
-                    <Command
-                        icon={icon}
-                        text={text}
-                        action={selectDashboard(dashboard)}
-                    />
-                )
+                icon: icon,
+                label: text,
+                onClick: () => selectDashboard(dashboard),
             })
         })
 
@@ -94,13 +87,9 @@ export default function DashboardCommandMenu() {
         if (selectedDashboard && selectedDashboard.authorizations?.edit) {
             menu.push({
                 key: 'edit',
-                label: (
-                    <Command
-                        icon={<FaEdit/>}
-                        text="Edit current dashboard"
-                        action={editDashboard}
-                    />
-                )
+                icon: <FaEdit/>,
+                label: "Edit current dashboard",
+                onClick: editDashboard,
             })
         }
 
@@ -108,39 +97,28 @@ export default function DashboardCommandMenu() {
         if (selectedDashboard && selectedDashboard.authorizations?.share) {
             menu.push({
                 key: 'share',
-                label: (
-                    <Command
-                        icon={<FaUsers/>}
-                        text="Share current dashboard"
-                        action={shareDashboard}
-                    />
-                )
+                icon: <FaUsers/>,
+                label: "Share current dashboard",
+                onClick: shareDashboard,
             })
         }
 
         // Cloning current
         menu.push({
             key: 'clone',
-            label: (
-                <Command
-                    icon={<FaCopy/>}
-                    text="Clone current dashboard"
-                    action={cloneDashboard}
-                />
-            )
+            icon: <FaCopy/>,
+            label: "Clone current dashboard",
+            onClick: cloneDashboard,
         })
 
         // Deleting current
         if (selectedDashboard && selectedDashboard.authorizations?.delete) {
             menu.push({
                 key: 'delete',
-                label: (
-                    <Command
-                        icon={<FaTrash/>}
-                        text="Delete current dashboard"
-                        action={deleteDashboard}
-                    />
-                )
+                icon: <FaTrash/>,
+                label: "Delete current dashboard",
+                danger: true,
+                onClick: deleteDashboard,
             })
         }
 
@@ -150,13 +128,9 @@ export default function DashboardCommandMenu() {
         // New dashboard
         menu.push({
             key: 'new',
-            label: (
-                <Command
-                    icon={<FaPlus/>}
-                    text="Create a new dashboard"
-                    action={createDashboard}
-                />
-            )
+            icon: <FaPlus/>,
+            label: "Create a new dashboard",
+            onClick: createDashboard,
         })
 
         setItems(menu)
