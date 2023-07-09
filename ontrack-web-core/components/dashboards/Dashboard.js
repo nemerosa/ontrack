@@ -1,10 +1,11 @@
 import {lazy, Suspense, useContext, useEffect, useState} from "react";
-import {Alert, Button, Col, Form, Row, Select, Skeleton, Space, Tooltip, Typography} from "antd";
+import {Alert, Button, Card, Col, Collapse, Form, Row, Select, Skeleton, Space, Tooltip, Typography} from "antd";
 import LayoutContextProvider from "@components/dashboards/layouts/LayoutContext";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import SelectableWidget from "@components/dashboards/widgets/SelectableWidget";
+import LayoutSelector from "@components/dashboards/layouts/LayoutSelector";
 
 export default function Dashboard() {
 
@@ -36,16 +37,10 @@ export default function Dashboard() {
         selectedDashboardDispatch({type: 'saveEdition'})
     }
 
-    const [layouts, setLayouts] = useState([])
     const [availableWidgets, setAvailableWidgets] = useState([])
     useEffect(() => {
         graphQLCall(gql`
-            query DashboardLayouts {
-                dashboardLayouts {
-                    value: key
-                    label: name
-                    description
-                }
+            query DashboardWidgets {
                 dashboardWidgets {
                     key
                     name
@@ -54,7 +49,6 @@ export default function Dashboard() {
                 }
             }
         `).then(data => {
-            setLayouts(data.dashboardLayouts)
             setAvailableWidgets(data.dashboardWidgets)
         })
     }, [])
@@ -115,27 +109,28 @@ export default function Dashboard() {
                                                         </Space>
                                                     }
                                                 />
-                                                <Form
-                                                    layout="vertical"
-                                                    form={form}
-                                                >
-                                                    <Form.Item name="layoutKey" label="Layout">
-                                                        <Select options={layouts} onChange={onLayoutKeySelected}/>
-                                                    </Form.Item>
-                                                </Form>
-                                                <p>Widgets</p>
-                                                <Row wrap gutter={[16, 16]}>
-                                                    {
-                                                        availableWidgets.map(availableWidget =>
-                                                            <Col span={12} key={availableWidget.key}>
-                                                                <SelectableWidget
-                                                                    widgetDef={availableWidget}
-                                                                    addWidget={addWidget}
-                                                                />
-                                                            </Col>
-                                                        )
-                                                    }
-                                                </Row>
+                                                <Collapse defaultActiveKey={["widgets"]} accordion={true}>
+                                                    <Collapse.Panel key="layout" header="Layout">
+                                                        <LayoutSelector
+                                                            selectedLayoutKey={selectedDashboard.layoutKey}
+                                                            onLayoutKeySelected={onLayoutKeySelected}
+                                                        />
+                                                    </Collapse.Panel>
+                                                    <Collapse.Panel key="widgets" header="Widgets">
+                                                        <Row wrap gutter={[16, 16]}>
+                                                            {
+                                                                availableWidgets.map(availableWidget =>
+                                                                    <Col span={24} key={availableWidget.key}>
+                                                                        <SelectableWidget
+                                                                            widgetDef={availableWidget}
+                                                                            addWidget={addWidget}
+                                                                        />
+                                                                    </Col>
+                                                                )
+                                                            }
+                                                        </Row>
+                                                    </Collapse.Panel>
+                                                </Collapse>
                                             </Space>
                                         </Col>
                                     </Row>
