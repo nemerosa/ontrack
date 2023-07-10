@@ -4,6 +4,7 @@ import {Space} from "antd";
 import ProjectBox from "@components/projects/ProjectBox";
 import {gql} from "graphql-request";
 import FavouriteProjectsWidgetForm from "@components/dashboards/widgets/home/FavouriteProjectsWidgetForm";
+import RowTag from "@components/common/RowTag";
 
 export default function FavouriteProjectsWidget() {
 
@@ -31,11 +32,13 @@ export default function FavouriteProjectsWidget() {
                 <Space direction="horizontal" size={16} wrap>
                     {
                         projects.map(project =>
-                            <ProjectBox
-                                key={project.id}
-                                project={project}
-                                displayFavourite={false}
-                            />
+                            <RowTag>
+                                <ProjectBox
+                                    key={project.id}
+                                    project={project}
+                                    displayFavourite={false}
+                                />
+                            </RowTag>
                         )
                     }
                 </Space>

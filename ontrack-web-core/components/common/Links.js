@@ -1,5 +1,7 @@
 import Link from "next/link";
 import clientConfig from "@client/clientConfig";
+import {Space} from "antd";
+import Image from "next/image";
 
 const uiConfig = {
     prefix: '',
@@ -32,4 +34,41 @@ export function branchUri(branch) {
 
 export function branchLink(branch, text) {
     return <Link href={branchUri(branch)}>{text ? text : branch.name}</Link>
+}
+
+export function buildUri(build) {
+    return `${uiConfig.prefix}/build/${build.id}`
+}
+
+export function buildLink(build, text) {
+    return <Link href={buildUri(build)}>{text ? text : build.name}</Link>
+}
+
+export function promotionLevelUri(promotionLevel) {
+    return `${uiConfig.prefix}/promotionLevel/${promotionLevel.id}`
+}
+
+export function promotionLevelImageLink(promotionLevel) {
+    return `${legacyUri()}rest/structure/promotionLevels/${promotionLevel.id}/image`
+}
+
+export const PromotionLevelImage = ({promotionLevel}) => {
+    return (
+        promotionLevel.image ?
+            <Image
+                src={promotionLevelImageLink(promotionLevel)}
+                alt={promotionLevel.name}
+                width={16}
+                height={16}
+            /> : undefined
+    )
+}
+
+export function promotionLevelLink(promotionLevel, text) {
+    return <Link href={promotionLevelUri(promotionLevel)}>
+        <Space>
+            <PromotionLevelImage promotionLevel={promotionLevel}/>
+            {text ? text : promotionLevel.name}
+        </Space>
+    </Link>
 }

@@ -9,20 +9,40 @@ export default function FavouriteBranchesWidgetForm({project}) {
     const {editionForm} = useContext(WidgetContext)
 
     const [projects, setProjects] = useState([])
-    useEffect(() => {
-        graphQLCall(
-            gql`
-                query Projects {
-                    projects {
-                        value: name
-                        label: name
-                    }
-                }
-            `
-        ).then(data => {
-            setProjects(data.projects)
-        })
-    }, [])
+    const [value, setValue] = useState(null)
+    const [searching, setSearching] = useState(false)
+
+    const handleChange = (newValue) => {
+        setValue(newValue);
+    }
+
+    const handleSearch = (token) => {
+        if (token && token.length > 2) {
+            if (!searching) {
+                setSearching(true)
+                graphQLCall(
+                    gql`
+                        query SearchProjects($token: String!) {
+                            projects(pattern: $token) {
+                                name
+                            }
+                        }
+                    `, {token}
+                ).then(data => {
+                    setProjects(data.projects)
+                }).finally(() => {
+                    setSearching(false)
+                })
+            }
+        } else {
+            setProjects([])
+        }
+    }
+
+    const handleClear = () => {
+        setProjects([])
+        setValue(null)
+    }
 
     return (
         <>
@@ -36,7 +56,21 @@ export default function FavouriteBranchesWidgetForm({project}) {
                     initialValue={project}
                 >
                     <Select
-                        options={projects}
+                        showSearch={true}
+                        value={value}
+                        placeholder="Type the name of the project"
+                        defaultActiveFirstOption={true}
+                        showArrow={false}
+                        filterOption={false}
+                        onSearch={handleSearch}
+                        onChange={handleChange}
+                        allowClear={true}
+                        onClear={handleClear}
+                        notFoundContent={null}
+                        options={(projects || []).map((d) => ({
+                            value: d.name,
+                            label: d.name,
+                        }))}
                     />
                 </Form.Item>
             </Form>

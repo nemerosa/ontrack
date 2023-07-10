@@ -1,9 +1,9 @@
 import SimpleWidget from "@components/dashboards/widgets/SimpleWidget";
-import {Space} from "antd";
 import {useState} from "react";
-import BranchBox from "@components/branches/BranchBox";
 import {gql} from "graphql-request";
 import FavouriteBranchesWidgetForm from "@components/dashboards/widgets/home/FavouriteBranchesWidgetForm";
+import {gqlDecorationFragment} from "@components/services/fragments";
+import BranchList from "@components/branches/BranchList";
 
 export default function FavouriteBranchesWidget({project}) {
 
@@ -19,8 +19,30 @@ export default function FavouriteBranchesWidget({project}) {
                     gql`
                         query FavouriteBranches($project: String) {
                             branches(favourite: true, project: $project) {
+                              id
+                              name
+                              disabled
+                              favourite
+                              project {
                                 id
                                 name
+                              }
+                              latestBuild: builds(count: 1) {
+                                id
+                                name
+                              }
+                              promotionLevels {
+                                id
+                                name
+                                image
+                                _image
+                                promotionRuns(first: 1) {
+                                  build {
+                                    id
+                                    name
+                                  }
+                                }
+                              }
                             }
                         }
                     `
@@ -30,9 +52,10 @@ export default function FavouriteBranchesWidget({project}) {
                 setData={data => setBranches(data.branches)}
                 form={<FavouriteBranchesWidgetForm project={project}/>}
             >
-                <Space direction="horizontal" size={16} wrap>
-                    {branches.map(branch => <BranchBox key={branch.id} branch={branch}/>)}
-                </Space>
+                <BranchList
+                    branches={branches}
+                    showProject={!project}
+                />
             </SimpleWidget>
         </>
     )

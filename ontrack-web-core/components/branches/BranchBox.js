@@ -1,17 +1,22 @@
-import {Card} from "antd";
-import {branchLink} from "@components/common/Links";
+import {Card, Space} from "antd";
+import {branchLink, projectLink} from "@components/common/Links";
+import Favourite from "@components/common/Favourite";
 
 const {Meta} = Card;
 
-export default function BranchBox({branch}) {
+export default function BranchBox({branch, showProject, displayFavourite = true}) {
     return (
         <>
-            <Card>
-                <Meta
-                    // avatar={<Favourite value={project.favourite}/>}
-                    title={branchLink(branch)}
-                />
-            </Card>
+            <Space>
+                { displayFavourite ? <Favourite value={branch.favourite}/> : undefined}
+                {
+                    showProject && projectLink(branch.project)
+                }
+                {
+                    showProject && "/"
+                }
+                {branchLink(branch)}
+            </Space>
         </>
     )
 }

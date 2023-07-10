@@ -25,6 +25,7 @@ class GQLTypeBranch(
     private val projectEntityInterface: GQLProjectEntityInterface,
     freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>,
     private val gqlPaginatedListFactory: GQLPaginatedListFactory,
+    private val branchFavouriteService: BranchFavouriteService,
 ) : AbstractGQLProjectEntity<Branch>(
     Branch::class.java,
     ProjectEntityType.BRANCH,
@@ -46,7 +47,18 @@ class GQLTypeBranch(
                 .description("Reference to project")
                 .type(GraphQLTypeReference(GQLTypeProject.PROJECT))
                 .build()
-        ) // Promotion levels
+        )
+        // Is this branch a favourite?
+        .field {
+            it.name("favourite")
+                .description("Is this branch a favourite of the current user?")
+                .type(Scalars.GraphQLBoolean)
+                .dataFetcher { env ->
+                    val branch: Branch = env.getSource()
+                    branchFavouriteService.isBranchFavourite(branch)
+                }
+        }
+        // Promotion levels
         .field(
             GraphQLFieldDefinition.newFieldDefinition()
                 .name("promotionLevels")

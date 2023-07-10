@@ -310,6 +310,8 @@ type Branch implements ProjectEntity {
     ): [Decoration!]!
     description: String
     disabled: Boolean!
+    "Is this branch a favourite of the current user?"
+    favourite: Boolean
     "Git branch"
     gitBranchConfigurationProperty: Property
     gitChangeLog(
