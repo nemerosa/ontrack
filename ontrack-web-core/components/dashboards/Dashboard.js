@@ -1,11 +1,13 @@
 import {lazy, Suspense, useContext, useEffect, useState} from "react";
-import {Alert, Button, Card, Col, Collapse, Form, Row, Select, Skeleton, Space, Tooltip, Typography} from "antd";
+import {Alert, Button, Col, Collapse, Row, Skeleton, Space} from "antd";
 import LayoutContextProvider from "@components/dashboards/layouts/LayoutContext";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import SelectableWidget from "@components/dashboards/widgets/SelectableWidget";
 import LayoutSelector from "@components/dashboards/layouts/LayoutSelector";
+import WidgetExpansionContextProvider from "@components/dashboards/layouts/WidgetExpansionContext";
+import LayoutContainer from "@components/dashboards/layouts/LayoutContainer";
 
 export default function Dashboard() {
 
@@ -53,13 +55,6 @@ export default function Dashboard() {
         })
     }, [])
 
-    const [form] = Form.useForm()
-    useEffect(() => {
-        if (selectedDashboard) {
-            form.setFieldValue("layoutKey", selectedDashboard.layoutKey)
-        }
-    }, [selectedDashboard])
-
     const onLayoutKeySelected = (key) => {
         selectedDashboardDispatch({
             type: 'changeLayout',
@@ -85,7 +80,10 @@ export default function Dashboard() {
                     }}>
                         <div>
                             <LayoutContextProvider>
-                                {!selectedDashboard.editionMode && loadedLayout}
+                                {!selectedDashboard.editionMode &&
+                                    <WidgetExpansionContextProvider>
+                                        <LayoutContainer loadedLayout={loadedLayout}/>
+                                    </WidgetExpansionContextProvider>}
                                 {
                                     selectedDashboard.editionMode &&
                                     <Row>

@@ -1,9 +1,10 @@
 import {Card, Skeleton, Space} from "antd";
-import {useContext} from "react";
+import {useContext, useState} from "react";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 import WidgetCommand from "@components/dashboards/commands/WidgetCommand";
-import {FaRegEdit, FaRegSave, FaTrash, FaWindowClose} from "react-icons/fa";
+import {FaCompressArrowsAlt, FaExpandArrowsAlt, FaRegEdit, FaRegSave, FaTrash, FaWindowClose} from "react-icons/fa";
 import {WidgetContext, WidgetDispatchContext, widgetFormSubmit} from "@components/dashboards/widgets/WidgetContext";
+import {WidgetExpansionContext} from "@components/dashboards/layouts/WidgetExpansionContext";
 
 export default function Widget({title, loading, commands, form, children}) {
 
@@ -11,6 +12,12 @@ export default function Widget({title, loading, commands, form, children}) {
     const selectedDashboardDispatch = useContext(DashboardDispatchContext)
     const widgetContext = useContext(WidgetContext)
     const widgetDispatch = useContext(WidgetDispatchContext)
+
+    const {expansion, toggleExpansion} = useContext(WidgetExpansionContext)
+
+    const toggleExpanded = () => {
+        if (toggleExpansion) toggleExpansion(widgetContext.widget.uuid)
+    }
 
     return (
         <Card
@@ -59,10 +66,22 @@ export default function Widget({title, loading, commands, form, children}) {
                         </Space>
                     }
                     {
-                        !selectedDashboard.editionMode && commands && <Space size={8}>
+                        !selectedDashboard.editionMode && <Space size={8}>
                             {
-                                commands.map((command, index) => <span key={index}>{command}</span>)
+                                commands && commands.map((command, index) => <span key={index}>{command}</span>)
                             }
+                            <WidgetCommand
+                                condition={expansion && !expansion.uuid}
+                                title="Makes the widget full size"
+                                icon={<FaExpandArrowsAlt/>}
+                                onAction={toggleExpanded}
+                            />
+                            <WidgetCommand
+                                condition={expansion && expansion.uuid === widgetContext.widget.uuid}
+                                title="Makes the widget to its regular size"
+                                icon={<FaCompressArrowsAlt/>}
+                                onAction={toggleExpanded}
+                            />
                         </Space>
                     }
                 </>

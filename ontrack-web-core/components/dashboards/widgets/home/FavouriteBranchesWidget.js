@@ -31,7 +31,7 @@ export default function FavouriteBranchesWidget({project}) {
                 form={<FavouriteBranchesWidgetForm project={project}/>}
             >
                 <Space direction="horizontal" size={16} wrap>
-                    {branches.map(branch => <BranchBox branch={branch}/>)}
+                    {branches.map(branch => <BranchBox key={branch.id} branch={branch}/>)}
                 </Space>
             </SimpleWidget>
         </>
