@@ -1,4 +1,4 @@
-import {homeLink} from "@components/common/Links";
+import {homeLink, projectLink} from "@components/common/Links";
 
 export function homeBreadcrumbs() {
     return [
@@ -9,5 +9,12 @@ export function homeBreadcrumbs() {
 export function projectBreadcrumbs(project) {
     return [
         homeLink(),
+    ]
+}
+
+export function branchBreadcrumbs(branch) {
+    return [
+        homeLink(),
+        projectLink(branch.project),
     ]
 }
