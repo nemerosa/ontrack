@@ -7,7 +7,7 @@ export default function SelectableWidget({widgetDef, addWidget}) {
             <Card
                 title={widgetDef.name}
                 actions={[
-                    <Tooltip title={`Add the "${widgetDef.name}" widget to the dashboard`}>
+                    <Tooltip key="add" title={`Add the "${widgetDef.name}" widget to the dashboard`}>
                         <FaPlus onClick={addWidget(widgetDef)}/>
                     </Tooltip>
                 ]}

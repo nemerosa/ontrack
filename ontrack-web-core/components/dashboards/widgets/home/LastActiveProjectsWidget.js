@@ -63,8 +63,8 @@ export default function LastActiveProjectsWidget({count}) {
             >
                 <Space direction="horizontal" size={16} wrap>
                     {
-                        projects.map(project => <RowTag>
-                                <ProjectBox key={project.id} project={project}/>
+                        projects.map(project => <RowTag key={project.id}>
+                                <ProjectBox project={project}/>
                             </RowTag>
                         )
                     }

@@ -217,7 +217,7 @@ export default function DashboardPage({
     }, [])
 
     const commands = [
-        <DashboardCommandMenu/>
+        <DashboardCommandMenu key="dashboard"/>
     ]
 
     return (
