@@ -4,7 +4,8 @@ import {UserContext} from "@components/providers/UserProvider";
 import {logout} from "@client/login";
 import {legacyUri} from "@components/common/Links";
 import {useRouter} from "next/router";
-import {FaDoorOpen, FaSignOutAlt} from "react-icons/fa";
+import {FaDoorOpen, FaExpandArrowsAlt, FaSignOutAlt} from "react-icons/fa";
+import {MainLayoutContext} from "@components/layouts/MainLayout";
 
 export function useUserMenu() {
     const [open, setOpen] = useState(false);
@@ -18,9 +19,14 @@ export function useUserMenu() {
 export default function UserMenu({userMenu}) {
 
     const router = useRouter()
+    const {toggleExpansion} = useContext(MainLayoutContext)
 
     const user = useContext(UserContext)
     const [items, setItems] = useState([])
+
+    const expandFullView = () => {
+        toggleExpansion()
+    }
 
     // const groupIcons = {
     //     Configuration: <AppstoreOutlined/>,
@@ -123,6 +129,13 @@ export default function UserMenu({userMenu}) {
             onClick: () => {
                 location.href = legacyUri()
             }
+        })
+        // Full view toggle
+        menu.push({
+            key: 'expand',
+            label: "Full view",
+            icon: <FaExpandArrowsAlt/>,
+            onClick: expandFullView,
         })
         // Separator
         menu.push({

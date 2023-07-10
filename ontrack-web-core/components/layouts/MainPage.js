@@ -1,5 +1,7 @@
 import {Layout, theme} from "antd";
 import MainPageBar from "@components/layouts/MainPageBar";
+import {useContext} from "react";
+import {MainLayoutContext} from "@components/layouts/MainLayout";
 
 const {Content} = Layout;
 
@@ -8,6 +10,8 @@ export default function MainPage({title, breadcrumbs, commands, children}) {
     const {
         token: {colorBgContainer},
     } = theme.useToken();
+
+    const {expanded} = useContext(MainLayoutContext)
 
     return (
         <>
@@ -24,11 +28,13 @@ export default function MainPage({title, breadcrumbs, commands, children}) {
                         background: colorBgContainer,
                     }}
                 >
-                    <MainPageBar
-                        breadcrumbs={breadcrumbs}
-                        title={title}
-                        commands={commands}
-                    />
+                    {
+                        !expanded && <MainPageBar
+                            breadcrumbs={breadcrumbs}
+                            title={title}
+                            commands={commands}
+                        />
+                    }
                     {children}
                 </Content>
             </Layout>
