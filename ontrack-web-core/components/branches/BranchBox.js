@@ -1,8 +1,6 @@
-import {Card, Space} from "antd";
+import {Space, Typography} from "antd";
 import {branchLink, projectLink} from "@components/common/Links";
 import Favourite from "@components/common/Favourite";
-
-const {Meta} = Card;
 
 export default function BranchBox({branch, showProject, displayFavourite = true}) {
     return (
@@ -15,7 +13,9 @@ export default function BranchBox({branch, showProject, displayFavourite = true}
                 {
                     showProject && "/"
                 }
-                {branchLink(branch)}
+                {
+                    branchLink(branch, <Typography.Text strong>{branch.name}</Typography.Text>)
+                }
             </Space>
         </>
     )

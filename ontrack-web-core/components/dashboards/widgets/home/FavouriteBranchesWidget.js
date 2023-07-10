@@ -35,7 +35,6 @@ export default function FavouriteBranchesWidget({project}) {
                                 id
                                 name
                                 image
-                                _image
                                 promotionRuns(first: 1) {
                                   build {
                                     id

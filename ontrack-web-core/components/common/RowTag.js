@@ -1,13 +1,16 @@
-import {Tag} from "antd";
+import {Card, Tag} from "antd";
 
 export default function RowTag({children}) {
     return (
-        <Tag
+        <Card
             style={{
-                padding: 6,
+                height: '100%',
+            }}
+            bodyStyle={{
+                padding: 8,
             }}
         >
             {children}
-        </Tag>
+        </Card>
     )
 }

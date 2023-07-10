@@ -1,4 +1,4 @@
-import {Space} from "antd";
+import {Space, Typography} from "antd";
 import Favourite from "@components/common/Favourite";
 import {projectLink} from "@components/common/Links";
 
@@ -7,7 +7,9 @@ export default function ProjectBox({project, displayFavourite = true}) {
         <>
             <Space>
                 {displayFavourite ? <Favourite value={project.favourite}/> : undefined}
-                {projectLink(project)}
+                {
+                    projectLink(project, <Typography.Text strong>{project.name}</Typography.Text>)
+                }
             </Space>
         </>
     )

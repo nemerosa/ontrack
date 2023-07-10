@@ -1,50 +1,13 @@
-import {useEffect, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
-import {gql} from "graphql-request";
-import ProjectBox from "@components/projects/ProjectBox";
 import {Space} from "antd";
-import LoadingContainer from "@components/common/LoadingContainer";
+import BranchRow from "@components/branches/BranchRow";
+import ProjectRow from "@components/projects/ProjectRow";
 
-export function useProjectList() {
-    const [projectsReload, setProjectReload] = useState(0)
-    return {
-        projectsReload: projectsReload,
-        refresh: () => {
-            setProjectReload(projectsReload + 1)
-        },
-    }
-}
-
-export default function ProjectList({projectList}) {
-
-    const [loadingProjects, setLoadingProjects] = useState(true)
-    const [projects, setProjects] = useState([])
-
-    useEffect(() => {
-        setLoadingProjects(true)
-        graphQLCall(
-            gql`
-                query GetProjects {
-                    lastActiveProjects(count: 10) {
-                        id
-                        name
-                        favourite
-                    }
-                }
-            `
-        ).then(data => {
-            setProjects(data.lastActiveProjects)
-            setLoadingProjects(false)
-        })
-    }, [projectList.projectsReload])
-
+export default function ProjectList({projects}) {
     return (
         <>
-            <LoadingContainer loading={loadingProjects} tip="Loading projects">
-                <Space direction="horizontal" size={16} wrap>
-                    {projects.map(project => <ProjectBox key={project.id} project={project}/>)}
-                </Space>
-            </LoadingContainer>
+            <Space direction="vertical" size={16} style={{width: '100%'}}>
+                {projects.map(project => <ProjectRow key={project.id} project={project}/>)}
+            </Space>
         </>
     )
 }

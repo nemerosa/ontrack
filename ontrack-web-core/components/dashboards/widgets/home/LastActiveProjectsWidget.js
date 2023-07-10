@@ -8,6 +8,7 @@ import WidgetCommand from "@components/dashboards/commands/WidgetCommand";
 import NewProjectDialog, {useNewProjectDialog} from "@components/projects/NewProjectDialog";
 import {UserContext} from "@components/providers/UserProvider";
 import LastActiveProjectsWidgetForm from "@components/dashboards/widgets/home/LastActiveProjectsWidgetForm";
+import RowTag from "@components/common/RowTag";
 
 export default function LastActiveProjectsWidget({count}) {
 
@@ -61,7 +62,12 @@ export default function LastActiveProjectsWidget({count}) {
                 form={<LastActiveProjectsWidgetForm count={count}/>}
             >
                 <Space direction="horizontal" size={16} wrap>
-                    {projects.map(project => <ProjectBox key={project.id} project={project}/>)}
+                    {
+                        projects.map(project => <RowTag>
+                                <ProjectBox key={project.id} project={project}/>
+                            </RowTag>
+                        )
+                    }
                 </Space>
             </SimpleWidget>
         </>

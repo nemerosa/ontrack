@@ -5,6 +5,8 @@ import ProjectBox from "@components/projects/ProjectBox";
 import {gql} from "graphql-request";
 import FavouriteProjectsWidgetForm from "@components/dashboards/widgets/home/FavouriteProjectsWidgetForm";
 import RowTag from "@components/common/RowTag";
+import {gqlDecorationFragment} from "@components/services/fragments";
+import ProjectList from "@components/projects/ProjectList";
 
 export default function FavouriteProjectsWidget() {
 
@@ -21,27 +23,38 @@ export default function FavouriteProjectsWidget() {
                                 id
                                 name
                                 favourite
+                                decorations {
+                                  ...decorationContent
+                                }
+                                branches(useModel: true, count: 10) {
+                                    id
+                                    name
+                                    latestBuild: builds(count: 1) {
+                                      id
+                                      name
+                                    }
+                                    promotionLevels {
+                                      id
+                                      name
+                                      image
+                                      promotionRuns(first: 1) {
+                                        build {
+                                          id
+                                          name
+                                        }
+                                      }
+                                    }
+                                }
                             }
                         }
+                        ${gqlDecorationFragment}
                     `
                 }
                 variables={{}}
                 setData={data => setProjects(data.projects)}
                 form={<FavouriteProjectsWidgetForm/>}
             >
-                <Space direction="horizontal" size={16} wrap>
-                    {
-                        projects.map(project =>
-                            <RowTag>
-                                <ProjectBox
-                                    key={project.id}
-                                    project={project}
-                                    displayFavourite={false}
-                                />
-                            </RowTag>
-                        )
-                    }
-                </Space>
+                <ProjectList projects={projects}/>
             </SimpleWidget>
         </>
     )
