@@ -48,15 +48,19 @@ export function promotionLevelUri(promotionLevel) {
     return `${uiConfig.prefix}/promotionLevel/${promotionLevel.id}`
 }
 
-export function promotionLevelImageLink(promotionLevel) {
+export function promotionLevelImageUri(promotionLevel) {
     return `${legacyUri()}rest/structure/promotionLevels/${promotionLevel.id}/image`
+}
+
+export function predefinedPromotionLevelImageUri(predefinedPromotionLevel) {
+    return `${legacyUri()}rest/admin/predefinedPromotionLevels/${predefinedPromotionLevel.id}/image`
 }
 
 export const PromotionLevelImage = ({promotionLevel}) => {
     return (
         promotionLevel.image ?
             <Image
-                src={promotionLevelImageLink(promotionLevel)}
+                src={promotionLevelImageUri(promotionLevel)}
                 alt={promotionLevel.name}
                 width={16}
                 height={16}
@@ -69,6 +73,39 @@ export function promotionLevelLink(promotionLevel, text) {
         <Space>
             <PromotionLevelImage promotionLevel={promotionLevel}/>
             {text ? text : promotionLevel.name}
+        </Space>
+    </Link>
+}
+
+export function predefinedValidationStampImageUri(predefinedValidationStamp) {
+    return `${legacyUri()}rest/admin/predefinedValidationStamps/${predefinedValidationStamp.id}/image`
+}
+
+export function validationStampImageUri(validationStamp) {
+    return `${legacyUri()}rest/structure/validationStamps/${validationStamp.id}/image`
+}
+
+export function validationStampUri(validationStamp) {
+    return `${uiConfig.prefix}/validationStamp/${validationStamp.id}`
+}
+
+export const ValidationStampImage = ({validationStamp}) => {
+    return (
+        validationStamp.image ?
+            <Image
+                src={validationStampImageUri(validationStamp)}
+                alt={validationStamp.name}
+                width={16}
+                height={16}
+            /> : undefined
+    )
+}
+
+export function validationStampLink(validationStamp, text) {
+    return <Link href={validationStampUri(validationStamp)}>
+        <Space>
+            <ValidationStampImage validationStamp={validationStamp}/>
+            {text ? text : validationStamp.name}
         </Space>
     </Link>
 }

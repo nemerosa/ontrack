@@ -18,6 +18,7 @@ fun <T> T?.asOptional(): Optional<T & Any> = Optional.ofNullable(this)
 /**
  * Optional to nullable
  */
+@Deprecated("Use the Kotlin built-in extension")
 fun <T> Optional<T>.getOrNull(): T? = orElse(null)
 
 /**

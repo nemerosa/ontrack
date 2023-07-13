@@ -346,6 +346,8 @@ type Branch implements ProjectEntity {
     "Reference to project"
     project: Project
     promotionLevels: [PromotionLevel!]!
+    "Given a list of promotion names, returns for each one the last promotion run or null if the promotion does not exist."
+    promotionStatuses(names: [String!]!): [PromotionRun!]!
     "List of properties"
     properties(
         "Keeps properties having a value"
@@ -377,6 +379,8 @@ type Branch implements ProjectEntity {
         "Filters on the validation stamp"
         name: String
     ): [ValidationStamp!]!
+    "Given a list of validation names, returns for each one the last validation run or null if the validation does not exist."
+    validationStatuses(names: [String!]!): [ValidationRun!]!
 }
 
 "Branch and associated information"
@@ -3580,6 +3584,30 @@ type PostQueuePayload implements Payload {
     queueDispatchResult: QueueDispatchResult
 }
 
+"Predefined promotion level"
+type PredefinedPromotionLevel {
+    "description field"
+    description: String
+    "id field"
+    id: Int
+    "isImage field"
+    isImage: Boolean
+    "name field"
+    name: String!
+}
+
+"Predefined validation stamp"
+type PredefinedValidationStamp {
+    "description field"
+    description: String
+    "id field"
+    id: Int
+    "isImage field"
+    isImage: Boolean
+    "name field"
+    name: String!
+}
+
 "Preferences"
 type Preferences {
     "Branch view VS groups"
@@ -4223,6 +4251,8 @@ type Query {
         name: String,
         "Name of the project the branch belongs to"
         project: String,
+        "Fragment to match against the branch name"
+        token: String,
         "Filter on property type and optional value pattern."
         withProperty: PropertyFilter
     ): [Branch!]
@@ -4402,6 +4432,16 @@ type Query {
     notificationSettings: NotificationSettings
     "Basic test service"
     ping: String
+    "Predefined promotion level by name"
+    predefinedPromotionLevelByName(
+        "Name"
+        name: String!
+    ): PredefinedPromotionLevel
+    "Gets a predefined validation stamps by name"
+    predefinedValidationStampByName(
+        "Name"
+        name: String!
+    ): PredefinedValidationStamp
     projects(
         "Favourite projects only"
         favourites: Boolean,
@@ -4420,6 +4460,11 @@ type Query {
         "ID of the promotion level to look for (required)"
         id: Int!
     ): PromotionLevel
+    "Gets a list of existing available promotion level names"
+    promotionLevelNames(
+        "Part of the name to look for"
+        token: String
+    ): [String!]!
     promotionRuns(
         "ID of the promotion run to look for"
         id: Int!
@@ -4508,6 +4553,11 @@ type Query {
         "ID of the validation stamp to look for (required)"
         id: Int!
     ): ValidationStamp
+    "Gets a list of existing available validation stamp names"
+    validationStampNames(
+        "Part of the name to look for"
+        token: String!
+    ): [String!]!
     "List of registred webhooks"
     webhooks(
         "Name of the webhook"
@@ -5648,6 +5698,8 @@ type ValidationRun implements ProjectEntity {
     id: Int!
     "Link to a Jenkins Build"
     jenkinsBuildProperty: Property
+    "Last validation status for this run"
+    lastStatus: ValidationRunStatus!
     "List of links."
     linkProperty: Property
     "Links"

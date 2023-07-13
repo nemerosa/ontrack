@@ -5,7 +5,23 @@ import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.exceptions.ArgumentMismatchException
+import net.nemerosa.ontrack.graphql.schema.listInputType
 import java.util.*
+
+/**
+ * Creates a `[String!]!` GraphQL argument.
+ *
+ * @param name Name of the argument
+ * @param description Description of the argument
+ */
+fun stringListArgument(
+    name: String,
+    description: String,
+): GraphQLArgument = GraphQLArgument.newArgument()
+    .name(name)
+    .description(description)
+    .type(listInputType(GraphQLString))
+    .build()
 
 /**
  * Creates a `String` GraphQL argument.
