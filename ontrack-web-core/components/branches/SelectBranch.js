@@ -3,7 +3,11 @@ import {Select} from "antd";
 import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 
-export default function SelectBranch({project, value, onChange, disabled}) {
+export default function SelectBranch({
+                                         project, value, onChange, disabled,
+                                         placeholder = "Type the name of the branch",
+                                         idAsValue = false,
+                                     }) {
     const [branches, setBranches] = useState([])
     const [searching, setSearching] = useState(false)
 
@@ -19,6 +23,7 @@ export default function SelectBranch({project, value, onChange, disabled}) {
                     gql`
                         query SearchBranches($project: String!, $token: String!) {
                             branches(project: $project, token: $token) {
+                                id
                                 name
                             }
                         }
@@ -45,7 +50,7 @@ export default function SelectBranch({project, value, onChange, disabled}) {
                 disabled={disabled}
                 showSearch={true}
                 value={value}
-                placeholder="Type the name of the branch"
+                placeholder={placeholder}
                 defaultActiveFirstOption={true}
                 showArrow={false}
                 filterOption={false}
@@ -55,7 +60,7 @@ export default function SelectBranch({project, value, onChange, disabled}) {
                 onClear={handleClear}
                 notFoundContent={null}
                 options={(branches || []).map((d) => ({
-                    value: d.name,
+                    value: idAsValue ? d.id : d.name,
                     label: d.name,
                 }))}
                 style={{
