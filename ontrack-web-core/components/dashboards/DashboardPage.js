@@ -13,6 +13,7 @@ import {
     shareDashboardQuery
 } from "@components/dashboards/DashboardConstants";
 import {Modal} from "antd";
+import JumpToProject from "@components/projects/JumpToProject";
 
 export default function DashboardPage({
                                           title,
@@ -217,6 +218,7 @@ export default function DashboardPage({
     }, [])
 
     const commands = [
+        <JumpToProject key="project"/>,
         <DashboardCommandMenu key="dashboard"/>
     ]
 

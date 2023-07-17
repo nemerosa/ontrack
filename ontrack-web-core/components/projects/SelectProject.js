@@ -3,7 +3,11 @@ import {Select} from "antd";
 import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 
-export default function SelectProject({value, onChange}) {
+export default function SelectProject({
+                                          value, onChange,
+                                          placeholder = "Type the name of the project",
+                                          idAsValue = false,
+                                      }) {
     const [projects, setProjects] = useState([])
     const [searching, setSearching] = useState(false)
 
@@ -19,6 +23,7 @@ export default function SelectProject({value, onChange}) {
                     gql`
                         query SearchProjects($token: String!) {
                             projects(pattern: $token) {
+                                id
                                 name
                             }
                         }
@@ -44,7 +49,7 @@ export default function SelectProject({value, onChange}) {
             <Select
                 showSearch={true}
                 value={value}
-                placeholder="Type the name of the project"
+                placeholder={placeholder}
                 defaultActiveFirstOption={true}
                 showArrow={false}
                 filterOption={false}
@@ -54,7 +59,7 @@ export default function SelectProject({value, onChange}) {
                 onClear={handleClear}
                 notFoundContent={null}
                 options={(projects || []).map((d) => ({
-                    value: d.name,
+                    value: idAsValue ? d.id : d.name,
                     label: d.name,
                 }))}
                 style={{
