@@ -7,9 +7,7 @@ export default function PageSection({loading, title, extra, children}) {
             headStyle={{
                 backgroundColor: 'lightgrey'
             }}
-            style={{
-                width: '100%'
-            }}
+            className="ot-line"
             extra={extra}
         >
             {children}

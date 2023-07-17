@@ -1,0 +1,6 @@
+/**
+ * For any component which must span 100% of the horizontal space
+ */
+.ot-line {
+    width: 100%;
+}

@@ -11,6 +11,7 @@ import LoadingContainer from "@components/common/LoadingContainer";
 import {gqlDecorationFragment} from "@components/services/fragments";
 import PageSection from "@components/common/PageSection";
 import BranchList from "@components/branches/BranchList";
+import {Space} from "antd";
 
 export default function ProjectView({id}) {
 
@@ -84,17 +85,25 @@ export default function ProjectView({id}) {
                 breadcrumbs={projectBreadcrumbs(project)}
                 commands={commands}
             >
-                {favouriteBranches &&
+                <Space direction="vertical" className="ot-line">
+                    {favouriteBranches &&
+                        <PageSection
+                            loading={loadingProject}
+                            title="Favourite branches"
+                        >
+                            <BranchList
+                                branches={favouriteBranches}
+                                showProject={false}
+                            />
+                        </PageSection>
+                    }
                     <PageSection
                         loading={loadingProject}
-                        title="Favourite branches"
+                        title="Last active branches"
                     >
-                        <BranchList
-                            branches={favouriteBranches}
-                            showProject={false}
-                        />
+
                     </PageSection>
-                }
+                </Space>
             </MainPage>
         </>
     )
