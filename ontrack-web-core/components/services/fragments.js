@@ -10,3 +10,14 @@ export const gqlDecorationFragment = gql`
         }
     }
 `
+
+export const gqlPropertiesFragment = gql`
+    fragment propertiesFragment on Property {
+        type {
+            typeName
+            name
+        }
+        editable
+        value
+    }
+`

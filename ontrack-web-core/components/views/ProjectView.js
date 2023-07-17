@@ -7,13 +7,14 @@ import {projectTitle} from "@components/common/Titles";
 import {projectBreadcrumbs} from "@components/common/Breadcrumbs";
 import {CloseCommand} from "@components/common/Commands";
 import {homeUri} from "@components/common/Links";
-import {gqlDecorationFragment} from "@components/services/fragments";
+import {gqlDecorationFragment, gqlPropertiesFragment} from "@components/services/fragments";
 import PageSection from "@components/common/PageSection";
 import BranchList from "@components/branches/BranchList";
-import {Empty, Space} from "antd";
+import {Col, Empty, Row, Space} from "antd";
 import RowTag from "@components/common/RowTag";
 import BranchBox from "@components/branches/BranchBox";
 import JumpToBranch from "@components/branches/JumpToBranch";
+import PropertiesSection from "@components/framework/properties/PropertiesSection";
 
 export default function ProjectView({id}) {
 
@@ -32,6 +33,9 @@ export default function ProjectView({id}) {
                         projects(id: $id) {
                             id
                             name
+                            properties {
+                                ...propertiesFragment
+                            }
                             branches(order: true, count: 5) {
                                 project {
                                     id
@@ -74,6 +78,7 @@ export default function ProjectView({id}) {
                     }
 
                     ${gqlDecorationFragment}
+                    ${gqlPropertiesFragment}
                 `,
                 {id}
             ).then(data => {
@@ -101,7 +106,7 @@ export default function ProjectView({id}) {
                 breadcrumbs={projectBreadcrumbs(project)}
                 commands={commands}
             >
-                <Space direction="vertical" className="ot-line">
+                <Space direction="vertical" className="ot-line" size={16}>
                     {
                         favouriteBranches && favouriteBranches.length > 0 &&
                         <PageSection
@@ -114,29 +119,39 @@ export default function ProjectView({id}) {
                             />
                         </PageSection>
                     }
-                    <PageSection
-                        loading={loadingProject}
-                        title="Last active branches"
-                    >
-                        {
-                            (!branches || branches.length === 0) &&
-                            <Empty
-                                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                                description="No branch has been created for this project"
-                            />
-                        }
-                        {
-                            branches && branches.length > 0 &&
-                            <Space direction="horizontal" size={16} wrap>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <PageSection
+                                loading={loadingProject}
+                                title="Last active branches"
+                            >
                                 {
-                                    branches.map(branch => <RowTag key={branch.id}>
-                                            <BranchBox branch={branch}/>
-                                        </RowTag>
-                                    )
+                                    (!branches || branches.length === 0) &&
+                                    <Empty
+                                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                        description="No branch has been created for this project"
+                                    />
                                 }
-                            </Space>
-                        }
-                    </PageSection>
+                                {
+                                    branches && branches.length > 0 &&
+                                    <Space direction="horizontal" size={16} wrap>
+                                        {
+                                            branches.map(branch => <RowTag key={branch.id}>
+                                                    <BranchBox branch={branch}/>
+                                                </RowTag>
+                                            )
+                                        }
+                                    </Space>
+                                }
+                            </PageSection>
+                        </Col>
+                        <Col span={12}>
+                            <PropertiesSection
+                                loading={loadingProject}
+                                entity={project}
+                            />
+                        </Col>
+                    </Row>
                 </Space>
             </MainPage>
         </>
