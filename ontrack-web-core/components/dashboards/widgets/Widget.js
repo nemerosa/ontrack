@@ -1,10 +1,11 @@
-import {Card, Skeleton, Space} from "antd";
-import {useContext, useState} from "react";
+import {Space} from "antd";
+import {useContext} from "react";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 import WidgetCommand from "@components/dashboards/commands/WidgetCommand";
 import {FaCompressArrowsAlt, FaExpandArrowsAlt, FaRegEdit, FaRegSave, FaTrash, FaWindowClose} from "react-icons/fa";
 import {WidgetContext, WidgetDispatchContext, widgetFormSubmit} from "@components/dashboards/widgets/WidgetContext";
 import {WidgetExpansionContext} from "@components/dashboards/layouts/WidgetExpansionContext";
+import PageSection from "@components/common/PageSection";
 
 export default function Widget({title, loading, commands, form, children}) {
 
@@ -20,14 +21,9 @@ export default function Widget({title, loading, commands, form, children}) {
     }
 
     return (
-        <Card
-            title={loading ? "Loading..." : title}
-            headStyle={{
-                backgroundColor: 'lightgrey'
-            }}
-            style={{
-                width: '100%'
-            }}
+        <PageSection
+            loading={loading}
+            title={title}
             extra={
                 <>
                     {
@@ -87,9 +83,8 @@ export default function Widget({title, loading, commands, form, children}) {
                 </>
             }
         >
-            {loading && <Skeleton active/>}
-            {!loading && !widgetContext.editionMode && children}
-            {!loading && widgetContext.editionMode && form}
-        </Card>
+            {!widgetContext.editionMode && children}
+            {widgetContext.editionMode && form}
+        </PageSection>
     )
 }

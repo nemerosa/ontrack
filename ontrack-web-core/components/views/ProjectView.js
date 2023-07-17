@@ -8,11 +8,16 @@ import {projectBreadcrumbs} from "@components/common/Breadcrumbs";
 import {CloseCommand} from "@components/common/Commands";
 import {homeUri} from "@components/common/Links";
 import LoadingContainer from "@components/common/LoadingContainer";
+import {gqlDecorationFragment} from "@components/services/fragments";
+import PageSection from "@components/common/PageSection";
+import BranchList from "@components/branches/BranchList";
 
 export default function ProjectView({id}) {
 
     const [loadingProject, setLoadingProject] = useState(true)
+
     const [project, setProject] = useState({})
+    const [favouriteBranches, setFavouriteBranches] = useState([])
 
     useEffect(() => {
         if (id) {
@@ -23,12 +28,43 @@ export default function ProjectView({id}) {
                         projects(id: $id) {
                             id
                             name
+                            favouriteBranches: branches(favourite: true, order: true) {
+                                id
+                                name
+                                disabled
+                                decorations {
+                                    ...decorationContent
+                                }
+                                project {
+                                    id
+                                    name
+                                }
+                                latestBuild: builds(count: 1) {
+                                    id
+                                    name
+                                }
+                                promotionLevels {
+                                    id
+                                    name
+                                    image
+                                    promotionRuns(first: 1) {
+                                        build {
+                                            id
+                                            name
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
+
+                    ${gqlDecorationFragment}
                 `,
                 {id}
             ).then(data => {
                 setProject(data.projects[0])
+                setFavouriteBranches(data.projects[0].favouriteBranches)
+            }).finally(() => {
                 setLoadingProject(false)
             })
         }
@@ -48,9 +84,17 @@ export default function ProjectView({id}) {
                 breadcrumbs={projectBreadcrumbs(project)}
                 commands={commands}
             >
-                <LoadingContainer loading={loadingProject} tip="Loading project">
-                    {project.name}
-                </LoadingContainer>
+                {favouriteBranches &&
+                    <PageSection
+                        loading={loadingProject}
+                        title="Favourite branches"
+                    >
+                        <BranchList
+                            branches={favouriteBranches}
+                            showProject={false}
+                        />
+                    </PageSection>
+                }
             </MainPage>
         </>
     )
