@@ -9,6 +9,7 @@ import NewProjectDialog, {useNewProjectDialog} from "@components/projects/NewPro
 import {UserContext} from "@components/providers/UserProvider";
 import LastActiveProjectsWidgetForm from "@components/dashboards/widgets/home/LastActiveProjectsWidgetForm";
 import RowTag from "@components/common/RowTag";
+import {gqlDecorationFragment} from "@components/services/fragments";
 
 export default function LastActiveProjectsWidget({count}) {
 
@@ -51,8 +52,13 @@ export default function LastActiveProjectsWidget({count}) {
                                 id
                                 name
                                 favourite
+                                decorations {
+                                    ...decorationContent
+                                }
                             }
                         }
+                        
+                        ${gqlDecorationFragment}
                     `
                 }
                 queryDeps={[user, count, projectsRefreshCount]}

@@ -7,7 +7,7 @@ export default function PropertyList({properties}) {
             {
                 properties && <Space direction="vertical">
                     {properties.filter(it => it.value).map(property =>
-                        <Property property={property}/>
+                        <Property key={property.type.typeName} property={property}/>
                     )}
                 </Space>
             }
