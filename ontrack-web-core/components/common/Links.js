@@ -56,14 +56,14 @@ export function predefinedPromotionLevelImageUri(predefinedPromotionLevel) {
     return `${legacyUri()}rest/admin/predefinedPromotionLevels/${predefinedPromotionLevel.id}/image`
 }
 
-export const PromotionLevelImage = ({promotionLevel}) => {
+export const PromotionLevelImage = ({promotionLevel, size = 16}) => {
     return (
         promotionLevel.image ?
             <Image
                 src={promotionLevelImageUri(promotionLevel)}
                 alt={promotionLevel.name}
-                width={16}
-                height={16}
+                width={size}
+                height={size}
             /> : undefined
     )
 }

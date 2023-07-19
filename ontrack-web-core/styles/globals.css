@@ -4,3 +4,22 @@
 .ot-line {
     width: 100%;
 }
+
+/**
+ * Change the transparency of an item on hover
+ */
+
+.ot-hover-transparent-10 {
+    opacity: 10%;
+}
+
+.ot-hover-transparent-10:hover {
+    opacity: 100%;
+}
+
+/**
+ * Displaying a pointer cursor
+ */
+.ot-action {
+    cursor: pointer;
+}

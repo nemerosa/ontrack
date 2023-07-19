@@ -8,6 +8,10 @@ import MainPage from "@components/layouts/MainPage";
 import {branchBreadcrumbs} from "@components/common/Breadcrumbs";
 import LoadingContainer from "@components/common/LoadingContainer";
 import {gql} from "graphql-request";
+import {BranchViewContextProvider} from "@components/branches/BranchViewContext";
+import BranchInfoViewExpandButton from "@components/branches/BranchInfoViewExpandButton";
+import BranchInfoViewDrawer from "@components/branches/BranchInfoViewDrawer";
+import BranchContent from "@components/branches/BranchContent";
 
 export default function BranchView({id}) {
     const [loadingBranch, setLoadingBranch] = useState(true)
@@ -53,7 +57,11 @@ export default function BranchView({id}) {
                 commands={commands}
             >
                 <LoadingContainer loading={loadingBranch} tip="Loading branch">
-                    {branch.name}
+                    <BranchViewContextProvider>
+                        <BranchContent branch={branch}/>
+                        <BranchInfoViewExpandButton/>
+                        <BranchInfoViewDrawer/>
+                    </BranchViewContextProvider>
                 </LoadingContainer>
             </MainPage>
         </>
