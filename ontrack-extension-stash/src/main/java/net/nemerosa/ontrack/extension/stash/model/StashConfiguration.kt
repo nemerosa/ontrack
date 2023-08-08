@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.stash.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APILabel
+import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
-import net.nemerosa.ontrack.model.form.Password
-import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 import org.apache.commons.lang3.StringUtils
@@ -15,13 +15,20 @@ import java.lang.String.format
  * @property url Bitbucket URL
  * @property user User name
  * @property password User password
+ * @property autoMergeToken Token used for approving pull requests for the auto merge operations
  */
 // TODO #532 Workaround
 open class StashConfiguration(
     name: String,
     val url: String,
     user: String?,
-    password: String?
+    password: String?,
+    @APILabel("Auto merge user")
+    @APIDescription("Slug of the user approving pull requests for the auto merge operations")
+    val autoMergeUser: String?,
+    @APILabel("Auto merge token")
+    @APIDescription("Token used for approving pull requests for the auto merge operations")
+    val autoMergeToken: String?,
 ) : UserPasswordConfiguration<StashConfiguration>(name, user, password) {
 
     /**
@@ -38,16 +45,23 @@ open class StashConfiguration(
             format("%s (%s)", name, url)
         )
 
-    override fun obfuscate(): StashConfiguration {
-        return withPassword("")
-    }
+    override fun obfuscate() = StashConfiguration(
+        name = name,
+        url = url,
+        user = user,
+        password = "",
+        autoMergeUser = autoMergeUser,
+        autoMergeToken = "",
+    )
 
     override fun withPassword(password: String?): StashConfiguration {
         return StashConfiguration(
-            name,
-            url,
-            user,
-            password
+            name = name,
+            url = url,
+            user = user,
+            password = password,
+            autoMergeUser = autoMergeUser,
+            autoMergeToken = autoMergeToken,
         )
     }
 
@@ -57,6 +71,8 @@ open class StashConfiguration(
             .fill("url", url)
             .fill("user", user)
             .fill("password", "")
+            .fill("autoMergeUser", autoMergeUser)
+            .fill("autoMergeToken", "")
     }
 
     companion object {
@@ -81,6 +97,8 @@ open class StashConfiguration(
                         .length(40)
                         .optional()
                 )
+                .textField(StashConfiguration::autoMergeUser, null)
+                .passwordField(StashConfiguration::autoMergeToken)
         }
     }
 }

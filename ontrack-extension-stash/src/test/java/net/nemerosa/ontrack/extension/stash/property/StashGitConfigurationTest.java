@@ -13,7 +13,7 @@ public class StashGitConfigurationTest {
                 new StashConfiguration(
                         "server",
                         "http://stash.mycompany.com",
-                        "", ""
+                        "", "", null, null
                 ), "nemerosa", "ontrack",
                 0, ""
         );
@@ -33,7 +33,7 @@ public class StashGitConfigurationTest {
                 new StashConfiguration(
                         "cloud",
                         "https://bitbucket.org",
-                        "", ""
+                        "", "", null, null
                 ), "nemerosa", "ontrack",
                 0, ""
         );

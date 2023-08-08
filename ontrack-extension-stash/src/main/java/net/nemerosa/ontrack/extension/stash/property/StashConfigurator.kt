@@ -53,12 +53,11 @@ class StashConfigurator(
                 null
             }
 
-    private fun getGitConfiguration(property: StashProjectConfigurationProperty): GitConfiguration {
-        return StashGitConfiguration(
+    fun getGitConfiguration(property: StashProjectConfigurationProperty): StashGitConfiguration =
+        StashGitConfiguration(
                 property,
                 getConfiguredIssueService(property)
         )
-    }
 
     private fun getConfiguredIssueService(property: StashProjectConfigurationProperty): ConfiguredIssueService? =
             property.issueServiceConfigurationIdentifier
