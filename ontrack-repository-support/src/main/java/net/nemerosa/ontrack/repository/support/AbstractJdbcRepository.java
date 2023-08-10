@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 
@@ -53,7 +54,18 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
         return keyHolder.getKey().intValue();
     }
 
+    @Nullable
     protected <T> T getFirstItem(String sql, MapSqlParameterSource criteria, Class<T> type) {
+        List<T> items = getNamedParameterJdbcTemplate().queryForList(sql, criteria, type);
+        if (items.isEmpty()) {
+            return null;
+        } else {
+            return items.get(0);
+        }
+    }
+
+    @Nullable
+    protected <T> T getFirstItem(String sql, Map<String,?> criteria, Class<T> type) {
         List<T> items = getNamedParameterJdbcTemplate().queryForList(sql, criteria, type);
         if (items.isEmpty()) {
             return null;

@@ -41,6 +41,7 @@ class AutoVersioningConfigSetup {
     var promotion: String = "IRON"
 
     var validationStamp: String? = null
+    var qualifier: String? = null
 
     @Deprecated("Use project property directory")
     fun sourceProject(value: String) {
@@ -71,7 +72,8 @@ class AutoVersioningConfigSetup {
         postProcessing = null,
         postProcessingConfig = null,
         validationStamp = validationStamp,
-        autoApprovalMode = AutoApprovalMode.SCM
+        autoApprovalMode = AutoApprovalMode.SCM,
+        qualifier = qualifier,
     )
 
 }

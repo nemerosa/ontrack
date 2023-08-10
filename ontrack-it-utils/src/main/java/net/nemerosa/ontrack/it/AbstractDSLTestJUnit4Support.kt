@@ -322,7 +322,8 @@ abstract class AbstractDSLTestJUnit4Support : AbstractServiceTestJUnit4Support()
     fun Build.unlinkTo(build: Build) {
         structureService.deleteBuildLink(
                 this,
-                build
+                build,
+            ""
         )
     }
 

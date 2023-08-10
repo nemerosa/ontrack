@@ -6,10 +6,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.extensions.support.Abstra
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.BuildSearchForm
-import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
 
@@ -30,17 +27,19 @@ class IngestionLinksEventProcessor(
 
     override fun process(build: Build, input: GitHubIngestionLinksPayload): IngestionEventProcessingResultDetails {
         val targets = input.buildLinks.mapNotNull { link ->
-            getTargetBuild(link)
+            getTargetBuild(link)?.run {
+                BuildLink(this, link.qualifier ?: BuildLink.DEFAULT)
+            }
         }
         // Gets the existing links
         val existingLinks =
-            structureService.getBuildsUsedBy(build, size = Int.MAX_VALUE).pageItems.map { it.id() }.toMutableSet()
+            structureService.getQualifiedBuildsUsedBy(build, size = Int.MAX_VALUE).pageItems.toMutableList()
         // Added links
-        val addedLinks = mutableSetOf<Int>()
+        val addedLinks = mutableSetOf<BuildLink>()
         // Adding all links of the input
         targets.forEach { link ->
-            structureService.addBuildLink(build, link)
-            addedLinks += link.id()
+            structureService.createBuildLink(build, link.build, link.qualifier)
+            addedLinks += link
         }
         // Deletes all authorised links which were not added again
         var removedLinks = 0
@@ -48,10 +47,11 @@ class IngestionLinksEventProcessor(
             // Other links, not authorised to view, were not subject to edition and are not visible
             existingLinks.removeAll(addedLinks)
             removedLinks = existingLinks.size
-            existingLinks.forEach { buildId ->
+            existingLinks.forEach { link ->
                 structureService.deleteBuildLink(
                     build,
-                    structureService.getBuild(ID.of(buildId))
+                    link.build,
+                    link.qualifier,
                 )
             }
         }

@@ -11,7 +11,7 @@ class PaginatedList<T>(
     val pageItems: List<T>,
 ) {
 
-    fun <S> map(fn: (T) -> S) = PaginatedList<S>(
+    fun <S> map(fn: (T) -> S) = PaginatedList(
         pageInfo = pageInfo,
         pageItems = pageItems.map(fn)
     )

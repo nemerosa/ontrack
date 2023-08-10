@@ -6,7 +6,29 @@ import org.springframework.stereotype.Repository
 import javax.sql.DataSource
 
 @Repository
-class BranchJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(dataSource), BranchRepository {
+class BranchJdbcRepository(
+    dataSource: DataSource,
+    private val projectJdbcRepositoryAccessor: ProjectJdbcRepositoryAccessor,
+) : AbstractJdbcRepository(dataSource), BranchRepository, BranchJdbcRepositoryAccessor {
+
+    override fun getBranch(id: ID, project: Project?): Branch =
+        getFirstItem(
+            """
+               SELECT *
+                FROM branches
+                WHERE id = :id
+            """,
+            params("id", id.value)
+        ) { rs, _ ->
+            Branch(
+                id = id(rs),
+                name = rs.getString("name"),
+                description = rs.getString("description"),
+                isDisabled = rs.getBoolean("disabled"),
+                project = project ?: projectJdbcRepositoryAccessor.getProject(id(rs, "projectid")),
+                signature = readSignature(rs)
+            )
+        }
 
     override fun filterBranchesForProject(
         project: Project,

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
 import net.nemerosa.ontrack.model.security.BuildConfig
@@ -9,56 +9,93 @@ import net.nemerosa.ontrack.model.security.BuildEdit
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class BuildLinkIT : AbstractDSLTestJUnit4Support() {
+class BuildLinkIT : AbstractDSLTestSupport() {
 
-    @Test(expected = ProjectNotFoundException::class)
-    fun `Edition of links - project not found at all`() {
-        val source = doCreateBuild()
-        asUser().with(source, BuildConfig::class.java).call {
-            // Adds the link using a form
-            structureService.editBuildLinks(
-                    source,
-                    BuildLinkForm(false,
-                            BuildLinkFormItem(uid("P"), "xxx")
-                    )
+    @Test
+    fun `Adding qualified build links`() {
+        asAdmin {
+            val source = doCreateBuild()
+            val target = doCreateBuild()
+            // Default link
+            structureService.createBuildLink(source, target, BuildLink.DEFAULT)
+            // Other qualifiers
+            structureService.createBuildLink(source, target, "dep1")
+            structureService.createBuildLink(source, target, "dep2")
+            // Gets the list of links
+            val links = structureService.getQualifiedBuildsUsedBy(source).pageItems
+            assertEquals(3, links.size)
+            assertEquals(
+                mapOf(
+                    "" to target.id(),
+                    "dep1" to target.id(),
+                    "dep2" to target.id(),
+                ),
+                links.associate {
+                    it.qualifier to it.build.id()
+                }
             )
         }
     }
 
-    @Test(expected = ProjectNotFoundException::class)
-    fun `Edition of links - project not authorised`() {
-        withNoGrantViewToAll {
-            val source = doCreateBuild()
-            val target = doCreateBuild()
-            asUser().with(source, BuildConfig::class.java).call {
-                // Adds the link using a form
+    @Test
+    fun `Edition of links - project not found at all`() {
+        val source = doCreateBuild()
+        asUser().withProjectFunction(source, BuildConfig::class.java).call {
+            // Adds the link using a form
+            assertFailsWith<ProjectNotFoundException> {
                 structureService.editBuildLinks(
-                        source,
-                        BuildLinkForm(false,
-                                BuildLinkFormItem(target.project.name, target.name)
-                        )
+                    source,
+                    BuildLinkForm(
+                        false,
+                        BuildLinkFormItem(uid("P"), "xxx", "")
+                    )
                 )
             }
         }
     }
 
-    @Test(expected = BuildNotFoundException::class)
+    @Test
+    fun `Edition of links - project not authorised`() {
+        withNoGrantViewToAll {
+            val source = doCreateBuild()
+            val target = doCreateBuild()
+            asUser().withProjectFunction(source, BuildConfig::class.java).call {
+                // Adds the link using a form
+                assertFailsWith<ProjectNotFoundException> {
+                    structureService.editBuildLinks(
+                        source,
+                        BuildLinkForm(
+                            false,
+                            BuildLinkFormItem(target.project.name, target.name, "")
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Edition of links - build not found`() {
         val source = doCreateBuild()
         val target = doCreateProject()
-        asUser().with(source, BuildConfig::class.java).withView(target).call {
+        asUser().withProjectFunction(source, BuildConfig::class.java).withView(target).call {
             // Adds the link using a form
-            structureService.editBuildLinks(
+            assertFailsWith<BuildNotFoundException> {
+                structureService.editBuildLinks(
                     source,
-                    BuildLinkForm(false,
-                            BuildLinkFormItem(target.name, "xxx")
+                    BuildLinkForm(
+                        false,
+                        BuildLinkFormItem(target.name, "xxx", "")
                     )
-            )
+                )
+            }
         }
     }
 
@@ -68,26 +105,28 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         val target1 = doCreateBuild()
         val target2 = doCreateBuild()
         val target3 = doCreateBuild()
-        asUser().with(source, BuildConfig::class.java).withView(target1).call {
-            structureService.addBuildLink(source, target1)
+        asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).call {
+            structureService.createBuildLink(source, target1, BuildLink.DEFAULT)
         }
-        asUser().with(source, BuildConfig::class.java).withView(target2).call {
-            structureService.addBuildLink(source, target2)
+        asUser().withProjectFunction(source, BuildConfig::class.java).withView(target2).call {
+            structureService.createBuildLink(source, target2, BuildLink.DEFAULT)
         }
-        asUser().with(source, BuildConfig::class.java).withView(target1).withView(target2).withView(target3).call {
+        asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).withView(target2)
+            .withView(target3).call {
             // Adds the link using a form
             structureService.editBuildLinks(
-                    source,
-                    BuildLinkForm(false,
-                            BuildLinkFormItem(target1.project.name, target1.name), // Existing
-                            BuildLinkFormItem(target2.project.name, target2.name), // Existing
-                            BuildLinkFormItem(target3.project.name, target3.name) // New
-                    )
+                source,
+                BuildLinkForm(
+                    false,
+                    BuildLinkFormItem(target1.project.name, target1.name, ""), // Existing
+                    BuildLinkFormItem(target2.project.name, target2.name, ""), // Existing
+                    BuildLinkFormItem(target3.project.name, target3.name, "") // New
+                )
             )
             // Checks all builds are still linked
             assertEquals(
-                    setOf(target1.id, target2.id, target3.id),
-                    structureService.getBuildsUsedBy(source).pageItems.map { it.id }.toSet()
+                setOf(target1.id, target2.id, target3.id),
+                structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
             )
         }
     }
@@ -98,26 +137,28 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         val target1 = doCreateBuild()
         val target2 = doCreateBuild()
         val target3 = doCreateBuild()
-        asUser().with(source, BuildConfig::class.java).withView(target1).call {
-            structureService.addBuildLink(source, target1)
+        asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).call {
+            structureService.createBuildLink(source, target1, BuildLink.DEFAULT)
         }
-        asUser().with(source, BuildConfig::class.java).withView(target2).call {
-            structureService.addBuildLink(source, target2)
+        asUser().withProjectFunction(source, BuildConfig::class.java).withView(target2).call {
+            structureService.createBuildLink(source, target2, BuildLink.DEFAULT)
         }
-        asUser().with(source, BuildConfig::class.java).withView(target1).withView(target2).withView(target3).call {
+        asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).withView(target2)
+            .withView(target3).call {
             // Adds the link using a form
             structureService.editBuildLinks(
-                    source,
-                    BuildLinkForm(false,
-                            BuildLinkFormItem(target1.project.name, target1.name), // Existing
-                            // BuildLinkFormItem(target2.project.name, target2.name), // Removing
-                            BuildLinkFormItem(target3.project.name, target3.name) // New
-                    )
+                source,
+                BuildLinkForm(
+                    false,
+                    BuildLinkFormItem(target1.project.name, target1.name, ""), // Existing
+                    // BuildLinkFormItem(target2.project.name, target2.name, ""), // Removing
+                    BuildLinkFormItem(target3.project.name, target3.name, "") // New
+                )
             )
             // Checks all builds are still linked
             assertEquals(
-                    setOf(target1.id, target3.id),
-                    structureService.getBuildsUsedBy(source).pageItems.map { it.id }.toSet()
+                setOf(target1.id, target3.id),
+                structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
             )
         }
     }
@@ -128,24 +169,26 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         val target1 = doCreateBuild()
         val target2 = doCreateBuild()
         val target3 = doCreateBuild()
-        asUser().with(source, BuildConfig::class.java).withView(target1).call {
-            structureService.addBuildLink(source, target1)
+        asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).call {
+            structureService.createBuildLink(source, target1, BuildLink.DEFAULT)
         }
-        asUser().with(source, BuildConfig::class.java).withView(target2).call {
-            structureService.addBuildLink(source, target2)
+        asUser().withProjectFunction(source, BuildConfig::class.java).withView(target2).call {
+            structureService.createBuildLink(source, target2, BuildLink.DEFAULT)
         }
-        asUser().with(source, BuildConfig::class.java).withView(target1).withView(target2).withView(target3).call {
+        asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).withView(target2)
+            .withView(target3).call {
             // Adds the link using a form
             structureService.editBuildLinks(
-                    source,
-                    BuildLinkForm(true,
-                            BuildLinkFormItem(target3.project.name, target3.name) // New
-                    )
+                source,
+                BuildLinkForm(
+                    true,
+                    BuildLinkFormItem(target3.project.name, target3.name, "") // New
+                )
             )
             // Checks all builds are still linked
             assertEquals(
-                    setOf(target1.id, target2.id, target3.id),
-                    structureService.getBuildsUsedBy(source).pageItems.map { it.id }.toSet()
+                setOf(target1.id, target2.id, target3.id),
+                structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
             )
         }
     }
@@ -157,27 +200,29 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
             val target1 = doCreateBuild()
             val target2 = doCreateBuild()
             val target3 = doCreateBuild()
-            asUser().with(source, BuildConfig::class.java).withView(target1).call {
-                structureService.addBuildLink(source, target1)
+            asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).call {
+                structureService.createBuildLink(source, target1, BuildLink.DEFAULT)
             }
-            asUser().with(source, BuildConfig::class.java).withView(target2).call {
-                structureService.addBuildLink(source, target2)
+            asUser().withProjectFunction(source, BuildConfig::class.java).withView(target2).call {
+                structureService.createBuildLink(source, target2, BuildLink.DEFAULT)
             }
-            asUser().with(source, BuildConfig::class.java).withView(target1).withView(target3).call {
+            asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).withView(target3).call {
                 // Adds the link using a form
                 structureService.editBuildLinks(
-                        source,
-                        BuildLinkForm(false,
-                                BuildLinkFormItem(target1.project.name, target1.name), // Existing
-                                BuildLinkFormItem(target3.project.name, target3.name) // New
-                        )
+                    source,
+                    BuildLinkForm(
+                        false,
+                        BuildLinkFormItem(target1.project.name, target1.name, ""), // Existing
+                        BuildLinkFormItem(target3.project.name, target3.name, "") // New
+                    )
                 )
             }
-            asUser().with(source, BuildConfig::class.java).withView(target1).withView(target2).withView(target3).call {
+            asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).withView(target2)
+                .withView(target3).call {
                 // Checks all builds are still linked
                 assertEquals(
-                        setOf(target1.id, target2.id, target3.id),
-                        structureService.getBuildsUsedBy(source).pageItems.map { it.id }.toSet()
+                    setOf(target1.id, target2.id, target3.id),
+                    structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
                 )
             }
         }
@@ -190,27 +235,29 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
             val target1 = doCreateBuild()
             val target2 = doCreateBuild()
             val target3 = doCreateBuild()
-            asUser().with(source, BuildConfig::class.java).withView(target1).call {
-                structureService.addBuildLink(source, target1)
+            asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).call {
+                structureService.createBuildLink(source, target1, BuildLink.DEFAULT)
             }
-            asUser().with(source, BuildConfig::class.java).withView(target2).call {
-                structureService.addBuildLink(source, target2)
+            asUser().withProjectFunction(source, BuildConfig::class.java).withView(target2).call {
+                structureService.createBuildLink(source, target2, BuildLink.DEFAULT)
             }
-            asUser().with(source, BuildConfig::class.java).withView(target1).withView(target3).call {
+            asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).withView(target3).call {
                 // Adds the link using a form
                 structureService.editBuildLinks(
-                        source,
-                        BuildLinkForm(false,
-                                // BuildLinkFormItem(target1.project.name, target1.name), // Removing
-                                BuildLinkFormItem(target3.project.name, target3.name) // New
-                        )
+                    source,
+                    BuildLinkForm(
+                        false,
+                        // BuildLinkFormItem(target1.project.name, target1.name, ""), // Removing
+                        BuildLinkFormItem(target3.project.name, target3.name, "") // New
+                    )
                 )
             }
-            asUser().with(source, BuildConfig::class.java).withView(target1).withView(target2).withView(target3).call {
+            asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).withView(target2)
+                .withView(target3).call {
                 // Checks all builds are still linked
                 assertEquals(
-                        setOf(target2.id, target3.id),
-                        structureService.getBuildsUsedBy(source).pageItems.map { it.id }.toSet()
+                    setOf(target2.id, target3.id),
+                    structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
                 )
             }
         }
@@ -222,26 +269,28 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         val target1 = doCreateBuild()
         val target2 = doCreateBuild()
         val target3 = doCreateBuild()
-        asUser().with(source, BuildConfig::class.java).withView(target1).call {
-            structureService.addBuildLink(source, target1)
+        asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).call {
+            structureService.createBuildLink(source, target1, BuildLink.DEFAULT)
         }
-        asUser().with(source, BuildConfig::class.java).withView(target2).call {
-            structureService.addBuildLink(source, target2)
+        asUser().withProjectFunction(source, BuildConfig::class.java).withView(target2).call {
+            structureService.createBuildLink(source, target2, BuildLink.DEFAULT)
         }
-        asUser().with(source, BuildConfig::class.java).withView(target1).withView(target3).call {
+        asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).withView(target3).call {
             // Adds the link using a form
             structureService.editBuildLinks(
-                    source,
-                    BuildLinkForm(true,
-                            BuildLinkFormItem(target3.project.name, target3.name) // New
-                    )
+                source,
+                BuildLinkForm(
+                    true,
+                    BuildLinkFormItem(target3.project.name, target3.name, "") // New
+                )
             )
         }
-        asUser().with(source, BuildConfig::class.java).withView(target1).withView(target2).withView(target3).call {
+        asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).withView(target2)
+            .withView(target3).call {
             // Checks all builds are still linked
             assertEquals(
-                    setOf(target1.id, target2.id, target3.id),
-                    structureService.getBuildsUsedBy(source).pageItems.map { it.id }.toSet()
+                setOf(target1.id, target2.id, target3.id),
+                structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
             )
         }
     }
@@ -254,17 +303,17 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         val target = doCreateBuild()
         // Build link creation
         asGlobalRole("AUTOMATION").call {
-            structureService.addBuildLink(build, target)
+            structureService.createBuildLink(build, target, BuildLink.DEFAULT)
         }
         // The build link is created
         val targets = asUser().withView(build).withView(target).call {
-            structureService.getBuildsUsedBy(build)
-        }.pageItems
+            structureService.getQualifiedBuildsUsedBy(build)
+        }.pageItems.map { it.build }
         assertTrue(targets.isNotEmpty())
         assertTrue(targets.any { it.name == target.name })
     }
 
-    @Test(expected = AccessDeniedException::class)
+    @Test
     fun `Build config is needed on source build to create a link`() {
         // Creates a build
         val build = doCreateBuild()
@@ -272,11 +321,13 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         val target = doCreateBuild()
         // Build link creation
         asUser().withView(target).call {
-            structureService.addBuildLink(build, target)
+            assertFailsWith<AccessDeniedException> {
+                structureService.createBuildLink(build, target, BuildLink.DEFAULT)
+            }
         }
     }
 
-    @Test(expected = AccessDeniedException::class)
+    @Test
     fun `Build view is needed on target build to create a link`() {
         withNoGrantViewToAll {
             // Creates a build
@@ -284,8 +335,10 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
             // Creates a second build to link
             val target = doCreateBuild()
             // Build link creation
-            asUser().with(build, BuildConfig::class.java).call {
-                structureService.addBuildLink(build, target)
+            asUser().withProjectFunction(build, BuildConfig::class.java).call {
+                assertFailsWith<AccessDeniedException> {
+                    structureService.createBuildLink(build, target, BuildLink.DEFAULT)
+                }
             }
         }
     }
@@ -297,23 +350,23 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         // Creates a second build to link
         val target = doCreateBuild()
         // Build link creation
-        asUser().with(build, BuildConfig::class.java).withView(target).call {
-            structureService.addBuildLink(build, target)
+        asUser().withProjectFunction(build, BuildConfig::class.java).withView(target).call {
+            structureService.createBuildLink(build, target, BuildLink.DEFAULT)
         }
         // The build link is created
         var targets = asUser().withView(build).withView(target).call {
-            structureService.getBuildsUsedBy(build)
+            structureService.getQualifiedBuildsUsedBy(build).map { it.build }
         }.pageItems
         assertTrue(targets.isNotEmpty())
         assertTrue(targets.any { it.name == target.name })
         // Deleting the build
-        asUser().with(build, BuildConfig::class.java).withView(target).call {
-            structureService.deleteBuildLink(build, target)
+        asUser().withProjectFunction(build, BuildConfig::class.java).withView(target).call {
+            structureService.deleteBuildLink(build, target, "")
         }
         // The build link is deleted
         targets = asUser().withView(build).withView(target).call {
-            structureService.getBuildsUsedBy(build)
-        }.pageItems
+            structureService.getQualifiedBuildsUsedBy(build)
+        }.pageItems.map { it.build }
         assertTrue(targets.isEmpty())
     }
 
@@ -324,15 +377,15 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         // Creates a second build to link
         val target = doCreateBuild()
         // Build link creation
-        asUser().with(build, BuildConfig::class.java).withView(target).call {
-            structureService.addBuildLink(build, target)
+        asUser().withProjectFunction(build, BuildConfig::class.java).withView(target).call {
+            structureService.createBuildLink(build, target, BuildLink.DEFAULT)
             // ... twice
-            structureService.addBuildLink(build, target)
+            structureService.createBuildLink(build, target, BuildLink.DEFAULT)
         }
         // The build link is created
         val targets = asUser().withView(build).withView(target).call {
-            structureService.getBuildsUsedBy(build)
-        }.pageItems
+            structureService.getQualifiedBuildsUsedBy(build)
+        }.pageItems.map { it.build }
         assertTrue(targets.isNotEmpty())
         assertEquals(1, targets.size)
         assertTrue(targets.any { it.name == target.name })
@@ -346,16 +399,16 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         val target = doCreateBuild()
         // Build link creation
         asGlobalRole("CONTROLLER").call {
-            structureService.addBuildLink(build, target)
+            structureService.createBuildLink(build, target, BuildLink.DEFAULT)
         }
         // The build link is created
         val targets = asUser().withView(build).withView(target).call {
-            structureService.getBuildsUsedBy(build)
-        }.pageItems
+            structureService.getQualifiedBuildsUsedBy(build)
+        }.pageItems.map { it.build }
         assertEquals(listOf(target.name), targets.map { it.name })
     }
 
-    @Test(expected = AccessDeniedException::class)
+    @Test
     fun `Creator role cannot create links`() {
         // Creates a build
         val build = doCreateBuild()
@@ -363,7 +416,9 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         val target = doCreateBuild()
         // Build link creation
         asGlobalRole("CREATOR").call {
-            structureService.addBuildLink(build, target)
+            assertFailsWith<AccessDeniedException> {
+                structureService.createBuildLink(build, target, BuildLink.DEFAULT)
+            }
         }
     }
 
@@ -374,13 +429,13 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         // Creates a second build to link
         val target = doCreateBuild()
         // Build link creation
-        asUser().with(build, BuildConfig::class.java).withView(target).call {
-            structureService.addBuildLink(build, target)
+        asUser().withProjectFunction(build, BuildConfig::class.java).withView(target).call {
+            structureService.createBuildLink(build, target, BuildLink.DEFAULT)
         }
         // The build link is created
         val targets = asUser().withView(build).withView(target).call {
-            structureService.getBuildsUsedBy(build)
-        }.pageItems
+            structureService.getQualifiedBuildsUsedBy(build)
+        }.pageItems.map { it.build }
         assertEquals(listOf(target.name), targets.map { it.name })
     }
 
@@ -391,25 +446,27 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         // Creates a second build to link
         val target = doCreateBuild()
         // Build link creation
-        asUser().with(build, BuildEdit::class.java).withView(target).call {
-            structureService.addBuildLink(build, target)
+        asUser().withProjectFunction(build, BuildEdit::class.java).withView(target).call {
+            structureService.createBuildLink(build, target, BuildLink.DEFAULT)
         }
         // The build link is created
         val targets = asUser().withView(build).withView(target).call {
-            structureService.getBuildsUsedBy(build)
-        }.pageItems
+            structureService.getQualifiedBuildsUsedBy(build)
+        }.pageItems.map { it.build }
         assertEquals(listOf(target.name), targets.map { it.name })
     }
 
-    @Test(expected = AccessDeniedException::class)
+    @Test
     fun `Build create function does not grant access to create links`() {
         // Creates a build
         val build = doCreateBuild()
         // Creates a second build to link
         val target = doCreateBuild()
         // Build link creation
-        asUser().with(build, BuildCreate::class.java).withView(target).call {
-            structureService.addBuildLink(build, target)
+        asUser().withProjectFunction(build, BuildCreate::class.java).withView(target).call {
+            assertFailsWith<AccessDeniedException> {
+                structureService.createBuildLink(build, target, BuildLink.DEFAULT)
+            }
         }
     }
 
@@ -420,22 +477,30 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         val b2 = doCreateBuild()
         val t1 = doCreateBuild()
         val t2 = doCreateBuild()
+        val t3 = doCreateBuild()
         // Creates the links
-        asUser().with(b1, BuildConfig::class.java).withView(t1).withView(t2).call {
-            structureService.addBuildLink(b1, t1)
-            structureService.addBuildLink(b1, t2)
+        asUser().withProjectFunction(b1, BuildConfig::class.java).withView(t1).withView(t2).withView(t3).call {
+            structureService.createBuildLink(b1, t1, BuildLink.DEFAULT)
+            structureService.createBuildLink(b1, t2, BuildLink.DEFAULT)
+            structureService.createBuildLink(b1, t3, "dep3")
         }
-        asUser().with(b2, BuildConfig::class.java).withView(t2).call {
-            structureService.addBuildLink(b2, t2)
+        asUser().withProjectFunction(b2, BuildConfig::class.java).withView(t2).call {
+            structureService.createBuildLink(b2, t2, BuildLink.DEFAULT)
         }
         // With full rights
-        asUserWithView(b1, b2, t1, t2).call {
+        asUserWithView(b1, b2, t1, t2, t3).call {
             assertTrue(structureService.isLinkedTo(b1, t1.project.name, ""))
             assertTrue(structureService.isLinkedTo(b1, t2.project.name, ""))
             assertTrue(structureService.isLinkedTo(b1, t1.project.name, t1.name))
             assertTrue(structureService.isLinkedTo(b1, t2.project.name, t2.name))
             assertTrue(structureService.isLinkedTo(b1, t1.project.name, t1.name.substring(0, 5) + "*"))
             assertTrue(structureService.isLinkedTo(b1, t2.project.name, t2.name.substring(0, 5) + "*"))
+            assertTrue(structureService.isLinkedTo(b1, t3.project.name, ""))
+            assertTrue(structureService.isLinkedTo(b1, t3.project.name, buildPattern = t3.name))
+            assertTrue(structureService.isLinkedTo(b1, t3.project.name, buildPattern = t3.name, qualifier = "dep3"))
+            assertTrue(structureService.isLinkedTo(b1, t3.project.name, "", qualifier = "dep3"))
+            assertFalse(structureService.isLinkedTo(b1, t3.project.name, "", qualifier = BuildLink.DEFAULT))
+            assertFalse(structureService.isLinkedTo(b1, t3.project.name, buildPattern = t3.name, qualifier = BuildLink.DEFAULT))
 
             assertTrue(structureService.isLinkedFrom(t2, b1.project.name, ""))
             assertTrue(structureService.isLinkedFrom(t2, b1.project.name, b1.name))
@@ -458,9 +523,9 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         val t1 = doCreateBuild(target, nd("2.0.0", ""))
         val t2 = doCreateBuild(target, nd("2.1.0", ""))
         // Creates links
-        asUser().withView(target).with(source, BuildConfig::class.java).call {
-            structureService.addBuildLink(b1, t1)
-            structureService.addBuildLink(b2, t2)
+        asUser().withView(target).withProjectFunction(source, BuildConfig::class.java).call {
+            structureService.createBuildLink(b1, t1, BuildLink.DEFAULT)
+            structureService.createBuildLink(b2, t2, BuildLink.DEFAULT)
         }
         // Standard filter on project
         assertBuildLinkedToFilter(source, target, target.project.name, listOf(b2, b1))
@@ -479,13 +544,13 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
     private fun assertBuildLinkedToFilter(source: Branch, target: Branch, pattern: String, expected: List<Build>) {
         asUserWithView(source, target).call {
             val builds = buildFilterService
-                    .standardFilterProviderData(10)
-                    .withLinkedTo(pattern)
-                    .build()
-                    .filterBranchBuilds(source)
+                .standardFilterProviderData(10)
+                .withLinkedTo(pattern)
+                .build()
+                .filterBranchBuilds(source)
             assertEquals(
-                    expected.map { it.id },
-                    builds.map { it.id }
+                expected.map { it.id },
+                builds.map { it.id }
             )
         }
     }
@@ -501,9 +566,9 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         val t1 = doCreateBuild(target, nd("2.0.0", ""))
         val t2 = doCreateBuild(target, nd("2.1.0", ""))
         // Creates links
-        asUser().withView(target).with(source, BuildConfig::class.java).call {
-            structureService.addBuildLink(b1, t1)
-            structureService.addBuildLink(b2, t2)
+        asUser().withView(target).withProjectFunction(source, BuildConfig::class.java).call {
+            structureService.createBuildLink(b1, t1, BuildLink.DEFAULT)
+            structureService.createBuildLink(b2, t2, BuildLink.DEFAULT)
         }
         // Standard filter on project
         assertBuildLinkedFromFilter(source, target, source.project.name, listOf(t2, t1))
@@ -522,13 +587,13 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
     private fun assertBuildLinkedFromFilter(source: Branch, target: Branch, pattern: String, expected: List<Build>) {
         asUserWithView(source, target).call {
             val builds = buildFilterService
-                    .standardFilterProviderData(10)
-                    .withLinkedFrom(pattern)
-                    .build()
-                    .filterBranchBuilds(target)
+                .standardFilterProviderData(10)
+                .withLinkedFrom(pattern)
+                .build()
+                .filterBranchBuilds(target)
             assertEquals(
-                    expected.map { it.id },
-                    builds.map { it.id }
+                expected.map { it.id },
+                builds.map { it.id }
             )
         }
     }
@@ -544,9 +609,9 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         val t1 = doCreateBuild(target, nd("2.0.0", ""))
         val t2 = doCreateBuild(target, nd("2.1.0", ""))
         // Creates links
-        asUser().withView(target).with(source, BuildConfig::class.java).call {
-            structureService.addBuildLink(b1, t1)
-            structureService.addBuildLink(b2, t2)
+        asUser().withView(target).withProjectFunction(source, BuildConfig::class.java).call {
+            structureService.createBuildLink(b1, t1, BuildLink.DEFAULT)
+            structureService.createBuildLink(b2, t2, BuildLink.DEFAULT)
         }
         // Standard filter on project
         assertProjectLinkedFromFilter(source, target, source.project.name, listOf(t2, t1))
@@ -565,12 +630,12 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
     private fun assertProjectLinkedFromFilter(source: Branch, target: Branch, pattern: String, expected: List<Build>) {
         asUserWithView(source, target).call {
             val builds = structureService.buildSearch(
-                    target.project.id,
-                    BuildSearchForm(linkedFrom = pattern)
+                target.project.id,
+                BuildSearchForm(linkedFrom = pattern)
             )
             assertEquals(
-                    expected.map { it.id },
-                    builds.map { it.id }
+                expected.map { it.id },
+                builds.map { it.id }
             )
         }
     }
@@ -586,9 +651,9 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
         val t1 = doCreateBuild(target, nd("2.0.0", ""))
         val t2 = doCreateBuild(target, nd("2.1.0", ""))
         // Creates links
-        asUser().withView(target).with(source, BuildConfig::class.java).call {
-            structureService.addBuildLink(b1, t1)
-            structureService.addBuildLink(b2, t2)
+        asUser().withView(target).withProjectFunction(source, BuildConfig::class.java).call {
+            structureService.createBuildLink(b1, t1, BuildLink.DEFAULT)
+            structureService.createBuildLink(b2, t2, BuildLink.DEFAULT)
         }
         // Standard filter on project
         assertProjectLinkedToFilter(source, target, target.project.name, listOf(b2, b1))
@@ -607,12 +672,12 @@ class BuildLinkIT : AbstractDSLTestJUnit4Support() {
     private fun assertProjectLinkedToFilter(source: Branch, target: Branch, pattern: String, expected: List<Build>) {
         asUserWithView(source, target).call {
             val builds = structureService.buildSearch(
-                    source.project.id,
-                    BuildSearchForm(linkedTo = pattern)
+                source.project.id,
+                BuildSearchForm(linkedTo = pattern)
             )
             assertEquals(
-                    expected.map { it.id },
-                    builds.map { it.id }
+                expected.map { it.id },
+                builds.map { it.id }
             )
         }
     }

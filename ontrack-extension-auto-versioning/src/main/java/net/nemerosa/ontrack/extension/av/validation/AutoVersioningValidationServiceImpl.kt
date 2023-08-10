@@ -101,9 +101,10 @@ class AutoVersioningValidationServiceImpl(
                             ).firstOrNull()
                         // Creation of the link
                         if (targetBuild != null) {
-                            structureService.addBuildLink(
+                            structureService.createBuildLink(
                                 fromBuild = build,
                                 toBuild = targetBuild,
+                                qualifier = config.qualifier ?: BuildLink.DEFAULT,
                             )
                         }
                     }

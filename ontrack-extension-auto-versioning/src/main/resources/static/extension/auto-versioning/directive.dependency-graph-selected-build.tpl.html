@@ -9,6 +9,7 @@
     <div class="panel-body">
         <p>
             <a href="{{ selectedBuild.branch.project.links._page }}"><b>{{ selectedBuild.branch.project.name }}</b></a>
+            <span ng-if="selectedBuild.qualifier">[{{ selectedBuild.qualifier }}]</span>
             /
             <a href="{{ selectedBuild.branch.links._page }}">{{ selectedBuild.branch.name }}</a>
 

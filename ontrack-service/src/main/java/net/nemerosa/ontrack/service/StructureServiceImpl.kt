@@ -21,10 +21,7 @@ import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityDefined
 import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityNew
 import net.nemerosa.ontrack.model.support.UserTransaction
-import net.nemerosa.ontrack.repository.BranchRepository
-import net.nemerosa.ontrack.repository.CoreBuildFilterRepository
-import net.nemerosa.ontrack.repository.StatsRepository
-import net.nemerosa.ontrack.repository.StructureRepository
+import net.nemerosa.ontrack.repository.*
 import net.nemerosa.ontrack.service.ImageHelper.checkImage
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.Validate
@@ -39,43 +36,50 @@ import java.util.function.BiFunction
 @Service
 @UserTransaction
 class StructureServiceImpl(
-        private val securityService: SecurityService,
-        private val eventPostService: EventPostService,
-        private val eventFactory: EventFactory,
-        private val validationRunStatusService: ValidationRunStatusService,
-        private val validationDataTypeService: ValidationDataTypeService,
-        private val structureRepository: StructureRepository,
-        private val branchRepository: BranchRepository,
-        private val extensionManager: ExtensionManager,
-        private val propertyService: PropertyService,
-        private val predefinedPromotionLevelService: PredefinedPromotionLevelService,
-        private val predefinedValidationStampService: PredefinedValidationStampService,
-        private val decorationService: DecorationService,
-        private val promotionRunCheckService: PromotionRunCheckService,
-        private val statsRepository: StatsRepository,
-        private val buildLinkListenerService: BuildLinkListenerService,
-        private val coreBuildFilterRepository: CoreBuildFilterRepository,
-        private val metricsExportService: MetricsExportService,
+    private val securityService: SecurityService,
+    private val eventPostService: EventPostService,
+    private val eventFactory: EventFactory,
+    private val validationRunStatusService: ValidationRunStatusService,
+    private val validationDataTypeService: ValidationDataTypeService,
+    private val structureRepository: StructureRepository,
+    private val branchRepository: BranchRepository,
+    private val buildLinkRepository: BuildLinkRepository,
+    private val extensionManager: ExtensionManager,
+    private val propertyService: PropertyService,
+    private val predefinedPromotionLevelService: PredefinedPromotionLevelService,
+    private val predefinedValidationStampService: PredefinedValidationStampService,
+    private val decorationService: DecorationService,
+    private val promotionRunCheckService: PromotionRunCheckService,
+    private val statsRepository: StatsRepository,
+    private val buildLinkListenerService: BuildLinkListenerService,
+    private val coreBuildFilterRepository: CoreBuildFilterRepository,
+    private val metricsExportService: MetricsExportService,
 ) : StructureService {
 
     private val logger = LoggerFactory.getLogger(StructureService::class.java)
 
     override val projectStatusViews: List<ProjectStatusView>
         get() = projectList
-                .map { project ->
-                    ProjectStatusView(
-                            project,
-                            decorationService.getDecorations(project),
-                            getBranchStatusViews(project.id)
-                    )
-                }
+            .map { project ->
+                ProjectStatusView(
+                    project,
+                    decorationService.getDecorations(project),
+                    getBranchStatusViews(project.id)
+                )
+            }
 
     override val projectList: List<Project>
         get() {
             val list = structureRepository.projectList
             return when {
                 securityService.isGlobalFunctionGranted(ProjectList::class.java) -> list
-                securityService.isLogged -> list.filter { p -> securityService.isProjectFunctionGranted(p.id(), ProjectView::class.java) }
+                securityService.isLogged -> list.filter { p ->
+                    securityService.isProjectFunctionGranted(
+                        p.id(),
+                        ProjectView::class.java
+                    )
+                }
+
                 else -> throw AccessDeniedException("Authentication is required.")
             }
         }
@@ -134,9 +138,9 @@ class StructureServiceImpl(
     }
 
     override fun findBranchByID(branchId: ID): Branch? =
-            structureRepository.findBranchByID(branchId)?.takeIf {
-                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
-            }
+        structureRepository.findBranchByID(branchId)?.takeIf {
+            securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+        }
 
     override fun getBranch(branchId: ID): Branch {
         val branch = structureRepository.getBranch(branchId)
@@ -173,15 +177,15 @@ class StructureServiceImpl(
 
     override fun getBranchStatusViews(projectId: ID): List<BranchStatusView> {
         return getBranchesForProject(projectId)
-                .map { this.getBranchStatusView(it) }
+            .map { this.getBranchStatusView(it) }
     }
 
     override fun getBranchStatusView(branch: Branch): BranchStatusView {
         return BranchStatusView(
-                branch,
-                decorationService.getDecorations(branch),
-                getLastBuildForBranch(branch),
-                getPromotionLevelListForBranch(branch.id).map { this.toPromotionView(it) }
+            branch,
+            decorationService.getDecorations(branch),
+            getLastBuildForBranch(branch),
+            getPromotionLevelListForBranch(branch.id).map { this.toPromotionView(it) }
         )
     }
 
@@ -220,8 +224,8 @@ class StructureServiceImpl(
         val promotionRun = getLastPromotionRunForPromotionLevel(promotionLevel)
         // OK
         return PromotionView(
-                promotionLevel,
-                promotionRun
+            promotionLevel,
+            promotionRun
         )
     }
 
@@ -233,8 +237,8 @@ class StructureServiceImpl(
     override fun getPromotionRunView(promotionLevel: PromotionLevel): PromotionRunView {
         securityService.checkProjectFunction(promotionLevel.projectId(), ProjectView::class.java)
         return PromotionRunView(
-                promotionLevel,
-                structureRepository.getPromotionRunsForPromotionLevel(promotionLevel)
+            promotionLevel,
+            structureRepository.getPromotionRunsForPromotionLevel(promotionLevel)
         )
     }
 
@@ -246,7 +250,10 @@ class StructureServiceImpl(
         return structureRepository.deletePromotionRun(promotionRunId)
     }
 
-    override fun getEarliestPromotionRunAfterBuild(promotionLevel: PromotionLevel, build: Build): Optional<PromotionRun> {
+    override fun getEarliestPromotionRunAfterBuild(
+        promotionLevel: PromotionLevel,
+        build: Build
+    ): Optional<PromotionRun> {
         securityService.checkProjectFunction(promotionLevel.projectId(), ProjectView::class.java)
         return structureRepository.getEarliestPromotionRunAfterBuild(promotionLevel, build)
     }
@@ -336,9 +343,9 @@ class StructureServiceImpl(
     }
 
     override fun findBuildByID(buildId: ID): Build? =
-            structureRepository.findBuildByID(buildId)?.takeIf {
-                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
-            }
+        structureRepository.findBuildByID(buildId)?.takeIf {
+            securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+        }
 
     override fun getBuild(buildId: ID): Build {
         val build = structureRepository.getBuild(buildId)
@@ -346,22 +353,26 @@ class StructureServiceImpl(
         return build
     }
 
-    override fun findBuild(branchId: ID, sortDirection: BuildSortDirection, buildPredicate: (Build) -> Boolean): Build? {
+    override fun findBuild(
+        branchId: ID,
+        sortDirection: BuildSortDirection,
+        buildPredicate: (Build) -> Boolean
+    ): Build? {
         // Gets the branch
         val branch = getBranch(branchId)
         // Build being found
         var ref: Build? = null
         // Loops over the builds
         structureRepository.builds(
-                branch,
-                { build ->
-                    val ok = buildPredicate(build)
-                    if (ok) {
-                        ref = build
-                    }
-                    !ok // Going on if no match
-                },
-                sortDirection
+            branch,
+            { build ->
+                val ok = buildPredicate(build)
+                if (ok) {
+                    ref = build
+                }
+                !ok // Going on if no match
+            },
+            sortDirection
         )
         // Result
         return ref
@@ -376,9 +387,9 @@ class StructureServiceImpl(
 
     override fun getLastBuild(branchId: ID): Optional<Build> {
         return Optional.ofNullable(
-                structureRepository.getLastBuildForBranch(
-                        getBranch(branchId)
-                )
+            structureRepository.getLastBuildForBranch(
+                getBranch(branchId)
+            )
         )
     }
 
@@ -391,67 +402,108 @@ class StructureServiceImpl(
         }
     }
 
+    @Deprecated("Use createBuildLink instead")
     override fun addBuildLink(fromBuild: Build, toBuild: Build) {
-        securityService.checkProjectFunction(fromBuild, BuildConfig::class.java)
-        securityService.checkProjectFunction(toBuild, ProjectView::class.java)
-        structureRepository.addBuildLink(fromBuild.id, toBuild.id)
-        buildLinkListenerService.onBuildLinkAdded(fromBuild, toBuild)
+        createBuildLink(fromBuild, toBuild, BuildLink.DEFAULT)
     }
 
-    override fun deleteBuildLink(fromBuild: Build, toBuild: Build) {
+    override fun createBuildLink(fromBuild: Build, toBuild: Build, qualifier: String) {
         securityService.checkProjectFunction(fromBuild, BuildConfig::class.java)
         securityService.checkProjectFunction(toBuild, ProjectView::class.java)
-        structureRepository.deleteBuildLink(fromBuild.id, toBuild.id)
-        buildLinkListenerService.onBuildLinkDeleted(fromBuild, toBuild)
+        buildLinkRepository.createBuildLink(fromBuild, toBuild, qualifier)
+        buildLinkListenerService.onBuildLinkAdded(fromBuild, toBuild, qualifier)
     }
 
-    override fun getBuildsUsedBy(build: Build, offset: Int, size: Int, filter: (Build) -> Boolean): PaginatedList<Build> {
+    override fun deleteBuildLink(fromBuild: Build, toBuild: Build, qualifier: String) {
+        securityService.checkProjectFunction(fromBuild, BuildConfig::class.java)
+        securityService.checkProjectFunction(toBuild, ProjectView::class.java)
+        buildLinkRepository.deleteBuildLink(fromBuild, toBuild, qualifier)
+        buildLinkListenerService.onBuildLinkDeleted(fromBuild, toBuild, qualifier)
+    }
+
+    @Deprecated("Only qualified build links should be used")
+    override fun getBuildsUsedBy(
+        build: Build,
+        offset: Int,
+        size: Int,
+        filter: (Build) -> Boolean
+    ): PaginatedList<Build> {
         securityService.checkProjectFunction(build, ProjectView::class.java)
         // Gets the complete list, filtered by ACL
         val list = structureRepository.getBuildsUsedBy(build)
-                .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
+            .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
         // OK
         return PaginatedList.create(list.filter(filter), offset, size)
     }
 
-    override fun getBuildsUsing(build: Build, offset: Int, size: Int, filter: (Build) -> Boolean): PaginatedList<Build> {
+    override fun getQualifiedBuildsUsedBy(
+        build: Build,
+        offset: Int,
+        size: Int,
+        filter: (Build) -> Boolean
+    ): PaginatedList<BuildLink> {
+        securityService.checkProjectFunction(build, ProjectView::class.java)
+        // Gets the complete list, filtered by ACL
+        val list = buildLinkRepository.getQualifiedBuildsUsedBy(build)
+            .filter { b -> securityService.isProjectFunctionGranted(b.build, ProjectView::class.java) }
+        // OK
+        return PaginatedList.create(list.filter { filter(it.build) }, offset, size)
+    }
+
+    @Deprecated("Only qualified build links should be used")
+    override fun getBuildsUsing(
+        build: Build,
+        offset: Int,
+        size: Int,
+        filter: (Build) -> Boolean
+    ): PaginatedList<Build> {
         securityService.checkProjectFunction(build, ProjectView::class.java)
         // Gets the complete list, filtered by ACL
         val list = structureRepository.getBuildsUsing(build)
-                .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
+            .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
         // OK
         return PaginatedList.create(list.filter(filter), offset, size)
     }
 
-    override fun searchBuildsLinkedTo(projectName: String, buildPattern: String): List<Build> {
-        return structureRepository.searchBuildsLinkedTo(projectName, buildPattern)
-                .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
+    override fun getQualifiedBuildsUsing(
+        build: Build,
+        offset: Int,
+        size: Int,
+        filter: (Build) -> Boolean
+    ): PaginatedList<BuildLink> {
+        securityService.checkProjectFunction(build, ProjectView::class.java)
+        // Gets the complete list, filtered by ACL
+        val list = buildLinkRepository.getQualifiedBuildsUsing(build)
+            .filter { b -> securityService.isProjectFunctionGranted(b.build, ProjectView::class.java) }
+        // OK
+        return PaginatedList.create(list.filter { filter(it.build) }, offset, size)
     }
 
     override fun editBuildLinks(build: Build, form: BuildLinkForm) {
         securityService.checkProjectFunction(build, BuildConfig::class.java)
         // Gets the existing links, filtered by authorisations
-        val authorisedExistingLinks = structureRepository.getBuildsUsedBy(build)
-                .filter { securityService.isProjectFunctionGranted(it, ProjectView::class.java) }
-                .map { it.id }
+        val authorisedExistingLinks = buildLinkRepository.getQualifiedBuildsUsedBy(build)
+            .filter { securityService.isProjectFunctionGranted(it.build, ProjectView::class.java) }
         // Added links
-        val addedLinks = HashSet<ID>()
+        val addedLinks = mutableSetOf<BuildLink>()
         // Loops through the new links
         form.links.forEach { item ->
             // Gets the project if possible
             val project = findProjectByName(item.project)
-                    .orElseThrow { ProjectNotFoundException(item.project) }
+                .orElseThrow { ProjectNotFoundException(item.project) }
             // Finds the build if possible (exact match - no regex)
-            val builds = buildSearch(project.id, BuildSearchForm(
-                maximumCount = 1,
-                buildName = item.build,
-                buildExactMatch = true,
-            ))
+            val builds = buildSearch(
+                project.id, BuildSearchForm(
+                    maximumCount = 1,
+                    buildName = item.build,
+                    buildExactMatch = true,
+                )
+            )
             if (builds.isNotEmpty()) {
                 val target = builds[0]
                 // Adds the link
-                addBuildLink(build, target)
-                addedLinks.add(target.id)
+                createBuildLink(build, target, item.qualifier)
+                addedLinks.add(BuildLink(target, item.qualifier))
             } else {
                 throw BuildNotFoundException(item.project, item.build)
             }
@@ -461,31 +513,42 @@ class StructureServiceImpl(
             // Other links, not authorised to view, were not subject to edition and are not visible
             val linksToDelete = HashSet(authorisedExistingLinks)
             linksToDelete.removeAll(addedLinks)
-            linksToDelete.forEach { id ->
+            linksToDelete.forEach { link ->
                 deleteBuildLink(
-                        build,
-                        getBuild(id)
+                    build,
+                    link.build,
+                    link.qualifier,
                 )
             }
         }
     }
 
-    override fun isLinkedFrom(build: Build, project: String, buildPattern: String): Boolean {
+    override fun isLinkedFrom(build: Build, project: String, buildPattern: String?, qualifier: String?): Boolean {
         securityService.checkProjectFunction(build, ProjectView::class.java)
-        return structureRepository.isLinkedFrom(build.id, project, buildPattern)
+        return buildLinkRepository.isLinkedFrom(build, project, buildPattern, qualifier)
     }
 
-    override fun isLinkedTo(build: Build, project: String, buildPattern: String): Boolean {
+    override fun isLinkedTo(build: Build, project: String, buildPattern: String?, qualifier: String?): Boolean {
         securityService.checkProjectFunction(build, ProjectView::class.java)
-        return structureRepository.isLinkedTo(build.id, project, buildPattern)
+        return buildLinkRepository.isLinkedTo(build, project, buildPattern, qualifier)
     }
 
-    override fun forEachBuildLink(code: (from: Build, to: Build) -> Unit) {
+    override fun isLinkedTo(build: Build, targetBuild: Build, qualifier: String?): Boolean {
+        securityService.checkProjectFunction(build, ProjectView::class.java)
+        securityService.checkProjectFunction(targetBuild, ProjectView::class.java)
+        return buildLinkRepository.isLinkedTo(build, targetBuild, qualifier)
+    }
+
+    override fun forEachBuildLink(code: (from: Build, to: Build, qualifier: String) -> Unit) {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
-        structureRepository.forEachBuildLink(code)
+        buildLinkRepository.forEachBuildLink(code)
     }
 
-    override fun getValidationStampRunViewsForBuild(build: Build, offset: Int, size: Int): List<ValidationStampRunView> {
+    override fun getValidationStampRunViewsForBuild(
+        build: Build,
+        offset: Int,
+        size: Int
+    ): List<ValidationStampRunView> {
         // Gets all validation stamps
         val stamps = getValidationStampListForBranch(build.branch.id)
         // Gets all runs for this build
@@ -496,8 +559,8 @@ class StructureServiceImpl(
 
     protected fun getValidationStampRunView(runs: List<ValidationRun>, stamp: ValidationStamp): ValidationStampRunView {
         return ValidationStampRunView(
-                stamp,
-                runs.filter { run -> run.validationStamp.id() == stamp.id() }
+            stamp,
+            runs.filter { run -> run.validationStamp.id() == stamp.id() }
         )
     }
 
@@ -513,8 +576,8 @@ class StructureServiceImpl(
         // Checking if there is an associated predefined promotion level
         return securityService.asAdmin {
             val predefined: PredefinedPromotionLevel? =
-                    predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevel.name)
-                            .getOrNull()
+                predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevel.name)
+                    .getOrNull()
             if (predefined != null) {
                 // Description
                 if (promotionLevel.description.isNullOrBlank()) {
@@ -523,8 +586,8 @@ class StructureServiceImpl(
                 // Image
                 if (predefined.isImage) {
                     setPromotionLevelImage(
-                            newPromotionLevel.id,
-                            predefinedPromotionLevelService.getPredefinedPromotionLevelImage(predefined.id)
+                        newPromotionLevel.id,
+                        predefinedPromotionLevelService.getPredefinedPromotionLevelImage(predefined.id)
                     )
                 }
                 // Reloading
@@ -544,7 +607,7 @@ class StructureServiceImpl(
         securityService.checkProjectFunction(promotionLevel.branch.project.id(), PromotionLevelCreate::class.java)
         // Repository
         val newPromotionLevel = structureRepository.newPromotionLevel(
-                promotionLevel.withSignature(securityService.currentSignature)
+            promotionLevel.withSignature(securityService.currentSignature)
         )
         // Event
         eventPostService.post(eventFactory.newPromotionLevel(newPromotionLevel))
@@ -559,9 +622,9 @@ class StructureServiceImpl(
     }
 
     override fun findPromotionLevelByID(promotionLevelId: ID): PromotionLevel? =
-            structureRepository.findPromotionLevelByID(promotionLevelId)?.takeIf {
-                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
-            }
+        structureRepository.findPromotionLevelByID(promotionLevelId)?.takeIf {
+            securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+        }
 
     override fun getPromotionLevelImage(promotionLevelId: ID): Document {
         // Checks access
@@ -619,43 +682,51 @@ class StructureServiceImpl(
         eventPostService.post(eventFactory.reorderPromotionLevels(branch))
     }
 
-    override fun newPromotionLevelFromPredefined(branch: Branch, predefinedPromotionLevel: PredefinedPromotionLevel): PromotionLevel {
+    override fun newPromotionLevelFromPredefined(
+        branch: Branch,
+        predefinedPromotionLevel: PredefinedPromotionLevel
+    ): PromotionLevel {
         val promotionLevel = rawNewPromotionLevel(
-                PromotionLevel.of(
-                        branch,
-                        NameDescription.nd(predefinedPromotionLevel.name, predefinedPromotionLevel.description)
-                )
+            PromotionLevel.of(
+                branch,
+                NameDescription.nd(predefinedPromotionLevel.name, predefinedPromotionLevel.description)
+            )
         )
 
         // Makes sure the order is the same than for the predefined promotion levels
-        val predefinedPromotionLevels = securityService.asAdmin { predefinedPromotionLevelService.predefinedPromotionLevels }
+        val predefinedPromotionLevels =
+            securityService.asAdmin { predefinedPromotionLevelService.predefinedPromotionLevels }
         val sortedIds = getPromotionLevelListForBranch(branch.id)
-                .sortedBy { pl ->
-                    val name: String = pl.name
-                    predefinedPromotionLevels.indexOfFirst { pred -> pred.name == name }
-                }
-                .map { it.id() }
+            .sortedBy { pl ->
+                val name: String = pl.name
+                predefinedPromotionLevels.indexOfFirst { pred -> pred.name == name }
+            }
+            .map { it.id() }
         reorderPromotionLevels(branch.id, Reordering(sortedIds))
 
         // Image?
         if (predefinedPromotionLevel.isImage) {
             setPromotionLevelImage(
-                    promotionLevel.id,
-                    predefinedPromotionLevelService.getPredefinedPromotionLevelImage(predefinedPromotionLevel.id)
+                promotionLevel.id,
+                predefinedPromotionLevelService.getPredefinedPromotionLevelImage(predefinedPromotionLevel.id)
             )
         }
         // OK
         return promotionLevel
     }
 
-    override fun getOrCreatePromotionLevel(branch: Branch, promotionLevelId: Int?, promotionLevelName: String?): PromotionLevel {
+    override fun getOrCreatePromotionLevel(
+        branch: Branch,
+        promotionLevelId: Int?,
+        promotionLevelName: String?
+    ): PromotionLevel {
         if (promotionLevelId != null) {
             return getPromotionLevel(ID.of(promotionLevelId))
         } else if (promotionLevelName != null) {
             var oPromotionLevel = findPromotionLevelByName(
-                    branch.project.name,
-                    branch.name,
-                    promotionLevelName
+                branch.project.name,
+                branch.name,
+                promotionLevelName
             )
             if (oPromotionLevel.isPresent) {
                 return oPromotionLevel.get()
@@ -665,9 +736,9 @@ class StructureServiceImpl(
                     val type = property.type
                     if (type is PromotionLevelPropertyType<*> && !property.isEmpty) {
                         oPromotionLevel = getPromotionLevelFromProperty(
-                                property,
-                                branch,
-                                promotionLevelName
+                            property,
+                            branch,
+                            promotionLevelName
                         )
                         if (oPromotionLevel.isPresent) {
                             return oPromotionLevel.get()
@@ -675,9 +746,9 @@ class StructureServiceImpl(
                     }
                 }
                 throw PromotionLevelNotFoundException(
-                        branch.project.name,
-                        branch.name,
-                        promotionLevelName
+                    branch.project.name,
+                    branch.name,
+                    promotionLevelName
                 )
             }
         } else {
@@ -686,14 +757,15 @@ class StructureServiceImpl(
     }
 
     protected fun <T> getPromotionLevelFromProperty(
-            property: Property<T>,
-            branch: Branch,
-            promotionLevelName: String): Optional<PromotionLevel> {
+        property: Property<T>,
+        branch: Branch,
+        promotionLevelName: String
+    ): Optional<PromotionLevel> {
         val promotionLevelPropertyType = property.type as PromotionLevelPropertyType<T>
         return promotionLevelPropertyType.getOrCreatePromotionLevel(
-                property.value,
-                branch,
-                promotionLevelName
+            property.value,
+            branch,
+            promotionLevelName
         )
     }
 
@@ -702,8 +774,10 @@ class StructureServiceImpl(
         isEntityNew(promotionRun, "Promotion run must be new")
         isEntityDefined(promotionRun.build, "Build must be defined")
         isEntityDefined(promotionRun.promotionLevel, "Promotion level must be defined")
-        Validate.isTrue(promotionRun.promotionLevel.branch.id() == promotionRun.build.branch.id(),
-                "Promotion for a promotion level can be done only on the same branch than the build.")
+        Validate.isTrue(
+            promotionRun.promotionLevel.branch.id() == promotionRun.build.branch.id(),
+            "Promotion for a promotion level can be done only on the same branch than the build."
+        )
         // Checks the authorization
         securityService.checkProjectFunction(promotionRun.build.branch.project.id(), PromotionRunCreate::class.java)
         // Checks the preconditions for the creation of the promotion run
@@ -725,9 +799,9 @@ class StructureServiceImpl(
     }
 
     override fun findPromotionRunByID(promotionRunId: ID): PromotionRun? =
-            structureRepository.findPromotionRunByID(promotionRunId)?.takeIf {
-                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
-            }
+        structureRepository.findPromotionRunByID(promotionRunId)?.takeIf {
+            securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+        }
 
     override fun getPromotionRunsForBuild(buildId: ID): List<PromotionRun> {
         val build = getBuild(buildId)
@@ -746,12 +820,18 @@ class StructureServiceImpl(
         return structureRepository.getLastPromotionRunsForBuild(build, promotionLevels)
     }
 
-    override fun getLastPromotionRunForBuildAndPromotionLevel(build: Build, promotionLevel: PromotionLevel): Optional<PromotionRun> {
+    override fun getLastPromotionRunForBuildAndPromotionLevel(
+        build: Build,
+        promotionLevel: PromotionLevel
+    ): Optional<PromotionRun> {
         securityService.checkProjectFunction(build, ProjectView::class.java)
         return structureRepository.getLastPromotionRun(build, promotionLevel)
     }
 
-    override fun getPromotionRunsForBuildAndPromotionLevel(build: Build, promotionLevel: PromotionLevel): List<PromotionRun> {
+    override fun getPromotionRunsForBuildAndPromotionLevel(
+        build: Build,
+        promotionLevel: PromotionLevel
+    ): List<PromotionRun> {
         securityService.checkProjectFunction(build, ProjectView::class.java)
         return structureRepository.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel)
     }
@@ -779,8 +859,8 @@ class StructureServiceImpl(
                 // Image
                 if (predefined.isImage) {
                     setValidationStampImage(
-                            newValidationStamp.id,
-                            predefinedValidationStampService.getPredefinedValidationStampImage(predefined.id)
+                        newValidationStamp.id,
+                        predefinedValidationStampService.getPredefinedValidationStampImage(predefined.id)
                     )
                 }
                 // Data type
@@ -805,7 +885,7 @@ class StructureServiceImpl(
         securityService.checkProjectFunction(validationStamp.branch.project.id(), ValidationStampCreate::class.java)
         // Repository
         val newValidationStamp = structureRepository.newValidationStamp(
-                validationStamp.withSignature(securityService.currentSignature)
+            validationStamp.withSignature(securityService.currentSignature)
         )
         // Event
         eventPostService.post(eventFactory.newValidationStamp(newValidationStamp))
@@ -820,32 +900,36 @@ class StructureServiceImpl(
     }
 
     override fun findValidationStampByID(validationStampId: ID): ValidationStamp? =
-            structureRepository.findValidationStampByID(validationStampId)?.takeIf {
-                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
-            }
+        structureRepository.findValidationStampByID(validationStampId)?.takeIf {
+            securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+        }
 
-    override fun findValidationStampByName(project: String, branch: String, validationStamp: String): Optional<ValidationStamp> {
+    override fun findValidationStampByName(
+        project: String,
+        branch: String,
+        validationStamp: String
+    ): Optional<ValidationStamp> {
         return structureRepository.getValidationStampByName(project, branch, validationStamp)
-                .filter { vs -> securityService.isProjectFunctionGranted(vs, ProjectView::class.java) }
+            .filter { vs -> securityService.isProjectFunctionGranted(vs, ProjectView::class.java) }
     }
 
     override fun findBuildByName(project: String, branch: String, build: String): Optional<Build> {
         return structureRepository.getBuildByName(project, branch, build)
-                .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
+            .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
     }
 
     override fun getEarliestPromotionsAfterBuild(build: Build): BranchStatusView {
         return BranchStatusView(
-                build.branch,
-                decorationService.getDecorations(build.branch),
-                getLastBuild(build.branch.id).orElse(null),
-                getPromotionLevelListForBranch(build.branch.id)
-                        .map { promotionLevel ->
-                            PromotionView(
-                                    promotionLevel,
-                                    getEarliestPromotionRunAfterBuild(promotionLevel, build).orElse(null)
-                            )
-                        }
+            build.branch,
+            decorationService.getDecorations(build.branch),
+            getLastBuild(build.branch.id).orElse(null),
+            getPromotionLevelListForBranch(build.branch.id)
+                .map { promotionLevel ->
+                    PromotionView(
+                        promotionLevel,
+                        getEarliestPromotionRunAfterBuild(promotionLevel, build).orElse(null)
+                    )
+                }
         )
     }
 
@@ -859,8 +943,8 @@ class StructureServiceImpl(
 
     override fun getBuildView(build: Build, withDecorations: Boolean): BuildView {
         var view = BuildView.of(build)
-                .withPromotionRuns(getLastPromotionRunsForBuild(build.id))
-                .withValidationStampRunViews(getValidationStampRunViewsForBuild(build))
+            .withPromotionRuns(getLastPromotionRunsForBuild(build.id))
+            .withValidationStampRunViews(getValidationStampRunViewsForBuild(build))
         if (withDecorations) {
             view = view.withDecorations(decorationService.getDecorations(build))
         }
@@ -894,7 +978,8 @@ class StructureServiceImpl(
         // Security
         securityService.checkProjectFunction(validationStamp.projectId(), ValidationStampEdit::class.java)
         // Gets any predefined validation stamp
-        val predefined = predefinedValidationStampService.findPredefinedValidationStampByName(validationStamp.name).getOrNull()
+        val predefined =
+            predefinedValidationStampService.findPredefinedValidationStampByName(validationStamp.name).getOrNull()
         val actualValidationStamp = if (predefined != null) {
             // Adapting the description
             val description = if (validationStamp.description.isNullOrBlank()) {
@@ -960,9 +1045,9 @@ class StructureServiceImpl(
 
     override fun getOrCreateValidationStamp(branch: Branch, validationStampName: String): ValidationStamp {
         var oValidationStamp = findValidationStampByName(
-                branch.project.name,
-                branch.name,
-                validationStampName
+            branch.project.name,
+            branch.name,
+            validationStampName
         )
         if (oValidationStamp.isPresent) {
             return oValidationStamp.get()
@@ -972,9 +1057,9 @@ class StructureServiceImpl(
                 val type = property.type
                 if (type is ValidationStampPropertyType<*> && !property.isEmpty) {
                     oValidationStamp = getValidationStampFromProperty(
-                            property,
-                            branch,
-                            validationStampName
+                        property,
+                        branch,
+                        validationStampName
                     )
                     if (oValidationStamp.isPresent) {
                         return oValidationStamp.get()
@@ -982,9 +1067,9 @@ class StructureServiceImpl(
                 }
             }
             throw ValidationStampNotFoundException(
-                    branch.project.name,
-                    branch.name,
-                    validationStampName
+                branch.project.name,
+                branch.name,
+                validationStampName
             )
         }
     }
@@ -1000,32 +1085,32 @@ class StructureServiceImpl(
             if (o.isPresent) {
                 // Updating the predefined validation stamp description & data type
                 predefinedValidationStampService.savePredefinedValidationStamp(
-                        o.get()
-                                .withDescription(validationStamp.description)
-                                .withDataType(validationStamp.dataType)
+                    o.get()
+                        .withDescription(validationStamp.description)
+                        .withDataType(validationStamp.dataType)
                 )
                 // Sets its image
                 val image = getValidationStampImage(validationStampId)
                 predefinedValidationStampService.setPredefinedValidationStampImage(
-                        o.get().id,
-                        image
+                    o.get().id,
+                    image
                 )
             } else {
                 // Creating the predefined validation stamp
                 val predefinedValidationStamp = predefinedValidationStampService.newPredefinedValidationStamp(
-                        PredefinedValidationStamp.of(
-                                NameDescription.nd(
-                                        validationStamp.name,
-                                        validationStamp.description
-                                )
-                        ).withDataType(validationStamp.dataType)
+                    PredefinedValidationStamp.of(
+                        NameDescription.nd(
+                            validationStamp.name,
+                            validationStamp.description
+                        )
+                    ).withDataType(validationStamp.dataType)
                 )
                 // Sets its image
                 val image = getValidationStampImage(validationStampId)
                 if (!image.isEmpty) {
                     predefinedValidationStampService.setPredefinedValidationStampImage(
-                            predefinedValidationStamp.id,
-                            image
+                        predefinedValidationStamp.id,
+                        image
                     )
                 }
             }
@@ -1047,29 +1132,29 @@ class StructureServiceImpl(
             if (o.isPresent) {
                 // Updating the predefined promotion level description
                 predefinedPromotionLevelService.savePredefinedPromotionLevel(
-                        o.get().withDescription(promotionLevel.description)
+                    o.get().withDescription(promotionLevel.description)
                 )
                 // Sets its image
                 val image = getPromotionLevelImage(promotionLevelId)
                 predefinedPromotionLevelService.setPredefinedPromotionLevelImage(
-                        o.get().id,
-                        image
+                    o.get().id,
+                    image
                 )
             } else {
                 // Creating the predefined promotion level
                 val predefinedPromotionLevel = predefinedPromotionLevelService.newPredefinedPromotionLevel(
-                        PredefinedPromotionLevel.of(
-                                NameDescription.nd(
-                                        promotionLevel.name,
-                                        promotionLevel.description
-                                )
+                    PredefinedPromotionLevel.of(
+                        NameDescription.nd(
+                            promotionLevel.name,
+                            promotionLevel.description
                         )
+                    )
                 )
                 // Sets its image
                 val image = getPromotionLevelImage(promotionLevelId)
                 predefinedPromotionLevelService.setPredefinedPromotionLevelImage(
-                        predefinedPromotionLevel.id,
-                        image
+                    predefinedPromotionLevel.id,
+                    image
                 )
             }
             // For all promotion levels
@@ -1080,29 +1165,30 @@ class StructureServiceImpl(
     }
 
     protected fun <T> getValidationStampFromProperty(
-            property: Property<T>,
-            branch: Branch,
-            validationStampName: String?): Optional<ValidationStamp> {
+        property: Property<T>,
+        branch: Branch,
+        validationStampName: String?
+    ): Optional<ValidationStamp> {
         val validationStampPropertyType = property.type as ValidationStampPropertyType<T>
         return validationStampPropertyType.getOrCreateValidationStamp(
-                property.value,
-                branch,
-                validationStampName
+            property.value,
+            branch,
+            validationStampName
         )
     }
 
     override fun newValidationStampFromPredefined(branch: Branch, stamp: PredefinedValidationStamp): ValidationStamp {
         val validationStamp = rawNewValidationStamp(
-                ValidationStamp.of(
-                        branch,
-                        NameDescription.nd(stamp.name, stamp.description)
-                ).withDataType(stamp.dataType)
+            ValidationStamp.of(
+                branch,
+                NameDescription.nd(stamp.name, stamp.description)
+            ).withDataType(stamp.dataType)
         )
         // Image?
         if (stamp.isImage) {
             setValidationStampImage(
-                    validationStamp.id,
-                    predefinedValidationStampService.getPredefinedValidationStampImage(stamp.id)
+                validationStamp.id,
+                predefinedValidationStampService.getPredefinedValidationStampImage(stamp.id)
             )
         }
         // OK
@@ -1112,51 +1198,55 @@ class StructureServiceImpl(
     override fun newValidationRun(build: Build, validationRunRequest: ValidationRunRequest): ValidationRun {
         // Gets the validation stamp
         val validationStamp = getOrCreateValidationStamp(
-                build.branch,
-                validationRunRequest.validationStampName)
+            build.branch,
+            validationRunRequest.validationStampName
+        )
         // Validation run data
         val rawDataTypeId: String? = validationRunRequest.dataTypeId
-                ?: validationStamp.dataType?.descriptor?.id
+            ?: validationStamp.dataType?.descriptor?.id
         val rawData: Any? = validationRunRequest.data
         // Gets the data type
         val rawDataType: ValidationDataType<Any, Any>? = rawDataTypeId?.run {
             validationDataTypeService.getValidationDataType(this)
-                    ?: throw ValidationRunDataTypeNotFoundException(this)
+                ?: throw ValidationRunDataTypeNotFoundException(this)
         }
         // Type descriptor + data
         val rawRunData: ValidationRunData<Any>? = if (rawDataType != null && rawData != null) {
             ValidationRunData(
-                    rawDataType.descriptor,
-                    rawData
+                rawDataType.descriptor,
+                rawData
             )
         } else {
             null
         }
         // Validation of the run data
         val status: ValidationRunDataWithStatus<Any> = validationDataTypeService.validateData(
-                rawRunData,
-                validationStamp.dataType,
-                validationRunRequest.validationRunStatusId
+            rawRunData,
+            validationStamp.dataType,
+            validationRunRequest.validationRunStatusId
         )
         // Validation run to create
         val validationRun = ValidationRun.of(
-                build,
-                validationStamp,
-                0,
-                validationRunRequest.signature ?: securityService.currentSignature,
-                status.runStatusID,
-                validationRunRequest.description
+            build,
+            validationStamp,
+            0,
+            validationRunRequest.signature ?: securityService.currentSignature,
+            status.runStatusID,
+            validationRunRequest.description
         ).withData(status.runData)
         // Validation
         isEntityNew(validationRun, "Validation run must be new")
         isEntityDefined(validationRun.build, "Build must be defined")
         isEntityDefined(validationRun.validationStamp, "Validation stamp must be defined")
-        Validate.isTrue(validationRun.validationStamp.branch.id() == validationRun.build.branch.id(),
-                "Validation run for a validation stamp can be done only on the same branch than the build.")
+        Validate.isTrue(
+            validationRun.validationStamp.branch.id() == validationRun.build.branch.id(),
+            "Validation run for a validation stamp can be done only on the same branch than the build."
+        )
         // Checks the authorization
         securityService.checkProjectFunction(validationRun.build.branch.project.id(), ValidationRunCreate::class.java)
         // Actual creation
-        val newValidationRun = structureRepository.newValidationRun(validationRun) { validationRunStatusService.getValidationRunStatus(it) }
+        val newValidationRun =
+            structureRepository.newValidationRun(validationRun) { validationRunStatusService.getValidationRunStatus(it) }
         // Event
         eventPostService.post(eventFactory.newValidationRun(newValidationRun))
         // Metrics
@@ -1164,9 +1254,9 @@ class StructureServiceImpl(
         // Saves the properties
         for ((propertyTypeName, propertyData) in validationRunRequest.properties) {
             propertyService.editProperty(
-                    newValidationRun,
-                    propertyTypeName,
-                    propertyData
+                newValidationRun,
+                propertyTypeName,
+                propertyData
             )
         }
         // OK
@@ -1189,7 +1279,8 @@ class StructureServiceImpl(
         validationRun: ValidationRun,
         validationRunData: ValidationRunData<T>,
     ) {
-        val dataType: ValidationDataType<Any, T>? = validationDataTypeService.getValidationDataType(validationRunData.descriptor.id)
+        val dataType: ValidationDataType<Any, T>? =
+            validationDataTypeService.getValidationDataType(validationRunData.descriptor.id)
         if (dataType != null) {
             val metrics: Map<String, *>? = dataType.getMetrics(validationRunData.data)
             if (metrics != null && metrics.isNotEmpty()) {
@@ -1227,22 +1318,33 @@ class StructureServiceImpl(
     }
 
     override fun getValidationRun(validationRunId: ID): ValidationRun {
-        val validationRun = structureRepository.getValidationRun(validationRunId) { validationRunStatusService.getValidationRunStatus(it) }
+        val validationRun =
+            structureRepository.getValidationRun(validationRunId) { validationRunStatusService.getValidationRunStatus(it) }
         securityService.checkProjectFunction(validationRun.build.branch.project.id(), ProjectView::class.java)
         return validationRun
     }
 
     override fun findValidationRunByID(validationRunId: ID): ValidationRun? =
-            structureRepository.findValidationRunByID(validationRunId) {
-                validationRunStatusService.getValidationRunStatus(it)
-            }?.takeIf {
-                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
-            }
+        structureRepository.findValidationRunByID(validationRunId) {
+            validationRunStatusService.getValidationRunStatus(it)
+        }?.takeIf {
+            securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+        }
 
-    override fun getValidationRunsForBuild(buildId: ID, offset: Int, count: Int, sortingMode: ValidationRunSortingMode): List<ValidationRun> {
+    override fun getValidationRunsForBuild(
+        buildId: ID,
+        offset: Int,
+        count: Int,
+        sortingMode: ValidationRunSortingMode
+    ): List<ValidationRun> {
         val build = getBuild(buildId)
         securityService.checkProjectFunction(build.branch.project.id(), ProjectView::class.java)
-        return structureRepository.getValidationRunsForBuild(build, offset, count, sortingMode) { validationRunStatusService.getValidationRunStatus(it) }
+        return structureRepository.getValidationRunsForBuild(
+            build,
+            offset,
+            count,
+            sortingMode
+        ) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
     override fun getValidationRunsCountForBuild(buildId: ID): Int {
@@ -1251,41 +1353,69 @@ class StructureServiceImpl(
         return structureRepository.getValidationRunsCountForBuild(build)
     }
 
-    override fun getValidationRunsForBuildAndValidationStamp(buildId: ID, validationStampId: ID, offset: Int, count: Int): List<ValidationRun> {
+    override fun getValidationRunsForBuildAndValidationStamp(
+        buildId: ID,
+        validationStampId: ID,
+        offset: Int,
+        count: Int
+    ): List<ValidationRun> {
         val build = getBuild(buildId)
         val validationStamp = getValidationStamp(validationStampId)
         return getValidationRunsForBuildAndValidationStamp(build, validationStamp, offset, count)
     }
 
-    override fun getValidationRunsForBuildAndValidationStamp(build: Build, validationStamp: ValidationStamp, offset: Int, count: Int): List<ValidationRun> {
+    override fun getValidationRunsForBuildAndValidationStamp(
+        build: Build,
+        validationStamp: ValidationStamp,
+        offset: Int,
+        count: Int
+    ): List<ValidationRun> {
         securityService.checkProjectFunction(build, ProjectView::class.java)
         return structureRepository.getValidationRunsForBuildAndValidationStamp(
-                build,
-                validationStamp,
-                offset,
-                count
+            build,
+            validationStamp,
+            offset,
+            count
         ) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
-    override fun getValidationRunsForBuildAndValidationStampAndStatus(buildId: ID, validationStampId: ID, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {
+    override fun getValidationRunsForBuildAndValidationStampAndStatus(
+        buildId: ID,
+        validationStampId: ID,
+        statuses: List<ValidationRunStatusID>,
+        offset: Int,
+        count: Int
+    ): List<ValidationRun> {
         val build = getBuild(buildId)
         val validationStamp = getValidationStamp(validationStampId)
         securityService.checkProjectFunction(build.branch.project.id(), ProjectView::class.java)
         return structureRepository.getValidationRunsForBuildAndValidationStampAndStatus(
-                build,
-                validationStamp,
-                statuses,
-                offset,
-                count
+            build,
+            validationStamp,
+            statuses,
+            offset,
+            count
         ) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
-    override fun getValidationRunsForValidationStamp(validationStamp: ValidationStamp, offset: Int, count: Int): List<ValidationRun> {
+    override fun getValidationRunsForValidationStamp(
+        validationStamp: ValidationStamp,
+        offset: Int,
+        count: Int
+    ): List<ValidationRun> {
         securityService.checkProjectFunction(validationStamp.branch.project.id(), ProjectView::class.java)
-        return structureRepository.getValidationRunsForValidationStamp(validationStamp, offset, count) { validationRunStatusService.getValidationRunStatus(it) }
+        return structureRepository.getValidationRunsForValidationStamp(
+            validationStamp,
+            offset,
+            count
+        ) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
-    override fun getValidationRunsForValidationStamp(validationStampId: ID, offset: Int, count: Int): List<ValidationRun> {
+    override fun getValidationRunsForValidationStamp(
+        validationStampId: ID,
+        offset: Int,
+        count: Int
+    ): List<ValidationRun> {
         val validationStamp = getValidationStamp(validationStampId)
         return getValidationRunsForValidationStamp(validationStamp, offset, count)
     }
@@ -1297,33 +1427,52 @@ class StructureServiceImpl(
     ): List<ValidationRun> {
         val validationStamp = getValidationStamp(validationStampId)
         securityService.checkProjectFunction(validationStamp, ProjectView::class.java)
-        return structureRepository.getValidationRunsForValidationStampBetweenDates(validationStamp, start, end) { validationRunStatusService.getValidationRunStatus(it) }
+        return structureRepository.getValidationRunsForValidationStampBetweenDates(
+            validationStamp,
+            start,
+            end
+        ) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
-    override fun getValidationRunsForValidationStampAndStatus(validationStamp: ValidationStamp, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {
+    override fun getValidationRunsForValidationStampAndStatus(
+        validationStamp: ValidationStamp,
+        statuses: List<ValidationRunStatusID>,
+        offset: Int,
+        count: Int
+    ): List<ValidationRun> {
         securityService.checkProjectFunction(validationStamp.branch.project.id(), ProjectView::class.java)
         return structureRepository.getValidationRunsForValidationStampAndStatus(
-                validationStamp,
-                statuses,
-                offset,
-                count
+            validationStamp,
+            statuses,
+            offset,
+            count
         ) {
             validationRunStatusService.getValidationRunStatus(it)
         }
     }
 
-    override fun getValidationRunsForValidationStampAndStatus(validationStampId: ID, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {
+    override fun getValidationRunsForValidationStampAndStatus(
+        validationStampId: ID,
+        statuses: List<ValidationRunStatusID>,
+        offset: Int,
+        count: Int
+    ): List<ValidationRun> {
         val validationStamp = getValidationStamp(validationStampId)
         return getValidationRunsForValidationStampAndStatus(validationStamp, statuses, offset, count)
     }
 
-    override fun getValidationRunsForStatus(branchId: ID, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {
+    override fun getValidationRunsForStatus(
+        branchId: ID,
+        statuses: List<ValidationRunStatusID>,
+        offset: Int,
+        count: Int
+    ): List<ValidationRun> {
         val branch = getBranch(branchId)
         return structureRepository.getValidationRunsForStatus(
-                branch,
-                statuses,
-                offset,
-                count
+            branch,
+            statuses,
+            offset,
+            count
         ) {
             validationRunStatusService.getValidationRunStatus(it)
         }
@@ -1334,7 +1483,10 @@ class StructureServiceImpl(
         isEntityDefined(validationRun, "Validation run must be defined")
         isEntityNew(runStatus, "Validation run status must not have any defined ID.")
         // Security check
-        securityService.checkProjectFunction(validationRun.build.branch.project.id(), ValidationRunStatusChange::class.java)
+        securityService.checkProjectFunction(
+            validationRun.build.branch.project.id(),
+            ValidationRunStatusChange::class.java
+        )
         // Transition check
         validationRunStatusService.checkTransition(validationRun.lastStatus.statusID, runStatus.statusID)
         // Creation
@@ -1356,6 +1508,7 @@ class StructureServiceImpl(
                 securityService.checkProjectFunction(run, ProjectView::class.java)
                 run
             }
+
             securityService.isProjectFunctionGranted(run, ProjectView::class.java) -> run
             else -> null
         }
@@ -1405,8 +1558,10 @@ class StructureServiceImpl(
             throw AccessDeniedException("Status comment edition denied.")
         }
         // Loading the status
-        val runStatus = structureRepository.getValidationRunStatus(runStatusId) { validationRunStatusService.getValidationRunStatus(it) }
-                ?: throw IllegalStateException("Could not find validation run status with id = $runStatusId")
+        val runStatus = structureRepository.getValidationRunStatus(runStatusId) {
+            validationRunStatusService.getValidationRunStatus(it)
+        }
+            ?: throw IllegalStateException("Could not find validation run status with id = $runStatusId")
         // Checks the parent run
         val parentOK = run.validationRunStatuses.any { it.id() == runStatus.id() }
         if (!parentOK) {
@@ -1430,7 +1585,12 @@ class StructureServiceImpl(
 
     override fun findProjectByName(project: String): Optional<Project> {
         return structureRepository.getProjectByName(project)
-                .filter { p -> securityService.isGlobalFunctionGranted(ProjectList::class.java) || securityService.isProjectFunctionGranted(p.id(), ProjectView::class.java) }
+            .filter { p ->
+                securityService.isGlobalFunctionGranted(ProjectList::class.java) || securityService.isProjectFunctionGranted(
+                    p.id(),
+                    ProjectView::class.java
+                )
+            }
     }
 
     @Throws(AccessDeniedException::class)
@@ -1454,15 +1614,21 @@ class StructureServiceImpl(
 
     override fun findBranchByName(project: String, branch: String): Optional<Branch> {
         return structureRepository.getBranchByName(project, branch)
-                .filter { b -> securityService.isProjectFunctionGranted(b.projectId(), ProjectView::class.java) }
+            .filter { b -> securityService.isProjectFunctionGranted(b.projectId(), ProjectView::class.java) }
     }
 
-    override fun findPromotionLevelByName(project: String, branch: String, promotionLevel: String): Optional<PromotionLevel> {
+    override fun findPromotionLevelByName(
+        project: String,
+        branch: String,
+        promotionLevel: String
+    ): Optional<PromotionLevel> {
         return structureRepository.getPromotionLevelByName(project, branch, promotionLevel)
-                .filter { pl -> securityService.isProjectFunctionGranted(pl.projectId(), ProjectView::class.java) }
+            .filter { pl -> securityService.isProjectFunctionGranted(pl.projectId(), ProjectView::class.java) }
     }
 
     override fun entityLoader(): BiFunction<ProjectEntityType, ID, ProjectEntity> {
-        return BiFunction { projectEntityType, id -> projectEntityType.getEntityFn(this@StructureServiceImpl).apply(id) }
+        return BiFunction { projectEntityType, id ->
+            projectEntityType.getEntityFn(this@StructureServiceImpl).apply(id)
+        }
     }
 }
