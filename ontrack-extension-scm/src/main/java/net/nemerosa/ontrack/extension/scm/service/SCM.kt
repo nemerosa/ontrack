@@ -53,7 +53,7 @@ interface SCM {
      * Uploads the content of a file to a branch.
      *
      * @param scmBranch Branch to upload the file to
-     * @param commit Commit of the branch
+     * @param commit Commit of the branch or empty for a new file
      * @param path Path to the file
      * @param content Binary content of the file
      * @param message Commit message
