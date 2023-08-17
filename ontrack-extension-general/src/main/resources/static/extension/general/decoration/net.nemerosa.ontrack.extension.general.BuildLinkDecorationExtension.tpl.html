@@ -1,9 +1,12 @@
 <span class="ot-decoration-border" ng-repeat="link in decoration.data.decorations">
     <!-- Build @ Project -->
-    <span ng-if="!link.uri">{{link.label}} @ {{link.project}}</span>
+    <span ng-if="!link.uri">
+        {{link.label}} @ {{link.project}}
+        <span ng-if="link.qualifier">[{{ link.qualifier }}]</span>
+    </span>
     <span ng-if="link.uri">
         <img src="extension/general/decoration/net.nemerosa.ontrack.extension.general.BuildLinkDecorationExtension/link.png"/>
-        <a href="{{link.uri}}">{{link.label}} @ {{link.project}}</a>
+        <a href="{{link.uri}}">{{link.label}} @ {{link.project}} <span ng-if="link.qualifier">[{{ link.qualifier }}]</span></a>
     </span>
     <!-- Promotions -->
     <span ng-repeat="promotion in link.promotions">

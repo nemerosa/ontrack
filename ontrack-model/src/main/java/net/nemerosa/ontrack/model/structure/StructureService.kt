@@ -129,9 +129,32 @@ interface StructureService {
      * Build links
      */
 
+    @Deprecated("Use createBuildLink instead")
     fun addBuildLink(fromBuild: Build, toBuild: Build)
 
-    fun deleteBuildLink(fromBuild: Build, toBuild: Build)
+    /**
+     * Creates a qualified build link
+     */
+    fun createBuildLink(fromBuild: Build, toBuild: Build, qualifier: String)
+
+    /**
+     * Deletes a qualified build link
+     */
+    fun deleteBuildLink(fromBuild: Build, toBuild: Build, qualifier: String)
+
+    /**
+     * Gets the builds used by the given one.
+     *
+     * This method is _deprecated_ and the [getQualifiedBuildsUsedBy] method should be used instead.
+     *
+     * @param build  Source build
+     * @param offset Offset for pagination
+     * @param size   Page size for pagination
+     * @param filter Optional filter on the builds
+     * @return List of builds which are used by the given one
+     */
+    @Deprecated("Only qualified build links should be used")
+    fun getBuildsUsedBy(build: Build, offset: Int = 0, size: Int = 10, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
 
     /**
      * Gets the builds used by the given one.
@@ -140,9 +163,9 @@ interface StructureService {
      * @param offset Offset for pagination
      * @param size   Page size for pagination
      * @param filter Optional filter on the builds
-     * @return List of builds which are used by the given one
+     * @return List of qualified build links which are used by the given one
      */
-    fun getBuildsUsedBy(build: Build, offset: Int = 0, size: Int = 10, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
+    fun getQualifiedBuildsUsedBy(build: Build, offset: Int = 0, size: Int = 10, filter: (Build) -> Boolean = { true }): PaginatedList<BuildLink>
 
     /**
      * Gets the builds which use the given one.
@@ -153,20 +176,31 @@ interface StructureService {
      * @param filter Optional filter on the builds
      * @return List of builds which use the given one
      */
+    @Deprecated("Only qualified build links should be used")
     fun getBuildsUsing(build: Build, offset: Int = 0, size: Int = 10, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
 
-    fun searchBuildsLinkedTo(projectName: String, buildPattern: String): List<Build>
+    /**
+     * Gets the builds which use the given one.
+     *
+     * @param build  Source build
+     * @param offset Offset for pagination
+     * @param size   Page size for pagination
+     * @param filter Optional filter on the builds
+     * @return List of builds which use the given one
+     */
+    fun getQualifiedBuildsUsing(build: Build, offset: Int = 0, size: Int = 10, filter: (Build) -> Boolean = { true }): PaginatedList<BuildLink>
 
     fun editBuildLinks(build: Build, form: BuildLinkForm)
 
-    fun isLinkedFrom(build: Build, project: String, buildPattern: String): Boolean
+    fun isLinkedFrom(build: Build, project: String, buildPattern: String? = null, qualifier: String? = null): Boolean
 
-    fun isLinkedTo(build: Build, project: String, buildPattern: String): Boolean
+    fun isLinkedTo(build: Build, project: String, buildPattern: String? = null, qualifier: String? = null): Boolean
+    fun isLinkedTo(build: Build, targetBuild: Build, qualifier: String? = null): Boolean
 
     /**
      * Loops over ALL the build links. Use this method with care, mostly for external indexation.
      */
-    fun forEachBuildLink(code: (from: Build, to: Build) -> Unit)
+    fun forEachBuildLink(code: (from: Build, to: Build, qualifier: String) -> Unit)
 
     /**
      * Looks for the first build which matches a given predicate.

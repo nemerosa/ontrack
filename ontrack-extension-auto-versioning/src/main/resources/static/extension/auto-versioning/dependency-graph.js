@@ -127,15 +127,18 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
         `;
 
         const gqlBuildDependencies = (autoVersioningArguments, direction) => {
-            let dependencyDirection = 'using';
+            let dependencyDirection = 'usingQualified';
             if (direction !== 'DOWN') {
-                dependencyDirection = 'usedBy';
+                dependencyDirection = 'usedByQualified';
             }
             return `
                 fragment BuildDependencies on Build {
                   ${dependencyDirection} {
                     pageItems {
-                      ...BuildNodeInfo
+                        qualifier
+                        build {
+                            ...BuildNodeInfo
+                        }
                     }
                   }
                 }
@@ -277,9 +280,17 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     ${gqlBuildDependencies('buildId: $buildId', config.direction)}
                 `, {buildId}).then(data => {
                     if (config.direction === 'DOWN') {
-                        return data.build.using.pageItems;
+                        return data.build.usingQualified.pageItems.map(link => {
+                            const build = link.build;
+                            build.qualifier = link.qualifier;
+                            return build;
+                        });
                     } else {
-                        return data.build.usedBy.pageItems;
+                        return data.build.usedByQualified.pageItems.map(link => {
+                            const build = link.build;
+                            build.qualifier = link.qualifier;
+                            return build;
+                        });
                     }
                 });
             };
@@ -368,8 +379,14 @@ angular.module('ontrack.extension.auto-versioning.dependency-graph', [
                     formatterLines.push('{hr|}');
                 };
 
-                // Project & branch name as a line
-                formatterLines.push(`{projectName|${build.branch.project.name}}`);
+                // Project name as the first line
+                let projectName = build.branch.project.name;
+                // Qualifier if any is appended to the display name
+                if (build.qualifier) {
+                    projectName += ` [${build.qualifier}]`;
+                }
+                formatterLines.push(`{projectName|${projectName}}`);
+                // Branch name as a line
                 formatterLines.push(build.branch.name);
                 // Build line
                 formatterLines.push(buildLine(node, build, {main: true}));

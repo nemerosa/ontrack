@@ -15,11 +15,11 @@ class BuildLinkListenerServiceImpl(
         applicationContext.getBeansOfType(BuildLinkListener::class.java).values
     }
 
-    override fun onBuildLinkAdded(from: Build, to: Build) {
-        listeners.forEach { it.onBuildLinkAdded(from, to) }
+    override fun onBuildLinkAdded(from: Build, to: Build, qualifier: String) {
+        listeners.forEach { it.onBuildLinkAdded(from, to, qualifier) }
     }
 
-    override fun onBuildLinkDeleted(from: Build, to: Build) {
-        listeners.forEach { it.onBuildLinkDeleted(from, to) }
+    override fun onBuildLinkDeleted(from: Build, to: Build, qualifier: String) {
+        listeners.forEach { it.onBuildLinkDeleted(from, to, qualifier) }
     }
 }

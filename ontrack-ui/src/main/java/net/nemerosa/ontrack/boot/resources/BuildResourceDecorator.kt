@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.boot.resources
 import net.nemerosa.ontrack.boot.ui.*
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.ui.resource.*
 import net.nemerosa.ontrack.ui.resource.LinkDefinitions.link
@@ -55,7 +56,7 @@ class BuildResourceDecorator(
                 ) { build -> on(ProjectEntityExtensionController::class.java).getInformation(ProjectEntityType.BUILD, build.id) },
                 // Update link
                 Link.UPDATE linkTo { build: Build ->
-                    on(BuildController::class.java).updateBuild(build.id, null)
+                    on(BuildController::class.java).updateBuild(build.id, NameDescription(build.name, build.description))
                 } linkIf BuildEdit::class,
                 // Delete link
                 Link.DELETE linkTo { build: Build ->

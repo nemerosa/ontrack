@@ -175,6 +175,7 @@ internal class GitHubIngestionBuildLinksMutationsIT : AbstractIngestionTestSuppo
                                         BuildLinkFormItem(
                                             project = targets[it]?.name ?: error("Cannot find project $it"),
                                             build = "build-$it",
+                                            qualifier = "",
                                         )
                                     }
                                 ))

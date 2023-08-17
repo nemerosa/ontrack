@@ -45,41 +45,42 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">Using</h3>
                 </div>
-                <div class="panel-body" ng-if="build.using.pageInfo.currentSize == 0">
+                <div class="panel-body" ng-if="build.usingQualified.pageInfo.currentSize == 0">
                     This build does not use another build.
                 </div>
-                <table class="table table-hover" ng-if="build.using.pageInfo.currentSize > 0">
+                <table class="table table-hover" ng-if="build.usingQualified.pageInfo.currentSize > 0">
                     <tbody>
-                    <tr ng-repeat="dependency in build.using.pageItems">
+                    <tr ng-repeat="dependency in build.usingQualified.pageItems">
                         <td>
-                            <a href="{{dependency.branch.project.links._page}}">{{dependency.branch.project.name}}</a>
+                            <a href="{{dependency.build.branch.project.links._page}}">{{dependency.build.branch.project.name}}</a>
                         </td>
                         <td>
-                            <a href="{{dependency.branch.links._page}}">{{dependency.branch.name}}</a>
+                            <a href="{{dependency.build.branch.links._page}}">{{dependency.build.branch.name}}</a>
                         </td>
                         <td>
-                            <a href="{{dependency.links._page}}">{{dependency.name}}</a>
+                            <a href="{{dependency.build.links._page}}">{{dependency.build.name}}</a>
+                            <span ng-if="dependency.qualifier">[{{ dependency.qualifier }}]</span>
                         </td>
                         <td>
-                            <ot-entity-embedded-decorations decorations="dependency.decorations"></ot-entity-embedded-decorations>
+                            <ot-entity-embedded-decorations decorations="dependency.build.decorations"></ot-entity-embedded-decorations>
                         </td>
                         <td class="ot-build-used-by-promotions">
-                                <span ng-repeat="promotionRun in dependency.promotionRuns">
+                                <span ng-repeat="promotionRun in dependency.build.promotionRuns">
                                     <ot-entity-image entity="promotionRun.promotionLevel" title="{{promotionRun.promotionLevel.name}}" link="{{promotionRun.promotionLevel.links._page}}"></ot-entity-image>
                                 </span>
                         </td>
                     </tr>
                     </tbody>
-                    <tfoot ng-show="build.using.pageInfo.previousPage || build.using.pageInfo.nextPage">
+                    <tfoot ng-show="build.usingQualified.pageInfo.previousPage || build.usingQualified.pageInfo.nextPage">
                     <tr>
                         <td colspan="4">
-                            <button id="build-using-previous" class="btn btn-default" type="button" ng-show="build.using.pageInfo.previousPage" ng-click="navigateUsing(build.using.pageInfo.previousPage)">
+                            <button id="build-using-previous" class="btn btn-default" type="button" ng-show="build.usingQualified.pageInfo.previousPage" ng-click="navigateUsing(build.usingQualified.pageInfo.previousPage)">
                                 <span class="fa fa-step-backward"></span>
                                 Previous
                             </button>
                         </td>
                         <td colspan="4" style="text-align: right;">
-                            <button id="build-using-next" class="btn btn-default" type="button" ng-show="build.using.pageInfo.nextPage" ng-click="navigateUsing(build.using.pageInfo.nextPage)">
+                            <button id="build-using-next" class="btn btn-default" type="button" ng-show="build.usingQualified.pageInfo.nextPage" ng-click="navigateUsing(build.usingQualified.pageInfo.nextPage)">
                                 <span class="fa fa-step-forward"></span>
                                 Next
                             </button>
@@ -93,41 +94,42 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">Used by</h3>
                 </div>
-                <div class="panel-body" ng-if="build.usedBy.pageInfo.currentSize == 0">
+                <div class="panel-body" ng-if="build.usedByQualified.pageInfo.currentSize == 0">
                     This build is not marked as being used by another build.
                 </div>
-                <table class="table table-hover" ng-if="build.usedBy.pageInfo.currentSize > 0">
+                <table class="table table-hover" ng-if="build.usedByQualified.pageInfo.currentSize > 0">
                     <tbody>
-                    <tr ng-repeat="usedBy in build.usedBy.pageItems">
+                    <tr ng-repeat="usedBy in build.usedByQualified.pageItems">
                         <td>
-                            <a href="{{usedBy.branch.project.links._page}}">{{usedBy.branch.project.name}}</a>
+                            <a href="{{usedBy.build.branch.project.links._page}}">{{usedBy.build.branch.project.name}}</a>
                         </td>
                         <td>
-                            <a href="{{usedBy.branch.links._page}}">{{usedBy.branch.name}}</a>
+                            <a href="{{usedBy.build.branch.links._page}}">{{usedBy.build.branch.name}}</a>
                         </td>
                         <td>
-                            <a href="{{usedBy.links._page}}">{{usedBy.name}}</a>
+                            <a href="{{usedBy.build.links._page}}">{{usedBy.build.name}}</a>
+                            <span ng-if="usedBy.qualifier">[{{ usedBy.qualifier }}]</span>
                         </td>
                         <td>
-                            <ot-entity-embedded-decorations decorations="usedBy.decorations"></ot-entity-embedded-decorations>
+                            <ot-entity-embedded-decorations decorations="usedBy.build.decorations"></ot-entity-embedded-decorations>
                         </td>
                         <td class="ot-build-used-by-promotions">
-                                <span ng-repeat="promotionRun in usedBy.promotionRuns">
+                                <span ng-repeat="promotionRun in usedBy.build.promotionRuns">
                                     <ot-entity-image entity="promotionRun.promotionLevel" title="{{promotionRun.promotionLevel.name}}" link="{{promotionRun.promotionLevel.links._page}}"></ot-entity-image>
                                 </span>
                         </td>
                     </tr>
                     </tbody>
-                    <tfoot ng-show="build.usedBy.pageInfo.previousPage || build.usedBy.pageInfo.nextPage">
+                    <tfoot ng-show="build.usedByQualified.pageInfo.previousPage || build.usedByQualified.pageInfo.nextPage">
                     <tr>
                         <td colspan="4">
-                            <button class="btn btn-default" type="button" ng-show="build.usedBy.pageInfo.previousPage" ng-click="navigateUsedBy(build.usedBy.pageInfo.previousPage)">
+                            <button class="btn btn-default" type="button" ng-show="build.usedByQualified.pageInfo.previousPage" ng-click="navigateUsedBy(build.usedByQualified.pageInfo.previousPage)">
                                 <span class="fa fa-step-backward"></span>
                                 Previous
                             </button>
                         </td>
                         <td colspan="4" style="text-align: right;">
-                            <button class="btn btn-default" type="button" ng-show="build.usedBy.pageInfo.nextPage" ng-click="navigateUsedBy(build.usedBy.pageInfo.nextPage)">
+                            <button class="btn btn-default" type="button" ng-show="build.usedByQualified.pageInfo.nextPage" ng-click="navigateUsedBy(build.usedByQualified.pageInfo.nextPage)">
                                 <span class="fa fa-step-forward"></span>
                                 Next
                             </button>

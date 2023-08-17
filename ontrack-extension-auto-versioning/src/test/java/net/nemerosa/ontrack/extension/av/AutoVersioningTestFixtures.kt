@@ -69,6 +69,7 @@ object AutoVersioningTestFixtures {
         validationStamp = null,
         autoApprovalMode = autoApprovalMode,
         notifications = notifications,
+        qualifier = null,
     )
 
 }

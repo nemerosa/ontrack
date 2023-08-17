@@ -8,4 +8,6 @@ data class GitHubIngestionLink(
     val project: String,
     @APIDescription("Name or label of the build to link to (labels start with #)")
     val buildRef: String,
+    @APIDescription("Qualifier for the link. Blank by default.")
+    val qualifier: String? = null,
 )

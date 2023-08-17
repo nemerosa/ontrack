@@ -12,15 +12,17 @@ interface BuildLinkListener {
      *
      * @param from Build linked from
      * @param to   Build linked to
+     * @param qualifier Link qualifier
      */
-    fun onBuildLinkAdded(from: Build, to: Build) {}
+    fun onBuildLinkAdded(from: Build, to: Build, qualifier: String) {}
 
     /**
      * A build is unlinked to another one
      *
      * @param from Build linked from
      * @param to   Build linked to
+     * @param qualifier Link qualifier
      */
-    fun onBuildLinkDeleted(from: Build, to: Build) {}
+    fun onBuildLinkDeleted(from: Build, to: Build, qualifier: String) {}
 
 }

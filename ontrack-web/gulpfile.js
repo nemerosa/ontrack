@@ -275,8 +275,8 @@ gulp.task('default', gulp.series('index:prod', 'graphiql:prod:index', 'assets', 
 
 gulp.task('watch', function () {
     liveReload.listen();
-    gulp.watch(lessResources, ['less']);
-    gulp.watch(indexResource, ['index:dev']);
-    gulp.watch(jsResources, ['index:dev']);
-    gulp.watch(templateResources, ['templates']);
+    gulp.watch(lessResources, gulp.series('less'));
+    gulp.watch(indexResource, gulp.series('index:dev'));
+    gulp.watch(jsResources, gulp.series('index:dev'));
+    gulp.watch(templateResources, gulp.series('templates'));
 });

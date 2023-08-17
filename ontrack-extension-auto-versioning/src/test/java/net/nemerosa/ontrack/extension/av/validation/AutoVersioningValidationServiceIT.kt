@@ -362,4 +362,59 @@ internal class AutoVersioningValidationServiceIT : AbstractAutoVersioningTestSup
         }
     }
 
+    @Test
+    fun `Check and validate for up-to-date dependency read from the SCM with existing validation stamp and qualified link`() {
+        val (linkedBuild430, linkedBuild431) = project<Pair<Build, Build>> {
+            branch<Pair<Build, Build>>("main") {
+                val gold = promotionLevel("GOLD")
+                val b430 = build("4.3.0")
+                b430.promote(gold)
+                val b431 = build("4.3.1")
+                b431.promote(gold)
+                b430 to b431
+            }
+        }
+
+        project {
+            branch {
+                testSCMExtension.registerProjectForTestSCM(project) {
+                    withFile("gradle.properties", branch = name) {
+                        "version = 4.3.1"
+                    }
+                }
+                val vs = validationStamp()
+                autoValidationStampProperty(project, autoCreateIfNotPredefined = true)
+                setAutoVersioning {
+                    autoVersioningConfig {
+                        project = linkedBuild430.project.name
+                        branch = linkedBuild430.branch.name
+                        promotion = "GOLD"
+                        validationStamp = vs.name
+                        qualifier = "dep1"
+                    }
+                }
+                val build = build()
+
+                val data = autoVersioningValidationService.checkAndValidate(build)
+
+                assertNotNull(data.firstOrNull(), "One validation") { validationData ->
+                    assertEquals(linkedBuild430.project.name, validationData.project)
+                    assertEquals("4.3.1", validationData.version)
+                    assertEquals("4.3.1", validationData.latestVersion)
+                    assertEquals("gradle.properties", validationData.path)
+                    assertTrue(validationData.time > 0)
+                }
+
+                val run =
+                    structureService.getValidationRunsForBuildAndValidationStamp(build.id, vs.id, 0, 1).firstOrNull()
+                assertNotNull(run, "Validation has been created") {
+                    assertEquals("PASSED", it.lastStatusId, "Validation passed")
+                }
+
+                // Checks that the build link has been created
+                structureService.isLinkedTo(build, linkedBuild431.project.name, linkedBuild431.name, qualifier = "dep1")
+            }
+        }
+    }
+
 }

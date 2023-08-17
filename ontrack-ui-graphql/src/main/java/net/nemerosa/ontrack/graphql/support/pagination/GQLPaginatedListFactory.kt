@@ -27,6 +27,7 @@ class GQLPaginatedListFactory(
      *
      * @param fieldName Name of the field
      * @param fieldDescription Description of the field
+     * @param deprecation Deprecation reason
      * @param itemType Type of the items being paginated
      * @param itemPaginatedListProvider Function to provide the paginated list directly.
      * @param arguments Optional list of arguments to add to the field
@@ -39,6 +40,7 @@ class GQLPaginatedListFactory(
             cache: GQLTypeCache,
             fieldName: String,
             fieldDescription: String,
+            deprecation: String? = null,
             itemType: String,
             itemPaginatedListProvider: (env: DataFetchingEnvironment, source: P, offset: Int, size: Int) -> PaginatedList<T>,
             arguments: List<GraphQLArgument> = emptyList(),
@@ -48,6 +50,7 @@ class GQLPaginatedListFactory(
                     cache,
                     fieldName,
                     fieldDescription,
+                    deprecation,
                     itemType,
                     arguments,
                     additionalFields,
@@ -68,6 +71,7 @@ class GQLPaginatedListFactory(
      *
      * @param fieldName Name of the field
      * @param fieldDescription Description of the field
+     * @param deprecation Deprecation reason
      * @param itemType Type of the items being paginated
      * @param itemListCounter Function to provide the _total_ number of items, regardless of pagination
      * @param itemListProvider Function to provide a list of items restricted by pagination
@@ -80,13 +84,14 @@ class GQLPaginatedListFactory(
             cache: GQLTypeCache,
             fieldName: String,
             fieldDescription: String,
+            deprecation: String? = null,
             itemType: String,
             itemListCounter: (DataFetchingEnvironment, P) -> Int,
             itemListProvider: (DataFetchingEnvironment, P, Int, Int) -> List<T>,
             arguments: List<GraphQLArgument> = emptyList()
     ): GraphQLFieldDefinition =
             createBasePaginatedListField(
-                    cache, fieldName, fieldDescription, itemType, arguments
+                    cache, fieldName, fieldDescription, deprecation, itemType, arguments
             ).dataFetcher { environment ->
                 val source: P = environment.getSource()
                 val offset = environment.getArgument<Int>(ARG_OFFSET) ?: 0
@@ -109,6 +114,7 @@ class GQLPaginatedListFactory(
             cache: GQLTypeCache,
             fieldName: String,
             fieldDescription: String,
+            deprecation: String?,
             itemType: String,
             arguments: List<GraphQLArgument>,
             additionalFields: List<GraphQLFieldDefinition> = emptyList(),
@@ -116,6 +122,7 @@ class GQLPaginatedListFactory(
             GraphQLFieldDefinition.newFieldDefinition()
                     .name(fieldName)
                     .description(fieldDescription)
+                    .deprecate(deprecation)
                     .argument {
                         it.name(ARG_OFFSET)
                                 .description("Offset for the page")

@@ -1,8 +1,11 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.json.getRequiredIntField
+import net.nemerosa.ontrack.json.getRequiredTextField
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 /**
  * Management of build links using GraphQL.
@@ -37,8 +40,56 @@ class BuildLinksGraphQLIT : AbstractQLKTITSupport() {
                 checkGraphQLUserErrors(data, "linkBuild") { payload ->
                     assertEquals(build1.id(), payload.path("build").path("id").asInt())
                     assertNotNull(
-                        structureService.getBuildsUsedBy(build1).pageItems.find { it.id == build2.id },
+                        structureService.getQualifiedBuildsUsedBy(build1).pageItems.find { it.build.id == build2.id },
                         "Link has been created"
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Linking a build to another build using names and a qualifier`() {
+        val build1 = doCreateBuild()
+        val build2 = doCreateBuild()
+        asAdmin {
+            run(
+                """
+                    mutation {
+                        linkBuild(input: {
+                            fromProject: "${build1.project.name}",
+                            fromBuild: "${build1.name}",
+                            toProject: "${build2.project.name}",
+                            toBuild: "${build2.name}",
+                            qualifier: "dep1",
+                        }) {
+                            build {
+                                id
+                            }
+                            errors {
+                                message
+                                exception
+                            }
+                        }
+                    }
+                """
+            ) { data ->
+                checkGraphQLUserErrors(data, "linkBuild") { payload ->
+                    assertEquals(build1.id(), payload.path("build").path("id").asInt())
+                    assertTrue(
+                        structureService.isLinkedTo(
+                            build1,
+                            build2,
+                        ),
+                        "Link OK"
+                    )
+                    assertTrue(
+                        structureService.isLinkedTo(
+                            build1,
+                            build2,
+                            "dep1"
+                        ),
+                        "Qualifier OK"
                     )
                 }
             }
@@ -80,7 +131,7 @@ class BuildLinksGraphQLIT : AbstractQLKTITSupport() {
                     assertEquals(build0.id(), payload.path("build").path("id").asInt())
                     (0..2).forEach { no ->
                         assertNotNull(
-                            structureService.getBuildsUsedBy(build0).pageItems.find { it.id == builds[no].id },
+                            structureService.getQualifiedBuildsUsedBy(build0).pageItems.find { it.build.id == builds[no].id },
                             "Link has been created"
                         )
                     }
@@ -115,10 +166,82 @@ class BuildLinksGraphQLIT : AbstractQLKTITSupport() {
                 checkGraphQLUserErrors(data, "linkBuildById") { payload ->
                     assertEquals(build1.id(), payload.path("build").path("id").asInt())
                     assertNotNull(
-                        structureService.getBuildsUsedBy(build1).pageItems.find { it.id == build2.id },
+                        structureService.getQualifiedBuildsUsedBy(build1).pageItems.find { it.build.id == build2.id },
                         "Link has been created"
                     )
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting the list of links`() {
+        asAdmin {
+            val build1 = doCreateBuild()
+            val build2 = doCreateBuild()
+            structureService.createBuildLink(build1, build2, "dep1")
+            structureService.createBuildLink(build1, build2, "dep2")
+            run(
+                """
+                query {
+                    build(id: ${build1.id}) {
+                        usingQualified {
+                            pageItems {
+                                build {
+                                    id
+                                }
+                                qualifier
+                            }
+                        }
+                    }
+                }
+            """
+            ) { data ->
+                val items = data.path("build").path("usingQualified").path("pageItems")
+                assertEquals(
+                    listOf(build2.id(), build2.id()),
+                    items.map { it.path("build").getRequiredIntField("id") }
+                )
+                assertEquals(
+                    setOf("dep1", "dep2"),
+                    items.map { it.getRequiredTextField("qualifier") }.toSet()
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Getting the list of links from`() {
+        asAdmin {
+            val build1 = doCreateBuild()
+            val build2 = doCreateBuild()
+            structureService.createBuildLink(build1, build2, "dep1")
+            structureService.createBuildLink(build1, build2, "dep2")
+            run(
+                """
+                query {
+                    build(id: ${build2.id}) {
+                        usedByQualified {
+                            pageItems {
+                                build {
+                                    id
+                                }
+                                qualifier
+                            }
+                        }
+                    }
+                }
+            """
+            ) { data ->
+                val items = data.path("build").path("usedByQualified").path("pageItems")
+                assertEquals(
+                    listOf(build1.id(), build1.id()),
+                    items.map { it.path("build").getRequiredIntField("id") }
+                )
+                assertEquals(
+                    setOf("dep1", "dep2"),
+                    items.map { it.getRequiredTextField("qualifier") }.toSet()
+                )
             }
         }
     }

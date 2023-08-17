@@ -26,7 +26,7 @@ class BuildLinkDecorationExtension(
         val labels = mainBuildLinksService.getMainBuildLinksConfig(entity.project).labels
         // Gets the main links from this build
         var extraLinks = false
-        val mainLinks = structureService.getBuildsUsedBy(entity as Build, 0, Int.MAX_VALUE) { target ->
+        val mainLinks = structureService.getQualifiedBuildsUsedBy(entity as Build, 0, Int.MAX_VALUE) { target ->
             val mainLink = labels.isEmpty() || mainBuildLinksFilterService.isMainBuidLink(target, labels)
             // There are extra links if a target build is NOT a main link
             extraLinks = extraLinks || !mainLink
@@ -59,13 +59,13 @@ class BuildLinkDecorationExtension(
         }
     }
 
-    protected fun getDecoration(build: Build): BuildLinkDecoration {
+    protected fun getDecoration(buildLink: BuildLink): BuildLinkDecoration {
         // Gets the list of promotion runs for this build
-        val promotionRuns = structureService.getLastPromotionRunsForBuild(build.id)
+        val promotionRuns = structureService.getLastPromotionRunsForBuild(buildLink.build.id)
         // Gets the label to use for the decoration
-        val label = buildDisplayNameService.getBuildDisplayName(build)
+        val label = buildDisplayNameService.getBuildDisplayName(buildLink.build)
         // Decoration
-        return build.asBuildLinkDecoration(uriBuilder, promotionRuns, label)
+        return buildLink.asBuildLinkDecoration(uriBuilder, promotionRuns, label)
     }
 
 }
