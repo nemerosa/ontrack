@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProper
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMExtension
+import net.nemerosa.ontrack.extension.scm.service.SCMPath
 import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.structure.Branch
@@ -24,6 +25,12 @@ class GitSCMExtension(
     extensionFeature: GitExtensionFeature,
     private val propertyService: PropertyService,
 ) : AbstractExtension(extensionFeature), SCMExtension {
+
+    override val type: String = "git"
+
+    override fun getSCMPath(configName: String, ref: String): SCMPath? {
+        TODO("Not yet implemented")
+    }
 
     override fun getSCM(project: Project): SCM? {
         val property: GitProjectConfigurationProperty? =
@@ -61,7 +68,7 @@ class GitSCMExtension(
             unsupported("createBranch")
         }
 
-        override fun download(scmBranch: String, path: String, retryOnNotFound: Boolean): ByteArray? {
+        override fun download(scmBranch: String?, path: String, retryOnNotFound: Boolean): ByteArray? {
             unsupported("download")
         }
 

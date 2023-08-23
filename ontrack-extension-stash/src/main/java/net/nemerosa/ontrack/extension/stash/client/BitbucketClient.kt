@@ -29,11 +29,11 @@ interface BitbucketClient {
      * Downloads the content of a file.
      *
      * @param repo Repository where to find the file
-     * @param branch Branch in which to find the file
+     * @param branch Branch in which to find the file (null for the default branch)
      * @param path Path to file
      * @return Binary content of the file (or null if not found)
      */
-    fun download(repo: BitbucketRepository, branch: String, path: String): ByteArray?
+    fun download(repo: BitbucketRepository, branch: String?, path: String): ByteArray?
 
     /**
      * Uploads the content of a file.

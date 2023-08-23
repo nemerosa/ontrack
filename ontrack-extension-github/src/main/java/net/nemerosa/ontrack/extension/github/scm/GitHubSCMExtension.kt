@@ -10,12 +10,16 @@ import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
 import net.nemerosa.ontrack.extension.github.catalog.GitHubSCMCatalogSettings
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
+import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
+import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMExtension
+import net.nemerosa.ontrack.extension.scm.service.SCMPath
 import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.model.exceptions.InputException
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
@@ -31,6 +35,7 @@ class GitHubSCMExtension(
     private val propertyService: PropertyService,
     private val clientFactory: OntrackGitHubClientFactory,
     private val cachedSettingsService: CachedSettingsService,
+    private val gitHubConfigurationService: GitHubConfigurationService,
 ) : AbstractExtension(gitHubExtensionFeature), SCMExtension {
 
     override fun getSCM(project: Project): SCM? {
@@ -39,48 +44,65 @@ class GitHubSCMExtension(
         val settings = cachedSettingsService.getCachedSettings(GitHubSCMCatalogSettings::class.java)
         return property?.run {
             GitHubSCM(
-                project,
-                property,
-                settings,
+                configuration = property.configuration,
+                repository = property.repository,
+                settings = settings,
             )
         }
     }
 
+    override val type: String = "github"
+
+    override fun getSCMPath(configName: String, ref: String): SCMPath? {
+        val config = gitHubConfigurationService.findConfiguration(configName)
+            ?: return null
+        val regex = "([^\\/]*)\\/([^\\/]*)\\/(.*)\$".toRegex()
+        val m = regex.matchEntire(ref)
+            ?: throw GitHubRefParsingException("Cannot get the repository out of the reference: $ref")
+        val (_, owner, repo, path) = m.groupValues
+        val scm = GitHubSCM(
+            configuration = config,
+            repository = "$owner/$repo",
+            settings = cachedSettingsService.getCachedSettings(GitHubSCMCatalogSettings::class.java),
+        )
+        return SCMPath(
+            scm = scm,
+            path = path,
+        )
+    }
+
     private inner class GitHubSCM(
-        private val project: Project,
-        private val property: GitHubProjectConfigurationProperty,
+        private val configuration: GitHubEngineConfiguration,
+        override val repository: String,
         private val settings: GitHubSCMCatalogSettings,
     ) : SCM {
 
-        override val repositoryURI: String = "${property.configuration.url}/${property.repository}.git"
+        override val repositoryURI: String = "${configuration.url}/${repository}.git"
 
-        override val repositoryHtmlURL: String = "${property.configuration.url}/${property.repository}"
-
-        override val repository: String = property.repository
+        override val repositoryHtmlURL: String = "${configuration.url}/${repository}"
 
         override fun getSCMBranch(branch: Branch): String? {
-            checkProject(branch.project)
             val branchProperty: GitBranchConfigurationProperty? =
                 propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java).value
             return branchProperty?.branch
         }
 
         override fun createBranch(sourceBranch: String, newBranch: String): String {
-            return client.createBranch(property.repository, sourceBranch, newBranch)
+            return client.createBranch(repository, sourceBranch, newBranch)
                 ?: throw GitHubCannotCreateBranchException(
                     """Cannot create branch $newBranch from $sourceBranch."""
                 )
         }
 
-        override fun download(scmBranch: String, path: String, retryOnNotFound: Boolean): ByteArray? =
-            client.getFileContent(property.repository, scmBranch, path, retryOnNotFound)
+        override fun download(scmBranch: String?, path: String, retryOnNotFound: Boolean): ByteArray? =
+            client.getFileContent(repository, scmBranch, path, retryOnNotFound)
 
         override fun upload(scmBranch: String, commit: String, path: String, content: ByteArray, message: String) {
             // First, we need the SHA of the file
-            val sha = client.getFile(property.repository, scmBranch, path, retryOnNotFound = true)
+            val sha = client.getFile(repository, scmBranch, path, retryOnNotFound = true)
                 ?.sha
                 ?: error("Cannot find file at $path for branch $scmBranch")
-            client.setFileContent(property.repository, scmBranch, sha, path, content, message)
+            client.setFileContent(repository, scmBranch, sha, path, content, message)
         }
 
         /**
@@ -97,7 +119,7 @@ class GitHubSCMExtension(
         ): SCMPullRequest {
             // Creates the pull request
             val pr = client.createPR(
-                repository = property.repository,
+                repository = repository,
                 title = title,
                 head = from,
                 base = to,
@@ -110,14 +132,14 @@ class GitHubSCMExtension(
             if (autoApproval) {
                 // Approving using the auto merge account
                 client.approvePR(
-                    repository = property.repository,
+                    repository = repository,
                     pr = pr.number,
                     body = "Automated review for auto versioning on promotion",
-                    token = property.configuration.autoMergeToken,
+                    token = configuration.autoMergeToken,
                 )
                 // Auto merge
                 if (remoteAutoMerge) {
-                    client.enableAutoMerge(property.repository, pr.number, message)
+                    client.enableAutoMerge(repository, pr.number, message)
                 } else {
                     merged = waitAndMerge(prId, message)
                 }
@@ -139,7 +161,7 @@ class GitHubSCMExtension(
             val autoApprovalIntervalMillis = settings.autoMergeInterval
             val merged = runBlocking {
                 withTimeoutOrNull(timeMillis = autoApprovalTimeoutMillis) {
-                    while (!client.isPRMergeable(property.repository, prId)) {
+                    while (!client.isPRMergeable(repository, prId)) {
                         delay(autoApprovalIntervalMillis)
                     }
                     true // PR has become mergeable
@@ -150,7 +172,7 @@ class GitHubSCMExtension(
             }
             // Merges the PR
             client.mergePR(
-                property.repository,
+                repository,
                 prId,
                 message
             )
@@ -158,18 +180,14 @@ class GitHubSCMExtension(
             return true
         }
 
-        private fun checkProject(other: Project) {
-            check(other.id == project.id) {
-                "An SCM service can be used only for its project."
-            }
-        }
-
         private val client: OntrackGitHubClient by lazy {
-            clientFactory.create(property.configuration)
+            clientFactory.create(configuration)
         }
 
     }
 
     private class GitHubCannotCreateBranchException(message: String) : BaseException(message)
+
+    private class GitHubRefParsingException(message: String) : InputException(message)
 
 }

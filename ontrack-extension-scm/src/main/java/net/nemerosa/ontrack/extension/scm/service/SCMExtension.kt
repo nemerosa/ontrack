@@ -9,6 +9,17 @@ import net.nemerosa.ontrack.model.structure.Project
 interface SCMExtension : Extension {
 
     /**
+     * Unique identifier for this SCM
+     */
+    val type: String
+
+    /**
+     * Given a configuration name and a reference path (which includes also a file path), returns
+     * a valid SCM interface.
+     */
+    fun getSCMPath(configName: String, ref: String): SCMPath?
+
+    /**
      * Given a [project], returns its [SCM] interface if any.
      */
     fun getSCM(project: Project): SCM?

@@ -9,7 +9,7 @@ apply<OntrackExtensionPlugin>()
 dependencies {
     api(project(":ontrack-extension-support"))
 
-
+    implementation(project(":ontrack-extension-scm"))
     implementation(project(":ontrack-ui-graphql"))
     implementation("org.slf4j:slf4j-api")
 
@@ -20,6 +20,7 @@ dependencies {
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-scm", configuration = "tests"))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
