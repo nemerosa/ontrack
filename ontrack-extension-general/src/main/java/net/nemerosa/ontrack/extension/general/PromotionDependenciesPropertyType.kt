@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.MultiSelection
-import net.nemerosa.ontrack.model.form.MultiStrings
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -15,7 +14,6 @@ import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.SelectableItem
 import org.springframework.stereotype.Component
 import java.util.function.Function
-import java.util.stream.Collectors
 
 /**
  * Definition of the "Promotion dependencies" property type.
@@ -58,7 +56,7 @@ class PromotionDependenciesPropertyType(
                                             it.id != promotion.id
                                         }.map {
                                             SelectableItem(
-                                                    it.name in value?.dependencies ?: emptyList(),
+                                                    it.name in (value?.dependencies ?: emptyList()),
                                                     it.name,
                                                     it.name
                                             )

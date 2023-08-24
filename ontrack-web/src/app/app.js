@@ -2,7 +2,7 @@ const ontrack = angular.module('ontrack', [
         'ui.bootstrap',
         'ui.router',
         'ui.sortable',
-        'multi-select',
+        'isteven-multi-select',
         'angular_taglist_directive',
         'ngSanitize',
         'oc.lazyLoad',
