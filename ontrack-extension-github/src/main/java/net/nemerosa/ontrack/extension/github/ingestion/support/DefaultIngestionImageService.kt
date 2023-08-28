@@ -4,6 +4,8 @@ import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
+import net.nemerosa.ontrack.extension.scm.service.SCMRefService
+import net.nemerosa.ontrack.extension.scm.service.downloadDocument
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
 import org.springframework.stereotype.Component
@@ -13,13 +15,19 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class DefaultIngestionImageService(
     private val propertyService: PropertyService,
-    private val gitHubClientFactory: OntrackGitHubClientFactory,
+    private val scmRefService: SCMRefService,
 ) : IngestionImageService {
 
     override fun downloadImage(project: Project, ref: String): Document {
         val parsedRef = IngestionImageRefParser.parseRef(ref)
         return when (parsedRef.protocol) {
             "github" -> downloadFromGitHub(project, parsedRef.path)
+            "scm" -> {
+                val uri = "scm://${parsedRef.path}"
+                scmRefService.downloadDocument(uri, "image/png")
+                    ?: throw IngestionImageNotFoundException(uri)
+            }
+
             else -> throw IngestionImageProtocolUnsupportedException(parsedRef.protocol, ref)
         }
     }
@@ -57,16 +65,9 @@ class DefaultIngestionImageService(
         repository: String,
         path: String,
     ): Document {
-        val client = gitHubClientFactory.create(gitHubConfig)
-        val bytes = client.getFileContent(
-            repository = "$owner/$repository",
-            branch = null, // Using the default branch
-            path = path
-        ) ?: throw IngestionImageNotFoundException("$owner/$repository/$path")
-        return Document(
-            type = "image/png",
-            content = bytes,
-        )
+        val uri = "scm://github/${gitHubConfig.name}/$owner/$repository/$path"
+        return scmRefService.downloadDocument(uri, "image/png")
+            ?: throw IngestionImageNotFoundException("$owner/$repository/$path")
     }
 
 

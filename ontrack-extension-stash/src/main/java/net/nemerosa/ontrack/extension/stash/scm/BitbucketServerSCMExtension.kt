@@ -7,13 +7,15 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMExtension
+import net.nemerosa.ontrack.extension.scm.service.SCMPath
 import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.extension.stash.StashExtensionFeature
 import net.nemerosa.ontrack.extension.stash.client.BitbucketClient
 import net.nemerosa.ontrack.extension.stash.client.BitbucketClientFactory
 import net.nemerosa.ontrack.extension.stash.model.BitbucketRepository
-import net.nemerosa.ontrack.extension.stash.property.StashConfigurator
-import net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationProperty
+import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
+import net.nemerosa.ontrack.extension.stash.model.getRepositoryUrl
+import net.nemerosa.ontrack.extension.stash.property.StashGitConfiguration
 import net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.stash.settings.BitbucketServerSettings
 import net.nemerosa.ontrack.extension.support.AbstractExtension
@@ -27,35 +29,51 @@ import org.springframework.stereotype.Component
 class BitbucketServerSCMExtension(
     extensionFeature: StashExtensionFeature,
     private val propertyService: PropertyService,
-    private val stashConfigurator: StashConfigurator,
     private val bitbucketClientFactory: BitbucketClientFactory,
     private val cachedSettingsService: CachedSettingsService,
 ) : AbstractExtension(extensionFeature), SCMExtension {
 
+    override val type: String = "bitbucket-server"
+
+    override fun getSCMPath(configName: String, ref: String): SCMPath? {
+        TODO("Not yet implemented")
+    }
+
     override fun getSCM(project: Project): SCM? {
         val property =
             propertyService.getPropertyValue(project, StashProjectConfigurationPropertyType::class.java) ?: return null
-        return BitbucketServerSCM(project, property, cachedSettingsService.getCachedSettings(BitbucketServerSettings::class.java))
+        return BitbucketServerSCM(
+            configuration = property.configuration,
+            project = property.project,
+            repositoryName = property.repository,
+            settings =  cachedSettingsService.getCachedSettings(BitbucketServerSettings::class.java),
+        )
     }
 
     private inner class BitbucketServerSCM(
-        private val project: Project,
-        private val property: StashProjectConfigurationProperty,
+        private val configuration: StashConfiguration,
+        private val project: String,
+        private val repositoryName: String,
         private val settings: BitbucketServerSettings,
     ) : SCM {
 
-        private val stashConfiguration = stashConfigurator.getGitConfiguration(property)
+        private val stashConfiguration = StashGitConfiguration(
+            configuration = configuration,
+            project = project,
+            repository = repositoryName,
+            indexationInterval = 0, // Not needed in this context
+            configuredIssueService = null, // Not needed in this context
+        )
 
-        private val repo = BitbucketRepository(property.project, property.repository)
+        private val repo = BitbucketRepository(project, repositoryName)
 
         override val repositoryURI: String = stashConfiguration.remote
 
-        override val repositoryHtmlURL: String = property.repositoryUrl
+        override val repositoryHtmlURL: String = getRepositoryUrl(configuration, project, repositoryName)
 
-        override val repository: String = "${property.project}/${property.repository}"
+        override val repository: String = "${project}/${repositoryName}"
 
         override fun getSCMBranch(branch: Branch): String? {
-            checkProject(branch.project)
             val branchProperty: GitBranchConfigurationProperty? =
                 propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java).value
             return branchProperty?.branch
@@ -64,7 +82,7 @@ class BitbucketServerSCMExtension(
         override fun createBranch(sourceBranch: String, newBranch: String): String =
             client.createBranch(repo, sourceBranch, newBranch)
 
-        override fun download(scmBranch: String, path: String, retryOnNotFound: Boolean): ByteArray? =
+        override fun download(scmBranch: String?, path: String, retryOnNotFound: Boolean): ByteArray? =
             client.download(repo, scmBranch, path)
 
         override fun upload(scmBranch: String, commit: String, path: String, content: ByteArray, message: String) {
@@ -101,18 +119,18 @@ class BitbucketServerSCMExtension(
             // Auto approval
             if (autoApproval) {
                 // Auto merge token must be set
-                if (property.configuration.autoMergeToken.isNullOrBlank()) {
-                    throw BitbucketServerSCMMissingAutoMergeTokenException(property.configuration.name)
+                if (configuration.autoMergeToken.isNullOrBlank()) {
+                    throw BitbucketServerSCMMissingAutoMergeTokenException(configuration.name)
                 }
-                if (property.configuration.autoMergeUser.isNullOrBlank()) {
-                    throw BitbucketServerSCMMissingAutoMergeUserException(property.configuration.name)
+                if (configuration.autoMergeUser.isNullOrBlank()) {
+                    throw BitbucketServerSCMMissingAutoMergeUserException(configuration.name)
                 }
                 // Approving using the auto merge account
                 client.approvePR(
                     repo = repo,
                     prId = pr.id,
-                    user = property.configuration.autoMergeUser,
-                    token = property.configuration.autoMergeToken,
+                    user = configuration.autoMergeUser,
+                    token = configuration.autoMergeToken,
                 )
                 // Auto merge
                 if (remoteAutoMerge) {
@@ -125,7 +143,7 @@ class BitbucketServerSCMExtension(
             return SCMPullRequest(
                 id = pr.id.toString(),
                 name = "PR-${pr.id}",
-                link = "${property.configuration.url}/projects/${property.project}/repos/${property.repository}/pull-requests/${pr.id}/overview",
+                link = "${configuration.url}/projects/${project}/repos/${repositoryName}/pull-requests/${pr.id}/overview",
                 merged = merged
             )
         }
@@ -155,14 +173,8 @@ class BitbucketServerSCMExtension(
             return true
         }
 
-        private fun checkProject(other: Project) {
-            check(other.id == project.id) {
-                "An SCM service can be used only for its project."
-            }
-        }
-
         private val client: BitbucketClient by lazy {
-            bitbucketClientFactory.getBitbucketClient(property.configuration)
+            bitbucketClientFactory.getBitbucketClient(configuration)
         }
 
     }

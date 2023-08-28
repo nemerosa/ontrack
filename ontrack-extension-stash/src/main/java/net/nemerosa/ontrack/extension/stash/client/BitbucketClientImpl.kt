@@ -62,9 +62,13 @@ class BitbucketClientImpl(
             ?.latestCommit
             ?: throw BitbucketServerCannotCreateBranchException()
 
-    override fun download(repo: BitbucketRepository, branch: String, path: String): ByteArray? =
+    override fun download(repo: BitbucketRepository, branch: String?, path: String): ByteArray? =
         try {
-            template.getForObject<ByteArray>("/rest/api/1.0/projects/${repo.project}/repos/${repo.repository}/raw/$path?at=$branch")
+            var uri = "/rest/api/1.0/projects/${repo.project}/repos/${repo.repository}/raw/$path"
+            if (!branch.isNullOrBlank()) {
+                uri += "?at=$branch"
+            }
+            template.getForObject<ByteArray>(uri)
         } catch (ignored: NotFound) {
             null
         }

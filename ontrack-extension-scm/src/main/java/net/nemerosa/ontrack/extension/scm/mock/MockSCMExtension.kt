@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMExtension
+import net.nemerosa.ontrack.extension.scm.service.SCMPath
 import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.structure.Branch
@@ -23,6 +24,12 @@ class MockSCMExtension(
         propertyService.getPropertyValue(project, MockSCMProjectPropertyType::class.java)?.let {
             MockSCM(it)
         }
+
+    override val type: String = "mock"
+
+    override fun getSCMPath(configName: String, ref: String): SCMPath? {
+        TODO("Not yet implemented")
+    }
 
     private val repositories = mutableMapOf<String, MockRepository>()
 
@@ -58,7 +65,7 @@ class MockSCMExtension(
             branch[path] = content
         }
 
-        fun getFile(scmBranch: String, path: String) = files[scmBranch]?.get(path)
+        fun getFile(scmBranch: String?, path: String) = files[scmBranch ?: ""]?.get(path)
 
         fun createBranch(sourceBranch: String, newBranch: String): String {
             createdBranches[sourceBranch] = newBranch
@@ -126,7 +133,7 @@ class MockSCMExtension(
         override fun createBranch(sourceBranch: String, newBranch: String): String =
             repository(mockScmProjectProperty.name).createBranch(sourceBranch, newBranch)
 
-        override fun download(scmBranch: String, path: String, retryOnNotFound: Boolean): ByteArray? =
+        override fun download(scmBranch: String?, path: String, retryOnNotFound: Boolean): ByteArray? =
             repository(mockScmProjectProperty.name).getFile(scmBranch, path)?.toByteArray()
 
         override fun upload(scmBranch: String, commit: String, path: String, content: ByteArray, message: String) {
