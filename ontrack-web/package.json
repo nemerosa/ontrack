@@ -17,7 +17,7 @@
     "prod": "gulp"
   },
   "dependencies": {
-    "angular": "1.2.32",
+    "angular": "1.8.3",
     "angular-sanitize": "1.2.32",
     "angular-ui-router": "0.2.18",
     "angular-ui-bootstrap": "0.12.1",
