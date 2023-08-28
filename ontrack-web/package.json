@@ -28,7 +28,7 @@
     "angular-ui-sortable": "0.14.4",
     "oclazyload": "1.0.9",
     "moment": "2.29.4",
-    "react": "15.3.2",
+    "react": "18.2.0",
     "fetch": "1.0.1",
     "echarts": "5.4.3"
   },
