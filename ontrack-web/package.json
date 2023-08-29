@@ -13,12 +13,26 @@
     "url": "git@github.com:nemerosa/ontrack.git"
   },
   "scripts": {
-    "bower": "bower install --allow-root",
     "dev": "gulp dev",
     "prod": "gulp"
   },
+  "dependencies": {
+    "angular": "1.2.32",
+    "angular-sanitize": "1.2.32",
+    "angular-ui-router": "0.2.18",
+    "angular-ui-bootstrap": "0.12.1",
+    "angular-multi-select": "4.0.2",
+    "bootstrap": "3.2.0",
+    "font-awesome": "4.6.3",
+    "jquery-ui": "1.13.2",
+    "angular-ui-sortable": "0.14.4",
+    "oclazyload": "1.0.9",
+    "moment": "2.29.4",
+    "react": "15.3.2",
+    "fetch": "1.0.1",
+    "echarts": "5.4.3"
+  },
   "devDependencies": {
-    "bower": "^1.8.14",
     "gulp": "^4.0.2",
     "gulp-less": "^5.0.0",
     "gulp-minify-css": "^1.2.4",

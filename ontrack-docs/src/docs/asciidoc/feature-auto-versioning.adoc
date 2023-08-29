@@ -170,6 +170,10 @@ configurations:
     validationStamp: String?
     # Auto approval mode
     autoApprovalMode: CLIENT | SCM
+    # Build link creation when running the checks. True by default.
+    buildLinkCreation: Boolean?
+    # Qualifier to use for the build links
+    qualifier: String?
 ----
 
 [NOTE]

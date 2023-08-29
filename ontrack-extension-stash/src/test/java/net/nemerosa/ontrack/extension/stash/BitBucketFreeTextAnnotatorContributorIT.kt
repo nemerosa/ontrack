@@ -56,7 +56,8 @@ class BitBucketFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
                                 gitConfigurationName,
                                 "https://bitbucket.nemerosa.net",
                                 "test",
-                                "xxx"
+                                "xxx",
+                            null, null,
                         )
                 )
             }

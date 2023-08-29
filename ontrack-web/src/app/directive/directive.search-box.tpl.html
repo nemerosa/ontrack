@@ -1,9 +1,10 @@
 <form class="{{config.css}}" ng-submit="performSearch()">
     <div class="input-group">
-        <div class="input-group-btn">
+        <div class="input-group-btn" dropdown>
             <button type="button"
                     id="ot-searchbox-{{boxId}}-type-button"
                     class="btn btn-default dropdown-toggle"
+                    dropdown-toggle
                     title="{{otSearchBox.selectedSearchResultType.description}}"
                     data-toggle="dropdown"
                     aria-haspopup="true"

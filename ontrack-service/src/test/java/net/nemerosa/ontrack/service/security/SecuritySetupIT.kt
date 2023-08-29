@@ -59,10 +59,12 @@ class SecuritySetupIT : AbstractDSLTestJUnit4Support() {
         val project = project {
             branch()
         }
-        val branches = asUser().call {
-            structureService.getBranchesForProject(project.id)
+        withGrantViewToAll {
+            val branches = asUser().call {
+                structureService.getBranchesForProject(project.id)
+            }
+            assertTrue(branches.isNotEmpty(), "Could access the branches")
         }
-        assertTrue(branches.isNotEmpty(), "Could access the branches")
     }
 
     @Test

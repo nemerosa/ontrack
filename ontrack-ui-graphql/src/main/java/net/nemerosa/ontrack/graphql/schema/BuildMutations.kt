@@ -63,7 +63,7 @@ class BuildMutations(
             val from = findBuildByProjectAndName(input.fromProject, input.fromBuild)
             val to = findBuildByProjectAndName(input.toProject, input.toBuild)
             if (from != null && to != null) {
-                structureService.addBuildLink(from, to)
+                structureService.createBuildLink(from, to, input.qualifier ?: BuildLink.DEFAULT)
             }
             // Return the origin
             from
@@ -80,7 +80,7 @@ class BuildMutations(
                 input.links.forEach { link ->
                     val to = findBuildByProjectAndName(link.project, link.build)
                     if (to != null) {
-                        structureService.addBuildLink(from, to)
+                        structureService.createBuildLink(from, to, link.qualifier ?: BuildLink.DEFAULT)
                     }
                 }
             }
@@ -96,7 +96,7 @@ class BuildMutations(
         ) { input ->
             val from = structureService.getBuild(ID.of(input.fromBuild))
             val to = structureService.getBuild(ID.of(input.toBuild))
-            structureService.addBuildLink(from, to)
+            structureService.createBuildLink(from, to, input.qualifier ?: BuildLink.DEFAULT)
             // Return the origin
             from
         },
@@ -246,6 +246,8 @@ data class LinkBuildInput(
     val toProject: String,
     @APIDescription("Name of the build to which the link must be created")
     val toBuild: String,
+    @APIDescription("Qualifier for the link")
+    val qualifier: String?,
 )
 
 data class LinkBuildByIdInput(
@@ -253,6 +255,8 @@ data class LinkBuildByIdInput(
     val fromBuild: Int,
     @APIDescription("ID of the build to which the link must be created")
     val toBuild: Int,
+    @APIDescription("Qualifier for the link")
+    val qualifier: String?,
 )
 
 
@@ -271,6 +275,8 @@ data class LinksBuildInputItem(
     val project: String,
     @APIDescription("Name of the build to which the link must be created")
     val build: String,
+    @APIDescription("Qualifier for the link")
+    val qualifier: String?,
 )
 
 @Component

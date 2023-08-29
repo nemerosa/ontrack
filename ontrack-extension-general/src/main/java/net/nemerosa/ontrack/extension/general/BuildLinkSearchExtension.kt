@@ -29,10 +29,10 @@ class BuildLinkSearchExtension(
     override val indexerSchedule: Schedule = Schedule.EVERY_DAY
 
     override val searchResultType = SearchResultType(
-            feature = extensionFeature.featureDescription,
-            id = "build-link",
-            name = "Linked Build",
-            description = "Reference to a linked project and build, using format project:[build] where the target build is optional"
+        feature = extensionFeature.featureDescription,
+        id = "build-link",
+        name = "Linked Build",
+        description = "Reference to a linked project and build, using format project:[build] where the target build is optional"
     )
 
     override val indexMapping: SearchIndexMapping? = indexMappings<BuildLinkSearchItem> {
@@ -44,8 +44,8 @@ class BuildLinkSearchExtension(
     }
 
     override fun indexAll(processor: (BuildLinkSearchItem) -> Unit) {
-        structureService.forEachBuildLink { from, to ->
-            process(from, to, processor)
+        structureService.forEachBuildLink { from, to, qualifier ->
+            process(from, to, qualifier, processor)
         }
     }
 
@@ -61,30 +61,30 @@ class BuildLinkSearchExtension(
             structureService.findBuildByID(ID.of(item.targetBuildId)) != null
         }?.run {
             SearchResult(
-                    entityDisplayName,
-                    "Linked to ${item.targetProject}:${item.targetBuild}",
-                    uriBuilder.getEntityURI(this),
-                    uriBuilder.getEntityPage(this),
-                    score,
-                    searchResultType
+                entityDisplayName,
+                "Linked to ${item.targetProject}:${item.targetBuild}",
+                uriBuilder.getEntityURI(this),
+                uriBuilder.getEntityPage(this),
+                score,
+                searchResultType
             )
         }
     }
 
-    override fun onBuildLinkAdded(from: Build, to: Build) {
-        process(from, to) { item ->
+    override fun onBuildLinkAdded(from: Build, to: Build, qualifier: String) {
+        process(from, to, qualifier) { item ->
             searchIndexService.createSearchIndex(this, item)
         }
     }
 
-    override fun onBuildLinkDeleted(from: Build, to: Build) {
-        process(from, to) { item ->
+    override fun onBuildLinkDeleted(from: Build, to: Build, qualifier: String) {
+        process(from, to, qualifier) { item ->
             searchIndexService.deleteSearchIndex(this, item.id)
         }
     }
 
-    private fun process(from: Build, to: Build, processor: (BuildLinkSearchItem) -> Unit) {
-        processor(BuildLinkSearchItem(from, to))
+    private fun process(from: Build, to: Build, qualifier: String, processor: (BuildLinkSearchItem) -> Unit) {
+        processor(BuildLinkSearchItem(from, to, qualifier = qualifier))
         // Alternative name
         val otherName = buildDisplayNameService.getBuildDisplayName(to)
         if (otherName != to.name) {
@@ -99,17 +99,19 @@ class BuildLinkSearchExtension(
 const val BUILD_LINK_SEARCH_INDEX = "build-links"
 
 class BuildLinkSearchItem(
-        val fromBuildId: Int,
-        val targetBuildId: Int,
-        val targetProject: String,
-        val targetBuild: String
+    val fromBuildId: Int,
+    val targetBuildId: Int,
+    val targetProject: String,
+    val targetBuild: String,
+    val qualifier: String,
 ) : SearchItem {
 
-    constructor(from: Build, to: Build, targetBuildName: String = to.name) : this(
-            fromBuildId = from.id(),
-            targetBuildId = to.id(),
-            targetProject = to.project.name,
-            targetBuild = targetBuildName
+    constructor(from: Build, to: Build, targetBuildName: String = to.name, qualifier: String = BuildLink.DEFAULT) : this(
+        fromBuildId = from.id(),
+        targetBuildId = to.id(),
+        targetProject = to.project.name,
+        targetBuild = targetBuildName,
+        qualifier = qualifier,
     )
 
     override val id: String = "$fromBuildId::$targetBuildId"
@@ -117,11 +119,12 @@ class BuildLinkSearchItem(
     val targetKey = "$targetProject:$targetBuild"
 
     override val fields: Map<String, Any?> = asMap(
-            this::fromBuildId,
-            this::targetBuildId,
-            this::targetProject,
-            this::targetBuild,
-            this::targetKey
+        this::fromBuildId,
+        this::targetBuildId,
+        this::targetProject,
+        this::targetBuild,
+        this::targetKey,
+        this::qualifier,
     )
 
 }

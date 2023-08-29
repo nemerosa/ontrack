@@ -173,6 +173,7 @@ internal class AutoVersioningConfigPushPayloadListenerTest {
                     targetProperty = "dep-version",
                     autoApproval = true,
                     autoApprovalMode = AutoApprovalMode.CLIENT,
+                    qualifier = null,
                 )
             )
         )

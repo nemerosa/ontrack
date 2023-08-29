@@ -34,24 +34,25 @@ import java.util.function.BiFunction
 @Service
 @UserTransaction
 class StructureServiceImpl(
-    private val securityService: SecurityService,
-    private val eventPostService: EventPostService,
-    private val eventFactory: EventFactory,
-    private val validationRunStatusService: ValidationRunStatusService,
-    private val validationDataTypeService: ValidationDataTypeService,
-    private val structureRepository: StructureRepository,
-    private val projectRepository: ProjectRepository,
-    private val branchRepository: BranchRepository,
-    private val extensionManager: ExtensionManager,
-    private val propertyService: PropertyService,
-    private val predefinedPromotionLevelService: PredefinedPromotionLevelService,
-    private val predefinedValidationStampService: PredefinedValidationStampService,
-    private val decorationService: DecorationService,
-    private val promotionRunCheckService: PromotionRunCheckService,
-    private val statsRepository: StatsRepository,
-    private val buildLinkListenerService: BuildLinkListenerService,
-    private val coreBuildFilterRepository: CoreBuildFilterRepository,
-    private val metricsExportService: MetricsExportService,
+        private val securityService: SecurityService,
+        private val eventPostService: EventPostService,
+        private val eventFactory: EventFactory,
+        private val validationRunStatusService: ValidationRunStatusService,
+        private val validationDataTypeService: ValidationDataTypeService,
+        private val structureRepository: StructureRepository,
+        private val projectRepository: ProjectRepository,
+        private val branchRepository: BranchRepository,
+        private val buildLinkRepository: BuildLinkRepository,
+        private val extensionManager: ExtensionManager,
+        private val propertyService: PropertyService,
+        private val predefinedPromotionLevelService: PredefinedPromotionLevelService,
+        private val predefinedValidationStampService: PredefinedValidationStampService,
+        private val decorationService: DecorationService,
+        private val promotionRunCheckService: PromotionRunCheckService,
+        private val statsRepository: StatsRepository,
+        private val buildLinkListenerService: BuildLinkListenerService,
+        private val coreBuildFilterRepository: CoreBuildFilterRepository,
+        private val metricsExportService: MetricsExportService,
 ) : StructureService {
 
     private val logger = LoggerFactory.getLogger(StructureService::class.java)
@@ -400,20 +401,26 @@ class StructureServiceImpl(
         }
     }
 
+    @Deprecated("Use createBuildLink instead")
     override fun addBuildLink(fromBuild: Build, toBuild: Build) {
-        securityService.checkProjectFunction(fromBuild, BuildConfig::class.java)
-        securityService.checkProjectFunction(toBuild, ProjectView::class.java)
-        structureRepository.addBuildLink(fromBuild.id, toBuild.id)
-        buildLinkListenerService.onBuildLinkAdded(fromBuild, toBuild)
+        createBuildLink(fromBuild, toBuild, BuildLink.DEFAULT)
     }
 
-    override fun deleteBuildLink(fromBuild: Build, toBuild: Build) {
+    override fun createBuildLink(fromBuild: Build, toBuild: Build, qualifier: String) {
         securityService.checkProjectFunction(fromBuild, BuildConfig::class.java)
         securityService.checkProjectFunction(toBuild, ProjectView::class.java)
-        structureRepository.deleteBuildLink(fromBuild.id, toBuild.id)
-        buildLinkListenerService.onBuildLinkDeleted(fromBuild, toBuild)
+        buildLinkRepository.createBuildLink(fromBuild, toBuild, qualifier)
+        buildLinkListenerService.onBuildLinkAdded(fromBuild, toBuild, qualifier)
     }
 
+    override fun deleteBuildLink(fromBuild: Build, toBuild: Build, qualifier: String) {
+        securityService.checkProjectFunction(fromBuild, BuildConfig::class.java)
+        securityService.checkProjectFunction(toBuild, ProjectView::class.java)
+        buildLinkRepository.deleteBuildLink(fromBuild, toBuild, qualifier)
+        buildLinkListenerService.onBuildLinkDeleted(fromBuild, toBuild, qualifier)
+    }
+
+    @Deprecated("Only qualified build links should be used")
     override fun getBuildsUsedBy(
         build: Build,
         offset: Int,
@@ -428,6 +435,21 @@ class StructureServiceImpl(
         return PaginatedList.create(list.filter(filter), offset, size)
     }
 
+    override fun getQualifiedBuildsUsedBy(
+        build: Build,
+        offset: Int,
+        size: Int,
+        filter: (Build) -> Boolean
+    ): PaginatedList<BuildLink> {
+        securityService.checkProjectFunction(build, ProjectView::class.java)
+        // Gets the complete list, filtered by ACL
+        val list = buildLinkRepository.getQualifiedBuildsUsedBy(build)
+            .filter { b -> securityService.isProjectFunctionGranted(b.build, ProjectView::class.java) }
+        // OK
+        return PaginatedList.create(list.filter { filter(it.build) }, offset, size)
+    }
+
+    @Deprecated("Only qualified build links should be used")
     override fun getBuildsUsing(
         build: Build,
         offset: Int,
@@ -442,19 +464,27 @@ class StructureServiceImpl(
         return PaginatedList.create(list.filter(filter), offset, size)
     }
 
-    override fun searchBuildsLinkedTo(projectName: String, buildPattern: String): List<Build> {
-        return structureRepository.searchBuildsLinkedTo(projectName, buildPattern)
-            .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
+    override fun getQualifiedBuildsUsing(
+        build: Build,
+        offset: Int,
+        size: Int,
+        filter: (Build) -> Boolean
+    ): PaginatedList<BuildLink> {
+        securityService.checkProjectFunction(build, ProjectView::class.java)
+        // Gets the complete list, filtered by ACL
+        val list = buildLinkRepository.getQualifiedBuildsUsing(build)
+            .filter { b -> securityService.isProjectFunctionGranted(b.build, ProjectView::class.java) }
+        // OK
+        return PaginatedList.create(list.filter { filter(it.build) }, offset, size)
     }
 
     override fun editBuildLinks(build: Build, form: BuildLinkForm) {
         securityService.checkProjectFunction(build, BuildConfig::class.java)
         // Gets the existing links, filtered by authorisations
-        val authorisedExistingLinks = structureRepository.getBuildsUsedBy(build)
-            .filter { securityService.isProjectFunctionGranted(it, ProjectView::class.java) }
-            .map { it.id }
+        val authorisedExistingLinks = buildLinkRepository.getQualifiedBuildsUsedBy(build)
+            .filter { securityService.isProjectFunctionGranted(it.build, ProjectView::class.java) }
         // Added links
-        val addedLinks = HashSet<ID>()
+        val addedLinks = mutableSetOf<BuildLink>()
         // Loops through the new links
         form.links.forEach { item ->
             // Gets the project if possible
@@ -471,8 +501,8 @@ class StructureServiceImpl(
             if (builds.isNotEmpty()) {
                 val target = builds[0]
                 // Adds the link
-                addBuildLink(build, target)
-                addedLinks.add(target.id)
+                createBuildLink(build, target, item.qualifier)
+                addedLinks.add(BuildLink(target, item.qualifier))
             } else {
                 throw BuildNotFoundException(item.project, item.build)
             }
@@ -482,28 +512,35 @@ class StructureServiceImpl(
             // Other links, not authorised to view, were not subject to edition and are not visible
             val linksToDelete = HashSet(authorisedExistingLinks)
             linksToDelete.removeAll(addedLinks)
-            linksToDelete.forEach { id ->
+            linksToDelete.forEach { link ->
                 deleteBuildLink(
                     build,
-                    getBuild(id)
+                    link.build,
+                    link.qualifier,
                 )
             }
         }
     }
 
-    override fun isLinkedFrom(build: Build, project: String, buildPattern: String): Boolean {
+    override fun isLinkedFrom(build: Build, project: String, buildPattern: String?, qualifier: String?): Boolean {
         securityService.checkProjectFunction(build, ProjectView::class.java)
-        return structureRepository.isLinkedFrom(build.id, project, buildPattern)
+        return buildLinkRepository.isLinkedFrom(build, project, buildPattern, qualifier)
     }
 
-    override fun isLinkedTo(build: Build, project: String, buildPattern: String): Boolean {
+    override fun isLinkedTo(build: Build, project: String, buildPattern: String?, qualifier: String?): Boolean {
         securityService.checkProjectFunction(build, ProjectView::class.java)
-        return structureRepository.isLinkedTo(build.id, project, buildPattern)
+        return buildLinkRepository.isLinkedTo(build, project, buildPattern, qualifier)
     }
 
-    override fun forEachBuildLink(code: (from: Build, to: Build) -> Unit) {
+    override fun isLinkedTo(build: Build, targetBuild: Build, qualifier: String?): Boolean {
+        securityService.checkProjectFunction(build, ProjectView::class.java)
+        securityService.checkProjectFunction(targetBuild, ProjectView::class.java)
+        return buildLinkRepository.isLinkedTo(build, targetBuild, qualifier)
+    }
+
+    override fun forEachBuildLink(code: (from: Build, to: Build, qualifier: String) -> Unit) {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
-        structureRepository.forEachBuildLink(code)
+        buildLinkRepository.forEachBuildLink(code)
     }
 
     override fun getValidationStampRunViewsForBuild(

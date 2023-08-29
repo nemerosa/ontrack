@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredTextField
+import net.nemerosa.ontrack.json.getTextField
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -35,6 +36,8 @@ class BitbucketServerConfigurationContext(
                 cascField("url", cascString, "Bitbucket Server root URL", required = true),
                 cascField("user", cascString, "Bitbucket Server user", required = true),
                 cascField("password", cascString, "Bitbucket Server password or token", required = true),
+                cascField("autoMergeUser", cascString, "Slug of the user approving pull requests for the auto merge operations", required = false),
+                cascField("autoMergeToken", cascString, "Token used for approving pull requests for the auto merge operations", required = false),
             )
         )
 
@@ -85,5 +88,7 @@ class BitbucketServerConfigurationContext(
             url = getRequiredTextField("url"),
             user = getRequiredTextField("user"),
             password = getRequiredTextField("password"),
+            autoMergeUser = getTextField("autoMergeUser"),
+            autoMergeToken = getTextField("autoMergeToken"),
         )
 }

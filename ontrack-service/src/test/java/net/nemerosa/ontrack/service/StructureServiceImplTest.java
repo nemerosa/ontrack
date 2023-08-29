@@ -54,6 +54,7 @@ public class StructureServiceImplTest {
                 structureRepository,
                 projectRepository,
                 branchRepository,
+                mock(BuildLinkRepository.class),
                 extensionManager,
                 propertyService,
                 predefinedPromotionLevelService,

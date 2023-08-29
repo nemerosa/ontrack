@@ -34,7 +34,7 @@ const jsResources = webPath + '/app/**/*.js';
 const templateResources = webPath + '/app/**/*.html';
 
 const indexResource = webPath + '/index.html';
-const vendor = './vendor';
+const vendor = './node_modules';
 
 const build = 'build/web';
 
@@ -56,24 +56,22 @@ const outputExtensionAssets = './' + outputPath + '/extension/';
 
 const vendorJsResources = [
     'jquery/dist/jquery.js',
-    'jquery-ui/jquery-ui.js',
+    'jquery-ui/dist/jquery-ui.js',
     'angular/angular.js',
     'angular-ui-router/release/angular-ui-router.js',
-    'angular-ui-sortable/sortable.js',
+    'angular-ui-sortable/dist/sortable.js',
     'angular-multi-select/angular-multi-select.js',
-    'angular-taglist/js/angular-taglist-directive.js',
     'angular-sanitize/angular-sanitize.js',
-    'angular-bootstrap/ui-bootstrap-tpls.js',
+    'angular-ui-bootstrap/ui-bootstrap-tpls.js',
     'moment/min/moment.min.js',
-    'oclazyload/dist/ocLazyLoad.min.js',
+    'oclazyload/dist/ocLazyLoad.js',
     'echarts/dist/echarts.js'
 ].map(function (rel) {
     return vendor + '/' + rel;
 });
 
 const vendorCssResources = [
-    'angular-multi-select/angular-multi-select.css',
-    'angular-taglist/css/angular-taglist-directive.css'
+    'angular-multi-select/angular-multi-select.css'
 ].map(function (rel) {
     return vendor + '/' + rel;
 });
@@ -275,8 +273,8 @@ gulp.task('default', gulp.series('index:prod', 'graphiql:prod:index', 'assets', 
 
 gulp.task('watch', function () {
     liveReload.listen();
-    gulp.watch(lessResources, ['less']);
-    gulp.watch(indexResource, ['index:dev']);
-    gulp.watch(jsResources, ['index:dev']);
-    gulp.watch(templateResources, ['templates']);
+    gulp.watch(lessResources, gulp.series('less'));
+    gulp.watch(indexResource, gulp.series('index:dev'));
+    gulp.watch(jsResources, gulp.series('index:dev'));
+    gulp.watch(templateResources, gulp.series('templates'));
 });

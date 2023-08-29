@@ -40,7 +40,7 @@ angular.module('ot.view.build', [
                         name
                       }
                     }
-                    using(offset: $usingOffset, size: 10) {
+                    usingQualified(offset: $usingOffset, size: 10) {
                       pageInfo {
                         ...pageInfoContent
                       }
@@ -48,7 +48,7 @@ angular.module('ot.view.build', [
                         ...buildLinkContent
                       }
                     }
-                    usedBy(offset: $usedByOffset, size: 10) {
+                    usedByQualified(offset: $usedByOffset, size: 10) {
                       pageInfo {
                         ...pageInfoContent
                       }
@@ -167,39 +167,42 @@ angular.module('ot.view.build', [
                   }
                 }
                 
-                fragment buildLinkContent on Build {
-                  name
-                  branch {
+                fragment buildLinkContent on BuildLink {
+                  qualifier
+                  build {
                     name
-                    links {
-                      _page
-                    }
-                    project {
+                    branch {
                       name
                       links {
                         _page
                       }
+                      project {
+                        name
+                        links {
+                          _page
+                        }
+                      }
                     }
-                  }
-                  links {
-                    _page
-                  }
-                  decorations {
-                    decorationType
-                    error
-                    data
-                    feature {
-                      id
+                    links {
+                      _page
                     }
-                  }
-                  promotionRuns(lastPerLevel: true) {
-                    promotionLevel {
-                      id
-                      name
-                      image
-                      _image
-                      links {
-                        _page
+                    decorations {
+                      decorationType
+                      error
+                      data
+                      feature {
+                        id
+                      }
+                    }
+                    promotionRuns(lastPerLevel: true) {
+                      promotionLevel {
+                        id
+                        name
+                        image
+                        _image
+                        links {
+                          _page
+                        }
                       }
                     }
                   }

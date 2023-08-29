@@ -135,18 +135,12 @@ public interface StructureRepository {
     Ack deleteBuild(ID buildId);
 
     /**
-     * Build links
-     */
-
-    void addBuildLink(ID fromBuildId, ID toBuildId);
-
-    void deleteBuildLink(ID fromBuildId, ID toBuildId);
-
-    /**
      * Gets the builds used by the given one.
      *
      * @param build Source build
      * @return List of builds used by the given one
+     *
+     * @deprecated Use {@link BuildLinkRepository#getQualifiedBuildsUsedBy(Build)} instead.
      */
     List<Build> getBuildsUsedBy(Build build);
 
@@ -155,19 +149,10 @@ public interface StructureRepository {
      *
      * @param build Source build
      * @return List of builds which use the given one
+     *
+     * @deprecated Use {@link BuildLinkRepository#getQualifiedBuildsUsing(Build)} instead.
      */
     List<Build> getBuildsUsing(Build build);
-
-    List<Build> searchBuildsLinkedTo(String projectName, String buildPattern);
-
-    boolean isLinkedFrom(ID id, String project, String buildPattern);
-
-    boolean isLinkedTo(ID id, String project, String buildPattern);
-
-    /**
-     * Loops over ALL the build links. Use this method with care, mostly for external indexation.
-     */
-    void forEachBuildLink(BiConsumer<Build,Build> code);
 
     // Promotion levels
 

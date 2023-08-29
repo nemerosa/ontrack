@@ -59,7 +59,7 @@ public class DevWebConfig implements WebMvcConfigurer {
         // Vendor resources
         String vendor = getPath(devSettings.getVendor());
         log.info("[dev] Vendor sources from: " + vendor);
-        registry.addResourceHandler("/vendor/**").addResourceLocations(vendor + "/");
+        registry.addResourceHandler("/node_modules/**").addResourceLocations(vendor + "/");
     }
 
     private String getPath(String dirName) {

@@ -41,6 +41,8 @@ data class AutoVersioningSourceConfig(
     @APIDescription("List of notifications subscriptions to setup for this auto versioning")
     @ListRef(embedded = true, suffix = "Input")
     val notifications: List<AutoVersioningNotification>? = null,
+    @APIDescription("Qualifier for the build link to create (when links are created)")
+    val qualifier: String? = null,
 ) : AutoVersioningTargetConfig {
 
     /**
@@ -126,6 +128,7 @@ data class AutoVersioningSourceConfig(
             autoApprovalMode = autoApprovalMode,
             buildLinkCreation = buildLinkCreation,
             notifications = notifications,
+            qualifier = qualifier,
         )
 
 }

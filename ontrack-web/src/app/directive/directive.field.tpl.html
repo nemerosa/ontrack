@@ -33,7 +33,7 @@
 <!-- Type: multi-selection -->
 <div ng-if="field.type == 'multi-selection'"
      class="multiSelect"
-     multi-select
+     isteven-multi-select
      input-model="field.items"
      button-label="name"
      item-label="name"
@@ -42,7 +42,7 @@
 
 <!-- Type: multi-strings -->
 <div ng-if="field.type == 'multi-strings'">
-    <taglist tag-data="data[field.name]">
+    <taglist style="width: 100%;" tag-data="data[field.name]">
         <input/>
     </taglist>
 </div>

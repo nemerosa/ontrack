@@ -15,6 +15,6 @@ public class DevSettings {
     private String dev = "build/web/dev";
     private String prod = "build/web/prod";
     private String src = "src";
-    private String vendor = "vendor";
+    private String vendor = "node_modules";
 
 }

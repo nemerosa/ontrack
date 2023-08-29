@@ -42,18 +42,18 @@ interface SCM {
     /**
      * Downloads the content of a file.
      *
-     * @param scmBranch Branch to download the file from
+     * @param scmBranch Branch to download the file from (empty or null to use the default branch)
      * @param path Path to the file
      * @param retryOnNotFound If the file is not found, should we retry until a timeout is reached?
      * @return Binary content of the file or null if non existing
      */
-    fun download(scmBranch: String, path: String, retryOnNotFound: Boolean = false): ByteArray?
+    fun download(scmBranch: String?, path: String, retryOnNotFound: Boolean = false): ByteArray?
 
     /**
      * Uploads the content of a file to a branch.
      *
      * @param scmBranch Branch to upload the file to
-     * @param commit Commit of the branch
+     * @param commit Commit of the branch or empty for a new file
      * @param path Path to the file
      * @param content Binary content of the file
      * @param message Commit message

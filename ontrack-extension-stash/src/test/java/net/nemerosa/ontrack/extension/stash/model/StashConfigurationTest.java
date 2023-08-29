@@ -13,7 +13,7 @@ public class StashConfigurationTest {
         StashConfiguration configuration = new StashConfiguration(
                 "server",
                 "http://stash.mycompany.com",
-                "user", "secret"
+                "user", "secret", null, null
         );
         assertEquals("", configuration.obfuscate().getPassword());
     }
@@ -23,7 +23,7 @@ public class StashConfigurationTest {
         StashConfiguration configuration = new StashConfiguration(
                 "server",
                 "http://stash.mycompany.com",
-                "", ""
+                "", "", null, null
         );
         assertFalse(configuration.isCloud());
     }
@@ -33,7 +33,7 @@ public class StashConfigurationTest {
         StashConfiguration configuration = new StashConfiguration(
                 "cloud",
                 "https://bitbucket.org",
-                "", ""
+                "", "", null, null
         );
         assertTrue(configuration.isCloud());
     }

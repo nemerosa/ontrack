@@ -28,8 +28,8 @@
             <form class="form-inline">
                 <div class="form-group">
                     <label for="view-selection"><span class="fa fa-filter"></span> View</label>
-                    <div class="btn-group">
-                        <button id="view-selection" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <div class="btn-group" dropdown>
+                        <button id="view-selection" type="button" class="btn btn-default dropdown-toggle" dropdown-toggle data-toggle="dropdown">
                             <span ng-if="currentView">
                                 <span class="fa fa-check"></span>
                                 {{ currentView.name }}
