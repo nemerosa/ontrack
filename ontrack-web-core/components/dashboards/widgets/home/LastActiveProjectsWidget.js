@@ -10,6 +10,7 @@ import {UserContext} from "@components/providers/UserProvider";
 import LastActiveProjectsWidgetForm from "@components/dashboards/widgets/home/LastActiveProjectsWidgetForm";
 import RowTag from "@components/common/RowTag";
 import {gqlDecorationFragment} from "@components/services/fragments";
+import {useDashboardEventForRefresh} from "@components/dashboards/DashboardEventsContext";
 
 export default function LastActiveProjectsWidget({count}) {
 
@@ -17,6 +18,7 @@ export default function LastActiveProjectsWidget({count}) {
 
     const [projects, setProjects] = useState([])
     const [projectsRefreshCount, setProjectsRefreshCount] = useState(0)
+    const favouritesRefreshCount = useDashboardEventForRefresh("project.favourite")
 
     const newProjectDialog = useNewProjectDialog({
         onSuccess: () => {
@@ -61,7 +63,7 @@ export default function LastActiveProjectsWidget({count}) {
                         ${gqlDecorationFragment}
                     `
                 }
-                queryDeps={[user, count, projectsRefreshCount]}
+                queryDeps={[user, count, projectsRefreshCount, favouritesRefreshCount]}
                 variables={{count}}
                 setData={data => setProjects(data.lastActiveProjects)}
                 getCommands={projects => getCommands(projects)}
@@ -79,7 +81,7 @@ export default function LastActiveProjectsWidget({count}) {
                     </Space>
                 }
                 {
-                    (!projects || projects.length == 0) && <Empty
+                    (!projects || projects.length === 0) && <Empty
                         image={Empty.PRESENTED_IMAGE_SIMPLE}
                         description={
                             <Typography.Text>

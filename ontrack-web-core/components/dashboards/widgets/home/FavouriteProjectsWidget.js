@@ -1,14 +1,15 @@
 import SimpleWidget from "@components/dashboards/widgets/SimpleWidget";
 import {useState} from "react";
-import {Space} from "antd";
-import ProjectBox from "@components/projects/ProjectBox";
+import {Empty, Typography} from "antd";
 import {gql} from "graphql-request";
 import FavouriteProjectsWidgetForm from "@components/dashboards/widgets/home/FavouriteProjectsWidgetForm";
-import RowTag from "@components/common/RowTag";
 import {gqlDecorationFragment} from "@components/services/fragments";
 import ProjectList from "@components/projects/ProjectList";
+import {useDashboardEventForRefresh} from "@components/dashboards/DashboardEventsContext";
 
 export default function FavouriteProjectsWidget() {
+
+    const refreshCount = useDashboardEventForRefresh("project.favourite")
 
     const [projects, setProjects] = useState([])
 
@@ -50,11 +51,22 @@ export default function FavouriteProjectsWidget() {
                         ${gqlDecorationFragment}
                     `
                 }
+                queryDeps={[refreshCount]}
                 variables={{}}
                 setData={data => setProjects(data.projects)}
                 form={<FavouriteProjectsWidgetForm/>}
             >
                 <ProjectList projects={projects}/>
+                {
+                    (!projects || projects.length === 0) && <Empty
+                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                        description={
+                            <Typography.Text>
+                                No project has been selected as a favourite yet.
+                            </Typography.Text>
+                        }
+                    />
+                }
             </SimpleWidget>
         </>
     )
