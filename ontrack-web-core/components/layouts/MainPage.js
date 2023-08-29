@@ -1,7 +1,8 @@
-import {Layout, theme} from "antd";
+import {Layout, Space, theme} from "antd";
 import MainPageBar from "@components/layouts/MainPageBar";
 import {useContext} from "react";
 import {MainLayoutContext} from "@components/layouts/MainLayout";
+import MainWarning from "@components/layouts/MainWarning";
 
 const {Content} = Layout;
 
@@ -35,7 +36,10 @@ export default function MainPage({title, breadcrumbs, commands, children}) {
                             commands={commands}
                         />
                     }
-                    {children}
+                    <Space direction="vertical" className="ot-line">
+                        <MainWarning/>
+                        {children}
+                    </Space>
                 </Content>
             </Layout>
         </>
