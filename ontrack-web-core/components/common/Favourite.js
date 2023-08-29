@@ -6,7 +6,13 @@ const {Text} = Typography;
 export default function Favourite({value}) {
     return (
         <>
-            <Text style={{color: "orange"}}>
+            <Text
+                className="ot-action"
+                style={{color: "orange"}}
+                title={
+                    value ? "Unselect as a favourite" : "Select as a favourite"
+                }
+            >
                 {
                     value ?
                         <FaStar/> :
