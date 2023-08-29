@@ -3,7 +3,7 @@ import {FaRegStar, FaStar} from "react-icons/fa";
 
 const {Text} = Typography;
 
-export default function Favourite({value}) {
+export default function Favourite({value, onClick}) {
     return (
         <>
             <Text
@@ -12,6 +12,7 @@ export default function Favourite({value}) {
                 title={
                     value ? "Unselect as a favourite" : "Select as a favourite"
                 }
+                onClick={onClick}
             >
                 {
                     value ?
