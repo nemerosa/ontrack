@@ -2,6 +2,7 @@ import Link from "next/link";
 import clientConfig from "@client/clientConfig";
 import {Space} from "antd";
 import Image from "next/image";
+import LegacyLink from "@components/common/LegacyLink";
 
 const uiConfig = {
     prefix: '',
@@ -45,7 +46,8 @@ export function buildLink(build, text) {
 }
 
 export function promotionLevelUri(promotionLevel) {
-    return `${uiConfig.prefix}/promotionLevel/${promotionLevel.id}`
+    return `${legacyUri()}#/promotionLevel/1532`
+    // TODO LEGACY return `${uiConfig.prefix}/promotionLevel/${promotionLevel.id}`
 }
 
 export function promotionLevelImageUri(promotionLevel) {
@@ -69,12 +71,12 @@ export const PromotionLevelImage = ({promotionLevel, size = 16}) => {
 }
 
 export function promotionLevelLink(promotionLevel, text) {
-    return <Link href={promotionLevelUri(promotionLevel)}>
+    return <LegacyLink href={promotionLevelUri(promotionLevel)}>
         <Space>
             <PromotionLevelImage promotionLevel={promotionLevel}/>
             {text ? text : promotionLevel.name}
         </Space>
-    </Link>
+    </LegacyLink>
 }
 
 export function predefinedValidationStampImageUri(predefinedValidationStamp) {
