@@ -5,7 +5,7 @@ import {gql} from "graphql-request";
 import FavouriteProjectsWidgetForm from "@components/dashboards/widgets/home/FavouriteProjectsWidgetForm";
 import {gqlDecorationFragment} from "@components/services/fragments";
 import ProjectList from "@components/projects/ProjectList";
-import {useDashboardEventForRefresh} from "@components/dashboards/DashboardEventsContext";
+import {useDashboardEventForRefresh} from "@components/common/EventsContext";
 
 export default function FavouriteProjectsWidget() {
 

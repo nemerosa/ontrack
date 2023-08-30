@@ -3,6 +3,7 @@ import MainPageBar from "@components/layouts/MainPageBar";
 import {useContext} from "react";
 import {MainLayoutContext} from "@components/layouts/MainLayout";
 import MainWarning from "@components/layouts/MainWarning";
+import EventsContextProvider from "@components/common/EventsContext";
 
 const {Content} = Layout;
 
@@ -29,17 +30,19 @@ export default function MainPage({title, breadcrumbs, commands, children}) {
                         background: colorBgContainer,
                     }}
                 >
-                    {
-                        !expanded && <MainPageBar
-                            breadcrumbs={breadcrumbs}
-                            title={title}
-                            commands={commands}
-                        />
-                    }
-                    <Space direction="vertical" className="ot-line">
-                        <MainWarning/>
-                        {children}
-                    </Space>
+                    <EventsContextProvider>
+                        {
+                            !expanded && <MainPageBar
+                                breadcrumbs={breadcrumbs}
+                                title={title}
+                                commands={commands}
+                            />
+                        }
+                        <Space direction="vertical" className="ot-line">
+                            <MainWarning/>
+                            {children}
+                        </Space>
+                    </EventsContextProvider>
                 </Content>
             </Layout>
         </>

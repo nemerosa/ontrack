@@ -1,9 +1,9 @@
 import {createContext, useContext, useState} from "react";
 
-export const DashboardEventsContext = createContext({})
+export const EventsContext = createContext({})
 
 export const useDashboardEventForRefresh = (name) => {
-    const dashboardEventsContext = useContext(DashboardEventsContext)
+    const dashboardEventsContext = useContext(EventsContext)
 
     const [refreshCount, setRefreshCount] = useState(0)
 
@@ -15,7 +15,7 @@ export const useDashboardEventForRefresh = (name) => {
 }
 
 
-export default function DashboardEventsContextProvider({children}) {
+export default function EventsContextProvider({children}) {
 
     const subscriptions = {}
 
@@ -37,5 +37,5 @@ export default function DashboardEventsContextProvider({children}) {
         eventSubscriptions.push(callback)
     }
 
-    return <DashboardEventsContext.Provider value={{fireEvent, subscribeToEvent}}>{children}</DashboardEventsContext.Provider>
+    return <EventsContext.Provider value={{fireEvent, subscribeToEvent}}>{children}</EventsContext.Provider>
 }

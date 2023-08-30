@@ -14,7 +14,6 @@ import {
 } from "@components/dashboards/DashboardConstants";
 import {Modal} from "antd";
 import JumpToProject from "@components/projects/JumpToProject";
-import DashboardEventsContextProvider from "@components/dashboards/DashboardEventsContext";
 
 export default function DashboardPage({
                                           title,
@@ -227,16 +226,14 @@ export default function DashboardPage({
         <>
             <DashboardContext.Provider value={{dashboards, selectedDashboard}}>
                 <DashboardDispatchContext.Provider value={selectedDashboardDispatch}>
-                    <DashboardEventsContextProvider>
-                        <SaveDashboardDialog saveDashboardDialog={saveDashboardDialog}/>
-                        <MainPage
-                            title={title}
-                            breadcrumbs={[]}
-                            commands={commands}
-                        >
-                            <Dashboard/>
-                        </MainPage>
-                    </DashboardEventsContextProvider>
+                    <SaveDashboardDialog saveDashboardDialog={saveDashboardDialog}/>
+                    <MainPage
+                        title={title}
+                        breadcrumbs={[]}
+                        commands={commands}
+                    >
+                        <Dashboard/>
+                    </MainPage>
                 </DashboardDispatchContext.Provider>
             </DashboardContext.Provider>
         </>

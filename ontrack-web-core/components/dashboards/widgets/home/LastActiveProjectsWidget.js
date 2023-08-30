@@ -10,7 +10,7 @@ import {UserContext} from "@components/providers/UserProvider";
 import LastActiveProjectsWidgetForm from "@components/dashboards/widgets/home/LastActiveProjectsWidgetForm";
 import RowTag from "@components/common/RowTag";
 import {gqlDecorationFragment} from "@components/services/fragments";
-import {useDashboardEventForRefresh} from "@components/dashboards/DashboardEventsContext";
+import {useDashboardEventForRefresh} from "@components/common/EventsContext";
 
 export default function LastActiveProjectsWidget({count}) {
 

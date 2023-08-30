@@ -15,6 +15,7 @@ import RowTag from "@components/common/RowTag";
 import BranchBox from "@components/branches/BranchBox";
 import JumpToBranch from "@components/branches/JumpToBranch";
 import PropertiesSection from "@components/framework/properties/PropertiesSection";
+import ProjectFavourite from "@components/projects/ProjectFavourite";
 
 export default function ProjectView({id}) {
 
@@ -102,7 +103,12 @@ export default function ProjectView({id}) {
                 {projectTitle(project)}
             </Head>
             <MainPage
-                title={project.name}
+                title={
+                    <Space>
+                        {project.name}
+                        <ProjectFavourite project={project}/>
+                    </Space>
+                }
                 breadcrumbs={projectBreadcrumbs(project)}
                 commands={commands}
             >
