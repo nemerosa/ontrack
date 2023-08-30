@@ -245,6 +245,8 @@ type AutoVersioningSourceConfig {
     postProcessing: String
     "Configuration of the post processing"
     postProcessingConfig: JSON
+    "Qualifier for the build link to create (when links are created)"
+    qualifier: String
     "Branches to watch using a regular expression"
     sourceBranch: String!
     "Project to watch"
@@ -555,7 +557,18 @@ type Build implements ProjectEntity {
         project: String,
         "Size of the page"
         size: Int = 20
-    ): BuildPaginated
+    ): BuildPaginated @deprecated(reason: "usedByQualified must be used instead")
+    "List of builds using this one."
+    usedByQualified(
+        "Keeps only links targeted from this branch. `project` argument is also required."
+        branch: String,
+        "Offset for the page"
+        offset: Int = 0,
+        "Keeps only links targeted from this project"
+        project: String,
+        "Size of the page"
+        size: Int = 20
+    ): BuildLinkPaginated
     "List of builds being used by this one."
     using(
         "Keeps only links targeted from this branch. `project` argument is also required."
@@ -566,7 +579,18 @@ type Build implements ProjectEntity {
         project: String,
         "Size of the page"
         size: Int = 20
-    ): BuildPaginated
+    ): BuildPaginated @deprecated(reason: "usingQualified must be used instead")
+    "List of builds being used by this one."
+    usingQualified(
+        "Keeps only links targeted from this branch. `project` argument is also required."
+        branch: String,
+        "Offset for the page"
+        offset: Int = 0,
+        "Keeps only links targeted from this project"
+        project: String,
+        "Size of the page"
+        size: Int = 20
+    ): BuildLinkPaginated
     "Validations for this build"
     validationRuns(
         "Maximum number of validation runs"
@@ -665,6 +689,21 @@ type BuildFilterResourceLinks {
 type BuildFilterValidation {
     "Validation message or null if valid."
     error: String
+}
+
+"Qualified link to a build"
+type BuildLink {
+    "Linked build"
+    build: Build!
+    "Nature/qualification of the link"
+    qualifier: String!
+}
+
+type BuildLinkPaginated {
+    "Information about the current page"
+    pageInfo: PageInfo
+    "Items in the current page"
+    pageItems: [BuildLink!]!
 }
 
 "Build links"
@@ -1491,6 +1530,14 @@ type ExtensionFeatureDescription {
     name: String
     "Feature version"
     version: String
+}
+
+"Output type for the favouriteBranch mutation."
+type FavouriteBranchPayload implements Payload {
+    "Updated branch"
+    branch: Branch
+    "List of errors"
+    errors: [UserError]
 }
 
 "Output type for the favouriteProject mutation."
@@ -2928,6 +2975,11 @@ type Mutation {
         "Input for the mutation"
         input: EnableSubscriptionInput
     ): EnableSubscriptionPayload
+    "Marks a branch as favourite"
+    favouriteBranch(
+        "Input for the mutation"
+        input: FavouriteBranchInput
+    ): FavouriteBranchPayload
     "Marks a project as favourite"
     favouriteProject(
         "Input for the mutation"
@@ -3417,6 +3469,11 @@ type Mutation {
         "Input for the mutation"
         input: SubscribeToEventsInput
     ): SubscribeToEventsPayload
+    "Unmarks a branch as favourite"
+    unfavouriteBranch(
+        "Input for the mutation"
+        input: UnfavouriteBranchInput
+    ): UnfavouriteBranchPayload
     "Unmarks a project as favourite"
     unfavouriteProject(
         "Input for the mutation"
@@ -5533,6 +5590,14 @@ type UIActionLink {
     uri: String
 }
 
+"Output type for the unfavouriteBranch mutation."
+type UnfavouriteBranchPayload implements Payload {
+    "Updated branch"
+    branch: Branch
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the unfavouriteProject mutation."
 type UnfavouriteProjectPayload implements Payload {
     "List of errors"
@@ -6209,6 +6274,8 @@ input AutoVersioningSourceConfigInput {
     postProcessing: String
     "Configuration of the post processing"
     postProcessingConfig: JSON
+    "Qualifier for the build link to create (when links are created)"
+    qualifier: String
     "Branches to watch using a regular expression"
     sourceBranch: String!
     "Project to watch"
@@ -6249,7 +6316,7 @@ input BuildSearchForm {
     promotionName: String
     "Matches a build having this property."
     property: String
-    "When `property` is set, matches against the property value."
+    "When the property is set, matches against the property value."
     propertyValue: String
     "Matches a build having at least this validation with PASSED as a status."
     validationStampName: String
@@ -6969,6 +7036,12 @@ input EventSubscriptionFilter {
     recursive: Boolean
 }
 
+"Input type for the favouriteBranch mutation."
+input FavouriteBranchInput {
+    "Branch ID"
+    id: Int!
+}
+
 "Input type for the favouriteProject mutation."
 input FavouriteProjectInput {
     "Project ID"
@@ -7077,6 +7150,8 @@ input GitHubIngestionLink {
     buildRef: String!
     "Name of the project to link to"
     project: String!
+    "Qualifier for the link. Blank by default."
+    qualifier: String
 }
 
 "Input type for the gitHubIngestionValidateDataByBuildLabel mutation."
@@ -7204,6 +7279,8 @@ input IssueChangeLogExportRequest {
 input LinkBuildByIdInput {
     "ID of the build from which the link must be created"
     fromBuild: Int!
+    "Qualifier for the link"
+    qualifier: String
     "ID of the build to which the link must be created"
     toBuild: Int!
 }
@@ -7214,6 +7291,8 @@ input LinkBuildInput {
     fromBuild: String!
     "Name of the project from which the link must be created"
     fromProject: String!
+    "Qualifier for the link"
+    qualifier: String
     "Name of the build to which the link must be created"
     toBuild: String!
     "Name of the project to which the link must be created"
@@ -7236,6 +7315,8 @@ input LinksBuildInputItem {
     build: String!
     "Name of the project to which the link must be created"
     project: String!
+    "Qualifier for the link"
+    qualifier: String
 }
 
 "Input type for the lockAccount mutation."
@@ -8336,6 +8417,12 @@ input SubscribeToEventsInput {
     keywords: String
     "Target project entity (null for global events)"
     projectEntity: ProjectEntityIDInput
+}
+
+"Input type for the unfavouriteBranch mutation."
+input UnfavouriteBranchInput {
+    "Branch ID"
+    id: Int!
 }
 
 "Input type for the unfavouriteProject mutation."

@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.InputException
 import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
-import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import javax.validation.constraints.NotNull
@@ -14,7 +13,7 @@ import javax.validation.constraints.Pattern
 @Component
 class BranchMutations(
     private val structureService: StructureService,
-    private val securityService: SecurityService
+    private val branchFavouriteService: BranchFavouriteService,
 ) : TypedMutationProvider() {
 
     override val mutations: List<Mutation> = listOf(
@@ -41,7 +40,29 @@ class BranchMutations(
             "branch", "Created or existing branch", Branch::class
         ) { input ->
             createBranchOrGet(input)
-        }
+        },
+        /*
+         * Mark a branch as favourite
+         */
+        simpleMutation(
+            "favouriteBranch", "Marks a branch as favourite", FavouriteBranchInput::class,
+            "branch", "Updated branch", Branch::class
+        ) { input ->
+            val branch = structureService.getBranch(ID.of(input.id))
+            branchFavouriteService.setBranchFavourite(branch, true)
+            structureService.getBranch(ID.of(input.id))
+        },
+        /*
+         * Unmark a project as favourite
+         */
+        simpleMutation(
+            "unfavouriteBranch", "Unmarks a branch as favourite", UnfavouriteBranchInput::class,
+            "branch", "Updated branch", Branch::class
+        ) { input ->
+            val branch = structureService.getBranch(ID.of(input.id))
+            branchFavouriteService.setBranchFavourite(branch, false)
+            structureService.getBranch(ID.of(input.id))
+        },
     )
 
 
@@ -135,3 +156,13 @@ data class CreateBranchOrGetInput(
         isDisabled = disabled ?: false
     )
 }
+
+data class FavouriteBranchInput(
+    @APIDescription("Branch ID")
+    val id: Int
+)
+
+data class UnfavouriteBranchInput(
+    @APIDescription("Branch ID")
+    val id: Int
+)

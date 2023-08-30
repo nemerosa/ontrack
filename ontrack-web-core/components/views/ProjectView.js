@@ -16,6 +16,7 @@ import BranchBox from "@components/branches/BranchBox";
 import JumpToBranch from "@components/branches/JumpToBranch";
 import PropertiesSection from "@components/framework/properties/PropertiesSection";
 import ProjectFavourite from "@components/projects/ProjectFavourite";
+import {useDashboardEventForRefresh} from "@components/common/EventsContext";
 
 export default function ProjectView({id}) {
 
@@ -24,6 +25,8 @@ export default function ProjectView({id}) {
     const [project, setProject] = useState({})
     const [branches, setBranches] = useState([])
     const [favouriteBranches, setFavouriteBranches] = useState([])
+
+    const favouriteRefreshCount = useDashboardEventForRefresh("branch.favourite")
 
     useEffect(() => {
         if (id) {
@@ -44,6 +47,7 @@ export default function ProjectView({id}) {
                                 }
                                 id
                                 name
+                                favourite
                                 decorations {
                                     ...decorationContent
                                 }
@@ -55,6 +59,7 @@ export default function ProjectView({id}) {
                                 }
                                 id
                                 name
+                                favourite
                                 disabled
                                 decorations {
                                     ...decorationContent
@@ -90,7 +95,7 @@ export default function ProjectView({id}) {
                 setLoadingProject(false)
             })
         }
-    }, [id])
+    }, [id, favouriteRefreshCount])
 
     const commands = [
         <JumpToBranch key="branch" projectName={project.name}/>,

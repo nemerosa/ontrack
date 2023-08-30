@@ -25,7 +25,7 @@ Other components can register to _events_ by _name_ and react to the _values_ (f
 
 # Implementation
 
-An [`EventsContexts`](components/common/EventsContext.js) context is registered in all pages inheriting from [`MainPage`](components/layouts/MainPage.js).
+An [`EventsContexts`](components/common/EventsContext.js) context is registered in [all pages](pages/_app.js).
 
 Any component which needs to emit events need to access this context and fire events. For example:
 

@@ -12,6 +12,8 @@ import {BranchViewContextProvider} from "@components/branches/BranchViewContext"
 import BranchInfoViewExpandButton from "@components/branches/BranchInfoViewExpandButton";
 import BranchInfoViewDrawer from "@components/branches/BranchInfoViewDrawer";
 import BranchContent from "@components/branches/BranchContent";
+import {Space} from "antd";
+import BranchFavourite from "@components/branches/BranchFavourite";
 
 export default function BranchView({id}) {
     const [loadingBranch, setLoadingBranch] = useState(true)
@@ -52,7 +54,12 @@ export default function BranchView({id}) {
                 {branchTitle(branch)}
             </Head>
             <MainPage
-                title={branch.name}
+                title={
+                    <Space>
+                        {branch.name}
+                        <BranchFavourite branch={branch}/>
+                    </Space>
+                }
                 breadcrumbs={branchBreadcrumbs(branch)}
                 commands={commands}
             >

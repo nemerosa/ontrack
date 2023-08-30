@@ -1,12 +1,12 @@
 import {Space, Typography} from "antd";
 import {branchLink, projectLink} from "@components/common/Links";
-import Favourite from "@components/common/Favourite";
+import BranchFavourite from "@components/branches/BranchFavourite";
 
 export default function BranchBox({branch, showProject, displayFavourite = true}) {
     return (
         <>
             <Space>
-                { displayFavourite ? <Favourite value={branch.favourite}/> : undefined}
+                { displayFavourite ? <BranchFavourite branch={branch}/> : undefined}
                 {
                     showProject && projectLink(branch.project)
                 }
