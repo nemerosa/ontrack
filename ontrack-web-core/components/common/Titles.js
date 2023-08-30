@@ -3,7 +3,7 @@ export function projectTitle(project) {
 }
 
 export function branchTitle(branch) {
-    return title(branch.name)
+    return title(`${branch.name} @ ${branch.project.name}`)
 }
 
 export function title(text) {
