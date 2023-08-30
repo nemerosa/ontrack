@@ -67,7 +67,7 @@ export default function Widget({title, loading, commands, form, children}) {
                                 commands && commands.map((command, index) => <span key={index}>{command}</span>)
                             }
                             <WidgetCommand
-                                condition={expansion && !expansion.uuid}
+                                condition={expansion && expansion.uuid !== widgetContext.widget.uuid}
                                 title="Makes the widget full size"
                                 icon={<FaExpandArrowsAlt/>}
                                 onAction={toggleExpanded}

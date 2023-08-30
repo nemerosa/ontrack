@@ -14,6 +14,7 @@ import {
 } from "@components/dashboards/DashboardConstants";
 import {Modal} from "antd";
 import JumpToProject from "@components/projects/JumpToProject";
+import {v4} from "uuid";
 
 export default function DashboardPage({
                                           title,
@@ -187,7 +188,7 @@ export default function DashboardPage({
                 return {
                     ...selectedDashboard,
                     widgets: selectedDashboard.widgets.concat({
-                        uuid: '',
+                        uuid: v4(),
                         key: action.widgetDef.key,
                         config: action.widgetDef.defaultConfig,
                     })
