@@ -1,6 +1,10 @@
 Ontrack Web Core (Next UI)
 ==========================
 
+## Architecture Decisions Records
+
+See [ADR](ADR.md).
+
 ## Local development
 
 Run the main application, this starts the API on http://localhost:8080
