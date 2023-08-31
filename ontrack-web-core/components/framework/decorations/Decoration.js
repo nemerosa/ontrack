@@ -7,7 +7,7 @@ export default function Decoration({decoration}) {
     const importDecorationDisplay = () => lazy(() =>
         import(`./${shortTypeName}`).catch(() => {
             console.warn(`Undefined decoration type: ${shortTypeName}`)
-            return import(`./default`);
+            return import(`./default.js`);
         })
     )
 

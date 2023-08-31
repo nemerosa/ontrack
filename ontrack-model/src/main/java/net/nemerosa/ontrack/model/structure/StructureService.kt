@@ -374,17 +374,25 @@ interface StructureService {
      * @param offset       Offset in the list
      * @param count        Maximum number of elements to return
      * @param sortingMode  How to sort the runs ([ValidationRunSortingMode.ID] by default)
+     * @param statuses List of statuses to filter upon
      * @return List of validation runs
      */
-    fun getValidationRunsForBuild(buildId: ID, offset: Int, count: Int, sortingMode: ValidationRunSortingMode = ValidationRunSortingMode.ID): List<ValidationRun>
+    fun getValidationRunsForBuild(
+        buildId: ID,
+        offset: Int,
+        count: Int,
+        sortingMode: ValidationRunSortingMode = ValidationRunSortingMode.ID,
+        statuses: List<String>? = null,
+    ): List<ValidationRun>
 
     /**
      * Gets the number of validation runs for a build.
      *
      * @param buildId ID of the build
+     * @param statuses List of statuses to filter upon
      * @return Number of validation runs
      */
-    fun getValidationRunsCountForBuild(buildId: ID): Int
+    fun getValidationRunsCountForBuild(buildId: ID, statuses: List<String>? = null): Int
 
     /**
      * Gets the list of validation runs for a build and a validation stamp.
@@ -395,7 +403,14 @@ interface StructureService {
      * @param count             Maximum number of elemnts to return
      * @return List of validation runs
      */
-    fun getValidationRunsForBuildAndValidationStamp(buildId: ID, validationStampId: ID, offset: Int, count: Int): List<ValidationRun>
+    fun getValidationRunsForBuildAndValidationStamp(
+        buildId: ID,
+        validationStampId: ID,
+        offset: Int,
+        count: Int,
+        sortingMode: ValidationRunSortingMode? = ValidationRunSortingMode.ID,
+        statuses: List<String>? = null,
+    ): List<ValidationRun>
 
     /**
      * Gets the list of validation runs for a build and a validation stamp.
@@ -406,7 +421,14 @@ interface StructureService {
      * @param count             Maximum number of elemnts to return
      * @return List of validation runs
      */
-    fun getValidationRunsForBuildAndValidationStamp(build: Build, validationStamp: ValidationStamp, offset: Int, count: Int): List<ValidationRun>
+    fun getValidationRunsForBuildAndValidationStamp(
+        build: Build,
+        validationStamp: ValidationStamp,
+        offset: Int,
+        count: Int,
+        sortingMode: ValidationRunSortingMode? = ValidationRunSortingMode.ID,
+        statuses: List<String>? = null,
+    ): List<ValidationRun>
 
     /**
      * Gets the list of validation runs for a build and a validation stamp, and a list of accepted statuses
@@ -527,7 +549,11 @@ interface StructureService {
      * @param validationStampId ID of the validation stamp
      * @return Number of validation runs for the validation stamp
      */
-    fun getValidationRunsCountForBuildAndValidationStamp(buildId: ID, validationStampId: ID): Int
+    fun getValidationRunsCountForBuildAndValidationStamp(
+        buildId: ID,
+        validationStampId: ID,
+        statuses: List<String>? = null,
+    ): Int
 
     /**
      * Gets the total number of validation runs for a validation stamp

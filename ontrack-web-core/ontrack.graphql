@@ -605,7 +605,11 @@ type Build implements ProjectEntity {
         "Size of the page"
         size: Int = 20,
         "Describes how the validation runs must be sorted."
-        sortingMode: ValidationRunSortingMode
+        sortingMode: ValidationRunSortingMode,
+        "List of statuses to select"
+        statuses: [String],
+        "Validation stamp to filter upon"
+        validationStamp: String
     ): ValidationRunPaginated
     "Validations per validation stamp"
     validations(
@@ -6208,6 +6212,7 @@ enum SCMChangeLogFileChangeType {
 "Defines how validation runs should be sorted"
 enum ValidationRunSortingMode {
     ID
+    NAME
     RUN_TIME
 }
 

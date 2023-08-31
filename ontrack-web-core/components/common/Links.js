@@ -3,6 +3,7 @@ import clientConfig from "@client/clientConfig";
 import {Space} from "antd";
 import Image from "next/image";
 import LegacyLink from "@components/common/LegacyLink";
+import {ValidationStampImage} from "@components/validationStamps/ValidationStampImage";
 
 const uiConfig = {
     prefix: '',
@@ -88,26 +89,9 @@ export function validationStampImageUri(validationStamp) {
 }
 
 export function validationStampUri(validationStamp) {
-    return `${uiConfig.prefix}/validationStamp/${validationStamp.id}`
+    return `${legacyUri()}#/validationStamp/${validationStamp.id}`
 }
 
-export const ValidationStampImage = ({validationStamp}) => {
-    return (
-        validationStamp.image ?
-            <Image
-                src={validationStampImageUri(validationStamp)}
-                alt={validationStamp.name}
-                width={16}
-                height={16}
-            /> : undefined
-    )
-}
-
-export function validationStampLink(validationStamp, text) {
-    return <Link href={validationStampUri(validationStamp)}>
-        <Space>
-            <ValidationStampImage validationStamp={validationStamp}/>
-            {text ? text : validationStamp.name}
-        </Space>
-    </Link>
+export function validationRunUri(validationRun) {
+    return `${legacyUri()}#/validationRun/${validationRun.id}`
 }

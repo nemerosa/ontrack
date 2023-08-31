@@ -9,7 +9,6 @@ import {branchBreadcrumbs} from "@components/common/Breadcrumbs";
 import LoadingContainer from "@components/common/LoadingContainer";
 import {gql} from "graphql-request";
 import {BranchViewContextProvider} from "@components/branches/BranchViewContext";
-import BranchInfoViewExpandButton from "@components/branches/BranchInfoViewExpandButton";
 import BranchInfoViewDrawer from "@components/branches/BranchInfoViewDrawer";
 import BranchContent from "@components/branches/BranchContent";
 import {Space} from "antd";
@@ -66,8 +65,7 @@ export default function BranchView({id}) {
                 <LoadingContainer loading={loadingBranch} tip="Loading branch">
                     <BranchViewContextProvider>
                         <BranchContent branch={branch}/>
-                        <BranchInfoViewExpandButton/>
-                        <BranchInfoViewDrawer/>
+                        <BranchInfoViewDrawer branch={branch}/>
                     </BranchViewContextProvider>
                 </LoadingContainer>
             </MainPage>

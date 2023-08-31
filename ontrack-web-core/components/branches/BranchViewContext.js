@@ -2,11 +2,6 @@ import {createContext, useState} from "react";
 import {useRange} from "@components/common/RangeSelector";
 
 export const BranchViewContext = createContext({
-    infoView: {
-        infoViewExpanded: false,
-        toggleInfoView: () => {
-        },
-    },
     setupPanel: {
         setupPanelExpanded: false,
         toggleSetupPanel: () => {
@@ -22,12 +17,7 @@ export const BranchViewContext = createContext({
 
 export const BranchViewContextProvider = ({children}) => {
 
-    const [infoViewExpanded, setInfoViewExpanded] = useState(false)
     const [setupPanelExpanded, setSetupPanelExpanded] = useState(false)
-
-    const toggleInfoView = () => {
-        setInfoViewExpanded(!infoViewExpanded)
-    }
 
     const toggleSetupPanel = () => {
         setSetupPanelExpanded(!setupPanelExpanded)
@@ -36,10 +26,6 @@ export const BranchViewContextProvider = ({children}) => {
     const buildRange = useRange()
 
     const context = {
-        infoView: {
-            infoViewExpanded,
-            toggleInfoView,
-        },
         setupPanel: {
             setupPanelExpanded,
             toggleSetupPanel,

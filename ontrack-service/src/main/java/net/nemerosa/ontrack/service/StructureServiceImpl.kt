@@ -24,6 +24,7 @@ import net.nemerosa.ontrack.repository.*
 import net.nemerosa.ontrack.service.ImageHelper.checkImage
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.Validate
+import org.jetbrains.annotations.Nullable
 import org.slf4j.LoggerFactory
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
@@ -34,25 +35,25 @@ import java.util.function.BiFunction
 @Service
 @UserTransaction
 class StructureServiceImpl(
-        private val securityService: SecurityService,
-        private val eventPostService: EventPostService,
-        private val eventFactory: EventFactory,
-        private val validationRunStatusService: ValidationRunStatusService,
-        private val validationDataTypeService: ValidationDataTypeService,
-        private val structureRepository: StructureRepository,
-        private val projectRepository: ProjectRepository,
-        private val branchRepository: BranchRepository,
-        private val buildLinkRepository: BuildLinkRepository,
-        private val extensionManager: ExtensionManager,
-        private val propertyService: PropertyService,
-        private val predefinedPromotionLevelService: PredefinedPromotionLevelService,
-        private val predefinedValidationStampService: PredefinedValidationStampService,
-        private val decorationService: DecorationService,
-        private val promotionRunCheckService: PromotionRunCheckService,
-        private val statsRepository: StatsRepository,
-        private val buildLinkListenerService: BuildLinkListenerService,
-        private val coreBuildFilterRepository: CoreBuildFilterRepository,
-        private val metricsExportService: MetricsExportService,
+    private val securityService: SecurityService,
+    private val eventPostService: EventPostService,
+    private val eventFactory: EventFactory,
+    private val validationRunStatusService: ValidationRunStatusService,
+    private val validationDataTypeService: ValidationDataTypeService,
+    private val structureRepository: StructureRepository,
+    private val projectRepository: ProjectRepository,
+    private val branchRepository: BranchRepository,
+    private val buildLinkRepository: BuildLinkRepository,
+    private val extensionManager: ExtensionManager,
+    private val propertyService: PropertyService,
+    private val predefinedPromotionLevelService: PredefinedPromotionLevelService,
+    private val predefinedValidationStampService: PredefinedValidationStampService,
+    private val decorationService: DecorationService,
+    private val promotionRunCheckService: PromotionRunCheckService,
+    private val statsRepository: StatsRepository,
+    private val buildLinkListenerService: BuildLinkListenerService,
+    private val coreBuildFilterRepository: CoreBuildFilterRepository,
+    private val metricsExportService: MetricsExportService,
 ) : StructureService {
 
     private val logger = LoggerFactory.getLogger(StructureService::class.java)
@@ -1334,7 +1335,8 @@ class StructureServiceImpl(
         buildId: ID,
         offset: Int,
         count: Int,
-        sortingMode: ValidationRunSortingMode
+        sortingMode: ValidationRunSortingMode,
+        statuses: List<String>?,
     ): List<ValidationRun> {
         val build = getBuild(buildId)
         securityService.checkProjectFunction(build.branch.project.id(), ProjectView::class.java)
@@ -1342,39 +1344,49 @@ class StructureServiceImpl(
             build,
             offset,
             count,
-            sortingMode
+            sortingMode,
+            statuses,
         ) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
-    override fun getValidationRunsCountForBuild(buildId: ID): Int {
+    override fun getValidationRunsCountForBuild(
+        buildId: ID,
+        statuses: List<String>?,
+    ): Int {
         val build = getBuild(buildId)
         securityService.checkProjectFunction(build.branch.project.id(), ProjectView::class.java)
-        return structureRepository.getValidationRunsCountForBuild(build)
+        return structureRepository.getValidationRunsCountForBuild(build, statuses)
     }
 
     override fun getValidationRunsForBuildAndValidationStamp(
         buildId: ID,
         validationStampId: ID,
         offset: Int,
-        count: Int
+        count: Int,
+        sortingMode: ValidationRunSortingMode?,
+        statuses: List<String>?,
     ): List<ValidationRun> {
         val build = getBuild(buildId)
         val validationStamp = getValidationStamp(validationStampId)
-        return getValidationRunsForBuildAndValidationStamp(build, validationStamp, offset, count)
+        return getValidationRunsForBuildAndValidationStamp(build, validationStamp, offset, count, sortingMode, statuses)
     }
 
     override fun getValidationRunsForBuildAndValidationStamp(
         build: Build,
         validationStamp: ValidationStamp,
         offset: Int,
-        count: Int
+        count: Int,
+        sortingMode: ValidationRunSortingMode?,
+        statuses: List<String>?,
     ): List<ValidationRun> {
         securityService.checkProjectFunction(build, ProjectView::class.java)
         return structureRepository.getValidationRunsForBuildAndValidationStamp(
             build,
             validationStamp,
             offset,
-            count
+            count,
+            sortingMode,
+            statuses,
         ) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
@@ -1574,8 +1586,16 @@ class StructureServiceImpl(
         return getValidationRun(run.id)
     }
 
-    override fun getValidationRunsCountForBuildAndValidationStamp(buildId: ID, validationStampId: ID): Int {
-        return structureRepository.getValidationRunsCountForBuildAndValidationStamp(buildId, validationStampId)
+    override fun getValidationRunsCountForBuildAndValidationStamp(
+        buildId: ID,
+        validationStampId: ID,
+        statuses: List<String>?,
+    ): Int {
+        return structureRepository.getValidationRunsCountForBuildAndValidationStamp(
+            buildId,
+            validationStampId,
+            statuses,
+        )
     }
 
     override fun getValidationRunsCountForValidationStamp(validationStampId: ID): Int {

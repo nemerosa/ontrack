@@ -11,8 +11,13 @@ enum class ValidationRunSortingMode {
     ID,
 
     /**
-     * Soirting by decreasing run time, therefore having the slowest validations in front.
+     * Sorting by decreasing run time, therefore having the slowest validations in front.
      */
     RUN_TIME,
+
+    /**
+     * Sorting by alphabetical order.
+     */
+    NAME,
 
 }
