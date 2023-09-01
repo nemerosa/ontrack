@@ -17,6 +17,7 @@ import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
 import net.nemerosa.ontrack.extension.stash.model.getRepositoryUrl
 import net.nemerosa.ontrack.extension.stash.property.StashGitConfiguration
 import net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType
+import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService
 import net.nemerosa.ontrack.extension.stash.settings.BitbucketServerSettings
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -31,12 +32,28 @@ class BitbucketServerSCMExtension(
     private val propertyService: PropertyService,
     private val bitbucketClientFactory: BitbucketClientFactory,
     private val cachedSettingsService: CachedSettingsService,
+    private val stashConfigurationService: StashConfigurationService,
 ) : AbstractExtension(extensionFeature), SCMExtension {
 
     override val type: String = "bitbucket-server"
 
     override fun getSCMPath(configName: String, ref: String): SCMPath? {
-        TODO("Not yet implemented")
+        val config = stashConfigurationService.findConfiguration(configName)
+            ?: return null
+        val regex = "([^\\/]*)\\/([^\\/]*)\\/(.*)\$".toRegex()
+        val m = regex.matchEntire(ref)
+            ?: throw BitbucketServerSCMRefParsingException("Cannot get the project and repository out of the reference: $ref")
+        val (_, project, repository, path) = m.groupValues
+        val scm = BitbucketServerSCM(
+            configuration = config,
+            project = project,
+            repositoryName = repository,
+            settings = cachedSettingsService.getCachedSettings(BitbucketServerSettings::class.java)
+        )
+        return SCMPath(
+            scm = scm,
+            path = path,
+        )
     }
 
     override fun getSCM(project: Project): SCM? {
@@ -46,7 +63,7 @@ class BitbucketServerSCMExtension(
             configuration = property.configuration,
             project = property.project,
             repositoryName = property.repository,
-            settings =  cachedSettingsService.getCachedSettings(BitbucketServerSettings::class.java),
+            settings = cachedSettingsService.getCachedSettings(BitbucketServerSettings::class.java),
         )
     }
 

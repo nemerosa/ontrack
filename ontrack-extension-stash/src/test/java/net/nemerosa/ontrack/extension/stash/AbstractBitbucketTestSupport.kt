@@ -31,7 +31,7 @@ abstract class AbstractBitbucketTestSupport : AbstractQLKTITSupport() {
         )
     }
 
-    private fun createBitbucketServerConfig(): StashConfiguration {
+    fun createBitbucketServerConfig(): StashConfiguration {
         val configName = uid("bb_")
         val config = StashConfiguration(
             name = configName,
