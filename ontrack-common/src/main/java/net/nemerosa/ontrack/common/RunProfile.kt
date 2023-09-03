@@ -1,28 +1,26 @@
-package net.nemerosa.ontrack.common;
+package net.nemerosa.ontrack.common
 
 /**
  * List of Spring profiles.
  */
-public interface RunProfile {
-
+object RunProfile {
     /**
      * Unit test mode
      */
-    String UNIT_TEST = "unitTest";
+    const val UNIT_TEST = "unitTest"
 
     /**
      * Development mode.
      */
-    String DEV = "dev";
+    const val DEV = "dev"
 
     /**
      * Acceptance mode
      */
-    String ACC = "acceptance";
+    const val ACC = "acceptance"
 
     /**
      * Production mode
      */
-    String PROD = "prod";
-
+    const val PROD = "prod"
 }

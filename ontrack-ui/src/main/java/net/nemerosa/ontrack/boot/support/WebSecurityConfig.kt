@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.boot.support
 
+import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.api.UISecurityExtension
 import net.nemerosa.ontrack.model.structure.TokensService
+import net.nemerosa.ontrack.model.support.EnvService
+import net.nemerosa.ontrack.model.support.isProfileEnabled
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.context.annotation.Bean
@@ -18,7 +21,9 @@ import org.springframework.web.cors.CorsConfiguration
 
 @Configuration
 @EnableWebSecurity
-class WebSecurityConfig {
+class WebSecurityConfig(
+    private val envService: EnvService,
+) {
 
     /**
      * Management end points are accessible on a separate port without any authentication needed
@@ -65,8 +70,10 @@ class WebSecurityConfig {
                 authorize("/hook/secured/**", permitAll)
                 authorize(anyRequest, authenticated)
             }
-            // TODO CORS only for development
-            cors{}
+            // CORS only for development
+            if (envService.isProfileEnabled(RunProfile.DEV) || envService.isProfileEnabled(RunProfile.ACC)) {
+                cors {}
+            }
             // Requires BASIC authentication
             httpBasic { }
             // Token based authentication (for API only)
