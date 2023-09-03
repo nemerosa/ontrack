@@ -8,11 +8,18 @@ import AnnotatedDescription from "@components/common/AnnotatedDescription";
 import PromotionLevel from "@components/promotionLevels/PromotionLevel";
 import BuildPromoteAction from "@components/builds/BuildPromoteAction";
 import {isAuthorized} from "@components/common/authorizations";
+import PromotionRunDeleteAction from "@components/promotionRuns/PromotionRunDeleteAction";
 
 export default function BuildContentPromotions({build}) {
 
     const [loading, setLoading] = useState(true)
     const [promotionRunItems, setPromotionRunItems] = useState([])
+
+    const [reloadCount, setReloadCount] = useState(0)
+
+    const reload = () => {
+        setReloadCount(reloadCount + 1)
+    }
 
     useEffect(() => {
         setLoading(true)
@@ -34,11 +41,16 @@ export default function BuildContentPromotions({build}) {
                                 annotatedDescription
                             }
                         }
-                        promotionRuns(lastPerLevel: true) {
+                        promotionRuns {
                             id
                             creation {
                                 time
                                 user
+                            }
+                            authorizations {
+                                name
+                                action
+                                authorized
                             }
                             description
                             annotatedDescription
@@ -70,6 +82,7 @@ export default function BuildContentPromotions({build}) {
                     runs.forEach(run => {
                         items.push({
                             label: <Space>
+                                {/* Information about the promotion */}
                                 <Popover content={
                                     <Space direction="vertical">
                                         <Typography.Text>Promoted by {run.creation.user}</Typography.Text>
@@ -79,12 +92,22 @@ export default function BuildContentPromotions({build}) {
                                 }>
                                     {dayjs(run.creation.time).format("YYYY MMM DD, HH:mm")}
                                 </Popover>
+                                {/* Repeating the promotion */}
                                 {
                                     isAuthorized(build, 'build', 'promote') ?
                                         <BuildPromoteAction
                                             build={build}
                                             promotionLevel={promotionLevel}
                                             tooltip={`Promotes the build again to ${promotionLevel.name}`}
+                                            onPromotion={reload}
+                                        /> : undefined
+                                }
+                                {/* Deleting the promotion */}
+                                {
+                                    isAuthorized(run, 'promotion_run', 'delete') ?
+                                        <PromotionRunDeleteAction
+                                            promotionRun={run}
+                                            onDeletion={reload}
                                         /> : undefined
                                 }
                             </Space>,
@@ -103,7 +126,11 @@ export default function BuildContentPromotions({build}) {
                     // This promotion has no run
                     items.push({
                         label: isAuthorized(build, 'build', 'promote') ?
-                            <BuildPromoteAction build={build} promotionLevel={promotionLevel}/> : undefined,
+                            <BuildPromoteAction
+                                build={build}
+                                promotionLevel={promotionLevel}
+                                onPromotion={reload}
+                            /> : undefined,
                         children: <Popover title={promotionLevel.name}
                                            content={<AnnotatedDescription entity={promotionLevel}/>}>
                             <Typography.Text disabled>{promotionLevel.name}</Typography.Text>
@@ -120,13 +147,14 @@ export default function BuildContentPromotions({build}) {
         }).finally(() => {
             setLoading(false)
         })
-    }, [build]);
+    }, [build, reloadCount]);
 
     return (
         <>
             <PageSection title="Promotions" loading={loading} fullHeight={true}>
                 <Timeline
                     mode="right"
+                    reverse={true}
                     items={promotionRunItems}
                 />
             </PageSection>

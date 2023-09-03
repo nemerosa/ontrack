@@ -4,7 +4,7 @@ import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import {PromotionLevelImage} from "@components/common/Links";
 
-export default function SelectPromotionLevel({branch, value, onChange}) {
+export default function SelectPromotionLevel({branch, value, onChange, useName = false}) {
 
     const [options, setOptions] = useState([])
 
@@ -28,7 +28,7 @@ export default function SelectPromotionLevel({branch, value, onChange}) {
             ).then(data => {
                 setOptions(data.branches[0].promotionLevels.map(pl => {
                     return {
-                        value: pl.id,
+                        value: useName ? pl.name : pl.id,
                         label: <Space>
                             <PromotionLevelImage promotionLevel={pl}/>
                             <Typography.Text>{pl.name}</Typography.Text>

@@ -25,6 +25,11 @@ data class Authorization(
         const val EDIT = "edit"
 
         /**
+         * Common actions: deleting
+         */
+        const val DELETE = "delete"
+
+        /**
          * Common actions: sharing
          */
         const val SHARE = "share"

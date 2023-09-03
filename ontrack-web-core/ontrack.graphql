@@ -1361,6 +1361,12 @@ type DeletePromotionRunMetaInfoPropertyPayload implements Payload {
     promotionRun: PromotionRun
 }
 
+"Output type for the deletePromotionRun mutation."
+type DeletePromotionRunPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the deleteSubscription mutation."
 type DeleteSubscriptionPayload implements Payload {
     "List of errors"
@@ -2887,6 +2893,11 @@ type Mutation {
         "Input for the mutation"
         input: DeletePromotionLevelMetaInfoPropertyByIdInput
     ): DeletePromotionLevelMetaInfoPropertyByIdPayload
+    "Deletes an existing promotion run"
+    deletePromotionRun(
+        "Input for the mutation"
+        input: DeletePromotionRunInput
+    ): DeletePromotionRunPayload
     "Deletes the message property on a promotion run identified by name."
     deletePromotionRunMessageProperty(
         "Input for the mutation"
@@ -4177,9 +4188,11 @@ type PromotionLevelLinks {
     _update: String
 }
 
-type PromotionRun implements ProjectEntity {
+type PromotionRun implements Authorizable & ProjectEntity {
     "Description with links."
     annotatedDescription: String
+    "Authorizations for this context"
+    authorizations: [Authorization!]!
     "Associated build"
     build: Build!
     creation: Signature
@@ -6473,6 +6486,8 @@ input CreatePromotionLevelByIdInput {
 input CreatePromotionRunByIdInput {
     "Build ID"
     buildId: Int!
+    "Promotion date/time"
+    dateTime: LocalDateTime
     "Promotion description"
     description: String
     "Promotion name"
@@ -6485,6 +6500,8 @@ input CreatePromotionRunInput {
     branch: String!
     "Build name"
     build: String!
+    "Promotion date/time"
+    dateTime: LocalDateTime
     "Promotion description"
     description: String
     "Project name"
@@ -6866,6 +6883,12 @@ input DeletePromotionLevelMetaInfoPropertyInput {
     project: String!
     "Promotion name"
     promotion: String!
+}
+
+"Input type for the deletePromotionRun mutation."
+input DeletePromotionRunInput {
+    "Promotion run ID"
+    promotionRunId: Int!
 }
 
 "Input type for the deletePromotionRunMessagePropertyById mutation."

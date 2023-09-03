@@ -2,18 +2,38 @@ import FormDialog, {useFormDialog} from "@components/form/FormDialog";
 import {DatePicker, Form, Input} from "antd";
 import SelectPromotionLevel from "@components/promotionLevels/SelectPromotionLevel";
 import dayjs from "dayjs";
+import {gql} from "graphql-request";
 
-const { TextArea } = Input;
+const {TextArea} = Input;
 
 export function useBuildPromoteDialog(config) {
     return useFormDialog({
         ...config,
         init: (form, context) => {
             form.setFieldsValue({
-                promotionLevel: context.promotionLevel?.id,
+                promotionLevel: context.promotionLevel?.name,
                 dateTime: dayjs(),
             })
         },
+        prepareValues: (values, context) => {
+            values.buildId = context.build.id
+            values.promotion = values.promotionLevel
+        },
+        query: gql`
+            mutation PromoteBuild($buildId: Int!, $promotion: String!, $description: String, $dateTime: LocalDateTime) {
+                createPromotionRunById(input: {
+                    buildId: $buildId,
+                    promotion: $promotion,
+                    description: $description,
+                    dateTime: $dateTime,
+                }) {
+                    errors {
+                        message
+                    }
+                }
+            }
+        `,
+        userNode: 'createPromotionRunById',
     })
 }
 
@@ -33,6 +53,7 @@ export default function BuildPromoteDialog({buildPromoteDialog}) {
                 >
                     <SelectPromotionLevel
                         branch={buildPromoteDialog?.context?.build?.branch}
+                        useName={true}
                     />
                 </Form.Item>
                 <Form.Item
