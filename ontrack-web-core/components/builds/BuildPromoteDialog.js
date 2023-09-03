@@ -1,7 +1,9 @@
 import FormDialog, {useFormDialog} from "@components/form/FormDialog";
-import {DatePicker, Form} from "antd";
+import {DatePicker, Form, Input} from "antd";
 import SelectPromotionLevel from "@components/promotionLevels/SelectPromotionLevel";
 import dayjs from "dayjs";
+
+const { TextArea } = Input;
 
 export function useBuildPromoteDialog(config) {
     return useFormDialog({
@@ -44,6 +46,12 @@ export default function BuildPromoteDialog({buildPromoteDialog}) {
                     ]}
                 >
                     <DatePicker showTime/>
+                </Form.Item>
+                <Form.Item
+                    name="description"
+                    label="Description"
+                >
+                    <TextArea rows={4}/>
                 </Form.Item>
             </FormDialog>
         </>
