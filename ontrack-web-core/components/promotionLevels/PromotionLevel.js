@@ -1,5 +1,6 @@
 import {Popover, Space, Typography} from "antd";
 import {PromotionLevelImage} from "@components/common/Links";
+import AnnotatedDescription from "@components/common/AnnotatedDescription";
 
 export default function PromotionLevel({promotionLevel, details, size = 16, displayTooltip = true}) {
     return (
@@ -12,10 +13,7 @@ export default function PromotionLevel({promotionLevel, details, size = 16, disp
                         }
                         content={
                             <Space direction="vertical">
-                                {
-                                    promotionLevel.description &&
-                                    <Typography.Text type="secondary">{promotionLevel.description}</Typography.Text>
-                                }
+                                <AnnotatedDescription entity={promotionLevel}/>
                                 {
                                     details
                                 }
@@ -23,6 +21,10 @@ export default function PromotionLevel({promotionLevel, details, size = 16, disp
                         }
                     >
                         <div>
+                            <PromotionLevelImage
+                                promotionLevel={promotionLevel}
+                                size={size}
+                            />
                         </div>
                     </Popover> :
                     <PromotionLevelImage
