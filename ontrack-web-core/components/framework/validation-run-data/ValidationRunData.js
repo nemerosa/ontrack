@@ -21,6 +21,8 @@ export default function ValidationRunData({data}) {
             }
             loadValidationRunData().then(() => {
             })
+        } else {
+            setLoadedValidationRunData('')
         }
     }, [data])
 
