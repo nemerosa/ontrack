@@ -5,6 +5,7 @@ import {gql} from "graphql-request";
 import {Popover, Space, Timeline, Typography} from "antd";
 import dayjs from "dayjs";
 import PromotionRun from "@components/promotionRuns/PromotionRun";
+import AnnotatedDescription from "@components/common/AnnotatedDescription";
 
 export default function BuildContentPromotions({build}) {
 
@@ -23,11 +24,14 @@ export default function BuildContentPromotions({build}) {
                                 time
                                 user
                             }
+                            description
                             annotatedDescription
                             promotionLevel {
                                 id
                                 name
                                 image
+                                description
+                                annotatedDescription
                             }
                         }
                     }
@@ -40,6 +44,7 @@ export default function BuildContentPromotions({build}) {
                         <Space direction="vertical">
                             <Typography.Text>Promoted by {run.creation.user}</Typography.Text>
                             {dayjs(run.creation.time).format("YYYY MMM DD, HH:mm:ss")}
+                            <AnnotatedDescription entity={run}/>
                         </Space>
                     }>
                         {dayjs(run.creation.time).format("YYYY MMM DD, HH:mm")}
