@@ -23,3 +23,16 @@
 .ot-action {
     cursor: pointer;
 }
+
+/**
+ * Commands
+ */
+.ot-command {
+    cursor: pointer;
+    opacity: 30%;
+}
+
+.ot-command:hover {
+    cursor: pointer;
+    opacity: 100%;
+}

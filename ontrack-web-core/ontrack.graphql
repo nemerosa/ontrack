@@ -5,6 +5,12 @@ schema {
     mutation: Mutation
 }
 
+"Any type which contains authorizations for itself"
+interface Authorizable {
+    "Authorizations for this context"
+    authorizations: [Authorization!]!
+}
+
 "Interface implemented by all mutation payloads"
 interface Payload {
     "List of errors"
@@ -477,11 +483,13 @@ type BranchLinksNode {
     edges: [BranchLinksEdge!]!
 }
 
-type Build implements ProjectEntity {
+type Build implements Authorizable & ProjectEntity {
     "Actions for a Build"
     actions: BuildActions
     "Description with links."
     annotatedDescription: String
+    "Authorizations for this context"
+    authorizations: [Authorization!]!
     "Auto versioning information for this build, in regards of a parent branch"
     autoVersioning(
         "ID of the parent branch. Is overridden by the buildId argument, but at least one of each is required."

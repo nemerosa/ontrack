@@ -6,6 +6,8 @@ import {Popover, Space, Timeline, Typography} from "antd";
 import dayjs from "dayjs";
 import AnnotatedDescription from "@components/common/AnnotatedDescription";
 import PromotionLevel from "@components/promotionLevels/PromotionLevel";
+import BuildPromoteAction from "@components/builds/BuildPromoteAction";
+import {isAuthorized} from "@components/common/authorizations";
 
 export default function BuildContentPromotions({build}) {
 
@@ -18,6 +20,11 @@ export default function BuildContentPromotions({build}) {
             gql`
                 query BuildPromotions($buildId: Int!) {
                     build(id: $buildId) {
+                        authorizations {
+                            name
+                            action
+                            authorized
+                        }
                         branch {
                             promotionLevels {
                                 id
@@ -43,6 +50,8 @@ export default function BuildContentPromotions({build}) {
                 }
             `, {buildId: build.id}
         ).then(data => {
+            // Authorizations
+            build.authorizations = data.build.authorizations
             // Gets all the promotion levels in their natural order
             const promotionLevels = data.build.branch.promotionLevels
             // Gets all the promotion runs
@@ -52,8 +61,6 @@ export default function BuildContentPromotions({build}) {
                 promotionLevel.runs = runs.filter(run => run.promotionLevel.id === promotionLevel.id)
             })
 
-            console.log({promotionLevels})
-
             // Converting the list of promotion levels and their runs into a timeline
             const items = []
             promotionLevels.forEach(promotionLevel => {
@@ -62,16 +69,27 @@ export default function BuildContentPromotions({build}) {
                     // This promotion has at least 1 run
                     runs.forEach(run => {
                         items.push({
-                            label: <Popover content={
-                                <Space direction="vertical">
-                                    <Typography.Text>Promoted by {run.creation.user}</Typography.Text>
-                                    {dayjs(run.creation.time).format("YYYY MMM DD, HH:mm:ss")}
-                                    <AnnotatedDescription entity={run}/>
-                                </Space>
-                            }>
-                                {dayjs(run.creation.time).format("YYYY MMM DD, HH:mm")}
-                            </Popover>,
-                            children: <Popover title={promotionLevel.name} content={<AnnotatedDescription entity={promotionLevel}/>}>
+                            label: <Space>
+                                <Popover content={
+                                    <Space direction="vertical">
+                                        <Typography.Text>Promoted by {run.creation.user}</Typography.Text>
+                                        {dayjs(run.creation.time).format("YYYY MMM DD, HH:mm:ss")}
+                                        <AnnotatedDescription entity={run}/>
+                                    </Space>
+                                }>
+                                    {dayjs(run.creation.time).format("YYYY MMM DD, HH:mm")}
+                                </Popover>
+                                {
+                                    isAuthorized(build, 'build', 'promote') ?
+                                        <BuildPromoteAction
+                                            build={build}
+                                            promotionLevel={promotionLevel}
+                                            tooltip={`Promotes the build again to ${promotionLevel.name}`}
+                                        /> : undefined
+                                }
+                            </Space>,
+                            children: <Popover title={promotionLevel.name}
+                                               content={<AnnotatedDescription entity={promotionLevel}/>}>
                                 <Typography.Text>{promotionLevel.name}</Typography.Text>
                             </Popover>,
                             dot: <PromotionLevel
@@ -84,8 +102,10 @@ export default function BuildContentPromotions({build}) {
                 } else {
                     // This promotion has no run
                     items.push({
-                        label: 'TODO Commands',
-                        children: <Popover title={promotionLevel.name} content={<AnnotatedDescription entity={promotionLevel}/>}>
+                        label: isAuthorized(build, 'build', 'promote') ?
+                            <BuildPromoteAction build={build} promotionLevel={promotionLevel}/> : undefined,
+                        children: <Popover title={promotionLevel.name}
+                                           content={<AnnotatedDescription entity={promotionLevel}/>}>
                             <Typography.Text disabled>{promotionLevel.name}</Typography.Text>
                         </Popover>,
                         dot: <PromotionLevel
