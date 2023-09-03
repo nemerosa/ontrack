@@ -34,7 +34,7 @@ class GQLProjectAuthorizationsFieldContributor(
                             .build()
             )
         } else {
-            emptyList<GraphQLFieldDefinition>()
+            emptyList()
         }
     }
 

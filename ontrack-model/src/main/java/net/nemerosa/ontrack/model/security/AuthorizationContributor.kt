@@ -3,8 +3,13 @@ package net.nemerosa.ontrack.model.security
 interface AuthorizationContributor {
 
     /**
-     * Gets the list of authorizations for the current user
+     * Does this contributor applies to a given context
      */
-    fun getAuthorizations(user: OntrackAuthenticatedUser): List<Authorization>
+    fun appliesTo(context: Any): Boolean
+
+    /**
+     * Gets the list of authorizations for the current user and the given [context]
+     */
+    fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization>
 
 }

@@ -11,7 +11,14 @@ import org.springframework.stereotype.Component
 class ExtensionAuthorizationContributor(
     private val extensionManager: ExtensionManager,
 ) : AuthorizationContributor {
-    override fun getAuthorizations(user: OntrackAuthenticatedUser): List<Authorization> =
+
+    private val extensions: Collection<AuthorizationContributorExtension> by lazy {
         extensionManager.getExtensions(AuthorizationContributorExtension::class.java)
-            .flatMap { it.getAuthorizations(user) }
+    }
+
+    override fun appliesTo(context: Any): Boolean = true
+
+    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> =
+        extensions.flatMap { it.getAuthorizations(user, context) }
+
 }

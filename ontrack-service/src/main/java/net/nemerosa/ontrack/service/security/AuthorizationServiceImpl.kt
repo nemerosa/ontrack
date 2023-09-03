@@ -11,11 +11,11 @@ class AuthorizationServiceImpl(
     private val securityService: SecurityService,
     private val authorizationContributors: List<AuthorizationContributor>,
 ) : AuthorizationService {
-    override val authorizations: List<Authorization>
-        get() {
-            val user = securityService.currentAccount ?: return emptyList()
-            return authorizationContributors.flatMap {
-                it.getAuthorizations(user)
-            }
-        }
+
+    override fun getAuthorizations(context: Any): List<Authorization> {
+        val user = securityService.currentAccount ?: return emptyList()
+        return authorizationContributors
+            .filter { it.appliesTo(context) }
+            .flatMap { it.getAuthorizations(user, context) }
+    }
 }

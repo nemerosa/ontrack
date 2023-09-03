@@ -9,6 +9,6 @@ package net.nemerosa.ontrack.model.security
  */
 interface AuthorizationService {
 
-    val authorizations: List<Authorization>
+    fun getAuthorizations(context: Any): List<Authorization>
 
 }

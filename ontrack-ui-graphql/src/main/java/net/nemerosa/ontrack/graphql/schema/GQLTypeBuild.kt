@@ -5,9 +5,9 @@ import graphql.schema.*
 import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType.newObject
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
 import net.nemerosa.ontrack.graphql.schema.actions.actions
+import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.pagination.PageRequest
@@ -18,6 +18,7 @@ import kotlin.jvm.optionals.getOrNull
 
 @Component
 class GQLTypeBuild(
+    private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
     private val uiActionsGraphQLService: UIActionsGraphQLService,
     private val structureService: StructureService,
     private val projectEntityInterface: GQLProjectEntityInterface,
@@ -47,6 +48,10 @@ class GQLTypeBuild(
             .fields(projectEntityInterfaceFields())
             // Actions
             .actions(uiActionsGraphQLService, Build::class)
+            // Authorizations
+            .apply {
+                gqlInterfaceAuthorizableService.apply(this, Build::class)
+            }
             // Ref to branch
             .field(
                 newFieldDefinition()

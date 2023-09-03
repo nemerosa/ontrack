@@ -10,8 +10,8 @@ import net.nemerosa.ontrack.model.security.OntrackAuthenticatedUser
 interface AuthorizationContributorExtension : Extension {
 
     /**
-     * Gets the list of authorizations for the current user
+     * Gets the list of authorizations for the current user and the given [context]
      */
-    fun getAuthorizations(user: OntrackAuthenticatedUser): List<Authorization>
+    fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization>
 
 }

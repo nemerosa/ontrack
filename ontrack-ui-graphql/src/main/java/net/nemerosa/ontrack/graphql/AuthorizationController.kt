@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.model.security.Authorization
 import net.nemerosa.ontrack.model.security.AuthorizationService
+import net.nemerosa.ontrack.model.security.GlobalAuthorizationContext
 import org.springframework.graphql.data.method.annotation.QueryMapping
 import org.springframework.stereotype.Controller
 
@@ -11,6 +12,6 @@ class AuthorizationController(
 ) {
 
     @QueryMapping
-    fun authorizations(): List<Authorization> = authorizationService.authorizations
+    fun authorizations(): List<Authorization> = authorizationService.getAuthorizations(GlobalAuthorizationContext)
 
 }
