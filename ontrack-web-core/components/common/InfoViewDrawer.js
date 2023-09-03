@@ -2,7 +2,7 @@ import {Drawer, FloatButton} from "antd";
 import {useState} from "react";
 import {FaInfoCircle} from "react-icons/fa";
 
-export default function InfoViewDrawer({title, tooltip, children}) {
+export default function InfoViewDrawer({title, tooltip, width, children}) {
 
     const [expanded, setExpanded] = useState(false)
 
@@ -24,6 +24,7 @@ export default function InfoViewDrawer({title, tooltip, children}) {
                 placement="right"
                 open={expanded}
                 onClose={toggleExpanded}
+                width={width}
             >
                 {children}
             </Drawer>

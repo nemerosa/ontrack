@@ -13,6 +13,7 @@ import BranchInfoViewDrawer from "@components/branches/BranchInfoViewDrawer";
 import BranchContent from "@components/branches/BranchContent";
 import {Space} from "antd";
 import BranchFavourite from "@components/branches/BranchFavourite";
+import {gqlPropertiesFragment} from "@components/services/fragments";
 
 export default function BranchView({id}) {
     const [loadingBranch, setLoadingBranch] = useState(true)
@@ -32,8 +33,12 @@ export default function BranchView({id}) {
                                 id
                                 name
                             }
+                            properties {
+                                ...propertiesFragment
+                            }
                         }
                     }
+                    ${gqlPropertiesFragment}
                 `,
                 {id}
             ).then(data => {
@@ -65,7 +70,7 @@ export default function BranchView({id}) {
                 <LoadingContainer loading={loadingBranch} tip="Loading branch">
                     <BranchViewContextProvider>
                         <BranchContent branch={branch}/>
-                        <BranchInfoViewDrawer branch={branch}/>
+                        <BranchInfoViewDrawer branch={branch} loadingBranch={loadingBranch}/>
                     </BranchViewContextProvider>
                 </LoadingContainer>
             </MainPage>

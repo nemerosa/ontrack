@@ -1,6 +1,6 @@
 import {useRouter} from "next/router";
 import MainLayout from "@components/layouts/MainLayout";
-import ProjectView from "@components/views/ProjectView";
+import ProjectView from "@components/projects/ProjectView";
 
 export default function ProjectPage() {
     const router = useRouter()

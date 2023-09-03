@@ -8,7 +8,10 @@ export default function Property({property}) {
     const shortTypeName = property.type.typeName.slice("net.nemerosa.ontrack.extension.".length)
 
     const importPropertyIcon = () => lazy(() =>
-        import(`./${shortTypeName}/Icon`).catch(() => import(`./default/NullIcon`))
+        import(`./${shortTypeName}/Icon`).catch(() => {
+            console.error(`Cannot find icon for property ${JSON.stringify(property)}: ${shortTypeName}`)
+            return import(`./default/NullIcon`);
+        })
     )
 
     const [loadedPropertyIcon, setLoadedPropertyIcon] = useState(<FaSpinner/>)
@@ -25,7 +28,10 @@ export default function Property({property}) {
     }, [property])
 
     const importPropertyDisplay = () => lazy(() =>
-        import(`./${shortTypeName}/Display`).catch(() => import(`./default/NullDisplay`))
+        import(`./${shortTypeName}/Display`).catch(() => {
+            console.error(`Cannot find display for property ${JSON.stringify(property)}: ${shortTypeName}`)
+            return import(`./default/NullDisplay`);
+        })
     )
 
     const [loadedPropertyDisplay, setLoadedPropertyDisplay] = useState(<FaSpinner/>)

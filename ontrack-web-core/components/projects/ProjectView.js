@@ -17,6 +17,7 @@ import JumpToBranch from "@components/branches/JumpToBranch";
 import PropertiesSection from "@components/framework/properties/PropertiesSection";
 import ProjectFavourite from "@components/projects/ProjectFavourite";
 import {useDashboardEventForRefresh} from "@components/common/EventsContext";
+import ProjectInfoViewDrawer from "@components/projects/ProjectInfoViewDrawer";
 
 export default function ProjectView({id}) {
 
@@ -40,7 +41,7 @@ export default function ProjectView({id}) {
                             properties {
                                 ...propertiesFragment
                             }
-                            branches(order: true, count: 5) {
+                            branches(order: true, count: 6) {
                                 project {
                                     id
                                     name
@@ -130,39 +131,30 @@ export default function ProjectView({id}) {
                             />
                         </PageSection>
                     }
-                    <Row gutter={16}>
-                        <Col span={12}>
-                            <PageSection
-                                loading={loadingProject}
-                                title="Last active branches"
-                            >
-                                {
-                                    (!branches || branches.length === 0) &&
-                                    <Empty
-                                        image={Empty.PRESENTED_IMAGE_SIMPLE}
-                                        description="No branch has been created for this project"
-                                    />
-                                }
-                                {
-                                    branches && branches.length > 0 &&
-                                    <Space direction="horizontal" size={16} wrap>
-                                        {
-                                            branches.map(branch => <RowTag key={branch.id}>
-                                                    <BranchBox branch={branch}/>
-                                                </RowTag>
-                                            )
-                                        }
-                                    </Space>
-                                }
-                            </PageSection>
-                        </Col>
-                        <Col span={12}>
-                            <PropertiesSection
-                                loading={loadingProject}
-                                entity={project}
+                    <PageSection
+                        loading={loadingProject}
+                        title="Last active branches"
+                    >
+                        {
+                            (!branches || branches.length === 0) &&
+                            <Empty
+                                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                description="No branch has been created for this project"
                             />
-                        </Col>
-                    </Row>
+                        }
+                        {
+                            branches && branches.length > 0 &&
+                            <Space direction="horizontal" size={16} wrap>
+                                {
+                                    branches.map(branch => <RowTag key={branch.id}>
+                                            <BranchBox branch={branch}/>
+                                        </RowTag>
+                                    )
+                                }
+                            </Space>
+                        }
+                    </PageSection>
+                    <ProjectInfoViewDrawer project={project} loadingProject={loadingProject}/>
                 </Space>
             </MainPage>
         </>

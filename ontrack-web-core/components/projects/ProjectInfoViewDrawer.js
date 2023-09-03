@@ -1,18 +1,19 @@
 import InfoViewDrawer from "@components/common/InfoViewDrawer";
 import PropertiesSection from "@components/framework/properties/PropertiesSection";
 
-export default function BranchInfoViewDrawer({branch, loadingBranch}) {
+export default function ProjectInfoViewDrawer({project, loadingProject}) {
     return (
         <>
             <InfoViewDrawer
-                title="Branch information"
-                tooltip="Displays information about the branch"
+                title="Project information"
+                tooltip="Displays information about the project"
                 width="40%"
             >
                 <PropertiesSection
-                    entity={branch}
-                    loading={loadingBranch}
+                    loading={loadingProject}
+                    entity={project}
                 />
+                {/*  TODO Extra information  */}
             </InfoViewDrawer>
         </>
     )
