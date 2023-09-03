@@ -244,6 +244,7 @@ export default function BuildContentValidations({build}) {
             <PageSection title="Validations"
                          loading={loading}
                          padding={false}
+                         fullHeight={true}
                          extra={
                              <>
                                  <Space>

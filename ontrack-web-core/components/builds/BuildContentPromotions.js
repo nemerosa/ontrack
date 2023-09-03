@@ -59,7 +59,7 @@ export default function BuildContentPromotions({build}) {
 
     return (
         <>
-            <PageSection title="Promotions" loading={loading}>
+            <PageSection title="Promotions" loading={loading} fullHeight={true}>
                 <Timeline
                     mode="right"
                     items={promotionRunItems}
