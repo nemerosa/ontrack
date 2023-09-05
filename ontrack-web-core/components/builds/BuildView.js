@@ -8,7 +8,7 @@ import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import {CloseCommand} from "@components/common/Commands";
 import {branchUri} from "@components/common/Links";
-import {gqlDecorationFragment} from "@components/services/fragments";
+import {gqlDecorationFragment, gqlPropertiesFragment} from "@components/services/fragments";
 import BuildContent from "@components/builds/BuildContent";
 import {Space} from "antd";
 import Decorations from "@components/framework/decorations/Decorations";
@@ -33,6 +33,9 @@ export default function BuildView({id}) {
                                 user
                                 time
                             }
+                            properties {
+                                ...propertiesFragment
+                            }
                             decorations {
                                 ...decorationContent
                             }
@@ -48,6 +51,7 @@ export default function BuildView({id}) {
                     }
 
                     ${gqlDecorationFragment}
+                    ${gqlPropertiesFragment}
                 `,
                 {id}
             ).then(data => {
@@ -77,7 +81,7 @@ export default function BuildView({id}) {
             >
                 <LoadingContainer loading={loadingBuild} tip="Loading build">
                     <BuildContent build={build}/>
-                    <BuildInfoViewDrawer build={build}/>
+                    <BuildInfoViewDrawer build={build} loading={loadingBuild}/>
                 </LoadingContainer>
             </MainPage>
         </>
