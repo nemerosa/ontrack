@@ -1,10 +1,12 @@
-import {Card} from "antd";
+import {Card, Spin} from "antd";
 import {FaSpinner} from "react-icons/fa";
 import {lazy, useEffect, useState} from "react";
+import ErrorBoundary from "@components/common/ErrorBoundary";
 
 const {Meta} = Card
 
 export default function Property({property}) {
+
     const shortTypeName = property.type.typeName.slice("net.nemerosa.ontrack.extension.".length)
 
     const importPropertyIcon = () => lazy(() =>
@@ -14,7 +16,7 @@ export default function Property({property}) {
         })
     )
 
-    const [loadedPropertyIcon, setLoadedPropertyIcon] = useState(<FaSpinner/>)
+    const [loadedPropertyIcon, setLoadedPropertyIcon] = useState(<Spin size="small"/>)
 
     useEffect(() => {
         if (property) {
@@ -48,12 +50,14 @@ export default function Property({property}) {
     }, [property])
 
     return (
-        <Card style={{width: '100%'}}>
-            <Meta
-                avatar={loadedPropertyIcon}
-                title={property.type.name}
+        <ErrorBoundary fallback={<p>Cannot display property</p>}>
+            <Card style={{width: '100%'}}>
+                <Meta
+                    avatar={loadedPropertyIcon}
+                    title={property.type.name}
                 />
-            {loadedPropertyDisplay}
-        </Card>
+                {loadedPropertyDisplay}
+            </Card>
+        </ErrorBoundary>
     )
 }
