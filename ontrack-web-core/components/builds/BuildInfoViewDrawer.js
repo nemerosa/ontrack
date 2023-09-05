@@ -1,5 +1,6 @@
 import InfoViewDrawer from "@components/common/InfoViewDrawer";
 import PropertiesSection from "@components/framework/properties/PropertiesSection";
+import InformationSection from "@components/framework/information/InformationSection";
 
 export default function BuildInfoViewDrawer({build, loading}) {
     return (
@@ -13,7 +14,10 @@ export default function BuildInfoViewDrawer({build, loading}) {
                     entity={build}
                     loading={loading}
                 />
-                {/*  TODO Extra information  */}
+                <InformationSection
+                    entity={build}
+                    loading={loading}
+                />
             </InfoViewDrawer>
         </>
     )

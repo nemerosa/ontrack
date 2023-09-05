@@ -1,5 +1,6 @@
 import InfoViewDrawer from "@components/common/InfoViewDrawer";
 import PropertiesSection from "@components/framework/properties/PropertiesSection";
+import InformationSection from "@components/framework/information/InformationSection";
 
 export default function BranchInfoViewDrawer({branch, loadingBranch}) {
     return (
@@ -10,6 +11,10 @@ export default function BranchInfoViewDrawer({branch, loadingBranch}) {
                 width="40%"
             >
                 <PropertiesSection
+                    entity={branch}
+                    loading={loadingBranch}
+                />
+                <InformationSection
                     entity={branch}
                     loading={loadingBranch}
                 />

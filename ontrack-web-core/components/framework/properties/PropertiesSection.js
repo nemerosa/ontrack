@@ -1,13 +1,15 @@
-import PageSection from "@components/common/PageSection";
-import PropertyList from "@components/framework/properties/PropertyList";
+import ListSection from "@components/common/ListSection";
+import Property from "@components/framework/properties/Property";
 
 export default function PropertiesSection({loading, entity}) {
     return (
-        <PageSection
-            loading={loading}
+        <ListSection
             title="Properties"
-        >
-            <PropertyList properties={entity.properties}/>
-        </PageSection>
+            loading={loading}
+            items={entity.properties.filter(it => it.value)}
+            renderItem={(property) => (
+                <Property property={property}/>
+            )}
+        />
     )
 }

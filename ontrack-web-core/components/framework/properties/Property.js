@@ -1,7 +1,8 @@
-import {Card, Spin} from "antd";
+import {Card, Space, Spin, Typography} from "antd";
 import {FaSpinner} from "react-icons/fa";
 import {lazy, useEffect, useState} from "react";
 import ErrorBoundary from "@components/common/ErrorBoundary";
+import Section from "@components/common/Section";
 
 const {Meta} = Card
 
@@ -51,13 +52,14 @@ export default function Property({property}) {
 
     return (
         <ErrorBoundary fallback={<p>Cannot display property</p>}>
-            <Card style={{width: '100%'}}>
-                <Meta
-                    avatar={loadedPropertyIcon}
-                    title={property.type.name}
-                />
+            <Section title={
+                <Space>
+                    {loadedPropertyIcon}
+                    <Typography.Text strong>{property.type.name}</Typography.Text>
+                </Space>
+            }>
                 {loadedPropertyDisplay}
-            </Card>
+            </Section>
         </ErrorBoundary>
     )
 }

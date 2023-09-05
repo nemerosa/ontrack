@@ -21,3 +21,10 @@ export const gqlPropertiesFragment = gql`
         value
     }
 `
+
+export const gqlInformationFragment = gql`
+    fragment informationFragment on EntityInformation {
+        type
+        data
+    }
+`

@@ -336,6 +336,8 @@ type Branch implements ProjectEntity {
         direction: BranchLinksDirection!
     ): BranchLinksNode! @deprecated(reason: "Graph UI will be dropped in 4.6 and `graph` fields in 5.0.")
     id: Int!
+    "List of information components attached to this entity"
+    information: [EntityInformation!]!
     "Link to a Jenkins Job"
     jenkinsJobProperty: Property
     "List of links."
@@ -522,6 +524,8 @@ type Build implements Authorizable & ProjectEntity {
         direction: BranchLinksDirection!
     ): BranchLinksNode! @deprecated(reason: "Graph UI will be dropped in 4.6 and `graph` fields in 5.0.")
     id: Int!
+    "List of information components attached to this entity"
+    information: [EntityInformation!]!
     "Link to a Jenkins Build"
     jenkinsBuildProperty: Property
     "List of links."
@@ -1500,6 +1504,14 @@ type EnableSubscriptionPayload implements Payload {
 type EntityCounts {
     "Number of projects"
     projects: Int!
+}
+
+"Extra information component about an entity"
+type EntityInformation {
+    "Associated data"
+    data: JSON
+    "Type of information"
+    type: String!
 }
 
 "EventSubscriptionPayload"
@@ -3762,6 +3774,8 @@ type Project implements ProjectEntity {
     id: Int!
     "List of indicator portfolios associated with this project, through its labels."
     indicatorPortfolios: [IndicatorPortfolio!]!
+    "List of information components attached to this entity"
+    information: [EntityInformation!]!
     "List of links to follow when displaying information about an issue."
     jIRAFollowLinksProperty: Property
     "Link to a Jenkins Job"
@@ -4125,6 +4139,8 @@ type PromotionLevel implements ProjectEntity {
     id: Int!
     "Flag to indicate if an image is associated"
     image: Boolean
+    "List of information components attached to this entity"
+    information: [EntityInformation!]!
     "Link to a Jenkins Job"
     jenkinsJobProperty: Property
     "List of links."
@@ -4203,6 +4219,8 @@ type PromotionRun implements Authorizable & ProjectEntity {
     ): [Decoration!]!
     description: String
     id: Int!
+    "List of information components attached to this entity"
+    information: [EntityInformation!]!
     "Link to a Jenkins Build"
     jenkinsBuildProperty: Property
     "List of links."
@@ -5786,6 +5804,8 @@ type ValidationRun implements ProjectEntity {
     ): [Decoration!]!
     description: String
     id: Int!
+    "List of information components attached to this entity"
+    information: [EntityInformation!]!
     "Link to a Jenkins Build"
     jenkinsBuildProperty: Property
     "Last validation status for this run"
@@ -5905,6 +5925,8 @@ type ValidationStamp implements ProjectEntity {
     id: Int!
     "Flag to indicate if an image is associated"
     image: Boolean
+    "List of information components attached to this entity"
+    information: [EntityInformation!]!
     "Link to a Jenkins Job"
     jenkinsJobProperty: Property
     "List of links."

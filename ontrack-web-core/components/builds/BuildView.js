@@ -8,7 +8,7 @@ import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import {CloseCommand} from "@components/common/Commands";
 import {branchUri} from "@components/common/Links";
-import {gqlDecorationFragment, gqlPropertiesFragment} from "@components/services/fragments";
+import {gqlDecorationFragment, gqlInformationFragment, gqlPropertiesFragment} from "@components/services/fragments";
 import BuildContent from "@components/builds/BuildContent";
 import {Space} from "antd";
 import Decorations from "@components/framework/decorations/Decorations";
@@ -36,6 +36,9 @@ export default function BuildView({id}) {
                             properties {
                                 ...propertiesFragment
                             }
+                            information {
+                                ...informationFragment
+                            }
                             decorations {
                                 ...decorationContent
                             }
@@ -52,6 +55,7 @@ export default function BuildView({id}) {
 
                     ${gqlDecorationFragment}
                     ${gqlPropertiesFragment}
+                    ${gqlInformationFragment}
                 `,
                 {id}
             ).then(data => {

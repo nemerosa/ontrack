@@ -7,7 +7,7 @@ import {projectTitle} from "@components/common/Titles";
 import {projectBreadcrumbs} from "@components/common/Breadcrumbs";
 import {CloseCommand} from "@components/common/Commands";
 import {homeUri} from "@components/common/Links";
-import {gqlDecorationFragment, gqlPropertiesFragment} from "@components/services/fragments";
+import {gqlDecorationFragment, gqlInformationFragment, gqlPropertiesFragment} from "@components/services/fragments";
 import PageSection from "@components/common/PageSection";
 import BranchList from "@components/branches/BranchList";
 import {Col, Empty, Row, Space} from "antd";
@@ -40,6 +40,9 @@ export default function ProjectView({id}) {
                             name
                             properties {
                                 ...propertiesFragment
+                            }
+                            information {
+                                ...informationFragment
                             }
                             branches(order: true, count: 6) {
                                 project {
@@ -86,6 +89,7 @@ export default function ProjectView({id}) {
 
                     ${gqlDecorationFragment}
                     ${gqlPropertiesFragment}
+                    ${gqlInformationFragment}
                 `,
                 {id}
             ).then(data => {

@@ -1,4 +1,4 @@
-import {Drawer, FloatButton} from "antd";
+import {Drawer, FloatButton, Space} from "antd";
 import {startTransition, useState} from "react";
 import {FaInfoCircle} from "react-icons/fa";
 
@@ -28,7 +28,9 @@ export default function InfoViewDrawer({title, tooltip, width, children}) {
                 onClose={toggleExpanded}
                 width={width}
             >
-                {children}
+                <Space direction="vertical" size={16} className="ot-line">
+                    {children}
+                </Space>
             </Drawer>
         </>
     )
