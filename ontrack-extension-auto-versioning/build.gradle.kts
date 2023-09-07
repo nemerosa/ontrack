@@ -29,6 +29,7 @@ dependencies {
     testImplementation(project(path = ":ontrack-extension-general", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-notifications", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
 
     testRuntimeOnly(project(":ontrack-service"))

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.av.config
 import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures
 import net.nemerosa.ontrack.extension.av.event.AutoVersioningEvents
+import net.nemerosa.ontrack.extension.av.setAutoVersioning
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscription
@@ -28,6 +29,72 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
 
     @Autowired
     protected lateinit var eventSubscriptionService: EventSubscriptionService
+
+    @Test
+    fun `Using &same expression in source branch returns the same branch as the promoted build`() {
+        asAdmin {
+            project {
+                branch {
+                    val sourceBranch = this
+
+                    // Additional branches for adding some noise
+                    project.branch()
+
+                    val sourceConfig = AutoVersioningTestFixtures.sourceConfig(
+                        sourceProject = sourceBranch.project.name,
+                        sourceBranch = "&same",
+                    )
+
+                    project {
+                        branch(name = sourceBranch.name) {
+                            val targetBranch = this
+
+                            val branch = autoVersioningConfigurationService.getLatestBranch(
+                                eligibleTargetBranch = targetBranch,
+                                project = sourceBranch.project,
+                                config = sourceConfig,
+                            )
+
+                            assertEquals(sourceBranch, branch, "Using the same branch")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Using &same expression in source branch does not return a match is no branch with the same name is present`() {
+        asAdmin {
+            project {
+                branch {
+                    val sourceBranch = this
+
+                    // Additional branches for adding some noise
+                    project.branch()
+
+                    val sourceConfig = AutoVersioningTestFixtures.sourceConfig(
+                        sourceProject = sourceBranch.project.name,
+                        sourceBranch = "&same",
+                    )
+
+                    project {
+                        branch(name = "another-name") { // Using another name
+                            val targetBranch = this
+
+                            val branch = autoVersioningConfigurationService.getLatestBranch(
+                                eligibleTargetBranch = targetBranch,
+                                project = sourceBranch.project,
+                                config = sourceConfig,
+                            )
+
+                            assertNull(branch, "Not finding a branch with the same name")
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @Test
     fun `Saving and retrieving a configuration`() {
@@ -606,6 +673,37 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
             ) {
                 assertEquals(dependency.project.name, it.sourceProject)
                 assertEquals("release/1.1", it.sourceBranch)
+            }
+        }
+    }
+
+    @Test
+    fun `Get AV config between two branches with &same branch expression`() {
+        asAdmin {
+            val dependency = project<Branch> {
+                branch("release/1.1")
+            }
+            val parent = project<Branch> {
+                branch("release/1.1") {
+                    autoVersioningConfigurationService.setupAutoVersioning(
+                        this,
+                        AutoVersioningConfig(
+                            configurations = listOf(
+                                AutoVersioningTestFixtures.sourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = "&same"
+                                )
+                            )
+                        )
+                    )
+                }
+            }
+            assertNotNull(
+                autoVersioningConfigurationService.getAutoVersioningBetween(parent, dependency),
+                "AV config on matching branch"
+            ) {
+                assertEquals(dependency.project.name, it.sourceProject)
+                assertEquals("&same", it.sourceBranch)
             }
         }
     }

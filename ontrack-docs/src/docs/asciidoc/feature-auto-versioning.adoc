@@ -127,7 +127,13 @@ configurations:
     # a regular expression. If several branches are eligible, only the latest version
     # can be used, based on inverted order of semantic versioning. Branches which
     # do not comply with semantic versioning are discarded.
+    #
     # See <Targeting a series of branches> for more information.
+    #
+    # Alternatively, the sourceBranch parameter can be set to "&<expression>" where `<expression>` is
+    # used to detect the valid source branch from the source project.
+    #
+    # See <Branch expressions> below for more information.
     sourceBranch: String
     # Promotion to watch
     sourcePromotion: String
@@ -202,6 +208,23 @@ Pro's:
 Con's:
 
 * the dependency must really take care of a strong semantic versioning
+
+[[auto-versioning-config-branch-expression]]
+===== Branch expressions
+
+The `sourceBranch` parameter can be set to `&<expression>` where `<expression>` is an expression used to detect the source branch on the source project for a branch eligible for auto versioning.
+
+[NOTE]
+====
+As of now, only one expression is supported: `same`. Other methods may be supported in later releases.
+====
+
+Example: if you have a branch `release-1.24` on a parent project `P` and you want to get updates from a `dependency` project only for the same branch, `release-1.24`, you can use:
+
+[source,yaml]
+----
+sourceBranch: "&same"
+----
 
 [[auto-versioning-config-type]]
 ===== Target files types
