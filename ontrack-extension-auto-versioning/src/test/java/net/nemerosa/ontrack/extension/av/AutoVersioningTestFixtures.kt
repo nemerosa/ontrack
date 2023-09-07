@@ -15,10 +15,15 @@ object AutoVersioningTestFixtures {
 
     fun Branch.createOrder(
         sourceProject: String,
-        targetVersion: String = "2.0.0"
+        targetVersion: String = "2.0.0",
+        sourceBuildId: Int? = null,
+        sourceBackValidation: String? = null,
     ) = AutoVersioningOrder(
         uuid = UUID.randomUUID().toString(),
         sourceProject = sourceProject,
+        sourceBuildId = sourceBuildId,
+        sourcePromotion = null,
+        sourceBackValidation = sourceBackValidation,
         branch = this,
         targetPaths = listOf("gradle.properties"),
         targetRegex = null,

@@ -55,6 +55,9 @@ class AutoVersioningAuditStoreDataTest {
     fun `Most recent state in JSON`() {
         val data = AutoVersioningAuditStoreData(
             sourceProject = "test",
+            sourceBuildId = null,
+            sourcePromotion = null,
+            sourceBackValidation = null,
             targetPaths = listOf("gradle.properties"),
             targetRegex = null,
             targetProperty = "version",
@@ -86,6 +89,9 @@ class AutoVersioningAuditStoreDataTest {
     fun `Running flag in JSON`() {
         val data = AutoVersioningAuditStoreData(
             sourceProject = "test",
+            sourceBuildId = null,
+            sourcePromotion = null,
+            sourceBackValidation = null,
             targetPaths = listOf("gradle.properties"),
             targetRegex = null,
             targetProperty = "version",
@@ -117,6 +123,9 @@ class AutoVersioningAuditStoreDataTest {
     fun `Running flag in JSON for an error final state`() {
         val data = AutoVersioningAuditStoreData(
             sourceProject = "test",
+            sourceBuildId = null,
+            sourcePromotion = null,
+            sourceBackValidation = null,
             targetPaths = listOf("gradle.properties"),
             targetRegex = null,
             targetProperty = "version",
@@ -149,6 +158,9 @@ class AutoVersioningAuditStoreDataTest {
     fun `Most recent state from JSON`() {
         val data = AutoVersioningAuditStoreData(
             sourceProject = "test",
+            sourceBuildId = null,
+            sourcePromotion = null,
+            sourceBackValidation = null,
             targetPaths = listOf("gradle.properties"),
             targetRegex = null,
             targetProperty = "version",

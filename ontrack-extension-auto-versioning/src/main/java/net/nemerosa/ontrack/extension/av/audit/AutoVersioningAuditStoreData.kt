@@ -7,6 +7,9 @@ import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
 @JsonIgnoreProperties(ignoreUnknown = true)
 internal data class AutoVersioningAuditStoreData(
     val sourceProject: String,
+    val sourceBuildId: Int?, // Nullable for backward compatibility
+    val sourcePromotion: String?, // Nullable for backward compatibility
+    val sourceBackValidation: String?, // Nullable for backward compatibility
     val targetPaths: List<String>,
     val targetRegex: String?,
     val targetProperty: String?,
@@ -30,6 +33,9 @@ internal data class AutoVersioningAuditStoreData(
 
     fun addState(newState: AutoVersioningAuditEntryState) = AutoVersioningAuditStoreData(
         sourceProject = sourceProject,
+        sourceBuildId = sourceBuildId,
+        sourcePromotion = sourcePromotion,
+        sourceBackValidation = sourceBackValidation,
         targetPaths = targetPaths,
         targetRegex = targetRegex,
         targetProperty = targetProperty,

@@ -123,12 +123,8 @@ class AutoVersioningValidationServiceImpl(
     private fun setupValidationStamp(
         branch: Branch,
         validationStampName: String,
-    ): ValidationStamp {
-        val vs = structureService.findValidationStampByName(branch.project.name, branch.name, validationStampName).getOrNull()
-        return vs ?: structureService.newValidationStamp(
-            ValidationStamp.of(branch, NameDescription.nd(validationStampName, "Auto created for auto versioning check"))
-        )
-    }
+    ): ValidationStamp =
+        structureService.setupValidationStamp(branch, validationStampName, "Auto created for auto versioning check")
 
     private fun getActualValidationStampName(config: AutoVersioningSourceConfig): String? =
         if (config.validationStamp.isNullOrBlank()) {

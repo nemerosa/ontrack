@@ -30,6 +30,7 @@ class AutoVersioningProcessingServiceImpl(
     private val autoVersioningAuditService: AutoVersioningAuditService,
     private val metrics: AutoVersioningMetricsService,
     private val autoVersioningEventService: AutoVersioningEventService,
+    private val autoVersioningCompletionListeners: List<AutoVersioningCompletionListener>,
 ) : AutoVersioningProcessingService {
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningProcessingServiceImpl::class.java)
@@ -165,7 +166,7 @@ class AutoVersioningProcessingServiceImpl(
                     )
                     // If auto approval mode = CLIENT and PR is not merged, we had a timeout
                     logger.debug("Processing auto versioning order end of PR process: {}", order)
-                    if (order.autoApproval) {
+                    val outcome = if (order.autoApproval) {
                         when (order.autoApprovalMode) {
                             AutoApprovalMode.SCM -> {
                                 autoVersioningAuditService.onPRApproved(
@@ -179,6 +180,8 @@ class AutoVersioningProcessingServiceImpl(
                                     "Auto versioning PR has been created and approved. Its merge process will be done at SCM level.",
                                     pr
                                 )
+                                // OK
+                                AutoVersioningProcessingOutcome.CREATED
                             }
                             AutoApprovalMode.CLIENT -> if (!pr.merged) {
                                 logger.debug("Processing auto versioning order PR timed out: {}", order)
@@ -194,6 +197,8 @@ class AutoVersioningProcessingServiceImpl(
                                     order,
                                     pr = pr
                                 )
+                                // OK
+                                AutoVersioningProcessingOutcome.TIMEOUT
                             } else {
                                 autoVersioningAuditService.onPRMerged(
                                     order = order,
@@ -206,6 +211,8 @@ class AutoVersioningProcessingServiceImpl(
                                     "Auto versioning PR has been created, approved and merged.",
                                     pr
                                 )
+                                // OK
+                                AutoVersioningProcessingOutcome.CREATED
                             }
                         }
                     } else {
@@ -215,14 +222,22 @@ class AutoVersioningProcessingServiceImpl(
                             prName = pr.name,
                             prLink = pr.link
                         )
+                        autoVersioningEventService.sendSuccess(
+                            order,
+                            "Auto versioning PR has been created.",
+                            pr
+                        )
+                        // OK
+                        AutoVersioningProcessingOutcome.CREATED
                     }
+                    // Back validation
+                    onCompletion(order, outcome)
+                    // OK
+                    return outcome
                 } catch (e: Exception) {
                     autoVersioningEventService.sendError(order, "Failed to create PR", e)
                     throw e
                 }
-
-                // OK
-                return AutoVersioningProcessingOutcome.CREATED
 
             } else {
                 logger.debug("Processing auto versioning order same version: {}", order)
@@ -233,6 +248,12 @@ class AutoVersioningProcessingServiceImpl(
             logger.debug("Processing auto versioning order no config: {}", order)
             autoVersioningAuditService.onProcessingAborted(order, "Target branch is not configured")
             return AutoVersioningProcessingOutcome.NO_CONFIG
+        }
+    }
+
+    private fun onCompletion(order: AutoVersioningOrder, outcome: AutoVersioningProcessingOutcome) {
+        autoVersioningCompletionListeners.forEach { autoVersioningCompletionListener ->
+            autoVersioningCompletionListener.onAutoVersioningCompletion(order, outcome)
         }
     }
 

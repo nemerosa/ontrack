@@ -80,10 +80,10 @@ class Build(
     ): PaginatedList<Build> = graphqlConnector.query(
         BuildUsingQuery(id.toInt(), offset, size)
     )?.paginate(
-        pageInfo = { it.builds()?.firstOrNull()?.using()?.pageInfo()?.fragments()?.pageInfoContent() },
-        pageItems = { it.builds()?.firstOrNull()?.using()?.pageItems() }
+        pageInfo = { it.builds()?.firstOrNull()?.usingQualified()?.pageInfo()?.fragments()?.pageInfoContent() },
+        pageItems = { it.builds()?.firstOrNull()?.usingQualified()?.pageItems() }
     )?.map {
-        it.fragments().buildFragment().toBuild(this@Build)
+        it.build().fragments().buildFragment().toBuild(this@Build)
     } ?: emptyPaginatedList()
 
     /**

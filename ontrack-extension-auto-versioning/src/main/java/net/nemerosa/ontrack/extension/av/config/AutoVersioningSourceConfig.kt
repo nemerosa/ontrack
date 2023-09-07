@@ -43,6 +43,8 @@ data class AutoVersioningSourceConfig(
     val notifications: List<AutoVersioningNotification>? = null,
     @APIDescription("Qualifier for the build link to create (when links are created)")
     val qualifier: String? = null,
+    @APIDescription("Validation stamp to create on the source build (optional)")
+    val backValidation: String? = null,
 ) : AutoVersioningTargetConfig {
 
     /**
@@ -129,6 +131,7 @@ data class AutoVersioningSourceConfig(
             buildLinkCreation = buildLinkCreation,
             notifications = notifications,
             qualifier = qualifier,
+            backValidation = backValidation,
         )
 
 }
