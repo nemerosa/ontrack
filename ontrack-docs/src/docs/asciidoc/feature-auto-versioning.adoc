@@ -448,6 +448,7 @@ The `postProcessingConfig` <<auto-versioning-config,property>> at branch level m
 * `commitMessage`  - Commit message to use to commit and push the result of the post-processing
 * `config` - GitHub configuration to use for the connection (optional, using defaults if not specified)
 * `workflow` - If defined, name of the workflow in _this_ repository containing the post-processing (like `post-processing.yml`)
+* `version` - the version which is upgraded to
 
 The `workflow` branch configuration property can be used to set the post-processing workflow to one in the very branch targeted by the auto versioning process.
 This would override the global settings.
@@ -621,7 +622,10 @@ The Jenkins job must accept the following parameters:
 |Branch containing the code to upgrade.
 
 |`CREDENTIALS`
-|Pipe (|) separated list of credential entries to pass to the command.
+|Pipe (\|) separated list of credential entries to pass to the command.
+
+|`VERSION`
+|The version which is upgraded to
 
 |===
 

@@ -95,6 +95,7 @@ class GitHubPostProcessing(
                     "docker_image" to config.dockerImage,
                     "docker_command" to config.dockerCommand,
                     "commit_message" to config.commitMessage,
+                    "version" to autoVersioningOrder.targetVersion,
                 ),
                 settings,
             )
