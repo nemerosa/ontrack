@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures.createOrder
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.util.*
 
 class BackValidationAutoVersioningCompletionListenerTest {
 
@@ -69,14 +70,16 @@ class BackValidationAutoVersioningCompletionListenerTest {
     fun `Back validation with passed outcome`() {
 
         val source = BuildFixtures.testBuild()
+        val vs = ValidationStampFixtures.testValidationStamp(branch = source.branch, name = "back-validation")
         val branch = BranchFixtures.testBranch()
         val order = branch.createOrder(
             sourceProject = source.project.name,
-            sourceBackValidation = "back-validation",
+            sourceBackValidation = vs.name,
             sourceBuildId = source.id(),
         )
 
         every { structureService.findBuildByID(source.id) } returns source
+        every { structureService.findValidationStampByName(source.project.name, source.branch.name, vs.name)} returns Optional.of(vs)
 
         listener.onAutoVersioningCompletion(order, AutoVersioningProcessingOutcome.CREATED)
         verify {
@@ -100,14 +103,16 @@ class BackValidationAutoVersioningCompletionListenerTest {
         ).forEach { outcome ->
 
             val source = BuildFixtures.testBuild()
+            val vs = ValidationStampFixtures.testValidationStamp(branch = source.branch, name = "back-validation")
             val branch = BranchFixtures.testBranch()
             val order = branch.createOrder(
                 sourceProject = source.project.name,
-                sourceBackValidation = "back-validation",
+                sourceBackValidation = vs.name,
                 sourceBuildId = source.id(),
             )
 
             every { structureService.findBuildByID(source.id) } returns source
+            every { structureService.findValidationStampByName(source.project.name, source.branch.name, vs.name)} returns Optional.of(vs)
 
             listener.onAutoVersioningCompletion(order, outcome)
             verify {
