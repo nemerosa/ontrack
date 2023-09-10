@@ -236,16 +236,19 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
     @JvmOverloads
     protected fun doPromote(build: Build, promotionLevel: PromotionLevel, description: String?, signature: Signature = of("test")): PromotionRun {
-        return asUser().with(build.projectId(), PromotionRunCreate::class.java).call {
-            structureService.newPromotionRun(
-                    of(
-                            build,
-                            promotionLevel,
-                            signature,
-                            description
-                    )
-            )
-        }
+        return asUser()
+            .with(build.projectId(), PromotionRunCreate::class.java)
+            .with(build.projectId(), ProjectView::class.java)
+            .call {
+                structureService.newPromotionRun(
+                        of(
+                                build,
+                                promotionLevel,
+                                signature,
+                                description
+                        )
+                )
+            }
     }
 
     protected fun <T> doSetProperty(entity: ProjectEntity, propertyType: Class<out PropertyType<T>>, data: T) {

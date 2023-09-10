@@ -36,3 +36,23 @@
     cursor: pointer;
     opacity: 100%;
 }
+
+/**
+ * Small inline box
+ */
+
+.ot-box {
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+}
+
+/**
+ * Dependency link
+ */
+
+.ot-dependency {
+    border: solid 1px rgb(128, 128, 128);
+    border-radius: 4px;
+    padding: 4px;
+}

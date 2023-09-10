@@ -13,7 +13,7 @@ export default function Timestamp({
             <Typography.Text type={type} italic={italic} style={{
                 fontSize: fontSize,
             }}>
-                {prefix}
+                {prefix && `${prefix} `}
                 {dayjs(value).format("YYYY MMM DD, HH:mm")}
             </Typography.Text>
         </>

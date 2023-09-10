@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.repository
 
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
@@ -11,6 +14,18 @@ class PromotionLevelJdbcRepository(
     dataSource: DataSource,
     private val branchJdbcRepositoryAccessor: BranchJdbcRepositoryAccessor,
 ) : AbstractJdbcRepository(dataSource), PromotionLevelRepository, PromotionLevelJdbcRepositoryAccessor {
+
+    override fun getPromotionLevel(id: ID, branch: Branch?): PromotionLevel =
+        getFirstItem(
+            """
+               SELECT *
+                FROM promotion_levels
+                WHERE id = :id
+            """,
+            params("id", id.value)
+        ) { rs, _ ->
+            toPromotionLevel(rs, branch)
+        }
 
     override fun findByToken(token: String?): List<PromotionLevel> =
         if (token.isNullOrBlank()) {
@@ -35,11 +50,11 @@ class PromotionLevelJdbcRepository(
             }
         }
 
-    override fun toPromotionLevel(rs: ResultSet) = PromotionLevel(
+    override fun toPromotionLevel(rs: ResultSet, branch: Branch?) = PromotionLevel(
         id = id(rs),
         name = rs.getString("name"),
         description = rs.getString("description"),
-        branch = branchJdbcRepositoryAccessor.getBranch(id(rs, "branchid")),
+        branch = branch ?: branchJdbcRepositoryAccessor.getBranch(id(rs, "branchid")),
         isImage = !rs.getString("imagetype").isNullOrBlank(),
         signature = readSignature(rs),
     )

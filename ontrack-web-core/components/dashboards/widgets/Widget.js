@@ -7,7 +7,7 @@ import {WidgetContext, WidgetDispatchContext, widgetFormSubmit} from "@component
 import {WidgetExpansionContext} from "@components/dashboards/layouts/WidgetExpansionContext";
 import PageSection from "@components/common/PageSection";
 
-export default function Widget({title, loading, commands, form, children}) {
+export default function Widget({title, loading, commands, form, padding, children}) {
 
     const {selectedDashboard} = useContext(DashboardContext)
     const selectedDashboardDispatch = useContext(DashboardDispatchContext)
@@ -24,6 +24,7 @@ export default function Widget({title, loading, commands, form, children}) {
         <PageSection
             loading={loading}
             title={title}
+            padding={padding}
             extra={
                 <>
                     {

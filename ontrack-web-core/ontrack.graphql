@@ -243,6 +243,8 @@ type AutoVersioningSourceConfig {
     autoApproval: Boolean
     "Auto approval mode"
     autoApprovalMode: AutoApprovalMode
+    "Validation stamp to create on the source build (optional)"
+    backValidation: String
     "Build link creation. True by default."
     buildLinkCreation: Boolean
     "List of notifications subscriptions to setup for this auto versioning"
@@ -3782,6 +3784,11 @@ type Project implements ProjectEntity {
     jenkinsJobProperty: Property
     "Labels for this project"
     labels: [Label!]!
+    "For each promotion, returns the last promotion run within the project"
+    lastBuildsWithPromotions(
+        "List of promotion names"
+        promotions: [String!]!
+    ): [PromotionRun!]!
     "List of links."
     linkProperty: Property
     "Links"
@@ -6314,6 +6321,8 @@ input AutoVersioningSourceConfigInput {
     autoApproval: Boolean
     "Auto approval mode"
     autoApprovalMode: AutoApprovalMode
+    "Validation stamp to create on the source build (optional)"
+    backValidation: String
     "Build link creation. True by default."
     buildLinkCreation: Boolean
     "List of notifications subscriptions to setup for this auto versioning"
