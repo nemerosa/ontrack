@@ -37,6 +37,7 @@ fun Branch.setAutoVersioningConfig(
                     .targetRegex(it.targetRegex)
                     .upgradeBranchPattern(it.upgradeBranchPattern)
                     .validationStamp(it.validationStamp)
+                    .backValidation(it.backValidation)
                     //.buildLinkCreation(it.buildLinkCreation)
                     .notifications(
                         it.notifications?.map { n ->

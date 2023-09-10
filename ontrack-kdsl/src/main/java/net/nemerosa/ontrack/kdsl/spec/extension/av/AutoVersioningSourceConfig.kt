@@ -18,4 +18,5 @@ data class AutoVersioningSourceConfig(
     val validationStamp: String? = null,
     val autoApprovalMode: AutoApprovalMode? = AutoApprovalMode.CLIENT,
     val notifications: List<AutoVersioningNotification>? = null,
+    val backValidation: String? = null,
 )

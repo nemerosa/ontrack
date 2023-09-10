@@ -141,4 +141,67 @@ class GQLTypeBuildAutoVersioningIT : AbstractAutoVersioningTestSupport() {
         }
     }
 
+    @Test
+    fun `Getting the last eligible build for a dependency using &same branch expression`() {
+        asAdmin {
+            val dependencyLinkedBuild = project<Build> {
+                branch<Build>("release/1.1") {
+                    val pl = promotionLevel("GOLD")
+                    val linkedBuild = build("1") {
+                        promote(pl)
+                    }
+                    build("2")
+                    build("3") {
+                        promote(pl)
+                    }
+                    build("4")
+                    linkedBuild
+                }
+            }
+            val parentBuild = project<Build> {
+                branch<Build>("release/1.1") {
+                    autoVersioningConfigurationService.setupAutoVersioning(
+                        this,
+                        AutoVersioningConfig(
+                            configurations = listOf(
+                                AutoVersioningTestFixtures.sourceConfig(
+                                    sourceProject = dependencyLinkedBuild.project.name,
+                                    sourceBranch = "&same",
+                                    sourcePromotion = "GOLD",
+                                )
+                            )
+                        )
+                    )
+                    build("parent-1") {
+                        linkTo(dependencyLinkedBuild)
+                    }
+                }
+            }
+
+            run(
+                """
+                {
+                    build(id: ${dependencyLinkedBuild.id}) {
+                        autoVersioning(branchId: ${parentBuild.branch.id}) {
+                            lastEligibleBuild {
+                                name
+                            }
+                        }
+                    }
+                }
+            """
+            ) { data ->
+                assertJsonNotNull(
+                    data.path("build").path("autoVersioning"),
+                    "AV config found"
+                ) {
+                    assertEquals(
+                        "3",
+                        path("lastEligibleBuild").path("name").asText()
+                    )
+                }
+            }
+        }
+    }
+
 }

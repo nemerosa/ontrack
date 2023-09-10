@@ -127,7 +127,13 @@ configurations:
     # a regular expression. If several branches are eligible, only the latest version
     # can be used, based on inverted order of semantic versioning. Branches which
     # do not comply with semantic versioning are discarded.
+    #
     # See <Targeting a series of branches> for more information.
+    #
+    # Alternatively, the sourceBranch parameter can be set to "&<expression>" where `<expression>` is
+    # used to detect the valid source branch from the source project.
+    #
+    # See <Branch expressions> below for more information.
     sourceBranch: String
     # Promotion to watch
     sourcePromotion: String
@@ -202,6 +208,23 @@ Pro's:
 Con's:
 
 * the dependency must really take care of a strong semantic versioning
+
+[[auto-versioning-config-branch-expression]]
+===== Branch expressions
+
+The `sourceBranch` parameter can be set to `&<expression>` where `<expression>` is an expression used to detect the source branch on the source project for a branch eligible for auto versioning.
+
+[NOTE]
+====
+As of now, only one expression is supported: `same`. Other methods may be supported in later releases.
+====
+
+Example: if you have a branch `release-1.24` on a parent project `P` and you want to get updates from a `dependency` project only for the same branch, `release-1.24`, you can use:
+
+[source,yaml]
+----
+sourceBranch: "&same"
+----
 
 [[auto-versioning-config-type]]
 ===== Target files types
@@ -425,6 +448,7 @@ The `postProcessingConfig` <<auto-versioning-config,property>> at branch level m
 * `commitMessage`  - Commit message to use to commit and push the result of the post-processing
 * `config` - GitHub configuration to use for the connection (optional, using defaults if not specified)
 * `workflow` - If defined, name of the workflow in _this_ repository containing the post-processing (like `post-processing.yml`)
+* `version` - the version which is upgraded to
 
 The `workflow` branch configuration property can be used to set the post-processing workflow to one in the very branch targeted by the auto versioning process.
 This would override the global settings.
@@ -598,7 +622,10 @@ The Jenkins job must accept the following parameters:
 |Branch containing the code to upgrade.
 
 |`CREDENTIALS`
-|Pipe (|) separated list of credential entries to pass to the command.
+|Pipe (\|) separated list of credential entries to pass to the command.
+
+|`VERSION`
+|The version which is upgraded to
 
 |===
 

@@ -50,7 +50,7 @@ class AutoVersioningAuditStoreImpl(
             states = AutoVersioningAuditState.runningAndNotProcessingStates,
         )
         findByFilter(filter).forEach { entry ->
-            logger.debug("Cancelling $entry")
+            logger.debug("Cancelling {}", entry)
             addState(
                 targetBranch = entry.order.branch,
                 uuid = entry.order.uuid,
@@ -71,6 +71,9 @@ class AutoVersioningAuditStoreImpl(
             order.run {
                 AutoVersioningAuditStoreData(
                     sourceProject = sourceProject,
+                    sourceBuildId = sourceBuildId,
+                    sourcePromotion = sourcePromotion,
+                    sourceBackValidation = sourceBackValidation,
                     targetPaths = targetPaths,
                     targetRegex = targetRegex,
                     targetProperty = targetProperty,
@@ -119,6 +122,9 @@ class AutoVersioningAuditStoreImpl(
                 initialData = initialData.run {
                     AutoVersioningAuditStoreData(
                         sourceProject = sourceProject,
+                        sourceBuildId = sourceBuildId,
+                        sourcePromotion = sourcePromotion,
+                        sourceBackValidation = sourceBackValidation,
                         targetPaths = targetPaths,
                         targetRegex = targetRegex,
                         targetProperty = targetProperty,
@@ -186,6 +192,9 @@ class AutoVersioningAuditStoreImpl(
                     uuid = this@toEntry.name,
                     branch = this@toEntry.entity as Branch,
                     sourceProject = sourceProject,
+                    sourceBuildId = sourceBuildId,
+                    sourcePromotion = sourcePromotion,
+                    sourceBackValidation = sourceBackValidation,
                     targetPaths = targetPaths,
                     targetRegex = targetRegex,
                     targetProperty = targetProperty,

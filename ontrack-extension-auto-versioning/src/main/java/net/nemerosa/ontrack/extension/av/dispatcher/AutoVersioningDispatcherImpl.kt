@@ -34,6 +34,9 @@ class AutoVersioningDispatcherImpl(
     ) = AutoVersioningOrder(
         uuid = UUID.randomUUID().toString(),
         sourceProject = event.build.project.name,
+        sourceBuildId = event.build.id(),
+        sourcePromotion = event.promotion,
+        sourceBackValidation = config.backValidation,
         branch = branch,
         targetPaths = config.getTargetPaths(),
         targetRegex = config.targetRegex,

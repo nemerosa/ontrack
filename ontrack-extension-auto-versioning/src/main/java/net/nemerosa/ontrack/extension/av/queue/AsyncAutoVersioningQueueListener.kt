@@ -105,7 +105,7 @@ class AsyncAutoVersioningQueueListener(
             if (entry == null) {
                 error("No audit entry found upon receiving the processing order")
             } else if (!entry.mostRecentState.state.isRunning) {
-                logger.debug("Cancelled order, not processing. $entry")
+                logger.debug("Cancelled order, not processing. {}", entry)
                 return
             }
 

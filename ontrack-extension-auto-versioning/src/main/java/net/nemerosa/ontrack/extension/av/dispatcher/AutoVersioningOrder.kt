@@ -8,7 +8,12 @@ import net.nemerosa.ontrack.model.structure.Branch
 
 data class AutoVersioningOrder(
     val uuid: String,
+    // Source information
     val sourceProject: String,
+    val sourceBuildId: Int?, // Nullable for backward compatibility
+    val sourcePromotion: String?, // Nullable for backward compatibility
+    val sourceBackValidation: String?, // Nullable for backward compatibility
+    // Target information
     val branch: Branch,
     val targetPaths: List<String>,
     override val targetRegex: String?,

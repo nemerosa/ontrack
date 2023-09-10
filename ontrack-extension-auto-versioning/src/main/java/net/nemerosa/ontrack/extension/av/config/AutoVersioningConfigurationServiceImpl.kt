@@ -19,6 +19,7 @@ class AutoVersioningConfigurationServiceImpl(
     private val ordering: OptionalVersionBranchOrdering,
     private val branchDisplayNameService: BranchDisplayNameService,
     private val eventSubscriptionService: EventSubscriptionService,
+    private val autoVersioningBranchExpressionService: AutoVersioningBranchExpressionService,
 ) : AutoVersioningConfigurationService {
 
     override fun setupAutoVersioning(branch: Branch, config: AutoVersioningConfig?) {
@@ -110,7 +111,7 @@ class AutoVersioningConfigurationServiceImpl(
         // Among these project matching configurations, retains the one
         // where the dependency branch matches the last eligible branch
         val branchMatchingConfigs = dependencyConfigs.filter {
-            val latestBranch = getLatestBranch(dependency.project, it)
+            val latestBranch = getLatestBranch(parent, dependency.project, it)
             latestBranch?.id == dependency.id
         }
         // Takes the first one
@@ -127,21 +128,26 @@ class AutoVersioningConfigurationServiceImpl(
             structureService.getBranch(ID.of(it.id))
         }
 
-    override fun getLatestBranch(project: Project, config: AutoVersioningSourceConfig): Branch? {
-        val sourceRegex = config.sourceBranch.toRegex()
-        // Version-based ordering
-        val versionComparator = ordering.getComparator(config.sourceBranch)
-        // Gets the list of branches for the source project
-        return structureService.getBranchesForProject(project.id)
-            // ... filters them by regex, using their path
-            .filter { sourceBranch ->
-                // Path of the branch
-                val sourcePath = branchDisplayNameService.getBranchDisplayName(sourceBranch)
-                // Match check
-                sourceRegex.matches(sourcePath) || sourceRegex.matches(sourceBranch.name)
-            }
-            // ... order them by version
-            .minWithOrNull(versionComparator)
+    override fun getLatestBranch(eligibleTargetBranch: Branch, project: Project, config: AutoVersioningSourceConfig): Branch? {
+        if (config.sourceBranch.startsWith("&")) {
+            val avBranchExpression = config.sourceBranch.drop(1)
+            return autoVersioningBranchExpressionService.getLatestBranch(eligibleTargetBranch, project, avBranchExpression)
+        } else {
+            val sourceRegex = config.sourceBranch.toRegex()
+            // Version-based ordering
+            val versionComparator = ordering.getComparator(config.sourceBranch)
+            // Gets the list of branches for the source project
+            return structureService.getBranchesForProject(project.id)
+                // ... filters them by regex, using their path
+                .filter { sourceBranch ->
+                    // Path of the branch
+                    val sourcePath = branchDisplayNameService.getBranchDisplayName(sourceBranch)
+                    // Match check
+                    sourceRegex.matches(sourcePath) || sourceRegex.matches(sourceBranch.name)
+                }
+                // ... order them by version
+                .minWithOrNull(versionComparator)
+        }
     }
 
     companion object {

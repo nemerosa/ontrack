@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.extension.stash.scm
 
-import net.nemerosa.ontrack.extension.scm.service.SCM
-import net.nemerosa.ontrack.extension.scm.service.SCMDetector
-import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
+import net.nemerosa.ontrack.extension.scm.service.*
 import net.nemerosa.ontrack.extension.stash.AbstractBitbucketTestSupport
 import net.nemerosa.ontrack.extension.stash.TestOnBitbucketServer
 import net.nemerosa.ontrack.extension.stash.bitbucketServerEnv
@@ -15,7 +13,37 @@ import kotlin.test.*
 class BitbucketServerSCMExtensionIT : AbstractBitbucketTestSupport() {
 
     @Autowired
+    private lateinit var extension: BitbucketServerSCMExtension
+
+    @Autowired
+    private lateinit var scmRefService: SCMRefService
+
+    @Autowired
     private lateinit var scmDetector: SCMDetector
+
+    @Test
+    fun `Using a complete SCM reference to download a file`() {
+        val config = createBitbucketServerConfig()
+        val document = scmRefService.downloadDocument(
+            "scm://bitbucket-server/${config.name}/${bitbucketServerEnv.project}/${bitbucketServerEnv.repository}/${bitbucketServerEnv.path}",
+            "text/plain"
+        ) ?: fail("Cannot download test document")
+        val content = document.content.decodeToString()
+        assertEquals(bitbucketServerEnv.pathContent.trim(), content.trim())
+    }
+
+    @Test
+    fun `Given a configuration, gets a SCM Path`() {
+        val config = createBitbucketServerConfig()
+        val (scm, path) = extension.getSCMPath(
+            config.name,
+            "${bitbucketServerEnv.project}/${bitbucketServerEnv.repository}/${bitbucketServerEnv.path}"
+        ) ?: fail("Cannot get SCM")
+        val document = scm.download(bitbucketServerEnv.defaultBranch, bitbucketServerEnv.path)
+            ?: fail("Cannot download test document")
+        val content = document.decodeToString()
+        assertEquals(bitbucketServerEnv.pathContent.trim(), content.trim())
+    }
 
     @Test
     fun `Project not configured does not have a BB Server SCM`() {

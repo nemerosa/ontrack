@@ -20,9 +20,14 @@ enum class AutoVersioningProcessingOutcome(
     SAME_VERSION("PR not created because no change in version"),
 
     /**
+     * The order was correct, but the process way not be complete because of a timeout.
+     */
+    TIMEOUT("PR not created because missing configuration"),
+
+    /**
      * The order was correct, but no PR was created because there was some missing configuration (typically
      * missing Git configuration at target project or branch).
      */
-    NO_CONFIG("PR not created because missing configuration")
+    NO_CONFIG("PR not created because missing configuration"),
 
 }

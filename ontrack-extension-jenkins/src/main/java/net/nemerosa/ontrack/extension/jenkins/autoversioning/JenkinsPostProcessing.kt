@@ -70,6 +70,7 @@ class JenkinsPostProcessing(
                 "COMMIT_MESSAGE" to (config.commitMessage ?: autoVersioningOrder.defaultCommitMessage),
                 "REPOSITORY_URI" to repositoryURI,
                 "UPGRADE_BRANCH" to upgradeBranch,
+                "VERSION" to autoVersioningOrder.targetVersion,
                 "CREDENTIALS" to (config.credentials?.renderParameter() ?: ""),
             ),
             settings.retries,

@@ -4,12 +4,14 @@ query BuildUsing(
     $size: Int! = 10,
 ) {
     builds(id: $buildId) {
-        using(offset: $offset, size: $size) {
+        usingQualified(offset: $offset, size: $size) {
             pageInfo {
                 ...PageInfoContent
             }
             pageItems {
-                ...BuildFragment
+                build {
+                    ...BuildFragment
+                }
             }
         }
     }

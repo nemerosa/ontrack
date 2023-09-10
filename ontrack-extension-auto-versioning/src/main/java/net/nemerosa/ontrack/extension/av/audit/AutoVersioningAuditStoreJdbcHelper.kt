@@ -55,6 +55,9 @@ class AutoVersioningAuditStoreJdbcHelper(
                     uuid = uuid,
                     branch = branch,
                     sourceProject = data.sourceProject,
+                    sourceBuildId = data.sourceBuildId,
+                    sourcePromotion = data.sourcePromotion,
+                    sourceBackValidation = data.sourceBackValidation,
                     targetPaths = data.targetPaths,
                     targetRegex = data.targetRegex,
                     targetProperty = data.targetProperty,
@@ -100,7 +103,7 @@ class AutoVersioningAuditStoreJdbcHelper(
             params += "state" to it.name
         }
         // Filter on state(s)
-        if (filter.states != null && filter.states.isNotEmpty()) {
+        if (!filter.states.isNullOrEmpty()) {
             val states = filter.states.joinToString(", ") { "'$it'" }
             jsonQueries += "S.json::jsonb->>'mostRecentState' IN ($states)"
         }

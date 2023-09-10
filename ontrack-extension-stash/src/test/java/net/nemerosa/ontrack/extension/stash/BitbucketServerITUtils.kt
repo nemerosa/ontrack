@@ -14,6 +14,8 @@ data class BitbucketServerEnv(
     val defaultBranch: String,
     val autoMergeUser: String?,
     val autoMergeToken: String?,
+    val path: String,
+    val pathContent: String,
 )
 
 val bitbucketServerEnv: BitbucketServerEnv by lazy {
@@ -27,6 +29,8 @@ val bitbucketServerEnv: BitbucketServerEnv by lazy {
         defaultBranch = getOptionalEnv("ontrack.test.extension.stash.branch") ?: "main",
         autoMergeUser = getOptionalEnv("ontrack.test.extension.stash.autoMergeUser") ?: "auto_merge",
         autoMergeToken = getOptionalEnv("ontrack.test.extension.stash.autoMergeToken"),
+        path = getOptionalEnv("ontrack.test.extension.stash.path") ?: "test.txt",
+        pathContent = getOptionalEnv("ontrack.test.extension.stash.pathContent") ?: "This is a test",
     )
 }
 

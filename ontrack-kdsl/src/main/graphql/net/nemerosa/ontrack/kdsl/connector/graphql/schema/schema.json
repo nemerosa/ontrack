@@ -620,6 +620,18 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "enabled",
+              "description": "enabled field",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -1732,6 +1744,18 @@
               "deprecationReason": null
             },
             {
+              "name": "backValidation",
+              "description": "Validation stamp to create on the source build (optional)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "buildLinkCreation",
               "description": "Build link creation. True by default.",
               "args": [],
@@ -1782,6 +1806,18 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "JSON",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "qualifier",
+              "description": "Qualifier for the build link to create (when links are created)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1956,6 +1992,16 @@
               "defaultValue": null
             },
             {
+              "name": "backValidation",
+              "description": "Validation stamp to create on the source build (optional)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "buildLinkCreation",
               "description": "Build link creation. True by default.",
               "type": {
@@ -1999,6 +2045,16 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "JSON",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "qualifier",
+              "description": "Qualifier for the build link to create (when links are created)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
                 "ofType": null
               },
               "defaultValue": null
@@ -3522,7 +3578,7 @@
           "fields": [
             {
               "name": "direction",
-              "description": "direction property",
+              "description": "direction field",
               "args": [],
               "type": {
                 "kind": "NON_NULL",
@@ -3538,7 +3594,7 @@
             },
             {
               "name": "linkedTo",
-              "description": "linkedTo property",
+              "description": "linkedTo field",
               "args": [],
               "type": {
                 "kind": "NON_NULL",
@@ -3554,7 +3610,7 @@
             },
             {
               "name": "decorations",
-              "description": "decorations property",
+              "description": "decorations field",
               "args": [],
               "type": {
                 "kind": "NON_NULL",
@@ -3584,7 +3640,7 @@
         {
           "kind": "OBJECT",
           "name": "BranchLinksNode",
-          "description": "Node in the graph of links for a branch.",
+          "description": "BranchLinksNode",
           "fields": [
             {
               "name": "branch",
@@ -4150,7 +4206,7 @@
               "deprecationReason": null
             },
             {
-              "name": "using",
+              "name": "usingQualified",
               "description": "List of builds being used by this one.",
               "args": [
                 {
@@ -4196,14 +4252,14 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "BuildPaginated",
+                "name": "BuildLinkPaginated",
                 "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "usedBy",
+              "name": "usedByQualified",
               "description": "List of builds using this one.",
               "args": [
                 {
@@ -4249,7 +4305,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "BuildPaginated",
+                "name": "BuildLinkPaginated",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -4669,6 +4725,95 @@
         },
         {
           "kind": "OBJECT",
+          "name": "BuildLink",
+          "description": "Qualified link to a build",
+          "fields": [
+            {
+              "name": "build",
+              "description": "Linked build",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "Build",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "qualifier",
+              "description": "Nature/qualification of the link",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "BuildLinkPaginated",
+          "description": null,
+          "fields": [
+            {
+              "name": "pageInfo",
+              "description": "Information about the current page",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PageInfo",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "pageItems",
+              "description": "Items in the current page",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "BuildLink"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
           "name": "BuildLinks",
           "description": "Build links",
           "fields": [
@@ -5068,7 +5213,7 @@
             },
             {
               "name": "propertyValue",
-              "description": "When `property` is set, matches against the property value.",
+              "description": "When the property is set, matches against the property value.",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -12578,7 +12723,7 @@
         {
           "kind": "OBJECT",
           "name": "EventSubscriptionPayload",
-          "description": "Event subscription record",
+          "description": "EventSubscriptionPayload",
           "fields": [
             {
               "name": "id",
@@ -15071,6 +15216,16 @@
                 }
               },
               "defaultValue": null
+            },
+            {
+              "name": "qualifier",
+              "description": "Qualifier for the link. Blank by default.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
             }
           ],
           "interfaces": null,
@@ -16064,36 +16219,48 @@
           "fields": [
             {
               "name": "id",
-              "description": "ID of the role",
+              "description": "id field",
               "args": [],
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "name",
-              "description": "Unique name for the role",
+              "description": "name field",
               "args": [],
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "description",
-              "description": "Description of the role",
+              "description": "description field",
               "args": [],
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -17204,7 +17371,7 @@
             },
             {
               "name": "previousStats",
-              "description": "previousStats property",
+              "description": "previousStats field",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -17500,7 +17667,7 @@
           "fields": [
             {
               "name": "stats",
-              "description": "stats property",
+              "description": "stats field",
               "args": [],
               "type": {
                 "kind": "NON_NULL",
@@ -19747,6 +19914,16 @@
               "defaultValue": null
             },
             {
+              "name": "qualifier",
+              "description": "Qualifier for the link",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "toBuild",
               "description": "ID of the build to which the link must be created",
               "type": {
@@ -19841,6 +20018,16 @@
                   "name": "String",
                   "ofType": null
                 }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "qualifier",
+              "description": "Qualifier for the link",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "defaultValue": null
             },
@@ -20013,6 +20200,16 @@
                   "name": "String",
                   "ofType": null
                 }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "qualifier",
+              "description": "Qualifier for the link",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "defaultValue": null
             }
@@ -24857,6 +25054,33 @@
         },
         {
           "kind": "OBJECT",
+          "name": "NotificationSettings",
+          "description": "Notification settings",
+          "fields": [
+            {
+              "name": "enabled",
+              "description": "Are the notifications enabled for this Ontrack instance?",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
           "name": "OntrackGitCommitInfo",
           "description": "Information about a commit",
           "fields": [
@@ -26138,7 +26362,7 @@
         {
           "kind": "OBJECT",
           "name": "Preferences",
-          "description": "Preferences of a user",
+          "description": "Preferences",
           "fields": [
             {
               "name": "branchViewVsGroups",
@@ -26508,8 +26732,8 @@
               "deprecationReason": null
             },
             {
-              "name": "staleProperty",
-              "description": "Allows to disable or delete stale branches",
+              "name": "jIRAFollowLinksProperty",
+              "description": "List of links to follow when displaying information about an issue.",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -26520,8 +26744,8 @@
               "deprecationReason": null
             },
             {
-              "name": "jIRAFollowLinksProperty",
-              "description": "List of links to follow when displaying information about an issue.",
+              "name": "staleProperty",
+              "description": "Allows to disable or delete stale branches",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -28749,36 +28973,48 @@
           "fields": [
             {
               "name": "id",
-              "description": "ID of the role",
+              "description": "id field",
               "args": [],
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "name",
-              "description": "Unique name for the role",
+              "description": "name field",
               "args": [],
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "description",
-              "description": "Description of the role",
+              "description": "description field",
               "args": [],
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -29914,6 +30150,18 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "notificationSettings",
+              "description": "Notification settings",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "NotificationSettings",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -31306,132 +31554,6 @@
               "deprecationReason": null
             },
             {
-              "name": "configurableIndicators",
-              "description": "List of configurable indicators",
-              "args": [
-                {
-                  "name": "category",
-                  "description": "Filter the indicators on their category ID",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "type",
-                  "description": "Filter the indicators on their type ID",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "LIST",
-                  "name": null,
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "ConfigurableIndicatorTypeState"
-                    }
-                  }
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "indicatorCategories",
-              "description": "List of indicator categories",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "IndicatorCategories",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "indicatorPortfolioOfPortfolios",
-              "description": "List of all portfolios",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "IndicatorPortfolioOfPortfolios",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "indicatorPortfolios",
-              "description": "List of indicator portfolios",
-              "args": [
-                {
-                  "name": "id",
-                  "description": "ID of the indicator portfolio",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "LIST",
-                  "name": null,
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "IndicatorPortfolio"
-                    }
-                  }
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "indicatorTypes",
-              "description": "List of indicator types",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "IndicatorTypes",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "indicatorViewList",
-              "description": "List of indicator views.",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "IndicatorViewList",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "notificationRecords",
               "description": "Access to the notification recordings",
               "args": [
@@ -31595,6 +31717,132 @@
                   "name": "CasC",
                   "ofType": null
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "configurableIndicators",
+              "description": "List of configurable indicators",
+              "args": [
+                {
+                  "name": "category",
+                  "description": "Filter the indicators on their category ID",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "type",
+                  "description": "Filter the indicators on their type ID",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "ConfigurableIndicatorTypeState"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "indicatorCategories",
+              "description": "List of indicator categories",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "IndicatorCategories",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "indicatorPortfolioOfPortfolios",
+              "description": "List of all portfolios",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "IndicatorPortfolioOfPortfolios",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "indicatorPortfolios",
+              "description": "List of indicator portfolios",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "ID of the indicator portfolio",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "IndicatorPortfolio"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "indicatorTypes",
+              "description": "List of indicator types",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "IndicatorTypes",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "indicatorViewList",
+              "description": "List of indicator views.",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "IndicatorViewList",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -45368,31 +45616,39 @@
           "fields": [
             {
               "name": "id",
-              "description": "Status ID",
+              "description": "id field",
               "args": [],
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "name",
-              "description": "Status display name",
+              "description": "name field",
               "args": [],
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "root",
-              "description": "Root status?",
+              "description": "root field",
               "args": [],
               "type": {
                 "kind": "SCALAR",
@@ -45404,7 +45660,7 @@
             },
             {
               "name": "passed",
-              "description": "Passing status?",
+              "description": "passed field",
               "args": [],
               "type": {
                 "kind": "SCALAR",
@@ -46169,18 +46425,6 @@
           "name": "VersionInfo",
           "description": "Version information",
           "fields": [
-            {
-              "name": "date",
-              "description": "Creation date",
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "LocalDateTime",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
             {
               "name": "display",
               "description": "Display version",

@@ -65,4 +65,5 @@ class ValidationRunStatusID(
         return id.hashCode()
     }
 
+    override fun toString(): String = id
 }

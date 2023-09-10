@@ -59,7 +59,7 @@ class GQLTypeBuildAutoVersioning(
         val av = context.config
         val dependencyBranch = context.dependencyBranch
         // Gets the latest branch
-        val latestBranch = autoVersioningConfigurationService.getLatestBranch(dependencyBranch.project, av)
+        val latestBranch = autoVersioningConfigurationService.getLatestBranch(context.parentBranch, dependencyBranch.project, av)
             ?: return null
         // Gets the latest promoted build on this branch
         return buildFilterService.standardFilterProviderData(1)

@@ -46,7 +46,11 @@ interface AutoVersioningConfigurationService {
 
     /**
      * Gets the latest eligible branch in a source project, based on the criteria of an auto versioning configuration.
+     *
+     * @param eligibleTargetBranch Target of the auto versioning containing the [config]
+     * @param project Source project
+     * @param config AV config for the [eligibleTargetBranch]
      */
-    fun getLatestBranch(project: Project, config: AutoVersioningSourceConfig): Branch?
+    fun getLatestBranch(eligibleTargetBranch: Branch, project: Project, config: AutoVersioningSourceConfig): Branch?
 
 }

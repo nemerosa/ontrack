@@ -73,7 +73,7 @@ class AutoVersioningPromotionListenerServiceImpl(
         promotionEvent: PromotionEvent,
         cache: MutableMap<Pair<Int, String>, Branch?>,
     ): AutoVersioningConfiguredBranch? {
-        logger.debug("Filtering branch ${branch.entityDisplayName} for event $promotionEvent...")
+        logger.debug("Filtering branch {} for event {}...", branch.entityDisplayName, promotionEvent)
         // The project must be configured for a SCM
         if (scmDetector.getSCM(branch.project) != null) {
             // Gets the auto versioning configuration for the branch
@@ -83,7 +83,7 @@ class AutoVersioningPromotionListenerServiceImpl(
                 // If present, gets its configurations
                 val autoVersioningConfigurations = config.configurations
                     // Filters the configurations based on the event
-                    .filter { configuration -> promotionEvent.match(configuration, cache) }
+                    .filter { configuration -> promotionEvent.match(branch, configuration, cache) }
                     // Removes any empty setup
                     .takeIf { configurations -> configurations.isNotEmpty() }
                 // Accepting the branch based on having at least one matching configuration
@@ -105,6 +105,7 @@ class AutoVersioningPromotionListenerServiceImpl(
     }
 
     private fun PromotionEvent.match(
+        eligibleTargetBranch: Branch,
         config: AutoVersioningSourceConfig,
         cache: MutableMap<Pair<Int, String>, Branch?>,
     ): Boolean {
@@ -119,7 +120,7 @@ class AutoVersioningPromotionListenerServiceImpl(
         }
         val match = config.sourceProject == build.project.name &&
                 config.sourcePromotion == promotion &&
-                sourceBranchMatch(config, cache)
+                sourceBranchMatch(eligibleTargetBranch, config, cache)
         if (logger.isDebugEnabled) {
             logger.debug("Promotion event matching: $match")
         }
@@ -127,12 +128,13 @@ class AutoVersioningPromotionListenerServiceImpl(
     }
 
     private fun PromotionEvent.sourceBranchMatch(
+        eligibleTargetBranch: Branch,
         config: AutoVersioningSourceConfig,
         cache: MutableMap<Pair<Int, String>, Branch?>,
     ): Boolean {
         val latestSourceBranch = cache.getOrPut(build.projectId() to config.sourceBranch) {
             logger.debug("""Promotion event matching based on branch latest promotion""")
-            autoVersioningConfigurationService.getLatestBranch(build.project, config)
+            autoVersioningConfigurationService.getLatestBranch(eligibleTargetBranch, build.project, config)
         }
         logger.debug("Latest branch: ${latestSourceBranch?.name}")
         // We want the promoted build to be on the latest source branch

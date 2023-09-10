@@ -123,12 +123,8 @@ class AutoVersioningValidationServiceImpl(
     private fun setupValidationStamp(
         branch: Branch,
         validationStampName: String,
-    ): ValidationStamp {
-        val vs = structureService.findValidationStampByName(branch.project.name, branch.name, validationStampName).getOrNull()
-        return vs ?: structureService.newValidationStamp(
-            ValidationStamp.of(branch, NameDescription.nd(validationStampName, "Auto created for auto versioning check"))
-        )
-    }
+    ): ValidationStamp =
+        structureService.setupValidationStamp(branch, validationStampName, "Auto created for auto versioning check")
 
     private fun getActualValidationStampName(config: AutoVersioningSourceConfig): String? =
         if (config.validationStamp.isNullOrBlank()) {
@@ -141,7 +137,7 @@ class AutoVersioningValidationServiceImpl(
 
     private fun getVersionInfo(build: Build, config: AutoVersioningSourceConfig) = VersionInfo(
         getCurrentVersion(build, config),
-        getLastVersion(config)
+        getLastVersion(build.branch, config)
     )
 
     private fun getCurrentVersion(build: Build, config: AutoVersioningSourceConfig): String? {
@@ -165,11 +161,11 @@ class AutoVersioningValidationServiceImpl(
         return autoVersioningTargetFileService.readVersion(config, lines)
     }
 
-    private fun getLastVersion(config: AutoVersioningSourceConfig): String? {
+    private fun getLastVersion(eligibleTargetBranch: Branch, config: AutoVersioningSourceConfig): String? {
         // Gets the source project
         val sourceProject = structureService.findProjectByName(config.sourceProject).getOrNull()
         // Gets the latest eligible branch for the source project
-        val sourceBranch = sourceProject?.run { autoVersionConfigurationService.getLatestBranch(sourceProject, config) }
+        val sourceBranch = sourceProject?.run { autoVersionConfigurationService.getLatestBranch(eligibleTargetBranch, sourceProject, config) }
         // Gets the latest build for this branch having the corresponding promotion
         val sourceBuild = sourceBranch?.run {
             buildFilterService.standardFilterProviderData(1)
