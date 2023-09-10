@@ -1,32 +1,12 @@
-import {lazy, useEffect, useState} from "react";
-import {FaSpinner} from "react-icons/fa";
+import useDynamic from "@components/common/Dynamic";
 
 export default function Decoration({decoration}) {
     const shortTypeName = decoration.decorationType.slice("net.nemerosa.ontrack.extension.".length)
 
-    const importDecorationDisplay = () => lazy(() =>
-        import(`./${shortTypeName}`).catch(() => {
-            console.warn(`Undefined decoration type: ${shortTypeName}`)
-            return import(`./default.js`);
-        })
-    )
+    return useDynamic({
+        path: `framework/decorations/${shortTypeName}`,
+        errorMessage: `Cannot load decoration: ${shortTypeName}`,
+        props: {decoration}
+    })
 
-    const [loadedDecorationDisplay, setLoadedDecorationDisplay] = useState(<FaSpinner/>)
-
-    useEffect(() => {
-        if (decoration) {
-            const loadDecoration = async () => {
-                const LoadedDecorationDisplay = await importDecorationDisplay()
-                setLoadedDecorationDisplay(<LoadedDecorationDisplay decoration={decoration}/>)
-            }
-            loadDecoration().then(() => {
-            })
-        }
-    }, [decoration])
-
-    return (
-        <>
-            {loadedDecorationDisplay}
-        </>
-    )
 }
