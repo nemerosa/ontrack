@@ -52,7 +52,7 @@ export default function SelectBranch({
                 value={value}
                 placeholder={placeholder}
                 defaultActiveFirstOption={true}
-                showArrow={false}
+                suffixIcon={null}
                 filterOption={false}
                 onSearch={handleSearch}
                 onChange={handleChange}
