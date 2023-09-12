@@ -18,3 +18,16 @@ fun AbstractDSLTestSupport.autoValidationStampProperty(
         )
     )
 }
+
+fun AbstractDSLTestSupport.autoPromotionLevelProperty(
+    project: Project,
+    autoCreate: Boolean = true,
+) {
+    setProperty(
+        project,
+        AutoPromotionLevelPropertyType::class.java,
+        AutoPromotionLevelProperty(
+            isAutoCreate = autoCreate,
+        )
+    )
+}
