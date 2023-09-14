@@ -18,6 +18,8 @@ data class Preferences(
     var branchViewVsGroups: Boolean = DEFAULT_BRANCH_VIEW_OPTION,
     @APIDescription("Dashboard selected by default")
     var dashboardUuid: String? = null,
+    @APIDescription("Selected branch view")
+    var selectedBranchViewKey: String? = null,
 ) {
     companion object {
         const val DEFAULT_BRANCH_VIEW_OPTION = false

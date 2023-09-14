@@ -27,6 +27,7 @@ export const gqlBuilds = gql`
                 }
                 pageItems {
                     id
+                    key: id
                     name
                     creation {
                         time
@@ -53,7 +54,18 @@ export const gqlBuilds = gql`
                             name
                         }
                         validationRuns(count: 1) {
-                            validationRunStatuses(lastOnly: true) {
+                            id
+                            runInfo {
+                                runTime
+                                sourceUri
+                            }
+                            lastStatus {
+                                creation {
+                                    time
+                                    user
+                                }
+                                description
+                                annotatedDescription
                                 statusID {
                                     id
                                     name

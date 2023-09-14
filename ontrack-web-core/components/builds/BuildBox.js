@@ -25,7 +25,7 @@ export default function BuildBox({
                                  }) {
 
     const core =
-        <Space direction="vertical">
+        <Space direction="vertical" size={0}>
             <Space>
                 {buildLink(build, text)}
                 {

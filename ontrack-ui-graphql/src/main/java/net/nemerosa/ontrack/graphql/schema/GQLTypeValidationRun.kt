@@ -5,6 +5,7 @@ import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.booleanArgument
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.toNotNull
@@ -24,6 +25,7 @@ class GQLTypeValidationRun(
     private val runInfoService: RunInfoService,
     private val validationRunData: GQLTypeValidationRunData,
     private val projectEntityInterface: GQLProjectEntityInterface,
+    private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
     freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
 ) : AbstractGQLProjectEntity<ValidationRun>(
     ValidationRun::class.java,
@@ -114,6 +116,10 @@ class GQLTypeValidationRun(
                 it.name("data")
                     .description("Data associated with the validation run")
                     .type(validationRunData.typeRef)
+            }
+            // Authorizations
+            .apply {
+                gqlInterfaceAuthorizableService.apply(this, ValidationRun::class)
             }
             // OK
             .build()

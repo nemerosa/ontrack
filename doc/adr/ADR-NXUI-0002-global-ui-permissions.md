@@ -36,3 +36,7 @@ The authorizations are filled in at server side using the
 `AuthorizationContributor` server and in particular its extensible
 variant `ExtensionAuthorizationContributor` through the
 `AuthorizationContributorExtension` extension points.
+
+# See also
+
+* [ADR-NXUI-0005-fine-entity-ui-permissions](ADR-NXUI-0005-entity-ui-permissions.md)

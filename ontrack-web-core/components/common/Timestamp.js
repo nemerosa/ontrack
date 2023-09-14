@@ -7,6 +7,7 @@ export default function Timestamp({
                                       italic = true,
                                       fontSize = '75%',
                                       prefix = '',
+                                      suffix = '',
                                   }) {
     return (
         <>
@@ -15,6 +16,7 @@ export default function Timestamp({
             }}>
                 {prefix && `${prefix} `}
                 {dayjs(value).format("YYYY MMM DD, HH:mm")}
+                {suffix && ` ${suffix}`}
             </Typography.Text>
         </>
     )

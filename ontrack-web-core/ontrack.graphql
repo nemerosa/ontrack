@@ -774,6 +774,22 @@ type CasC {
     yaml: String!
 }
 
+"Output type for the changeValidationRunStatusComment mutation."
+type ChangeValidationRunStatusCommentPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Updated validation run"
+    validationRun: ValidationRun
+}
+
+"Output type for the changeValidationRunStatus mutation."
+type ChangeValidationRunStatusPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Updated validation run"
+    validationRun: ValidationRun
+}
+
 "Reference to a chart that an entity exposes."
 type ChartDefinition {
     "Additional fields that the chart type required"
@@ -2614,6 +2630,16 @@ type LockAccountPayload implements Payload {
 }
 
 type Mutation {
+    "Change the status of a validation run"
+    changeValidationRunStatus(
+        "Input for the mutation"
+        input: ChangeValidationRunStatusInput
+    ): ChangeValidationRunStatusPayload
+    "Change the comment on a validation run status"
+    changeValidationRunStatusComment(
+        "Input for the mutation"
+        input: ChangeValidationRunStatusCommentInput
+    ): ChangeValidationRunStatusCommentPayload
     "Checks the status of the auto versioning compared to the latest versions and creates an appropriate validation"
     checkAutoVersioning(
         "Input for the mutation"
@@ -3714,6 +3740,8 @@ type Preferences {
     branchViewVsNames: Boolean!
     "Dashboard selected by default"
     dashboardUuid: String
+    "Selected branch view"
+    selectedBranchViewKey: String
 }
 
 type Project implements ProjectEntity {
@@ -4553,6 +4581,8 @@ type Query {
         "Name"
         name: String!
     ): PredefinedValidationStamp
+    "Gets the preferences of the current user"
+    preferences: Preferences!
     projects(
         "Favourite projects only"
         favourites: Boolean,
@@ -5800,9 +5830,11 @@ type ValidationIssue {
     validationRuns: [ValidationRun!]!
 }
 
-type ValidationRun implements ProjectEntity {
+type ValidationRun implements Authorizable & ProjectEntity {
     "Description with links."
     annotatedDescription: String
+    "Authorizations for this context"
+    authorizations: [Authorization!]!
     "Associated build"
     build: Build!
     creation: Signature
@@ -5880,9 +5912,11 @@ type ValidationRunPaginated {
     pageItems: [ValidationRun!]!
 }
 
-type ValidationRunStatus {
+type ValidationRunStatus implements Authorizable {
     "Description with links."
     annotatedDescription: String
+    "Authorizations for this context"
+    authorizations: [Authorization!]!
     creation: Signature
     description: String
     id: Int!
@@ -6389,6 +6423,24 @@ input CHMLLevel {
     level: CHML!
     "Count to reach to raise this level"
     value: Int!
+}
+
+"Input type for the changeValidationRunStatusComment mutation."
+input ChangeValidationRunStatusCommentInput {
+    "comment field"
+    comment: String
+    "validationRunStatusId field"
+    validationRunStatusId: Int!
+}
+
+"Input type for the changeValidationRunStatus mutation."
+input ChangeValidationRunStatusInput {
+    "Optional validation run status description"
+    description: String
+    "Validation run ID"
+    validationRunId: Int!
+    "Validation run status ID"
+    validationRunStatusId: String!
 }
 
 "Input type for the checkAutoVersioning mutation."
@@ -7728,6 +7780,10 @@ input SetPreferencesInput {
     branchViewVsGroups: Boolean
     "branchViewVsNames field"
     branchViewVsNames: Boolean
+    "Dashboard selected by default"
+    dashboardUuid: String
+    "Selected branch view"
+    selectedBranchViewKey: String
 }
 
 "Input type for the setProjectAutoPromotionLevelPropertyById mutation."

@@ -1,19 +1,21 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.TypeRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataJSONInputException
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class ValidationRunMutations(
     private val structureService: StructureService,
+    private val securityService: SecurityService,
     private val validationRunStatusService: ValidationRunStatusService,
     private val validationDataTypeService: ValidationDataTypeService,
     private val runInfoService: RunInfoService,
@@ -43,6 +45,23 @@ class ValidationRunMutations(
         ) { input ->
             val build = structureService.getBuild(ID.of(input.buildId))
             validate(build, input)
+        },
+        simpleMutation(
+            name = "changeValidationRunStatus",
+            description = "Change the status of a validation run",
+            input = ChangeValidationRunStatusInput::class,
+            outputName = "validationRun",
+            outputDescription = "Updated validation run",
+            outputType = ValidationRun::class
+        ) { input ->
+            val validationRun = structureService.getValidationRun(ID.of(input.validationRunId))
+            val runStatus = ValidationRunStatus(
+                ID.NONE,
+                securityService.currentSignature,
+                validationRunStatusService.getValidationRunStatus(input.validationRunStatusId),
+                input.description
+            )
+            structureService.newValidationRunStatus(validationRun, runStatus)
         }
     )
 
@@ -153,3 +172,12 @@ class CreateValidationRunByIdInput(
     @TypeRef
     override val runInfo: RunInfoInput?,
 ): ValidationRunInput
+
+class ChangeValidationRunStatusInput(
+    @APIDescription("Validation run ID")
+    val validationRunId: Int,
+    @APIDescription("Validation run status ID")
+    val validationRunStatusId: String,
+    @APIDescription("Optional validation run status description")
+    val description: String? = null,
+)

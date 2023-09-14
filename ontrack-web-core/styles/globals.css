@@ -38,6 +38,16 @@
 }
 
 /**
+ * Information section
+ */
+
+.ot-info {
+    width: 100%;
+    border-left: solid 3px lightgray;
+    padding-left: 6px;
+}
+
+/**
  * Small inline box
  */
 

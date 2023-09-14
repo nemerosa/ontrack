@@ -1,5 +1,5 @@
-`ADR-NXUI-0001-local-events` - local page events
-================================================
+`ADR-NXUI-0001-ui-local-events` - UI local page events
+======================================================
 
 # Context
 
@@ -25,7 +25,7 @@ Other components can register to _events_ by _name_ and react to the _values_ (f
 
 # Implementation
 
-An [`EventsContexts`](components/common/EventsContext.js) context is registered in [all pages](pages/_app.js).
+An [`EventsContexts`](../../ontrack-web-core/components/common/EventsContext.js) context is registered in [all pages](pages/_app.js).
 
 Any component which needs to emit events need to access this context and fire events. For example:
 

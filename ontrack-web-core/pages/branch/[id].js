@@ -1,6 +1,6 @@
 import {useRouter} from "next/router";
 import MainLayout from "@components/layouts/MainLayout";
-import BranchView from "@components/branches/BranchView";
+import BranchPageView from "@components/branches/BranchPageView";
 
 export default function BranchPage() {
     const router = useRouter()
@@ -10,7 +10,7 @@ export default function BranchPage() {
         <>
             <main>
                 <MainLayout>
-                    <BranchView id={id}/>
+                    <BranchPageView id={id}/>
                 </MainLayout>
             </main>
         </>

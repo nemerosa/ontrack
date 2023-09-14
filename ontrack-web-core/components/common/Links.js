@@ -114,3 +114,9 @@ export function validationRunUri(validationRun) {
 export function buildDependencyDownstreamGraph({id}) {
     return `${legacyUri()}#/extension/auto-versioning/dependency-graph/build/${id}/downstream`
 }
+
+// TODO Extensions
+
+export function gitChangeLogUri({from, to}) {
+    return `${legacyUri()}/#/extension/git/changelog?from=${from}&to=${to}`
+}
