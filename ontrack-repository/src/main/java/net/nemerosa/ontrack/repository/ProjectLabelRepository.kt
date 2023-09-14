@@ -10,6 +10,11 @@ interface ProjectLabelRepository {
     fun getLabelsForProject(project: Int): List<LabelRecord>
 
     /**
+     * Checks if a project has a given label
+     */
+    fun hasProjectLabel(project: Int, label: Int): Boolean
+
+    /**
      * Gets the projects for a label
      *
      * @return List of project IDs

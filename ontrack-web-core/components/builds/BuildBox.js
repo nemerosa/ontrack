@@ -8,18 +8,29 @@ import Timestamp from "@components/common/Timestamp";
  * @param build
  * @param text Alternative text for the build (build name by default)
  * @param extra Components to add at the right of the box
+ * @param displayDecorations If the build decorations must be displayed after the build link
  * @param creationDisplayMode How the build timestamp information is displayed:
  *   * inline (default) - just below the build links & decorations
+ *   * none - nothing to display
  *   * tooltip - as a tooltip
+ * @param className Specific CSS class to set to the box
  * @returns {JSX.Element}
  * @constructor
  */
-export default function BuildBox({build, text, extra, creationDisplayMode = "inline", className}) {
+export default function BuildBox({
+                                     build, text, extra,
+                                     displayDecorations = true,
+                                     creationDisplayMode = "inline",
+                                     className
+                                 }) {
 
     const core =
         <Space direction="vertical">
             <Space>
                 {buildLink(build, text)}
+                {
+                    displayDecorations && <Decorations entity={build}/>
+                }
             </Space>
             {
                 creationDisplayMode === 'inline' &&
@@ -38,7 +49,6 @@ export default function BuildBox({build, text, extra, creationDisplayMode = "inl
                         {core}
                     </Popover>
                 }
-                <Decorations entity={build}/>
                 {
                     creationDisplayMode !== 'tooltip' && core
                 }

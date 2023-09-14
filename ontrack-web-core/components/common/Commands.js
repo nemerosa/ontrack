@@ -1,16 +1,17 @@
-import {FaEdit, FaTimes} from "react-icons/fa";
+import {FaDoorOpen, FaTimes} from "react-icons/fa";
 import {Button, Space, Typography} from "antd";
 import Link from "next/link";
 import {homeUri} from "@components/common/Links";
-import {useContext} from "react";
-import {UserContext} from "@components/providers/UserProvider";
+import LegacyLink from "@components/common/LegacyLink";
 
-export function Command({icon, text, href, action}) {
+export function Command({icon, text, href, action, title, legacy = false}) {
     return <Button
         type="text"
         onClick={action}
+        title={title}
     >
-        {href && <Link href={href}>{icon} {text}</Link>}
+        {href && !legacy && <Link href={href}>{icon} {text}</Link>}
+        {href && legacy && <LegacyLink href={href}>{icon} {text}</LegacyLink>}
         {!href && <>
             <Space size={8}>
                 {icon}
@@ -28,17 +29,11 @@ export function CloseToHomeCommand() {
     return <CloseCommand href={homeUri()}/>
 }
 
-export function DashboardEditCommand({editionMode, onClick}) {
-    const user = useContext(UserContext)
-    return (
-        <>
-            {
-                user.authorizations?.dashboard?.edit && !editionMode ? <Command
-                    icon={<FaEdit/>}
-                    text="Edit dashboard"
-                    action={onClick}
-                /> : undefined
-            }
-        </>
-    )
+export function LegacyLinkCommand({href, text, title}) {
+    return <Command icon={<FaDoorOpen/>}
+                    href={href}
+                    text={text}
+                    title={title}
+                    legacy={true}
+    />
 }

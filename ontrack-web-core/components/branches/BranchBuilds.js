@@ -33,7 +33,7 @@ export default function BranchBuilds({builds, pageInfo, onLoadMore}) {
                                 />
                             </Col>
                             <Col span={4}>
-                                <BuildBox build={build}/>
+                                <BuildBox build={build} displayDecorations={true}/>
                             </Col>
                             <Col span={6}>
                                 <Space size={8}>

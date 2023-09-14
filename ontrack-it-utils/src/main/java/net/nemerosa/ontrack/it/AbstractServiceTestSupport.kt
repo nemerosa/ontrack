@@ -164,7 +164,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     }
 
     @JvmOverloads
-    protected fun doCreateBuild(branch: Branch = doCreateBranch(), nameDescription: NameDescription = nameDescription(), signature: Signature = of("test")): Build {
+    fun doCreateBuild(branch: Branch = doCreateBranch(), nameDescription: NameDescription = nameDescription(), signature: Signature = of("test")): Build {
         return asUser().with(branch.projectId(), BuildCreate::class.java).call {
             structureService.newBuild(
                     of(

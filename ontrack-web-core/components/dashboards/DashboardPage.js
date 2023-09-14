@@ -15,6 +15,8 @@ import {
 import {Modal} from "antd";
 import JumpToProject from "@components/projects/JumpToProject";
 import {v4} from "uuid";
+import {legacyUri} from "@components/common/Links";
+import {LegacyLinkCommand} from "@components/common/Commands";
 
 export default function DashboardPage({
                                           title,
@@ -220,6 +222,12 @@ export default function DashboardPage({
 
     const commands = [
         <JumpToProject key="project"/>,
+        <LegacyLinkCommand
+            key="legacy"
+            href={legacyUri()}
+            text="Legacy home"
+            title="Goes to the legacy home page"
+        />,
         <DashboardCommandMenu key="dashboard"/>
     ]
 

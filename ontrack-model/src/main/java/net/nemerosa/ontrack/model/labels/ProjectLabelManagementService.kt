@@ -11,6 +11,11 @@ interface ProjectLabelManagementService {
     fun getLabelsForProject(project: Project): List<Label>
 
     /**
+     * Checks if a project has a given label
+     */
+    fun hasProjectLabel(project: Project, label: Label): Boolean
+
+    /**
      * Gets the projects for a label
      *
      * @return List of project IDs

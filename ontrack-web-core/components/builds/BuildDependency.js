@@ -3,7 +3,13 @@ import {FaLink} from "react-icons/fa";
 import BuildBox from "@components/builds/BuildBox";
 import PromotionRun from "@components/promotionRuns/PromotionRun";
 
-export default function BuildDependency({link, displayPromotions, displayBox = false, displayIcon = false}) {
+export default function BuildDependency({
+                                            link,
+                                            displayProject = true,
+                                            displayPromotions,
+                                            displayBox = false,
+                                            displayIcon = false
+                                        }) {
     return (
         <BuildBox
             className={displayBox ? "ot-dependency" : undefined}
@@ -11,7 +17,11 @@ export default function BuildDependency({link, displayPromotions, displayBox = f
             text={
                 <Space>
                     {displayIcon ? <FaLink/> : undefined}
-                    {`${link.build.name} @ ${link.build.branch.project.name}`}
+                    {
+                        displayProject ?
+                            `${link.build.name} @ ${link.build.branch.project.name}` :
+                            link.build.name
+                    }
                     {link.qualifier && <Typography.Text>[{link.qualifier}]</Typography.Text>}
                 </Space>
             }

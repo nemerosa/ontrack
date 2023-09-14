@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import graphQLCall from "@client/graphQLCall";
-import {CloseCommand} from "@components/common/Commands";
-import {projectUri} from "@components/common/Links";
+import {CloseCommand, LegacyLinkCommand} from "@components/common/Commands";
+import {branchLegacyUri, projectLegacyUri, projectUri} from "@components/common/Links";
 import Head from "next/head";
 import {branchTitle} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
@@ -50,6 +50,12 @@ export default function BranchView({id}) {
                 setBranch(branch)
                 setLoadingBranch(false)
                 setCommands([
+                    <LegacyLinkCommand
+                        key="legacy"
+                        href={branchLegacyUri(branch)}
+                        text="Legacy branch"
+                        title="Goes to the legacy branch page"
+                    />,
                     <CloseCommand key="close" href={projectUri(branch.project)}/>,
                 ])
             })

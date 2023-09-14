@@ -1,12 +1,13 @@
 package net.nemerosa.ontrack.graphql.support
 
 import graphql.Scalars.*
+import graphql.language.IntValue
+import graphql.language.StringValue
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.exceptions.ArgumentMismatchException
 import net.nemerosa.ontrack.graphql.schema.listInputType
-import java.util.*
 
 /**
  * Creates a `[String!]!` GraphQL argument.
@@ -33,10 +34,16 @@ fun stringArgument(
     name: String,
     description: String,
     nullable: Boolean = true,
+    defaultValue: String? = null,
 ): GraphQLArgument = GraphQLArgument.newArgument()
     .name(name)
     .description(description)
     .type(nullableInputType(GraphQLString, nullable))
+    .apply {
+        if (defaultValue != null) {
+            defaultValueLiteral(StringValue.of(defaultValue))
+        }
+    }
     .build()
 
 /**
@@ -68,9 +75,15 @@ fun intArgument(
     name: String,
     description: String,
     nullable: Boolean = true,
+    defaultValue: Int? = null,
 ): GraphQLArgument = GraphQLArgument.newArgument()
     .name(name)
     .description(description)
+    .apply {
+        if (defaultValue != null) {
+            defaultValueLiteral(IntValue.of(defaultValue))
+        }
+    }
     .type(nullableInputType(GraphQLInt, nullable))
     .build()
 

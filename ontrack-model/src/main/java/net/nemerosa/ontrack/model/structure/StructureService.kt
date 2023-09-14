@@ -157,15 +157,32 @@ interface StructureService {
     fun getBuildsUsedBy(build: Build, offset: Int = 0, size: Int = 10, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
 
     /**
+     * Gets the total number of downstream links
+     *
+     * @param build  Source build
+     * @return Number of downstream links
+     */
+    fun getCountQualifiedBuildsUsedBy(
+        build: Build,
+    ): Int
+
+    /**
      * Gets the builds used by the given one.
      *
      * @param build  Source build
      * @param offset Offset for pagination
      * @param size   Page size for pagination
+     * @param depth  If greater than 0, looks for children up to this depth
      * @param filter Optional filter on the builds
      * @return List of qualified build links which are used by the given one
      */
-    fun getQualifiedBuildsUsedBy(build: Build, offset: Int = 0, size: Int = 10, filter: (Build) -> Boolean = { true }): PaginatedList<BuildLink>
+    fun getQualifiedBuildsUsedBy(
+        build: Build,
+        offset: Int = 0,
+        size: Int = 10,
+        depth: Int = 0,
+        filter: (Build) -> Boolean = { true },
+    ): PaginatedList<BuildLink>
 
     /**
      * Gets the builds which use the given one.

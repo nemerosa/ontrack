@@ -598,6 +598,10 @@ type Build implements Authorizable & ProjectEntity {
     usingQualified(
         "Keeps only links targeted from this branch. `project` argument is also required."
         branch: String,
+        "If greater than 0, looks for children up to this depth"
+        depth: Int = 0,
+        "Label (category:name) to filter build projects with"
+        label: String = "",
         "Offset for the page"
         offset: Int = 0,
         "Keeps only links targeted from this project"

@@ -5,7 +5,7 @@ export default function Decorations({entity}) {
     return (
         <>
             {
-                entity.decorations && <Space size={8}>
+                entity.decorations && <Space size={4}>
                     {
                         entity.decorations.map(decoration => <Decoration key={decoration.decorationType} decoration={decoration}/>)
                     }

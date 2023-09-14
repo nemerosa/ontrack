@@ -11,7 +11,7 @@ import BuildDependency from "@components/builds/BuildDependency";
 
 const {Column} = Table;
 
-export default function ProjectPromotionWidget({project, promotions, label}) {
+export default function ProjectPromotionWidget({project, promotions, depth, label}) {
 
     const [runs, setRuns] = useState([])
     const [projects, setProjects] = useState([])
@@ -28,13 +28,19 @@ export default function ProjectPromotionWidget({project, promotions, label}) {
                         query GetProjectPromotions(
                             $project: String!,
                             $promotions: [String!]!,
+                            $depth: Int = 0,
+                            $label: String = null,
                         ) {
                             projects(name: $project) {
                                 lastBuildsWithPromotions(promotions: $promotions) {
                                     ...promotionRunContent
                                     build {
                                         ...buildContent
-                                        usingQualified(size: 10) {
+                                        usingQualified(
+                                            size: 10,
+                                            depth: $depth,
+                                            label: $label,
+                                        ) {
                                             pageItems {
                                                 qualifier
                                                 build {
@@ -87,8 +93,8 @@ export default function ProjectPromotionWidget({project, promotions, label}) {
                         ${gqlDecorationFragment}
                     `
                 }
-                queryDeps={[project, promotions, label]}
-                variables={{project, promotions, label}}
+                queryDeps={[project, promotions, depth, label]}
+                variables={{project, promotions, depth, label}}
                 canQuery={() => project}
                 setData={data => {
                     const projectList = []
@@ -111,6 +117,7 @@ export default function ProjectPromotionWidget({project, promotions, label}) {
                     <ProjectPromotionWidgetForm
                         project={project}
                         promotions={promotions}
+                        depth={depth}
                         label={label}
                     />
                 }
@@ -156,6 +163,7 @@ export default function ProjectPromotionWidget({project, promotions, label}) {
                                     return <BuildDependency
                                         link={dependency}
                                         displayPromotions={true}
+                                        displayProject={false}
                                     />
                                 } else {
                                     return <Popover content={`No dependency on ${projectName}`}>

@@ -436,18 +436,53 @@ class StructureServiceImpl(
         return PaginatedList.create(list.filter(filter), offset, size)
     }
 
+    override fun getCountQualifiedBuildsUsedBy(build: Build): Int {
+        securityService.checkProjectFunction(build, ProjectView::class.java)
+        return buildLinkRepository.getCountQualifiedBuildsUsedBy(build)
+    }
+
     override fun getQualifiedBuildsUsedBy(
         build: Build,
         offset: Int,
         size: Int,
+        depth: Int,
         filter: (Build) -> Boolean
     ): PaginatedList<BuildLink> {
         securityService.checkProjectFunction(build, ProjectView::class.java)
-        // Gets the complete list, filtered by ACL
-        val list = buildLinkRepository.getQualifiedBuildsUsedBy(build)
-            .filter { b -> securityService.isProjectFunctionGranted(b.build, ProjectView::class.java) }
+        // First level dependency (depth == 0)
+        val list = internalQualifiedBuildsUsedBy(
+            build = build,
+            depth = depth
+        )
+            // Filtering using ACL
+            .filter { b ->
+                securityService.isProjectFunctionGranted(b.build, ProjectView::class.java)
+            }
         // OK
         return PaginatedList.create(list.filter { filter(it.build) }, offset, size)
+    }
+
+    private fun internalQualifiedBuildsUsedBy(
+        build: Build,
+        depth: Int,
+    ): List<BuildLink> {
+        // First level dependency (depth == 0)
+        val list = buildLinkRepository.getQualifiedBuildsUsedBy(build)
+        // Recursivity
+        return if (depth > 0) {
+            list.flatMap { link ->
+                // The top lebel build itself
+                listOf(link) +
+                        // ... and its children (without any filter)
+                        internalQualifiedBuildsUsedBy(
+                            build = link.build,
+                            depth = depth - 1, // One level less
+                        )
+            }
+        } else {
+            list
+        }
+
     }
 
     @Deprecated("Only qualified build links should be used")

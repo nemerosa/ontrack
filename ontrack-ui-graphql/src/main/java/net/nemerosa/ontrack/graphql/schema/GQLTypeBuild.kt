@@ -1,15 +1,23 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars.*
+import graphql.language.IntValue
 import graphql.schema.*
 import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType.newObject
+import net.nemerosa.ontrack.common.and
 import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
 import net.nemerosa.ontrack.graphql.schema.actions.actions
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
+import net.nemerosa.ontrack.graphql.support.intArgument
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
+import net.nemerosa.ontrack.graphql.support.stringArgument
+import net.nemerosa.ontrack.model.labels.Label
+import net.nemerosa.ontrack.model.labels.LabelManagementService
+import net.nemerosa.ontrack.model.labels.LabelNotFoundException
+import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
 import net.nemerosa.ontrack.model.pagination.PageRequest
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
@@ -28,6 +36,8 @@ class GQLTypeBuild(
     private val gqlEnumValidationRunSortingMode: GQLEnumValidationRunSortingMode,
     private val runInfoService: RunInfoService,
     private val paginatedListFactory: GQLPaginatedListFactory,
+    private val labelManagementService: LabelManagementService,
+    private val projectLabelManagementService: ProjectLabelManagementService,
     creation: GQLTypeCreation,
     projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
     freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
@@ -257,15 +267,38 @@ class GQLTypeBuild(
                             .name("branch")
                             .description("Keeps only links targeted from this branch. `project` argument is also required.")
                             .type(GraphQLString)
-                            .build()
+                            .build(),
+                        intArgument(
+                            name = "depth",
+                            description = "If greater than 0, looks for children up to this depth",
+                            nullable = true,
+                            defaultValue = 0,
+                        ),
+                        stringArgument(
+                            name = "label",
+                            description = "Label (category:name) to filter build projects with",
+                            nullable = true,
+                            defaultValue = "",
+                        )
                     ),
                     itemPaginatedListProvider = { environment, build, offset, size ->
-                        val filter: (Build) -> Boolean = getFilter(environment)
+                        val depth = environment.getArgument<Int>("depth") ?: 0
+                        var filter: (Build) -> Boolean = getFilter(environment)
+                        val label: String? = environment.getArgument("label")
+                        if (!label.isNullOrBlank()) {
+                            val (labelCategory, labelName) = Label.categoryAndNameFromDisplay(label)
+                            val actualLabel = labelManagementService.findLabels(labelCategory, labelName).firstOrNull()
+                                ?: throw LabelNotFoundException(labelCategory, labelName)
+                            filter = filter and {
+                                projectLabelManagementService.hasProjectLabel(it.project, actualLabel)
+                            }
+                        }
                         structureService.getQualifiedBuildsUsedBy(
-                            build,
-                            offset,
-                            size,
-                            filter
+                            build = build,
+                            offset = offset,
+                            size = size,
+                            depth = depth,
+                            filter = filter,
                         )
                     }
                 )

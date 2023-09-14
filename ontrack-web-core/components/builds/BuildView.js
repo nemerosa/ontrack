@@ -6,8 +6,8 @@ import LoadingContainer from "@components/common/LoadingContainer";
 import {useEffect, useState} from "react";
 import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
-import {CloseCommand} from "@components/common/Commands";
-import {branchUri} from "@components/common/Links";
+import {CloseCommand, LegacyLinkCommand} from "@components/common/Commands";
+import {branchLegacyUri, branchUri, buildLegacyUri} from "@components/common/Links";
 import {gqlDecorationFragment, gqlInformationFragment, gqlPropertiesFragment} from "@components/services/fragments";
 import BuildContent from "@components/builds/BuildContent";
 import {Space} from "antd";
@@ -62,6 +62,12 @@ export default function BuildView({id}) {
                 setBuild(data.build)
                 setLoadingBuild(false)
                 setCommands([
+                    <LegacyLinkCommand
+                        key="legacy"
+                        href={buildLegacyUri(data.build)}
+                        text="Legacy build"
+                        title="Goes to the legacy build page"
+                    />,
                     <CloseCommand key="close" href={branchUri(data.build.branch)}/>,
                 ])
             })

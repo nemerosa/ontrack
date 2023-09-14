@@ -44,6 +44,17 @@ class BuildLinkJdbcRepository(
         )
     }
 
+    override fun getCountQualifiedBuildsUsedBy(build: Build): Int =
+        namedParameterJdbcTemplate!!.queryForObject(
+            """
+                SELECT COUNT(BL.ID)
+                FROM BUILD_LINKS BL
+                WHERE BL.BUILDID = :buildId
+            """,
+            mapOf("buildId" to build.id()),
+            Int::class.java
+        ) ?: 0
+
     override fun getQualifiedBuildsUsedBy(build: Build): List<BuildLink> {
         return namedParameterJdbcTemplate!!.query(
             """

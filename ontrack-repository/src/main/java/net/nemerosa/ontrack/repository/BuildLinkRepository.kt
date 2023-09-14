@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.structure.BuildLink
 
 interface BuildLinkRepository {
 
+    fun getCountQualifiedBuildsUsedBy(build: Build): Int
     fun getQualifiedBuildsUsedBy(build: Build): List<BuildLink>
     fun getQualifiedBuildsUsing(build: Build): List<BuildLink>
 

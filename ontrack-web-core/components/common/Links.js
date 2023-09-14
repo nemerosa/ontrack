@@ -26,12 +26,20 @@ export function projectUri(project) {
     return `${uiConfig.prefix}/project/${project.id}`
 }
 
+export function projectLegacyUri(project) {
+    return `${legacyUri()}#/project/${project.id}`
+}
+
 export function projectLink(project, text) {
     return <Link href={projectUri(project)}>{text ? text : project.name}</Link>
 }
 
 export function branchUri(branch) {
     return `${uiConfig.prefix}/branch/${branch.id}`
+}
+
+export function branchLegacyUri(branch) {
+    return `${legacyUri()}#/branch/${branch.id}`
 }
 
 export function branchLink(branch, text) {
@@ -42,8 +50,15 @@ export function buildUri(build) {
     return `${uiConfig.prefix}/build/${build.id}`
 }
 
+export function buildLegacyUri(build) {
+    return `${legacyUri()}#/build/${build.id}`
+}
+
 export function buildLink(build, text) {
-    return <Link href={buildUri(build)}>{text ? text : build.name}</Link>
+    return <Link
+        href={buildUri(build)}
+        title="Link to build page"
+    >{text ? text : build.name}</Link>
 }
 
 export function promotionLevelUri(promotionLevel) {
@@ -94,4 +109,8 @@ export function validationStampUri(validationStamp) {
 
 export function validationRunUri(validationRun) {
     return `${legacyUri()}#/validationRun/${validationRun.id}`
+}
+
+export function buildDependencyDownstreamGraph({id}) {
+    return `${legacyUri()}#/extension/auto-versioning/dependency-graph/build/${id}/downstream`
 }

@@ -12,6 +12,7 @@ class ProjectPromotionsWidget : AbstractWidget<ProjectPromotionsWidget.ProjectPr
     data class ProjectPromotionsWidgetConfig(
         val project: String?,
         val promotions: List<String> = emptyList(),
+        val depth: Int? = null,
         val label: String? = null,
     ) : WidgetConfig
 }
