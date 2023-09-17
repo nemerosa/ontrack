@@ -40,19 +40,25 @@ export default function FormDialog({dialog, onValuesChange, children}) {
         try {
             const values = await form.validateFields()
             if (dialog.prepareValues) dialog.prepareValues(values, dialog.context)
-            const data = await graphQLCall(
-                dialog.query,
-                values
-            )
-            const result = data[dialog.userNode]
-            const errors = getUserErrors(result)
+            let result
+            let errors = undefined
+            if (dialog.query) {
+                const data = await graphQLCall(
+                    dialog.query,
+                    values
+                )
+                result = data[dialog.userNode]
+                errors = getUserErrors(result)
+            } else {
+                result = values
+            }
             if (errors) {
                 setFormErrors(errors)
             } else {
                 dialog.setOpen(false)
                 form.resetFields()
                 if (dialog.onSuccess) {
-                    dialog.onSuccess(result)
+                    dialog.onSuccess(result, dialog.context)
                 }
             }
         } catch (ignored) {

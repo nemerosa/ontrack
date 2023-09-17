@@ -19,7 +19,7 @@ To set a query field in the URL, the component can use:
 
 ```javascript
 router.replace({
-    pathname: router.asPath,
+    pathname: `your/path`,
     query: {my_field: my_value}
-})
+}, undefined, {shallow: true})
 ```

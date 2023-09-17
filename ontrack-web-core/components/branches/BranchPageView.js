@@ -77,6 +77,11 @@ export default function BranchPageView({id}) {
                                 id
                                 name
                             }
+                            authorizations {
+                                name
+                                action
+                                authorized
+                            }
                             properties {
                                 ...propertiesFragment
                             }

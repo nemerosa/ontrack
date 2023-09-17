@@ -28,9 +28,10 @@ const {Column} = Table;
  * @param onChange Callback when builds, runs, statuses, etc. need to be reloaded after a user action
  */
 export default function BranchBuilds({
-                                         builds, loadingBuilds, pageInfo, onLoadMore, rangeSelection,
+                                         branch, builds, loadingBuilds, pageInfo, onLoadMore, rangeSelection,
                                          validationStamps, loadingValidationStamps,
                                          onChange,
+                                         selectedBuildFilter, onSelectedBuildFilter, onPermalinkBuildFilter,
                                      }) {
 
     const router = useRouter()
@@ -81,13 +82,6 @@ export default function BranchBuilds({
                                         </Space>
                                     </Button>
                                 </Popover>
-                                {
-                                    loadingBuilds &&
-                                    <Space>
-                                        <Spin/>
-                                        <Typography.Text disabled>Loading builds...</Typography.Text>
-                                    </Space>
-                                }
                             </Space>
                         </>
                     )}
@@ -102,6 +96,10 @@ export default function BranchBuilds({
                             <Space>
                                 {/* Build filter */}
                                 <BuildFilterDropdown
+                                    branch={branch}
+                                    selectedBuildFilter={selectedBuildFilter}
+                                    onSelectedBuildFilter={onSelectedBuildFilter}
+                                    onPermalink={onPermalinkBuildFilter}
                                 />
                                 {/* Change log */}
                                 <LegacyIndicator>
@@ -126,9 +124,15 @@ export default function BranchBuilds({
                                 </LegacyIndicator>
                                 {/* VS filter */}
                                 <ValidationStampFilterDropdown
-                                    initialGrouping={grouping}
+                                    grouping={grouping}
                                     onGroupingChange={onGroupingChange}
                                 />
+                                {
+                                    loadingBuilds &&
+                                    <Popover content="Loading builds...">
+                                        <Spin/>
+                                    </Popover>
+                                }
                             </Space>
                         }
                         render={(_, build) =>

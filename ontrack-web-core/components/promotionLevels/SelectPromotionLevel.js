@@ -4,7 +4,7 @@ import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import {PromotionLevelImage} from "@components/common/Links";
 
-export default function SelectPromotionLevel({branch, value, onChange, useName = false}) {
+export default function SelectPromotionLevel({branch, value, onChange, useName = false, allowClear = false}) {
 
     const [options, setOptions] = useState([])
 
@@ -44,6 +44,7 @@ export default function SelectPromotionLevel({branch, value, onChange, useName =
             options={options}
             value={value}
             onChange={onChange}
+            allowClear={allowClear}
         />
     )
 }

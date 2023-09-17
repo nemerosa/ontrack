@@ -12,3 +12,13 @@ export default function useDynamic({path, props, errorMessage}, dependencies = [
     </Suspense>
 
 }
+
+export function Dynamic({path, props, errorMessage, dependencies = []}) {
+    return (
+        <>
+            {
+                useDynamic({path, props, errorMessage}, dependencies)
+            }
+        </>
+    )
+}

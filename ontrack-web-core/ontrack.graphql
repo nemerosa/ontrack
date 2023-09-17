@@ -277,11 +277,13 @@ type AutoVersioningSourceConfig {
     validationStamp: String
 }
 
-type Branch implements ProjectEntity {
+type Branch implements Authorizable & ProjectEntity {
     "Description with links."
     annotatedDescription: String
     "Synchronisation of the promotions with Artifactory build statuses"
     artifactoryPromotionSyncProperty: Property
+    "Authorizations for this context"
+    authorizations: [Authorization!]!
     "Auto versioning configuration"
     autoVersioningConfig: AutoVersioningConfig
     "Actions to get a diff on builds of the branch"
@@ -675,7 +677,7 @@ type BuildAutoVersioning {
 "Form to create a new build filter."
 type BuildFilterForm {
     "Form for the filter."
-    form: JSON
+    form: JSON @deprecated(reason: "Form is only used for the Ontrack legacy UI")
     "If the filter is predefined and cannot be configured."
     isPredefined: Boolean
     "FQCN for the build filter provider"
@@ -1067,6 +1069,12 @@ type DeleteBranchReleaseValidationPropertyByIdPayload implements Payload {
 type DeleteBranchReleaseValidationPropertyPayload implements Payload {
     "Branch updated"
     branch: Branch
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the deleteBuildFilter mutation."
+type DeleteBuildFilterPayload implements Payload {
     "List of errors"
     errors: [UserError]
 }
@@ -2755,6 +2763,11 @@ type Mutation {
         "Input for the mutation"
         input: DeleteBranchReleaseValidationPropertyByIdInput
     ): DeleteBranchReleaseValidationPropertyByIdPayload
+    "Deletes a build filter for current user and for all users if shared"
+    deleteBuildFilter(
+        "Input for the mutation"
+        input: DeleteBuildFilterInput
+    ): DeleteBuildFilterPayload
     "Deletes the git commit property on a build identified by name."
     deleteBuildGitCommitProperty(
         "Input for the mutation"
@@ -3130,6 +3143,11 @@ type Mutation {
     purgeQueueRecordings: PurgeQueueRecordingsPayload
     "Reload the configuration from the CasC files"
     reloadCasc: ReloadCascPayload
+    "Saves a build filter in the user preferences"
+    saveBuildFilter(
+        "Input for the mutation"
+        input: SaveBuildFilterInput
+    ): SaveBuildFilterPayload
     "Saves a dashboard"
     saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
     "Selects a dashboard"
@@ -3524,6 +3542,11 @@ type Mutation {
         "Input for the mutation"
         input: SetupValidationStampInput
     ): SetupValidationStampPayload
+    "Shares a build filter for all users"
+    shareBuildFilter(
+        "Input for the mutation"
+        input: ShareBuildFilterInput
+    ): ShareBuildFilterPayload
     "Shares a dashboard"
     shareDashboard(input: ShareDashboardInput!): ShareDashboardPayload
     "Shares or updates a filter at project level"
@@ -4920,6 +4943,12 @@ type SCMFileChangeFilters {
     filters: [SCMFileChangeFilter!]!
 }
 
+"Output type for the saveBuildFilter mutation."
+type SaveBuildFilterPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 type SaveDashboardPayload implements PayloadInterface {
     "Saved dashboard"
     dashboard: Dashboard
@@ -5603,6 +5632,12 @@ type SetupValidationStampPayload implements Payload {
     errors: [UserError]
     "Created or updated validation stamp"
     validationStamp: ValidationStamp
+}
+
+"Output type for the shareBuildFilter mutation."
+type ShareBuildFilterPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
 }
 
 type ShareDashboardPayload implements PayloadInterface {
@@ -6723,6 +6758,14 @@ input DeleteBranchReleaseValidationPropertyInput {
     project: String!
 }
 
+"Input type for the deleteBuildFilter mutation."
+input DeleteBuildFilterInput {
+    "branchId field"
+    branchId: Int!
+    "name field"
+    name: String!
+}
+
 "Input type for the deleteBuildGitCommitPropertyById mutation."
 input DeleteBuildGitCommitPropertyByIdInput {
     "ID of the build"
@@ -7518,6 +7561,18 @@ input RunInfoInput {
     triggerData: String
     "Type of trigger (like \"scm\" or \"user\")"
     triggerType: String
+}
+
+"Input type for the saveBuildFilter mutation."
+input SaveBuildFilterInput {
+    "branchId field"
+    branchId: Int!
+    "data field"
+    data: JSON!
+    "name field"
+    name: String!
+    "type field"
+    type: String!
 }
 
 input SaveDashboardInput {
@@ -8470,6 +8525,18 @@ input SetupValidationStampInput {
     project: String!
     "validation field"
     validation: String!
+}
+
+"Input type for the shareBuildFilter mutation."
+input ShareBuildFilterInput {
+    "branchId field"
+    branchId: Int!
+    "data field"
+    data: JSON!
+    "name field"
+    name: String!
+    "type field"
+    type: String!
 }
 
 input ShareDashboardInput {

@@ -5,8 +5,13 @@ import {Space} from "antd";
 import BranchBuilds from "@components/branches/BranchBuilds";
 import useRangeSelection from "@components/common/RangeSelection";
 import {gql} from "graphql-request";
+import {getLocallySelectedBuildFilter, setLocallySelectedBuildFilter} from "@components/storage/local";
+import {useRouter} from "next/router";
 
 export default function ClassicBranchView({branch}) {
+
+    // Router (used for permalinks)
+    const router = useRouter()
 
     // Pagination status
     const [pagination, setPagination] = useState({
@@ -21,6 +26,39 @@ export default function ClassicBranchView({branch}) {
     })
     const [buildsReloads, setBuildsReloads] = useState(0)
 
+    // Initially selected build filter
+    let initialBuildFilter = undefined
+    const {buildFilter} = router.query
+    if (buildFilter) {
+        try {
+            initialBuildFilter = JSON.parse(buildFilter)
+            // Clears the permalink
+            router.replace({
+                pathname: `/branch/${branch.id}`,
+                query: {}
+            }, undefined, {shallow: true})
+        } catch (ignored) {}
+    } else {
+        initialBuildFilter = getLocallySelectedBuildFilter(branch.id)
+    }
+
+    // Selected build filter
+    const [selectedBuildFilter, setSelectedBuildFilter] = useState(initialBuildFilter)
+    const onSelectedBuildFilter = (resource) => {
+        setLocallySelectedBuildFilter(branch.id, resource)
+        setSelectedBuildFilter(resource)
+    }
+    const onPermalinkBuildFilter = (resource) => {
+        if (resource) {
+            router.replace({
+                pathname: `/branch/${branch.id}`,
+                query: {
+                    buildFilter: JSON.stringify(resource),
+                }
+            }, undefined, {shallow: true})
+        }
+    }
+
     // Loading the builds
     const [loadingBuilds, setLoadingBuilds] = useState(true)
     useEffect(() => {
@@ -30,14 +68,13 @@ export default function ClassicBranchView({branch}) {
                 branchId: branch.id,
                 offset: pagination.offset,
                 size: pagination.size,
-                // filterType: buildFilter.type,
+                filterType: selectedBuildFilter?.type,
                 // GraphQL type for the filter data is expected to be a string
-                // filterData: JSON.stringify(buildFilter.data),
+                filterData: selectedBuildFilter ? JSON.stringify(selectedBuildFilter.data) : undefined,
             }).then(data => {
                 const buildPage = data.branches[0].buildsPaginated
                 // Builds page info (for the more button)
                 setBuildsPageInfo(buildPage.pageInfo)
-                // TODO Computing validation status groups
                 // Completing the builds list of a pagination request (based on offset > 0)
                 if (pagination.offset > 0) {
                     setBuilds([...builds, ...buildPage.pageItems])
@@ -48,7 +85,7 @@ export default function ClassicBranchView({branch}) {
                 setLoadingBuilds(false)
             })
         }
-    }, [branch, pagination, buildsReloads])
+    }, [branch, pagination, buildsReloads, selectedBuildFilter])
 
     // Loading more builds
     const onLoadMoreBuilds = () => {
@@ -97,6 +134,7 @@ export default function ClassicBranchView({branch}) {
         <>
             <Space direction="vertical" className="ot-line">
                 <BranchBuilds
+                    branch={branch}
                     builds={builds}
                     loadingBuilds={loadingBuilds}
                     pageInfo={buildsPageInfo}
@@ -105,6 +143,9 @@ export default function ClassicBranchView({branch}) {
                     validationStamps={validationStamps}
                     loadingValidationStamps={loadingValidationStamps}
                     onChange={reloadBuilds}
+                    selectedBuildFilter={selectedBuildFilter}
+                    onSelectedBuildFilter={onSelectedBuildFilter}
+                    onPermalinkBuildFilter={onPermalinkBuildFilter}
                 />
             </Space>
         </>

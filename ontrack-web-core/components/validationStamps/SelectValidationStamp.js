@@ -5,7 +5,7 @@ import {gql} from "graphql-request";
 import {PromotionLevelImage} from "@components/common/Links";
 import ValidationStampImage from "@components/validationStamps/ValidationStampImage";
 
-export default function SelectValidationStamp({branch, value, onChange, onValidationStampSelected, useName = false}) {
+export default function SelectValidationStamp({branch, value, onChange, onValidationStampSelected, useName = false, allowClear = false}) {
 
     const [validationStamps, setValidationStamps] = useState([])
     const [options, setOptions] = useState([])
@@ -67,6 +67,7 @@ export default function SelectValidationStamp({branch, value, onChange, onValida
             options={options}
             value={value}
             onChange={onLocalChange}
+            allowClear={allowClear}
         />
     )
 }

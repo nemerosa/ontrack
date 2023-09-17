@@ -1,18 +1,26 @@
-import {Space, Typography} from "antd";
+import {Space} from "antd";
 import {FaCheck} from "react-icons/fa";
-import {useState} from "react";
 
-export default function SelectableMenuItem({text, initialSelectedValue, onChange}) {
-    const [selected, setSelected] = useState(initialSelectedValue)
-    const onClick = () => {
-        let newValue = !selected;
-        setSelected(newValue)
-        if (onChange) onChange(newValue)
+export default function SelectableMenuItem(
+    {
+        icon,
+        text,
+        value,
+        onChange,
+        extra,
     }
-    return <Space onClick={onClick}>
-        {
-            selected ? <FaCheck/> : undefined
-        }
-        <Typography.Text>{text}</Typography.Text>
-    </Space>
+) {
+    return (
+        <Space>
+            {/* Select icon or placeholder */}
+            {value ? <FaCheck/> : undefined}
+            {/* Menu body */}
+            <Space onClick={onChange} className="ot-action">
+                {icon}
+                {text}
+            </Space>
+            {/* Extra (commands...) */}
+            {extra}
+        </Space>
+    )
 }

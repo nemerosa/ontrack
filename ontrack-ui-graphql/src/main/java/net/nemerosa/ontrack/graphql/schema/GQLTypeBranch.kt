@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars
 import graphql.schema.*
+import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.disabledField
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
@@ -26,6 +27,7 @@ class GQLTypeBranch(
     freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>,
     private val gqlPaginatedListFactory: GQLPaginatedListFactory,
     private val branchFavouriteService: BranchFavouriteService,
+    private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
 ) : AbstractGQLProjectEntity<Branch>(
     Branch::class.java,
     ProjectEntityType.BRANCH,
@@ -48,6 +50,10 @@ class GQLTypeBranch(
                 .type(GraphQLTypeReference(GQLTypeProject.PROJECT))
                 .build()
         )
+        // Authorizations
+        .apply {
+            gqlInterfaceAuthorizableService.apply(this, Branch::class)
+        }
         // Is this branch a favourite?
         .field {
             it.name("favourite")
