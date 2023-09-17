@@ -18,6 +18,7 @@ export function useBuildValidateDialog(config) {
             })
         },
         prepareValues: (values, context) => {
+            console.log({values})
             values.buildId = context.build.id
         },
         query: gql`
