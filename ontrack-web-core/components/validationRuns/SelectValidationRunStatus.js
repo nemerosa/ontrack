@@ -21,7 +21,11 @@ export default function SelectValidationRunStatus({
             value: vrs.id,
             label: vrs.name,
         })) :
-        [] // TODO Roots
+        validationRunStatuses.roots.map(vrs => ({
+            ...vrs,
+            value: vrs.id,
+            label: vrs.name,
+        }))
 
     return (
         <>

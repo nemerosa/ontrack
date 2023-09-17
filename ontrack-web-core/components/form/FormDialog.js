@@ -23,7 +23,7 @@ export function useFormDialog(config) {
     }
 }
 
-export default function FormDialog({dialog, children}) {
+export default function FormDialog({dialog, onValuesChange, children}) {
 
     const form = dialog.form
     const [formErrors, setFormErrors] = useState([]);
@@ -74,6 +74,7 @@ export default function FormDialog({dialog, children}) {
                 <Form
                     layout="vertical"
                     form={form}
+                    onValuesChange={onValuesChange}
                 >
                     {children}
                 </Form>

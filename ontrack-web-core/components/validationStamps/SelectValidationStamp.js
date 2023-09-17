@@ -5,8 +5,9 @@ import {gql} from "graphql-request";
 import {PromotionLevelImage} from "@components/common/Links";
 import ValidationStampImage from "@components/validationStamps/ValidationStampImage";
 
-export default function SelectValidationStamp({branch, value, onChange, useName = false}) {
+export default function SelectValidationStamp({branch, value, onChange, onValidationStampSelected, useName = false}) {
 
+    const [validationStamps, setValidationStamps] = useState([])
     const [options, setOptions] = useState([])
 
     useEffect(() => {
@@ -33,6 +34,7 @@ export default function SelectValidationStamp({branch, value, onChange, useName 
                 `,
                 {branchId: branch.id}
             ).then(data => {
+                setValidationStamps(data.branches[0].validationStamps)
                 setOptions(data.branches[0].validationStamps.map(vs => {
                     return {
                         value: useName ? vs.name : vs.id,
@@ -46,11 +48,25 @@ export default function SelectValidationStamp({branch, value, onChange, useName 
         }
     }, [branch]);
 
+    const onLocalChange = (value) => {
+        if (onChange) onChange(value)
+        if (onValidationStampSelected) {
+            const vs = validationStamps.find(it => {
+                if (useName) {
+                    return it.name === value
+                } else {
+                    return it.id === value
+                }
+            })
+            onValidationStampSelected(vs)
+        }
+    }
+
     return (
         <Select
             options={options}
             value={value}
-            onChange={onChange}
+            onChange={onLocalChange}
         />
     )
 }

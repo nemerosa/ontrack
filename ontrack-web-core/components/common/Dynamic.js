@@ -17,7 +17,7 @@ export default function useDynamic({path, props, errorMessage}, dependencies = [
                     const LoadedComponent = await importComponent()
                     setLoadedComponent(<LoadedComponent {...props}/>)
                 } catch (any) {
-                    console.warn(errorMessage)
+                    console.error(errorMessage, any)
                     setLoadedComponent(<Alert
                         type="error"
                         message={errorMessage}

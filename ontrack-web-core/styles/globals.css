@@ -48,6 +48,18 @@
 }
 
 /**
+ * Well (inspired by Bootstrap)
+ */
+
+.ot-well {
+    width: 100%;
+    background-color: rgb(230, 230, 230);
+    border: solid 1px darkgrey;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+/**
  * Small inline box
  */
 

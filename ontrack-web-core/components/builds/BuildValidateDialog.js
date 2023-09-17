@@ -2,6 +2,10 @@ import FormDialog, {useFormDialog} from "@components/form/FormDialog";
 import {Form, Input} from "antd";
 import {gql} from "graphql-request";
 import SelectValidationStamp from "@components/validationStamps/SelectValidationStamp";
+import SelectValidationRunStatus from "@components/validationRuns/SelectValidationRunStatus";
+import Well from "@components/common/Well";
+import {useState} from "react";
+import ValidationRunDataForm from "@components/framework/validation-run-data-form/ValidationRunDataForm";
 
 const {TextArea} = Input;
 
@@ -15,7 +19,6 @@ export function useBuildValidateDialog(config) {
         },
         prepareValues: (values, context) => {
             values.buildId = context.build.id
-            values.validationStamp = values.validationStamp
         },
         query: gql`
             #            mutation PromoteBuild($buildId: Int!, $promotion: String!, $description: String, $dateTime: LocalDateTime) {
@@ -36,6 +39,13 @@ export function useBuildValidateDialog(config) {
 }
 
 export default function BuildValidateDialog({buildValidateDialog}) {
+
+    const [dataType, setDataType] = useState()
+
+    const onValidationStampSelected = (vs) => {
+        setDataType(vs.dataType)
+    }
+
     return (
         <>
             <FormDialog dialog={buildValidateDialog}>
@@ -52,11 +62,36 @@ export default function BuildValidateDialog({buildValidateDialog}) {
                     <SelectValidationStamp
                         branch={buildValidateDialog?.context?.build?.branch}
                         useName={true}
+                        onValidationStampSelected={onValidationStampSelected}
                     />
                 </Form.Item>
-                {/* TODO Validation data (depends on the validation stamp) */}
-                {/* TODO Status */}
-                {/* TODO Description */}
+                {/* Validation data (depends on the validation stamp) */}
+                {
+                    dataType &&
+                    <Form.Item
+                        label="Validation data"
+                    >
+                        <Well>
+                            <ValidationRunDataForm
+                                dataType={dataType}
+                            />
+                        </Well>
+                    </Form.Item>
+                }
+                {/* Status */}
+                <Form.Item
+                    name="status"
+                    label="Status"
+                >
+                    <SelectValidationRunStatus/>
+                </Form.Item>
+                {/* Description */}
+                <Form.Item
+                    name="description"
+                    label="Description"
+                >
+                    <TextArea rows={4}/>
+                </Form.Item>
             </FormDialog>
         </>
     )
