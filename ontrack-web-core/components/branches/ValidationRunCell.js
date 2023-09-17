@@ -20,7 +20,7 @@ export default function ValidationRunCell({build, validationStamp, onChange}) {
     const validationRunHistoryDialog = useValidationRunHistoryDialog();
 
     const displayRunStatuses = () => {
-        validationRunHistoryDialog.start()
+        validationRunHistoryDialog.start(run)
     }
 
     return (
@@ -67,7 +67,6 @@ export default function ValidationRunCell({build, validationStamp, onChange}) {
                         }
                     />
                     <ValidationRunHistoryDialog
-                        run={run}
                         dialog={validationRunHistoryDialog}
                         onChange={onChange}
                     />

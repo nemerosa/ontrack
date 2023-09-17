@@ -8,10 +8,11 @@ import ValidationRunLink from "@components/validationRuns/ValidationRunLink";
 import ValidationRunStatus from "@components/validationRuns/ValidationRunStatus";
 import Duration from "@components/common/Duration";
 import Timestamp from "@components/common/Timestamp";
-import {FaEraser, FaInfoCircle} from "react-icons/fa";
+import {FaEraser, FaGavel, FaInfoCircle} from "react-icons/fa";
 import AnnotatedDescription from "@components/common/AnnotatedDescription";
 import ValidationRunData from "@components/framework/validation-run-data/ValidationRunData";
 import ValidationRunSortingMode from "@components/validationRuns/ValidationRunSortingMode";
+import BuildValidateAction from "@components/builds/BuildValidateAction";
 
 export default function BuildContentValidations({build}) {
 
@@ -248,6 +249,17 @@ export default function BuildContentValidations({build}) {
                          extra={
                              <>
                                  <Space>
+                                     {/* Validates the current build */}
+                                     <BuildValidateAction
+                                         build={build}
+                                     >
+                                         <Button>
+                                             <Space>
+                                                 <FaGavel/>
+                                                 <Typography.Text>Validate</Typography.Text>
+                                             </Space>
+                                         </Button>
+                                     </BuildValidateAction>
                                      {/* Reset filter */}
                                      <Button onClick={resetFilters}>
                                          <Space>

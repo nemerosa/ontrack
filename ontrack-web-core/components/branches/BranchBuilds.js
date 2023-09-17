@@ -10,6 +10,9 @@ import BuildFilterDropdown from "@components/branches/filters/builds/BuildFilter
 import ValidationStampFilterDropdown from "@components/branches/filters/validationStamps/ValidationStampFilterDropdown";
 import ValidationStampHeader from "@components/branches/ValidationStampHeader";
 import ValidationRunCell from "@components/branches/ValidationRunCell";
+import {useState} from "react";
+import ValidationGroups from "@components/validationRuns/ValidationGroups";
+import {usePreferences} from "@components/providers/PreferencesProvider";
 
 const {Column} = Table;
 
@@ -40,6 +43,16 @@ export default function BranchBuilds({
             // noinspection JSIgnoredPromiseFromCall
             router.push(gitChangeLogUri({from, to}))
         }
+    }
+
+    // Preferences for the display (filters, options...)
+
+    const {branchViewVsGroups, setPreferences} = usePreferences()
+
+    const [grouping, setGrouping] = useState(branchViewVsGroups)
+    const onGroupingChange = (value) => {
+        setPreferences({branchViewVsGroups: value})
+        setGrouping(value)
     }
 
     return (
@@ -113,6 +126,8 @@ export default function BranchBuilds({
                                 </LegacyIndicator>
                                 {/* VS filter */}
                                 <ValidationStampFilterDropdown
+                                    initialGrouping={grouping}
+                                    onGroupingChange={onGroupingChange}
                                 />
                             </Space>
                         }
@@ -150,24 +165,46 @@ export default function BranchBuilds({
                     />
                     {/* One column per validation stamp */}
                     {
-                        validationStamps.map(validationStamp => (
-                            <Column
-                                key={validationStamp.name}
-                                title={
-                                    <ValidationStampHeader
-                                        key={validationStamp.id}
-                                        validationStamp={validationStamp}
-                                    />
+                        validationStamps
+                            .filter(validationStamp => {
+                                // TODO If a filter is selected, we use only this filter
+                                // If grouping is selected, we keep only the validation stamps which are
+                                // part of the current filter
+                                if (grouping) {
+                                    // TODO Uses the current filter
+                                    return false
+                                } else {
+                                    // No grouping, no filter, we display ALL the validation stamps
+                                    return true
                                 }
-                                render={(_, build) =>
-                                    <ValidationRunCell
-                                        build={build}
-                                        validationStamp={validationStamp}
-                                        onChange={onChange}
-                                    />
-                                }
-                            />
-                        ))
+                            })
+                            .map(validationStamp => (
+                                <Column
+                                    key={validationStamp.name}
+                                    title={
+                                        <ValidationStampHeader
+                                            key={validationStamp.id}
+                                            validationStamp={validationStamp}
+                                        />
+                                    }
+                                    render={(_, build) =>
+                                        <ValidationRunCell
+                                            build={build}
+                                            validationStamp={validationStamp}
+                                            onChange={onChange}
+                                        />
+                                    }
+                                />
+                            ))
+                    }
+                    {/* Grouping per validation status */}
+                    {
+                        grouping && <Column
+                            key="groups"
+                            render={(_, build) =>
+                                <ValidationGroups build={build}/>
+                            }
+                        />
                     }
                 </Table>
             </Space>

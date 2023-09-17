@@ -52,6 +52,9 @@ export const gqlBuilds = gql`
                         validationStamp {
                             id
                             name
+                            description
+                            annotatedDescription
+                            image
                         }
                         validationRuns(count: 1) {
                             id

@@ -1,8 +1,16 @@
 import {Button, Dropdown, Space, Typography} from "antd";
-import {FaCaretDown, FaCheck, FaFilter} from "react-icons/fa";
+import {FaCaretDown, FaFilter} from "react-icons/fa";
 import {useEffect, useState} from "react";
+import SelectableMenuItem from "@components/common/SelectableMenuItem";
 
-export default function ValidationStampFilterDropdown() {
+/**
+ * @param initialGrouping Initial value for the grouping preference
+ * @param onGroupingChange Callback when the grouping preference changes
+ */
+export default function ValidationStampFilterDropdown({
+                                                          initialGrouping,
+                                                          onGroupingChange,
+                                                      }) {
 
     const [items, setItems] = useState([])
 
@@ -15,9 +23,11 @@ export default function ValidationStampFilterDropdown() {
         // Grouping the VS
         menu.push({
             key: 'group',
-            label: "Group validation stamps per status",
-            icon: <FaCheck/>,
-            // TODO Activate/deactivate the grouping
+            label: <SelectableMenuItem
+                text="Group validation stamps per status"
+                initialSelectedValue={initialGrouping}
+                onChange={onGroupingChange}
+            />,
         })
         // OK
         setItems(menu)

@@ -4,7 +4,7 @@ import ValidationRunStatusIcon from "@components/validationRuns/ValidationRunSta
 const CoreValidationRunStatus = ({status, displayText = true, text, onClick}) => {
     return (
         <>
-            <Space size={8} className="ot-action" onClick={onClick}>
+            <Space size={8} className={onClick ? "ot-action" : undefined} onClick={onClick}>
                 <ValidationRunStatusIcon statusID={status.statusID}/>
                 {displayText && (text || status.statusID.name)}
             </Space>

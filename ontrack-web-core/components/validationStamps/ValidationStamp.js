@@ -9,16 +9,18 @@ export default function ValidationStamp({
                                             text, displayText = true,
                                             displayImage = true, imageSize = 16,
                                             link, displayLink = true,
-                                            tooltip, displayTooltip = true, tooltipPlacement
+                                            tooltip, displayTooltip = true, tooltipPlacement,
+                                            onClick,
                                         }) {
 
     function InnerValidationStamp({
                                       validationStamp,
                                       text, displayText = true,
                                       displayImage = true,
+                                      onClick,
                                   }) {
         return (
-            <Space>
+            <Space onClick={onClick} className={onClick ? "ot-action" : undefined}>
                 {
                     displayImage && <ValidationStampImage validationStamp={validationStamp} size={imageSize}/>
                 }
@@ -35,11 +37,14 @@ export default function ValidationStamp({
                                           validationStamp,
                                           text, displayText = true,
                                           displayImage = true,
-                                          link, displayLink = true
+                                          link, displayLink = true,
+                                          onClick,
                                       }) {
         const inner = <InnerValidationStamp validationStamp={validationStamp}
                                             text={text} displayText={displayText}
-                                            displayImage={displayImage}/>
+                                            displayImage={displayImage}
+                                            onClick={onClick}
+        />
         if (displayLink) {
             return <LegacyLink href={validationStampUri(validationStamp)}>
                 {inner}
@@ -52,7 +57,9 @@ export default function ValidationStamp({
     const inner = <InnerValidationStampLink validationStamp={validationStamp}
                                             text={text} displayText={displayText}
                                             displayImage={displayImage}
-                                            link={link} displayLink={displayLink}/>
+                                            link={link} displayLink={displayLink}
+                                            onClick={onClick}
+    />
 
     if (displayTooltip) {
         const tooltipContent = tooltip ? tooltip : <Space direction="vertical">

@@ -53,3 +53,7 @@ preferences.setPreferences({
 # Exceptions
 
 * [ ] Selected dashboard on the home page is set using the `selectDashboard` mutation - this should be replaced by the `setPreferences` mutation
+
+# See also
+
+* [`ADR-NXUI-0007-ui-local-preferences`](ADR-NXUI-0007-ui-local-preferences.md) - for browser/local preferences

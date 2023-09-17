@@ -18,6 +18,10 @@ const refDataSignature = {
          * List of all roots
          */
         roots: [],
+        /**
+         * All possible statuses
+         */
+        list: [],
     }
 }
 
@@ -51,6 +55,7 @@ export default function RefDataContextProvider({children}) {
         return {
             getAccessibleStatuses,
             roots: list.filter(vrs => vrs.root),
+            list,
         }
     }
 

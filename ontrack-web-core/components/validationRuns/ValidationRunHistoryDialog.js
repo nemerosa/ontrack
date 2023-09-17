@@ -19,8 +19,10 @@ import ValidationRunData from "@components/framework/validation-run-data/Validat
 
 export function useValidationRunHistoryDialog() {
     const [open, setOpen] = useState(false)
+    const [run, setRun] = useState({})
 
-    const start = () => {
+    const start = (run) => {
+        setRun(run)
         setOpen(true)
     }
 
@@ -32,10 +34,11 @@ export function useValidationRunHistoryDialog() {
         open, // State of the dialog
         start, // Opens the dialog
         close, // Closes the dialog
+        run, // Selected run
     }
 }
 
-export default function ValidationRunHistoryDialog({run, dialog, onChange}) {
+export default function ValidationRunHistoryDialog({dialog, onChange}) {
 
     const [loading, setLoading] = useState(true)
     const [build, setBuild] = useState()
@@ -44,7 +47,7 @@ export default function ValidationRunHistoryDialog({run, dialog, onChange}) {
     const [runs, setRuns] = useState([])
     const [runsReload, setRunsReload] = useState(0)
     useEffect(() => {
-        if (dialog.open) {
+        if (dialog.open && dialog.run?.id) {
             setLoading(true)
             graphQLCall(
                 gql`
@@ -62,7 +65,7 @@ export default function ValidationRunHistoryDialog({run, dialog, onChange}) {
                         }
                     }
                 `,
-                {runId: run.id}
+                {runId: dialog.run.id}
             ).then(data => {
                 const buildId = data.validationRuns[0].build.id
                 const validationStampName = data.validationRuns[0].validationStamp.name
@@ -169,7 +172,7 @@ export default function ValidationRunHistoryDialog({run, dialog, onChange}) {
                 setLoading(false)
             })
         }
-    }, [run, dialog.open, runsReload]);
+    }, [dialog.open, dialog.run, runsReload]);
 
     const onOk = async () => {
         dialog.close()
