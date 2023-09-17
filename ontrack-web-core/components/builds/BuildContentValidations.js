@@ -13,6 +13,7 @@ import AnnotatedDescription from "@components/common/AnnotatedDescription";
 import ValidationRunData from "@components/framework/validation-run-data/ValidationRunData";
 import ValidationRunSortingMode from "@components/validationRuns/ValidationRunSortingMode";
 import BuildValidateAction from "@components/builds/BuildValidateAction";
+import {isAuthorized} from "@components/common/authorizations";
 
 export default function BuildContentValidations({build}) {
 
@@ -67,6 +68,12 @@ export default function BuildContentValidations({build}) {
         } else {
             return 0
         }
+    }
+
+    const [reloadCount, setReloadCount] = useState(0)
+
+    const reload = () => {
+        setReloadCount(reloadCount + 1)
     }
 
     const [statuses, setStatuses] = useState([])
@@ -138,6 +145,7 @@ export default function BuildContentValidations({build}) {
                                         time
                                         user
                                     }
+                                    description
                                     annotatedDescription
                                     statusID {
                                         id
@@ -184,7 +192,7 @@ export default function BuildContentValidations({build}) {
         }).finally(() => {
             setLoading(false)
         })
-    }, [build, pageRequest, filteredInfo, sortingMode]);
+    }, [build, pageRequest, filteredInfo, sortingMode, reloadCount]);
 
     // Definition of the columns
 
@@ -210,6 +218,11 @@ export default function BuildContentValidations({build}) {
             filters: statuses,
             filterSearch: true,
             filteredValue: filteredInfo.status || null,
+        },
+        {
+            title: "Description",
+            key: 'description',
+            render: (_, run) => <AnnotatedDescription entity={run.lastStatus}/>,
         },
         {
             title: "Creation",
@@ -250,16 +263,20 @@ export default function BuildContentValidations({build}) {
                              <>
                                  <Space>
                                      {/* Validates the current build */}
-                                     <BuildValidateAction
-                                         build={build}
-                                     >
-                                         <Button>
-                                             <Space>
-                                                 <FaGavel/>
-                                                 <Typography.Text>Validate</Typography.Text>
-                                             </Space>
-                                         </Button>
-                                     </BuildValidateAction>
+                                     {
+                                         isAuthorized(build, 'build', 'validate') &&
+                                         <BuildValidateAction
+                                             build={build}
+                                             onValidation={reload}
+                                         >
+                                             <Button>
+                                                 <Space>
+                                                     <FaGavel/>
+                                                     <Typography.Text>Validate</Typography.Text>
+                                                 </Space>
+                                             </Button>
+                                         </BuildValidateAction>
+                                     }
                                      {/* Reset filter */}
                                      <Button onClick={resetFilters}>
                                          <Space>

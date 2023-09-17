@@ -10,41 +10,54 @@ import ValidationRunDataForm from "@components/framework/validation-run-data-for
 const {TextArea} = Input;
 
 export function useBuildValidateDialog(config) {
+
+    const [dataType, setDataType] = useState()
+
     return useFormDialog({
         ...config,
+        dataType, setDataType,
         init: (form, context) => {
             form.setFieldsValue({
                 validationStamp: context.validationStamp?.name,
             })
         },
         prepareValues: (values, context) => {
-            console.log({values})
             values.buildId = context.build.id
+            values.dataTypeId = dataType?.descriptor?.id
+            console.log({values})
         },
         query: gql`
-            #            mutation PromoteBuild($buildId: Int!, $promotion: String!, $description: String, $dateTime: LocalDateTime) {
-            #                createPromotionRunById(input: {
-            #                    buildId: $buildId,
-            #                    promotion: $promotion,
-            #                    description: $description,
-            #                    dateTime: $dateTime,
-            #                }) {
-            #                    errors {
-            #                        message
-            #                    }
-            #                }
-            #            }
+            mutation ValidateBuild(
+                $buildId: Int!,
+                $description: String,
+                $validationStamp: String!,
+                $status: String,
+                $dataTypeId: String,
+                $data: JSON,
+            ) {
+                createValidationRunById(input: {
+                    buildId: $buildId,
+                    description: $description,
+                    validationStamp: $validationStamp,
+                    dataTypeId: $dataTypeId,
+                    data: $data,
+                    validationRunStatus: $status,
+                }) {
+                    errors {
+                        message
+                    }
+                }
+            }
         `,
-        userNode: 'createPromotionRunById',
+        userNode: 'createValidationRunById',
     })
 }
 
 export default function BuildValidateDialog({buildValidateDialog}) {
 
-    const [dataType, setDataType] = useState()
 
     const onValidationStampSelected = (vs) => {
-        setDataType(vs.dataType)
+        buildValidateDialog.setDataType(vs.dataType)
     }
 
     return (
@@ -68,13 +81,13 @@ export default function BuildValidateDialog({buildValidateDialog}) {
                 </Form.Item>
                 {/* Validation data (depends on the validation stamp) */}
                 {
-                    dataType &&
+                    buildValidateDialog.dataType &&
                     <Form.Item
                         label="Validation data"
                     >
                         <Well>
                             <ValidationRunDataForm
-                                dataType={dataType}
+                                dataType={buildValidateDialog.dataType}
                             />
                         </Well>
                     </Form.Item>

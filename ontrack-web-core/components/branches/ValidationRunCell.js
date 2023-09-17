@@ -8,6 +8,8 @@ import ValidationRunStatusNone from "@components/validationRuns/ValidationRunSta
 import ValidationRunHistoryDialog, {
     useValidationRunHistoryDialog
 } from "@components/validationRuns/ValidationRunHistoryDialog";
+import {isAuthorized} from "@components/common/authorizations";
+import BuildValidateDialog, {useBuildValidateDialog} from "@components/builds/BuildValidateDialog";
 
 export default function ValidationRunCell({build, validationStamp, onChange}) {
 
@@ -23,13 +25,30 @@ export default function ValidationRunCell({build, validationStamp, onChange}) {
         validationRunHistoryDialog.start(run)
     }
 
+    const buildValidateDialog = useBuildValidateDialog({
+        onSuccess: onChange,
+    })
+
+    const createValidation = () => {
+        if (isAuthorized(build, 'build', 'validate')) {
+            buildValidateDialog.start({
+                build,
+                validationStamp,
+            })
+        }
+    }
+
     return (
         <>
             {/* Not run */}
             {
-                !run && <ValidationRunStatusNone
-                    disabled={false} // TODO Depends on user rights
-                />
+                !run && <>
+                    <ValidationRunStatusNone
+                        disabled={!isAuthorized(build, 'build', 'validate')}
+                        onClick={createValidation}
+                    />
+                    <BuildValidateDialog buildValidateDialog={buildValidateDialog}/>
+                </>
             }
             {/* Last status */}
             {

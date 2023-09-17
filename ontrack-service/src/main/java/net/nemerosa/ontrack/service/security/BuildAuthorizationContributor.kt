@@ -15,7 +15,19 @@ class BuildAuthorizationContributor(
 
     override fun appliesTo(context: Any): Boolean = context is Build
 
-    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> = listOf(
-        Authorization(BUILD, "promote", securityService.isProjectFunctionGranted<PromotionRunCreate>(context as Build))
-    )
+    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> =
+        (context as Build).let { build ->
+            listOf(
+                Authorization(
+                    BUILD,
+                    "promote",
+                    securityService.isProjectFunctionGranted<PromotionRunCreate>(build)
+                ),
+                Authorization(
+                    BUILD,
+                    "validate",
+                    securityService.isProjectFunctionGranted<ValidationRunCreate>(build)
+                ),
+            )
+        }
 }

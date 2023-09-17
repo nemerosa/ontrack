@@ -76,8 +76,10 @@ export const gqlBuilds = gql`
                             }
                         }
                     }
-                    links {
-                        _validate
+                    authorizations {
+                        name
+                        action
+                        authorized
                     }
                 }
             }
