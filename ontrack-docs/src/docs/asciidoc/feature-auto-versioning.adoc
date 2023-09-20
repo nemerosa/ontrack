@@ -248,6 +248,7 @@ Two types are currently supported:
 * `npm` - NPM package file, typically used for `package.json`
 * `maven` - <<auto-versioning-config-type-maven,Maven POM file>>
 * `yaml` - YAML file, see <<auto-versioning-config-type-yaml>>
+* `toml` - TOML file, see <<auto-versioning-config-type-toml>>
 
 See the <<auto-versioning-config-examples,examples section>> for their usage.
 
@@ -328,6 +329,32 @@ For this purpose, you need to specify also the `propertyRegex` and set it, for t
 ----
 ^repo\/component:(.*)$
 ----
+
+[[auto-versioning-config-type-tomml]]
+====== TOML files
+
+
+When `propertyType` is set to `yaml`, `property` is expected to define a path inside the YAML file.
+
+For example, given the following TOML file:
+
+[source,toml]
+----
+[images]
+myVersion = "2.0.0"
+----
+
+To update the `myVersion` property in the `images` table, one can set the auto versioning `property` to `images.myVersion`.
+
+[WARNING]
+====
+The support of TOML in the Ontrack auto versioning uses the https://github.com/valderman/4koma[4koma] library and this comes with some caveats:
+
+* comments are not supported and will be _stripped_ from the file after the auto versioning request has been processed
+* only basic expressions like `a.b.c` are supported. Arrays and other structures are not supported.
+
+Request for help: if you know of a better TOML Java/Kotlin library which would support comments, updates of the TOML structure, more complex queries, please let me know.
+====
 
 [[auto-versioning-config-integrations]]
 ===== Integrations

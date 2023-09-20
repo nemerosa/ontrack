@@ -6,6 +6,12 @@ plugins {
 
 apply<OntrackExtensionPlugin>()
 
+repositories {
+    maven {
+        url = uri("https://jitpack.io")
+    }
+}
+
 dependencies {
     api(project(":ontrack-extension-support"))
 
@@ -21,6 +27,8 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation(project(":ontrack-extension-notifications"))
+
+    implementation("cc.ekblad:4koma:1.2.0")
 
     testImplementation(project(":ontrack-extension-general"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
