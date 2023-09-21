@@ -6,12 +6,6 @@ plugins {
 
 apply<OntrackExtensionPlugin>()
 
-repositories {
-    maven {
-        url = uri("https://jitpack.io")
-    }
-}
-
 dependencies {
     api(project(":ontrack-extension-support"))
 
