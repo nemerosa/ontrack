@@ -2,10 +2,14 @@ import {Select, Space, Typography} from "antd";
 import {useEffect, useState} from "react";
 import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
-import {PromotionLevelImage} from "@components/common/Links";
 import ValidationStampImage from "@components/validationStamps/ValidationStampImage";
 
-export default function SelectValidationStamp({branch, value, onChange, onValidationStampSelected, useName = false, allowClear = false}) {
+export default function SelectValidationStamp({
+                                                  branch, value, onChange, onValidationStampSelected,
+                                                  useName = false,
+                                                  allowClear = false,
+                                                  multiple = false,
+                                              }) {
 
     const [validationStamps, setValidationStamps] = useState([])
     const [options, setOptions] = useState([])
@@ -68,6 +72,7 @@ export default function SelectValidationStamp({branch, value, onChange, onValida
             value={value}
             onChange={onLocalChange}
             allowClear={allowClear}
+            mode={multiple ? "multiple" : undefined}
         />
     )
 }

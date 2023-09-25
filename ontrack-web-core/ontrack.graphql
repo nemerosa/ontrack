@@ -969,6 +969,14 @@ type CreateValidationStampByIdPayload implements Payload {
     validationStamp: ValidationStamp
 }
 
+"Output type for the createValidationStampFilter mutation."
+type CreateValidationStampFilterPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Validation stamp filter having been created"
+    validationStampFilter: ValidationStampFilter
+}
+
 "Output type for the createWebhook mutation."
 type CreateWebhookPayload implements Payload {
     "List of errors"
@@ -2718,6 +2726,11 @@ type Mutation {
         "Input for the mutation"
         input: CreateValidationStampByIdInput
     ): CreateValidationStampByIdPayload
+    "Creates an empty validation stamp filter"
+    createValidationStampFilter(
+        "Input for the mutation"
+        input: CreateValidationStampFilterInput
+    ): CreateValidationStampFilterPayload
     "Registers a webhook"
     createWebhook(
         "Input for the mutation"
@@ -3584,6 +3597,11 @@ type Mutation {
         "Input for the mutation"
         input: UpdateProjectInput
     ): UpdateProjectPayload
+    "Updates a validation stamp filter"
+    updateValidationStampFilter(
+        "Input for the mutation"
+        input: UpdateValidationStampFilterInput
+    ): UpdateValidationStampFilterPayload
     "Validates a build identified by id with CHML data"
     validateBuildByIdWithCHML(
         "Input for the mutation"
@@ -4404,6 +4422,11 @@ type Query {
     ): AutoVersioningAuditEntryPaginated
     "List of possible states for auto version audit entries"
     autoVersioningAuditStates: [String!]!
+    "Getting a branch using its ID"
+    branch(
+        "ID of the branch to look for"
+        id: Int!
+    ): Branch!
     branches(
         "Keeps only branches listed as favourute"
         favourite: Boolean,
@@ -5747,6 +5770,14 @@ type UpdateProjectPayload implements Payload {
     project: Project
 }
 
+"Output type for the updateValidationStampFilter mutation."
+type UpdateValidationStampFilterPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Validation stamp filter having been updated"
+    validationStampFilter: ValidationStampFilter
+}
+
 "Representation of the current user"
 type User {
     "Account associated to the user"
@@ -6044,7 +6075,9 @@ type ValidationStamp implements ProjectEntity {
 }
 
 "Validation stamp filter"
-type ValidationStampFilter {
+type ValidationStampFilter implements Authorizable {
+    "Authorizations for this context"
+    authorizations: [Authorization!]!
     "ID of the filter"
     id: Int
     "Links"
@@ -6683,6 +6716,12 @@ input CreateValidationStampByIdInput {
     "Validation stamp description"
     description: String!
     "Validation stamp name"
+    name: String!
+}
+
+"Input type for the createValidationStampFilter mutation."
+input CreateValidationStampFilterInput {
+    "Name of the validation stamp filter"
     name: String!
 }
 
@@ -8649,6 +8688,14 @@ input UpdateProjectInput {
     id: Int!
     "Project name (leave null to not change)"
     name: String
+}
+
+"Input type for the updateValidationStampFilter mutation."
+input UpdateValidationStampFilterInput {
+    "ID of the validation stamp filter"
+    id: Int!
+    "Validation stamp names"
+    vsNames: [String!]!
 }
 
 "Input type for the validateBuildByIdWithCHML mutation."

@@ -5,7 +5,11 @@ import {Space} from "antd";
 import BranchBuilds from "@components/branches/BranchBuilds";
 import useRangeSelection from "@components/common/RangeSelection";
 import {gql} from "graphql-request";
-import {getLocallySelectedBuildFilter, setLocallySelectedBuildFilter} from "@components/storage/local";
+import {
+    getLocallySelectedBuildFilter, getLocallySelectedValidationFilter,
+    setLocallySelectedBuildFilter,
+    setLocallySelectedValidationStampFilter
+} from "@components/storage/local";
 import {useRouter} from "next/router";
 
 export default function ClassicBranchView({branch}) {
@@ -57,6 +61,12 @@ export default function ClassicBranchView({branch}) {
                 }
             }, undefined, {shallow: true})
         }
+    }
+
+    // Mgt of the validation stamp filters
+    const [selectedValidationStampFilter, setSelectedValidationStampFilter] = useState()
+    const onSelectedValidationStampFilter = (filter) => {
+        setSelectedValidationStampFilter(filter)
     }
 
     // Loading the builds
@@ -146,6 +156,8 @@ export default function ClassicBranchView({branch}) {
                     selectedBuildFilter={selectedBuildFilter}
                     onSelectedBuildFilter={onSelectedBuildFilter}
                     onPermalinkBuildFilter={onPermalinkBuildFilter}
+                    selectedValidationStampFilter={selectedValidationStampFilter}
+                    onSelectedValidationStampFilter={onSelectedValidationStampFilter}
                 />
             </Space>
         </>

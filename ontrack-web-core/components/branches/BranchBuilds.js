@@ -1,6 +1,6 @@
 import BuildBox from "@components/builds/BuildBox";
 import {Button, Col, Popover, Row, Space, Spin, Table, Typography} from "antd";
-import {FaSearch} from "react-icons/fa";
+import {FaCheckSquare, FaEyeSlash, FaSearch, FaSquare} from "react-icons/fa";
 import PromotionRun from "@components/promotionRuns/PromotionRun";
 import RangeSelector from "@components/common/RangeSelector";
 import LegacyIndicator from "@components/common/LegacyIndicator";
@@ -17,7 +17,7 @@ import {usePreferences} from "@components/providers/PreferencesProvider";
 const {Column} = Table;
 
 /**
- *
+ * @param branch Target branch
  * @param builds List of builds to display
  * @param loadingBuilds Build loading indicator
  * @param pageInfo Page info for the builds
@@ -26,12 +26,14 @@ const {Column} = Table;
  * @param validationStamps List of validation stamps
  * @param loadingValidationStamps Validation stamps loading indicator
  * @param onChange Callback when builds, runs, statuses, etc. need to be reloaded after a user action
+ * @param selectedBuildFilter Currently selected build filter (can be undefined)
  */
 export default function BranchBuilds({
                                          branch, builds, loadingBuilds, pageInfo, onLoadMore, rangeSelection,
                                          validationStamps, loadingValidationStamps,
                                          onChange,
                                          selectedBuildFilter, onSelectedBuildFilter, onPermalinkBuildFilter,
+                                         selectedValidationStampFilter, onSelectedValidationStampFilter,
                                      }) {
 
     const router = useRouter()
@@ -51,15 +53,30 @@ export default function BranchBuilds({
     const {branchViewVsGroups, setPreferences} = usePreferences()
 
     const [grouping, setGrouping] = useState(branchViewVsGroups)
-    const onGroupingChange = (value) => {
-        setPreferences({branchViewVsGroups: value})
-        setGrouping(value)
+    const onGroupingChange = () => {
+        const newGrouping = !grouping
+        setPreferences({branchViewVsGroups: newGrouping})
+        setGrouping(newGrouping)
+    }
+
+    // Online edition of the validation stamp filter
+    const [inlineEdition, setInlineEdition] = useState(false)
+
+    const onInlineEdition = (flag) => {
+        setInlineEdition(flag)
+    }
+
+    const stopInlineEdition = () => {
+        onInlineEdition(false)
     }
 
     return (
         <>
             <Space className="ot-line" direction="vertical" size={8}>
                 <Table
+                    className={
+                        inlineEdition ? "ot-validation-stamp-filter-edition" : undefined
+                    }
                     size="small"
                     dataSource={builds}
                     footer={() => (
@@ -86,6 +103,42 @@ export default function BranchBuilds({
                         </>
                     )}
                     pagination={false} // Pagination is managed by the "load more"
+                    title={() => {
+                        return inlineEdition && selectedValidationStampFilter ?
+                            <Row>
+                                <Col span={24} align="right">
+                                    <Space>
+                                        <Button className="ot-validation-stamp-filter-edition">
+                                            <Space>
+                                                <FaCheckSquare/>
+                                                <Typography.Text>
+                                                    Select all for&nbsp;
+                                                    <Typography.Text strong>{selectedValidationStampFilter.name}</Typography.Text>
+                                                </Typography.Text>
+                                            </Space>
+                                        </Button>
+                                        <Button className="ot-validation-stamp-filter-edition">
+                                            <Space>
+                                                <FaSquare/>
+                                                <Typography.Text>
+                                                    Select none for&nbsp;
+                                                    <Typography.Text strong>{selectedValidationStampFilter.name}</Typography.Text>
+                                                </Typography.Text>
+                                            </Space>
+                                        </Button>
+                                        <Button className="ot-validation-stamp-filter-edition" onClick={stopInlineEdition}>
+                                            <Space>
+                                                <FaEyeSlash/>
+                                                <Typography.Text>
+                                                    <Typography.Text strong>{selectedValidationStampFilter.name}</Typography.Text>
+                                                    &nbsp;done editing
+                                                </Typography.Text>
+                                            </Space>
+                                        </Button>
+                                    </Space>
+                                </Col>
+                            </Row> : undefined
+                    }}
                 >
                     <Column
                         width="2em"
@@ -124,8 +177,13 @@ export default function BranchBuilds({
                                 </LegacyIndicator>
                                 {/* VS filter */}
                                 <ValidationStampFilterDropdown
+                                    branch={branch}
                                     grouping={grouping}
                                     onGroupingChange={onGroupingChange}
+                                    selectedValidationStampFilter={selectedValidationStampFilter}
+                                    onSelectedValidationStampFilter={onSelectedValidationStampFilter}
+                                    inlineEdition={inlineEdition}
+                                    onInlineEdition={onInlineEdition}
                                 />
                                 {
                                     loadingBuilds &&
@@ -171,20 +229,25 @@ export default function BranchBuilds({
                     {
                         validationStamps
                             .filter(validationStamp => {
-                                // TODO If a filter is selected, we use only this filter
-                                // If grouping is selected, we keep only the validation stamps which are
-                                // part of the current filter
-                                if (grouping) {
-                                    // TODO Uses the current filter
-                                    return false
-                                } else {
-                                    // No grouping, no filter, we display ALL the validation stamps
+                                // If we are in inline edition mode, we display ALL the validation stamps
+                                if (inlineEdition) {
                                     return true
+                                }
+                                // If a filter is selected, we use only this filter
+                                else if (selectedValidationStampFilter) {
+                                    // Checking the filter
+                                    return selectedValidationStampFilter.vsNames.indexOf(validationStamp.name) >= 0
+                                }
+                                    // If grouping is selected, we keep only the validation stamps which are
+                                // part of the current filter
+                                else {
+                                    return !grouping
                                 }
                             })
                             .map(validationStamp => (
                                 <Column
                                     key={validationStamp.name}
+                                    className="ot-validation-stamp"
                                     title={
                                         <ValidationStampHeader
                                             key={validationStamp.id}
@@ -203,7 +266,7 @@ export default function BranchBuilds({
                     }
                     {/* Grouping per validation status */}
                     {
-                        grouping && <Column
+                        !inlineEdition && grouping && <Column
                             key="groups"
                             render={(_, build) =>
                                 <ValidationGroups build={build}/>

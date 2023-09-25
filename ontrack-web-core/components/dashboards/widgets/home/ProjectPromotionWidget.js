@@ -33,6 +33,7 @@ export default function ProjectPromotionWidget({project, promotions, depth, labe
                         ) {
                             projects(name: $project) {
                                 lastBuildsWithPromotions(promotions: $promotions) {
+                                    key: id
                                     ...promotionRunContent
                                     build {
                                         ...buildContent

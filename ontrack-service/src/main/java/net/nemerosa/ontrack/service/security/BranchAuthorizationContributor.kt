@@ -23,6 +23,16 @@ class BranchAuthorizationContributor(
                     "build_filter_manage",
                     securityService.isProjectFunctionGranted<BranchFilterMgt>(branch)
                 ),
+                Authorization(
+                    BRANCH,
+                    "validation_stamp_filter_create",
+                    securityService.isProjectFunctionGranted<ValidationStampFilterCreate>(branch)
+                ),
+                Authorization(
+                    BRANCH,
+                    "validation_stamp_filter_share",
+                    securityService.isProjectFunctionGranted<ValidationStampFilterShare>(branch)
+                ),
             )
         }
 }

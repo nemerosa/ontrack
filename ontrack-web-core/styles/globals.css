@@ -80,6 +80,18 @@
 }
 
 /**
+ * Element highlighted for VSF edition
+ */
+
+button.ot-validation-stamp-filter-edition {
+    background-color: lightyellow;
+}
+
+.ot-validation-stamp-filter-edition table th.ot-validation-stamp {
+    background-color: lightyellow;
+}
+
+/**
  * Dependency link
  */
 
