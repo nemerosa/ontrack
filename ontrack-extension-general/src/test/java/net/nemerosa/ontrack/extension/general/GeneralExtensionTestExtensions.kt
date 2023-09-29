@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
 
 fun AbstractDSLTestSupport.autoValidationStampProperty(
@@ -31,3 +31,47 @@ fun AbstractDSLTestSupport.autoPromotionLevelProperty(
         )
     )
 }
+
+fun AbstractDSLTestSupport.useLabel(
+    project: Project,
+    useLabel: Boolean = true,
+) {
+    setProperty(
+        project,
+        BuildLinkDisplayPropertyType::class.java,
+        BuildLinkDisplayProperty(
+            useLabel = useLabel,
+        )
+    )
+}
+
+/**
+ * Release property
+ */
+fun AbstractDSLTestSupport.releaseProperty(
+    build: Build,
+    label: String,
+) {
+    setProperty(build, ReleasePropertyType::class.java, ReleaseProperty(label))
+}
+
+/**
+ * Meta information
+ */
+fun AbstractDSLTestSupport.metaInfoProperty(
+    build: Build,
+    vararg items: MetaInfoPropertyItem,
+) {
+    setProperty(
+        build,
+        MetaInfoPropertyType::class.java,
+        MetaInfoProperty(items.toList())
+    )
+}
+
+fun metaInfoItem(
+    name: String,
+    value: String?,
+    link: String? = null,
+    category: String? = null,
+) = MetaInfoPropertyItem(name, value, link, category)

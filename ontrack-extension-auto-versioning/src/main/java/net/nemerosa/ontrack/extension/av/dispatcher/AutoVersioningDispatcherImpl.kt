@@ -13,6 +13,7 @@ import java.util.*
 class AutoVersioningDispatcherImpl(
     private val securityService: SecurityService,
     private val queue: AutoVersioningQueue,
+    private val versionSourceFactory: VersionSourceFactory,
 ) : AutoVersioningDispatcher {
     override fun dispatch(configuredBranches: AutoVersioningConfiguredBranches) {
         securityService.asAdmin {
@@ -43,7 +44,7 @@ class AutoVersioningDispatcherImpl(
         targetProperty = config.targetProperty,
         targetPropertyRegex = config.targetPropertyRegex,
         targetPropertyType = config.targetPropertyType,
-        targetVersion = event.version,
+        targetVersion = getBuildSourceVersion(event, config),
         autoApproval = config.autoApproval ?: true,
         upgradeBranchPattern = config.upgradeBranchPattern ?: AutoVersioningSourceConfig.DEFAULT_UPGRADE_BRANCH_PATTERN,
         postProcessing = config.postProcessing,
@@ -51,4 +52,11 @@ class AutoVersioningDispatcherImpl(
         validationStamp = config.validationStamp,
         autoApprovalMode = config.autoApprovalMode ?: AutoVersioningSourceConfig.DEFAULT_AUTO_APPROVAL_MODE,
     )
+
+    private fun getBuildSourceVersion(event: PromotionEvent, config: AutoVersioningSourceConfig): String {
+        val (id, param) = config.versionSource?.let {
+            getVersionSourceConfig(it)
+        } ?: (DefaultVersionSource.ID to null)
+        return versionSourceFactory.getVersionSource(id).getVersion(event.build, param)
+    }
 }

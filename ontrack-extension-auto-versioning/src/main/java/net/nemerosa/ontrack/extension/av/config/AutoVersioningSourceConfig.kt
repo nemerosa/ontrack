@@ -45,6 +45,8 @@ data class AutoVersioningSourceConfig(
     val qualifier: String? = null,
     @APIDescription("Validation stamp to create on the source build (optional)")
     val backValidation: String? = null,
+    @APIDescription("Source of the version for the build. By default, uses the build label is the source project is configured so, or the build name itself. This allows the customization of this behavior.")
+    val versionSource: String? = null,
 ) : AutoVersioningTargetConfig {
 
     /**
@@ -132,6 +134,7 @@ data class AutoVersioningSourceConfig(
             notifications = notifications,
             qualifier = qualifier,
             backValidation = backValidation,
+            versionSource = versionSource,
         )
 
 }

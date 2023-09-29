@@ -10,17 +10,19 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class BuildDisplayNameServiceImpl(
-        private val extensionManager: ExtensionManager
+    private val extensionManager: ExtensionManager
 ) : BuildDisplayNameService {
 
     override fun getBuildDisplayName(build: Build): String {
         val extendedName = extensionManager.getExtensions(BuildDisplayNameExtension::class.java)
-                .mapNotNull { extension -> extension.getBuildDisplayName(build) }
-                .firstOrNull()
+            .firstNotNullOfOrNull { extension -> extension.getBuildDisplayName(build) }
         return extendedName ?: build.name
     }
 
-    override fun getEligibleBuildDisplayName(build: Build): String? {
+    override fun getEligibleBuildDisplayName(
+        build: Build,
+        defaultValue: (Build) -> String?,
+    ): String? {
         val extensions = extensionManager.getExtensions(BuildDisplayNameExtension::class.java)
         // Gets the first extension which may return an eligible name
         val extension = extensions.find { it.mustProvideBuildName(build) }
@@ -28,7 +30,7 @@ class BuildDisplayNameServiceImpl(
         return if (extension != null) {
             extension.getBuildDisplayName(build)
         } else {
-            build.name
+            defaultValue(build)
         }
     }
 }

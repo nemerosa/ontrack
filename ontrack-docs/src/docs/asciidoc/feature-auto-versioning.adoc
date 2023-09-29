@@ -180,6 +180,9 @@ configurations:
     buildLinkCreation: Boolean?
     # Qualifier to use for the build links
     qualifier: String?
+    # How must the version to use be computed from the source build?
+    # See "Version source" below
+    versionSource: String?
 ----
 
 [NOTE]
@@ -225,6 +228,25 @@ Example: if you have a branch `release-1.24` on a parent project `P` and you wan
 ----
 sourceBranch: "&same"
 ----
+
+[[auto-versioning-config-version-source]]
+===== Version source
+
+By default, the version to use in the target project is computed directly from the <<model,build>> which has been promoted.
+
+The default behavior is:
+
+* if the source project is configured to use the labels for the builds ("Build name display" property), the label (or release, or version) of the build is used. If this label is not present, the auto versioning request will be rejected
+* if the source project is not configured, the build name is taken as the version
+
+This version computation can be adapted using the <<auto-versioning-config,`versionSource`>> configuration parameter.
+
+The different options for this parameter are:
+
+* `default` - uses the default behavior described above
+* `name` - uses the name of the build, regardless of the source project configuration
+* `labelOnly` - uses the label attached to the build, regardless of the source project configuration. If there is no label, the auto versioning request is rejected
+* `metaInfo/<category>/<name>` or `metaInfo/<name>` - the version is the value of a meta information item of the request category (optional) or name. If so such meta information is found, the auto versioning request is rejected.
 
 [[auto-versioning-config-type]]
 ===== Target files types

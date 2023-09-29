@@ -38,7 +38,8 @@ fun Branch.setAutoVersioningConfig(
                     .upgradeBranchPattern(it.upgradeBranchPattern)
                     .validationStamp(it.validationStamp)
                     .backValidation(it.backValidation)
-                    //.buildLinkCreation(it.buildLinkCreation)
+                    .versionSource(it.versionSource)
+                    .buildLinkCreation(it.buildLinkCreation)
                     .notifications(
                         it.notifications?.map { n ->
                             AutoVersioningNotificationInput.builder()
