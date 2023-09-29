@@ -32,6 +32,7 @@ data class JsonAutoVersioningConfig(
     @JsonProperty("auto-approval-mode")
     val autoApprovalMode: AutoApprovalMode?,
     val qualifier: String?,
+    val versionSource: String? = null,
 ) {
     fun toConfig() = AutoVersioningSourceConfig(
         sourceProject = project,
@@ -49,5 +50,6 @@ data class JsonAutoVersioningConfig(
         validationStamp = validationStamp,
         autoApprovalMode = autoApprovalMode,
         qualifier = qualifier,
+        versionSource = versionSource,
     )
 }
