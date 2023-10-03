@@ -707,4 +707,35 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
             }
         }
     }
+
+    @Test
+    fun `Get AV config between two branches with &same-release branch expression`() {
+        asAdmin {
+            val dependency = project<Branch> {
+                branch("release/1.24.15")
+            }
+            val parent = project<Branch> {
+                branch("release/1.24.6") {
+                    autoVersioningConfigurationService.setupAutoVersioning(
+                        this,
+                        AutoVersioningConfig(
+                            configurations = listOf(
+                                AutoVersioningTestFixtures.sourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = "&same-release:2"
+                                )
+                            )
+                        )
+                    )
+                }
+            }
+            assertNotNull(
+                autoVersioningConfigurationService.getAutoVersioningBetween(parent, dependency),
+                "AV config on matching branch"
+            ) {
+                assertEquals(dependency.project.name, it.sourceProject)
+                assertEquals("&same-release:2", it.sourceBranch)
+            }
+        }
+    }
 }

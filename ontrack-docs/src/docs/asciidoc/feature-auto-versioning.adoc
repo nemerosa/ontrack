@@ -217,10 +217,27 @@ Con's:
 
 The `sourceBranch` parameter can be set to `&<expression>` where `<expression>` is an expression used to detect the source branch on the source project for a branch eligible for auto versioning.
 
-[NOTE]
-====
-As of now, only one expression is supported: `same`. Other methods may be supported in later releases.
-====
+Supported values are:
+
+====== `&regex`
+
+By using:
+
+[source,yaml]
+----
+sourceBranch: "&regex:<regex>"
+----
+
+this is equivalent to the default behaviour:
+
+[source,yaml]
+----
+sourceBranch: "<regex>"
+----
+
+====== `&same`
+
+The source branch must have the exact same name as the target branch.
 
 Example: if you have a branch `release-1.24` on a parent project `P` and you want to get updates from a `dependency` project only for the same branch, `release-1.24`, you can use:
 
@@ -228,6 +245,37 @@ Example: if you have a branch `release-1.24` on a parent project `P` and you wan
 ----
 sourceBranch: "&same"
 ----
+
+====== `&same-release`
+
+On the same model as the "&same" `sourceBranch` parameter, there is the possibility to get a "&same-release" branch source.
+
+This is to be used in cases where the dependency and its parent follow the same branch policy at `release/` branch level, but only for a limited number of levels.
+
+For example, a parent has release branches like release/1.24.10, with a dependency using on release/1.24.15. We want release/1.x.y to always depend on the latest release/1.x.z branch (using 1. as a common prefix).
+
+One way to do this is to use: `sourceBranch: "release/1.24.*"`  but this would force you to always update the source branch parameter for every branch:
+
+* release/1.24.* in release/1.24.x branch
+* release/1.25.* in release/1.25.x branch
+* etc.
+
+A better way is to use, in this scenario:
+
+[source,yaml]
+----
+sourceBranch: "&same-release:2"
+----
+
+This means:
+
+* if you're on a release/x.y.z branch, use release/x.y.* for the latest branch
+* for any other branch (main) for example, we use the same branch
+
+[NOTE]
+====
+Note that `:2` means: take the first two numbers of the version of the release branch. By default, it'd be `:1` and can be omitted: `sourceBranch: "&same-release"`.
+====
 
 [[auto-versioning-config-version-source]]
 ===== Version source
