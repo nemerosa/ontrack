@@ -47,6 +47,9 @@ data class AutoVersioningSourceConfig(
     val backValidation: String? = null,
     @APIDescription("Source of the version for the build. By default, uses the build label is the source project is configured so, or the build name itself. This allows the customization of this behavior.")
     val versionSource: String? = null,
+    @APIDescription("List of reviewers to always set on the pull request created by the auto versioning")
+    @ListRef
+    val reviewers: List<String>?,
 ) : AutoVersioningTargetConfig {
 
     /**
@@ -135,6 +138,7 @@ data class AutoVersioningSourceConfig(
             qualifier = qualifier,
             backValidation = backValidation,
             versionSource = versionSource,
+            reviewers = reviewers,
         )
 
 }

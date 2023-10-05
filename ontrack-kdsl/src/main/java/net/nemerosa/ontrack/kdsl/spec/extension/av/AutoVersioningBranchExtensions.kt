@@ -40,6 +40,7 @@ fun Branch.setAutoVersioningConfig(
                     .backValidation(it.backValidation)
                     .versionSource(it.versionSource)
                     .buildLinkCreation(it.buildLinkCreation)
+                    .reviewers(it.reviewers)
                     .notifications(
                         it.notifications?.map { n ->
                             AutoVersioningNotificationInput.builder()

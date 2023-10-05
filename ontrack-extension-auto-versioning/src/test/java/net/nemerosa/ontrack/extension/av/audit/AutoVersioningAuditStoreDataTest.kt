@@ -76,6 +76,7 @@ class AutoVersioningAuditStoreDataTest {
             ),
             routing = "routing",
             queue = "queue",
+            reviewers = null,
         )
         assertEquals(AutoVersioningAuditState.RECEIVED, data.mostRecentState)
         val json = data.asJson()
@@ -110,6 +111,7 @@ class AutoVersioningAuditStoreDataTest {
             ),
             routing = "routing",
             queue = "queue",
+            reviewers = null,
         )
         assertEquals(AutoVersioningAuditState.RECEIVED, data.mostRecentState)
         val json = data.asJson()
@@ -145,6 +147,7 @@ class AutoVersioningAuditStoreDataTest {
             ),
             routing = "routing",
             queue = "queue",
+            reviewers = null,
         )
         assertEquals(AutoVersioningAuditState.ERROR, data.mostRecentState)
         val json = data.asJson()
@@ -179,6 +182,7 @@ class AutoVersioningAuditStoreDataTest {
             ),
             routing = "routing",
             queue = "queue",
+            reviewers = null,
         )
         assertEquals(AutoVersioningAuditState.RECEIVED, data.mostRecentState)
         val json = data.asJson()

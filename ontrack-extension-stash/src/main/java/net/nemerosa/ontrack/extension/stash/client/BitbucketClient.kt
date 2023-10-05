@@ -63,7 +63,14 @@ interface BitbucketClient {
      * @param head Source of the PR
      * @param base Target of the PR
      */
-    fun createPR(repo: BitbucketRepository, title: String, head: String, base: String, body: String): BitbucketServerPR
+    fun createPR(
+        repo: BitbucketRepository,
+        title: String,
+        head: String,
+        base: String,
+        body: String,
+        reviewers: List<String>,
+    ): BitbucketServerPR
 
     /**
      * Approves a PR.

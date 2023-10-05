@@ -171,9 +171,17 @@ interface OntrackGitHubClient {
      * @param head Source branch
      * @param base Target branch
      * @param body PR description
+     * @param reviewers List of reviewers
      * @return Created PR
      */
-    fun createPR(repository: String, title: String, head: String, base: String, body: String): GitHubPR
+    fun createPR(
+        repository: String,
+        title: String,
+        head: String,
+        base: String,
+        body: String,
+        reviewers: List<String>,
+    ): GitHubPR
 
     /**
      * Approves a pull request.

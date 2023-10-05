@@ -180,6 +180,7 @@ $actualContent
         val title: String,
         val approved: Boolean,
         val merged: Boolean,
+        val reviewers: List<String>,
     )
 
     data class MockSCMFileContent(

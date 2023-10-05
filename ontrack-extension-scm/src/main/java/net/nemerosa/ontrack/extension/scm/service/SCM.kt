@@ -13,6 +13,7 @@ interface SCM {
      * Gets the (clone) URL of the project's repository
      */
     val repositoryURI: String
+
     /**
      * Gets the URL of the project's repository page
      */
@@ -72,6 +73,7 @@ interface SCM {
      * @param autoApproval Must the created pull request be auto-approved?
      * @param remoteAutoMerge If the SCM allows this, sets the PR in auto merge mode
      * @param message Commit message to set on auto merge
+     * @param reviewers List of reviewers to set on the pull request (each entry is the ID of a user as supported by the remote SCM)
      * @return PR information
      */
     fun createPR(
@@ -82,6 +84,7 @@ interface SCM {
         autoApproval: Boolean,
         remoteAutoMerge: Boolean,
         message: String,
+        reviewers: List<String>,
     ): SCMPullRequest
 
 }

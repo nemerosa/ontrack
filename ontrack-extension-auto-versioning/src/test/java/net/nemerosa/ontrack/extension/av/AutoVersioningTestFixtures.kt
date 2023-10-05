@@ -36,7 +36,8 @@ object AutoVersioningTestFixtures {
         postProcessing = null,
         postProcessingConfig = NullNode.instance,
         validationStamp = null,
-        autoApprovalMode = AutoApprovalMode.SCM
+        autoApprovalMode = AutoApprovalMode.SCM,
+        reviewers = emptyList(),
     )
 
     fun sampleConfig() = AutoVersioningConfig(
@@ -75,6 +76,7 @@ object AutoVersioningTestFixtures {
         autoApprovalMode = autoApprovalMode,
         notifications = notifications,
         qualifier = null,
+        reviewers = null,
     )
 
 }

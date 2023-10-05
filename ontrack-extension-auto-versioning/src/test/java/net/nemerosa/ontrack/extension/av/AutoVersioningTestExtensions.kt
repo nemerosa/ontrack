@@ -74,6 +74,7 @@ class AutoVersioningConfigSetup {
         validationStamp = validationStamp,
         autoApprovalMode = AutoApprovalMode.SCM,
         qualifier = qualifier,
+        reviewers = null,
     )
 
 }

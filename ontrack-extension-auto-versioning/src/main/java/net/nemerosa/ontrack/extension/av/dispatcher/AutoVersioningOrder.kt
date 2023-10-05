@@ -27,6 +27,7 @@ data class AutoVersioningOrder(
     val postProcessingConfig: JsonNode?,
     val validationStamp: String?,
     val autoApprovalMode: AutoApprovalMode,
+    val reviewers: List<String>,
 ) : AutoVersioningTargetConfig {
     /**
      * Gets a meaningful commit message for this order

@@ -163,6 +163,8 @@ class AutoVersioningProcessingServiceImpl(
                         remoteAutoMerge = (order.autoApprovalMode == AutoApprovalMode.SCM),
                         // Commit message to use on merge
                         message = message,
+                        // List of reviewers
+                        reviewers = order.reviewers ?: emptyList(),
                     )
                     // If auto approval mode = CLIENT and PR is not merged, we had a timeout
                     logger.debug("Processing auto versioning order end of PR process: {}", order)

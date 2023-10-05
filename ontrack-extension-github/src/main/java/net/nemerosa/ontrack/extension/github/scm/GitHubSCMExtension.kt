@@ -116,6 +116,7 @@ class GitHubSCMExtension(
             autoApproval: Boolean,
             remoteAutoMerge: Boolean,
             message: String,
+            reviewers: List<String>,
         ): SCMPullRequest {
             // Creates the pull request
             val pr = client.createPR(
@@ -123,7 +124,8 @@ class GitHubSCMExtension(
                 title = title,
                 head = from,
                 base = to,
-                body = description
+                body = description,
+                reviewers = reviewers,
             )
             val prId = pr.number
             // Auto approval process (approval + wait for checks + merge)

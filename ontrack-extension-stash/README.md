@@ -21,7 +21,9 @@ Go to http://localhost:7990 and follow the setup instructions. In particular,
 you need to request an evaluation license for 90 days using your
 Atlassian account.
 
-Create a `TEST` project and a `test` repository with some content.
+Create a `TEST` project and a `test` repository, with a `main` default branch.
+
+At the root, create a `test.txt` file with `This is a test` as a content.
 
 Create a user called `auto_merge` and create an HTTP access 
 token for it. Add this user as a write user in the test repository.

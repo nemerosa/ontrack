@@ -64,6 +64,7 @@ class AutoVersioningDispatcherImpl(
                 postProcessingConfig = config.postProcessingConfig,
                 validationStamp = config.validationStamp,
                 autoApprovalMode = config.autoApprovalMode ?: AutoVersioningSourceConfig.DEFAULT_AUTO_APPROVAL_MODE,
+                reviewers = config.reviewers ?: emptyList(),
             )
         } catch (ex: Exception) {
             // Logging the event

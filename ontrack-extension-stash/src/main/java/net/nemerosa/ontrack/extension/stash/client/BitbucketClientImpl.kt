@@ -105,7 +105,8 @@ class BitbucketClientImpl(
         title: String,
         head: String,
         base: String,
-        body: String
+        body: String,
+        reviewers: List<String>,
     ): BitbucketServerPR =
         template.postForObject(
             "/rest/api/latest/projects/${repo.project}/repos/${repo.repository}/pull-requests",
@@ -117,7 +118,14 @@ class BitbucketClientImpl(
                 ),
                 "toRef" to mapOf(
                     "id" to "refs/heads/$base"
-                )
+                ),
+                "reviewers" to reviewers.map {
+                    mapOf(
+                        "user" to mapOf(
+                            "name" to it,
+                        )
+                    )
+                }
             ),
             BitbucketServerPR::class.java
         ) ?: throw BitbucketServerCannotCreatePRException()

@@ -21,4 +21,5 @@ data class AutoVersioningSourceConfig(
     val backValidation: String? = null,
     val versionSource: String? = null,
     val buildLinkCreation: Boolean? = null,
+    val reviewers: List<String> = emptyList(),
 )

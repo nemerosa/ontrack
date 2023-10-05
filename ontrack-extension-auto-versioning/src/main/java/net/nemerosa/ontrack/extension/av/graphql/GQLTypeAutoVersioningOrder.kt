@@ -10,10 +10,7 @@ import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeBranch
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
-import net.nemerosa.ontrack.graphql.support.booleanField
-import net.nemerosa.ontrack.graphql.support.enumField
-import net.nemerosa.ontrack.graphql.support.stringField
+import net.nemerosa.ontrack.graphql.support.*
 import org.springframework.stereotype.Component
 
 @Component
@@ -66,6 +63,10 @@ class GQLTypeAutoVersioningOrder(
             .enumField(
                 AutoVersioningOrder::autoApprovalMode,
                 "Defines the way the PR is merged when auto approval is set."
+            )
+            .stringListField(
+                AutoVersioningOrder::reviewers,
+                "List of reviewers to always add to the pull request"
             )
             .field {
                 it.name("repositoryHtmlURL")
