@@ -11,6 +11,8 @@ export default function ValidationStamp({
                                             link, displayLink = true,
                                             tooltip, displayTooltip = true, tooltipPlacement,
                                             onClick,
+                                            selectable,
+                                            selected,
                                         }) {
 
     function InnerValidationStamp({
@@ -20,7 +22,13 @@ export default function ValidationStamp({
                                       onClick,
                                   }) {
         return (
-            <Space onClick={onClick} className={onClick ? "ot-action" : undefined}>
+            <Space
+                onClick={onClick}
+                className={onClick ? "ot-action" : undefined}
+                style={{
+                    opacity: !selectable || selected ? undefined : '30%'
+                }}
+            >
                 {
                     displayImage && <ValidationStampImage validationStamp={validationStamp} size={imageSize}/>
                 }
@@ -46,7 +54,7 @@ export default function ValidationStamp({
                                             onClick={onClick}
         />
         if (displayLink) {
-            return <LegacyLink href={validationStampUri(validationStamp)}>
+            return <LegacyLink href={link ? link : validationStampUri(validationStamp)}>
                 {inner}
             </LegacyLink>
         } else {
@@ -54,11 +62,11 @@ export default function ValidationStamp({
         }
     }
 
-    const inner = <InnerValidationStampLink validationStamp={validationStamp}
-                                            text={text} displayText={displayText}
-                                            displayImage={displayImage}
-                                            link={link} displayLink={displayLink}
-                                            onClick={onClick}
+    const innerLink = <InnerValidationStampLink validationStamp={validationStamp}
+                                                text={text} displayText={displayText}
+                                                displayImage={displayImage}
+                                                link={link} displayLink={displayLink}
+                                                onClick={onClick}
     />
 
     if (displayTooltip) {
@@ -71,11 +79,11 @@ export default function ValidationStamp({
             placement={tooltipPlacement}
         >
             <span>
-                {inner}
+                {innerLink}
             </span>
         </Popover>
     } else {
-        return inner
+        return innerLink
     }
 
 }

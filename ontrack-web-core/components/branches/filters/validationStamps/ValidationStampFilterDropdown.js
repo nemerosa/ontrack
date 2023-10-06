@@ -13,6 +13,9 @@ import NewValidationStampFilterDialog, {
 import EditValidationStampFilterDialog, {
     useEditValidationStampFilterDialog
 } from "@components/branches/filters/validationStamps/EditValidationStampFilterDialog";
+import {
+    gqlValidationStampFilterFragment
+} from "@components/branches/filters/validationStamps/ValidationStampFilterGraphQLFragments";
 
 /**
  * @param branch Target branch for the filters
@@ -44,20 +47,6 @@ export default function ValidationStampFilterDropdown({
             selectFilter(filter)
         }
     }
-
-    const gqlValidationStampFilterFragment = gql`
-        fragment validationStampFilterContent on ValidationStampFilter {
-            id
-            name
-            scope
-            vsNames
-            authorizations {
-                name
-                action
-                authorized
-            }
-        }
-    `
 
     const newValidationStampFilterDialog = useNewValidationStampFilterDialog({
         onSuccess: (values) => {

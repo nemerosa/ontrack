@@ -33,7 +33,7 @@ export default function BranchBuilds({
                                          validationStamps, loadingValidationStamps,
                                          onChange,
                                          selectedBuildFilter, onSelectedBuildFilter, onPermalinkBuildFilter,
-                                         selectedValidationStampFilter, onSelectedValidationStampFilter,
+                                         selectedValidationStampFilter, onSelectedValidationStampFilter, onSelectValidationStampForFilter,
                                      }) {
 
     const router = useRouter()
@@ -68,6 +68,12 @@ export default function BranchBuilds({
 
     const stopInlineEdition = () => {
         onInlineEdition(false)
+    }
+
+    const localOnSelectValidationStampForFilter = (validationStamp) => {
+        if (selectedBuildFilter && inlineEdition && onSelectValidationStampForFilter) {
+            onSelectValidationStampForFilter(validationStamp)
+        }
     }
 
     return (
@@ -113,7 +119,8 @@ export default function BranchBuilds({
                                                 <FaCheckSquare/>
                                                 <Typography.Text>
                                                     Select all for&nbsp;
-                                                    <Typography.Text strong>{selectedValidationStampFilter.name}</Typography.Text>
+                                                    <Typography.Text
+                                                        strong>{selectedValidationStampFilter.name}</Typography.Text>
                                                 </Typography.Text>
                                             </Space>
                                         </Button>
@@ -122,15 +129,18 @@ export default function BranchBuilds({
                                                 <FaSquare/>
                                                 <Typography.Text>
                                                     Select none for&nbsp;
-                                                    <Typography.Text strong>{selectedValidationStampFilter.name}</Typography.Text>
+                                                    <Typography.Text
+                                                        strong>{selectedValidationStampFilter.name}</Typography.Text>
                                                 </Typography.Text>
                                             </Space>
                                         </Button>
-                                        <Button className="ot-validation-stamp-filter-edition" onClick={stopInlineEdition}>
+                                        <Button className="ot-validation-stamp-filter-edition"
+                                                onClick={stopInlineEdition}>
                                             <Space>
                                                 <FaEyeSlash/>
                                                 <Typography.Text>
-                                                    <Typography.Text strong>{selectedValidationStampFilter.name}</Typography.Text>
+                                                    <Typography.Text
+                                                        strong>{selectedValidationStampFilter.name}</Typography.Text>
                                                     &nbsp;done editing
                                                 </Typography.Text>
                                             </Space>
@@ -252,6 +262,14 @@ export default function BranchBuilds({
                                         <ValidationStampHeader
                                             key={validationStamp.id}
                                             validationStamp={validationStamp}
+                                            selectable={inlineEdition}
+                                            tooltip={
+                                                inlineEdition && selectedValidationStampFilter ?
+                                                    `Select/unselect this "${validationStamp.name}" validation to add/remove it from the "${selectedValidationStampFilter.name}" filter` :
+                                                    undefined
+                                            }
+                                            selected={selectedBuildFilter && selectedBuildFilter.vsNames.indexOf(validationStamp.name) >= 0}
+                                            onSelect={() => localOnSelectValidationStampForFilter(validationStamp)}
                                         />
                                     }
                                     render={(_, build) =>

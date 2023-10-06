@@ -6,11 +6,12 @@ import BranchBuilds from "@components/branches/BranchBuilds";
 import useRangeSelection from "@components/common/RangeSelection";
 import {gql} from "graphql-request";
 import {
-    getLocallySelectedBuildFilter, getLocallySelectedValidationFilter,
-    setLocallySelectedBuildFilter,
-    setLocallySelectedValidationStampFilter
+    getLocallySelectedBuildFilter, setLocallySelectedBuildFilter,
 } from "@components/storage/local";
 import {useRouter} from "next/router";
+import {
+    gqlValidationStampFilterFragment
+} from "@components/branches/filters/validationStamps/ValidationStampFilterGraphQLFragments";
 
 export default function ClassicBranchView({branch}) {
 
@@ -41,7 +42,8 @@ export default function ClassicBranchView({branch}) {
                 pathname: `/branch/${branch.id}`,
                 query: {}
             }, undefined, {shallow: true})
-        } catch (ignored) {}
+        } catch (ignored) {
+        }
     } else {
         initialBuildFilter = getLocallySelectedBuildFilter(branch.id)
     }
@@ -67,6 +69,42 @@ export default function ClassicBranchView({branch}) {
     const [selectedValidationStampFilter, setSelectedValidationStampFilter] = useState()
     const onSelectedValidationStampFilter = (filter) => {
         setSelectedValidationStampFilter(filter)
+    }
+
+    const onSelectValidationStampForFilter = (validationStamp) => {
+        if (selectedValidationStampFilter) {
+            let vsNames = selectedValidationStampFilter.vsNames
+            if (vsNames.indexOf(validationStamp.name) >= 0) {
+                vsNames = vsNames.filter(it => it !== validationStamp.name).sort()
+            } else {
+                vsNames = [...vsNames, validationStamp.name].sort()
+            }
+            graphQLCall(
+                gql`
+                    mutation UpdateValidationStampFilter(
+                        $id: Int!,
+                        $vsNames: [String!]!,
+                    ) {
+                        updateValidationStampFilter(input: {
+                            id: $id,
+                            vsNames: $vsNames,
+                        }) {
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                `, {
+                    id: selectedValidationStampFilter.id,
+                    vsNames,
+                }
+            ).then(data => {
+                setSelectedValidationStampFilter({
+                    ...selectedValidationStampFilter,
+                    vsNames,
+                })
+            })
+        }
     }
 
     // Loading the builds
@@ -158,6 +196,7 @@ export default function ClassicBranchView({branch}) {
                     onPermalinkBuildFilter={onPermalinkBuildFilter}
                     selectedValidationStampFilter={selectedValidationStampFilter}
                     onSelectedValidationStampFilter={onSelectedValidationStampFilter}
+                    onSelectValidationStampForFilter={onSelectValidationStampForFilter}
                 />
             </Space>
         </>
