@@ -40,8 +40,11 @@ class AutoVersioningConfigSetup {
     var branch: String = "main"
     var promotion: String = "IRON"
 
+    var targetProperty = "version"
+
     var validationStamp: String? = null
     var qualifier: String? = null
+    var versionSource: String? = null
 
     @Deprecated("Use project property directory")
     fun sourceProject(value: String) {
@@ -64,7 +67,7 @@ class AutoVersioningConfigSetup {
         sourcePromotion = promotion,
         targetPath = "gradle.properties",
         targetRegex = null,
-        targetProperty = "version",
+        targetProperty = targetProperty,
         targetPropertyRegex = null,
         targetPropertyType = null,
         autoApproval = null,
@@ -75,6 +78,7 @@ class AutoVersioningConfigSetup {
         autoApprovalMode = AutoApprovalMode.SCM,
         qualifier = qualifier,
         reviewers = null,
+        versionSource = versionSource,
     )
 
 }

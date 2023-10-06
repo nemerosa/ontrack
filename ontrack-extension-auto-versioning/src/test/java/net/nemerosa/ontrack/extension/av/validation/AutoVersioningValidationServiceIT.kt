@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.extension.av.validation
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.general.autoValidationStampProperty
+import net.nemerosa.ontrack.extension.general.metaInfoItem
+import net.nemerosa.ontrack.extension.general.metaInfoProperty
 import net.nemerosa.ontrack.extension.scm.service.TestSCMExtension
 import net.nemerosa.ontrack.model.structure.Build
 import org.junit.jupiter.api.Test
@@ -142,7 +144,8 @@ internal class AutoVersioningValidationServiceIT : AbstractAutoVersioningTestSup
                 val build = build()
                 build.linkTo(linkedBuild430)
 
-                run("""
+                run(
+                    """
                     mutation {
                         checkAutoVersioning(input: {
                             project: "${build.project.name}",
@@ -154,7 +157,8 @@ internal class AutoVersioningValidationServiceIT : AbstractAutoVersioningTestSup
                             }
                         }
                     }
-                """) { data ->
+                """
+                ) { data ->
                     checkGraphQLUserErrors(data, "checkAutoVersioning")
                 }
 
@@ -467,6 +471,71 @@ internal class AutoVersioningValidationServiceIT : AbstractAutoVersioningTestSup
 
                 // Checks that the build link has been created
                 structureService.isLinkedTo(build, linkedBuild431.project.name, linkedBuild431.name, qualifier = "dep1")
+            }
+        }
+    }
+
+    @Test
+    fun `Check and validate based on a floating version stored in meta information`() {
+        project {
+            branch {
+                val dependency = this
+                // Promotion
+                val pl = promotionLevel()
+                // Creates some builds whose "version" is floating (snapshot, yes, I know, very bad)
+                // and stored into the meta information
+                build {
+                    metaInfoProperty(this, metaInfoItem("myVersion", "1-SNAPSHOT"))
+                    promote(pl)
+                }
+                build {
+                    metaInfoProperty(this, metaInfoItem("myVersion", "2-SNAPSHOT"))
+                    promote(pl)
+                }
+                val lastDependencyBuild = build {
+                    metaInfoProperty(this, metaInfoItem("myVersion", "2-SNAPSHOT"))
+                    promote(pl)
+                }
+
+                // Now, let's focus on the target
+                project {
+                    branch {
+                        val vs = validationStamp("av-my-version")
+                        setAutoVersioning {
+                            autoVersioningConfig {
+                                project = dependency.project.name
+                                branch = dependency.name
+                                promotion = pl.name
+                                targetProperty = "myVersion"
+                                versionSource = "metaInfo/myVersion"
+                                validationStamp = "av-my-version"
+                            }
+                        }
+                        testSCMExtension.registerProjectForTestSCM(project) {
+                            withFile("gradle.properties", branch = name) {
+                                "myVersion = 2-SNAPSHOT" // Up to date
+                            }
+                        }
+
+                        // Creating a build
+                        val build = build()
+
+                        // Running the check
+                        autoVersioningValidationService.checkAndValidate(build)
+
+                        // Gets the validation
+                        val run =
+                            structureService.getValidationRunsForBuildAndValidationStamp(build.id, vs.id, 0, 1)
+                                .firstOrNull()
+                        assertNotNull(run, "Validation has been created") {
+                            assertEquals("PASSED", it.lastStatusId, "Validation passed")
+                        }
+
+                        // Checks that the build link has been created
+                        structureService.isLinkedTo(build, lastDependencyBuild.project.name, lastDependencyBuild.name)
+                    }
+                }
+
             }
         }
     }

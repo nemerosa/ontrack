@@ -86,9 +86,6 @@ class AutoVersioningDispatcherImpl(
     }
 
     private fun getBuildSourceVersion(event: PromotionEvent, config: AutoVersioningSourceConfig): String {
-        val (id, param) = config.versionSource?.let {
-            getVersionSourceConfig(it)
-        } ?: (DefaultVersionSource.ID to null)
-        return versionSourceFactory.getVersionSource(id).getVersion(event.build, param)
+        return versionSourceFactory.getBuildVersion(event.build, config)
     }
 }
