@@ -25,6 +25,7 @@ internal data class AutoVersioningAuditStoreData(
     val states: List<AutoVersioningAuditEntryState>,
     val routing: String,
     val queue: String?,
+    val reviewers: List<String>?, // Nullable for backward compatibility
 ) {
     val mostRecentState
         get() = states.first().state
@@ -52,5 +53,6 @@ internal data class AutoVersioningAuditStoreData(
         states = listOf(newState) + states,
         routing = routing,
         queue = queue,
+        reviewers = reviewers,
     )
 }

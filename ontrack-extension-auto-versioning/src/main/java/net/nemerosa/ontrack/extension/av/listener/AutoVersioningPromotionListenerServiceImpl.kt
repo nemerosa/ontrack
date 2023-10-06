@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.extension.av.model.PromotionEvent
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.BuildDisplayNameService
 import net.nemerosa.ontrack.model.structure.PromotionLevel
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class AutoVersioningPromotionListenerServiceImpl(
-    private val buildDisplayNameService: BuildDisplayNameService,
     private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
     private val scmDetector: SCMDetector,
 ) : AutoVersioningPromotionListenerService {
@@ -27,23 +25,8 @@ class AutoVersioningPromotionListenerServiceImpl(
 
     override fun getConfiguredBranches(build: Build, promotion: PromotionLevel): AutoVersioningConfiguredBranches? {
         logger.debug("Looking for configured branches: ${build.entityDisplayName} @ ${promotion.name}...")
-        // Gets the build name or version
-        // We need to check if the build has any eligible version, based on its settings.
-        // For example, a build having a "build display name" property stating that the label
-        // must be used, if not having a label, won't have any eligible version.
-        val version = buildDisplayNameService.getEligibleBuildDisplayName(build)
-        // If no version can be gotten from the build, we don't return any configuration
-        if (version == null) {
-            // Logging the event
-            logger.info("Build ${build.id} (${build.entityDisplayName}) was promoted, " +
-                    "but is not eligible to auto versioning because no version was returned. " +
-                    "This can typically be due to the fact that its project requires a label " +
-                    "and the build has none.")
-            // Not returning any config
-            return null
-        }
         // Creation of the event
-        val promotionEvent = PromotionEvent(build, promotion.name, version)
+        val promotionEvent = PromotionEvent(build, promotion.name)
         // Gets all the trigger configurations about this event, based on project & promotion only
         val branches = autoVersioningConfigurationService.getBranchesConfiguredFor(build.project.name, promotion.name)
         logger.debug("Raw configured branches for ${build.entityDisplayName} @ ${promotion.name}: ${branches.size}")

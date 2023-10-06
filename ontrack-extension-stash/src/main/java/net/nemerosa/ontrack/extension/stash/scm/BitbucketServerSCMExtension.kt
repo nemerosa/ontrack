@@ -120,7 +120,8 @@ class BitbucketServerSCMExtension(
             description: String,
             autoApproval: Boolean,
             remoteAutoMerge: Boolean,
-            message: String
+            message: String,
+            reviewers: List<String>,
         ): SCMPullRequest {
             // Creates the pull request
             val pr = client.createPR(
@@ -128,7 +129,8 @@ class BitbucketServerSCMExtension(
                 title = title,
                 head = from,
                 base = to,
-                body = description
+                body = description,
+                reviewers = reviewers,
             )
             val prId = pr.id
             // Auto approval process (approval + wait for checks + merge)

@@ -77,6 +77,38 @@ class BitbucketServerSCMExtensionIT : AbstractBitbucketTestSupport() {
     }
 
     @Test
+    fun `Creating a pull request with reviewers`() {
+        withScm { scm ->
+            // Creating the branch
+            val branchName = uid("branch/")
+            scm.createBranch(bitbucketServerEnv.defaultBranch, branchName)
+            // Uploading a file to this branch
+            val path = uid("file_") + ".txt"
+            scm.upload(
+                scmBranch = branchName,
+                commit = "",
+                path = path,
+                content = "Some text content".encodeToByteArray(),
+                message = "Test for PR"
+            )
+            // Creating a PR
+            val pr = scm.createPR(
+                from = branchName,
+                to = "main",
+                title = uid("pr_"),
+                description = "Test PR with reviewers",
+                autoApproval = false,
+                remoteAutoMerge = false,
+                message = "Test PR with reviewers",
+                reviewers = listOf(
+                    bitbucketServerEnv.autoMergeUser ?: error("Auto merge user is required")
+                ),
+            )
+            // TODO Checks that the PR has some reviewers
+        }
+    }
+
+    @Test
     fun `Editing and downloading a file on a branch`() {
         withScm { scm ->
             val branchName = uid("branch/")
@@ -157,7 +189,8 @@ class BitbucketServerSCMExtensionIT : AbstractBitbucketTestSupport() {
                 description = "Sample pull request description",
                 autoApproval = autoApproval,
                 remoteAutoMerge = remoteAutoMerge,
-                message = "Commit message for auto merge"
+                message = "Commit message for auto merge",
+                reviewers = emptyList(),
             )
             // Checks
             assertTrue(pr.id.isNotBlank(), "PR created")

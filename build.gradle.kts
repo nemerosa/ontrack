@@ -73,6 +73,10 @@ subprojects {
 allprojects {
     repositories {
         mavenCentral()
+        // For auto-versioning module, for 4koma (TOML)
+        maven {
+            url = uri("https://jitpack.io")
+        }
     }
 }
 

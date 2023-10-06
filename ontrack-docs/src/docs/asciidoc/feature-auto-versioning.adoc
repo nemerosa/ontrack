@@ -180,6 +180,9 @@ configurations:
     buildLinkCreation: Boolean?
     # Qualifier to use for the build links
     qualifier: String?
+    # How must the version to use be computed from the source build?
+    # See "Version source" below
+    versionSource: String?
 ----
 
 [NOTE]
@@ -214,10 +217,27 @@ Con's:
 
 The `sourceBranch` parameter can be set to `&<expression>` where `<expression>` is an expression used to detect the source branch on the source project for a branch eligible for auto versioning.
 
-[NOTE]
-====
-As of now, only one expression is supported: `same`. Other methods may be supported in later releases.
-====
+Supported values are:
+
+====== `&regex`
+
+By using:
+
+[source,yaml]
+----
+sourceBranch: "&regex:<regex>"
+----
+
+this is equivalent to the default behaviour:
+
+[source,yaml]
+----
+sourceBranch: "<regex>"
+----
+
+====== `&same`
+
+The source branch must have the exact same name as the target branch.
 
 Example: if you have a branch `release-1.24` on a parent project `P` and you want to get updates from a `dependency` project only for the same branch, `release-1.24`, you can use:
 
@@ -225,6 +245,56 @@ Example: if you have a branch `release-1.24` on a parent project `P` and you wan
 ----
 sourceBranch: "&same"
 ----
+
+====== `&same-release`
+
+On the same model as the "&same" `sourceBranch` parameter, there is the possibility to get a "&same-release" branch source.
+
+This is to be used in cases where the dependency and its parent follow the same branch policy at `release/` branch level, but only for a limited number of levels.
+
+For example, a parent has release branches like release/1.24.10, with a dependency using on release/1.24.15. We want release/1.x.y to always depend on the latest release/1.x.z branch (using 1. as a common prefix).
+
+One way to do this is to use: `sourceBranch: "release/1.24.*"`  but this would force you to always update the source branch parameter for every branch:
+
+* release/1.24.* in release/1.24.x branch
+* release/1.25.* in release/1.25.x branch
+* etc.
+
+A better way is to use, in this scenario:
+
+[source,yaml]
+----
+sourceBranch: "&same-release:2"
+----
+
+This means:
+
+* if you're on a release/x.y.z branch, use release/x.y.* for the latest branch
+* for any other branch (main) for example, we use the same branch
+
+[NOTE]
+====
+Note that `:2` means: take the first two numbers of the version of the release branch. By default, it'd be `:1` and can be omitted: `sourceBranch: "&same-release"`.
+====
+
+[[auto-versioning-config-version-source]]
+===== Version source
+
+By default, the version to use in the target project is computed directly from the <<model,build>> which has been promoted.
+
+The default behavior is:
+
+* if the source project is configured to use the labels for the builds ("Build name display" property), the label (or release, or version) of the build is used. If this label is not present, the auto versioning request will be rejected
+* if the source project is not configured, the build name is taken as the version
+
+This version computation can be adapted using the <<auto-versioning-config,`versionSource`>> configuration parameter.
+
+The different options for this parameter are:
+
+* `default` - uses the default behavior described above
+* `name` - uses the name of the build, regardless of the source project configuration
+* `labelOnly` - uses the label attached to the build, regardless of the source project configuration. If there is no label, the auto versioning request is rejected
+* `metaInfo/<category>/<name>` or `metaInfo/<name>` - the version is the value of a meta information item of the request category (optional) or name. If so such meta information is found, the auto versioning request is rejected.
 
 [[auto-versioning-config-type]]
 ===== Target files types
@@ -248,6 +318,7 @@ Two types are currently supported:
 * `npm` - NPM package file, typically used for `package.json`
 * `maven` - <<auto-versioning-config-type-maven,Maven POM file>>
 * `yaml` - YAML file, see <<auto-versioning-config-type-yaml>>
+* `toml` - TOML file, see <<auto-versioning-config-type-toml>>
 
 See the <<auto-versioning-config-examples,examples section>> for their usage.
 
@@ -328,6 +399,32 @@ For this purpose, you need to specify also the `propertyRegex` and set it, for t
 ----
 ^repo\/component:(.*)$
 ----
+
+[[auto-versioning-config-type-tomml]]
+====== TOML files
+
+
+When `propertyType` is set to `yaml`, `property` is expected to define a path inside the YAML file.
+
+For example, given the following TOML file:
+
+[source,toml]
+----
+[images]
+myVersion = "2.0.0"
+----
+
+To update the `myVersion` property in the `images` table, one can set the auto versioning `property` to `images.myVersion`.
+
+[WARNING]
+====
+The support of TOML in the Ontrack auto versioning uses the https://github.com/valderman/4koma[4koma] library and this comes with some caveats:
+
+* comments are not supported and will be _stripped_ from the file after the auto versioning request has been processed
+* only basic expressions like `a.b.c` are supported. Arrays and other structures are not supported.
+
+Request for help: if you know of a better TOML Java/Kotlin library which would support comments, updates of the TOML structure, more complex queries, please let me know.
+====
 
 [[auto-versioning-config-integrations]]
 ===== Integrations

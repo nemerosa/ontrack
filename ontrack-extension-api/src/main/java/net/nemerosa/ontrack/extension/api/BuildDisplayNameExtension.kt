@@ -9,10 +9,13 @@ import net.nemerosa.ontrack.model.structure.Build
  */
 interface BuildDisplayNameExtension : Extension {
 
+    /**
+     * Returns a name according to the build configuration or null if not available.
+     */
     fun getBuildDisplayName(build: Build): String?
 
     /**
-     * Checks if
+     * Checks if the build MUST return a name according to its configuration.
      */
     fun mustProvideBuildName(build: Build): Boolean
 

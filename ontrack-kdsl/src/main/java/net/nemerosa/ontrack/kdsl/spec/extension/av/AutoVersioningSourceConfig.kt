@@ -19,4 +19,7 @@ data class AutoVersioningSourceConfig(
     val autoApprovalMode: AutoApprovalMode? = AutoApprovalMode.CLIENT,
     val notifications: List<AutoVersioningNotification>? = null,
     val backValidation: String? = null,
+    val versionSource: String? = null,
+    val buildLinkCreation: Boolean? = null,
+    val reviewers: List<String> = emptyList(),
 )

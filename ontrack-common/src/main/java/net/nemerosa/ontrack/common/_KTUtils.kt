@@ -4,6 +4,17 @@ import java.util.*
 import kotlin.reflect.KCallable
 
 /**
+ * Creating a list by repeating an element
+ */
+operator fun <T> T.times(n: Int): List<T> {
+    val list = mutableListOf<T>()
+    repeat(n) {
+        list += this
+    }
+    return list.toList()
+}
+
+/**
  * Combination of predicates
  */
 infix fun <T> ((T) -> Boolean).and(other: (T) -> Boolean): (T) -> Boolean = { t ->

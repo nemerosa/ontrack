@@ -21,10 +21,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.RestClientResponseException
-import org.springframework.web.client.RestTemplate
-import org.springframework.web.client.getForObject
+import org.springframework.web.client.*
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -590,7 +587,14 @@ class DefaultOntrackGitHubClient(
         }?.`object`?.sha
     }
 
-    override fun setFileContent(repository: String, branch: String, sha: String, path: String, content: ByteArray, message: String) {
+    override fun setFileContent(
+        repository: String,
+        branch: String,
+        sha: String,
+        path: String,
+        content: ByteArray,
+        message: String
+    ) {
         // Getting a client
         val client = createGitHubRestTemplate()
         // Gets the repository for this project
@@ -609,12 +613,19 @@ class DefaultOntrackGitHubClient(
         }
     }
 
-    override fun createPR(repository: String, title: String, head: String, base: String, body: String): GitHubPR {
+    override fun createPR(
+        repository: String,
+        title: String,
+        head: String,
+        base: String,
+        body: String,
+        reviewers: List<String>,
+    ): GitHubPR {
         // Gets the repository for this project
         val (owner, name) = getRepositoryParts(repository)
         // Retries
         return retryOnNotFound("Creating PR from $head to $base") {
-            postForObject(
+            val pr = postForObject(
                 "/repos/$owner/$name/pulls",
                 mapOf(
                     "title" to title,
@@ -624,7 +635,20 @@ class DefaultOntrackGitHubClient(
                 ),
                 GitHubPullRequestResponse::class.java
             )
+            // Requesting reviewers
+            if (pr != null && reviewers.isNotEmpty()) {
+                postForObject(
+                    "/repos/$owner/$name/pulls/${pr.number}/requested_reviewers",
+                    mapOf(
+                        "reviewers" to reviewers,
+                    ),
+                    JsonNode::class.java,
+                )
+            }
+            // OK
+            pr
         }?.run {
+            // OK
             GitHubPR(
                 number = number,
                 mergeable = mergeable,

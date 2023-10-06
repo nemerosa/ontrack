@@ -2,8 +2,8 @@ package net.nemerosa.ontrack.graphql.schema
 
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
-import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ID
@@ -53,14 +53,17 @@ class PromotionRunMutations(
     )
 
     private fun promote(build: Build, input: PromotionRunInput): PromotionRun {
-        val promotionLevel = structureService.findPromotionLevelByName(
+        val branch = structureService.findBranchByName(
             build.project.name,
             build.branch.name,
-            input.promotion
-        ).getOrNull() ?: throw PromotionLevelNotFoundException(
+        ).getOrNull() ?: throw BranchNotFoundException(
             build.project.name,
             build.branch.name,
-            input.promotion
+        )
+        val promotionLevel = structureService.getOrCreatePromotionLevel(
+            branch,
+            promotionLevelId = null,
+            promotionLevelName = input.promotion,
         )
         val signature = securityService.currentSignature.run {
             if (input.dateTime != null) {

@@ -15,9 +15,8 @@ import org.springframework.transaction.annotation.Transactional
 class AutoVersioningConfigurationServiceImpl(
     private val securityService: SecurityService,
     private val entityDataService: EntityDataService,
+    private val regexBranchSource: RegexBranchSource,
     private val structureService: StructureService,
-    private val ordering: OptionalVersionBranchOrdering,
-    private val branchDisplayNameService: BranchDisplayNameService,
     private val eventSubscriptionService: EventSubscriptionService,
     private val autoVersioningBranchExpressionService: AutoVersioningBranchExpressionService,
 ) : AutoVersioningConfigurationService {
@@ -128,27 +127,21 @@ class AutoVersioningConfigurationServiceImpl(
             structureService.getBranch(ID.of(it.id))
         }
 
-    override fun getLatestBranch(eligibleTargetBranch: Branch, project: Project, config: AutoVersioningSourceConfig): Branch? {
+    override fun getLatestBranch(
+        eligibleTargetBranch: Branch,
+        project: Project,
+        config: AutoVersioningSourceConfig
+    ): Branch? =
         if (config.sourceBranch.startsWith("&")) {
             val avBranchExpression = config.sourceBranch.drop(1)
-            return autoVersioningBranchExpressionService.getLatestBranch(eligibleTargetBranch, project, avBranchExpression)
+            autoVersioningBranchExpressionService.getLatestBranch(eligibleTargetBranch, project, avBranchExpression)
         } else {
-            val sourceRegex = config.sourceBranch.toRegex()
-            // Version-based ordering
-            val versionComparator = ordering.getComparator(config.sourceBranch)
-            // Gets the list of branches for the source project
-            return structureService.getBranchesForProject(project.id)
-                // ... filters them by regex, using their path
-                .filter { sourceBranch ->
-                    // Path of the branch
-                    val sourcePath = branchDisplayNameService.getBranchDisplayName(sourceBranch)
-                    // Match check
-                    sourceRegex.matches(sourcePath) || sourceRegex.matches(sourceBranch.name)
-                }
-                // ... order them by version
-                .minWithOrNull(versionComparator)
+            regexBranchSource.getLatestBranch(
+                config.sourceBranch,
+                project,
+                eligibleTargetBranch
+            )
         }
-    }
 
     companion object {
         private val STORE: String = AutoVersioningConfig::class.java.name

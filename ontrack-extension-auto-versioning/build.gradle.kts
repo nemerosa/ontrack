@@ -22,6 +22,8 @@ dependencies {
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation(project(":ontrack-extension-notifications"))
 
+    implementation("cc.ekblad:4koma:1.2.0")
+
     testImplementation(project(":ontrack-extension-general"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))

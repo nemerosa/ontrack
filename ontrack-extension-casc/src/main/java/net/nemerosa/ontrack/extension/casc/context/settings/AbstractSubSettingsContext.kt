@@ -39,5 +39,7 @@ abstract class AbstractSubSettingsContext<T : Any>(
 
     protected open fun adjustNodeBeforeParsing(node: JsonNode): JsonNode = node
 
-    override fun render(): JsonNode = cachedSettingsService.getCachedSettings(settingsClass.java).asJson()
+    override fun render(): JsonNode = obfuscate(cachedSettingsService.getCachedSettings(settingsClass.java)).asJson()
+
+    open fun obfuscate(settings: T): T = settings
 }

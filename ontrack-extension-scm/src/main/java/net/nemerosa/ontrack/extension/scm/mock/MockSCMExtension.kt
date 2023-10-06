@@ -44,6 +44,7 @@ class MockSCMExtension(
         val title: String,
         val approved: Boolean,
         val merged: Boolean,
+        val reviewers: List<String>,
     )
 
     data class MockBranch(
@@ -78,6 +79,7 @@ class MockSCMExtension(
             title: String,
             autoApproval: Boolean,
             remoteAutoMerge: Boolean,
+            reviewers: List<String>,
         ): SCMPullRequest {
             val id = createdPullRequests.size + 1
             val pr = MockPullRequest(
@@ -87,6 +89,7 @@ class MockSCMExtension(
                 title = title,
                 approved = autoApproval,
                 merged = autoApproval, // Merged immediately?
+                reviewers = reviewers,
             )
 
             if (autoApproval) {
@@ -108,8 +111,7 @@ class MockSCMExtension(
 
         fun findPR(from: String?, to: String?): MockPullRequest? =
             createdPullRequests
-                .filter { from == null || it.from == from }.
-                firstOrNull { to == null || it.to == to }
+                .filter { from == null || it.from == from }.firstOrNull { to == null || it.to == to }
 
         fun getBranch(name: String): MockBranch? = createdBranches[name]?.let {
             MockBranch(it)
@@ -147,13 +149,15 @@ class MockSCMExtension(
             description: String,
             autoApproval: Boolean,
             remoteAutoMerge: Boolean,
-            message: String
+            message: String,
+            reviewers: List<String>,
         ): SCMPullRequest = repository(mockScmProjectProperty.name).createPR(
             from = from,
             to = to,
             title = title,
             autoApproval = autoApproval,
             remoteAutoMerge = remoteAutoMerge,
+            reviewers = reviewers,
         )
 
     }

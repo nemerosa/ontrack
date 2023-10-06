@@ -95,6 +95,7 @@ class AutoVersioningAuditStoreImpl(
                     ),
                     routing = routing,
                     queue = null,
+                    reviewers = reviewers,
                 )
             }
         )
@@ -140,6 +141,7 @@ class AutoVersioningAuditStoreImpl(
                         states = states,
                         routing = routing,
                         queue = queue,
+                        reviewers = reviewers,
                     )
                 }
             }
@@ -207,6 +209,7 @@ class AutoVersioningAuditStoreImpl(
                     postProcessingConfig = postProcessingConfig,
                     validationStamp = validationStamp,
                     autoApprovalMode = autoApprovalMode,
+                    reviewers = reviewers ?: emptyList(),
                 ),
                 audit = states,
                 routing = routing,

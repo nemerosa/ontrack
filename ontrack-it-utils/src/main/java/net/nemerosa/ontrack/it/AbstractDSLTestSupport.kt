@@ -455,8 +455,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Creation of a predefined promotion level
      */
-    protected fun predefinedPromotionLevel(name: String, description: String = "", image: Boolean = false) {
-        asAdmin().call {
+    protected fun predefinedPromotionLevel(name: String = uid("ppl_"), description: String = "", image: Boolean = false): PredefinedPromotionLevel =
+        asAdmin {
             val ppl = predefinedPromotionLevelService.newPredefinedPromotionLevel(
                     PredefinedPromotionLevel.of(
                             NameDescription.nd(name, description)
@@ -469,8 +469,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                         document
                 )
             }
+            ppl
         }
-    }
 
     /**
      * Creation of a predefined validation stamp

@@ -78,6 +78,7 @@ class TestSCMExtension(
             autoApproval: Boolean,
             remoteAutoMerge: Boolean,
             message: String,
+            reviewers: List<String>,
         ): SCMPullRequest {
             TODO("Not yet implemented")
         }

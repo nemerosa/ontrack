@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.common.toVersion
 import net.nemerosa.ontrack.model.ordering.BranchOrdering
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.BranchDisplayNameService
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 
 /**
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component
  * a capturing group.
  */
 @Component
+@Qualifier("optionalVersion")
 class OptionalVersionBranchOrdering(
         private val branchDisplayNameService: BranchDisplayNameService
 ) : BranchOrdering {
@@ -24,7 +26,7 @@ class OptionalVersionBranchOrdering(
     override val id: String = OPTIONAL_VERSION_BRANCH_ORDERING_ID
 
     override fun getComparator(param: String?): Comparator<Branch> {
-        return if (param != null && param.isNotBlank()) {
+        return if (!param.isNullOrBlank()) {
             val regex = param.toRegex()
             compareByDescending { branch -> getVersion(branch, regex) }
         } else {

@@ -84,6 +84,7 @@ class GitSCMExtension(
             autoApproval: Boolean,
             remoteAutoMerge: Boolean,
             message: String,
+            reviewers: List<String>,
         ): SCMPullRequest {
             unsupported("createPR")
         }

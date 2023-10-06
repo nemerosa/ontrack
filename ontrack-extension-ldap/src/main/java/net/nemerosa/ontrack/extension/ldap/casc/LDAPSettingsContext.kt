@@ -24,4 +24,6 @@ class LDAPSettingsContext(
         LDAPSettings::groupSearchFilter to LDAPSettings.DEFAULT_GROUP_SEARCH_FILTER,
     )
 
+    override fun obfuscate(settings: LDAPSettings): LDAPSettings = settings.withPassword("")
+
 }

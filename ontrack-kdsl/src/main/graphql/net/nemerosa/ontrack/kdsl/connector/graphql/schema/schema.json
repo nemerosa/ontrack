@@ -1697,6 +1697,29 @@
               "deprecationReason": null
             },
             {
+              "name": "reviewers",
+              "description": "List of reviewers to always add to the pull request",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "repositoryHtmlURL",
               "description": "Link to the target repository",
               "args": [],
@@ -1824,6 +1847,26 @@
               "deprecationReason": null
             },
             {
+              "name": "reviewers",
+              "description": "List of reviewers to always set on the pull request created by the auto versioning",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "sourceBranch",
               "description": "Branches to watch using a regular expression",
               "args": [],
@@ -1950,6 +1993,18 @@
             {
               "name": "validationStamp",
               "description": "Validation stamp to create on auto versioning (optional)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "versionSource",
+              "description": "Source of the version for the build. By default, uses the build label is the source project is configured so, or the build name itself. This allows the customization of this behavior.",
               "args": [],
               "type": {
                 "kind": "SCALAR",
@@ -2060,6 +2115,24 @@
               "defaultValue": null
             },
             {
+              "name": "reviewers",
+              "description": "List of reviewers to always set on the pull request created by the auto versioning",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
               "name": "sourceBranch",
               "description": "Branches to watch using a regular expression",
               "type": {
@@ -2168,6 +2241,16 @@
             {
               "name": "validationStamp",
               "description": "Validation stamp to create on auto versioning (optional)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "versionSource",
+              "description": "Source of the version for the build. By default, uses the build label is the source project is configured so, or the build name itself. This allows the customization of this behavior.",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
