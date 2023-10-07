@@ -29,11 +29,21 @@ const {Column} = Table;
  * @param selectedBuildFilter Currently selected build filter (can be undefined)
  */
 export default function BranchBuilds({
-                                         branch, builds, loadingBuilds, pageInfo, onLoadMore, rangeSelection,
-                                         validationStamps, loadingValidationStamps,
+                                         branch,
+                                         builds,
+                                         loadingBuilds,
+                                         pageInfo,
+                                         onLoadMore,
+                                         rangeSelection,
+                                         validationStamps,
+                                         loadingValidationStamps,
                                          onChange,
-                                         selectedBuildFilter, onSelectedBuildFilter, onPermalinkBuildFilter,
-                                         selectedValidationStampFilter, onSelectedValidationStampFilter, onSelectValidationStampForFilter,
+                                         selectedBuildFilter,
+                                         onSelectedBuildFilter,
+                                         onPermalinkBuildFilter,
+                                         selectedValidationStampFilter,
+                                         onSelectedValidationStampFilter,
+                                         onSelectValidationStampForFilter,
                                      }) {
 
     const router = useRouter()
@@ -71,7 +81,7 @@ export default function BranchBuilds({
     }
 
     const localOnSelectValidationStampForFilter = (validationStamp) => {
-        if (selectedBuildFilter && inlineEdition && onSelectValidationStampForFilter) {
+        if (selectedValidationStampFilter && inlineEdition && onSelectValidationStampForFilter) {
             onSelectValidationStampForFilter(validationStamp)
         }
     }
@@ -259,18 +269,22 @@ export default function BranchBuilds({
                                     key={validationStamp.name}
                                     className="ot-validation-stamp"
                                     title={
-                                        <ValidationStampHeader
-                                            key={validationStamp.id}
-                                            validationStamp={validationStamp}
-                                            selectable={inlineEdition}
-                                            tooltip={
-                                                inlineEdition && selectedValidationStampFilter ?
-                                                    `Select/unselect this "${validationStamp.name}" validation to add/remove it from the "${selectedValidationStampFilter.name}" filter` :
-                                                    undefined
-                                            }
-                                            selected={selectedBuildFilter && selectedBuildFilter.vsNames.indexOf(validationStamp.name) >= 0}
-                                            onSelect={() => localOnSelectValidationStampForFilter(validationStamp)}
-                                        />
+                                        <>
+                                            <ValidationStampHeader
+                                                key={validationStamp.id}
+                                                validationStamp={validationStamp}
+                                                selectable={inlineEdition}
+                                                tooltip={
+                                                    inlineEdition && selectedValidationStampFilter ?
+                                                        `Select/unselect this "${validationStamp.name}" validation to add/remove it from the "${selectedValidationStampFilter.name}" filter` :
+                                                        undefined
+                                                }
+                                                selected={
+                                                    selectedValidationStampFilter && selectedValidationStampFilter.vsNames.indexOf(validationStamp.name) >= 0
+                                                }
+                                                onSelect={() => localOnSelectValidationStampForFilter(validationStamp)}
+                                            />
+                                        </>
                                     }
                                     render={(_, build) =>
                                         <ValidationRunCell
