@@ -12,6 +12,9 @@ import {useRouter} from "next/router";
 import {
     gqlValidationStampFilterFragment
 } from "@components/branches/filters/validationStamps/ValidationStampFilterGraphQLFragments";
+import {
+    ValidationStampFilterProvider
+} from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
 
 export default function ClassicBranchView({branch}) {
 
@@ -181,23 +184,25 @@ export default function ClassicBranchView({branch}) {
     return (
         <>
             <Space direction="vertical" className="ot-line">
-                <BranchBuilds
-                    branch={branch}
-                    builds={builds}
-                    loadingBuilds={loadingBuilds}
-                    pageInfo={buildsPageInfo}
-                    onLoadMore={onLoadMoreBuilds}
-                    rangeSelection={rangeSelection}
-                    validationStamps={validationStamps}
-                    loadingValidationStamps={loadingValidationStamps}
-                    onChange={reloadBuilds}
-                    selectedBuildFilter={selectedBuildFilter}
-                    onSelectedBuildFilter={onSelectedBuildFilter}
-                    onPermalinkBuildFilter={onPermalinkBuildFilter}
-                    selectedValidationStampFilter={selectedValidationStampFilter}
-                    onSelectedValidationStampFilter={onSelectedValidationStampFilter}
-                    onSelectValidationStampForFilter={onSelectValidationStampForFilter}
-                />
+                <ValidationStampFilterProvider branch={branch}>
+                    <BranchBuilds
+                        branch={branch}
+                        builds={builds}
+                        loadingBuilds={loadingBuilds}
+                        pageInfo={buildsPageInfo}
+                        onLoadMore={onLoadMoreBuilds}
+                        rangeSelection={rangeSelection}
+                        validationStamps={validationStamps}
+                        loadingValidationStamps={loadingValidationStamps}
+                        onChange={reloadBuilds}
+                        selectedBuildFilter={selectedBuildFilter}
+                        onSelectedBuildFilter={onSelectedBuildFilter}
+                        onPermalinkBuildFilter={onPermalinkBuildFilter}
+                        selectedValidationStampFilter={selectedValidationStampFilter}
+                        onSelectedValidationStampFilter={onSelectedValidationStampFilter}
+                        onSelectValidationStampForFilter={onSelectValidationStampForFilter}
+                    />
+                </ValidationStampFilterProvider>
             </Space>
         </>
     )
