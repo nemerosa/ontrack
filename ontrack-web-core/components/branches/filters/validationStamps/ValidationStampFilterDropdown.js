@@ -209,6 +209,15 @@ export default function ValidationStampFilterDropdown({
                                     onClick={exitInlineEdit}
                                 />
                             }
+                            {
+                                isAuthorized(filter, "validation_stamp_filter", "edit") &&
+                                !inlineEdition &&
+                                <FaEdit
+                                    className="ot-command"
+                                    title="Edits this filter"
+                                    onClick={onEditFilter(filter)}
+                                />
+                            }
                         </>
                     }
                 />,
