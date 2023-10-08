@@ -105,7 +105,7 @@ export default function BranchBuilds({
                             <Row>
                                 <Col span={24} align="right">
                                     <Space>
-                                        <Button className="ot-validation-stamp-filter-edition">
+                                        <Button onClick={vsfContext.toggleAll} className="ot-validation-stamp-filter-edition">
                                             <Space>
                                                 <FaCheckSquare/>
                                                 <Typography.Text>
@@ -115,7 +115,7 @@ export default function BranchBuilds({
                                                 </Typography.Text>
                                             </Space>
                                         </Button>
-                                        <Button className="ot-validation-stamp-filter-edition">
+                                        <Button onClick={vsfContext.toggleNone} className="ot-validation-stamp-filter-edition">
                                             <Space>
                                                 <FaSquare/>
                                                 <Typography.Text>

@@ -26,6 +26,8 @@ export const ValidationStampFilterContext = createContext({
     // Toggles a validation stamp for the current filter
     toggleValidationStamp: (validationStamp) => {
     },
+    toggleAll: () => {},
+    toggleNone: () => {},
     // Inline edition management
     inlineEdition: false,
     startInlineEdition: (filter) => {
@@ -41,6 +43,7 @@ export const ValidationStampFilterContext = createContext({
 
 export default function ValidationStampFilterContextProvider({branch, children}) {
 
+    const [validationStampNames, setValidationStampNames] = useState([])
     const [filters, setFilters] = useState([])
     useEffect(() => {
         graphQLCall(
@@ -52,6 +55,9 @@ export default function ValidationStampFilterContextProvider({branch, children})
                         validationStampFilters(all: true) {
                             ...validationStampFilterContent
                         }
+                        validationStamps {
+                            name
+                        }
                     }
                 }
 
@@ -61,6 +67,8 @@ export default function ValidationStampFilterContextProvider({branch, children})
             }
         ).then(data => {
             setFilters(data.branch.validationStampFilters)
+            // Validation stamp names
+            setValidationStampNames(data.branch.validationStamps.map(it => it.name))
             // Selection of the initial filter
             // TODO Checks also the permalink
             const initialFilter = getLocallySelectedValidationFilter(branch.id)
@@ -78,6 +86,34 @@ export default function ValidationStampFilterContextProvider({branch, children})
         setSelectedFilter(filter)
     }
 
+    const updateFilter = (vsNames) => {
+        graphQLCall(
+            gql`
+                mutation UpdateValidationStampFilter(
+                    $id: Int!,
+                    $vsNames: [String!]!,
+                ) {
+                    updateValidationStampFilter(input: {
+                        id: $id,
+                        vsNames: $vsNames,
+                    }) {
+                        errors {
+                            message
+                        }
+                    }
+                }
+            `, {
+                id: selectedFilter.id,
+                vsNames,
+            }
+        ).then(data => {
+            setSelectedFilter({
+                ...selectedFilter,
+                vsNames,
+            })
+        })
+    }
+
     const toggleValidationStamp = useCallback((validationStamp) => {
         if (selectedFilter) {
             let vsNames = selectedFilter.vsNames
@@ -86,31 +122,19 @@ export default function ValidationStampFilterContextProvider({branch, children})
             } else {
                 vsNames = [...vsNames, validationStamp.name].sort()
             }
-            graphQLCall(
-                gql`
-                    mutation UpdateValidationStampFilter(
-                        $id: Int!,
-                        $vsNames: [String!]!,
-                    ) {
-                        updateValidationStampFilter(input: {
-                            id: $id,
-                            vsNames: $vsNames,
-                        }) {
-                            errors {
-                                message
-                            }
-                        }
-                    }
-                `, {
-                    id: selectedFilter.id,
-                    vsNames,
-                }
-            ).then(data => {
-                setSelectedFilter({
-                    ...selectedFilter,
-                    vsNames,
-                })
-            })
+            updateFilter(vsNames)
+        }
+    }, [selectedFilter])
+
+    const toggleAll = useCallback(() => {
+        if (selectedFilter) {
+            updateFilter(validationStampNames)
+        }
+    }, [selectedFilter])
+
+    const toggleNone = useCallback(() => {
+        if (selectedFilter) {
+            updateFilter([])
         }
     }, [selectedFilter])
 
@@ -209,6 +233,8 @@ export default function ValidationStampFilterContextProvider({branch, children})
         selectedFilter,
         selectFilter,
         toggleValidationStamp,
+        toggleAll,
+        toggleNone,
         inlineEdition,
         startInlineEdition,
         stopInlineEdition,
