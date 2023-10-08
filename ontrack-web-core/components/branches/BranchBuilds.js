@@ -10,9 +10,10 @@ import BuildFilterDropdown from "@components/branches/filters/builds/BuildFilter
 import ValidationStampFilterDropdown from "@components/branches/filters/validationStamps/ValidationStampFilterDropdown";
 import ValidationStampHeader from "@components/branches/ValidationStampHeader";
 import ValidationRunCell from "@components/branches/ValidationRunCell";
-import {useState} from "react";
+import {useContext, useState} from "react";
 import ValidationGroups from "@components/validationRuns/ValidationGroups";
 import {usePreferences} from "@components/providers/PreferencesProvider";
+import {ValidationStampFilterContext} from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
 
 const {Column} = Table;
 
@@ -36,17 +37,14 @@ export default function BranchBuilds({
                                          onLoadMore,
                                          rangeSelection,
                                          validationStamps,
-                                         loadingValidationStamps,
                                          onChange,
                                          selectedBuildFilter,
                                          onSelectedBuildFilter,
                                          onPermalinkBuildFilter,
-                                         selectedValidationStampFilter,
-                                         onSelectedValidationStampFilter,
-                                         onSelectValidationStampForFilter,
                                      }) {
 
     const router = useRouter()
+    const vsfContext = useContext(ValidationStampFilterContext)
 
     const onChangeLog = () => {
         if (rangeSelection.isComplete()) {
@@ -69,29 +67,12 @@ export default function BranchBuilds({
         setGrouping(newGrouping)
     }
 
-    // Online edition of the validation stamp filter
-    const [inlineEdition, setInlineEdition] = useState(false)
-
-    const onInlineEdition = (flag) => {
-        setInlineEdition(flag)
-    }
-
-    const stopInlineEdition = () => {
-        onInlineEdition(false)
-    }
-
-    const localOnSelectValidationStampForFilter = (validationStamp) => {
-        if (selectedValidationStampFilter && inlineEdition && onSelectValidationStampForFilter) {
-            onSelectValidationStampForFilter(validationStamp)
-        }
-    }
-
     return (
         <>
             <Space className="ot-line" direction="vertical" size={8}>
                 <Table
                     className={
-                        inlineEdition ? "ot-validation-stamp-filter-edition" : undefined
+                        vsfContext.inlineEdition ? "ot-validation-stamp-filter-edition" : undefined
                     }
                     size="small"
                     dataSource={builds}
@@ -120,7 +101,7 @@ export default function BranchBuilds({
                     )}
                     pagination={false} // Pagination is managed by the "load more"
                     title={() => {
-                        return inlineEdition && selectedValidationStampFilter ?
+                        return vsfContext.inlineEdition && vsfContext.selectedFilter ?
                             <Row>
                                 <Col span={24} align="right">
                                     <Space>
@@ -130,7 +111,7 @@ export default function BranchBuilds({
                                                 <Typography.Text>
                                                     Select all for&nbsp;
                                                     <Typography.Text
-                                                        strong>{selectedValidationStampFilter.name}</Typography.Text>
+                                                        strong>{vsfContext.selectedFilter.name}</Typography.Text>
                                                 </Typography.Text>
                                             </Space>
                                         </Button>
@@ -140,17 +121,17 @@ export default function BranchBuilds({
                                                 <Typography.Text>
                                                     Select none for&nbsp;
                                                     <Typography.Text
-                                                        strong>{selectedValidationStampFilter.name}</Typography.Text>
+                                                        strong>{vsfContext.selectedFilter.name}</Typography.Text>
                                                 </Typography.Text>
                                             </Space>
                                         </Button>
                                         <Button className="ot-validation-stamp-filter-edition"
-                                                onClick={stopInlineEdition}>
+                                                onClick={vsfContext.stopInlineEdition}>
                                             <Space>
                                                 <FaEyeSlash/>
                                                 <Typography.Text>
                                                     <Typography.Text
-                                                        strong>{selectedValidationStampFilter.name}</Typography.Text>
+                                                        strong>{vsfContext.selectedFilter.name}</Typography.Text>
                                                     &nbsp;done editing
                                                 </Typography.Text>
                                             </Space>
@@ -200,11 +181,8 @@ export default function BranchBuilds({
                                     branch={branch}
                                     grouping={grouping}
                                     onGroupingChange={onGroupingChange}
-                                    selectedValidationStampFilter={selectedValidationStampFilter}
-                                    onSelectedValidationStampFilter={onSelectedValidationStampFilter}
-                                    inlineEdition={inlineEdition}
-                                    onInlineEdition={onInlineEdition}
                                 />
+                                {/* Loading indicator */}
                                 {
                                     loadingBuilds &&
                                     <Popover content="Loading builds...">
@@ -250,13 +228,13 @@ export default function BranchBuilds({
                         validationStamps
                             .filter(validationStamp => {
                                 // If we are in inline edition mode, we display ALL the validation stamps
-                                if (inlineEdition) {
+                                if (vsfContext.inlineEdition) {
                                     return true
                                 }
                                 // If a filter is selected, we use only this filter
-                                else if (selectedValidationStampFilter) {
+                                else if (vsfContext.selectedFilter) {
                                     // Checking the filter
-                                    return selectedValidationStampFilter.vsNames.indexOf(validationStamp.name) >= 0
+                                    return vsfContext.selectedFilter.vsNames.indexOf(validationStamp.name) >= 0
                                 }
                                     // If grouping is selected, we keep only the validation stamps which are
                                 // part of the current filter
@@ -273,16 +251,16 @@ export default function BranchBuilds({
                                             <ValidationStampHeader
                                                 key={validationStamp.id}
                                                 validationStamp={validationStamp}
-                                                selectable={inlineEdition}
+                                                selectable={vsfContext.inlineEdition}
                                                 tooltip={
-                                                    inlineEdition && selectedValidationStampFilter ?
-                                                        `Select/unselect this "${validationStamp.name}" validation to add/remove it from the "${selectedValidationStampFilter.name}" filter` :
+                                                    vsfContext.inlineEdition && vsfContext.selectedFilter ?
+                                                        `Select/unselect this "${validationStamp.name}" validation to add/remove it from the "${vsfContext.selectedFilter.name}" filter` :
                                                         undefined
                                                 }
                                                 selected={
-                                                    selectedValidationStampFilter && selectedValidationStampFilter.vsNames.indexOf(validationStamp.name) >= 0
+                                                    vsfContext.selectedFilter && vsfContext.selectedFilter.vsNames.indexOf(validationStamp.name) >= 0
                                                 }
-                                                onSelect={() => localOnSelectValidationStampForFilter(validationStamp)}
+                                                onSelect={() => vsfContext.toggleValidationStamp(validationStamp)}
                                             />
                                         </>
                                     }
@@ -298,7 +276,7 @@ export default function BranchBuilds({
                     }
                     {/* Grouping per validation status */}
                     {
-                        !inlineEdition && grouping && <Column
+                        !vsfContext.inlineEdition && grouping && <Column
                             key="groups"
                             render={(_, build) =>
                                 <ValidationGroups build={build}/>

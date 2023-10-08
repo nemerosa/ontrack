@@ -5,13 +5,10 @@ import {Space} from "antd";
 import BranchBuilds from "@components/branches/BranchBuilds";
 import useRangeSelection from "@components/common/RangeSelection";
 import {gql} from "graphql-request";
-import {
-    getLocallySelectedBuildFilter, setLocallySelectedBuildFilter,
-} from "@components/storage/local";
+import {getLocallySelectedBuildFilter, setLocallySelectedBuildFilter,} from "@components/storage/local";
 import {useRouter} from "next/router";
-import {
-    gqlValidationStampFilterFragment
-} from "@components/branches/filters/validationStamps/ValidationStampFilterGraphQLFragments";
+import ValidationStampFilterContextProvider
+    from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
 
 export default function ClassicBranchView({branch}) {
 
@@ -62,48 +59,6 @@ export default function ClassicBranchView({branch}) {
                     buildFilter: JSON.stringify(resource),
                 }
             }, undefined, {shallow: true})
-        }
-    }
-
-    // Mgt of the validation stamp filters
-    const [selectedValidationStampFilter, setSelectedValidationStampFilter] = useState()
-    const onSelectedValidationStampFilter = (filter) => {
-        setSelectedValidationStampFilter(filter)
-    }
-
-    const onSelectValidationStampForFilter = (validationStamp) => {
-        if (selectedValidationStampFilter) {
-            let vsNames = selectedValidationStampFilter.vsNames
-            if (vsNames.indexOf(validationStamp.name) >= 0) {
-                vsNames = vsNames.filter(it => it !== validationStamp.name).sort()
-            } else {
-                vsNames = [...vsNames, validationStamp.name].sort()
-            }
-            graphQLCall(
-                gql`
-                    mutation UpdateValidationStampFilter(
-                        $id: Int!,
-                        $vsNames: [String!]!,
-                    ) {
-                        updateValidationStampFilter(input: {
-                            id: $id,
-                            vsNames: $vsNames,
-                        }) {
-                            errors {
-                                message
-                            }
-                        }
-                    }
-                `, {
-                    id: selectedValidationStampFilter.id,
-                    vsNames,
-                }
-            ).then(data => {
-                setSelectedValidationStampFilter({
-                    ...selectedValidationStampFilter,
-                    vsNames,
-                })
-            })
         }
     }
 
@@ -181,23 +136,21 @@ export default function ClassicBranchView({branch}) {
     return (
         <>
             <Space direction="vertical" className="ot-line">
-                <BranchBuilds
-                    branch={branch}
-                    builds={builds}
-                    loadingBuilds={loadingBuilds}
-                    pageInfo={buildsPageInfo}
-                    onLoadMore={onLoadMoreBuilds}
-                    rangeSelection={rangeSelection}
-                    validationStamps={validationStamps}
-                    loadingValidationStamps={loadingValidationStamps}
-                    onChange={reloadBuilds}
-                    selectedBuildFilter={selectedBuildFilter}
-                    onSelectedBuildFilter={onSelectedBuildFilter}
-                    onPermalinkBuildFilter={onPermalinkBuildFilter}
-                    selectedValidationStampFilter={selectedValidationStampFilter}
-                    onSelectedValidationStampFilter={onSelectedValidationStampFilter}
-                    onSelectValidationStampForFilter={onSelectValidationStampForFilter}
-                />
+                <ValidationStampFilterContextProvider branch={branch}>
+                    <BranchBuilds
+                        branch={branch}
+                        builds={builds}
+                        loadingBuilds={loadingBuilds}
+                        pageInfo={buildsPageInfo}
+                        onLoadMore={onLoadMoreBuilds}
+                        rangeSelection={rangeSelection}
+                        validationStamps={validationStamps}
+                        onChange={reloadBuilds}
+                        selectedBuildFilter={selectedBuildFilter}
+                        onSelectedBuildFilter={onSelectedBuildFilter}
+                        onPermalinkBuildFilter={onPermalinkBuildFilter}
+                    />
+                </ValidationStampFilterContextProvider>
             </Space>
         </>
     )
