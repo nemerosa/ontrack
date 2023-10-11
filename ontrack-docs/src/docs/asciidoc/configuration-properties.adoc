@@ -219,6 +219,9 @@ ontrack.config.extension.git.remote.maxNoRemote = 3
 # Enabling pull requests
 ontrack.config.extension.git.pullrequests.enabled = true
 
+# Timeout before giving up on getting PR information
+ontrack.config.extension.git.pullrequests.timeout = 5s
+
 # Caching enabled for pull requests
 ontrack.config.extension.git.pullrequests.cache.enabled = true
 

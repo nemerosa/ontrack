@@ -113,6 +113,12 @@ class GitConfigProperties {
         var enabled: Boolean = true
 
         /**
+         * Timeout before giving up on PR check
+         */
+        @DurationUnit(ChronoUnit.SECONDS)
+        var timeout: Duration = Duration.ofSeconds(5)
+
+        /**
          * Pull requests caching configuration
          */
         var cache = GitPullRequestCacheConfigProperties()
