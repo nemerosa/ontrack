@@ -532,7 +532,14 @@ internal class AutoVersioningValidationServiceIT : AbstractAutoVersioningTestSup
                         }
 
                         // Checks that the build link has been created
-                        structureService.isLinkedTo(build, lastDependencyBuild.project.name, lastDependencyBuild.name)
+                        assertTrue(
+                            structureService.isLinkedTo(
+                                build,
+                                lastDependencyBuild.project.name,
+                                lastDependencyBuild.name
+                            ),
+                            "Link to the last eligible build"
+                        )
                     }
                 }
 

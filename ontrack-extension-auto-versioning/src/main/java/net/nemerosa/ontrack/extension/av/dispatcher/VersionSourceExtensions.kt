@@ -14,8 +14,10 @@ import net.nemerosa.ontrack.model.structure.Build
  * * `labelOnly`
  * * `metaInfo/key`
  */
-fun getVersionSourceConfig(token: String): Pair<String, String?> =
-    if (token.contains("/")) {
+fun getVersionSourceConfig(token: String?): Pair<String, String?> =
+    if (token.isNullOrBlank()) {
+        DefaultVersionSource.ID to null
+    } else if (token.contains("/")) {
         token.substringBefore("/") to token.substringAfter("/")
     } else {
         token to null
