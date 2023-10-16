@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningTargetFileService
 import net.nemerosa.ontrack.extension.av.dispatcher.VersionSourceFactory
 import net.nemerosa.ontrack.extension.av.dispatcher.getBuildVersion
+import net.nemerosa.ontrack.extension.av.dispatcher.getBuildWithVersion
 import net.nemerosa.ontrack.extension.av.dispatcher.getVersionSourceConfig
 import net.nemerosa.ontrack.extension.av.settings.AutoVersioningSettings
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
@@ -41,18 +42,20 @@ class AutoVersioningValidationServiceImpl(
         // Validation stamp name
         val validationStampName = getActualValidationStampName(config)
         return if (!validationStampName.isNullOrBlank()) {
+            val sourceProject = structureService.findProjectByName(config.sourceProject).getOrNull()
+                ?: return null
             // Gets the version information
             val start = System.currentTimeMillis()
             val time: Long
             val (current, last) = try {
-                getVersionInfo(build, config)
+                getVersionInfo(build, config, sourceProject)
             } finally {
                 time = System.currentTimeMillis() - start
             }
             // Validation
             val data = AutoVersioningValidationData(
                 project = config.sourceProject,
-                version = current ?: "",
+                version = current?.version ?: "",
                 latestVersion = last?.version ?: "",
                 path = config.targetPath,
                 time = time
@@ -82,7 +85,6 @@ class AutoVersioningValidationServiceImpl(
             if (settings.buildLinks
                 && current != null
                 && (config.buildLinkCreation == null || config.buildLinkCreation)
-                && last != null
             ) {
                 val links = structureService.getQualifiedBuildsUsedBy(build)
                 val existingLink = links.pageItems.find {
@@ -90,11 +92,10 @@ class AutoVersioningValidationServiceImpl(
                 }
                 if (existingLink == null) {
                     // Source project
-                    val sourceProject = structureService.findProjectByName(config.sourceProject).getOrNull()
                     if (sourceProject != null) {
                         structureService.createBuildLink(
                             fromBuild = build,
-                            toBuild = last.build,
+                            toBuild = current.build,
                             qualifier = config.qualifier ?: BuildLink.DEFAULT,
                         )
                     }
@@ -125,20 +126,36 @@ class AutoVersioningValidationServiceImpl(
             config.validationStamp
         }
 
-    private fun getVersionInfo(build: Build, config: AutoVersioningSourceConfig) = VersionInfo(
-        getCurrentVersion(build, config),
-        getLastVersion(build.branch, config)
+    private fun getVersionInfo(build: Build, config: AutoVersioningSourceConfig, sourceProject: Project) = VersionInfo(
+        getCurrentVersion(build, config, sourceProject),
+        getLastVersion(build.branch, config, sourceProject)
     )
 
-    private fun getCurrentVersion(build: Build, config: AutoVersioningSourceConfig): String? {
+    private fun getCurrentVersion(
+        build: Build,
+        config: AutoVersioningSourceConfig,
+        sourceProject: Project
+    ): BuildVersionInfo? {
         // Using build links first
         val link = structureService.getQualifiedBuildsUsedBy(build, 0, 1) {
             it.project.name == config.sourceProject
         }.pageItems.firstOrNull()?.build
-        val linkedVersion = link?.run {
-            versionSourceFactory.getBuildVersion(this, config)
+        return if (link != null) {
+            val linkedVersion = link.run {
+                versionSourceFactory.getBuildVersion(this, config)
+            }
+            BuildVersionInfo(link, linkedVersion)
+        } else {
+            val scmVersion = readCurrentVersion(build.branch, config)
+                ?: return null
+            // Given the stored version, get the build from the source project
+            versionSourceFactory.getBuildWithVersion(sourceProject, config, scmVersion)?.let {
+                BuildVersionInfo(
+                    build = it,
+                    version = scmVersion,
+                )
+            }
         }
-        return linkedVersion ?: readCurrentVersion(build.branch, config)
     }
 
     private fun readCurrentVersion(branch: Branch, config: AutoVersioningSourceConfig): String? {
@@ -153,11 +170,13 @@ class AutoVersioningValidationServiceImpl(
         return autoVersioningTargetFileService.readVersion(config, lines)
     }
 
-    private fun getLastVersion(eligibleTargetBranch: Branch, config: AutoVersioningSourceConfig): BuildVersionInfo? {
-        // Gets the source project
-        val sourceProject = structureService.findProjectByName(config.sourceProject).getOrNull()
+    private fun getLastVersion(
+        eligibleTargetBranch: Branch,
+        config: AutoVersioningSourceConfig,
+        sourceProject: Project
+    ): BuildVersionInfo? {
         // Gets the latest eligible branch for the source project
-        val sourceBranch = sourceProject?.run {
+        val sourceBranch = sourceProject.run {
             autoVersionConfigurationService.getLatestBranch(
                 eligibleTargetBranch,
                 sourceProject,

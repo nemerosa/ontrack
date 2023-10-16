@@ -12,6 +12,9 @@ import kotlin.test.assertFailsWith
 class DefaultVersionSourceIT : AbstractDSLTestSupport() {
 
     @Autowired
+    private lateinit var versionSourceFactory: VersionSourceFactory
+
+    @Autowired
     private lateinit var source: DefaultVersionSource
 
     @Test
@@ -65,6 +68,31 @@ class DefaultVersionSourceIT : AbstractDSLTestSupport() {
                         source.getVersion(this, null)
                     }
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Finding build by label and then by name`() {
+        project {
+            branch {
+                build("1") {
+                    releaseProperty(this, "1.0.1")
+                }
+                val sourceBuild = build("2") {
+                    releaseProperty(this, "1.0.2")
+                }
+                build("3") {
+                    releaseProperty(this, "1.0.3")
+                }
+                val otherBuild = build("4")
+                val source = versionSourceFactory.getVersionSource("default")
+                assertEquals(sourceBuild, source.getBuildFromVersion(project, null, "1.0.2"))
+                assertEquals(sourceBuild, source.getBuildFromVersion(project, null, "2"))
+                assertEquals(null, source.getBuildFromVersion(project, null, "1.0.4"))
+                assertEquals(otherBuild, source.getBuildFromVersion(project, null, "4"))
+                assertEquals(null, source.getBuildFromVersion(project, null, "1.0.5"))
+                assertEquals(null, source.getBuildFromVersion(project, null, "5"))
             }
         }
     }

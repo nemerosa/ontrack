@@ -18,9 +18,9 @@ import java.util.function.Function
 
 @Component
 class MetaInfoPropertyType(
-        extensionFeature: GeneralExtensionFeature,
-        private val searchIndexService: SearchIndexService,
-        private val metaInfoSearchExtension: MetaInfoSearchExtension
+    extensionFeature: GeneralExtensionFeature,
+    private val searchIndexService: SearchIndexService,
+    private val metaInfoSearchExtension: MetaInfoSearchExtension
 ) : AbstractPropertyType<MetaInfoProperty>(extensionFeature) {
 
     override fun getName(): String = "Meta information"
@@ -44,24 +44,24 @@ class MetaInfoPropertyType(
     }
 
     override fun getEditionForm(entity: ProjectEntity, value: MetaInfoProperty?): Form = Form.create()
-            .with(
-                    MultiForm.of(
-                            "items",
-                            Form.create()
-                                    .name()
-                                    .with(
-                                            Text.of("value").label("Value")
-                                    )
-                                    .with(
-                                            Text.of("link").label("Link").optional()
-                                    )
-                                    .with(
-                                            Text.of("category").label("Category").optional()
-                                    )
+        .with(
+            MultiForm.of(
+                "items",
+                Form.create()
+                    .name()
+                    .with(
+                        Text.of("value").label("Value")
                     )
-                            .label("Items")
-                            .value(value?.items ?: emptyList<Any>())
+                    .with(
+                        Text.of("link").label("Link").optional()
+                    )
+                    .with(
+                        Text.of("category").label("Category").optional()
+                    )
             )
+                .label("Items")
+                .value(value?.items ?: emptyList<Any>())
+        )
 
     override fun fromClient(node: JsonNode): MetaInfoProperty {
         return fromStorage(node)
@@ -82,64 +82,56 @@ class MetaInfoPropertyType(
         }
     }
 
-    override fun replaceValue(value: MetaInfoProperty, replacementFunction: Function<String, String>): MetaInfoProperty {
+    override fun replaceValue(
+        value: MetaInfoProperty,
+        replacementFunction: Function<String, String>
+    ): MetaInfoProperty {
         return MetaInfoProperty(
-                value.items
-                        .map { item ->
-                            MetaInfoPropertyItem(
-                                    item.name,
-                                    item.value?.apply { replacementFunction.apply(this) },
-                                    item.link?.apply { replacementFunction.apply(this) },
-                                    item.category?.apply { replacementFunction.apply(this) }
-                            )
-                        }
+            value.items
+                .map { item ->
+                    MetaInfoPropertyItem(
+                        item.name,
+                        item.value?.apply { replacementFunction.apply(this) },
+                        item.link?.apply { replacementFunction.apply(this) },
+                        item.category?.apply { replacementFunction.apply(this) }
+                    )
+                }
         )
     }
 
     override fun getSearchArguments(token: String): PropertySearchArguments? {
-        val name: String?
-        val value: String?
-        if (token.indexOf(":") >= 1) {
-            name = token.substringBefore(":").trim()
-            value = token.substringAfter(":").trimStart()
-        } else {
-            name = null
-            value = token
+        val (name, value, _, category) = MetaInfoPropertyItem.parse(token)
+        // If no name, no search is done
+        if (name.isBlank()) {
+            return null
         }
-        return if (name.isNullOrBlank()) {
-            if (value.isNullOrBlank()) {
-                // Empty
-                null
+        // Criteria
+        val criteria = mutableListOf<String>()
+        val params = mutableMapOf<String, String>()
+        // Name
+        criteria += "item->>'name' = :name"
+        params["name"] = name
+        // Value
+        if (value != null) {
+            criteria += "item->>'value' ilike :value"
+            params["value"] = value.toValuePattern()
+        }
+        // Category
+        if (category != null) {
+            if (category.isBlank()) {
+                // Explicitly looking for names without categories
+                criteria += "item->>'category' is null"
             } else {
-                // Value only
-                PropertySearchArguments(
-                        jsonContext = "jsonb_array_elements(pp.json->'items') as item",
-                        jsonCriteria = "item->>'value' ilike :value",
-                        criteriaParams = mapOf(
-                                "value" to value.toValuePattern()
-                        )
-                )
+                criteria += "item->>'category' = :category"
+                params["category"] = category
             }
-        } else if (value.isNullOrBlank()) {
-            // Name only
-            PropertySearchArguments(
-                    jsonContext = "jsonb_array_elements(pp.json->'items') as item",
-                    jsonCriteria = "item->>'name' = :name",
-                    criteriaParams = mapOf(
-                            "name" to name
-                    )
-            )
-        } else {
-            // Name & value
-            PropertySearchArguments(
-                    jsonContext = "jsonb_array_elements(pp.json->'items') as item",
-                    jsonCriteria = "item->>'name' = :name and item->>'value' ilike :value",
-                    criteriaParams = mapOf(
-                            "name" to name,
-                            "value" to value.toValuePattern()
-                    )
-            )
         }
+        // OK
+        return PropertySearchArguments(
+            jsonContext = "jsonb_array_elements(pp.json->'items') as item",
+            jsonCriteria = criteria.joinToString(" and "),
+            criteriaParams = params,
+        )
     }
 
     private fun String.toValuePattern(): String {
