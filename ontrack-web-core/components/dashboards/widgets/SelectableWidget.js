@@ -1,4 +1,4 @@
-import {Card, Tooltip, Typography} from "antd";
+import {Button, Card, Tooltip, Typography} from "antd";
 import {FaPlus} from "react-icons/fa";
 
 export default function SelectableWidget({widgetDef, addWidget}) {
@@ -6,11 +6,11 @@ export default function SelectableWidget({widgetDef, addWidget}) {
         <>
             <Card
                 title={widgetDef.name}
-                actions={[
+                extra={
                     <Tooltip key="add" title={`Add the "${widgetDef.name}" widget to the dashboard`}>
-                        <FaPlus onClick={addWidget(widgetDef)}/>
+                        <Button type="primary" onClick={addWidget(widgetDef)} icon={<FaPlus/>}/>
                     </Tooltip>
-                ]}
+                }
             >
                 <p>
                     <Typography.Text type="secondary">{widgetDef.description}</Typography.Text>

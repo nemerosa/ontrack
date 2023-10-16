@@ -33,6 +33,10 @@ export default function SelectableLayout({layoutDef, selected, onLayoutKeySelect
                         <Typography.Text>{layoutDef.name}</Typography.Text>
                     </Tooltip>
                 }
+                headStyle={{
+                    backgroundColor: selected ? '#0F0' : undefined,
+                    cursor: 'pointer',
+                }}
                 extra={
                     <Tooltip title={`Use the "${layoutDef.name}" layout for the dashboard`}>
                         {

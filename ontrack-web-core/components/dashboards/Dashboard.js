@@ -1,5 +1,5 @@
 import {lazy, Suspense, useContext, useEffect, useState} from "react";
-import {Alert, Button, Col, Collapse, Row, Skeleton, Space} from "antd";
+import {Alert, Button, Col, Row, Skeleton, Space, Tabs, Typography} from "antd";
 import LayoutContextProvider from "@components/dashboards/layouts/LayoutContext";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 import graphQLCall from "@client/graphQLCall";
@@ -8,6 +8,7 @@ import SelectableWidget from "@components/dashboards/widgets/SelectableWidget";
 import LayoutSelector from "@components/dashboards/layouts/LayoutSelector";
 import WidgetExpansionContextProvider from "@components/dashboards/layouts/WidgetExpansionContext";
 import LayoutContainer from "@components/dashboards/layouts/LayoutContainer";
+import {FaCog, FaWindowRestore} from "react-icons/fa";
 
 export default function Dashboard() {
 
@@ -107,28 +108,40 @@ export default function Dashboard() {
                                                         </Space>
                                                     }
                                                 />
-                                                <Collapse defaultActiveKey={["widgets"]} accordion={true}>
-                                                    <Collapse.Panel key="layout" header="Layout">
-                                                        <LayoutSelector
-                                                            selectedLayoutKey={selectedDashboard.layoutKey}
-                                                            onLayoutKeySelected={onLayoutKeySelected}
-                                                        />
-                                                    </Collapse.Panel>
-                                                    <Collapse.Panel key="widgets" header="Widgets">
-                                                        <Row wrap gutter={[16, 16]}>
-                                                            {
-                                                                availableWidgets.map(availableWidget =>
-                                                                    <Col span={24} key={availableWidget.key}>
-                                                                        <SelectableWidget
-                                                                            widgetDef={availableWidget}
-                                                                            addWidget={addWidget}
-                                                                        />
-                                                                    </Col>
-                                                                )
-                                                            }
-                                                        </Row>
-                                                    </Collapse.Panel>
-                                                </Collapse>
+                                                <Tabs
+                                                    items={[
+                                                        {
+                                                            key: 'widgets',
+                                                            label: <Space>
+                                                                <FaCog/>
+                                                                <Typography.Text>Widgets</Typography.Text>
+                                                            </Space>,
+                                                            children: <Row wrap gutter={[16, 16]}>
+                                                                {
+                                                                    availableWidgets.map(availableWidget =>
+                                                                        <Col span={24} key={availableWidget.key}>
+                                                                            <SelectableWidget
+                                                                                widgetDef={availableWidget}
+                                                                                addWidget={addWidget}
+                                                                            />
+                                                                        </Col>
+                                                                    )
+                                                                }
+                                                            </Row>,
+                                                        },
+                                                        {
+                                                            key: 'layouts',
+                                                            label: <Space>
+                                                                <FaWindowRestore/>
+                                                                <Typography.Text>Layouts</Typography.Text>
+                                                            </Space>,
+                                                            children: <LayoutSelector
+                                                                selectedLayoutKey={selectedDashboard.layoutKey}
+                                                                onLayoutKeySelected={onLayoutKeySelected}
+                                                            />,
+                                                        }
+                                                    ]}
+                                                />
                                             </Space>
                                         </Col>
                                     </Row>
