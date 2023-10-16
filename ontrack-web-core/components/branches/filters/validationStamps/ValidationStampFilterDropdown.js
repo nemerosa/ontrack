@@ -42,9 +42,6 @@ export default function ValidationStampFilterDropdown({
         vsfContext.selectFilter(undefined)
     }
 
-    // TODO Deprecated
-    const [filters, setFilters] = useState([])
-
     const buildMenu = () => {
         const menu = []
         // Loading existing validation stamp filters
@@ -57,24 +54,25 @@ export default function ValidationStampFilterDropdown({
                     onChange={onSelect(filter)}
                     extra={
                         <>
-                            {
-                                isAuthorized(filter, "validation_stamp_filter", "edit") &&
-                                !vsfContext.inlineEdition &&
-                                <FaCheckDouble
-                                    className="ot-command"
-                                    title="Edits this filter using the branch view"
-                                    onClick={() => vsfContext.startInlineEdition(filter)}
-                                />
-                            }
-                            {
-                                isAuthorized(filter, "validation_stamp_filter", "edit") &&
-                                vsfContext.inlineEdition &&
-                                <FaEyeSlash
-                                    className="ot-command"
-                                    title="Stops the edition of this filter"
-                                    onClick={vsfContext.stopInlineEdition}
-                                />
-                            }
+                            {/* TODO Disabled inline edition - performance issues */}
+                            {/*{*/}
+                            {/*    isAuthorized(filter, "validation_stamp_filter", "edit") &&*/}
+                            {/*    !vsfContext.inlineEdition &&*/}
+                            {/*    <FaCheckDouble*/}
+                            {/*        className="ot-command"*/}
+                            {/*        title="Edits this filter using the branch view"*/}
+                            {/*        onClick={() => vsfContext.startInlineEdition(filter)}*/}
+                            {/*    />*/}
+                            {/*}*/}
+                            {/*{*/}
+                            {/*    isAuthorized(filter, "validation_stamp_filter", "edit") &&*/}
+                            {/*    vsfContext.inlineEdition &&*/}
+                            {/*    <FaEyeSlash*/}
+                            {/*        className="ot-command"*/}
+                            {/*        title="Stops the edition of this filter"*/}
+                            {/*        onClick={vsfContext.stopInlineEdition}*/}
+                            {/*    />*/}
+                            {/*}*/}
                             {
                                 isAuthorized(filter, "validation_stamp_filter", "edit") &&
                                 !vsfContext.inlineEdition &&
