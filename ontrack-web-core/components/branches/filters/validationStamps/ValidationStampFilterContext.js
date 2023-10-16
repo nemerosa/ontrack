@@ -13,6 +13,7 @@ import EditValidationStampFilterDialog
     , {
     useEditValidationStampFilterDialog
 } from "@components/branches/filters/validationStamps/EditValidationStampFilterDialog";
+import {usePreferences} from "@components/providers/PreferencesProvider";
 
 // noinspection JSUnusedLocalSymbols
 export const ValidationStampFilterContext = createContext({
@@ -26,8 +27,10 @@ export const ValidationStampFilterContext = createContext({
     // Toggles a validation stamp for the current filter
     toggleValidationStamp: (validationStamp) => {
     },
-    toggleAll: () => {},
-    toggleNone: () => {},
+    toggleAll: () => {
+    },
+    toggleNone: () => {
+    },
     // Inline edition management
     inlineEdition: false,
     startInlineEdition: (filter) => {
@@ -38,6 +41,10 @@ export const ValidationStampFilterContext = createContext({
     newFilter: () => {
     },
     editFilter: (filter) => {
+    },
+    // Grouping options
+    grouping: false,
+    setGrouping: (value) => {
     },
 })
 
@@ -228,6 +235,16 @@ export default function ValidationStampFilterContextProvider({branch, children})
         editValidationStampFilterDialog.start({filter})
     }
 
+    // Preferences
+    const {branchViewVsGroups, setPreferences} = usePreferences()
+
+    // Grouping
+    const [grouping, setGrouping] = useState(branchViewVsGroups)
+    const onGrouping = (value) => {
+        setPreferences({branchViewVsGroups: value})
+        setGrouping(value)
+    }
+
     const context = {
         filters,
         selectedFilter,
@@ -240,6 +257,8 @@ export default function ValidationStampFilterContextProvider({branch, children})
         stopInlineEdition,
         newFilter,
         editFilter,
+        grouping,
+        setGrouping: onGrouping,
     }
 
     return (

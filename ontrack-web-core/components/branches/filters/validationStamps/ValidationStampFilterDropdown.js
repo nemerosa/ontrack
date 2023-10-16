@@ -20,15 +20,8 @@ import {ValidationStampFilterContext} from "@components/branches/filters/validat
 
 /**
  * @param branch Target branch for the filters
- * @param grouping Value for the grouping preference
- * @param onGroupingChange Callback when the grouping preference changes
- * @param onSelectedValidationStampFilter Sets the new currently selected filter
  */
-export default function ValidationStampFilterDropdown({
-                                                          branch,
-                                                          grouping,
-                                                          onGroupingChange,
-                                                      }) {
+export default function ValidationStampFilterDropdown({branch}) {
 
     const vsfContext = useContext(ValidationStampFilterContext)
 
@@ -115,8 +108,8 @@ export default function ValidationStampFilterDropdown({
             key: 'group',
             label: <SelectableMenuItem
                 text="Group validation stamps per status"
-                value={grouping}
-                onChange={onGroupingChange}
+                value={vsfContext.grouping}
+                onChange={() => vsfContext.setGrouping(!vsfContext.grouping)}
             />,
         })
         // OK
@@ -128,7 +121,7 @@ export default function ValidationStampFilterDropdown({
         if (vsfContext.filters) {
             buildMenu()
         }
-    }, [vsfContext.filters, grouping, vsfContext.inlineEdition, vsfContext.selectedFilter]);
+    }, [vsfContext.filters, vsfContext.grouping, vsfContext.inlineEdition, vsfContext.selectedFilter]);
 
     return (
         <>

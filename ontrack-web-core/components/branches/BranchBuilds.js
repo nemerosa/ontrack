@@ -10,9 +10,8 @@ import BuildFilterDropdown from "@components/branches/filters/builds/BuildFilter
 import ValidationStampFilterDropdown from "@components/branches/filters/validationStamps/ValidationStampFilterDropdown";
 import ValidationStampHeader from "@components/branches/ValidationStampHeader";
 import ValidationRunCell from "@components/branches/ValidationRunCell";
-import {useContext, useState} from "react";
+import {useContext} from "react";
 import ValidationGroups from "@components/validationRuns/ValidationGroups";
-import {usePreferences} from "@components/providers/PreferencesProvider";
 import {ValidationStampFilterContext} from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
 
 const {Column} = Table;
@@ -58,15 +57,6 @@ export default function BranchBuilds({
 
     // Preferences for the display (filters, options...)
 
-    const {branchViewVsGroups, setPreferences} = usePreferences()
-
-    const [grouping, setGrouping] = useState(branchViewVsGroups)
-    const onGroupingChange = () => {
-        const newGrouping = !grouping
-        setPreferences({branchViewVsGroups: newGrouping})
-        setGrouping(newGrouping)
-    }
-
     return (
         <>
             <Space className="ot-line" direction="vertical" size={8}>
@@ -105,7 +95,8 @@ export default function BranchBuilds({
                             <Row>
                                 <Col span={24} align="right">
                                     <Space>
-                                        <Button onClick={vsfContext.toggleAll} className="ot-validation-stamp-filter-edition">
+                                        <Button onClick={vsfContext.toggleAll}
+                                                className="ot-validation-stamp-filter-edition">
                                             <Space>
                                                 <FaCheckSquare/>
                                                 <Typography.Text>
@@ -115,7 +106,8 @@ export default function BranchBuilds({
                                                 </Typography.Text>
                                             </Space>
                                         </Button>
-                                        <Button onClick={vsfContext.toggleNone} className="ot-validation-stamp-filter-edition">
+                                        <Button onClick={vsfContext.toggleNone}
+                                                className="ot-validation-stamp-filter-edition">
                                             <Space>
                                                 <FaSquare/>
                                                 <Typography.Text>
@@ -179,8 +171,6 @@ export default function BranchBuilds({
                                 {/* VS filter */}
                                 <ValidationStampFilterDropdown
                                     branch={branch}
-                                    grouping={grouping}
-                                    onGroupingChange={onGroupingChange}
                                 />
                                 {/* Loading indicator */}
                                 {
@@ -239,7 +229,7 @@ export default function BranchBuilds({
                                     // If grouping is selected, we keep only the validation stamps which are
                                 // part of the current filter
                                 else {
-                                    return !grouping
+                                    return !vsfContext.grouping
                                 }
                             })
                             .map(validationStamp => (
@@ -276,7 +266,7 @@ export default function BranchBuilds({
                     }
                     {/* Grouping per validation status */}
                     {
-                        !vsfContext.inlineEdition && grouping && <Column
+                        !vsfContext.inlineEdition && vsfContext.grouping && <Column
                             key="groups"
                             render={(_, build) =>
                                 <ValidationGroups build={build}/>
