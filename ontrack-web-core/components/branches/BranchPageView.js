@@ -16,6 +16,7 @@ import BranchViewSelector from "@components/branches/BranchViewSelector";
 import {getBranchViews} from "@components/branches/views/branchViews";
 import {usePreferences} from "@components/providers/PreferencesProvider";
 import {useRouter} from "next/router";
+import JumpToBranch from "@components/branches/JumpToBranch";
 
 export default function BranchPageView({id}) {
     const [loadingBranch, setLoadingBranch] = useState(true)
@@ -107,6 +108,7 @@ export default function BranchPageView({id}) {
                     //     initialSelectedViewKey={initialSelectedViewKey}
                     //     onBranchViewSelected={onBranchViewSelected}
                     // />,
+                    <JumpToBranch key="branch" projectName={branch.project.name}/>,
                     <LegacyLinkCommand
                         key="legacy"
                         href={branchLegacyUri(branch)}
