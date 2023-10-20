@@ -11,6 +11,7 @@ import {Select} from "antd";
 export default function SelectValidationRunStatus({
                                                       statusId,
                                                       all,
+                                                      disabled,
                                                       value,
                                                       onChange
                                                   }) {
@@ -32,6 +33,7 @@ export default function SelectValidationRunStatus({
         <>
             <Select
                 style={{width: '10em'}}
+                disabled={disabled}
                 options={vrsList}
                 allowClear={true}
                 placeholder="Select a status"
