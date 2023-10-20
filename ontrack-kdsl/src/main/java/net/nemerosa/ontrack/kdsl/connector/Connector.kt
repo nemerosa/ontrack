@@ -50,4 +50,13 @@ interface Connector {
         headers: Map<String, String> = emptyMap()
     )
 
+    /**
+     * Uploading a single file
+     */
+    fun uploadFile(
+        path: String,
+        headers: Map<String, String> = emptyMap(),
+        file: Pair<String,ByteArray>,
+    )
+
 }

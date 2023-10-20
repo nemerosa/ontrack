@@ -1,0 +1,8 @@
+query PredefinedPromotionLevelByName($name: String!) {
+    predefinedPromotionLevelByName(name: $name) {
+        id
+        name
+        description
+        isImage
+    }
+}

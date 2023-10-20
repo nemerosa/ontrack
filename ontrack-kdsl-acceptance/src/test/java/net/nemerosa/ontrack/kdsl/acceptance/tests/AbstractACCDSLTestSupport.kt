@@ -19,8 +19,14 @@ abstract class AbstractACCDSLTestSupport : AbstractACCTestSupport() {
     protected fun <T> project(
         name: String = uid("p"),
         description: String = "",
+        deleteFirst: Boolean = false,
         code: Project.() -> T,
-    ): T = ontrack.createProject(name, description).code()
+    ): T {
+        if (deleteFirst) {
+            ontrack.findProjectByName(name)?.delete()
+        }
+        return ontrack.createProject(name, description).code()
+    }
 
     /**
      * Wrapper code to create a branch inside a project.
