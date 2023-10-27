@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.git.service
 
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.common.FutureUtils
 import net.nemerosa.ontrack.common.asOptional
 import net.nemerosa.ontrack.common.getOrNull
@@ -770,7 +772,11 @@ class GitServiceImpl(
                     }
             }
             // Calling the cache
-            gitPullRequestCache.getBranchPullRequest(branch, ::internalPR)
+            runBlocking {
+                withTimeoutOrNull(timeMillis = gitConfigProperties.pullRequests.timeout.toMillis()) {
+                    gitPullRequestCache.getBranchPullRequest(branch, ::internalPR)
+                }
+            }
         } else {
             // Pull requests are not supported
             null

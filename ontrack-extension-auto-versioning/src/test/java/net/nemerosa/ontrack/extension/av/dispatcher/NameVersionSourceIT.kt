@@ -1,14 +1,9 @@
 package net.nemerosa.ontrack.extension.av.dispatcher
 
-import net.nemerosa.ontrack.extension.general.releaseProperty
-import net.nemerosa.ontrack.extension.general.useLabel
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.datasource.embedded.DataSourceFactory
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 class NameVersionSourceIT : AbstractDSLTestSupport() {
 
@@ -24,6 +19,20 @@ class NameVersionSourceIT : AbstractDSLTestSupport() {
                     val version = source.getVersion(this, null)
                     assertEquals(name, version)
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Finding build by name`() {
+        project {
+            branch {
+                build("1.0.1")
+                val sourceBuild = build("1.0.2")
+                build("1.0.3")
+                val source = versionSourceFactory.getVersionSource("name")
+                assertEquals(sourceBuild, source.getBuildFromVersion(project, null, "1.0.2"))
+                assertEquals(null, source.getBuildFromVersion(project, null, "1.0.4"))
             }
         }
     }

@@ -150,4 +150,55 @@ class MetaInfoVersionSourceIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Finding build by meta information`() {
+        project {
+            branch {
+                val nameOnlyBuild = build("1") {
+                    metaInfoProperty(this, metaInfoItem("version", "1.1-SNAPSHOT"))
+                }
+                build("2") {
+                    metaInfoProperty(this, metaInfoItem("version", "1.1-SNAPSHOT", category = "versions"))
+                }
+                build("3")
+                val latestNameAndCategoryBuild = build("4") {
+                    metaInfoProperty(this, metaInfoItem("version", "1.1-SNAPSHOT", category = "versions"))
+                }
+                build("5") {
+                    metaInfoProperty(this, metaInfoItem("version", "1.2-SNAPSHOT", category = "versions"))
+                }
+
+                val source = versionSourceFactory.getVersionSource("metaInfo")
+
+                // Name only ==> categories are eligible
+                assertEquals(
+                    latestNameAndCategoryBuild,
+                    source.getBuildFromVersion(project, "version", "1.1-SNAPSHOT"),
+                    "Finding build on meta info name with any category"
+                )
+
+                // Name only ==> explicitly without a category
+                assertEquals(
+                    nameOnlyBuild,
+                    source.getBuildFromVersion(project, "/version", "1.1-SNAPSHOT"),
+                    "Finding build on meta info name"
+                )
+
+                // Name and category (latest)
+                assertEquals(
+                    latestNameAndCategoryBuild,
+                    source.getBuildFromVersion(project, "versions/version", "1.1-SNAPSHOT"),
+                    "Finding build on meta info name and category"
+                )
+
+                // Not found with new version
+                assertEquals(
+                    null,
+                    source.getBuildFromVersion(project, "versions/version", "1.3-SNAPSHOT"),
+                    "Not finding build on meta info name and category"
+                )
+            }
+        }
+    }
+
 }

@@ -79,4 +79,29 @@ class LabelOnlyVersionSourceIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Finding build by label only`() {
+        project {
+            branch {
+                build("1") {
+                    releaseProperty(this, "1.0.1")
+                }
+                val sourceBuild = build("2") {
+                    releaseProperty(this, "1.0.2")
+                }
+                build("3") {
+                    releaseProperty(this, "1.0.3")
+                }
+                build("4")
+                val source = versionSourceFactory.getVersionSource("labelOnly")
+                assertEquals(sourceBuild, source.getBuildFromVersion(project, null, "1.0.2"))
+                assertEquals(null, source.getBuildFromVersion(project, null, "2"))
+                assertEquals(null, source.getBuildFromVersion(project, null, "1.0.4"))
+                assertEquals(null, source.getBuildFromVersion(project, null, "4"))
+                assertEquals(null, source.getBuildFromVersion(project, null, "1.0.5"))
+                assertEquals(null, source.getBuildFromVersion(project, null, "5"))
+            }
+        }
+    }
+
 }

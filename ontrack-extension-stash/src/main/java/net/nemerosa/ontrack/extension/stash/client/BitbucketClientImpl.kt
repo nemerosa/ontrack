@@ -141,7 +141,9 @@ class BitbucketClientImpl(
         val response = template.getForObject<PRMergeableResponse>(
             "/rest/api/latest/projects/${repo.project}/repos/${repo.repository}/pull-requests/${prId}/merge",
         )
-        return response.outcome == "CLEAN" && !response.conflicted
+        return response.outcome == "CLEAN"
+                && response.vetoes.isNullOrEmpty()
+                && !response.conflicted
     }
 
     override fun mergePR(repo: BitbucketRepository, prId: Int, message: String) {
@@ -177,7 +179,12 @@ class BitbucketClientImpl(
 
     private class PRMergeableResponse(
         val outcome: String,
+        val vetoes: List<Veto>?,
         val conflicted: Boolean,
+    )
+
+    private class Veto(
+        val summaryMessage: String,
     )
 
     private class CreateBranchResponse(

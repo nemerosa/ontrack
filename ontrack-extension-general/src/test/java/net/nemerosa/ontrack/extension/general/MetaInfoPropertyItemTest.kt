@@ -1,10 +1,65 @@
 package net.nemerosa.ontrack.extension.general
 
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class MetaInfoPropertyItemTest {
+
+    @Test
+    fun `Parsing into item`() {
+        // Name only
+        assertEquals(
+            MetaInfoPropertyItem(name = "name", value = null, category = null, link = null),
+            MetaInfoPropertyItem.parse("name")
+        )
+        // Name with blank category
+        assertEquals(
+            MetaInfoPropertyItem(name = "name", value = null, category = "", link = null),
+            MetaInfoPropertyItem.parse("/name")
+        )
+        // Name with category
+        assertEquals(
+            MetaInfoPropertyItem(name = "name", value = null, category = "category", link = null),
+            MetaInfoPropertyItem.parse("category/name")
+        )
+        // Name and value
+        assertEquals(
+            MetaInfoPropertyItem(name = "name", value = "value", category = null, link = null),
+            MetaInfoPropertyItem.parse("name:value")
+        )
+        // Name with blank category and value
+        assertEquals(
+            MetaInfoPropertyItem(name = "name", value = "value", category = "", link = null),
+            MetaInfoPropertyItem.parse("/name:value")
+        )
+        // Name with category and value
+        assertEquals(
+            MetaInfoPropertyItem(name = "name", value = "value", category = "category", link = null),
+            MetaInfoPropertyItem.parse("category/name:value")
+        )
+    }
+
+    @Test
+    fun `Search token`() {
+        assertEquals(
+            "/name:",
+            MetaInfoPropertyItem(name = "name", value = null, category = null, link = null).toSearchToken()
+        )
+        assertEquals(
+            "/name:value",
+            MetaInfoPropertyItem(name = "name", value = "value", category = null, link = null).toSearchToken()
+        )
+        assertEquals(
+            "category/name:",
+            MetaInfoPropertyItem(name = "name", value = null, category = "category", link = null).toSearchToken()
+        )
+        assertEquals(
+            "category/name:value",
+            MetaInfoPropertyItem(name = "name", value = "value", category = "category", link = null).toSearchToken()
+        )
+    }
 
     @Test
     fun match_name_nok() {

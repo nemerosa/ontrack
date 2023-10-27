@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.av.dispatcher
 
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.Project
 
 /**
  * Given a `versionSource` parameter value, returns the ID of the version source
@@ -14,8 +15,10 @@ import net.nemerosa.ontrack.model.structure.Build
  * * `labelOnly`
  * * `metaInfo/key`
  */
-fun getVersionSourceConfig(token: String): Pair<String, String?> =
-    if (token.contains("/")) {
+fun getVersionSourceConfig(token: String?): Pair<String, String?> =
+    if (token.isNullOrBlank()) {
+        DefaultVersionSource.ID to null
+    } else if (token.contains("/")) {
         token.substringBefore("/") to token.substringAfter("/")
     } else {
         token to null
@@ -37,4 +40,19 @@ fun VersionSourceFactory.getBuildVersion(
         getVersionSourceConfig(it)
     } ?: (DefaultVersionSource.ID to null)
     return getVersionSource(id).getVersion(build, param)
+}
+
+/**
+ * Given a source project and a version, use the `versionSource` ID to get
+ * the corresponding build.
+ */
+fun VersionSourceFactory.getBuildWithVersion(
+    sourceProject: Project,
+    config: AutoVersioningSourceConfig,
+    version: String
+): Build? {
+    val (id, param) = config.versionSource?.let {
+        getVersionSourceConfig(it)
+    } ?: (DefaultVersionSource.ID to null)
+    return getVersionSource(id).getBuildFromVersion(sourceProject, param, version)
 }
