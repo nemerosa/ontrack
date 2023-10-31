@@ -16,6 +16,7 @@ import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunDecorator
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
+import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.BeforeEach
@@ -361,7 +362,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
         val repoName = uid("R")
         val owner = uid("o")
         val commit = "1234567890"
-        val projectName = normalizeName(repoName)
+        val projectName = normalizeName(repoName, Project.PROJECT_NAME_MAX_LENGTH)
         val branchName = "release-1.0"
         val buildName = "ci-1"
         // Starting the run
@@ -428,7 +429,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
         val repoName = uid("R")
         val owner = uid("o")
         val commit = "1234567890"
-        val projectName = normalizeName(repoName)
+        val projectName = normalizeName(repoName, Project.PROJECT_NAME_MAX_LENGTH)
         val branchName = "release-1.0"
         val buildName = "ci-1"
         // Starting the run
@@ -657,7 +658,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
             processor.process(payload, configuration = null)
         }
         // Checks the project, branch & build
-        val projectName = normalizeName(repoName)
+        val projectName = normalizeName(repoName, Project.PROJECT_NAME_MAX_LENGTH)
         val branchName = "release-1.0"
         val buildName = "ci-1"
         asAdmin {

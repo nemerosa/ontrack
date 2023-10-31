@@ -19,6 +19,7 @@ import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunProp
 import net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType
 import net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobPropertyType
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.ValidationStamp
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -299,7 +300,7 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
         expectedVsName: String = IngestionConfigVSNameNormalization.DEFAULT("$job-$step"),
         expectedStatus: String = "PASSED",
         expectedJob: Boolean = false,
-        expectedJobVsName: String = normalizeName(job),
+        expectedJobVsName: String = normalizeName(job, ValidationStamp.NAME_MAX_LENGTH),
     ) {
         setupTest(
             runId = runId,

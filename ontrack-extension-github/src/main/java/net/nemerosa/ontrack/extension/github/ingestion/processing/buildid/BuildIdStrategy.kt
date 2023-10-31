@@ -15,7 +15,8 @@ interface BuildIdStrategy {
     fun setupBuild(build: Build, workflowRun: WorkflowRun, config: JsonNode)
 
     fun getBuildName(workflowRun: WorkflowRun, config: JsonNode): String = normalizeName(
-        "${workflowRun.name}-${workflowRun.runNumber}"
+        "${workflowRun.name}-${workflowRun.runNumber}",
+        Build.BUILD_NAME_MAX_LENGTH
     )
 
     /**

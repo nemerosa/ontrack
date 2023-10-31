@@ -41,7 +41,7 @@ data class Branch(
         /**
          * Maximum length for the name of a branch.
          */
-        const val NAME_MAX_LENGTH = 120
+        const val NAME_MAX_LENGTH = 200
 
         @JvmStatic
         fun of(project: Project, nameDescription: NameDescription) =

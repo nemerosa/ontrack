@@ -48,6 +48,11 @@ data class Build(
 
     companion object {
 
+        /**
+         * Maximum length for the name of a build
+         */
+        const val BUILD_NAME_MAX_LENGTH = 150
+
         @JvmStatic
         fun of(branch: Branch, nameDescription: NameDescription, signature: Signature) =
                 Build(

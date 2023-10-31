@@ -103,22 +103,22 @@ class StructureServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `#269 Branch name of 120 characters is allowed`() {
+    fun `#269 Branch name of 200 characters is allowed`() {
         val project = doCreateProject()
         doCreateBranch(project, nd(
-                "b".repeat(120),
-                "Test with 120 characters"
+                "b".repeat(200),
+                "Test with 200 characters"
         ))
     }
 
     @Test
-    fun `#269 Branch name of more than 120 characters is not allowed`() {
+    fun `#269 Branch name of more than 200 characters is not allowed`() {
         val project = doCreateProject()
         assertFailsWith<DataIntegrityViolationException> {
             doCreateBranch(
                 project, nd(
-                    "b".repeat(121),
-                    "Test with 121 characters"
+                    "b".repeat(201),
+                    "Test with 201 characters"
                 )
             )
         }

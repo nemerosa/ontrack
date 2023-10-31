@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Reposito
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.normalizeName
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
+import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -255,7 +256,7 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
                     ),
                     configuration = configName,
                 )
-                val projectName = normalizeName(name)
+                val projectName = normalizeName(name, Project.PROJECT_NAME_MAX_LENGTH)
                 assertNotNull(structureService.findProjectByName(projectName).getOrNull()) { project ->
                     assertNotNull(
                         getProperty(project, GitHubProjectConfigurationPropertyType::class.java),
