@@ -13,7 +13,7 @@ internal class AutoVersioningEventsIT: AbstractDSLTestSupport() {
     private lateinit var htmlNotificationEventRenderer: HtmlNotificationEventRenderer
 
     @Test
-    fun `Rendering the post processing event`() {
+    fun `Rendering the post processing error event`() {
         val source = project()
         project {
             branch {
@@ -30,6 +30,34 @@ internal class AutoVersioningEventsIT: AbstractDSLTestSupport() {
                         Auto versioning post-processing of <a href="http://localhost:8080/#/project/${project.id}">${project.name}</a>/<a href="http://localhost:8080/#/branch/${id}">${name}</a> for dependency <a href="http://localhost:8080/#/project/${source.id}">${source.name}</a> version "1.1.0" has failed.
 
                         <a href="urn:post-processing-job">Post processing error</a>
+                    """.trimIndent(),
+                    text
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Rendering the success event`() {
+        val source = project()
+        project {
+            branch {
+                val event = Event.of(AutoVersioningEvents.AUTO_VERSIONING_SUCCESS)
+                    .withBranch(this)
+                    .withExtraProject(source)
+                    .with("version", "1.1.0")
+                    .with("message", "Created, approved and merged.")
+                    .with("pr-name", "PR-42")
+                    .with("pr-link", "https://scm/pr/42")
+                    .build()
+                val text = event.render(htmlNotificationEventRenderer)
+                assertEquals(
+                    """
+                        Auto versioning of <a href="http://localhost:8080/#/project/${project.id}">${project.name}</a>/<a href="http://localhost:8080/#/branch/${id}">${name}</a> for dependency <a href="http://localhost:8080/#/project/${source.id}">${source.name}</a> version "1.1.0" has been done.
+
+                        Created, approved and merged.
+                        
+                        Pull request <a href="https://scm/pr/42">PR-42</a>
                     """.trimIndent(),
                     text
                 )
