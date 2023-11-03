@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.av.event
 
-import net.nemerosa.ontrack.extension.notifications.rendering.HtmlNotificationEventRenderer
+import net.nemerosa.ontrack.model.events.HtmlNotificationEventRenderer
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.events.Event
 import org.junit.jupiter.api.Test

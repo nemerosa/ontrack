@@ -20,6 +20,11 @@ public class UIEvent {
     private final Map<String, NameValue> values;
 
     /**
+     * HTML rendering
+     */
+    private final String html;
+
+    /**
      * Additional data processed from the values or entities
      */
     private final Map<String, ?> data;

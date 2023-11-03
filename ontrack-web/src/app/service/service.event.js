@@ -7,11 +7,15 @@ angular.module('ot.service.event', [
         var self = {};
 
         self.renderEvent = function (event) {
-
-            return event.template.replace(
-                variableRegex,
-                replacementFunction(event)
-            );
+            if (event.html) {
+                return event.html;
+            } else {
+                // Legacy code
+                return event.template.replace(
+                    variableRegex,
+                    replacementFunction(event)
+                );
+            }
         };
 
         function replacementFunction(event) {

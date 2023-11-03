@@ -4,7 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures.createOrder
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
-import net.nemerosa.ontrack.extension.notifications.rendering.HtmlNotificationEventRenderer
+import net.nemerosa.ontrack.model.events.HtmlNotificationEventRenderer
 import net.nemerosa.ontrack.extension.notifications.subscriptions.matchesKeywords
 import net.nemerosa.ontrack.extension.scm.service.SCMTestFixtures
 import net.nemerosa.ontrack.model.structure.Branch
