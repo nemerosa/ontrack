@@ -1,7 +1,5 @@
-package net.nemerosa.ontrack.ui.controller
+package net.nemerosa.ontrack.model.structure
 
-import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.apache.commons.text.CaseUtils
 import java.util.*
 

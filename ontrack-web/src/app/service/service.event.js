@@ -7,11 +7,15 @@ angular.module('ot.service.event', [
         var self = {};
 
         self.renderEvent = function (event) {
-
-            return event.template.replace(
-                variableRegex,
-                replacementFunction(event)
-            );
+            if (event.html) {
+                return event.html;
+            } else {
+                // Legacy code
+                return event.template.replace(
+                    variableRegex,
+                    replacementFunction(event)
+                );
+            }
         };
 
         function replacementFunction(event) {
@@ -40,6 +44,13 @@ angular.module('ot.service.event', [
                     } else {
                         return "#ERROR:REF";
                     }
+                } else if (expression.startsWith('X_')) {
+                    const type = expression.substring(2);
+                    entity = event.extraEntities[type];
+                    if (!entity) {
+                        return "#ERROR:" + expression;
+                    }
+                    return renderEntity(type, entity);
                 } else {
                     // We want an entity reference
                     entity = event.entities[expression];

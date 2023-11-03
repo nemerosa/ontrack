@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.events.Event;
 import net.nemerosa.ontrack.model.events.EventQueryService;
+import net.nemerosa.ontrack.model.events.HtmlNotificationEventRenderer;
 import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.NameValue;
@@ -30,11 +31,13 @@ public class EventController extends AbstractResourceController {
 
     private final EventQueryService eventQueryService;
     private final PropertyService propertyService;
+    private final HtmlNotificationEventRenderer htmlNotificationEventRenderer;
 
     @Autowired
-    public EventController(EventQueryService eventQueryService, PropertyService propertyService) {
+    public EventController(EventQueryService eventQueryService, PropertyService propertyService, HtmlNotificationEventRenderer htmlNotificationEventRenderer) {
         this.eventQueryService = eventQueryService;
         this.propertyService = propertyService;
+        this.htmlNotificationEventRenderer = htmlNotificationEventRenderer;
     }
 
     /**
@@ -117,8 +120,10 @@ public class EventController extends AbstractResourceController {
                 event.getEventType().getTemplate(),
                 event.getSignature(),
                 event.getEntities(),
+                event.getExtraEntities(),
                 event.getRef(),
                 event.getValues(),
+                event.render(htmlNotificationEventRenderer),
                 computeData(event)
         );
     }
