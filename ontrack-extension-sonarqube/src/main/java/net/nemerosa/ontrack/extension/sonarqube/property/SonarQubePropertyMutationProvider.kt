@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.sonarqube.property
 import graphql.schema.GraphQLInputObjectField
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfigurationService
 import net.nemerosa.ontrack.graphql.schema.*
+import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.PropertyType
 import org.springframework.stereotype.Component
@@ -27,6 +28,7 @@ class SonarQubePropertyMutationProvider(
             "branchPattern",
             "Regex to use to restrict the branches for which the measures are collected"
         ),
+        requiredBooleanInputField(SonarQubeProperty::validationMetrics.name, getPropertyDescription(SonarQubeProperty::validationMetrics))
     )
 
     override fun readInput(entity: ProjectEntity, input: MutationInput) = SonarQubeProperty(
@@ -37,6 +39,7 @@ class SonarQubePropertyMutationProvider(
         override = input.getRequiredInput("override"),
         branchModel = input.getRequiredInput("branchModel"),
         branchPattern = input.getInput("branchPattern"),
+        validationMetrics = input.getRequiredInput(SonarQubeProperty::validationMetrics.name),
     )
 
 }

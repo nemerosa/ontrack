@@ -38,6 +38,7 @@ class SonarQubePropertyMutationProviderIT : AbstractQLKTITSupport() {
                                     override: false,
                                     branchModel: false,
                                     branchPattern: "develop",
+                                    validationMetrics: true,
                                 }) {
                                     errors {
                                         message
@@ -55,6 +56,7 @@ class SonarQubePropertyMutationProviderIT : AbstractQLKTITSupport() {
                                 assertEquals(false, property.override)
                                 assertEquals(false, property.branchModel)
                                 assertEquals("develop", property.branchPattern)
+                                assertEquals(true, property.validationMetrics)
                             }
                         }
                     }

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.sonarqube.measures
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfiguration
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
@@ -19,14 +20,25 @@ internal class SonarQubeMeasuresEventListenerTest {
     private lateinit var sonarQubeMeasuresCollectionService: SonarQubeMeasuresCollectionService
     private lateinit var cachedSettingsService: CachedSettingsService
     private lateinit var listener: SonarQubeMeasuresEventListener
+    private lateinit var validationRunService: ValidationRunService
+    private lateinit var metricsValidationDataType: MetricsValidationDataType
 
     @BeforeEach
     fun before() {
         propertyService = mockk(relaxed = true)
         sonarQubeMeasuresCollectionService = mockk(relaxed = true)
         cachedSettingsService = mockk(relaxed = true)
+        validationRunService = mockk(relaxed = true)
+        metricsValidationDataType = mockk(relaxed = true)
         listener =
-            SonarQubeMeasuresEventListener(propertyService, sonarQubeMeasuresCollectionService, cachedSettingsService)
+            SonarQubeMeasuresEventListener(
+                propertyService,
+                sonarQubeMeasuresCollectionService,
+                cachedSettingsService,
+                validationRunService,
+                metricsValidationDataType,
+                mockk(),
+            )
     }
 
     @Test
@@ -55,8 +67,10 @@ internal class SonarQubeMeasuresEventListenerTest {
 
     private inner class ImmediateCollectionTestContext(
         settingsDisabled: Boolean,
+        val validationMetrics: Boolean = true,
     ) {
         val build: Build
+        val run: ValidationRun
         val event: Event
         val sqProperty: SonarQubeProperty
 
@@ -76,7 +90,9 @@ internal class SonarQubeMeasuresEventListenerTest {
             val project = Project.of(NameDescription.nd("prj", "")).withId(ID.of(1))
             val branch = Branch.of(project, NameDescription.nd("main", "")).withId(ID.of(10))
             build = Build.of(branch, NameDescription.nd("1", ""), Signature.of("test")).withId(ID.of(100))
-            val vs = ValidationStamp.of(branch, NameDescription.nd("sonarqube", ""))
+            val vs = ValidationStamp.of(branch, NameDescription.nd("sonarqube", "")).withId(ID.of(100))
+            run = ValidationRun.of(build, vs, 1, Signature.of("test"), ValidationRunStatusID.STATUS_PASSED, null)
+                .withId(ID.of(1000))
 
             // SQ config & property
             val sqConfig = SonarQubeConfiguration(
@@ -91,7 +107,8 @@ internal class SonarQubeMeasuresEventListenerTest {
                 measures = emptyList(),
                 override = false,
                 branchModel = false,
-                branchPattern = "main"
+                branchPattern = "main",
+                validationMetrics = true,
             )
             every {
                 propertyService.getPropertyValue(project, SonarQubePropertyType::class.java)
@@ -104,10 +121,9 @@ internal class SonarQubeMeasuresEventListenerTest {
 
             // Creating a validation event
             event = Event.of(EventFactory.NEW_VALIDATION_RUN)
-                .withBuild(build)
-                .withValidationStamp(vs)
-                .with("status", "PASSED")
-                .get()
+                .withValidationRun(run)
+                .with("status", run.lastStatusId)
+                .build()
         }
 
         fun runTest(test: ImmediateCollectionTestContext.() -> Unit) {
@@ -122,10 +138,12 @@ internal class SonarQubeMeasuresEventListenerTest {
 
     private fun immediateCollectionTest(
         settingsDisabled: Boolean = false,
+        validationMetrics: Boolean = true,
         test: ImmediateCollectionTestContext.() -> Unit,
     ) {
         val context = ImmediateCollectionTestContext(
             settingsDisabled = settingsDisabled,
+            validationMetrics = validationMetrics,
         )
         context.runTest(test)
     }
