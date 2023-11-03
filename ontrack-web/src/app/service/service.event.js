@@ -40,6 +40,13 @@ angular.module('ot.service.event', [
                     } else {
                         return "#ERROR:REF";
                     }
+                } else if (expression.startsWith('X_')) {
+                    const type = expression.substring(2);
+                    entity = event.extraEntities[type];
+                    if (!entity) {
+                        return "#ERROR:" + expression;
+                    }
+                    return renderEntity(type, entity);
                 } else {
                     // We want an entity reference
                     entity = event.entities[expression];
