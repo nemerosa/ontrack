@@ -15,6 +15,15 @@ fun requiredStringInputField(
     .type(GraphQLNonNull(GraphQLString))
     .build()
 
+fun requiredStringListInputField(
+    name: String,
+    description: String,
+): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
+    .name(name)
+    .description(description)
+    .type(GraphQLNonNull(GraphQLList(GraphQLNonNull(GraphQLString))))
+    .build()
+
 fun optionalStringInputField(
     name: String,
     description: String,
@@ -59,6 +68,15 @@ fun optionalBooleanInputField(
     .name(name)
     .description(description)
     .type(GraphQLBoolean)
+    .build()
+
+fun requiredBooleanInputField(
+    name: String,
+    description: String,
+): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
+    .name(name)
+    .description(description)
+    .type(GraphQLNonNull(GraphQLBoolean))
     .build()
 
 fun requiredRefInputField(

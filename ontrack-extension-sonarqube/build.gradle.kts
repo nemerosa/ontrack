@@ -10,6 +10,7 @@ dependencies {
     api(project(":ontrack-extension-support"))
 
     implementation(project(":ontrack-extension-casc"))
+    implementation(project(":ontrack-ui-graphql"))
     implementation("io.micrometer:micrometer-core")
     implementation(project(":ontrack-extension-indicators"))
     implementation("org.slf4j:slf4j-api")
@@ -17,6 +18,7 @@ dependencies {
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(":ontrack-extension-general"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
     testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
 
