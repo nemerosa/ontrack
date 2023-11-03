@@ -20,8 +20,8 @@ class ValidationStampMetricsChartProvider(
     override fun getChartDefinition(subject: ValidationStamp): ChartDefinition? {
         // Gets the validation data type from the validation stamp
         val dataTypeId = subject.dataType?.descriptor?.id
-        // ... or from the last validation run
-                ?: structureService.getValidationRunsForValidationStamp(subject, 0, 1).firstOrNull()?.data?.descriptor?.id
+        // ... or from the last validation runs
+                ?: getValidationDataTypeFromValidationRuns(subject)?.descriptor?.id
                 ?: return null
         // Gets the data type
         val dataType = validationDataTypeService.getValidationDataType<Any, Any>(dataTypeId)
@@ -39,6 +39,13 @@ class ValidationStampMetricsChartProvider(
         } else {
             null
         }
+    }
+
+    private fun getValidationDataTypeFromValidationRuns(subject: ValidationStamp): ValidationRunData<*>? {
+        // Getting a sample of the last runs (hard coded to 5 at max)
+        val runs = structureService.getValidationRunsForValidationStamp(subject, 0, 5)
+        // Getting the first data type
+        return runs.firstNotNullOfOrNull { it.data }
     }
 
     override fun getChart(runs: List<ValidationRun>, options: GetChartOptions): MetricsChart {
