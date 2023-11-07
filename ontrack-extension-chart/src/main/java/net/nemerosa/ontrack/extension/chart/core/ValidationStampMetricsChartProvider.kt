@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class ValidationStampMetricsChartProvider(
-        structureService: StructureService,
-        private val validationDataTypeService: ValidationDataTypeService,
+    structureService: StructureService,
+    private val validationDataTypeService: ValidationDataTypeService,
 ) : AbstractValidationStampChartProvider<MetricsChart>(structureService) {
 
     override val name: String = "validation-stamp-metrics"
@@ -21,20 +21,20 @@ class ValidationStampMetricsChartProvider(
         // Gets the validation data type from the validation stamp
         val dataTypeId = subject.dataType?.descriptor?.id
         // ... or from the last validation runs
-                ?: getValidationDataTypeFromValidationRuns(subject)?.descriptor?.id
-                ?: return null
+            ?: getValidationDataTypeFromValidationRuns(subject)?.descriptor?.id
+            ?: return null
         // Gets the data type
         val dataType = validationDataTypeService.getValidationDataType<Any, Any>(dataTypeId)
         // Creating a chart only if this validation data type can provide numeric metrics
         return if (dataType is NumericValidationDataType) {
             ChartDefinition(
-                    id = name,
-                    title = "Validation stamp metrics",
-                    type = MetricsChart.TYPE,
-                    config = NullNode.instance,
-                    parameters = mapOf(
-                            "id" to subject.id()
-                    ).asJson(),
+                id = name,
+                title = "Validation stamp metrics",
+                type = MetricsChart.TYPE,
+                config = NullNode.instance,
+                parameters = mapOf(
+                    "id" to subject.id()
+                ).asJson(),
             )
         } else {
             null
@@ -49,25 +49,23 @@ class ValidationStampMetricsChartProvider(
     }
 
     override fun getChart(runs: List<ValidationRun>, options: GetChartOptions): MetricsChart {
+        val emptyMetricsChart = MetricsChart.compute(
+            names = emptyList(),
+            colors = emptyList(),
+            items = emptyList(),
+            interval = options.actualInterval,
+            period = options.period,
+        )
+        // Gets the validation stamp from the first run
+        val validationStamp = runs.firstOrNull()?.validationStamp
+            ?: return emptyMetricsChart
         // Gets the validation data type from the v
-        val dataTypeId = runs.firstOrNull()
-                ?.validationStamp?.dataType?.descriptor?.id
-                ?: return MetricsChart.compute(
-                        names = emptyList(),
-                        colors = emptyList(),
-                        items = emptyList(),
-                        interval = options.actualInterval,
-                        period = options.period,
-                )
+        val dataTypeId = validationStamp.dataType?.descriptor?.id
+            ?: getValidationDataTypeFromValidationRuns(validationStamp)?.descriptor?.id
+            ?: return emptyMetricsChart
         val dataType = (validationDataTypeService.getValidationDataType<Any, Any>(dataTypeId)
-                ?.takeIf { it is NumericValidationDataType }
-                ?: return MetricsChart.compute(
-                        names = emptyList(),
-                        colors = emptyList(),
-                        items = emptyList(),
-                        interval = options.actualInterval,
-                        period = options.period,
-                ))
+            ?.takeIf { it is NumericValidationDataType }
+            ?: return emptyMetricsChart)
                 as NumericValidationDataType
         // Collecting all metrics
         val items = runs.mapNotNull { run ->
@@ -75,8 +73,8 @@ class ValidationStampMetricsChartProvider(
                 val runDataType = validationDataTypeService.getValidationDataType<Any, Any>(data.descriptor.id)
                 if (runDataType != null && runDataType.descriptor.id == dataTypeId) {
                     MetricsChartItemData(
-                            timestamp = run.lastStatus.signature.time,
-                            dataType.getNumericMetrics(data.data!!)
+                        timestamp = run.lastStatus.signature.time,
+                        dataType.getNumericMetrics(data.data!!)
                     )
                 } else {
                     null
@@ -85,11 +83,11 @@ class ValidationStampMetricsChartProvider(
         }
         // Creating the chart
         return MetricsChart.compute(
-                names = dataType.getMetricNames(),
-                colors = dataType.getMetricColors(),
-                items = items,
-                interval = options.actualInterval,
-                period = options.period,
+            names = dataType.getMetricNames(),
+            colors = dataType.getMetricColors(),
+            items = items,
+            interval = options.actualInterval,
+            period = options.period,
         )
     }
 }
