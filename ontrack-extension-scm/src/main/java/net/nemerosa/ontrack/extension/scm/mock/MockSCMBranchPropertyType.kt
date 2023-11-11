@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 import java.util.function.Function
 
 @Component
-@Profile(RunProfile.ACC)
+@Profile(RunProfile.ACC, RunProfile.UNIT_TEST)
 class MockSCMBranchPropertyType(
     extensionFeature: SCMExtensionFeature,
 ) : AbstractPropertyType<MockSCMBranchProperty>(extensionFeature) {

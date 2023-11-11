@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.events.EventVariableService
 import net.nemerosa.ontrack.model.form.*
 import org.springframework.stereotype.Component
 
@@ -16,12 +17,13 @@ import org.springframework.stereotype.Component
 class JenkinsNotificationChannel(
     private val jenkinsConfigurationService: JenkinsConfigurationService,
     private val jenkinsClientFactory: JenkinsClientFactory,
+    private val eventVariableService: EventVariableService,
 ) : AbstractNotificationChannel<JenkinsNotificationChannelConfig>(
     JenkinsNotificationChannelConfig::class
 ) {
     override fun publish(config: JenkinsNotificationChannelConfig, event: Event): NotificationResult {
         // Computing the expansion parameters
-        val templateParameters = event.getTemplateParameters(caseVariants = true)
+        val templateParameters = eventVariableService.getTemplateParameters(event, caseVariants = true)
         // Gets the Jenkins configuration
         val jenkinsConfig = jenkinsConfigurationService.findConfiguration(config.config)
             ?: return NotificationResult.invalidConfiguration("Jenkins configuration cannot be found: ${config.config}")
@@ -29,9 +31,9 @@ class JenkinsNotificationChannel(
         val jenkinsClient = jenkinsClientFactory.getClient(jenkinsConfig)
         // Running the job
         val job = SimpleExpand.expand(config.job, templateParameters)
-        val parameters = config.parameters.map {
+        val parameters = config.parameters.associate {
             it.name to SimpleExpand.expand(it.value, templateParameters)
-        }.toMap()
+        }
         val error = when (config.callMode) {
             JenkinsNotificationChannelConfigCallMode.ASYNC -> launchAsync(jenkinsClient, job, parameters)
             JenkinsNotificationChannelConfigCallMode.SYNC -> launchSync(jenkinsClient, job, config.timeout, parameters)

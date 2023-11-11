@@ -1,14 +1,19 @@
 package net.nemerosa.ontrack.model.structure
 
+import java.util.*
+
 
 /**
  * Name suitable for generating a code variable.
  */
 val ProjectEntityType.varName: String
-    get() = name.lowercase().split("_").joinToString("") { it.capitalize() }.decapitalize()
+    get() = name.lowercase()
+        .split("_")
+        .joinToString("") { it.replaceFirstChar { c -> c.titlecase() } }
+        .replaceFirstChar { it.lowercase() }
 
 /**
  * Name suitable for generating a code type.
  */
 val ProjectEntityType.typeName: String
-    get() = varName.capitalize()
+    get() = varName.replaceFirstChar { it.titlecase() }
