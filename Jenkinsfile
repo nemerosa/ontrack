@@ -1,4 +1,4 @@
-@Library("ontrack-jenkins-cli-pipeline@1.0.1") _
+@Library("ontrack-jenkins-cli-pipeline@1.3.1") _
 
 pipeline {
 
@@ -78,6 +78,28 @@ pipeline {
                         ],
                         PRODUCTION: [:],
                     ]
+                )
+                ontrackCliSetupBranchNotifications(
+                        channel: 'slack',
+                        channelConfig: [
+                                channel: '#notifications',
+                                type: 'ERROR'
+                        ],
+                        events: [
+                                'new_validation_run',
+                        ],
+                        keywords: 'failed',
+                )
+                ontrackCliSetupPromotionLevelNotifications(
+                        promotion: 'BRONZE',
+                        channel: 'slack',
+                        channelConfig: [
+                                channel: '#notifications',
+                                type: 'SUCCESS'
+                        ],
+                        events: [
+                                'new_promotion_run',
+                        ],
                 )
             }
         }
