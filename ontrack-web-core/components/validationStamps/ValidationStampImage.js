@@ -1,5 +1,6 @@
 import Image from "next/image";
 import {validationStampImageUri} from "@components/common/Links";
+import {FaWrench} from "react-icons/fa";
 
 export default function ValidationStampImage({validationStamp, size = 16}) {
     return (
@@ -9,6 +10,9 @@ export default function ValidationStampImage({validationStamp, size = 16}) {
                 alt={validationStamp.name}
                 width={size}
                 height={size}
-            /> : undefined
+            /> : <FaWrench
+                width={size}
+                height={size}
+            />
     )
 }
