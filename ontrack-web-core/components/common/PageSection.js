@@ -1,4 +1,4 @@
-import {Card} from "antd";
+import {Card, Space, Spin, Typography} from "antd";
 
 export default function PageSection({loading, title, extra, padding = true, fullHeight = false, children}) {
     const bodyStyle = {}
@@ -20,7 +20,16 @@ export default function PageSection({loading, title, extra, padding = true, full
             extra={extra}
             bodyStyle={bodyStyle}
         >
-            {children}
+            {
+                !loading && children
+            }
+            {
+                loading &&
+                <Space>
+                    <Spin/>
+                    <Typography.Text>Loading...</Typography.Text>
+                </Space>
+            }
         </Card>
     )
 }
