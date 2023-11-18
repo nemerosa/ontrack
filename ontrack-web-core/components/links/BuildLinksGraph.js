@@ -2,9 +2,9 @@ import {applyNodeChanges, Background, Controls, ReactFlow, ReactFlowProvider} fr
 import {gql} from "graphql-request";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import graphQLCall from "@client/graphQLCall";
-import Dagre from "dagre";
 import BuildNode from "@components/links/BuildNode";
 import BuildGroupNode from "@components/links/BuildGroupNode";
+import {autoLayout} from "@components/links/GraphUtils";
 
 function BuildLinksFlow({build}) {
 
@@ -144,8 +144,6 @@ function BuildLinksFlow({build}) {
         build: BuildNode,
         group: BuildGroupNode,
     }), []);
-
-    const dagreGraph = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}))
 
     const buildToNode = (build, id) => {
         return {
@@ -309,33 +307,14 @@ function BuildLinksFlow({build}) {
 
             // Layout for the graph
 
-            dagreGraph.setGraph({rankdir: 'LR'})
-
-            const nodeWidth = 180
-            const nodeHeight = 30
-
-            edges.forEach((edge) => dagreGraph.setEdge(edge.source, edge.target))
-            nodes.forEach((node) => dagreGraph.setNode(node.id, {
-                width: nodeWidth,
-                height: nodeHeight,
-            }))
-
-            Dagre.layout(dagreGraph)
-
-            nodes.forEach(node => {
-                const nodeWithPosition = dagreGraph.node(node.id)
-                node.targetPosition = 'left'
-                node.sourcePosition = 'right'
-
-                node.position = {
-                    x: nodeWithPosition.x - nodeWidth / 2,
-                    y: nodeWithPosition.y - nodeHeight / 2,
-                }
+            autoLayout({
+                nodes,
+                edges,
+                nodeWidth: (node) => node.type === 'group' ? 200 : 180,
+                nodeHeight: (node) => node.type === 'group' ? 300 : 120,
+                setNodes,
+                setEdges,
             })
-
-            // OK
-            setNodes(nodes)
-            setEdges(edges)
         })
     }, [build])
 
