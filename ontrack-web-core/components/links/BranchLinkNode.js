@@ -21,6 +21,9 @@ export default function BranchLinkNode({data}) {
     return (
         <>
             <Handle type="target" position={Position.Left}/>
+            <Handle type="source" position={Position.Right}/>
+            <Handle type="target" position={Position.Top}/>
+            <Handle type="source" position={Position.Bottom}/>
             <Card
                 title={undefined}
                 size="small"
@@ -57,7 +60,6 @@ export default function BranchLinkNode({data}) {
                     </Space>
                 </Space>
             </Card>
-            <Handle type="source" position={Position.Right}/>
         </>
     )
 }
