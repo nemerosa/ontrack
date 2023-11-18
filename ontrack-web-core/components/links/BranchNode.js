@@ -1,10 +1,13 @@
 import {Handle, Position} from "reactflow";
 import {Card, Space, Tooltip, Typography} from "antd";
-import {branchLink, projectLink} from "@components/common/Links";
+import {branchLink, buildLink, projectLink} from "@components/common/Links";
+import {FaArrowCircleRight} from "react-icons/fa";
 
 export default function BranchNode({data}) {
 
     const {branch, selected} = data
+
+    const latestBuild = branch.latestBuilds ? branch.latestBuilds[0] : undefined
 
     return (
         <>
@@ -35,6 +38,13 @@ export default function BranchNode({data}) {
                         <Typography.Text italic ellipsis>
                             {branch.name}
                         </Typography.Text>
+                    }
+                    {
+                        latestBuild &&
+                        <Space>
+                            <FaArrowCircleRight title="Latest build"/>
+                            {buildLink(latestBuild)}
+                        </Space>
                     }
                 </Space>
             </Card>

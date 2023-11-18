@@ -11,6 +11,16 @@ function BranchLinksFlow({branch}) {
     const maxDownstreamDepth = 5
     const maxUpstreamDepth = 5
 
+    const gqlBuildInfo = gql`
+        fragment BuildInfo on Build {
+            id
+            name
+            releaseProperty {
+                value
+            }
+        }
+    `
+
     const gqlBranchInfo = gql`
         fragment BranchInfo on Branch {
             id
@@ -24,9 +34,11 @@ function BranchLinksFlow({branch}) {
     `
 
     const gqlBranchNodeInfo = gql`
-        ${gqlBranchInfo}
         fragment BranchNodeInfo on Branch {
             ...BranchInfo
+            latestBuilds: builds(count: 1) {
+                ...BuildInfo
+            }
         }
     `
 
@@ -53,6 +65,8 @@ function BranchLinksFlow({branch}) {
                 ${gqlDownstreamDependencies(maxDownstreamDepth)}
             }
         }
+        ${gqlBuildInfo}
+        ${gqlBranchInfo}
         ${gqlBranchNodeInfo}
     `
 
