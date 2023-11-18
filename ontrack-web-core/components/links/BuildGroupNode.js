@@ -16,7 +16,7 @@ export default function BuildGroupNode({data}) {
 
     useEffect(() => {
         // Sorting the builds from the oldest to the newest
-        const sortedBuilds = builds.toSorted((a, b) => a.id - b.id)
+        const sortedBuilds = builds.toSorted((a, b) => b.id - a.id)
         // First build
         const firstBuild = sortedBuilds[0]
         // Last build
