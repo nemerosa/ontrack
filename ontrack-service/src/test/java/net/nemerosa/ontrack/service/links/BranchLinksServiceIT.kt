@@ -112,25 +112,16 @@ class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
 
                     assertEquals(
                         listOf(
-                            BranchLink(
-                                branch = targetPreview,
-                                qualifier = "preview"
-                            ),
-                            BranchLink(
-                                branch = targetMain,
-                                qualifier = ""
-                            ),
-                            BranchLink(
-                                branch = otherMain,
-                                qualifier = ""
-                            ),
+                            "preview" to targetPreview,
+                            "" to targetMain,
+                            "" to otherMain,
                         ).sortedWith(
                             compareBy(
-                                { it.branch.project.name },
-                                { it.qualifier },
+                                { it.second.project.name },
+                                { it.first },
                             )
-                        ).map {
-                              it.qualifier to it.branch.name
+                        ).map { (qualifier, branch) ->
+                              qualifier to branch.name
                         },
                         links.map {
                             it.qualifier to it.branch.name
