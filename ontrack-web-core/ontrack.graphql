@@ -441,6 +441,10 @@ type BranchLink {
     branch: Branch!
     "Nature/qualification of the link"
     qualifier: String!
+    "Last source build"
+    sourceBuild: Build!
+    "Last target build"
+    targetBuild: Build!
 }
 
 "Branch links"

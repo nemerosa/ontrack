@@ -27,33 +27,19 @@ class BranchLinksServiceImpl(
 
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    private fun collectDependencies(
-        buildLinks: List<BuildLink>,
-        nextBuilds: MutableMap<Pair<ID, String>, Build>,
-    ) {
-        buildLinks.forEach { buildLink ->
-            // Key
-            val key = buildLink.build.project.id to buildLink.qualifier
-            // Existing build?
-            val existingBuild = nextBuilds[key]
-            if (existingBuild != null) {
-                // Takes the new build if more recent
-                if (buildLink.build.id() > existingBuild.id()) {
-                    nextBuilds[key] = buildLink.build
-                }
-            } else {
-                // New build
-                nextBuilds[key] = buildLink.build
-            }
-        }
-    }
+    private data class LinkInfo(
+        val sourceBuild: Build,
+        val targetBuild: Build,
+    )
 
     private fun convertToLinks(
-        nextBuilds: MutableMap<Pair<ID, String>, Build>,
+        nextBuilds: MutableMap<Pair<ID, String>, LinkInfo>,
     ): List<BranchLink> = nextBuilds.map { (key, nextBuild) ->
         val (_, qualifier) = key
         BranchLink(
-            branch = nextBuild.branch,
+            branch = nextBuild.targetBuild.branch,
+            targetBuild = nextBuild.targetBuild,
+            sourceBuild = nextBuild.sourceBuild,
             qualifier = qualifier,
         )
     }.sortedWith(
@@ -63,17 +49,42 @@ class BranchLinksServiceImpl(
         )
     )
 
+    private fun collectLinkInfo(
+        buildLink: BuildLink,
+        nextBuilds: MutableMap<Pair<ID, String>, LinkInfo>,
+        linkInfo: LinkInfo,
+    ) {
+        val key = buildLink.build.project.id to buildLink.qualifier
+        // Existing build?
+        val existingBuild = nextBuilds[key]
+        if (existingBuild != null) {
+            // Takes the new build if more recent
+            if (buildLink.build.id() > existingBuild.sourceBuild.id()) {
+                nextBuilds[key] = linkInfo
+            }
+        } else {
+            // New build
+            nextBuilds[key] = linkInfo
+        }
+    }
+
     override fun getDownstreamDependencies(branch: Branch, n: Int): List<BranchLink> {
         // Gets the N first builds
         val builds = getBuilds(branch, n)
         // Grouping per project & qualifier
-        val nextBuilds = mutableMapOf<Pair<ID, String>, Build>()
+        val nextBuilds = mutableMapOf<Pair<ID, String>, LinkInfo>()
         // Looping over the N first builds
         builds.forEach { build ->
             // Gets the downstream builds
             val downstreamBuildLinks = structureService.getQualifiedBuildsUsedBy(build, size = n).pageItems
             // Looping over these dependencies
-            collectDependencies(downstreamBuildLinks, nextBuilds)
+            downstreamBuildLinks.forEach<BuildLink> { buildLink ->
+                val linkInfo = LinkInfo(
+                    sourceBuild = build,
+                    targetBuild = buildLink.build,
+                )
+                collectLinkInfo(buildLink, nextBuilds, linkInfo)
+            }
         }
         // Result
         return convertToLinks(nextBuilds)
@@ -83,13 +94,19 @@ class BranchLinksServiceImpl(
         // Gets the N first builds
         val builds = getBuilds(branch, n)
         // Grouping per project & qualifier
-        val nextBuilds = mutableMapOf<Pair<ID, String>, Build>()
+        val nextBuilds = mutableMapOf<Pair<ID, String>, LinkInfo>()
         // Looping over the N first builds
         builds.forEach { build ->
             // Gets the downstream builds
             val upstreamBuildLinks = structureService.getQualifiedBuildsUsing(build, size = n).pageItems
             // Looping over these dependencies
-            collectDependencies(upstreamBuildLinks, nextBuilds)
+            upstreamBuildLinks.forEach<BuildLink> { buildLink ->
+                val linkInfo = LinkInfo(
+                    sourceBuild = buildLink.build,
+                    targetBuild = build,
+                )
+                collectLinkInfo(buildLink, nextBuilds, linkInfo)
+            }
         }
         // Result
         return convertToLinks(nextBuilds)

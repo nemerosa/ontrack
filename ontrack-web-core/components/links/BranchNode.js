@@ -1,10 +1,12 @@
 import {Handle, Position} from "reactflow";
 import {Card, Space, Tooltip, Typography} from "antd";
-import {branchLink, branchUri, buildLink, projectLink} from "@components/common/Links";
+import {branchLink, branchUri, projectLink} from "@components/common/Links";
 import {FaArrowCircleLeft, FaLink} from "react-icons/fa";
 import Timestamp from "@components/common/Timestamp";
 import PromotionRun from "@components/promotionRuns/PromotionRun";
 import Link from "next/link";
+import BuildRef from "@components/links/BuildRef";
+import BuildPromotions from "@components/links/BuildPromotions";
 
 function NodeSection({icon, title, children}) {
     return (
@@ -36,10 +38,6 @@ export default function BranchNode({data}) {
     ><FaLink/></Link>
 
     const latestBuild = branch.latestBuilds ? branch.latestBuilds[0] : undefined
-    let latestBuildText = <Typography.Text ellipsis>{latestBuild?.name}</Typography.Text>
-    if (latestBuild?.releaseProperty?.value) {
-        latestBuildText = <Tooltip title={latestBuild?.name}>{latestBuildText}</Tooltip>
-    }
 
     return (
         <>
@@ -83,19 +81,9 @@ export default function BranchNode({data}) {
                             icon={<FaArrowCircleLeft/>}
                             title="Latest build"
                         >
-                            {buildLink(latestBuild, latestBuildText)}
+                            <BuildRef build={latestBuild}/>
                             <Timestamp value={latestBuild?.creation?.time}/>
-                            <Space size={8}>
-                                {
-                                    latestBuild.promotionRuns.map(promotionRun =>
-                                        <PromotionRun
-                                            key={promotionRun.id}
-                                            promotionRun={promotionRun}
-                                            size={16}
-                                        />
-                                    )
-                                }
-                            </Space>
+                            <BuildPromotions build={latestBuild}/>
                         </NodeSection>
                     }
                 </Space>

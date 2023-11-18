@@ -11,6 +11,10 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 data class BranchLink(
     @APIDescription("Linked branch")
     val branch: Branch,
+    @APIDescription("Last source build")
+    val sourceBuild: Build,
+    @APIDescription("Last target build")
+    val targetBuild: Build,
     @APIDescription("Nature/qualification of the link")
     val qualifier: String,
 ) {

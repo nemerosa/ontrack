@@ -17,6 +17,8 @@ class GQLTypeBranchLink : GQLType {
             .description("Qualified link to a branch")
             .field(BranchLink::branch, GQLTypeBranch.BRANCH)
             .stringField(BranchLink::qualifier)
+            .field(BranchLink::sourceBuild, GQLTypeBuild.BUILD)
+            .field(BranchLink::targetBuild, GQLTypeBuild.BUILD)
             .build()
 
 }

@@ -4,6 +4,7 @@ import {branchLink, projectLink} from "@components/common/Links";
 import BuildLink from "@components/builds/BuildLink";
 import PromotionRun from "@components/promotionRuns/PromotionRun";
 import Timestamp from "@components/common/Timestamp";
+import BuildPromotions from "@components/links/BuildPromotions";
 
 export default function BuildNode({data}) {
 
@@ -32,17 +33,7 @@ export default function BuildNode({data}) {
                         {build && <BuildLink build={build}></BuildLink>}
                     </Typography.Text>
                     <Timestamp value={build?.creation?.time}/>
-                    <Space size={8}>
-                        {
-                            build.promotionRuns.map(promotionRun =>
-                                <PromotionRun
-                                    key={promotionRun.id}
-                                    promotionRun={promotionRun}
-                                    size={16}
-                                />
-                            )
-                        }
-                    </Space>
+                    <BuildPromotions build={build}/>
                 </Space>
             </Card>
             <Handle type="source" position={Position.Right}/>
