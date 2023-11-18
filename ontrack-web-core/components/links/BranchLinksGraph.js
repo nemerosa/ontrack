@@ -197,6 +197,69 @@ function BranchLinksFlow({branch}) {
         })
     }
 
+    const collectUpstreamNodes = (startNode, nodes, edges, nodesCache, edgesCache) => {
+        const {branch} = startNode.data
+
+        branch.upstreamLinks.forEach(link => {
+            const qualifier = link.qualifier
+            const parentBranch = link.branch
+
+            // Gets or creates the parent node
+            const parentId = String(parentBranch.id)
+            let parentNode = nodesCache[parentId]
+            if (!parentNode) {
+                parentNode = branchToNode(parentBranch, parentId)
+                nodesCache[parentId] = parentNode
+                nodes.push(parentNode)
+            }
+
+            // Node for the dependency information
+            const dependencyId = qualifier ?
+                `${startNode.id}-${parentNode.id}-${qualifier}` :
+                `${startNode.id}-${parentNode.id}`
+            let dependencyNode = nodesCache[dependencyId]
+            if (!dependencyNode) {
+                dependencyNode = branchLinkToNode(dependencyId, startNode.data.branch, link)
+                nodesCache[dependencyId] = dependencyNode
+                nodes.push(dependencyNode)
+            }
+
+            // Edge from the parent node to the link node
+            const edgeParentId = `${parentNode.id}-${dependencyNode.id}`
+            if (!edgesCache[edgeParentId]) {
+                const edge = {
+                    id: edgeParentId,
+                    source: parentNode.id,
+                    target: dependencyNode.id,
+                    type: 'smoothstep',
+                    markerStart: {
+                        type: MarkerType.ArrowClosed,
+                        width: 40,
+                        height: 40,
+                    },
+                }
+                edges.push(edge)
+                edgesCache[edgeParentId] = edge
+            }
+
+            // Edge from the link node to the start node
+            const edgeStartId = `${dependencyNode.id}-${startNode.id}`
+            if (!edgesCache[edgeStartId]) {
+                const edge = {
+                    id: edgeStartId,
+                    source: dependencyNode.id,
+                    target: startNode.id,
+                    type: 'smoothstep',
+                }
+                edges.push(edge)
+                edgesCache[edgeStartId] = edge
+            }
+
+            // Iteration
+            collectUpstreamNodes(parentNode, nodes, edges, nodesCache, edgesCache)
+        })
+    }
+
     useEffect(() => {
         graphQLCall(
             branchQuery,
@@ -221,8 +284,7 @@ function BranchLinksFlow({branch}) {
             nodesCache[rootNode.id] = rootNode
 
             collectDownstreamNodes(rootNode, nodes, edges, nodesCache, edgesCache)
-
-            // TODO Collect upstream dependencies
+            collectUpstreamNodes(rootNode, nodes, edges, nodesCache, edgesCache)
 
             // Layout for the graph
 
