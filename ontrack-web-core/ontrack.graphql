@@ -388,6 +388,11 @@ type Branch implements Authorizable & ProjectEntity {
     pullRequest: GitPullRequest
     "When set, adding a release/label on a build will also validate this build."
     releaseValidationProperty: Property
+    "List of branches this branch is a dependency of."
+    upstreamLinks(
+        "Number of builds to use to get the dependencies"
+        builds: Int
+    ): [BranchLink!]!
     "List of issues reported into the validation run statuses"
     validationIssues(
         "Maximum number of validation runs to fetch per validation stamp in order to get the issues"

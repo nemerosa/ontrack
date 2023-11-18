@@ -27,6 +27,42 @@ class BranchLinksServiceImpl(
 
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
+    private fun collectDependencies(
+        buildLinks: List<BuildLink>,
+        nextBuilds: MutableMap<Pair<ID, String>, Build>,
+    ) {
+        buildLinks.forEach { buildLink ->
+            // Key
+            val key = buildLink.build.project.id to buildLink.qualifier
+            // Existing build?
+            val existingBuild = nextBuilds[key]
+            if (existingBuild != null) {
+                // Takes the new build if more recent
+                if (buildLink.build.id() > existingBuild.id()) {
+                    nextBuilds[key] = buildLink.build
+                }
+            } else {
+                // New build
+                nextBuilds[key] = buildLink.build
+            }
+        }
+    }
+
+    private fun convertToLinks(
+        nextBuilds: MutableMap<Pair<ID, String>, Build>,
+    ): List<BranchLink> = nextBuilds.map { (key, nextBuild) ->
+        val (_, qualifier) = key
+        BranchLink(
+            branch = nextBuild.branch,
+            qualifier = qualifier,
+        )
+    }.sortedWith(
+        compareBy(
+            { it.branch.project.name },
+            { it.qualifier },
+        )
+    )
+
     override fun getDownstreamDependencies(branch: Branch, n: Int): List<BranchLink> {
         // Gets the N first builds
         val builds = getBuilds(branch, n)
@@ -37,35 +73,26 @@ class BranchLinksServiceImpl(
             // Gets the downstream builds
             val downstreamBuildLinks = structureService.getQualifiedBuildsUsedBy(build, size = n).pageItems
             // Looping over these dependencies
-            downstreamBuildLinks.forEach { buildLink ->
-                // Key
-                val key = buildLink.build.project.id to buildLink.qualifier
-                // Existing build?
-                val existingBuild = nextBuilds[key]
-                if (existingBuild != null) {
-                    // Takes the new build if more recent
-                    if (buildLink.build.id() > existingBuild.id()) {
-                        nextBuilds[key] = buildLink.build
-                    }
-                } else {
-                    // New build
-                    nextBuilds[key] = buildLink.build
-                }
-            }
+            collectDependencies(downstreamBuildLinks, nextBuilds)
         }
         // Result
-        return nextBuilds.map { (key, nextBuild) ->
-            val (_, qualifier) = key
-            BranchLink(
-                branch = nextBuild.branch,
-                qualifier = qualifier,
-            )
-        }.sortedWith(
-            compareBy(
-                { it.branch.project.name },
-                { it.qualifier },
-            )
-        )
+        return convertToLinks(nextBuilds)
+    }
+
+    override fun getUpstreamDependencies(branch: Branch, n: Int): List<BranchLink> {
+        // Gets the N first builds
+        val builds = getBuilds(branch, n)
+        // Grouping per project & qualifier
+        val nextBuilds = mutableMapOf<Pair<ID, String>, Build>()
+        // Looping over the N first builds
+        builds.forEach { build ->
+            // Gets the downstream builds
+            val upstreamBuildLinks = structureService.getQualifiedBuildsUsing(build, size = n).pageItems
+            // Looping over these dependencies
+            collectDependencies(upstreamBuildLinks, nextBuilds)
+        }
+        // Result
+        return convertToLinks(nextBuilds)
     }
 
     private val providers: Collection<BranchLinksDecorationExtension> by lazy {

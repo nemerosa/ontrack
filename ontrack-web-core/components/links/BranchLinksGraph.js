@@ -74,11 +74,28 @@ function BranchLinksFlow({branch}) {
         }
     }
 
+    const gqlUpstreamDependencies = (depth) => {
+        if (depth <= 0) {
+            return ''
+        } else {
+            return `
+                upstreamLinks(builds: 5) {
+                    qualifier
+                    branch {
+                        ...BranchNodeInfo
+                        ${gqlUpstreamDependencies(depth - 1)}
+                    }
+                }
+            `
+        }
+    }
+
     const branchQuery = `
         query RootBranch($branchId: Int!) {
             branch(id: $branchId) {
                 ...BranchNodeInfo
                 ${gqlDownstreamDependencies(maxDownstreamDepth)}
+                ${gqlUpstreamDependencies(maxUpstreamDepth)}
             }
         }
         ${gqlBuildInfo}

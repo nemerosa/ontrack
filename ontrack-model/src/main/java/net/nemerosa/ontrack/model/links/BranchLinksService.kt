@@ -22,6 +22,18 @@ interface BranchLinksService {
     ): List<BranchLink>
 
     /**
+     * Given a [branch], returns its upstream links based on the first [n] builds.
+     *
+     * @param branch Source branch
+     * @param n Number of builds to take into account to get the branch upstream dependencies
+     * @return Upstream dependencies (ie. the branches [branch] is a dependency of)
+     */
+    fun getUpstreamDependencies(
+        branch: Branch,
+        n: Int,
+    ): List<BranchLink>
+
+    /**
      * Given a starting [branch] and a [direction], computes the abstract graph of links starting
      * from this branch.
      *
