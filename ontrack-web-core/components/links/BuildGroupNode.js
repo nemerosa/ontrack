@@ -34,6 +34,9 @@ export default function BuildGroupNode({data}) {
     return (
         <>
             <Handle type="target" position={Position.Left}/>
+            <Handle type="source" position={Position.Right}/>
+            <Handle type="source" position={Position.Top}/>
+            <Handle type="source" position={Position.Bottom}/>
             <Space direction="vertical" size={16}>
                 {/* First build */}
                 <BuildNode data={{build: group.firstBuild}}/>
@@ -44,7 +47,6 @@ export default function BuildGroupNode({data}) {
                 {/* Last build */}
                 <BuildNode data={{build: group.lastBuild}}/>
             </Space>
-            <Handle type="source" position={Position.Right}/>
         </>
     )
 }
