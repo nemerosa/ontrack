@@ -228,6 +228,7 @@ function BuildLinksFlow({build}) {
                             id: edgeId,
                             source: String(boxNode.id),
                             target: String(childId),
+                            type: 'smoothstep',
                         }
                         edges.push(edge)
                         edgesCache[edgeId] = edgeId
@@ -260,6 +261,7 @@ function BuildLinksFlow({build}) {
                     id: edgeId,
                     source: String(build.id),
                     target: String(child.id),
+                    type: 'smoothstep',
                     label: link.qualifier,
                 }
                 edges.push(edge)
