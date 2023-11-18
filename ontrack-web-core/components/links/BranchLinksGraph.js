@@ -18,6 +18,21 @@ function BranchLinksFlow({branch}) {
             releaseProperty {
                 value
             }
+            creation {
+                time
+            }
+            promotionRuns(lastPerLevel: true) {
+                creation {
+                    time
+                }
+                promotionLevel {
+                    id
+                    description
+                    name
+                    image
+                    _image
+                }
+            }
         }
     `
 
@@ -136,6 +151,11 @@ function BranchLinksFlow({branch}) {
                     source: startNode.id,
                     target: dependencyNode.id,
                     type: 'smoothstep',
+                    markerStart: {
+                        type: MarkerType.ArrowClosed,
+                        width: 40,
+                        height: 40,
+                    },
                 }
                 edges.push(edge)
                 edgesCache[edgeStartId] = edge
@@ -149,11 +169,6 @@ function BranchLinksFlow({branch}) {
                     source: dependencyNode.id,
                     target: childNode.id,
                     type: 'smoothstep',
-                    markerEnd: {
-                        type: MarkerType.ArrowClosed,
-                        width: 40,
-                        height: 40,
-                    },
                 }
                 edges.push(edge)
                 edgesCache[edgeChildId] = edge

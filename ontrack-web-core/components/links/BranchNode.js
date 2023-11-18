@@ -1,7 +1,7 @@
 import {Handle, Position} from "reactflow";
 import {Card, Space, Tooltip, Typography} from "antd";
-import {branchLink, buildLink, projectLink} from "@components/common/Links";
-import {FaArrowCircleRight} from "react-icons/fa";
+import {buildLink, projectLink} from "@components/common/Links";
+import {FaArrowCircleLeft} from "react-icons/fa";
 
 export default function BranchNode({data}) {
 
@@ -42,7 +42,8 @@ export default function BranchNode({data}) {
                     {
                         latestBuild &&
                         <Space>
-                            <FaArrowCircleRight title="Latest build"/>
+                            <Typography.Text italic>Latest</Typography.Text>
+                            <FaArrowCircleLeft/>
                             {buildLink(latestBuild)}
                         </Space>
                     }
