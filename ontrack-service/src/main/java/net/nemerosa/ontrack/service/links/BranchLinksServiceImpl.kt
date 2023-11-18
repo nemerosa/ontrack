@@ -34,10 +34,11 @@ class BranchLinksServiceImpl(
 
     private fun convertToLinks(
         nextBuilds: MutableMap<Pair<ID, String>, LinkInfo>,
+        refBranch: (LinkInfo) -> Branch,
     ): List<BranchLink> = nextBuilds.map { (key, nextBuild) ->
         val (_, qualifier) = key
         BranchLink(
-            branch = nextBuild.targetBuild.branch,
+            branch = refBranch(nextBuild),
             targetBuild = nextBuild.targetBuild,
             sourceBuild = nextBuild.sourceBuild,
             qualifier = qualifier,
@@ -78,7 +79,7 @@ class BranchLinksServiceImpl(
             // Gets the downstream builds
             val downstreamBuildLinks = structureService.getQualifiedBuildsUsedBy(build, size = n).pageItems
             // Looping over these dependencies
-            downstreamBuildLinks.forEach<BuildLink> { buildLink ->
+            downstreamBuildLinks.forEach { buildLink ->
                 val linkInfo = LinkInfo(
                     sourceBuild = build,
                     targetBuild = buildLink.build,
@@ -87,7 +88,9 @@ class BranchLinksServiceImpl(
             }
         }
         // Result
-        return convertToLinks(nextBuilds)
+        return convertToLinks(nextBuilds) {
+            it.targetBuild.branch
+        }
     }
 
     override fun getUpstreamDependencies(branch: Branch, n: Int): List<BranchLink> {
@@ -100,7 +103,7 @@ class BranchLinksServiceImpl(
             // Gets the downstream builds
             val upstreamBuildLinks = structureService.getQualifiedBuildsUsing(build, size = n).pageItems
             // Looping over these dependencies
-            upstreamBuildLinks.forEach<BuildLink> { buildLink ->
+            upstreamBuildLinks.forEach { buildLink ->
                 val linkInfo = LinkInfo(
                     sourceBuild = buildLink.build,
                     targetBuild = build,
@@ -109,7 +112,9 @@ class BranchLinksServiceImpl(
             }
         }
         // Result
-        return convertToLinks(nextBuilds)
+        return convertToLinks(nextBuilds) {
+            it.sourceBuild.branch
+        }
     }
 
     private val providers: Collection<BranchLinksDecorationExtension> by lazy {

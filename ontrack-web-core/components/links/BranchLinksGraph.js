@@ -87,6 +87,12 @@ function BranchLinksFlow({branch}) {
             return `
                 upstreamLinks(builds: 5) {
                     qualifier
+                    sourceBuild {
+                        ...BuildInfo
+                    }
+                    targetBuild {
+                        ...BuildInfo
+                    }
                     branch {
                         ...BranchNodeInfo
                         ${gqlUpstreamDependencies(depth - 1)}
@@ -222,8 +228,8 @@ function BranchLinksFlow({branch}) {
 
             // Node for the dependency information
             const dependencyId = qualifier ?
-                `${startNode.id}-${parentNode.id}-${qualifier}` :
-                `${startNode.id}-${parentNode.id}`
+                `${parentNode.id}-${startNode.id}-${qualifier}` :
+                `${parentNode.id}-${startNode.id}`
             let dependencyNode = nodesCache[dependencyId]
             if (!dependencyNode) {
                 dependencyNode = branchLinkToNode(dependencyId, parentNode.data.branch, startNode.data.branch, link)
