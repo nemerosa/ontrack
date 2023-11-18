@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import graphQLCall from "@client/graphQLCall";
-import {CloseCommand, LegacyLinkCommand} from "@components/common/Commands";
-import {branchLegacyUri, projectUri} from "@components/common/Links";
+import {CloseCommand, Command, LegacyLinkCommand} from "@components/common/Commands";
+import {branchLegacyUri, branchUri, projectUri} from "@components/common/Links";
 import Head from "next/head";
 import {branchTitle} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
@@ -17,6 +17,7 @@ import {getBranchViews} from "@components/branches/views/branchViews";
 import {usePreferences} from "@components/providers/PreferencesProvider";
 import {useRouter} from "next/router";
 import JumpToBranch from "@components/branches/JumpToBranch";
+import {FaLink, FaTimes} from "react-icons/fa";
 
 export default function BranchPageView({id}) {
     const [loadingBranch, setLoadingBranch] = useState(true)
@@ -109,6 +110,13 @@ export default function BranchPageView({id}) {
                     //     onBranchViewSelected={onBranchViewSelected}
                     // />,
                     <JumpToBranch key="branch" projectName={branch.project.name}/>,
+                    <Command
+                        key="links"
+                        icon={<FaLink/>}
+                        href={`${branchUri(branch)}/links`}
+                        text="Links"
+                        title="Displays downstream and upstream dependencies"
+                    />,
                     <LegacyLinkCommand
                         key="legacy"
                         href={branchLegacyUri(branch)}

@@ -306,9 +306,6 @@ function BuildLinksFlow({build}) {
                 edgesCache,
             )
 
-            // Logging
-            console.log({nodes, edges})
-
             // Layout for the graph
 
             dagreGraph.setGraph({rankdir: 'LR'})

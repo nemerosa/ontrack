@@ -15,11 +15,12 @@ import kotlin.test.fail
 
 fun withMockScmRepository(
     ontrack: Ontrack,
+    prefix: String = "ontrack-auto-versioning-test",
     code: MockScmRepositoryContext.() -> Unit,
 ) {
     // Unique name for the repository
     val uuid = UUID.randomUUID().toString()
-    val repo = "ontrack-auto-versioning-test-$uuid"
+    val repo = "${prefix}-$uuid"
 
     // Context
     val context = MockScmRepositoryContext(ontrack, repo)

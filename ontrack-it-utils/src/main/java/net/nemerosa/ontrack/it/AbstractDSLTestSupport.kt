@@ -55,10 +55,11 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Kotlin friendly
      */
-    protected final inline fun <reified T : GlobalFunction> asUserWith(noinline code: () -> Unit): Unit = asUserWith<T, Unit>(code)
+    protected final inline fun <reified T : GlobalFunction> asUserWith(noinline code: () -> Unit): Unit =
+        asUserWith<T, Unit>(code)
 
     protected final inline fun <reified T : GlobalFunction, R> asUserWith(noinline code: () -> R): R =
-            asUser().with(T::class.java).call(code)
+        asUser().with(T::class.java).call(code)
 
     /**
      * Kotlin friendly
@@ -145,10 +146,14 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         }
     }
 
-    fun Branch.promotionLevel(name: String = uid("P"), description: String = "", init: PromotionLevel.() -> Unit = {}): PromotionLevel =
-            doCreatePromotionLevel(this, NameDescription.nd(name, description)).apply {
-                init()
-            }
+    fun Branch.promotionLevel(
+        name: String = uid("P"),
+        description: String = "",
+        init: PromotionLevel.() -> Unit = {}
+    ): PromotionLevel =
+        doCreatePromotionLevel(this, NameDescription.nd(name, description)).apply {
+            init()
+        }
 
     /**
      * Creates and returns a validation stamp
@@ -158,11 +163,11 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * @return Created validation stamp
      */
     fun Branch.validationStamp(
-            name: String = uid("VS"),
-            validationDataTypeConfig: ValidationDataTypeConfig<*>? = null,
-            description: String = "",
+        name: String = uid("VS"),
+        validationDataTypeConfig: ValidationDataTypeConfig<*>? = null,
+        description: String = "",
     ): ValidationStamp =
-            doCreateValidationStamp(this, NameDescription.nd(name, description), validationDataTypeConfig)
+        doCreateValidationStamp(this, NameDescription.nd(name, description), validationDataTypeConfig)
 
     /**
      * Deletes a validation stamp
@@ -190,13 +195,13 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * Updating the signature of a [Branch].
      */
     fun Branch.updateBranchSignature(
-            user: String? = null,
-            time: LocalDateTime? = null
+        user: String? = null,
+        time: LocalDateTime? = null
     ) {
         structureService.saveBranch(
-                withSignature(
-                        Signature(time ?: signature.time, user?.let { User(user) } ?: signature.user)
-                )
+            withSignature(
+                Signature(time ?: signature.time, user?.let { User(user) } ?: signature.user)
+            )
         )
     }
 
@@ -204,34 +209,38 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * Updating the signature of a [Build].
      */
     fun Build.updateBuildSignature(
-            user: String? = null,
-            time: LocalDateTime? = null
+        user: String? = null,
+        time: LocalDateTime? = null
     ) =
         structureService.saveBuild(
-                withSignature(
-                        Signature(time ?: signature.time, user?.let { User(user) } ?: signature.user)
-                )
+            withSignature(
+                Signature(time ?: signature.time, user?.let { User(user) } ?: signature.user)
+            )
         )
 
     protected fun <T, P : PropertyType<T>> ProjectEntity.property(type: KClass<P>, value: T?) {
         if (value != null) {
             propertyService.editProperty(
-                    this,
-                    type.java,
-                    value
+                this,
+                type.java,
+                value
             )
         } else {
             propertyService.deleteProperty(
-                    this,
-                    type.java
+                this,
+                type.java
             )
         }
     }
 
     protected fun <T, P : PropertyType<T>> ProjectEntity.property(type: KClass<P>): T? =
-            propertyService.getProperty(this, type.java).value
+        propertyService.getProperty(this, type.java).value
 
-    fun Build.promote(promotionLevel: PromotionLevel, description: String = "", signature: Signature = Signature.of("test")) =
+    fun Build.promote(
+        promotionLevel: PromotionLevel,
+        description: String = "",
+        signature: Signature = Signature.of("test")
+    ) =
         doPromote(this, promotionLevel, description, signature)
 
     fun Build.promote(promotionLevel: PromotionLevel, description: String = "", time: LocalDateTime) =
@@ -245,19 +254,19 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * @param validationRunStatusID Status to apply
      */
     fun Build.validate(
-            validationStamp: ValidationStamp,
-            validationRunStatusID: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED,
-            description: String? = null,
-            signature: Signature? = null,
-            duration: Int? = null,
-            code: ValidationRun.() -> Unit = {}
+        validationStamp: ValidationStamp,
+        validationRunStatusID: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED,
+        description: String? = null,
+        signature: Signature? = null,
+        duration: Int? = null,
+        code: ValidationRun.() -> Unit = {}
     ): ValidationRun {
         return this.validateWithData<Any>(
-                validationStampName = validationStamp.name,
-                validationRunStatusID = validationRunStatusID,
-                description = description,
-                signature = signature,
-                duration = duration,
+            validationStampName = validationStamp.name,
+            validationRunStatusID = validationRunStatusID,
+            description = description,
+            signature = signature,
+            duration = duration,
         ).apply {
             code()
         }
@@ -271,12 +280,12 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * @param validationRunStatusID Status to apply
      */
     fun Build.validateWithTime(
-            validationStamp: ValidationStamp,
-            validationRunStatusID: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED,
-            description: String? = null,
-            time: LocalDateTime? = null,
-            duration: Int? = null,
-            code: ValidationRun.() -> Unit = {}
+        validationStamp: ValidationStamp,
+        validationRunStatusID: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED,
+        description: String? = null,
+        time: LocalDateTime? = null,
+        duration: Int? = null,
+        code: ValidationRun.() -> Unit = {}
     ): ValidationRun = validate(
         validationStamp,
         validationRunStatusID,
@@ -290,48 +299,50 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * Creates a validation run on a build, possibly with some data and a status.
      */
     fun <T> Build.validateWithData(
-            validationStamp: ValidationStamp,
-            validationRunStatusID: ValidationRunStatusID? = null,
-            validationDataTypeId: String? = null,
-            validationRunData: T? = null,
-            description: String? = null
+        validationStamp: ValidationStamp,
+        validationRunStatusID: ValidationRunStatusID? = null,
+        validationDataTypeId: String? = null,
+        validationRunData: T? = null,
+        description: String? = null
     ) = validateWithData(
-            validationStampName = validationStamp.name,
-            validationRunStatusID = validationRunStatusID,
-            validationDataTypeId = validationDataTypeId,
-            validationRunData = validationRunData,
-            description = description
+        validationStampName = validationStamp.name,
+        validationRunStatusID = validationRunStatusID,
+        validationDataTypeId = validationDataTypeId,
+        validationRunData = validationRunData,
+        description = description
     )
 
     /**
      * Creates a validation run on a build, possibly with some data and a status.
      */
     fun <T> Build.validateWithData(
-            validationStampName: String,
-            validationRunStatusID: ValidationRunStatusID? = null,
-            validationDataTypeId: String? = null,
-            validationRunData: T? = null,
-            description: String? = null,
-            signature: Signature? = null,
-            duration: Int? = null,
+        validationStampName: String,
+        validationRunStatusID: ValidationRunStatusID? = null,
+        validationDataTypeId: String? = null,
+        validationRunData: T? = null,
+        description: String? = null,
+        signature: Signature? = null,
+        duration: Int? = null,
     ): ValidationRun {
         return asUser().withView(this).with(this, ValidationRunCreate::class.java).call {
             val run = structureService.newValidationRun(
-                    this,
-                    ValidationRunRequest(
-                            validationStampName = validationStampName,
-                            dataTypeId = validationDataTypeId,
-                            data = validationRunData,
-                            validationRunStatusId = validationRunStatusID,
-                            description = description,
-                            signature = signature,
-                    )
+                this,
+                ValidationRunRequest(
+                    validationStampName = validationStampName,
+                    dataTypeId = validationDataTypeId,
+                    data = validationRunData,
+                    validationRunStatusId = validationRunStatusID,
+                    description = description,
+                    signature = signature,
+                )
             )
             // Run info duration
             if (duration != null) {
-                runInfoService.setRunInfo(run, RunInfoInput(
-                    runTime = duration,
-                ))
+                runInfoService.setRunInfo(
+                    run, RunInfoInput(
+                        runTime = duration,
+                    )
+                )
             }
             // OK
             run
@@ -347,29 +358,38 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         }
     }
 
-    fun Build.linkTo(project: Project, buildName: String) {
+    fun Build.linkTo(project: Project, buildName: String, qualifier: String = "") {
         val build = structureService.buildSearch(
-                project.id,
-                BuildSearchForm(
-                    buildExactMatch = true,
-                    buildName = buildName,
-                )
+            project.id,
+            BuildSearchForm(
+                buildExactMatch = true,
+                buildName = buildName,
+            )
         ).firstOrNull() ?: throw BuildNotFoundException(project.name, buildName)
-        linkTo(build)
+        linkTo(build, qualifier)
+    }
+
+    fun Build.linkTo(build: Build, qualifier: String = "") {
+        structureService.createBuildLink(
+            this,
+            build,
+            qualifier,
+        )
     }
 
     infix fun Build.linkTo(build: Build) {
-        structureService.addBuildLink(
-                this,
-                build
+        structureService.createBuildLink(
+            this,
+            build,
+            ""
         )
     }
 
     fun Build.unlinkTo(build: Build) {
         structureService.deleteBuildLink(
-                this,
-                build,
-                ""
+            this,
+            build,
+            ""
         )
     }
 
@@ -379,13 +399,13 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     fun ValidationRun.validationStatus(status: ValidationRunStatusID, description: String): ValidationRun {
         return asUser().with(this, ValidationRunStatusChange::class.java).call {
             structureService.newValidationRunStatus(
-                    this,
-                    ValidationRunStatus(
-                            ID.NONE,
-                            Signature.of("test"),
-                            status,
-                            description
-                    )
+                this,
+                ValidationRunStatus(
+                    ID.NONE,
+                    Signature.of("test"),
+                    status,
+                    description
+                )
             )
         }
     }
@@ -393,15 +413,18 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Change of status for a validation run
      */
-    fun ValidationRun.validationStatusWithCurrentUser(status: ValidationRunStatusID, description: String): ValidationRun {
+    fun ValidationRun.validationStatusWithCurrentUser(
+        status: ValidationRunStatusID,
+        description: String
+    ): ValidationRun {
         return structureService.newValidationRunStatus(
-                this,
-                ValidationRunStatus(
-                        ID.NONE,
-                        securityService.currentSignature,
-                        status,
-                        description
-                )
+            this,
+            ValidationRunStatus(
+                ID.NONE,
+                securityService.currentSignature,
+                status,
+                description
+            )
         )
     }
 
@@ -414,21 +437,21 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                 val labels = labelManagementService.findLabels(category, name)
                 val existingLabel = labels.firstOrNull()
                 existingLabel ?: labelManagementService.newLabel(
-                        LabelForm(
-                                category = category,
-                                name = name,
-                                description = null,
-                                color = "#FF0000"
-                        )
+                    LabelForm(
+                        category = category,
+                        name = name,
+                        description = null,
+                        color = "#FF0000"
+                    )
                 )
             } else {
                 labelManagementService.newLabel(
-                        LabelForm(
-                                category = category,
-                                name = name,
-                                description = null,
-                                color = "#FF0000"
-                        )
+                    LabelForm(
+                        category = category,
+                        name = name,
+                        description = null,
+                        color = "#FF0000"
+                    )
                 )
             }
         }
@@ -444,10 +467,10 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         set(value) {
             asUser().with(this, ProjectLabelManagement::class.java).execute {
                 projectLabelManagementService.associateProjectToLabels(
-                        this,
-                        ProjectLabelForm(
-                                value.map { it.id }
-                        )
+                    this,
+                    ProjectLabelForm(
+                        value.map { it.id }
+                    )
                 )
             }
         }
@@ -455,18 +478,22 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Creation of a predefined promotion level
      */
-    protected fun predefinedPromotionLevel(name: String = uid("ppl_"), description: String = "", image: Boolean = false): PredefinedPromotionLevel =
+    protected fun predefinedPromotionLevel(
+        name: String = uid("ppl_"),
+        description: String = "",
+        image: Boolean = false
+    ): PredefinedPromotionLevel =
         asAdmin {
             val ppl = predefinedPromotionLevelService.newPredefinedPromotionLevel(
-                    PredefinedPromotionLevel.of(
-                            NameDescription.nd(name, description)
-                    )
+                PredefinedPromotionLevel.of(
+                    NameDescription.nd(name, description)
+                )
             )
             if (image) {
                 val document = Document("image/png", TestUtils.resourceBytes("/promotionLevelImage1.png"))
                 predefinedPromotionLevelService.setPredefinedPromotionLevelImage(
-                        ppl.id,
-                        document
+                    ppl.id,
+                    document
                 )
             }
             ppl
@@ -475,18 +502,23 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Creation of a predefined validation stamp
      */
-    protected fun predefinedValidationStamp(name: String, description: String = "", image: Boolean = false, dataType: ValidationDataTypeConfig<*>? = null) {
+    protected fun predefinedValidationStamp(
+        name: String,
+        description: String = "",
+        image: Boolean = false,
+        dataType: ValidationDataTypeConfig<*>? = null
+    ) {
         asAdmin {
             val pps = predefinedValidationStampService.newPredefinedValidationStamp(
-                    PredefinedValidationStamp.of(
-                            NameDescription.nd(name, description)
-                    ).withDataType(dataType)
+                PredefinedValidationStamp.of(
+                    NameDescription.nd(name, description)
+                ).withDataType(dataType)
             )
             if (image) {
                 val document = Document("image/png", TestUtils.resourceBytes("/validationStampImage1.png"))
                 predefinedValidationStampService.setPredefinedValidationStampImage(
-                        pps.id,
-                        document
+                    pps.id,
+                    document
                 )
             }
         }
@@ -495,14 +527,14 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Saving current settings, runs some code and restores the format settings
      */
-    protected final inline fun <reified T: Any> withSettings(noinline code: () -> Unit) {
+    protected final inline fun <reified T : Any> withSettings(noinline code: () -> Unit) {
         withSettings(T::class, code)
     }
 
     /**
      * Saving the the current settings and removing them for the duration of the code
      */
-    protected final inline fun <reified T: Any> withCleanSettings(noinline code: () -> Unit) {
+    protected final inline fun <reified T : Any> withCleanSettings(noinline code: () -> Unit) {
         withSettings<T> {
             cachedSettingsService.invalidate(T::class.java)
             settingsRepository.deleteAll(T::class.java)
@@ -513,7 +545,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Saving current settings, runs some code and restores the format settings
      */
-    protected fun <T: Any> withSettings(settingsClass: KClass<T>, code: () -> Unit) {
+    protected fun <T : Any> withSettings(settingsClass: KClass<T>, code: () -> Unit) {
         val settings: T = settingsService.getCachedSettings(settingsClass.java)
         // Runs the code
         code()
@@ -534,9 +566,9 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     protected fun setMainBuildLinksSettings(vararg labels: String) {
         asAdmin().execute {
             settingsManagerService.saveSettings(
-                    MainBuildLinksConfig(
-                            labels.toList()
-                    )
+                MainBuildLinksConfig(
+                    labels.toList()
+                )
             )
         }
     }
@@ -597,8 +629,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     }
 
     protected class BuildSearchAssertion(
-            private val branch: Branch,
-            private val filter: BuildFilterProviderData<*>
+        private val branch: Branch,
+        private val filter: BuildFilterProviderData<*>
     ) {
         infix fun returns(expected: Build) {
             returns(listOf(expected))
@@ -607,8 +639,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         infix fun returns(expected: List<Build>) {
             val results = filter.filterBranchBuilds(branch)
             assertEquals(
-                    expected.map { it.id },
-                    results.map { it.id }
+                expected.map { it.id },
+                results.map { it.id }
             )
         }
     }

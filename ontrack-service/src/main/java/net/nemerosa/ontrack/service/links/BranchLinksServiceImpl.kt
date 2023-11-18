@@ -27,6 +27,47 @@ class BranchLinksServiceImpl(
 
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
+    override fun getDownstreamDependencies(branch: Branch, n: Int): List<BranchLink> {
+        // Gets the N first builds
+        val builds = getBuilds(branch, n)
+        // Grouping per project & qualifier
+        val nextBuilds = mutableMapOf<Pair<ID, String>, Build>()
+        // Looping over the N first builds
+        builds.forEach { build ->
+            // Gets the downstream builds
+            val downstreamBuildLinks = structureService.getQualifiedBuildsUsedBy(build, size = n).pageItems
+            // Looping over these dependencies
+            downstreamBuildLinks.forEach { buildLink ->
+                // Key
+                val key = buildLink.build.project.id to buildLink.qualifier
+                // Existing build?
+                val existingBuild = nextBuilds[key]
+                if (existingBuild != null) {
+                    // Takes the new build if more recent
+                    if (buildLink.build.id() > existingBuild.id()) {
+                        nextBuilds[key] = buildLink.build
+                    }
+                } else {
+                    // New build
+                    nextBuilds[key] = buildLink.build
+                }
+            }
+        }
+        // Result
+        return nextBuilds.map { (key, nextBuild) ->
+            val (_, qualifier) = key
+            BranchLink(
+                branch = nextBuild.branch,
+                qualifier = qualifier,
+            )
+        }.sortedWith(
+            compareBy(
+                { it.branch.project.name },
+                { it.qualifier },
+            )
+        )
+    }
+
     private val providers: Collection<BranchLinksDecorationExtension> by lazy {
         extensionManager.getExtensions(BranchLinksDecorationExtension::class.java)
     }
@@ -60,7 +101,8 @@ class BranchLinksServiceImpl(
             // Gets the following branches using the current direction
             if (item.depth < settings.depth) {
                 // Gets the next branches using the build links
-                val nextBranches: List<Branch> = getNextBranches(item.branch, direction, settings.history, settings.maxLinksPerLevel)
+                val nextBranches: List<Branch> =
+                    getNextBranches(item.branch, direction, settings.history, settings.maxLinksPerLevel)
                 // For every next branch...
                 nextBranches.forEach { nextBranch ->
                     // If not already processed
@@ -117,7 +159,11 @@ class BranchLinksServiceImpl(
         )
     }
 
-    private fun populate(edge: BranchLinksEdge, source: BranchLinksNode, direction: BranchLinksDirection): BranchLinksEdge {
+    private fun populate(
+        edge: BranchLinksEdge,
+        source: BranchLinksNode,
+        direction: BranchLinksDirection
+    ): BranchLinksEdge {
         // Gets the target build if any
         val target = source.build?.let { getEdgeBuild(it, edge.linkedTo.branch, direction) }
         // If no build, we return the edge as it is
@@ -136,7 +182,12 @@ class BranchLinksServiceImpl(
         }
     }
 
-    private fun getNextBranches(branch: Branch, direction: BranchLinksDirection, history: Int, maxLinksPerLevel: Int): List<Branch> {
+    private fun getNextBranches(
+        branch: Branch,
+        direction: BranchLinksDirection,
+        history: Int,
+        maxLinksPerLevel: Int
+    ): List<Branch> {
         // List of branches
         val branches = mutableMapOf<ID, Branch>()
         // Gets the first N builds for this branch
@@ -160,6 +211,7 @@ class BranchLinksServiceImpl(
         when (direction) {
             BranchLinksDirection.USING ->
                 structureService.getBuildsUsedBy(build, 0, maxLinksPerLevel).pageItems
+
             BranchLinksDirection.USED_BY ->
                 structureService.getBuildsUsing(build, 0, maxLinksPerLevel).pageItems
         }
@@ -173,6 +225,7 @@ class BranchLinksServiceImpl(
                 structureService.getBuildsUsedBy(build, 0, 1) {
                     it.branch.id == target.id
                 }.pageItems.firstOrNull()
+
             BranchLinksDirection.USED_BY ->
                 structureService.getBuildsUsing(build, 0, 1) {
                     it.branch.id == target.id
@@ -214,7 +267,7 @@ class BranchLinksServiceImpl(
             }
         )
 
-    private class MaxArrayDeque<T>: ArrayDeque<T>() {
+    private class MaxArrayDeque<T> : ArrayDeque<T>() {
 
         private val _max = AtomicInteger(0)
 

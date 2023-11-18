@@ -31,7 +31,7 @@ export default function BuildNode({data}) {
                     <Typography.Text strong>
                         {build && <BuildLink build={build}></BuildLink>}
                     </Typography.Text>
-                    <Timestamp value={build.creation.time}/>
+                    <Timestamp value={build?.creation?.time}/>
                     <Space size={8}>
                         {
                             build.promotionRuns.map(promotionRun =>

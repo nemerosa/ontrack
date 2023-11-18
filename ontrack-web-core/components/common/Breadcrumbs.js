@@ -19,10 +19,14 @@ export function branchBreadcrumbs(branch) {
     ]
 }
 
-export function buildBreadcrumbs(build) {
+export function downToBranchBreeadcrumbs({branch}) {
     return [
         homeLink(),
-        projectLink(build.branch.project),
-        branchLink(build.branch),
+        projectLink(branch.project),
+        branchLink(branch),
     ]
+}
+
+export function buildBreadcrumbs(build) {
+    return downToBranchBreeadcrumbs(build)
 }
