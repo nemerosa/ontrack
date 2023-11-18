@@ -11,8 +11,8 @@
   "dependencies": {
     "ace-builds": "^1.24.2",
     "antd": "^5.8.6",
-    "dagre": "^0.8.5",
     "dayjs": "^1.11.7",
+    "elkjs": "^0.8.2",
     "eslint": "8.38.0",
     "eslint-config-next": "13.3.0",
     "graphql": "^16.6.0",
@@ -25,6 +25,7 @@
     "react-dom": "18.2.0",
     "react-icons": "^4.9.0",
     "reactflow": "^11.9.4",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "web-worker": "^1.2.0"
   }
 }
