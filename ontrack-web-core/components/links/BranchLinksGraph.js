@@ -22,6 +22,7 @@ function BranchLinksFlow({branch}) {
                 time
             }
             promotionRuns(lastPerLevel: true) {
+                id
                 creation {
                     time
                 }

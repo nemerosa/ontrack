@@ -22,6 +22,7 @@ function BuildLinksFlow({build}) {
                 time
             }
             promotionRuns(lastPerLevel: true) {
+                id
                 creation {
                     time
                 }
