@@ -49,8 +49,10 @@ export default function BranchNode({data}) {
                 size="small"
                 style={
                     selected ? {
-                        border: 'solid 3px blue'
-                    } : {}
+                        border: 'solid 5px blue'
+                    } : {
+                        border: 'solid 2px black'
+                    }
                 }
             >
                 <Space direction="vertical">
