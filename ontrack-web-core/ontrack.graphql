@@ -290,6 +290,15 @@ type Branch implements Authorizable & ProjectEntity {
     artifactoryPromotionSyncProperty: Property
     "Authorizations for this context"
     authorizations: [Authorization!]!
+    "Auto versioning information for this build, in regards of a parent branch"
+    autoVersioning(
+        "ID of the parent branch. Is overridden by the buildId argument, but at least one of each is required."
+        branchId: Int,
+        "ID of the parent build. Takes precedence on the branchId argument, but at least one of each is required."
+        buildId: Int,
+        "Downstream or upstream dependencies (down by default)."
+        direction: AutoVersioningDirection
+    ): BuildAutoVersioning
     "Auto versioning configuration"
     autoVersioningConfig: AutoVersioningConfig
     "Actions to get a diff on builds of the branch"
