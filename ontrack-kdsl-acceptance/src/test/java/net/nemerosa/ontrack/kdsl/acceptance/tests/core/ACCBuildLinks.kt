@@ -3,8 +3,10 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.core
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.spec.admin.admin
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
+@Disabled // Only used locally to create some data
 class ACCBuildLinks : AbstractACCDSLTestSupport() {
 
     companion object {

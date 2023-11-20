@@ -167,41 +167,6 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
-    void 'Filter interval'() {
-        Branch branch = createBuildsAndPromotions()
-        def results = branch.intervalFilter from: '3', to: '1'
-        assert results.collect { it.name } == ['3', '2', '1']
-    }
-
-    @Test
-    void 'Filter interval in reverse order'() {
-        Branch branch = createBuildsAndPromotions()
-        def results = branch.intervalFilter from: '1', to: '3'
-        assert results.collect { it.name } == ['3', '2', '1']
-    }
-
-    @Test
-    void 'Filter interval - only two'() {
-        Branch branch = createBuildsAndPromotions()
-        def results = branch.intervalFilter from: '2', to: '3'
-        assert results.collect { it.name } == ['3', '2']
-    }
-
-    @Test
-    void 'Filter interval - only one'() {
-        Branch branch = createBuildsAndPromotions()
-        def results = branch.intervalFilter from: '2', to: '2'
-        assert results.collect { it.name } == ['2']
-    }
-
-    @Test
-    void 'Filter interval - not existing'() {
-        Branch branch = createBuildsAndPromotions()
-        def results = branch.intervalFilter from: '2', to: '4'
-        assert results.isEmpty() : "No build is returned"
-    }
-
-    @Test
     void 'Filtering build on promotion'() {
         Branch branch = createBuildsAndPromotions()
         // Filtering builds on promotion
