@@ -17,14 +17,14 @@ class SonarQubePropertyTypeTest {
 
     private val configurationService = mock(SonarQubeConfigurationService::class.java)
     private val configuration = SonarQubeConfiguration(
-            "conf-name",
-            "https://sonarqube.nemerosa.net",
-            "xxxx"
+        "conf-name",
+        "https://sonarqube.nemerosa.net",
+        "xxxx"
     )
 
     private val type = SonarQubePropertyType(
-            SonarQubeExtensionFeature(IndicatorsExtensionFeature(), CascExtensionFeature()),
-            configurationService
+        SonarQubeExtensionFeature(IndicatorsExtensionFeature(), CascExtensionFeature()),
+        configurationService
     )
 
     @Before
@@ -35,13 +35,13 @@ class SonarQubePropertyTypeTest {
     @Test
     fun clientParsing() {
         val client = mapOf(
-                "configuration" to "conf-name",
-                "key" to "project:key",
-                "validationStamp" to "sonarqube",
-                "measures" to listOf("measure-1", "measure-2"),
-                "override" to true,
-                "branchModel" to true,
-                "branchPattern" to "master|develop"
+            "configuration" to "conf-name",
+            "key" to "project:key",
+            "validationStamp" to "sonarqube",
+            "measures" to listOf("measure-1", "measure-2"),
+            "override" to true,
+            "branchModel" to true,
+            "branchPattern" to "master|develop"
         ).asJson()
         val parsed = type.fromClient(client)
         assertEquals("conf-name", parsed.configuration.name)
@@ -58,8 +58,8 @@ class SonarQubePropertyTypeTest {
     @Test
     fun `Client parsing with default values`() {
         val client = mapOf(
-                "configuration" to "conf-name",
-                "key" to "project:key"
+            "configuration" to "conf-name",
+            "key" to "project:key"
         ).asJson()
         val parsed = type.fromClient(client)
         assertEquals("conf-name", parsed.configuration.name)
@@ -76,11 +76,11 @@ class SonarQubePropertyTypeTest {
     @Test
     fun clientParsingWithNoMeasure() {
         val client = mapOf(
-                "configuration" to "conf-name",
-                "key" to "project:key",
-                "validationStamp" to "sonarqube",
-                "measures" to listOf<String>(),
-                "override" to false
+            "configuration" to "conf-name",
+            "key" to "project:key",
+            "validationStamp" to "sonarqube",
+            "measures" to listOf<String>(),
+            "override" to false
         ).toJson()!!
         val parsed = type.fromClient(client)
         assertEquals("conf-name", parsed.configuration.name)
@@ -95,13 +95,14 @@ class SonarQubePropertyTypeTest {
     @Test
     fun storage() {
         val item = SonarQubeProperty(
-                configuration = configuration,
-                key = "project:key",
-                validationStamp = "sonarqube",
-                measures = listOf("measure-1", "measure-2"),
-                override = false,
-                branchModel = false,
-                branchPattern = null
+            configuration = configuration,
+            key = "project:key",
+            validationStamp = "sonarqube",
+            measures = listOf("measure-1", "measure-2"),
+            override = false,
+            branchModel = false,
+            branchPattern = null,
+            validationMetrics = true,
         )
         // For storage
         val stored = type.forStorage(item)
@@ -122,13 +123,14 @@ class SonarQubePropertyTypeTest {
     @Test
     fun storageWithNoMeasure() {
         val item = SonarQubeProperty(
-                configuration = configuration,
-                key = "project:key",
-                validationStamp = "sonarqube",
-                measures = emptyList(),
-                override = false,
-                branchModel = true,
-                branchPattern = "master|develop"
+            configuration = configuration,
+            key = "project:key",
+            validationStamp = "sonarqube",
+            measures = emptyList(),
+            override = false,
+            branchModel = true,
+            branchPattern = "master|develop",
+            validationMetrics = true,
         )
         // For storage
         val stored = type.forStorage(item)

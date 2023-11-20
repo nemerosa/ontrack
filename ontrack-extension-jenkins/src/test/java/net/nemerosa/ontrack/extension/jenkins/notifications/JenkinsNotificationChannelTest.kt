@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.extension.jenkins.client.JenkinsJob
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultType
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactoryImpl
+import net.nemerosa.ontrack.model.events.EventVariableService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.BeforeEach
@@ -24,6 +25,8 @@ class JenkinsNotificationChannelTest {
     private lateinit var jenkinsClient: JenkinsClient
 
     private lateinit var jenkinsNotificationChannel: JenkinsNotificationChannel
+
+    private lateinit var eventVariableService: EventVariableService
 
     private lateinit var jenkinsConfigName: String
     private lateinit var jenkinsConfig: JenkinsConfiguration
@@ -51,9 +54,12 @@ class JenkinsNotificationChannelTest {
         jenkinsClientFactory = mockk()
         every { jenkinsClientFactory.getClient(jenkinsConfig) } returns jenkinsClient
 
+        eventVariableService = mockk()
+
         jenkinsNotificationChannel = JenkinsNotificationChannel(
             jenkinsConfigurationService,
             jenkinsClientFactory,
+            eventVariableService,
         )
     }
 
@@ -159,7 +165,15 @@ class JenkinsNotificationChannelTest {
         val promotionLevel = PromotionLevel.of(branch, NameDescription.nd(PROMOTION, "")).withId(ID.of(100))
         val build = Build.of(branch, NameDescription.nd("1", ""), Signature.of("test")).withId(ID.of(1000))
         val promotionRun = PromotionRun.of(build, promotionLevel, Signature.of("test"), null).withId(ID.of(10000))
-        return EventFactoryImpl().newPromotionRun(promotionRun)
+        val event = EventFactoryImpl().newPromotionRun(promotionRun)
+
+        every {
+            eventVariableService.getTemplateParameters(event, any())
+        } returns mapOf(
+            "Promotion" to promotionLevel.name,
+        )
+
+        return event
     }
 
     companion object {

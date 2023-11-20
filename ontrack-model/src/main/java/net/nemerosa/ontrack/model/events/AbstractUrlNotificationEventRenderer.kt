@@ -1,6 +1,5 @@
-package net.nemerosa.ontrack.extension.notifications.rendering
+package net.nemerosa.ontrack.model.events
 
-import net.nemerosa.ontrack.model.events.AbstractEventRenderer
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 
 abstract class AbstractUrlNotificationEventRenderer(

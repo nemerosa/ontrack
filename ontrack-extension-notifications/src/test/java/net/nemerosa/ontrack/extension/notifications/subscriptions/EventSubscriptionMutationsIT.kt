@@ -13,6 +13,115 @@ import kotlin.test.*
 class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
 
     @Test
+    fun `Settings subscriptions using the branch mutation`() {
+        asAdmin {
+            project {
+                branch {
+                    run("""
+                        mutation {
+                            subscribeBranchToEvents(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                channel: "mock",
+                                channelConfig: {
+                                    target: "#test"
+                                },
+                                events: [
+                                    "new_promotion_run"
+                                ],
+                                keywords: "GOLD",
+                            }) {
+                                errors {
+                                    message
+                                }
+                                subscription {
+                                    id
+                                }
+                            }
+                        }
+                    """) { data ->
+                        checkGraphQLUserErrors(data, "subscribeBranchToEvents") { payload ->
+                            val id = payload.getRequiredJsonField("subscription").getRequiredTextField("id")
+                            val subscription: EventSubscription = eventSubscriptionService.getSubscriptionById(this, id)
+                            assertEquals(
+                                setOf(
+                                    "new_promotion_run"
+                                ),
+                                subscription.events
+                            )
+                            assertEquals(this, subscription.projectEntity)
+                            assertEquals("GOLD", subscription.keywords)
+                            assertEquals(
+                                "mock",
+                                subscription.channel
+                            )
+                            assertEquals(
+                                mapOf("target" to "#test").asJson(),
+                                subscription.channelConfig
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Settings subscriptions using the promotion level mutation`() {
+        asAdmin {
+            project {
+                branch {
+                    val pl = promotionLevel("GOLD")
+                    run("""
+                        mutation {
+                            subscribePromotionLevelToEvents(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                promotion: "GOLD",
+                                channel: "mock",
+                                channelConfig: {
+                                    target: "#test"
+                                },
+                                events: [
+                                    "new_promotion_run"
+                                ]
+                            }) {
+                                errors {
+                                    message
+                                }
+                                subscription {
+                                    id
+                                }
+                            }
+                        }
+                    """) { data ->
+                        checkGraphQLUserErrors(data, "subscribePromotionLevelToEvents") { payload ->
+                            val id = payload.getRequiredJsonField("subscription").getRequiredTextField("id")
+                            val subscription: EventSubscription = eventSubscriptionService.getSubscriptionById(pl, id)
+                            assertEquals(
+                                setOf(
+                                    "new_promotion_run"
+                                ),
+                                subscription.events
+                            )
+                            assertEquals(pl, subscription.projectEntity)
+                            assertEquals(null, subscription.keywords)
+                            assertEquals(
+                                "mock",
+                                subscription.channel
+                            )
+                            assertEquals(
+                                mapOf("target" to "#test").asJson(),
+                                subscription.channelConfig
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Disabling and enabling a subscription for an entity`() {
         asAdmin {
             project {

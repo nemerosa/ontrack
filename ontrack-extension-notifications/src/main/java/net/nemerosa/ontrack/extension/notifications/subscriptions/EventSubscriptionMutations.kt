@@ -1,14 +1,12 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.graphql.schema.Mutation
-import net.nemerosa.ontrack.graphql.support.ListRef
-import net.nemerosa.ontrack.graphql.support.TypeRef
-import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
+import graphql.Scalars
+import graphql.schema.*
+import net.nemerosa.ontrack.graphql.schema.*
+import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.ProjectEntityID
-import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 
 @Component
@@ -17,97 +15,173 @@ class EventSubscriptionMutations(
     private val structureService: StructureService,
 ) : TypedMutationProvider() {
 
-    override val mutations: List<Mutation> = listOf(
+    override val mutations: List<Mutation>
+        get() =
+            genericMutations +
+                    ProjectEntityType.values().map { type ->
+                        createEntitySubscriptionMutation(type)
+                    }
 
-        simpleMutation(
-            name = "subscribeToEvents",
-            description = "Creates a subscription to a list of events",
-            input = SubscribeToEventsInput::class,
-            outputName = "subscription",
-            outputDescription = "Saved subscription",
-            outputType = EventSubscriptionPayload::class,
-        ) { input ->
-            val projectEntity = input.projectEntity?.run {
-                type.getEntityFn(structureService).apply(ID.of(id))
-            }
-            val record = eventSubscriptionService.subscribe(
-                EventSubscription(
-                    channel = input.channel,
-                    channelConfig = input.channelConfig,
-                    events = input.events.toSet(),
-                    projectEntity = projectEntity,
-                    keywords = input.keywords,
-                    disabled = false,
-                    origin = EventSubscriptionOrigins.API,
+    private fun createEntitySubscriptionMutation(type: ProjectEntityType): Mutation =
+        object : Mutation {
+
+            override val name: String = "subscribe${type.typeName}ToEvents"
+
+            override val description: String =
+                "Set a list of subscriptions on a ${type.displayName} identified by name."
+
+            override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> =
+                type.names.map {
+                    name(it)
+                } + listOf(
+                    stringInputField(SubscribeToEventsInput::channel),
+                    jsonInputField(SubscribeToEventsInput::channelConfig),
+                    stringListInputField(SubscribeToEventsInput::events),
+                    stringInputField(SubscribeToEventsInput::keywords),
+                )
+
+            override val outputFields: List<GraphQLFieldDefinition> = listOf(
+                objectField(
+                    type = EventSubscriptionPayload::class,
+                    name = "subscription",
+                    description = "Saved subscription"
                 )
             )
-            EventSubscriptionPayload(
-                id = record.id,
-                channel = record.data.channel,
-                channelConfig = record.data.channelConfig,
-                events = record.data.events.toList(),
-                keywords = record.data.keywords,
-                disabled = record.data.disabled,
-                origin = record.data.origin,
-            )
-        },
 
-        unitMutation<DeleteSubscriptionInput>(
-            name = "deleteSubscription",
-            description = "Deletes an existing subscription using its ID",
-        ) { input ->
-            val projectEntity = input.projectEntity?.run {
-                type.getEntityFn(structureService).apply(ID.of(id))
+            override fun fetch(env: DataFetchingEnvironment): Any {
+                // Loads the entity
+                val names = type.names.associateWith { name ->
+                    getRequiredMutationInputField<String>(env, name)
+                }
+                val entity: ProjectEntity = type.loadByNames(structureService, names)
+                    ?: throw EntityNotFoundByNameException(type, names)
+                // Creates the payload
+                val payload = createEventSubscriptionPayload(
+                    projectEntity = entity,
+                    channel = getRequiredMutationInputField(env, SubscribeToEventsInput::channel.name),
+                    channelConfig = getRequiredMutationInputField(env, SubscribeToEventsInput::channelConfig.name),
+                    events = getRequiredMutationInputField(env, SubscribeToEventsInput::events.name),
+                    keywords = getMutationInputField(env, SubscribeToEventsInput::keywords.name),
+                )
+                // OK
+                return mapOf("subscription" to payload)
             }
-            eventSubscriptionService.deleteSubscriptionById(projectEntity, input.id)
-        },
+        }
 
-        simpleMutation(
-            name = "disableSubscription",
-            description = "Disables an existing subscription",
-            input = DisableSubscriptionInput::class,
-            outputName = "subscription",
-            outputDescription = "Saved subscription",
-            outputType = EventSubscriptionPayload::class,
-        ) { input ->
-            val projectEntity = input.projectEntity?.run {
-                type.getEntityFn(structureService).apply(ID.of(id))
-            }
-            val record = eventSubscriptionService.disableSubscriptionById(projectEntity, input.id)
-            EventSubscriptionPayload(
-                id = record.id,
-                channel = record.data.channel,
-                channelConfig = record.data.channelConfig,
-                events = record.data.events.toList(),
-                keywords = record.data.keywords,
-                disabled = record.data.disabled,
-                origin = record.data.origin,
-            )
-        },
+    private val genericMutations: List<Mutation>
+        get() = listOf(
 
-        simpleMutation(
-            name = "enableSubscription",
-            description = "Enables an existing subscription",
-            input = EnableSubscriptionInput::class,
-            outputName = "subscription",
-            outputDescription = "Saved subscription",
-            outputType = EventSubscriptionPayload::class,
-        ) { input ->
-            val projectEntity = input.projectEntity?.run {
-                type.getEntityFn(structureService).apply(ID.of(id))
-            }
-            val record = eventSubscriptionService.enableSubscriptionById(projectEntity, input.id)
-            EventSubscriptionPayload(
-                id = record.id,
-                channel = record.data.channel,
-                channelConfig = record.data.channelConfig,
-                events = record.data.events.toList(),
-                keywords = record.data.keywords,
-                disabled = record.data.disabled,
-                origin = record.data.origin,
+            simpleMutation(
+                name = "subscribeToEvents",
+                description = "Creates a subscription to a list of events",
+                input = SubscribeToEventsInput::class,
+                outputName = "subscription",
+                outputDescription = "Saved subscription",
+                outputType = EventSubscriptionPayload::class,
+            ) { input ->
+                val projectEntity = input.projectEntity?.run {
+                    type.getEntityFn(structureService).apply(ID.of(id))
+                }
+                createEventSubscriptionPayload(
+                    projectEntity = projectEntity,
+                    channel = input.channel,
+                    channelConfig = input.channelConfig,
+                    events = input.events,
+                    keywords = input.keywords,
+                )
+            },
+
+            unitMutation<DeleteSubscriptionInput>(
+                name = "deleteSubscription",
+                description = "Deletes an existing subscription using its ID",
+            ) { input ->
+                val projectEntity = input.projectEntity?.run {
+                    type.getEntityFn(structureService).apply(ID.of(id))
+                }
+                eventSubscriptionService.deleteSubscriptionById(projectEntity, input.id)
+            },
+
+            simpleMutation(
+                name = "disableSubscription",
+                description = "Disables an existing subscription",
+                input = DisableSubscriptionInput::class,
+                outputName = "subscription",
+                outputDescription = "Saved subscription",
+                outputType = EventSubscriptionPayload::class,
+            ) { input ->
+                val projectEntity = input.projectEntity?.run {
+                    type.getEntityFn(structureService).apply(ID.of(id))
+                }
+                val record = eventSubscriptionService.disableSubscriptionById(projectEntity, input.id)
+                EventSubscriptionPayload(
+                    id = record.id,
+                    channel = record.data.channel,
+                    channelConfig = record.data.channelConfig,
+                    events = record.data.events.toList(),
+                    keywords = record.data.keywords,
+                    disabled = record.data.disabled,
+                    origin = record.data.origin,
+                )
+            },
+
+            simpleMutation(
+                name = "enableSubscription",
+                description = "Enables an existing subscription",
+                input = EnableSubscriptionInput::class,
+                outputName = "subscription",
+                outputDescription = "Saved subscription",
+                outputType = EventSubscriptionPayload::class,
+            ) { input ->
+                val projectEntity = input.projectEntity?.run {
+                    type.getEntityFn(structureService).apply(ID.of(id))
+                }
+                val record = eventSubscriptionService.enableSubscriptionById(projectEntity, input.id)
+                EventSubscriptionPayload(
+                    id = record.id,
+                    channel = record.data.channel,
+                    channelConfig = record.data.channelConfig,
+                    events = record.data.events.toList(),
+                    keywords = record.data.keywords,
+                    disabled = record.data.disabled,
+                    origin = record.data.origin,
+                )
+            },
+        )
+
+    private fun createEventSubscriptionPayload(
+        projectEntity: ProjectEntity?,
+        channel: String,
+        channelConfig: JsonNode,
+        events: List<String>,
+        keywords: String?
+    ): EventSubscriptionPayload {
+        val record = eventSubscriptionService.subscribe(
+            EventSubscription(
+                channel = channel,
+                channelConfig = channelConfig,
+                events = events.toSet(),
+                projectEntity = projectEntity,
+                keywords = keywords,
+                disabled = false,
+                origin = EventSubscriptionOrigins.API,
             )
-        },
-    )
+        )
+        return EventSubscriptionPayload(
+            id = record.id,
+            channel = record.data.channel,
+            channelConfig = record.data.channelConfig,
+            events = record.data.events.toList(),
+            keywords = record.data.keywords,
+            disabled = record.data.disabled,
+            origin = record.data.origin,
+        )
+    }
+
+    private fun name(name: String): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
+        .name(name)
+        .description("${name.replaceFirstChar { it.titlecase() }} name")
+        .type(GraphQLNonNull(Scalars.GraphQLString))
+        .build()
 }
 
 @APIDescription("Subscription deletion")

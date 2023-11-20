@@ -13,6 +13,8 @@ dependencies {
     implementation("org.apache.commons:commons-math3")
 
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
+    testImplementation(project(":ontrack-extension-general"))
+    testImplementation(project(path = ":ontrack-extension-general", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
 
     testRuntimeOnly(project(":ontrack-service"))

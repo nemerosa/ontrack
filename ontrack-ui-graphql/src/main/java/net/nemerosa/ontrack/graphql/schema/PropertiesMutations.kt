@@ -10,7 +10,6 @@ import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.graphql.support.getMutationInputField
 import net.nemerosa.ontrack.graphql.support.getRequiredMutationInputField
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.model.exceptions.NotFoundException
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 
@@ -288,13 +287,6 @@ class PropertiesMutations(
             )
         }
     }
-
-    class EntityNotFoundByNameException(
-        type: ProjectEntityType,
-        names: Map<String, String>
-    ) : NotFoundException(
-        """Cannot find ${type.displayName} using names: $names."""
-    )
 
     class MultiplePropertyMutationProviderException(propertyType: PropertyType<*>) : BaseException(
         """Found multiple implementations of mutation providers for ${propertyType::class.java.name}. This is not supported."""

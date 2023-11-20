@@ -9,8 +9,6 @@ import net.nemerosa.ontrack.model.settings.LabelProviderJobSettings
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
-import java.util.stream.Stream
-import kotlin.streams.asStream
 
 /**
  * Orchestrates the collection of labels for all projects.

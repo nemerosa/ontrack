@@ -7,6 +7,8 @@ import net.nemerosa.ontrack.extension.general.BuildLinkDisplayProperty
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
 import net.nemerosa.ontrack.extension.general.ReleaseProperty
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
+import net.nemerosa.ontrack.extension.general.validation.MetricsValidationData
+import net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType
 import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClient
 import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClientFactory
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfiguration
@@ -17,7 +19,7 @@ import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresInform
 import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresSettings
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.Build
@@ -25,18 +27,19 @@ import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertIs
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class SonarQubeIT : AbstractDSLTestJUnit4Support() {
+class SonarQubeIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var sonarQubeConfigurationService: SonarQubeConfigurationService
@@ -53,30 +56,34 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
     @Test
     fun `Launching the collection on validation run`() {
         val returnedMeasures = mapOf(
-                "measure-1" to 12.3,
-                "measure-2" to 45.0
+            "measure-1" to 12.3,
+            "measure-2" to 45.0
         )
         testCollectionWithListener(
-                actualMeasures = mapOf(
-                        "measure-1" to 12.3,
-                        "measure-2" to 45.0
-                ),
-                returnedMeasures = returnedMeasures
+            actualMeasures = mapOf(
+                "measure-1" to 12.3,
+                "measure-2" to 45.0
+            ),
+            returnedMeasures = returnedMeasures
         ) { build ->
             // Checks that metrics are exported
             returnedMeasures.forEach { (name, value) ->
                 verify(metricsExportService).exportMetrics(
-                        metric = eq("ontrack_sonarqube_measure"),
-                        tags = eq(mapOf(
-                                "project" to build.project.name,
-                                "branch" to build.branch.name,
-                                "status" to "PASSED",
-                                "measure" to name
-                        )),
-                        fields = eq(mapOf(
-                                "value" to value
-                        )),
-                        timestamp = any()
+                    metric = eq("ontrack_sonarqube_measure"),
+                    tags = eq(
+                        mapOf(
+                            "project" to build.project.name,
+                            "branch" to build.branch.name,
+                            "status" to "PASSED",
+                            "measure" to name
+                        )
+                    ),
+                    fields = eq(
+                        mapOf(
+                            "value" to value
+                        )
+                    ),
+                    timestamp = any()
                 )
             }
             // Checks the entity information
@@ -84,8 +91,25 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
             assertNotNull(information) {
                 assertIs<SonarQubeMeasures>(it.data) { q ->
                     assertEquals(
-                            returnedMeasures,
-                            q.measures
+                        returnedMeasures,
+                        q.measures
+                    )
+                }
+            }
+            // Checks that the metrics have been attached to the run
+            val vs = structureService.findValidationStampByName(build.project.name, build.branch.name, "sonarqube")
+                .getOrNull() ?: error("Cannot find the validation stamp")
+            val run = structureService.getValidationRunsForBuildAndValidationStamp(build.id, vs.id, 0, 1).firstOrNull()
+                ?: error("Cannot find the validation run")
+            assertNotNull(run.data, "Run has some data") { data ->
+                assertEquals(
+                    data.descriptor.id,
+                    MetricsValidationDataType::class.java.name
+                )
+                assertIs<MetricsValidationData>(data.data) {
+                    assertEquals(
+                        returnedMeasures,
+                        it.metrics
                     )
                 }
             }
@@ -93,145 +117,205 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
     }
 
     @Test
+    fun `Launching the collection on validation run with validation metrics disabled`() {
+        val returnedMeasures = mapOf(
+            "measure-1" to 12.3,
+            "measure-2" to 45.0
+        )
+        testCollectionWithListener(
+            actualMeasures = mapOf(
+                "measure-1" to 12.3,
+                "measure-2" to 45.0
+            ),
+            returnedMeasures = returnedMeasures,
+            validationMetrics = false,
+        ) { build ->
+            // Checks that metrics are exported
+            returnedMeasures.forEach { (name, value) ->
+                verify(metricsExportService).exportMetrics(
+                    metric = eq("ontrack_sonarqube_measure"),
+                    tags = eq(
+                        mapOf(
+                            "project" to build.project.name,
+                            "branch" to build.branch.name,
+                            "status" to "PASSED",
+                            "measure" to name
+                        )
+                    ),
+                    fields = eq(
+                        mapOf(
+                            "value" to value
+                        )
+                    ),
+                    timestamp = any()
+                )
+            }
+            // Checks the entity information
+            val information = informationExtension.getInformation(build)
+            assertNotNull(information) {
+                assertIs<SonarQubeMeasures>(it.data) { q ->
+                    assertEquals(
+                        returnedMeasures,
+                        q.measures
+                    )
+                }
+            }
+            // Checks that the metrics have been attached to the run
+            val vs = structureService.findValidationStampByName(build.project.name, build.branch.name, "sonarqube")
+                .getOrNull() ?: error("Cannot find the validation stamp")
+            val run = structureService.getValidationRunsForBuildAndValidationStamp(build.id, vs.id, 0, 1).firstOrNull()
+                ?: error("Cannot find the validation run")
+            assertNull(run.data, "Not expecting any data on the run")
+        }
+    }
+
+    @Test
     fun `Launching the collection on validation run without any measure`() {
         testCollectionWithListener(
-                actualMeasures = null,
-                returnedMeasures = null
+            actualMeasures = null,
+            returnedMeasures = null
         )
     }
 
     @Test
     fun `Launching the collection on validation run using a non default validation stamp`() {
         testCollectionWithListener(
-                validationStamp = "sonar-qube",
-                actualMeasures = mapOf(
-                        "measure-1" to 12.3,
-                        "measure-2" to 45.0
-                ),
-                returnedMeasures = mapOf(
-                        "measure-1" to 12.3,
-                        "measure-2" to 45.0
-                )
+            validationStamp = "sonar-qube",
+            actualMeasures = mapOf(
+                "measure-1" to 12.3,
+                "measure-2" to 45.0
+            ),
+            returnedMeasures = mapOf(
+                "measure-1" to 12.3,
+                "measure-2" to 45.0
+            )
         )
     }
 
     @Test
     fun `Launching the collection on validation run can be disabled at global level`() {
         testCollectionWithListener(
-                globalDisabled = true,
-                actualMeasures = mapOf(
-                        "measure-1" to 12.3,
-                        "measure-2" to 45.0
-                ),
-                returnedMeasures = null,
+            globalDisabled = true,
+            actualMeasures = mapOf(
+                "measure-1" to 12.3,
+                "measure-2" to 45.0
+            ),
+            returnedMeasures = null,
         )
     }
 
     @Test
     fun `Launching the collection on validation run with global settings`() {
         testCollectionWithListener(
-                globalMeasures = listOf("measure-2"),
-                actualMeasures = mapOf(
-                        "measure-1" to 12.3,
-                        "measure-2" to 45.0
-                ),
-                returnedMeasures = mapOf(
-                        "measure-2" to 45.0
-                )
+            globalMeasures = listOf("measure-2"),
+            actualMeasures = mapOf(
+                "measure-1" to 12.3,
+                "measure-2" to 45.0
+            ),
+            returnedMeasures = mapOf(
+                "measure-2" to 45.0
+            )
         )
     }
 
     @Test
     fun `Launching the collection on validation run with global settings completed by project`() {
         testCollectionWithListener(
-                globalMeasures = listOf("measure-2"),
-                projectMeasures = listOf("measure-1"),
-                actualMeasures = mapOf(
-                        "measure-1" to 12.3,
-                        "measure-2" to 45.0
-                ),
-                returnedMeasures = mapOf(
-                        "measure-1" to 12.3,
-                        "measure-2" to 45.0
-                )
+            globalMeasures = listOf("measure-2"),
+            projectMeasures = listOf("measure-1"),
+            actualMeasures = mapOf(
+                "measure-1" to 12.3,
+                "measure-2" to 45.0
+            ),
+            returnedMeasures = mapOf(
+                "measure-1" to 12.3,
+                "measure-2" to 45.0
+            )
         )
     }
 
     @Test
     fun `Launching the collection on validation run with global settings overridden by project`() {
         testCollectionWithListener(
-                globalMeasures = listOf("measure-2"),
-                projectMeasures = listOf("measure-1"),
-                projectOverride = true,
-                actualMeasures = mapOf(
-                        "measure-1" to 12.3,
-                        "measure-2" to 45.0
-                ),
-                returnedMeasures = mapOf(
-                        "measure-1" to 12.3
-                )
+            globalMeasures = listOf("measure-2"),
+            projectMeasures = listOf("measure-1"),
+            projectOverride = true,
+            actualMeasures = mapOf(
+                "measure-1" to 12.3,
+                "measure-2" to 45.0
+            ),
+            returnedMeasures = mapOf(
+                "measure-1" to 12.3
+            )
         )
     }
 
     @Test
     fun `Launching the collection on validation run using build label`() {
         testCollectionWithListener(
-                useLabel = true,
-                buildName = "release-1.0.0",
-                buildLabel = "1.0.0",
-                actualMeasures = mapOf(
-                        "measure-1" to 12.3,
-                        "measure-2" to 45.0
-                ),
-                returnedMeasures = mapOf(
-                        "measure-1" to 12.3,
-                        "measure-2" to 45.0
-                )
+            useLabel = true,
+            buildName = "release-1.0.0",
+            buildLabel = "1.0.0",
+            actualMeasures = mapOf(
+                "measure-1" to 12.3,
+                "measure-2" to 45.0
+            ),
+            returnedMeasures = mapOf(
+                "measure-1" to 12.3,
+                "measure-2" to 45.0
+            )
         )
     }
 
     @Test
     fun `Launching the collection on validation run with missing measures`() {
         testCollectionWithListener(
-                actualMeasures = mapOf(
-                        "measure-1" to 12.3
-                ),
-                returnedMeasures = mapOf(
-                        "measure-1" to 12.3
-                )
+            actualMeasures = mapOf(
+                "measure-1" to 12.3
+            ),
+            returnedMeasures = mapOf(
+                "measure-1" to 12.3
+            )
         )
     }
 
     private fun testCollectionWithListener(
-            globalMeasures: List<String> = listOf("measure-1", "measure-2"),
-            globalDisabled: Boolean = false,
-            validationStamp: String = "sonarqube",
-            projectMeasures: List<String> = emptyList(),
-            projectOverride: Boolean = false,
-            useLabel: Boolean = false,
-            buildVersion: String = "1.0.0",
-            buildName: String = "1.0.0",
-            buildLabel: String? = null,
-            actualMeasures: Map<String, Double>?,
-            returnedMeasures: Map<String, Double>?,
-            code: (Build) -> Unit = {}
+        globalMeasures: List<String> = listOf("measure-1", "measure-2"),
+        globalDisabled: Boolean = false,
+        validationStamp: String = "sonarqube",
+        validationMetrics: Boolean = true,
+        projectMeasures: List<String> = emptyList(),
+        projectOverride: Boolean = false,
+        useLabel: Boolean = false,
+        buildVersion: String = "1.0.0",
+        buildName: String = "1.0.0",
+        buildLabel: String? = null,
+        actualMeasures: Map<String, Double>?,
+        returnedMeasures: Map<String, Double>?,
+        code: (Build) -> Unit = {}
     ) {
         withSonarQubeSettings(measures = globalMeasures, disabled = globalDisabled) {
             val key = uid("p")
             // Mocking the measures
             if (actualMeasures != null) {
                 mockSonarQubeMeasures(
-                        key,
-                        buildVersion,
-                        *actualMeasures.toList().toTypedArray()
+                    key,
+                    buildVersion,
+                    *actualMeasures.toList().toTypedArray()
                 )
             }
-            withConfiguredProject(key = key, stamp = validationStamp, measures = projectMeasures, override = projectOverride) {
+            withConfiguredProject(
+                key = key,
+                stamp = validationStamp,
+                measures = projectMeasures,
+                override = projectOverride,
+                validationMetrics = validationMetrics,
+            ) {
                 if (useLabel) {
                     setProperty(
-                            this,
-                            BuildLinkDisplayPropertyType::class.java,
-                            BuildLinkDisplayProperty(true)
+                        this,
+                        BuildLinkDisplayPropertyType::class.java,
+                        BuildLinkDisplayProperty(true)
                     )
                 }
                 branch {
@@ -240,9 +324,9 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
                         // Label for the build
                         if (buildLabel != null) {
                             setProperty(
-                                    this,
-                                    ReleasePropertyType::class.java,
-                                    ReleaseProperty(buildLabel)
+                                this,
+                                ReleasePropertyType::class.java,
+                                ReleaseProperty(buildLabel)
                             )
                         }
                         // Validates to launch the collection
@@ -252,8 +336,8 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
                         if (returnedMeasures != null) {
                             assertNotNull(measures) {
                                 assertEquals(
-                                        returnedMeasures,
-                                        it.measures
+                                    returnedMeasures,
+                                    it.measures
                                 )
                             }
                         } else {
@@ -276,11 +360,14 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
                     branch {
                         build {
                             val result = sonarQubeMeasuresCollectionService.collect(
-                                    this,
-                                    getProperty(project, SonarQubePropertyType::class.java)
+                                this,
+                                getProperty(project, SonarQubePropertyType::class.java)
                             )
                             assertFalse(result.ok, "Nothing was collected")
-                            assertEquals("Validation stamp sonarqube cannot be found in ${branch.entityDisplayName}", result.message)
+                            assertEquals(
+                                "Validation stamp sonarqube cannot be found in ${branch.entityDisplayName}",
+                                result.message
+                            )
                         }
                     }
                 }
@@ -307,33 +394,35 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
                         }
                     }
                     // Setting the configuration of the project now, builds are still not scanned
-                    mockSonarQubeMeasures(key, "1.0.0",
-                            "measure-1" to 1.0,
-                            "measure-2" to 1.1
+                    mockSonarQubeMeasures(
+                        key, "1.0.0",
+                        "measure-1" to 1.0,
+                        "measure-2" to 1.1
                     )
-                    mockSonarQubeMeasures(key, "abdcefg",
-                            "measure-1" to 2.0,
-                            "measure-2" to 2.1
+                    mockSonarQubeMeasures(
+                        key, "abdcefg",
+                        "measure-1" to 2.0,
+                        "measure-2" to 2.1
                     )
                     // Scanning of the project
                     sonarQubeMeasuresCollectionService.collect(this) { println(it) }
                     // Checks the measures attached to the builds
                     assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build1)) {
                         assertEquals(
-                                mapOf(
-                                        "measure-1" to 1.0,
-                                        "measure-2" to 1.1
-                                ),
-                                it.measures
+                            mapOf(
+                                "measure-1" to 1.0,
+                                "measure-2" to 1.1
+                            ),
+                            it.measures
                         )
                     }
                     assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build2)) {
                         assertEquals(
-                                mapOf(
-                                        "measure-1" to 2.0,
-                                        "measure-2" to 2.1
-                                ),
-                                it.measures
+                            mapOf(
+                                "measure-1" to 2.0,
+                                "measure-2" to 2.1
+                            ),
+                            it.measures
                         )
                     }
                 }
@@ -360,24 +449,26 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
                         }
                     }
                     // Setting the configuration of the project now, builds are still not scanned
-                    mockSonarQubeMeasures(key, "1.0.0",
-                            "measure-1" to 1.0,
-                            "measure-2" to 1.1
+                    mockSonarQubeMeasures(
+                        key, "1.0.0",
+                        "measure-1" to 1.0,
+                        "measure-2" to 1.1
                     )
-                    mockSonarQubeMeasures(key, "abdcefg",
-                            "measure-1" to 2.0,
-                            "measure-2" to 2.1
+                    mockSonarQubeMeasures(
+                        key, "abdcefg",
+                        "measure-1" to 2.0,
+                        "measure-2" to 2.1
                     )
                     // Scanning of the project
                     sonarQubeMeasuresCollectionService.collect(this) { println(it) }
                     // Checks the measures attached to the builds
                     assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build1)) {
                         assertEquals(
-                                mapOf(
-                                        "measure-1" to 1.0,
-                                        "measure-2" to 1.1
-                                ),
-                                it.measures
+                            mapOf(
+                                "measure-1" to 1.0,
+                                "measure-2" to 1.1
+                            ),
+                            it.measures
                         )
                     }
                     assertNull(sonarQubeMeasuresCollectionService.getMeasures(build2))
@@ -409,24 +500,26 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
                         }
                     }
                     // Setting the configuration of the project now, builds are still not scanned
-                    mockSonarQubeMeasures(key, "1.0.0",
-                            "measure-1" to 1.0,
-                            "measure-2" to 1.1
+                    mockSonarQubeMeasures(
+                        key, "1.0.0",
+                        "measure-1" to 1.0,
+                        "measure-2" to 1.1
                     )
-                    mockSonarQubeMeasures(key, "abdcefg",
-                            "measure-1" to 2.0,
-                            "measure-2" to 2.1
+                    mockSonarQubeMeasures(
+                        key, "abdcefg",
+                        "measure-1" to 2.0,
+                        "measure-2" to 2.1
                     )
                     // Scanning of the project
                     sonarQubeMeasuresCollectionService.collect(this) { println(it) }
                     // Checks the measures attached to the builds
                     assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build1)) {
                         assertEquals(
-                                mapOf(
-                                        "measure-1" to 1.0,
-                                        "measure-2" to 1.1
-                                ),
-                                it.measures
+                            mapOf(
+                                "measure-1" to 1.0,
+                                "measure-2" to 1.1
+                            ),
+                            it.measures
                         )
                     }
                     assertNull(sonarQubeMeasuresCollectionService.getMeasures(build2))
@@ -452,13 +545,15 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
                         }
                     }
                     // Setting the configuration of the project now, builds are still not scanned
-                    mockSonarQubeMeasures(key, "1.0.0",
-                            "measure-1" to 1.0,
-                            "measure-2" to 1.1
+                    mockSonarQubeMeasures(
+                        key, "1.0.0",
+                        "measure-1" to 1.0,
+                        "measure-2" to 1.1
                     )
-                    mockSonarQubeMeasures(key, "abdcefg",
-                            "measure-1" to 2.0,
-                            "measure-2" to 2.1
+                    mockSonarQubeMeasures(
+                        key, "abdcefg",
+                        "measure-1" to 2.0,
+                        "measure-2" to 2.1
                     )
                     // Scanning of the project
                     sonarQubeMeasuresCollectionService.collect(this) { println(it) }
@@ -466,11 +561,11 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
                     assertNull(sonarQubeMeasuresCollectionService.getMeasures(build1))
                     assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build2)) {
                         assertEquals(
-                                mapOf(
-                                        "measure-1" to 2.0,
-                                        "measure-2" to 2.1
-                                ),
-                                it.measures
+                            mapOf(
+                                "measure-1" to 2.0,
+                                "measure-2" to 2.1
+                            ),
+                            it.measures
                         )
                     }
                 }
@@ -497,33 +592,35 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
                         }
                     }
                     // Setting the configuration of the project now, builds are still not scanned
-                    mockSonarQubeMeasures(key, "1.0.0",
-                            "measure-1" to 1.0,
-                            "measure-2" to 1.1
+                    mockSonarQubeMeasures(
+                        key, "1.0.0",
+                        "measure-1" to 1.0,
+                        "measure-2" to 1.1
                     )
-                    mockSonarQubeMeasures(key, "abdcefg",
-                            "measure-1" to 2.0,
-                            "measure-2" to 2.1
+                    mockSonarQubeMeasures(
+                        key, "abdcefg",
+                        "measure-1" to 2.0,
+                        "measure-2" to 2.1
                     )
                     // Scanning of the project
                     sonarQubeMeasuresCollectionService.collect(this) { println(it) }
                     // Checks the measures attached to the builds
                     assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build1)) {
                         assertEquals(
-                                mapOf(
-                                        "measure-1" to 1.0,
-                                        "measure-2" to 1.1
-                                ),
-                                it.measures
+                            mapOf(
+                                "measure-1" to 1.0,
+                                "measure-2" to 1.1
+                            ),
+                            it.measures
                         )
                     }
                     assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build2)) {
                         assertEquals(
-                                mapOf(
-                                        "measure-1" to 2.0,
-                                        "measure-2" to 2.1
-                                ),
-                                it.measures
+                            mapOf(
+                                "measure-1" to 2.0,
+                                "measure-2" to 2.1
+                            ),
+                            it.measures
                         )
                     }
                 }
@@ -547,13 +644,15 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
                         }
                     }
                     // Setting the configuration of the project now, builds are still not scanned
-                    mockSonarQubeMeasures(key, "1.0.0",
-                            "measure-1" to 1.0,
-                            "measure-2" to 1.1
+                    mockSonarQubeMeasures(
+                        key, "1.0.0",
+                        "measure-1" to 1.0,
+                        "measure-2" to 1.1
                     )
-                    mockSonarQubeMeasures(key, "abdcefg",
-                            "measure-1" to 2.0,
-                            "measure-2" to 2.1
+                    mockSonarQubeMeasures(
+                        key, "abdcefg",
+                        "measure-1" to 2.0,
+                        "measure-2" to 2.1
                     )
                     // Scanning of the project
                     sonarQubeMeasuresCollectionService.collect(this) { println(it) }
@@ -561,11 +660,11 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
                     assertNull(sonarQubeMeasuresCollectionService.getMeasures(build1))
                     assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build2)) {
                         assertEquals(
-                                mapOf(
-                                        "measure-1" to 2.0,
-                                        "measure-2" to 2.1
-                                ),
-                                it.measures
+                            mapOf(
+                                "measure-1" to 2.0,
+                                "measure-2" to 2.1
+                            ),
+                            it.measures
                         )
                     }
                 }
@@ -579,11 +678,11 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
             val name = uid("S")
             asUserWith<GlobalSettings> {
                 val saved = sonarQubeConfigurationService.newConfiguration(
-                        SonarQubeConfiguration(
-                                name,
-                                "https://sonarqube.nemerosa.net",
-                                "my-ultra-secret-token"
-                        )
+                    SonarQubeConfiguration(
+                        name,
+                        "https://sonarqube.nemerosa.net",
+                        "my-ultra-secret-token"
+                    )
                 )
                 assertEquals(name, saved.name)
                 assertEquals("https://sonarqube.nemerosa.net", saved.url)
@@ -592,9 +691,9 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
                 val configs = sonarQubeConfigurationService.configurations
                 // Checks we find the one we just created
                 assertNotNull(
-                        configs.find {
-                            it.name == name
-                        }
+                    configs.find {
+                        it.name == name
+                    }
                 )
                 // Getting it by name
                 val found = sonarQubeConfigurationService.getConfiguration(name)
@@ -613,16 +712,18 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
             val configuration = createSonarQubeConfiguration(name)
             project {
                 // Property
-                setProperty(this, SonarQubePropertyType::class.java,
-                        SonarQubeProperty(
-                                configuration,
-                                "my:key",
-                                "sonarqube",
-                                listOf("measure-1"),
-                                false,
-                                branchModel = true,
-                                branchPattern = "master|develop"
-                        )
+                setProperty(
+                    this, SonarQubePropertyType::class.java,
+                    SonarQubeProperty(
+                        configuration,
+                        "my:key",
+                        "sonarqube",
+                        listOf("measure-1"),
+                        false,
+                        branchModel = true,
+                        branchPattern = "master|develop",
+                        validationMetrics = true,
+                    )
                 )
                 // Gets the property back
                 val property: SonarQubeProperty? = getProperty(this, SonarQubePropertyType::class.java)
@@ -663,38 +764,41 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
      * Creating a new configuration
      */
     private fun createSonarQubeConfiguration(name: String = uid("S")) =
-            asUserWith<GlobalSettings, SonarQubeConfiguration> {
-                sonarQubeConfigurationService.newConfiguration(
-                        SonarQubeConfiguration(
-                                name,
-                                "https://sonarqube.nemerosa.net",
-                                "my-ultra-secret-token"
-                        )
+        asUserWith<GlobalSettings, SonarQubeConfiguration> {
+            sonarQubeConfigurationService.newConfiguration(
+                SonarQubeConfiguration(
+                    name,
+                    "https://sonarqube.nemerosa.net",
+                    "my-ultra-secret-token"
                 )
-            }
+            )
+        }
 
     /**
      * Sets a project property
      */
     private fun Project.setSonarQubeProperty(
-            configuration: SonarQubeConfiguration,
-            key: String,
-            stamp: String = "sonarqube",
-            measures: List<String> = emptyList(),
-            override: Boolean = false,
-            branchModel: Boolean = false,
-            branchPattern: String? = null
+        configuration: SonarQubeConfiguration,
+        key: String,
+        stamp: String = "sonarqube",
+        measures: List<String> = emptyList(),
+        override: Boolean = false,
+        branchModel: Boolean = false,
+        branchPattern: String? = null,
+        validationMetrics: Boolean = true,
     ) {
-        setProperty(this, SonarQubePropertyType::class.java,
-                SonarQubeProperty(
-                        configuration = configuration,
-                        key = key,
-                        validationStamp = stamp,
-                        measures = measures,
-                        override = override,
-                        branchModel = branchModel,
-                        branchPattern = branchPattern
-                )
+        setProperty(
+            this, SonarQubePropertyType::class.java,
+            SonarQubeProperty(
+                configuration = configuration,
+                key = key,
+                validationStamp = stamp,
+                measures = measures,
+                override = override,
+                branchModel = branchModel,
+                branchPattern = branchPattern,
+                validationMetrics = validationMetrics,
+            )
         )
     }
 
@@ -702,21 +806,21 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
      * Testing with some SonarQube measures
      */
     private fun withSonarQubeSettings(
-            measures: List<String> = listOf("measure-1", "measure-2"),
-            disabled: Boolean = false,
-            code: () -> Unit
+        measures: List<String> = listOf("measure-1", "measure-2"),
+        disabled: Boolean = false,
+        code: () -> Unit
     ) {
         val settings = settingsService.getCachedSettings(SonarQubeMeasuresSettings::class.java)
         try {
             // Sets the settings
             asAdmin {
                 settingsManagerService.saveSettings(
-                        SonarQubeMeasuresSettings(
-                                measures = measures,
-                                disabled = disabled,
-                                coverageThreshold = 80,
-                                blockerThreshold = 5
-                        )
+                    SonarQubeMeasuresSettings(
+                        measures = measures,
+                        disabled = disabled,
+                        coverageThreshold = 80,
+                        blockerThreshold = 5
+                    )
                 )
             }
             // Runs the code
@@ -733,25 +837,27 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
      * Testing with a project configured for SonarQube
      */
     private fun withConfiguredProject(
-            key: String,
-            stamp: String = "sonarqube",
-            measures: List<String> = emptyList(),
-            override: Boolean = false,
-            branchModel: Boolean = false,
-            branchPattern: String? = null,
-            code: Project.() -> Unit
+        key: String,
+        stamp: String = "sonarqube",
+        measures: List<String> = emptyList(),
+        override: Boolean = false,
+        branchModel: Boolean = false,
+        branchPattern: String? = null,
+        validationMetrics: Boolean = true,
+        code: Project.() -> Unit
     ) {
         withDisabledConfigurationTest {
             val config = createSonarQubeConfiguration()
             project {
                 setSonarQubeProperty(
-                        configuration = config,
-                        key = key,
-                        stamp = stamp,
-                        measures = measures,
-                        override = override,
-                        branchModel = branchModel,
-                        branchPattern = branchPattern
+                    configuration = config,
+                    key = key,
+                    stamp = stamp,
+                    measures = measures,
+                    override = override,
+                    branchModel = branchModel,
+                    branchPattern = branchPattern,
+                    validationMetrics = validationMetrics,
                 )
                 code()
             }
@@ -759,12 +865,14 @@ class SonarQubeIT : AbstractDSLTestJUnit4Support() {
     }
 
     private fun mockSonarQubeMeasures(key: String, version: String, vararg measures: Pair<String, Double>) {
-        whenever(client.getMeasuresForVersion(
+        whenever(
+            client.getMeasuresForVersion(
                 eq(key),
                 any(),
                 eq(version),
                 any()
-        )).then { invocation ->
+            )
+        ).then { invocation ->
             // List of desired measures
             @Suppress("UNCHECKED_CAST")
             val measureList: List<String> = invocation.arguments[3] as List<String>

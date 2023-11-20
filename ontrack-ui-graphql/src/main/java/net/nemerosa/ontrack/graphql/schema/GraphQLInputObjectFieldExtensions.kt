@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.graphql.schema
 
+import com.fasterxml.jackson.databind.JsonNode
 import graphql.Scalars.*
 import graphql.schema.*
+import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
 import net.nemerosa.ontrack.graphql.support.nullableInputType
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import kotlin.reflect.KProperty
@@ -13,6 +15,15 @@ fun requiredStringInputField(
     .name(name)
     .description(description)
     .type(GraphQLNonNull(GraphQLString))
+    .build()
+
+fun requiredStringListInputField(
+    name: String,
+    description: String,
+): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
+    .name(name)
+    .description(description)
+    .type(GraphQLNonNull(GraphQLList(GraphQLNonNull(GraphQLString))))
     .build()
 
 fun optionalStringInputField(
@@ -61,6 +72,15 @@ fun optionalBooleanInputField(
     .type(GraphQLBoolean)
     .build()
 
+fun requiredBooleanInputField(
+    name: String,
+    description: String,
+): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
+    .name(name)
+    .description(description)
+    .type(GraphQLNonNull(GraphQLBoolean))
+    .build()
+
 fun requiredRefInputField(
     name: String,
     description: String,
@@ -103,17 +123,32 @@ fun listInputType(
 // Typed fields
 // ================================================================================================
 
-fun stringInputField(property: KProperty<String?>, description: String? = null, nullable: Boolean? = null) : GraphQLInputObjectField =
+fun stringInputField(
+    property: KProperty<String?>,
+    description: String? = null,
+    nullable: Boolean? = null
+): GraphQLInputObjectField =
     inputField(property, GraphQLString, description, nullable)
 
-fun booleanInputField(property: KProperty<Boolean?>, description: String? = null, nullable: Boolean? = null) : GraphQLInputObjectField =
+fun booleanInputField(
+    property: KProperty<Boolean?>,
+    description: String? = null,
+    nullable: Boolean? = null
+): GraphQLInputObjectField =
     inputField(property, GraphQLBoolean, description, nullable)
 
-fun intInputField(property: KProperty<Int?>, description: String? = null, nullable: Boolean? = null) : GraphQLInputObjectField =
+fun intInputField(
+    property: KProperty<Int?>,
+    description: String? = null,
+    nullable: Boolean? = null
+): GraphQLInputObjectField =
     inputField(property, GraphQLInt, description, nullable)
 
-fun stringListInputField(property: KProperty<List<String>?>) : GraphQLInputObjectField =
+fun stringListInputField(property: KProperty<List<String>?>): GraphQLInputObjectField =
     inputField(property, GraphQLList(GraphQLNonNull(GraphQLString)))
+
+fun jsonInputField(property: KProperty<JsonNode?>): GraphQLInputObjectField =
+    inputField(property, type = GQLScalarJSON.INSTANCE)
 
 fun inputField(
     property: KProperty<*>,

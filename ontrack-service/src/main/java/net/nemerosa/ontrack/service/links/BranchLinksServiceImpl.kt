@@ -7,7 +7,10 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.links.*
 import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.structure.StructureService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

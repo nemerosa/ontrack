@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.slack.notifications
 
-import net.nemerosa.ontrack.extension.notifications.rendering.AbstractUrlNotificationEventRenderer
+import net.nemerosa.ontrack.model.events.AbstractUrlNotificationEventRenderer
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.support.NameValue
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
-import net.nemerosa.ontrack.ui.controller.ProjectEntityPageBuilder
+import net.nemerosa.ontrack.model.structure.ProjectEntityPageBuilder
 import org.springframework.stereotype.Component
 
 @Component

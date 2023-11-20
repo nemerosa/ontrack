@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.sonarqube.property
 
 import net.nemerosa.ontrack.extension.sonarqube.SonarQubeMeasuresList
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfiguration
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APILabel
 import net.nemerosa.ontrack.model.support.ConfigurationProperty
 import java.net.URLEncoder
 
@@ -12,7 +14,10 @@ class SonarQubeProperty(
     override val measures: List<String>,
     val override: Boolean,
     val branchModel: Boolean,
-    val branchPattern: String?
+    val branchPattern: String?,
+    @APIDescription("If checked, collected SQ measures will be attached as metrics to the validation.")
+    @APILabel("Metrics")
+    val validationMetrics: Boolean,
 ) : ConfigurationProperty<SonarQubeConfiguration>, SonarQubeMeasuresList {
 
     val projectUrl: String

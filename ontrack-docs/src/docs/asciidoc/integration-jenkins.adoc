@@ -11,7 +11,7 @@ Jenkins can inject data into Ontrack - see <<feeding-jenkins>> for this purpose.
 [[integration-jenkins-notifications]]
 ==== Triggering Jenkins builds on notifications
 
-Upon a <<notifications,notification>>, one may want to trigger a Jenkins build. For example, given a <<model,build>> being promoted to a certain level ("BRONZE" for example), one may want to trigger a Jenkins build to complete additional validations. This is a pretty good way to perform long running deployment pipelines (security scans, performance tests, etc.) while avoiding coupling pipelines together.
+Upon a <<notifications,notification>>, one may want to trigger a Jenkins build. For example, given a <<model,build>> being promoted to a certain level ("BRONZE" for example), one may want to trigger a Jenkins build to complete additional validations. This is a pretty good way to perform long-running deployment pipelines (security scans, performance tests, etc.) while avoiding coupling pipelines together.
 
 To do this, a <<notifications,subscription>> can be created at the promotion level, to listen to "new promotion runs" events and to trigger a Jenkins pipeline.
 
@@ -32,15 +32,50 @@ Several remarks:
 
 For example, a parameter value may contain `{Project}`  as a value, indicating that the project name linked to the event the notification is about will be used as a value.
 
-Case variants are available:
+Other placeholders, like `Branch`, `Promotion`, etc., are available, depending on the type of event. Their values can also be updated and encoded. See <<appendix-event-variables>> for a list of options.
 
-* `{PROJECT}` will use the uppercase version
-* `{project}` will use the lowercase version
-* `{Project}` will use the raw value
+[[integration-jenkins-notifications-api]]
+===== Using the API
 
-Other placeholders, like `Branch`, `Promotion`, etc., depending on the type of event.
+The GraphQL API can be used to setup the promotion:
 
-Finally, like all other subscriptions, the Jenkins notifications can be defined <<casc,as code>>. For example, to define a trigger for a promotion level:
+[source,graphql]
+----
+mutation {
+    subscribePromotionLevelToEvents(input: {
+        project: "my-project",
+        branch: "my-branch",
+        promotion: "BRONZE",
+        channel: "jenkins",
+        channelConfig: {
+            config: "my-jenkins-config-name",
+            job: "my-folder/my-pipeline/{scmBranch|urlencode}",
+            parameters: [
+                {
+                    name: "PROMOTION",
+                    value: "{Promotion}"
+                }
+            ],
+            callMode: "ASYNC"
+        },
+        events: [
+            "new_promotion_run"
+        ]
+    }) {
+        errors {
+            message
+        }
+        subscription {
+            id
+        }
+    }
+}
+----
+
+[[integration-jenkins-notifications-casc]]
+===== Definition as code
+
+Like all other subscriptions, the Jenkins notifications can be defined <<casc,as code>>. For example, to define a trigger for a promotion level:
 
 [source,yaml]
 ----
@@ -56,7 +91,7 @@ ontrack:
             - channel: jenkins
               channel-config:
                 config: my-jenkins-config-name
-                job: path/to/pipeline
+                job: "my-folder/my-pipeline/{scmBranch|urlencode}",
                 parameters:
                   - name: PROMOTION
                     value: "{Promotion}"
@@ -64,3 +99,4 @@ ontrack:
               events:
                 - new_promotion_run
 ----
+

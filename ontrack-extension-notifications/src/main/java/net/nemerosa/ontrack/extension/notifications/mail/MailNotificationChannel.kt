@@ -4,9 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.SimpleExpand
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
-import net.nemerosa.ontrack.extension.notifications.rendering.HtmlNotificationEventRenderer
+import net.nemerosa.ontrack.model.events.HtmlNotificationEventRenderer
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.events.EventVariableService
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.textField
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component
 class MailNotificationChannel(
     private val mailService: MailService,
     private val htmlNotificationEventRenderer: HtmlNotificationEventRenderer,
+    private val eventVariableService: EventVariableService,
 ) : AbstractNotificationChannel<MailNotificationChannelConfig>(MailNotificationChannelConfig::class) {
 
     override val type: String = "mail"
@@ -37,7 +39,7 @@ class MailNotificationChannel(
 
     override fun publish(config: MailNotificationChannelConfig, event: Event): NotificationResult {
         // Subject as a template
-        val parameters = event.getTemplateParameters(caseVariants = true)
+        val parameters = eventVariableService.getTemplateParameters(event, caseVariants = true)
         val subject = SimpleExpand.expand(config.subject, parameters)
         // Formatting the message
         val message = event.render(htmlNotificationEventRenderer)

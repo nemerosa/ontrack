@@ -15,8 +15,14 @@ public class UIEvent {
     private final String template;
     private final Signature signature;
     private final Map<ProjectEntityType, ProjectEntity> entities;
+    private final Map<ProjectEntityType, ProjectEntity> extraEntities;
     private final ProjectEntityType ref;
     private final Map<String, NameValue> values;
+
+    /**
+     * HTML rendering
+     */
+    private final String html;
 
     /**
      * Additional data processed from the values or entities
