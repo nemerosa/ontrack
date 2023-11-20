@@ -72,6 +72,26 @@ function BranchLinksFlow({branch}) {
                     targetBuild {
                         ...BuildInfo
                     }
+                    autoVersioning {
+                        lastEligibleBuild {
+                            ...BuildInfo
+                        }
+                        status {
+                            order {
+                                targetVersion
+                            }
+                            running
+                            mostRecentState {
+                              state
+                              running
+                              processing
+                              creation {
+                                  time
+                              }
+                              data
+                            }
+                        }
+                    }
                     branch {
                         ...BranchNodeInfo
                         ${gqlDownstreamDependencies(depth - 1)}
@@ -304,7 +324,7 @@ function BranchLinksFlow({branch}) {
                 nodes,
                 edges,
                 nodeWidth: 220,
-                nodeHeight: (node) => node.type === 'branch' ? 150 : 100,
+                nodeHeight: (node) => node.type === 'branch' ? 220 : 100,
                 setNodes,
                 setEdges,
             })

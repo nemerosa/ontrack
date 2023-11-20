@@ -1,32 +1,13 @@
 import {Handle, Position} from "reactflow";
-import {Card, Space, Tooltip, Typography} from "antd";
-import {branchLink, branchUri, projectLink} from "@components/common/Links";
+import {Card, Space, Typography} from "antd";
+import {branchUri, projectLink} from "@components/common/Links";
 import {FaArrowCircleLeft, FaLink} from "react-icons/fa";
 import Timestamp from "@components/common/Timestamp";
 import Link from "next/link";
 import BuildRef from "@components/links/BuildRef";
 import BuildPromotions from "@components/links/BuildPromotions";
 import BranchDisplayNameLink from "@components/links/BranchDisplayNameLink";
-
-function NodeSection({icon, title, children}) {
-    return (
-        <>
-            <Space
-                direction="vertical"
-                style={{
-                    borderTop: "solid 1px gray",
-                    padding: '8px',
-                }}
-            >
-                <Space>
-                    {icon}
-                    {title}
-                </Space>
-                {children}
-            </Space>
-        </>
-    )
-}
+import {NodeSection} from "@components/links/NodeSection";
 
 export default function BranchNode({data}) {
 

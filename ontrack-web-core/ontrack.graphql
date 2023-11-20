@@ -446,6 +446,8 @@ type BranchInfos {
 
 "Qualified link to a branch"
 type BranchLink {
+    "Auto versioning information for this link, in regards to the relationship from the source branch to the target branch."
+    autoVersioning: BuildAutoVersioning
     "Linked branch"
     branch: Branch!
     "Nature/qualification of the link"

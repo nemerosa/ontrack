@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
 
 @Component
-class AutoVersioningGQLBranchFieldContributor(
+class AutoVersioningConfigGQLBranchFieldContributor(
     private val gqlTypeAutoVersioningConfig: GQLTypeAutoVersioningConfig,
     private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
 ) : GQLProjectEntityFieldContributor {
